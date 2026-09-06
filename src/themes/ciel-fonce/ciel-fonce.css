@@ -19,15 +19,6 @@
      l'y concentrer, et l'obscurité s'étire de coin à coin sans qu'aucune
      valeur ne le lui demande.
 
-     LA BANDE SOMBRE EST LARGE ET FONDUE (2026-09-06, « élargis et fond la
-     bande foncée diagonale ») : au lieu d'un seul arrêt sombre au milieu, elle
-     tient un PLATEAU de 36 % à 64 % de l'axe — près d'un tiers de la course —
-     et deux ÉPAULES intermédiaires (#162237 à 18 %, #1d2a44 à 82 %) fondent
-     ses bords. Sans elles, l'élargissement du plateau laissait deux lisières
-     nettes de part et d'autre : c'est le fondu qui les efface, pas la largeur.
-     Les deux épaules sont calculées entre les teintes voisines, en OKLCH, et
-     non choisies à l'œil.
-
      Les deux bouts sont les deux éclaircissements, INÉGAUX comme demandé :
      - en haut à droite, le plus clair : #394f7a, L 43,0 % ;
      - en bas à gauche, plus léger : #22314e, L 31,5 % — le bleu de nuit de la
@@ -44,10 +35,7 @@
   --fond: linear-gradient(
     to top right,
     #22314e 0%,
-    #162237 18%,
-    #0d1626 36%,
-    #0d1626 64%,
-    #1d2a44 82%,
+    #0d1626 50%,
     #394f7a 100%
   );
 
