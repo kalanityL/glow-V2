@@ -19,7 +19,12 @@
 
   /* Encres sur fond sombre */
   --on-dark: #ffffff;
-  --on-dark-55: rgba(255, 255, 255, 0.55);
+  /* LES DEUX GRIS DU THÈME, ÉCLAIRCIS le 2026-09-06 : le chapeau passe de
+     55 % à 72 % de blanc, le surtitre de 62 % à 78 %. Le surtitre reste le
+     plus clair des deux, comme avant — il est en capitales espacées, plus
+     maigre à l'œil, et s'éteindrait le premier. */
+  --on-dark-72: rgba(255, 255, 255, 0.72);
+  --on-dark-78: rgba(255, 255, 255, 0.78);
 
   --font-display: 'Outfit', system-ui, sans-serif;
   --font-body: 'Plus Jakarta Sans', system-ui, sans-serif;
@@ -127,7 +132,7 @@
   text-transform: uppercase;
   letter-spacing: 0.36em;
   font-size: 11px;
-  color: rgba(255, 255, 255, 0.62);
+  color: var(--on-dark-78);
 }
 
 .gate__eyebrow {
@@ -151,5 +156,5 @@
   margin: 10px 0 26px;
   font-size: 14px;
   line-height: 1.6;
-  color: var(--on-dark-55);
+  color: var(--on-dark-72);
 }

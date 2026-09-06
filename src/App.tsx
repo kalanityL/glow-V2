@@ -1,3 +1,4 @@
+import { useTextes } from './i18n/useTextes';
 import { CielPage } from './themes/ciel/CielPage';
 import './themes/ciel/ciel.css';
 
@@ -11,6 +12,8 @@ import './themes/ciel/ciel.css';
  * ordinaire — ce dépôt n'a ni Tailwind ni bibliothèque d'icônes.
  */
 export default function App() {
+  const textes = useTextes();
+
   return (
     <div className="app-root">
       {/* Le contour du téléphone, dessiné en dur — bordure épaisse sombre et
@@ -36,8 +39,8 @@ export default function App() {
           <button
             type="button"
             className="phone-bar-back"
-            title="Retour"
-            aria-label="Retour"
+            title={textes.retour}
+            aria-label={textes.retour}
             aria-disabled
             disabled
           >

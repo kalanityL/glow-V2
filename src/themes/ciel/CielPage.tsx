@@ -1,5 +1,6 @@
 import { Logomark } from '../../components/Logomark';
 import { Wordmark } from '../../components/Wordmark';
+import { useTextes } from '../../i18n/useTextes';
 
 /**
  * LA PAGE DU THÈME CIEL — le premier thème de V2.
@@ -10,10 +11,13 @@ import { Wordmark } from '../../components/Wordmark';
  * DEUX ÉCARTS VOULUS, demandés le 2026-09-06 :
  *   - AUCUN FORMULAIRE — ni champs, ni bouton « Entrer » ;
  *   - les trois textes sont des « hello world », le temps que le thème
- *     s'installe.
+ *     s'installe. Ils viennent du dictionnaire, comme tout texte du projet :
+ *     rien n'est écrit en dur dans un écran.
  * L'ENTÊTE, LUI, RESTE TEL QUEL : pastille et mot-symbole, sans retouche.
  */
 export function CielPage() {
+  const textes = useTextes();
+
   return (
     <div className="gate">
       <div className="gate__card">
@@ -22,9 +26,9 @@ export function CielPage() {
           <Wordmark />
         </div>
 
-        <p className="eyebrow gate__eyebrow">hello world</p>
-        <h1 className="gate__title">hello world</h1>
-        <p className="gate__lede">hello world</p>
+        <p className="eyebrow gate__eyebrow">{textes.ciel.surtitre}</p>
+        <h1 className="gate__title">{textes.ciel.titre}</h1>
+        <p className="gate__lede">{textes.ciel.chapeau}</p>
       </div>
     </div>
   );
