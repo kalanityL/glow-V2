@@ -8,62 +8,14 @@
    permet de passer de l'un à l'autre sans que rien d'autre ne remue. */
 
 .theme-ciel-fonce {
-  /* LE FOND, EN TROIS TEMPS (2026-09-06) — « je veux aussi un éclaircissement
-     en bas à gauche, plus léger, et que le plus sombre du fond se concentre
-     sur la diagonale haut gauche / bas droit ».
-
-     UN SEUL dégradé linéaire suffit, et c'est de la géométrie, pas une
-     astuce : la ligne d'un dégradé `to top right` est PERPENDICULAIRE à la
-     diagonale haut gauche / bas droit. L'arrêt du milieu tombe donc
-     exactement sur cette diagonale — y poser la teinte la plus sombre, c'est
-     l'y concentrer, et l'obscurité s'étire de coin à coin sans qu'aucune
-     valeur ne le lui demande.
-
-     LA BANDE SOMBRE EST LARGE, ET ÉLARGIE PAR LE DÉGRADÉ LUI-MÊME
-     (2026-09-06, « Elargit et fond en la dégradant » — un premier essai
-     l'élargissait par un PLATEAU de teinte constante bordé de deux épaules ;
-     il a été annulé, une teinte plate n'est pas un dégradé).
-
-     Ici, aucune teinte ne se répète : la clarté PLONGE VITE en approchant du
-     milieu puis remonte lentement, ce qui creuse le fond sur une plage large
-     tout en le faisant varier partout. La courbe est `x^0,45` — `x` étant la
-     part du chemin faite vers le milieu —, et les onze arrêts en sont
-     l'échantillonnage, calculé en OKLCH et non choisi à l'œil. Résultat : la
-     clarté reste sous 23 % du quart au deux tiers de la course, sans qu'un
-     seul segment soit uni.
-
-     Les deux bouts sont les deux éclaircissements, INÉGAUX comme demandé :
-     - en haut à droite, le plus clair : #394f7a, L 43,0 % ;
-     - en bas à gauche, plus léger : #15223b, L 25,5 %. IL A ÉTÉ ASSOMBRI le
-       2026-09-06 (« fais la partie basse gauche plus sombre ») : il valait
-       #22314e, L 31,5 %, soit le milieu exact entre l'ombre et le coin clair,
-       et pesait trop face au haut droit. À 25,5 %, il n'est plus qu'à un tiers
-       du chemin — l'éclaircissement se voit encore, sans disputer le coin
-       clair. Tout son versant a été recalculé sur la même courbe : c'est le
-       BOUT qui change, pas la loi du dégradé ;
-     - au milieu, sur la diagonale, le plus sombre : #0d1626, L 19,9 %.
-
-     Les trois clartés sont mesurées en OKLCH et gardent l'écart de Ciel (23,1
-     points entre l'ombre et le coin le plus clair) : c'est ce qui donne au
-     fond le même relief que le thème clair.
-
-     Un dégradé LINÉAIRE, et non deux halos radiaux : React Native sait poser
-     un dégradé linéaire à plusieurs arrêts, là où un halo radial demanderait
-     du SVG. Le dessin doit pouvoir passer en natif tel quel. */
-  --fond: linear-gradient(
-    to top right,
-    #15223b 0%,
-    #111b2f 14%,
-    #0f192b 28%,
-    #0e1728 40%,
-    #0d1626 50%,
-    #111b2d 60%,
-    #162238 72%,
-    #1c2a43 82%,
-    #23324f 90%,
-    #2a3c5d 96%,
-    #394f7a 100%
-  );
+  /* LE MÊME EFFET DE DÉGRADÉ QUE CIEL (2026-09-06) : un premier essai avait
+     resserré l'écart entre les deux teintes, et le fond paraissait plat.
+     L'écart est donc REPRIS À L'IDENTIQUE de Ciel, mesuré en OKLCH — 23,1
+     points de clarté et 0,040 de chroma entre les deux bouts —, puis centré
+     sur le bleu de nuit demandé (#22314e). D'où ces deux teintes, calculées et
+     non choisies à l'œil : #0d1626 (L 19,9 %) et #394f7a (L 43,0 %).
+     Même géométrie que Ciel : le coin le plus clair est en haut à droite. */
+  --fond: linear-gradient(to top right, #0d1626 0%, #394f7a 100%);
 
   --accent: #5fc0ff;
 
