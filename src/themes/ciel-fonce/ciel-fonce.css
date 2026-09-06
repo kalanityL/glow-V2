@@ -14,8 +14,42 @@
      points de clarté et 0,040 de chroma entre les deux bouts —, puis centré
      sur le bleu de nuit demandé (#22314e). D'où ces deux teintes, calculées et
      non choisies à l'œil : #0d1626 (L 19,9 %) et #394f7a (L 43,0 %).
-     Même géométrie que Ciel : le coin le plus clair est en haut à droite. */
-  --fond: linear-gradient(to top right, #0d1626 0%, #394f7a 100%);
+     Même géométrie que Ciel : le coin le plus clair est en haut à droite.
+
+     LE FONCÉ GRIMPE EN DIAGONALE, SANS FONCER LE HAUT DROIT (2026-09-06,
+     « fais grimper le foncé un peu plus en diagonal vers le haut droit, sans
+     foncer la partie haut droite »).
+
+     La contrainte est double, et c'est elle qui donne la forme de la courbe :
+     l'ombre doit monter PLUS LOIN le long de l'axe, mais le coin clair doit
+     rester exactement aussi clair. Une simple puissance (`t^1,45`, un essai
+     précédent) fait les deux à la fois — elle assombrit aussi le haut droit,
+     de deux à trois points de clarté.
+
+     D'où une courbe qui CREUSE PUIS SE RÉSORBE. L'écart à la droite, en points
+     de clarté OKLCH :
+
+       15 %  -2,8      60 %  -6,0      90 %  -1,4
+       30 %  -4,8      72 %  -4,6      95 %  -0,7
+       45 %  -6,0      82 %  -2,8     100 %   0,0
+
+     Le retard est maximal aux deux tiers de la course — c'est là que l'ombre
+     gagne du terrain — et il est refermé avant le coin, qui garde sa clarté au
+     dixième de point près. Les dix arrêts sont l'échantillonnage de cette
+     courbe, calculés en OKLCH ; aucun ne répète le précédent. */
+  --fond: linear-gradient(
+    to top right,
+    #0d1626 0%,
+    #0e1828 15%,
+    #111b2d 30%,
+    #152035 45%,
+    #1b2841 60%,
+    #233250 72%,
+    #2b3d5f 82%,
+    #31456c 90%,
+    #354a73 95%,
+    #394f7a 100%
+  );
 
   --accent: #5fc0ff;
 
