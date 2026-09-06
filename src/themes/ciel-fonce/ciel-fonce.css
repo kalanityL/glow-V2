@@ -34,8 +34,13 @@
 
      Les deux bouts sont les deux éclaircissements, INÉGAUX comme demandé :
      - en haut à droite, le plus clair : #394f7a, L 43,0 % ;
-     - en bas à gauche, plus léger : #22314e, L 31,5 % — le bleu de nuit de la
-       capture, à mi-chemin entre l'ombre et le coin clair ;
+     - en bas à gauche, plus léger : #15223b, L 25,5 %. IL A ÉTÉ ASSOMBRI le
+       2026-09-06 (« fais la partie basse gauche plus sombre ») : il valait
+       #22314e, L 31,5 %, soit le milieu exact entre l'ombre et le coin clair,
+       et pesait trop face au haut droit. À 25,5 %, il n'est plus qu'à un tiers
+       du chemin — l'éclaircissement se voit encore, sans disputer le coin
+       clair. Tout son versant a été recalculé sur la même courbe : c'est le
+       BOUT qui change, pas la loi du dégradé ;
      - au milieu, sur la diagonale, le plus sombre : #0d1626, L 19,9 %.
 
      Les trois clartés sont mesurées en OKLCH et gardent l'écart de Ciel (23,1
@@ -47,10 +52,10 @@
      du SVG. Le dessin doit pouvoir passer en natif tel quel. */
   --fond: linear-gradient(
     to top right,
-    #22314e 0%,
-    #162137 14%,
-    #121c2f 28%,
-    #0f182a 40%,
+    #15223b 0%,
+    #111b2f 14%,
+    #0f192b 28%,
+    #0e1728 40%,
     #0d1626 50%,
     #111b2d 60%,
     #162238 72%,
