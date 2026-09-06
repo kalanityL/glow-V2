@@ -1,0 +1,132 @@
+/* LA STRUCTURE DE LA PAGE — commune à TOUS les thèmes.
+
+   Trois étages étanches, et cette feuille est celui du milieu :
+     1. les écrans (`src/screens/`) ne posent que des CLASSES ;
+     2. CETTE feuille dit la mise en page, les tailles et les rapports, et ne
+        nomme AUCUNE couleur : elle ne fait que consommer des jetons ;
+     3. la feuille de chaque thème (`src/themes/<id>/`) pose les jetons, et
+        rien d'autre.
+
+   Ajouter un thème ne demande donc jamais de toucher ici. Si une couleur
+   apparaît dans ce fichier, c'est une faute : elle appartient à un thème. */
+
+.page {
+  flex: 1;
+  min-height: 0;
+  /* Le contenu commence en haut : pas de centrage vertical. */
+  display: block;
+  overflow-y: auto;
+  /* Marges réduites, PAS supprimées — le contenu ne doit pas venir toucher le
+     bord de l'écran, y compris à 320 px de large. */
+  padding: 16px;
+  font-family: var(--font-body);
+  color: var(--encre);
+  background: var(--fond);
+  -webkit-font-smoothing: antialiased;
+}
+
+/* La colonne de lecture, à même la page : ni contour, ni fond, ni ombre. */
+.page__colonne {
+  width: 100%;
+  max-width: 380px;
+  display: flex;
+  flex-direction: column;
+}
+
+/* ── L'ENTÊTE ───────────────────────────────────────────────────────────── */
+
+.entete {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 26px;
+}
+
+.logomark {
+  flex: none;
+  width: var(--logo-size, 36px);
+  height: var(--logo-size, 36px);
+  /* L'arrondi et le dessin se déduisent de la taille : la pastille garde sa
+     forme à n'importe quelle échelle, y compris fluide. */
+  border-radius: calc(var(--logo-size, 36px) * 0.263);
+  display: grid;
+  place-items: center;
+  background: linear-gradient(to top right, var(--logo-from) 0%, var(--logo-via) 50%, var(--logo-to) 100%);
+  box-shadow: var(--logo-ombre);
+}
+
+.logomark svg {
+  display: block;
+  width: 80%;
+  height: 80%;
+}
+
+.wordmark {
+  /* UNE MARQUE NE SE RETOURNE PAS : en langue droite-à-gauche, le document
+     retourne l'ordre des enfants flex, mot-symbole compris — « G·LP1·LOW » s'y
+     lirait « LOW·LP1·G ». `direction: ltr` l'en isole. */
+  direction: ltr;
+  font-family: var(--font-display);
+  font-weight: 900;
+  font-size: 26px;
+  line-height: 1;
+  letter-spacing: -0.025em;
+}
+
+.wordmark__lockup {
+  display: flex;
+  align-items: center;
+}
+
+/* G et LOW étirés en hauteur SEULEMENT, pour couvrir la colonne L/P/1 qui les
+   dépasse. La largeur ne bouge pas. L'étirement se voit : c'est voulu. */
+.wordmark__g,
+.wordmark__low {
+  transform: scaleY(1.26);
+}
+
+.wordmark__g {
+  font-weight: 800;
+}
+
+/* La colonne L/P/1 : corps, interligne, air de rang et marges latérales
+   arrivent du composant, tous rapportés à sa propre échelle. */
+.wordmark__lp1 {
+  display: flex;
+  flex-direction: column;
+  font-weight: 900;
+  text-transform: uppercase;
+  text-align: center;
+  user-select: none;
+  color: var(--accent);
+}
+
+/* ── LES TEXTES ─────────────────────────────────────────────────────────── */
+
+.surtitre {
+  font-family: var(--font-display);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.36em;
+  font-size: 11px;
+  margin: 0;
+  color: var(--encre-surtitre);
+}
+
+.titre {
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: 25px;
+  line-height: 1.15;
+  letter-spacing: -0.02em;
+  text-wrap: balance;
+  margin: 12px 0 0;
+  color: var(--encre);
+}
+
+.chapeau {
+  margin: 10px 0 26px;
+  font-size: 14px;
+  line-height: 1.6;
+  color: var(--encre-chapeau);
+}

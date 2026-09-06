@@ -1,0 +1,33 @@
+/* LE THÈME CIEL FONCÉ — le second thème, la nuit du premier.
+
+   Des JETONS, et rien d'autre : la mise en page est dans `themes/page.css` et
+   ne bouge pas d'un thème à l'autre.
+
+   Il garde TOUT ce qui fait le dessin de Ciel — la géométrie du dégradé, la
+   marque, les rapports d'encre — et n'en change que la lumière. C'est ce qui
+   permet de passer de l'un à l'autre sans que rien d'autre ne remue. */
+
+.theme-ciel-fonce {
+  /* Le même dégradé, du même coin sombre vers le même coin clair en haut à
+     droite, mais dans les bleus de nuit. L'écart entre les deux teintes est
+     resserré : dans le sombre, le même écart se verrait comme une tache. */
+  --fond: linear-gradient(to top right, #1b2740 0%, #2c3f60 100%);
+
+  --accent: #5fc0ff;
+
+  /* La marque ne change pas — mais son halo est rentré : sur un fond de nuit,
+     le halo de plein jour bavait autour de la pastille. */
+  --logo-from: oklch(74.6% 0.16 232.661);
+  --logo-via: #0284c7;
+  --logo-to: oklch(76.5% 0.177 163.223);
+  --logo-ombre: 0 6px 16px -8px rgba(14, 165, 233, 0.55);
+
+  /* Les mêmes rapports d'encre que Ciel : le titre le plus lumineux, le
+     surtitre juste derrière, le chapeau ensuite. */
+  --encre: #ffffff;
+  --encre-surtitre: rgba(255, 255, 255, 0.9);
+  --encre-chapeau: rgba(255, 255, 255, 0.86);
+
+  --font-display: 'Outfit', system-ui, sans-serif;
+  --font-body: 'Plus Jakarta Sans', system-ui, sans-serif;
+}

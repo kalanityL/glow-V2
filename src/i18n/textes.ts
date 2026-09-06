@@ -26,7 +26,7 @@ export const LANGUE_PAR_DEFAUT: Langue = 'fr';
 
 /** Le contrat : chaque langue doit porter exactement ces clés. */
 export interface Textes {
-  ciel: {
+  accueil: {
     surtitre: string;
     titre: string;
     chapeau: string;
@@ -37,7 +37,7 @@ export interface Textes {
 
 export const TEXTES: Record<Langue, Textes> = {
   fr: {
-    ciel: {
+    accueil: {
       surtitre: 'hello world',
       titre: 'hello world',
       chapeau: 'hello world',
@@ -45,7 +45,7 @@ export const TEXTES: Record<Langue, Textes> = {
     retour: 'Retour',
   },
   en: {
-    ciel: {
+    accueil: {
       surtitre: 'hello world',
       titre: 'hello world',
       chapeau: 'hello world',

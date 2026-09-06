@@ -1,12 +1,17 @@
 import { useTextes } from './i18n/useTextes';
-import { CielPage } from './themes/ciel/CielPage';
+import { Accueil } from './screens/Accueil';
+/* La mise en page d'abord, les jetons des thèmes ensuite : les feuilles de
+   thème doivent pouvoir battre la structure, jamais l'inverse. */
+import './themes/page.css';
 import './themes/ciel/ciel.css';
+import './themes/ciel-fonce/ciel-fonce.css';
 
 /**
  * V2 — repartie de zéro.
  *
  * Pour l'instant : le cadre du téléphone, sa barre du bas avec le bouton
- * « retour », et entre les deux l'unique page du seul thème, Ciel.
+ * « retour », et entre les deux l'unique page, habillée par le thème actif
+ * (voir `themes/themes.ts` : c'est là, et là seulement, qu'on en change).
  *
  * Le cadre et le bouton sont repris de la version Mixte, réécrits en CSS
  * ordinaire — ce dépôt n'a ni Tailwind ni bibliothèque d'icônes.
@@ -28,7 +33,7 @@ export default function App() {
             éléments `position: fixed` qu'il abritera : les popups s'y
             centreront, plutôt que dans la fenêtre du navigateur. */}
         <div className="phone-screen" id="phone-screen">
-          <CielPage />
+          <Accueil />
         </div>
 
         {/* La barre du bas, hors écran : elle figure le menu natif du
