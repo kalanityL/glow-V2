@@ -8,10 +8,14 @@
    permet de passer de l'un à l'autre sans que rien d'autre ne remue. */
 
 .theme-ciel-fonce {
-  /* Le même dégradé, du même coin sombre vers le même coin clair en haut à
-     droite, mais dans les bleus de nuit. L'écart entre les deux teintes est
-     resserré : dans le sombre, le même écart se verrait comme une tache. */
-  --fond: linear-gradient(to top right, #1b2740 0%, #2c3f60 100%);
+  /* LE MÊME EFFET DE DÉGRADÉ QUE CIEL (2026-09-06) : un premier essai avait
+     resserré l'écart entre les deux teintes, et le fond paraissait plat.
+     L'écart est donc REPRIS À L'IDENTIQUE de Ciel, mesuré en OKLCH — 23,1
+     points de clarté et 0,040 de chroma entre les deux bouts —, puis centré
+     sur le bleu de nuit demandé (#22314e). D'où ces deux teintes, calculées et
+     non choisies à l'œil : #0d1626 (L 19,9 %) et #394f7a (L 43,0 %).
+     Même géométrie que Ciel : le coin le plus clair est en haut à droite. */
+  --fond: linear-gradient(to top right, #0d1626 0%, #394f7a 100%);
 
   --accent: #5fc0ff;
 
