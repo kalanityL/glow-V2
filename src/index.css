@@ -1,0 +1,11 @@
+/* Le socle, et rien de plus : une page blanche, sans marge. */
+html,
+body,
+#root {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  background: #ffffff;
+}
