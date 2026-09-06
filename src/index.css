@@ -1,4 +1,15 @@
-/* Le socle, et rien de plus : une page blanche, sans marge. */
+/* Le socle : la fenêtre, le cadre du téléphone, sa barre du bas. Rien de
+   thématique — aucune couleur d'application n'est encore choisie. */
+
+/* Bordures et rembourrages comptés DANS les dimensions : sans cela, les 10 px
+   de contour et le rembourrage de la fenêtre s'ajoutent aux hauteurs en
+   pourcentage et la barre du bas passe sous le pli. */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
 html,
 body,
 #root {
@@ -8,4 +19,100 @@ body,
 body {
   margin: 0;
   background: #ffffff;
+  font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+}
+
+/* La fenêtre autour du téléphone : le cadre y est centré. */
+.app-root {
+  height: 100dvh;
+  width: 100vw;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  background: #f1f5f9;
+  padding: 0;
+}
+
+/* Au-dessus du format téléphone, on décolle le cadre du bord. */
+@media (min-width: 768px) {
+  .app-root {
+    padding: 1rem;
+  }
+}
+
+/* Le téléphone lui-même : bordure épaisse sombre, coins très arrondis. */
+.phone-frame {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  height: 100%;
+  min-width: 300px;
+  max-width: 480px;
+  overflow: hidden;
+  border: 10px solid #0f172a;
+  border-radius: 36px;
+  background: #ffffff;
+  box-shadow: 0 25px 50px -12px rgb(0 0 0 / 0.25);
+}
+
+@media (min-width: 768px) {
+  .phone-frame {
+    width: 45vw;
+  }
+}
+
+/* L'écran : tout l'espace laissé par la barre du bas. */
+.phone-screen {
+  position: relative;
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  transform: translateZ(0);
+}
+
+/* La barre du bas, qui figure le menu natif. */
+.phone-bar {
+  z-index: 30;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.375rem 0.5rem;
+  background: #0f172a;
+}
+
+.phone-bar-back {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.25rem;
+  height: 2rem;
+  padding: 0;
+  border: 1px solid #334155;
+  border-radius: 0.5rem;
+  background: #1e293b;
+  color: #e2e8f0;
+  transition: all 150ms;
+}
+
+/* Sans historique : à moitié éteint, et sans main au survol. */
+.phone-bar-back[aria-disabled='true'] {
+  opacity: 0.4;
+  cursor: default;
+}
+
+.phone-bar-back:not([aria-disabled='true']) {
+  cursor: pointer;
+}
+
+.phone-bar-back:not([aria-disabled='true']):active {
+  transform: scale(0.95);
+}
+
+.phone-bar-back svg {
+  width: 1.25rem;
+  height: 1.25rem;
 }
