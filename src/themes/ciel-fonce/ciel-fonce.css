@@ -40,15 +40,28 @@
      DEUX RETOUCHES DU 2026-09-06 (« monte encore un tout petit peu le foncé
      sans changer le clair haut droit, et eclaircis legerement le bas gauche ») :
 
-     - L'OMBRE MONTE ENCORE, de quatre à sept points de course : les clartés
-       qui tombaient à 45, 60, 72, 82 et 90 % de l'axe tombent maintenant à 52,
-       64, 76, 85 et 92 %. Les VALEURS sont les mêmes, ce sont leurs POSITIONS
-       qui glissent vers le haut — c'est ce qui fait monter l'ombre sans rien
-       assombrir.
-     - LE COIN BAS GAUCHE S'ÉCLAIRCIT, de L 20,0 % à 22,5 %. Le point le plus
-       sombre n'est donc plus dans le coin mais un quart plus haut, à 25 % de
-       l'axe : l'ombre est une BANDE qui traverse, et le coin n'en est plus le
-       creux.
+     - L'OMBRE MONTE PAR GLISSEMENT, deux fois de suite. Les VALEURS ne
+       changent jamais : ce sont leurs POSITIONS qui remontent l'axe, et c'est
+       ce qui fait grimper l'ombre sans qu'un seul point de l'écran devienne
+       plus sombre qu'avant.
+
+           creux     45 % -> 52 % -> 57 %
+                     60 % -> 64 % -> 68 %
+                     72 % -> 76 % -> 79 %
+                     82 % -> 85 % -> 87 %
+                     90 % -> 92 % -> 93 %
+
+       Les arrêts se resserrent d'autant près du coin clair : la même montée de
+       clarté s'y fait sur une course plus courte, donc plus vite. C'est la
+       contrepartie mécanique du glissement, et la limite de la manœuvre — au
+       glissement suivant, la fin deviendra raide et se lira comme une lisière.
+     - LE COIN BAS GAUCHE S'ÉCLAIRCIT, de L 20,0 % à 22,5 %, puis à 25,0 % à
+       la demande suivante (« éclaricit un peu plus le bas gauche »). Le point
+       le plus sombre n'est donc plus dans le coin mais un quart plus haut, à
+       25 % de l'axe : l'ombre est une BANDE qui traverse, et le coin n'en est
+       plus le creux. L'arrêt de 12 % suit (L 20,6 % -> 21,4 %) pour que la
+       descente vers le creux garde sa pente : sans lui, le coin plongeait
+       d'un coup.
      - Le coin haut droit ne bouge pas : #394f7a, L 43,0 %, comme demandé.
 
      Les onze arrêts sont l'échantillonnage de la courbe, calculés en OKLCH ;
@@ -56,16 +69,16 @@
      course. */
   --fond: linear-gradient(
     to top right,
-    #111c2e 0%,
-    #0e1728 12%,
-    #0d1626 25%,
-    #101a2c 40%,
-    #152035 52%,
-    #1b2841 64%,
-    #233250 76%,
-    #2b3d5f 85%,
-    #31456b 92%,
-    #354a73 96%,
+    #162137 0%,
+    #0f192a 14%,
+    #0d1626 29%,
+    #101a2c 45%,
+    #152035 57%,
+    #1b2841 68%,
+    #233250 79%,
+    #2b3d5f 87%,
+    #31456b 93%,
+    #354a73 96.5%,
     #394f7a 100%
   );
 
