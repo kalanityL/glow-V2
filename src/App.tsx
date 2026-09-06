@@ -1,9 +1,11 @@
+import { CielPage } from './themes/ciel/CielPage';
+import './themes/ciel/ciel.css';
+
 /**
  * V2 — repartie de zéro.
  *
  * Pour l'instant : le cadre du téléphone, sa barre du bas avec le bouton
- * « retour », et un écran blanc entre les deux. Aucune page, aucune
- * fonctionnalité, aucun thème, aucun template.
+ * « retour », et entre les deux l'unique page du seul thème, Ciel.
  *
  * Le cadre et le bouton sont repris de la version Mixte, réécrits en CSS
  * ordinaire — ce dépôt n'a ni Tailwind ni bibliothèque d'icônes.
@@ -22,7 +24,9 @@ export default function App() {
             Le `translateZ(0)` fait de cet écran le bloc conteneur des
             éléments `position: fixed` qu'il abritera : les popups s'y
             centreront, plutôt que dans la fenêtre du navigateur. */}
-        <div className="phone-screen" id="phone-screen" />
+        <div className="phone-screen" id="phone-screen">
+          <CielPage />
+        </div>
 
         {/* La barre du bas, hors écran : elle figure le menu natif du
             téléphone — d'où sa livrée sombre, assortie au contour — avec le

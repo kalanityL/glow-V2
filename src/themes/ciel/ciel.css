@@ -1,0 +1,162 @@
+/* LE THÈME CIEL — le premier thème de V2.
+
+   Toute la matière du thème vit ici : les jetons, le ciel, la carte de verre,
+   la marque et les textes. Rien de tout cela n'est écrit dans les composants,
+   qui ne posent que des classes. */
+
+.gate {
+  /* Les jetons du thème. Ils sont posés SUR LA PAGE et non sur `:root` :
+     un deuxième thème aura les siens, sans se marcher dessus. */
+  --c-deep: #0b3c63;
+  --c-mid: #2e7fbe;
+
+  --sky: #5fc0ff;
+
+  /* Les trois teintes du dégradé de la pastille. */
+  --logo-from: oklch(74.6% 0.16 232.661);
+  --logo-via: #0284c7;
+  --logo-to: oklch(76.5% 0.177 163.223);
+
+  /* Verre */
+  --glass: rgba(255, 255, 255, 0.08);
+  --glass-line: rgba(255, 255, 255, 0.22);
+
+  /* Encres sur fond sombre */
+  --on-dark: #ffffff;
+  --on-dark-55: rgba(255, 255, 255, 0.55);
+
+  --radius-lg: 22px;
+
+  --font-display: 'Outfit', system-ui, sans-serif;
+  --font-body: 'Plus Jakarta Sans', system-ui, sans-serif;
+
+  flex: 1;
+  min-height: 0;
+  display: grid;
+  place-items: center;
+  overflow-y: auto;
+  padding: 28px;
+  font-family: var(--font-body);
+  color: var(--on-dark);
+  background: linear-gradient(168deg, var(--c-deep) 0%, var(--c-mid) 100%);
+  -webkit-font-smoothing: antialiased;
+}
+
+/* LA CARTE DE VERRE. Le `backdrop-filter` est le seul effet coûteux de la
+   page ; il n'a rien à flouter tant que le ciel est uni, mais il est gardé
+   pour le jour où quelque chose passera dessous. */
+.gate__card {
+  width: 100%;
+  max-width: 380px;
+  display: flex;
+  flex-direction: column;
+  border: 1px solid var(--glass-line);
+  border-radius: var(--radius-lg);
+  background: var(--glass);
+  backdrop-filter: blur(14px);
+  padding: 34px 30px 30px;
+  box-shadow: 0 40px 90px -40px rgba(0, 0, 0, 0.7);
+}
+
+/* ── L'ENTÊTE, tel quel ─────────────────────────────────────────────────── */
+
+.gate__mark {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 26px;
+}
+
+.logomark {
+  flex: none;
+  width: var(--logo-size, 36px);
+  height: var(--logo-size, 36px);
+  /* L'arrondi et le dessin se déduisent de la taille : la pastille garde sa
+     forme à n'importe quelle échelle, y compris fluide. */
+  border-radius: calc(var(--logo-size, 36px) * 0.263);
+  display: grid;
+  place-items: center;
+  background: linear-gradient(to top right, var(--logo-from) 0%, var(--logo-via) 50%, var(--logo-to) 100%);
+  box-shadow: 0 6px 18px -6px rgba(14, 165, 233, 0.8);
+}
+
+.logomark svg {
+  display: block;
+  width: 80%;
+  height: 80%;
+}
+
+.wordmark {
+  /* UNE MARQUE NE SE RETOURNE PAS : en langue droite-à-gauche, le document
+     retourne l'ordre des enfants flex, mot-symbole compris — « G·LP1·LOW » s'y
+     lirait « LOW·LP1·G ». `direction: ltr` l'en isole. */
+  direction: ltr;
+  font-family: var(--font-display);
+  font-weight: 900;
+  font-size: 26px;
+  line-height: 1;
+  letter-spacing: -0.025em;
+}
+
+.wordmark__lockup {
+  display: flex;
+  align-items: center;
+}
+
+/* G et LOW étirés en hauteur SEULEMENT, pour couvrir la colonne L/P/1 qui les
+   dépasse. La largeur ne bouge pas. L'étirement se voit : c'est voulu. */
+.wordmark__g,
+.wordmark__low {
+  transform: scaleY(1.26);
+}
+
+.wordmark__g {
+  font-weight: 800;
+}
+
+/* La colonne L/P/1 : corps, interligne, air de rang et marges latérales
+   arrivent du composant, tous rapportés à sa propre échelle. */
+.wordmark__lp1 {
+  display: flex;
+  flex-direction: column;
+  font-weight: 900;
+  text-transform: uppercase;
+  text-align: center;
+  user-select: none;
+  color: var(--sky);
+}
+
+/* ── Les textes ─────────────────────────────────────────────────────────── */
+
+.eyebrow {
+  font-family: var(--font-display);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.36em;
+  font-size: 11px;
+  color: rgba(255, 255, 255, 0.62);
+}
+
+.gate__eyebrow {
+  margin: 0;
+}
+
+.gate__title {
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: 25px;
+  line-height: 1.15;
+  letter-spacing: -0.02em;
+  text-wrap: balance;
+  margin: 12px 0 0;
+  color: var(--on-dark);
+}
+
+.gate__lede {
+  /* La marge du bas était celle qui séparait le texte du formulaire ; le
+     formulaire parti, elle reste : c'est le pied de la carte. */
+  margin: 10px 0 26px;
+  font-size: 14px;
+  line-height: 1.6;
+  color: var(--on-dark-55);
+}
