@@ -55,7 +55,14 @@ body {
   overflow: hidden;
   border: 10px solid #0f172a;
   border-radius: 36px;
-  background: #ffffff;
+  /* LE FOND DU CADRE EST CELUI DU CONTOUR, PAS DU BLANC (2026-09-06).
+     Il n'est visible NULLE PART — la page le recouvre entièrement — sauf sur
+     une épaisseur de sous-pixel dans les quatre coins arrondis : là, le
+     navigateur lisse le coin de la page contre la courbe intérieure du
+     contour, et ce qu'il laisse voir dessous, c'est ce fond. En blanc, cela
+     dessinait un liseré gris clair en arc dans chaque coin. De la couleur du
+     contour, le lissage ne montre plus que du contour. */
+  background: #0f172a;
   box-shadow: 0 25px 50px -12px rgb(0 0 0 / 0.25);
 }
 
