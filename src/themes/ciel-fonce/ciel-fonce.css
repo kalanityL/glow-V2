@@ -35,21 +35,40 @@
 
      Le retard est maximal aux deux tiers de la course — c'est là que l'ombre
      gagne du terrain — et il est refermé avant le coin, qui garde sa clarté au
-     dixième de point près. Les dix arrêts sont l'échantillonnage de cette
-     courbe, calculés en OKLCH ; aucun ne répète le précédent. */
+     dixième de point près.
+
+     DEUX RETOUCHES DU 2026-09-06 (« monte encore un tout petit peu le foncé
+     sans changer le clair haut droit, et eclaircis legerement le bas gauche ») :
+
+     - L'OMBRE MONTE ENCORE, de quatre à sept points de course : les clartés
+       qui tombaient à 45, 60, 72, 82 et 90 % de l'axe tombent maintenant à 52,
+       64, 76, 85 et 92 %. Les VALEURS sont les mêmes, ce sont leurs POSITIONS
+       qui glissent vers le haut — c'est ce qui fait monter l'ombre sans rien
+       assombrir.
+     - LE COIN BAS GAUCHE S'ÉCLAIRCIT, de L 20,0 % à 22,5 %. Le point le plus
+       sombre n'est donc plus dans le coin mais un quart plus haut, à 25 % de
+       l'axe : l'ombre est une BANDE qui traverse, et le coin n'en est plus le
+       creux.
+     - Le coin haut droit ne bouge pas : #394f7a, L 43,0 %, comme demandé.
+
+     Les onze arrêts sont l'échantillonnage de la courbe, calculés en OKLCH ;
+     la teinte et la saturation y suivent la clarté, comme sur toute la
+     course. */
   --fond: linear-gradient(
     to top right,
-    #0d1626 0%,
-    #0e1828 15%,
-    #111b2d 30%,
-    #152035 45%,
-    #1b2841 60%,
-    #233250 72%,
-    #2b3d5f 82%,
-    #31456c 90%,
-    #354a73 95%,
+    #111c2e 0%,
+    #0e1728 12%,
+    #0d1626 25%,
+    #101a2c 40%,
+    #152035 52%,
+    #1b2841 64%,
+    #233250 76%,
+    #2b3d5f 85%,
+    #31456b 92%,
+    #354a73 96%,
     #394f7a 100%
   );
+
 
   --accent: #5fc0ff;
 
