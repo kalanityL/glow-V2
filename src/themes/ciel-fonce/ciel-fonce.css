@@ -19,6 +19,19 @@
      l'y concentrer, et l'obscurité s'étire de coin à coin sans qu'aucune
      valeur ne le lui demande.
 
+     LA BANDE SOMBRE EST LARGE, ET ÉLARGIE PAR LE DÉGRADÉ LUI-MÊME
+     (2026-09-06, « Elargit et fond en la dégradant » — un premier essai
+     l'élargissait par un PLATEAU de teinte constante bordé de deux épaules ;
+     il a été annulé, une teinte plate n'est pas un dégradé).
+
+     Ici, aucune teinte ne se répète : la clarté PLONGE VITE en approchant du
+     milieu puis remonte lentement, ce qui creuse le fond sur une plage large
+     tout en le faisant varier partout. La courbe est `x^0,45` — `x` étant la
+     part du chemin faite vers le milieu —, et les onze arrêts en sont
+     l'échantillonnage, calculé en OKLCH et non choisi à l'œil. Résultat : la
+     clarté reste sous 23 % du quart au deux tiers de la course, sans qu'un
+     seul segment soit uni.
+
      Les deux bouts sont les deux éclaircissements, INÉGAUX comme demandé :
      - en haut à droite, le plus clair : #394f7a, L 43,0 % ;
      - en bas à gauche, plus léger : #22314e, L 31,5 % — le bleu de nuit de la
@@ -35,7 +48,15 @@
   --fond: linear-gradient(
     to top right,
     #22314e 0%,
+    #162137 14%,
+    #121c2f 28%,
+    #0f182a 40%,
     #0d1626 50%,
+    #111b2d 60%,
+    #162238 72%,
+    #1c2a43 82%,
+    #23324f 90%,
+    #2a3c5d 96%,
     #394f7a 100%
   );
 
