@@ -141,7 +141,56 @@
   box-shadow: 0 0 0 2px var(--accent);
 }
 
+/* ── LES RÉPONSES D'UNE QUESTION ────────────────────────────────────────── */
+
+/* Empilées et pleine largeur : la question se lit d'un trait, du haut vers le
+   bas. Deux colonnes obligeraient à comparer là où il n'y a qu'à choisir. */
+.options {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin: 20px 0 24px;
+}
+
+.option {
+  width: 100%;
+  padding: 15px 16px;
+  text-align: left;
+  border: 1px solid var(--option-filet);
+  border-radius: 14px;
+  background: var(--option-fond);
+  color: var(--encre);
+  font-family: var(--font-body);
+  font-weight: 500;
+  font-size: 15px;
+  cursor: pointer;
+  /* Le liseré du choix est une `box-shadow` et non une bordure épaissie : une
+     bordure qui grossit déplacerait le texte au moment du clic. */
+  transition: box-shadow 150ms, background 150ms;
+}
+
+.option--choisi {
+  background: var(--option-choisi-fond);
+  box-shadow: 0 0 0 2px var(--accent);
+}
+
 /* ── LE BOUTON ──────────────────────────────────────────────────────────── */
+
+/* La rangée des deux boutons. « Précédent » prend le tiers, « Suivant » le
+   reste : le geste qui avance est le plus large, et le doigt le trouve sans
+   viser. */
+.boutons {
+  display: flex;
+  gap: 10px;
+}
+
+.boutons .bouton--second {
+  flex: 1;
+}
+
+.boutons .bouton:not(.bouton--second) {
+  flex: 2;
+}
 
 /* LE BOUTON EST HABILLÉ PAR LE THÈME, PAS PAR CETTE FEUILLE (2026-09-07,
    « changer le style du bouton suivant en fonction du theme ») : elle ne pose
@@ -176,6 +225,15 @@
 
 .bouton:active {
   transform: scale(0.99);
+}
+
+/* LE SECOND BOUTON, celui qui recule : même forme, matière effacée. Il ne
+   dispute pas l'attention à celui qui avance. */
+.bouton--second {
+  background: var(--bouton2-fond);
+  color: var(--bouton2-encre);
+  border-color: var(--bouton2-filet);
+  box-shadow: none;
 }
 
 /* ── LES TEXTES ─────────────────────────────────────────────────────────── */

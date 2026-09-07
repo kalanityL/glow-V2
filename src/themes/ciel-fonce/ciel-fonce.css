@@ -112,6 +112,13 @@
   --encre: #ffffff;
   --encre-chapeau: rgba(255, 255, 255, 0.86);
 
+  /* Les réponses d'une question : un fond posé sur le ciel, son filet, et le
+     fond de celle qui est retenue — son liseré, lui, est l'accent, commun aux
+     deux thèmes. */
+  --option-fond: rgba(255, 255, 255, 0.06);
+  --option-filet: rgba(255, 255, 255, 0.14);
+  --option-choisi-fond: rgba(95, 192, 255, 0.14);
+
   --carte-filet: rgba(255, 255, 255, 0.18);
 
   /* LE BOUTON DE CIEL FONCÉ. Il était cerné et translucide — un bouton
@@ -127,6 +134,12 @@
   --bouton-fond: var(--accent);
   --bouton-encre: #08131f;
   --bouton-filet: transparent;
+  /* Le second bouton, celui qui recule : pas de matière, un simple filet et
+     l'encre de la page. Il garde l'arrondi du premier — c'est la même rangée. */
+  --bouton2-fond: transparent;
+  --bouton2-encre: var(--encre);
+  --bouton2-filet: rgba(255, 255, 255, 0.22);
+
   --bouton-rayon: 999px;
   --bouton-ombre: none;
 

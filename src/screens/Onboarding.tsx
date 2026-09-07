@@ -2,29 +2,40 @@ import { useState } from 'react';
 import { Logomark } from '../components/Logomark';
 import { Wordmark } from '../components/Wordmark';
 import { useTextes } from '../i18n/useTextes';
-import { THEMES, THEME_PAR_DEFAUT, classeDuTheme, type ThemeId } from '../themes/themes';
+import { THEME_PAR_DEFAUT, classeDuTheme, type ThemeId } from '../themes/themes';
+import { EtapeTheme } from './onboarding/EtapeTheme';
+import { EtapeObjectif } from './onboarding/EtapeObjectif';
+import { OBJECTIF_PAR_DEFAUT, type Objectif } from './onboarding/objectifs';
+
+interface OnboardingProps {
+  /** L'étape affichée, comptée à partir de zéro. */
+  etape: number;
+  /** Faux à la première étape : il n'y a rien derrière. */
+  peutRevenir: boolean;
+  /** Revenir à la précédente. */
+  onPrecedent: () => void;
+  /** Passer à la suivante. */
+  onSuivant: () => void;
+}
+
+/** Le nombre d'étapes, lu par le parcours pour savoir où s'arrêter. */
+export const NOMBRE_ETAPES = 2;
 
 /**
- * L'ONBOARDING — ÉCRAN 1 : LE CHOIX DU THÈME.
+ * L'ONBOARDING — l'entête, l'étape courante, le bouton « Suivant ».
  *
- * Un cadre par thème, SANS SON NOM — on choisit ce qu'on voit —, le premier
- * sélectionné à l'ouverture. Toucher un cadre
- * HABILLE AUSSITÔT TOUTE LA PAGE : le thème choisi est posé sur la page
- * elle-même, donc l'entête, les textes, les cadres et le bouton changent
- * ensemble. On voit le thème qu'on choisit, pas une vignette de ce qu'il
- * serait.
+ * IL PORTE LES RÉPONSES, PAS LA NAVIGATION. Le rang de l'étape vit un cran
+ * plus haut, dans `App` : le bouton « retour » est HORS de l'écran du
+ * téléphone — c'est le bouton natif simulé — et il doit pouvoir reculer dans
+ * le parcours. Descendre la navigation ici l'aurait mise hors de sa portée.
  *
- * Chaque cadre porte EN PLUS sa propre classe de thème : il montre son fond et
- * son encre à lui, même quand ce n'est pas lui qui habille la page. C'est ce
- * qui permet de comparer les deux d'un coup d'œil.
- *
- * Le choix vit ici, en état de composant : rien n'est encore enregistré, il n'y
- * a pas de deuxième écran où l'emporter. Quand il y en aura un, cet état
- * remontera d'un cran — pas plus loin.
+ * Les réponses, elles, ne sortent pas d'ici tant que rien ne les attend
+ * ailleurs. Elles ne sont pas encore enregistrées : un rechargement les perd.
  */
-export function Onboarding() {
+export function Onboarding({ etape, peutRevenir, onPrecedent, onSuivant }: OnboardingProps) {
   const textes = useTextes();
   const [theme, setTheme] = useState<ThemeId>(THEME_PAR_DEFAUT);
+  const [objectif, setObjectif] = useState<Objectif>(OBJECTIF_PAR_DEFAUT);
 
   return (
     <div className={`page ${classeDuTheme(theme)}`}>
@@ -34,31 +45,24 @@ export function Onboarding() {
           <Wordmark />
         </div>
 
-        <h1 className="titre">{textes.onboarding.theme.question}</h1>
+        {etape === 0 ? <EtapeTheme theme={theme} onTheme={setTheme} /> : null}
+        {etape === 1 ? <EtapeObjectif objectif={objectif} onObjectif={setObjectif} /> : null}
 
-        <div className="choix-themes">
-          {THEMES.map((id) => (
-            <button
-              key={id}
-              type="button"
-              /* La classe du thème sur le cadre lui-même : il se montre tel
-                 qu'il est. `aria-pressed` dit lequel est retenu, pour qui
-                 n'a que la voix pour le savoir. */
-              className={`carte-theme ${classeDuTheme(id)}${id === theme ? ' carte-theme--choisi' : ''}`}
-              /* LE NOM DU THÈME N'EST PLUS ÉCRIT DANS LE CADRE (2026-09-07) :
-                 on choisit ce qu'on voit, pas un nom. Il reste en `aria-label`
-                 — un cadre sans texte n'est qu'un bouton muet pour qui écoute
-                 la page, et il faut bien nommer ce qu'on lui propose. */
-              aria-label={textes.themes[id]}
-              aria-pressed={id === theme}
-              onClick={() => setTheme(id)}
-            />
-          ))}
+        {/* « PRÉCÉDENT » N'EXISTE PAS À LA PREMIÈRE ÉTAPE (2026-09-07) : il
+            n'est pas éteint, il est absent — rien ne se propose de reculer là
+            où il n'y a rien derrière. « Suivant » occupe alors toute la
+            rangée. Le bouton de la barre du téléphone, lui, ne peut pas
+            disparaître : c'est le bouton natif, il s'éteint à moitié. */}
+        <div className="boutons">
+          {peutRevenir ? (
+            <button type="button" className="bouton bouton--second" onClick={onPrecedent}>
+              {textes.onboarding.precedent}
+            </button>
+          ) : null}
+          <button type="button" className="bouton" onClick={onSuivant}>
+            {textes.onboarding.suivant}
+          </button>
         </div>
-
-        <button type="button" className="bouton">
-          {textes.onboarding.suivant}
-        </button>
       </div>
     </div>
   );

@@ -1,3 +1,4 @@
+import type { Objectif } from '../screens/onboarding/objectifs';
 import type { ThemeId } from '../themes/themes';
 
 /**
@@ -33,10 +34,16 @@ export interface Textes {
    * ajouter un thème sans le nommer dans CHAQUE langue ne compile pas.
    */
   themes: Record<ThemeId, string>;
+  /** Les objectifs, sous le même contrat : en ajouter un l'exige dans chaque langue. */
+  objectifs: Record<Objectif, string>;
   onboarding: {
     theme: {
       question: string;
     };
+    objectif: {
+      question: string;
+    };
+    precedent: string;
     suivant: string;
   };
   /** Le bouton « retour » de la barre du bas : lu par les lecteurs d'écran. */
@@ -49,10 +56,18 @@ export const TEXTES: Record<Langue, Textes> = {
       ciel: 'Ciel',
       'ciel-fonce': 'Ciel foncé',
     },
+    objectifs: {
+      perdre: 'Perdre du poids',
+      stabiliser: 'Stabiliser mon poids',
+    },
     onboarding: {
       theme: {
         question: 'Choisissez',
       },
+      objectif: {
+        question: 'Vous souhaitez…',
+      },
+      precedent: 'Précédent',
       suivant: 'Suivant',
     },
     retour: 'Retour',
@@ -62,10 +77,18 @@ export const TEXTES: Record<Langue, Textes> = {
       ciel: 'Sky',
       'ciel-fonce': 'Dark sky',
     },
+    objectifs: {
+      perdre: 'Lose weight',
+      stabiliser: 'Keep my weight steady',
+    },
     onboarding: {
       theme: {
         question: 'Choose',
       },
+      objectif: {
+        question: 'You would like to…',
+      },
+      precedent: 'Previous',
       suivant: 'Next',
     },
     retour: 'Back',
