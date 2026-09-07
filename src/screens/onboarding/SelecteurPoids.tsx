@@ -15,15 +15,30 @@ interface SelecteurPoidsProps {
 /** Le séparateur décimal affiché. La valeur, elle, est gardée avec une virgule. */
 const SEPARATEUR = ',';
 
-/** Les dixièmes : de 0 à 9. En kilos, ce sont les centaines de grammes. */
+/** Les dix crans de la seconde liste. */
 const DIXIEMES = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9];
+
+/**
+ * CE QU'AFFICHE UN CRAN DE LA SECONDE LISTE (2026-09-07, « choix centaine :
+ * 0/100/200 etc... »).
+ *
+ * En kilos, un cran vaut 100 grammes et s'écrit donc « 0, 100, 200… 900 » :
+ * c'est la grandeur réelle, celle qu'on lit sur une balance, et non un rang
+ * sans unité. En livres, le cran est un dixième et n'a pas de sous-unité usuelle
+ * à nommer : il s'écrit « 0 à 9 ».
+ *
+ * La VALEUR gardée ne change pas pour autant : c'est toujours le dixième, et
+ * « 95,3 » veut dire 95 kg et 300 g. L'affichage ne décide de rien.
+ */
+const PAS_AFFICHE: Partial<Record<Unite, number>> = { kg: 100 };
 
 /**
  * LE POIDS SE CHOISIT, IL NE SE TAPE PLUS (demande du 2026-09-07 : « selecteur
  * de poids : select kg / centaines de g comme heure / minutes »).
  *
- * DEUX LISTES, comme une heure et ses minutes : l'unité entière d'un côté, le
- * dixième de l'autre, séparés par la virgule. Ce que ça change, et pourquoi
+ * DEUX LISTES DANS UN SEUL CHAMP, comme une heure et ses minutes : l'unité
+ * entière d'un côté, le dixième de l'autre, la virgule entre les deux et une
+ * seule bordure autour. Ce que ça change, et pourquoi
  * c'est mieux qu'un champ libre : on ne peut plus taper une valeur impossible,
  * ni oublier l'unité, ni hésiter entre le point et la virgule — le clavier ne
  * s'ouvre même pas.
@@ -49,7 +64,12 @@ export function SelecteurPoids({ id, valeur, onValeur, unite, question }: Select
 
   return (
     <div className="selecteur">
-      <span className="selecteur__champ">
+      {/* UN SEUL CHAMP pour les deux listes (demande du 2026-09-07, « kg et
+          centaines de grammes dans le meme champs, comme qd on choisit hures
+          et minutes ») : une seule boîte, une seule bordure, la virgule
+          dedans. Les deux listes n'ont plus de matière propre — c'est la boîte
+          qui la porte, et qui s'allume quand l'une ou l'autre est prise. */}
+      <div className="selecteur__boite">
         <select
           id={id}
           className="selecteur__liste"
@@ -65,16 +85,14 @@ export function SelecteurPoids({ id, valeur, onValeur, unite, question }: Select
             </option>
           ))}
         </select>
-      </span>
 
-      <span className="selecteur__separateur" aria-hidden="true">
-        {SEPARATEUR}
-      </span>
+        <span className="selecteur__separateur" aria-hidden="true">
+          {SEPARATEUR}
+        </span>
 
-      <span className="selecteur__champ">
         <select
           id={`${id}-dixieme`}
-          className="selecteur__liste selecteur__liste--courte"
+          className="selecteur__liste"
           value={dixieme}
           onChange={(evenement) => poser(entiere, Number(evenement.target.value))}
           /* Nommée par ce qu'elle est vraiment — des centaines de grammes en
@@ -83,12 +101,13 @@ export function SelecteurPoids({ id, valeur, onValeur, unite, question }: Select
         >
           {DIXIEMES.map((valeurDixieme) => (
             <option key={valeurDixieme} value={valeurDixieme}>
-              {valeurDixieme}
+              {valeurDixieme * (PAS_AFFICHE[unite] ?? 1)}
             </option>
           ))}
         </select>
-      </span>
+      </div>
 
+      {/* L'unité reste DEHORS, comme demandé le 2026-09-07. */}
       <span className="champ__unite">{textes.unites[unite]}</span>
     </div>
   );

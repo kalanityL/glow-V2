@@ -143,22 +143,38 @@
 
 /* ── UN SÉLECTEUR DE MESURE ─────────────────────────────────────────────── */
 
-/* Deux listes et leur virgule, comme une heure et ses minutes, puis l'unité.
-   L'unité reste DEHORS : dans une liste, elle se répéterait à chaque cran. */
+/* Deux listes dans UN SEUL CHAMP, comme une heure et ses minutes, puis
+   l'unité à côté. C'est la BOÎTE qui porte la matière — fond, filet, arrondi —
+   et les listes n'en ont plus : sans quoi on verrait trois cadres là où il n'y
+   a qu'une mesure. */
 .selecteur {
   display: flex;
   align-items: center;
-  gap: 6px;
+  gap: 10px;
   margin: 20px 0 24px;
 }
 
-/* L'enveloppe porte le chevron : un `select` ne peut pas avoir de `::after`. */
-.selecteur__champ {
+.selecteur__boite {
   position: relative;
   display: inline-flex;
+  align-items: center;
+  padding-right: 28px;
+  border: 1px solid var(--option-filet);
+  border-radius: 14px;
+  background: var(--option-fond);
+  transition: box-shadow 150ms, background 150ms;
 }
 
-.selecteur__champ::after {
+/* `:focus-within` et non `:focus` : c'est la boîte qui s'allume, quelle que
+   soit celle des deux listes qui a la main. */
+.selecteur__boite:focus-within {
+  background: var(--option-choisi-fond);
+  box-shadow: 0 0 0 2px var(--accent);
+}
+
+/* Le chevron, UNE SEULE FOIS pour le champ entier, sur la boîte : un `select`
+   ne peut pas porter de `::after`, et deux chevrons diraient deux champs. */
+.selecteur__boite::after {
   content: '';
   position: absolute;
   top: 50%;
@@ -168,33 +184,27 @@
   margin-top: -2px;
   border: 5px solid transparent;
   border-top-color: var(--encre-chapeau);
-  /* Le chevron ne doit pas manger le clic : il est décoratif, la liste est
-     dessous. */
+  /* Décoratif : il ne doit pas manger le clic destiné à la liste. */
   pointer-events: none;
 }
 
 .selecteur__liste {
-  /* `appearance: none` retire le dessin natif — flèche comprise, d'où le
-     chevron ci-dessus — pour que la liste porte la matière du thème comme
-     n'importe quel autre champ. */
+  /* `appearance: none` retire le dessin natif, flèche comprise : la matière
+     est celle de la boîte, la liste n'est plus qu'un mot qu'on choisit. */
   appearance: none;
-  width: 100%;
-  padding: 15px 34px 15px 16px;
-  border: 1px solid var(--option-filet);
-  border-radius: 14px;
-  background: var(--option-fond);
+  padding: 15px 4px 15px 16px;
+  border: none;
+  background: none;
   color: var(--encre);
   font-family: var(--font-body);
   font-weight: 500;
   font-size: 17px;
   cursor: pointer;
-  transition: box-shadow 150ms, background 150ms;
 }
 
+/* La boîte porte déjà le liseré : la liste n'en met pas un second par-dessus. */
 .selecteur__liste:focus {
   outline: none;
-  background: var(--option-choisi-fond);
-  box-shadow: 0 0 0 2px var(--accent);
 }
 
 .selecteur__separateur {
