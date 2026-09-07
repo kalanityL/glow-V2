@@ -3,6 +3,7 @@ import { Wordmark } from '../components/Wordmark';
 import { useTextes } from '../i18n/useTextes';
 import { classeDuTheme } from '../themes/themes';
 import type { useParcours } from '../app/useParcours';
+import { EtapeLangue } from './onboarding/EtapeLangue';
 import { EtapeTheme } from './onboarding/EtapeTheme';
 import { EtapeSysteme } from './onboarding/EtapeSysteme';
 import { EtapeObjectif } from './onboarding/EtapeObjectif';
@@ -27,6 +28,10 @@ export function Onboarding({ parcours }: { parcours: ReturnType<typeof useParcou
           <Logomark size={46} />
           <Wordmark />
         </div>
+
+        {etape === 'langue' ? (
+          <EtapeLangue langue={reponses.langue} onLangue={(langue) => repondre('langue', langue)} />
+        ) : null}
 
         {etape === 'theme' ? (
           <EtapeTheme theme={reponses.theme} onTheme={(theme) => repondre('theme', theme)} />

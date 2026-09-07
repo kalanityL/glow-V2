@@ -1,4 +1,5 @@
 import { SYSTEME_PAR_DEFAUT, type Systeme } from '../../domaine/unites';
+import { LANGUE_PAR_DEFAUT, type Langue } from '../../i18n/textes';
 import { THEME_PAR_DEFAUT, type ThemeId } from '../../themes/themes';
 
 /** Les objectifs proposés, dans l'ordre d'affichage. Le premier est retenu d'avance. */
@@ -23,6 +24,12 @@ export type NiveauActivite = (typeof NIVEAUX_ACTIVITE)[number];
  * `null` veut dire « pas encore répondu », et se distingue d'une réponse vide.
  */
 export interface Reponses {
+  /**
+   * LA LANGUE CHOISIE — recueillie, mais PAS ENCORE BRANCHÉE (2026-09-07) :
+   * l'application parle toujours la langue qu'elle détecte. Voir
+   * `EtapeLangue` pour ce qu'il faudra faire le jour où on la branchera.
+   */
+  langue: Langue;
   theme: ThemeId;
   systeme: Systeme;
   objectif: Objectif;
@@ -32,6 +39,7 @@ export interface Reponses {
 }
 
 export const REPONSES_INITIALES: Reponses = {
+  langue: LANGUE_PAR_DEFAUT,
   theme: THEME_PAR_DEFAUT,
   systeme: SYSTEME_PAR_DEFAUT,
   objectif: OBJECTIFS[0],

@@ -34,6 +34,13 @@ export interface Textes {
    * LE NOM DE CHAQUE THÈME. `Record<ThemeId, string>` et non un objet libre :
    * ajouter un thème sans le nommer dans CHAQUE langue ne compile pas.
    */
+  /**
+   * LE NOM DE CHAQUE LANGUE, ÉCRIT DANS SA PROPRE LANGUE — « Français »,
+   * « English » — et non traduit : c'est l'usage, et c'est le seul moyen que
+   * quelqu'un qui ne lit pas la langue affichée retrouve la sienne. Les deux
+   * dictionnaires portent donc les mêmes mots, et c'est normal.
+   */
+  langues: Record<Langue, string>;
   themes: Record<ThemeId, string>;
   /** Les objectifs, sous le même contrat : en ajouter un l'exige dans chaque langue. */
   objectifs: Record<Objectif, string>;
@@ -72,6 +79,9 @@ export interface Textes {
    */
   fractions: Record<Unite, string>;
   onboarding: {
+    langue: {
+      question: string;
+    };
     theme: {
       question: string;
     };
@@ -99,6 +109,10 @@ export interface Textes {
 
 export const TEXTES: Record<Langue, Textes> = {
   fr: {
+    langues: {
+      fr: 'Français',
+      en: 'English',
+    },
     themes: {
       ciel: 'Ciel',
       'ciel-fonce': 'Ciel foncé',
@@ -130,6 +144,9 @@ export const TEXTES: Record<Langue, Textes> = {
       in: 'Dixièmes de pouce',
     },
     onboarding: {
+      langue: {
+        question: 'Votre langue',
+      },
       theme: {
         question: 'Choisissez',
       },
@@ -154,6 +171,10 @@ export const TEXTES: Record<Langue, Textes> = {
     retour: 'Retour',
   },
   en: {
+    langues: {
+      fr: 'Français',
+      en: 'English',
+    },
     themes: {
       ciel: 'Sky',
       'ciel-fonce': 'Dark sky',
@@ -185,6 +206,9 @@ export const TEXTES: Record<Langue, Textes> = {
       in: 'Tenths of an inch',
     },
     onboarding: {
+      langue: {
+        question: 'Your language',
+      },
       theme: {
         question: 'Choose',
       },
