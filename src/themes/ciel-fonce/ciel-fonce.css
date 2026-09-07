@@ -112,12 +112,18 @@
   --encre: #ffffff;
   --encre-chapeau: rgba(255, 255, 255, 0.86);
 
-  /* Le filet d'un cadre de thème, et le bouton. L'encre du bouton est prise
-     dans le noir du thème plutôt qu'en blanc : sur un aplat clair comme
-     l'accent, du blanc ne tiendrait pas le contraste. */
   --carte-filet: rgba(255, 255, 255, 0.18);
-  --bouton-fond: var(--accent);
-  --bouton-encre: #0b1a2b;
+
+  /* LE BOUTON DE CIEL FONCÉ : un bouton de nuit. Pas d'aplat — une pastille
+     translucide cernée d'un filet d'accent, l'accent lui-même pour encre, et
+     aucune ombre : sur un fond de nuit, un halo se verrait comme une tache.
+     Le contraste de l'accent sur ce fond dépasse 7 pour 1, la lisibilité ne
+     paie pas la discrétion. */
+  --bouton-fond: rgba(95, 192, 255, 0.12);
+  --bouton-encre: var(--accent);
+  --bouton-filet: rgba(95, 192, 255, 0.55);
+  --bouton-rayon: 999px;
+  --bouton-ombre: none;
 
   --font-display: 'Outfit', system-ui, sans-serif;
   --font-body: 'Plus Jakarta Sans', system-ui, sans-serif;

@@ -143,13 +143,24 @@
 
 /* ── LE BOUTON ──────────────────────────────────────────────────────────── */
 
+/* LE BOUTON EST HABILLÉ PAR LE THÈME, PAS PAR CETTE FEUILLE (2026-09-07,
+   « changer le style du bouton suivant en fonction du theme ») : elle ne pose
+   que la forme commune — la largeur, le rembourrage, la police, la réaction au
+   toucher. Le fond, l'encre, le filet, l'arrondi et l'ombre sont cinq jetons,
+   et chaque thème en fait ce qu'il veut : Ciel un aplat plein, Ciel foncé un
+   bouton de nuit, cerné et translucide.
+
+   Le filet est TOUJOURS déclaré, même transparent : un thème qui n'en veut pas
+   le met en `transparent` plutôt qu'à `none`, sinon le bouton changerait de
+   taille d'un thème à l'autre. */
 .bouton {
   width: 100%;
   padding: 13px 20px;
-  border: none;
-  border-radius: 14px;
+  border: 1px solid var(--bouton-filet);
+  border-radius: var(--bouton-rayon);
   background: var(--bouton-fond);
   color: var(--bouton-encre);
+  box-shadow: var(--bouton-ombre);
   /* LE BOUTON EST EN TEXTE COURANT, PAS EN POLICE DE TITRE (2026-09-07) : il
      porte une action, pas un titre. D'où `--font-body` (Plus Jakarta Sans) en
      700 — la graisse la plus forte de cette famille dans le dépôt, celle qui

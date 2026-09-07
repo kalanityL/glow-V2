@@ -26,12 +26,17 @@
   --encre: #ffffff;
   --encre-chapeau: rgba(255, 255, 255, 0.86);
 
-  /* Le filet d'un cadre de thème, et le bouton. L'encre du bouton est prise
-     dans le noir du thème plutôt qu'en blanc : sur un aplat clair comme
-     l'accent, du blanc ne tiendrait pas le contraste. */
   --carte-filet: rgba(255, 255, 255, 0.25);
+
+  /* LE BOUTON DE CIEL : un aplat plein de plein jour. L'accent en fond, une
+     encre prise dans le noir du thème — sur un aplat aussi clair, du blanc ne
+     tiendrait pas le contraste —, pas de filet, et un halo bleu sous le
+     bouton, du même bleu que le fond. */
   --bouton-fond: var(--accent);
   --bouton-encre: #0b1a2b;
+  --bouton-filet: transparent;
+  --bouton-rayon: 14px;
+  --bouton-ombre: 0 10px 24px -12px rgba(14, 165, 233, 0.9);
 
   /* Les polices : Outfit pour les titres et la marque, Plus Jakarta Sans pour
      le texte courant. Embarquées, voir `src/fonts.css`. */
