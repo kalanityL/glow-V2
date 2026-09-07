@@ -36,7 +36,15 @@ export const REPONSES_INITIALES: Reponses = {
   systeme: SYSTEME_PAR_DEFAUT,
   objectif: OBJECTIFS[0],
   /* 95,0 par défaut (demande du 2026-09-07) : le sélecteur s'ouvre sur une
-     valeur plausible plutôt que sur son premier cran, qui serait 1 kg. */
+     valeur plausible plutôt que sur son premier cran, qui serait 1 kg.
+
+     DEUX CHAMPS SÉPARÉS, ET JAMAIS UN SEUL (mise en garde du 2026-09-07 :
+     « pas de mémorisation de poids entre écran poids et ecran poids cible : ce
+     ne sont pas les memes valeurs »). Ils partent de la même valeur par
+     défaut, ce qui peut donner le change, mais ils ne se touchent jamais :
+     choisir 97 au poids actuel laisse le poids visé à 95. Ne JAMAIS les
+     fusionner, ni faire partir l'un de l'autre « pour rendre service » — c'est
+     précisément ce qu'elle refuse. */
   poids: '95.0',
   poidsCible: '95.0',
   activite: null,
