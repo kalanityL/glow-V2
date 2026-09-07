@@ -119,6 +119,13 @@
   --option-filet: rgba(255, 255, 255, 0.14);
   --option-choisi-fond: rgba(95, 192, 255, 0.14);
 
+  /* LE PANNEAU FLOTTANT des roues du sélecteur. Son fond est OPAQUE et pris
+     dans le ciel du thème : il passe par-dessus le texte de la page, et une
+     matière translucide rendrait les deux illisibles. */
+  --panneau-fond: #15223b;
+  --panneau-filet: rgba(255, 255, 255, 0.16);
+  --panneau-ombre: 0 18px 40px -18px rgba(0, 0, 0, 0.8);
+
   --carte-filet: rgba(255, 255, 255, 0.18);
 
   /* LE BOUTON DE CIEL FONCÉ. Il était cerné et translucide — un bouton

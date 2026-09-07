@@ -143,11 +143,13 @@
 
 /* ── UN SÉLECTEUR DE MESURE ─────────────────────────────────────────────── */
 
-/* Deux listes dans UN SEUL CHAMP, comme une heure et ses minutes, puis
-   l'unité à côté. C'est la BOÎTE qui porte la matière — fond, filet, arrondi —
-   et les listes n'en ont plus : sans quoi on verrait trois cadres là où il n'y
-   a qu'une mesure. */
+/* LE SÉLECTEUR DE MESURE : un champ, et deux roues qui s'ouvrent ensemble.
+
+   La boîte porte toute la matière — fond, filet, arrondi — et les deux nombres
+   se serrent contre leur virgule : l'entier aligné à droite, la fraction à
+   gauche, comme dans un sélecteur d'heure. L'unité, elle, reste dehors. */
 .selecteur {
+  position: relative;
   display: flex;
   align-items: center;
   gap: 10px;
@@ -155,82 +157,112 @@
 }
 
 .selecteur__boite {
+  /* Positionnée pour que son chevron s'accroche à ELLE, et non au sélecteur
+     entier — l'unité et le panneau ne doivent pas le déplacer. */
   position: relative;
   display: inline-flex;
   align-items: center;
-  /* LE REMBOURRAGE EST SUR LA BOÎTE, PAS SUR LES LISTES (2026-09-07, « pas
-     d'écart autour de la virgule ») : quand chaque liste portait le sien, ils
-     s'additionnaient de part et d'autre de la virgule et « 97 , 100 » se lisait
-     détaché. Ici, l'air est aux deux bouts du champ et nulle part au milieu. */
-  padding: 0 28px 0 16px;
+  /* Le rembourrage est ICI et non sur les nombres : sur eux, il
+     s'additionnerait de part et d'autre de la virgule et l'écarterait. */
+  padding: 15px 28px 15px 16px;
   border: 1px solid var(--option-filet);
   border-radius: 14px;
   background: var(--option-fond);
-  transition: box-shadow 150ms, background 150ms;
-}
-
-/* `:focus-within` et non `:focus` : c'est la boîte qui s'allume, quelle que
-   soit celle des deux listes qui a la main. */
-.selecteur__boite:focus-within {
-  background: var(--option-choisi-fond);
-  box-shadow: 0 0 0 2px var(--accent);
-}
-
-/* Le chevron, UNE SEULE FOIS pour le champ entier, sur la boîte : un `select`
-   ne peut pas porter de `::after`, et deux chevrons diraient deux champs. */
-.selecteur__boite::after {
-  content: '';
-  position: absolute;
-  top: 50%;
-  right: 12px;
-  width: 0;
-  height: 0;
-  margin-top: -2px;
-  border: 5px solid transparent;
-  border-top-color: var(--encre-chapeau);
-  /* Décoratif : il ne doit pas manger le clic destiné à la liste. */
-  pointer-events: none;
-}
-
-.selecteur__liste {
-  /* `appearance: none` retire le dessin natif, flèche comprise : la matière
-     est celle de la boîte, la liste n'est plus qu'un mot qu'on choisit. */
-  appearance: none;
-  /* Aucun rembourrage horizontal : les chiffres viennent au contact de la
-     virgule, comme dans un sélecteur d'heure. */
-  padding: 15px 0;
-  border: none;
-  background: none;
   color: var(--encre);
   font-family: var(--font-body);
   font-weight: 500;
   font-size: 17px;
   cursor: pointer;
+  transition: box-shadow 150ms, background 150ms;
 }
 
-/* CHAQUE LISTE EST LARGE COMME SON PLUS LONG CRAN — « 999 », « 900 » — et non
-   comme la valeur affichée. Sans alignement, « 97 » flottait à gauche de sa
-   liste et rouvrait un écart avant la virgule. Les deux se serrent donc contre
-   elle : l'entière à droite, la fraction à gauche. C'est aussi ce que fait un
-   sélecteur d'heure. */
-.selecteur__liste--entiere {
+.selecteur__boite--ouvert,
+.selecteur__boite:focus-visible {
+  outline: none;
+  background: var(--option-choisi-fond);
+  box-shadow: 0 0 0 2px var(--accent);
+}
+
+/* Le chevron, une seule fois pour le champ entier. */
+.selecteur__boite::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  right: 12px;
+  margin-top: -2px;
+  border: 5px solid transparent;
+  border-top-color: var(--encre-chapeau);
+  pointer-events: none;
+}
+
+/* CHAQUE NOMBRE EST LARGE COMME SON PLUS LONG CRAN — « 999 », « 900 » — pour
+   que la virgule ne bouge pas quand la valeur change. Sans cette largeur fixe,
+   passer de 95 à 100 décalerait tout le champ sous le doigt. */
+.selecteur__valeur {
+  display: inline-block;
+}
+
+.selecteur__valeur--entiere {
+  min-width: 3ch;
   text-align: right;
 }
 
-.selecteur__liste--fraction {
+.selecteur__valeur--fraction {
+  min-width: 3ch;
   text-align: left;
 }
 
-/* La boîte porte déjà le liseré : la liste n'en met pas un second par-dessus. */
-.selecteur__liste:focus {
-  outline: none;
+.selecteur__separateur {
+  color: var(--encre);
 }
 
-.selecteur__separateur {
+/* LES DEUX ROUES, OUVERTES ENSEMBLE. C'est tout l'objet du panneau : les deux
+   nombres se lisent en même temps, là où deux listes natives se seraient
+   ouvertes l'une après l'autre. */
+.roues {
+  position: absolute;
+  top: calc(100% + 6px);
+  left: 0;
+  z-index: 20;
+  display: flex;
+  gap: 4px;
+  padding: 6px;
+  border: 1px solid var(--panneau-filet);
+  border-radius: 16px;
+  /* Un fond OPAQUE : le panneau passe par-dessus le texte de la page, et une
+     matière translucide rendrait les deux illisibles. */
+  background: var(--panneau-fond);
+  box-shadow: var(--panneau-ombre);
+}
+
+.roue {
+  max-height: 240px;
+  overflow-y: auto;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  /* Chaque colonne défile pour elle-même, comme les heures et les minutes. */
+  scrollbar-width: thin;
+}
+
+.roue__cran {
+  width: 100%;
+  min-width: 72px;
+  padding: 10px 14px;
+  border: none;
+  border-radius: 10px;
+  background: none;
+  color: var(--encre);
   font-family: var(--font-body);
   font-weight: 500;
   font-size: 17px;
-  color: var(--encre);
+  text-align: center;
+  cursor: pointer;
+}
+
+.roue__cran--choisi {
+  background: var(--option-choisi-fond);
+  font-weight: 700;
 }
 
 /* L'unité, commune au sélecteur et à toute saisie à venir : une étiquette, pas

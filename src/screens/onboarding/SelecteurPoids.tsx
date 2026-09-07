@@ -1,10 +1,11 @@
+import { useEffect, useRef, useState } from 'react';
 import { useTextes } from '../../i18n/useTextes';
 import { POIDS_MAX } from '../../domaine/mesures';
 import type { Unite } from '../../domaine/unites';
 
 interface SelecteurPoidsProps {
   id: string;
-  /** Le poids, tel qu'il est gardé : « 95,0 ». */
+  /** Le poids, tel qu'il est gardé : « 95.0 ». */
   valeur: string;
   onValeur: (valeur: string) => void;
   unite: Unite;
@@ -22,45 +23,48 @@ interface SelecteurPoidsProps {
  */
 const SEPARATEUR_STOCKE = '.';
 
-/** Les dix crans de la seconde liste. */
+/** Les dix crans de la seconde roue. */
 const DIXIEMES = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9];
 
 /**
- * CE QU'AFFICHE UN CRAN DE LA SECONDE LISTE (2026-09-07, « choix centaine :
- * 0/100/200 etc... »).
+ * CE QU'AFFICHE UN CRAN DE LA SECONDE ROUE.
  *
- * En kilos, un cran vaut 100 grammes et s'écrit donc « 0, 100, 200… 900 » :
- * c'est la grandeur réelle, celle qu'on lit sur une balance, et non un rang
- * sans unité. En livres, le cran est un dixième et n'a pas de sous-unité usuelle
- * à nommer : il s'écrit « 0 à 9 ».
+ * En kilos, un cran vaut 100 grammes et s'écrit « 0, 100, 200… 900 » : c'est la
+ * grandeur réelle, celle qu'on lit sur une balance. En livres, le cran est un
+ * dixième et n'a pas de sous-unité usuelle à nommer : il s'écrit « 0 à 9 ».
  *
  * La VALEUR gardée ne change pas pour autant : c'est toujours le dixième, et
- * « 95,3 » veut dire 95 kg et 300 g. L'affichage ne décide de rien.
+ * « 95.3 » veut dire 95 kg et 300 g.
  */
 const PAS_AFFICHE: Partial<Record<Unite, number>> = { kg: 100 };
 
 /**
- * LE POIDS SE CHOISIT, IL NE SE TAPE PLUS (demande du 2026-09-07 : « selecteur
- * de poids : select kg / centaines de g comme heure / minutes »).
+ * LE POIDS SE CHOISIT DANS DEUX ROUES QUI S'OUVRENT ENSEMBLE, comme une heure
+ * et ses minutes (demande du 2026-09-07 : « quand on clique sur le champ poid,
+ * ça ouvre les deux select comme l'heure »).
  *
- * DEUX LISTES DANS UN SEUL CHAMP, comme une heure et ses minutes : l'unité
- * entière d'un côté, le dixième de l'autre, la virgule entre les deux et une
- * seule bordure autour. Ce que ça change, et pourquoi
- * c'est mieux qu'un champ libre : on ne peut plus taper une valeur impossible,
- * ni oublier l'unité, ni hésiter entre le point et la virgule — le clavier ne
- * s'ouvre même pas.
+ * POURQUOI PAS DEUX `select` NATIFS, ce qu'il y avait avant : ils s'ouvrent
+ * l'un APRÈS l'autre — deux gestes, deux listes qui se recouvrent, et jamais
+ * les deux nombres sous les yeux en même temps. Ici, un seul geste ouvre le
+ * panneau et les deux colonnes se lisent ensemble ; on repart quand les deux
+ * sont posés.
  *
- * LES BORNES VIENNENT DE L'UNITÉ : 1 à 999 en kilos, 1 à 2000 en livres. La
- * liste est donc plus longue en livres, et c'est normal — c'est le même
- * plafond qu'avant, celui du domaine, lu au même endroit.
- *
- * LA VALEUR RESTE UNE CHAÎNE « 95,0 », comme quand elle se tapait : ce qui la
- * lit en aval n'a pas à savoir d'où elle vient, et le jour où l'on rendra la
- * saisie libre à ceux qui la préfèrent, rien d'autre ne bougera.
+ * CE QUI EST DU NAVIGATEUR ET DEVRA CHANGER EN NATIF, et rien d'autre :
+ *   - la fermeture au clic dehors, écrite avec `document` ;
+ *   - la touche Échap ;
+ *   - `scrollIntoView`, qui amène le cran retenu au milieu de sa colonne à
+ *     l'ouverture.
+ * Tout le reste — l'état, les bornes, l'affichage — est ordinaire.
  */
 export function SelecteurPoids({ id, valeur, onValeur, unite, question }: SelecteurPoidsProps) {
   const textes = useTextes();
   const max = POIDS_MAX[unite] ?? 999;
+  const pas = PAS_AFFICHE[unite] ?? 1;
+
+  const [ouvert, setOuvert] = useState(false);
+  const enveloppe = useRef<HTMLDivElement>(null);
+  const cranEntiere = useRef<HTMLButtonElement>(null);
+  const cranDixieme = useRef<HTMLButtonElement>(null);
 
   const [entiereBrute = '', dixiemeBrut = '0'] = valeur.split(/[.,]/);
   const entiere = Number(entiereBrute) || 1;
@@ -69,53 +73,92 @@ export function SelecteurPoids({ id, valeur, onValeur, unite, question }: Select
   const poser = (nouvelleEntiere: number, nouveauDixieme: number) =>
     onValeur(`${nouvelleEntiere}${SEPARATEUR_STOCKE}${nouveauDixieme}`);
 
+  /* À l'ouverture, chaque colonne se place sur son cran retenu : sans cela, on
+     tomberait sur le début de la liste, à 1 kg. */
+  useEffect(() => {
+    if (!ouvert) return;
+    cranEntiere.current?.scrollIntoView({ block: 'center' });
+    cranDixieme.current?.scrollIntoView({ block: 'center' });
+  }, [ouvert]);
+
+  /* Le panneau se referme au clic dehors et sur Échap — les deux façons
+     ordinaires de dire « j'ai fini », l'une à la souris, l'autre au clavier. */
+  useEffect(() => {
+    if (!ouvert) return;
+
+    const auClic = (evenement: MouseEvent) => {
+      if (!enveloppe.current?.contains(evenement.target as Node)) setOuvert(false);
+    };
+    const auClavier = (evenement: KeyboardEvent) => {
+      if (evenement.key === 'Escape') setOuvert(false);
+    };
+
+    document.addEventListener('mousedown', auClic);
+    document.addEventListener('keydown', auClavier);
+    return () => {
+      document.removeEventListener('mousedown', auClic);
+      document.removeEventListener('keydown', auClavier);
+    };
+  }, [ouvert]);
+
+  const entieres = Array.from({ length: max }, (_, rang) => rang + 1);
+
   return (
-    <div className="selecteur">
-      {/* UN SEUL CHAMP pour les deux listes (demande du 2026-09-07, « kg et
-          centaines de grammes dans le meme champs, comme qd on choisit hures
-          et minutes ») : une seule boîte, une seule bordure, la virgule
-          dedans. Les deux listes n'ont plus de matière propre — c'est la boîte
-          qui la porte, et qui s'allume quand l'une ou l'autre est prise. */}
-      <div className="selecteur__boite">
-        <select
-          id={id}
-          className="selecteur__liste selecteur__liste--entiere"
-          value={entiere}
-          onChange={(evenement) => poser(Number(evenement.target.value), dixieme)}
-          aria-label={question}
-        >
-          {/* De 1 au plafond de l'unité. La liste est longue, et c'est le prix
-              d'un choix borné : aucun poids possible n'en est absent. */}
-          {Array.from({ length: max }, (_, rang) => rang + 1).map((valeurEntiere) => (
-            <option key={valeurEntiere} value={valeurEntiere}>
-              {valeurEntiere}
-            </option>
-          ))}
-        </select>
+    <div className="selecteur" ref={enveloppe}>
+      <button
+        type="button"
+        id={id}
+        className={`selecteur__boite${ouvert ? ' selecteur__boite--ouvert' : ''}`}
+        onClick={() => setOuvert((etait) => !etait)}
+        aria-haspopup="listbox"
+        aria-expanded={ouvert}
+        aria-label={question}
+      >
+        <span className="selecteur__valeur selecteur__valeur--entiere">{entiere}</span>
+        <span className="selecteur__separateur">{textes.separateurDecimal}</span>
+        <span className="selecteur__valeur selecteur__valeur--fraction">{dixieme * pas}</span>
+      </button>
 
-        <span className="selecteur__separateur" aria-hidden="true">
-          {textes.separateurDecimal}
-        </span>
-
-        <select
-          id={`${id}-dixieme`}
-          className="selecteur__liste selecteur__liste--fraction"
-          value={dixieme}
-          onChange={(evenement) => poser(entiere, Number(evenement.target.value))}
-          /* Nommée par ce qu'elle est vraiment — des centaines de grammes en
-             kilos, des dixièmes de livre en livres — et non par « décimale ». */
-          aria-label={textes.fractions[unite]}
-        >
-          {DIXIEMES.map((valeurDixieme) => (
-            <option key={valeurDixieme} value={valeurDixieme}>
-              {valeurDixieme * (PAS_AFFICHE[unite] ?? 1)}
-            </option>
-          ))}
-        </select>
-      </div>
-
-      {/* L'unité reste DEHORS, comme demandé le 2026-09-07. */}
+      {/* L'unité reste DEHORS du champ, comme demandé le 2026-09-07. */}
       <span className="champ__unite">{textes.unites[unite]}</span>
+
+      {ouvert ? (
+        <div className="roues">
+          <ul className="roue" role="listbox" aria-label={question}>
+            {entieres.map((valeurEntiere) => (
+              <li key={valeurEntiere}>
+                <button
+                  type="button"
+                  ref={valeurEntiere === entiere ? cranEntiere : undefined}
+                  className={`roue__cran${valeurEntiere === entiere ? ' roue__cran--choisi' : ''}`}
+                  role="option"
+                  aria-selected={valeurEntiere === entiere}
+                  onClick={() => poser(valeurEntiere, dixieme)}
+                >
+                  {valeurEntiere}
+                </button>
+              </li>
+            ))}
+          </ul>
+
+          <ul className="roue" role="listbox" aria-label={textes.fractions[unite]}>
+            {DIXIEMES.map((valeurDixieme) => (
+              <li key={valeurDixieme}>
+                <button
+                  type="button"
+                  ref={valeurDixieme === dixieme ? cranDixieme : undefined}
+                  className={`roue__cran${valeurDixieme === dixieme ? ' roue__cran--choisi' : ''}`}
+                  role="option"
+                  aria-selected={valeurDixieme === dixieme}
+                  onClick={() => poser(entiere, valeurDixieme)}
+                >
+                  {valeurDixieme * pas}
+                </button>
+              </li>
+            ))}
+          </ul>
+        </div>
+      ) : null}
     </div>
   );
 }
