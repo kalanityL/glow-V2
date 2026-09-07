@@ -53,8 +53,23 @@
 
        Les arrêts se resserrent d'autant près du coin clair : la même montée de
        clarté s'y fait sur une course plus courte, donc plus vite. C'est la
-       contrepartie mécanique du glissement, et la limite de la manœuvre — au
-       glissement suivant, la fin deviendra raide et se lira comme une lisière.
+       contrepartie mécanique du glissement, et sa limite — un glissement de
+       plus aurait rendu la fin raide, et elle se serait lue comme une lisière.
+
+     - LE CRAN SUIVANT A DONC CHANGÉ LES VALEURS, pas les positions (2026-09-07,
+       « remonte un peu encore le sombre ») : les sept arrêts du milieu et du
+       haut perdent de un à deux points de clarté, le creux d'un point au plus.
+
+           45 %  21,8 -> 21,0      87 %  36,1 -> 34,6
+           57 %  24,4 -> 23,2      93 %  39,3 -> 38,4
+           68 %  27,9 -> 26,3      96,5 % 41,2 -> 40,9
+           79 %  32,0 -> 30,3     100 %  43,0 (inchangé)
+
+       Le retrait s'éteint en approchant du coin : -1,7 point au plus fort,
+       -0,3 à l'avant-dernier arrêt, zéro au coin. Le sombre remonte donc
+       encore sans que le clair du haut droit bouge d'un dixième. Les trois
+       premiers arrêts — le coin bas gauche et sa descente — ne bougent pas non
+       plus.
      - LE COIN BAS GAUCHE S'ÉCLAIRCIT, de L 20,0 % à 22,5 %, puis à 25,0 % à
        la demande suivante (« éclaricit un peu plus le bas gauche »). Le point
        le plus sombre n'est donc plus dans le coin mais un quart plus haut, à
@@ -72,13 +87,13 @@
     #162137 0%,
     #0f192a 14%,
     #0d1626 29%,
-    #101a2c 45%,
-    #152035 57%,
-    #1b2841 68%,
-    #233250 79%,
-    #2b3d5f 87%,
-    #31456b 93%,
-    #354a73 96.5%,
+    #0f1829 45%,
+    #131d31 57%,
+    #18243b 68%,
+    #202e4a 79%,
+    #283959 87%,
+    #304368 93%,
+    #354972 96.5%,
     #394f7a 100%
   );
 
