@@ -114,14 +114,19 @@
 
   --carte-filet: rgba(255, 255, 255, 0.18);
 
-  /* LE BOUTON DE CIEL FONCÉ : un bouton de nuit. Pas d'aplat — une pastille
-     translucide cernée d'un filet d'accent, l'accent lui-même pour encre, et
-     aucune ombre : sur un fond de nuit, un halo se verrait comme une tache.
-     Le contraste de l'accent sur ce fond dépasse 7 pour 1, la lisibilité ne
-     paie pas la discrétion. */
-  --bouton-fond: rgba(95, 192, 255, 0.12);
-  --bouton-encre: var(--accent);
-  --bouton-filet: rgba(95, 192, 255, 0.55);
+  /* LE BOUTON DE CIEL FONCÉ. Il était cerné et translucide — un bouton
+     fantôme —, et elle ne l'aimait pas (2026-09-07). Il est maintenant PLEIN :
+     l'accent en aplat, une encre presque noire, pas de filet. Sur une page de
+     nuit, c'est la seule surface claire : l'action se voit tout de suite, ce
+     qu'un contour ne faisait pas.
+
+     CE QUI LE DISTINGUE DE CIEL n'est plus la matière mais LA FORME : arrondi
+     complet ici, 14 px là-bas. Et son encre est plus sombre que celle de Ciel
+     (#08131f contre #0b1a2b), l'aplat se détachant davantage sur un fond de
+     nuit — il supporte, et demande, un noir plus franc. */
+  --bouton-fond: var(--accent);
+  --bouton-encre: #08131f;
+  --bouton-filet: transparent;
   --bouton-rayon: 999px;
   --bouton-ombre: none;
 
