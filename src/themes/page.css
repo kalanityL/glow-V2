@@ -101,6 +101,72 @@
   color: var(--accent);
 }
 
+/* ── LE CHOIX DU THÈME ──────────────────────────────────────────────────── */
+
+/* Un cadre par thème, côte à côte. Deux colonnes égales : à deux thèmes elles
+   se partagent la largeur, à trois elles passeront à la ligne sans réglage. */
+.choix-themes {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+  gap: 12px;
+  margin: 20px 0 24px;
+}
+
+/* CHAQUE CADRE PORTE SA PROPRE CLASSE DE THÈME : son fond et son encre sont
+   ceux du thème qu'il propose, pas ceux de la page. On compare les deux d'un
+   coup d'œil, et le cadre choisi n'est pas le seul à se montrer. */
+.carte-theme {
+  display: flex;
+  align-items: flex-end;
+  aspect-ratio: 3 / 4;
+  padding: 12px;
+  border: 1px solid var(--carte-filet);
+  border-radius: 16px;
+  background: var(--fond);
+  color: var(--encre);
+  cursor: pointer;
+  /* Le liseré de sélection est dessiné en `box-shadow` et non en `border` : une
+     bordure qui s'épaissit déplacerait le contenu du cadre au moment du clic. */
+  box-shadow: none;
+  transition: box-shadow 150ms, transform 150ms;
+}
+
+.carte-theme:active {
+  transform: scale(0.98);
+}
+
+.carte-theme--choisi {
+  box-shadow: 0 0 0 2px var(--accent);
+}
+
+.carte-theme__nom {
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 13px;
+  letter-spacing: -0.01em;
+}
+
+/* ── LE BOUTON ──────────────────────────────────────────────────────────── */
+
+.bouton {
+  width: 100%;
+  padding: 13px 20px;
+  border: none;
+  border-radius: 14px;
+  background: var(--bouton-fond);
+  color: var(--bouton-encre);
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: 14px;
+  letter-spacing: 0.02em;
+  cursor: pointer;
+  transition: transform 150ms, opacity 150ms;
+}
+
+.bouton:active {
+  transform: scale(0.99);
+}
+
 /* ── LES TEXTES ─────────────────────────────────────────────────────────── */
 
 .surtitre {

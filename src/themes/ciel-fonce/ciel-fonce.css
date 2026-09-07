@@ -113,6 +113,13 @@
   --encre-surtitre: rgba(255, 255, 255, 0.9);
   --encre-chapeau: rgba(255, 255, 255, 0.86);
 
+  /* Le filet d'un cadre de thème, et le bouton. L'encre du bouton est prise
+     dans le noir du thème plutôt qu'en blanc : sur un aplat clair comme
+     l'accent, du blanc ne tiendrait pas le contraste. */
+  --carte-filet: rgba(255, 255, 255, 0.18);
+  --bouton-fond: var(--accent);
+  --bouton-encre: #0b1a2b;
+
   --font-display: 'Outfit', system-ui, sans-serif;
   --font-body: 'Plus Jakarta Sans', system-ui, sans-serif;
 }

@@ -1,5 +1,5 @@
 import { useTextes } from './i18n/useTextes';
-import { Accueil } from './screens/Accueil';
+import { Onboarding } from './screens/Onboarding';
 /* La mise en page d'abord, les jetons des thèmes ensuite : les feuilles de
    thème doivent pouvoir battre la structure, jamais l'inverse. */
 import './themes/page.css';
@@ -33,7 +33,7 @@ export default function App() {
             éléments `position: fixed` qu'il abritera : les popups s'y
             centreront, plutôt que dans la fenêtre du navigateur. */}
         <div className="phone-screen" id="phone-screen">
-          <Accueil />
+          <Onboarding />
         </div>
 
         {/* La barre du bas, hors écran : elle figure le menu natif du

@@ -28,6 +28,13 @@
   --encre-surtitre: rgba(255, 255, 255, 0.9);
   --encre-chapeau: rgba(255, 255, 255, 0.86);
 
+  /* Le filet d'un cadre de thème, et le bouton. L'encre du bouton est prise
+     dans le noir du thème plutôt qu'en blanc : sur un aplat clair comme
+     l'accent, du blanc ne tiendrait pas le contraste. */
+  --carte-filet: rgba(255, 255, 255, 0.25);
+  --bouton-fond: var(--accent);
+  --bouton-encre: #0b1a2b;
+
   /* Les polices : Outfit pour les titres et la marque, Plus Jakarta Sans pour
      le texte courant. Embarquées, voir `src/fonts.css`. */
   --font-display: 'Outfit', system-ui, sans-serif;

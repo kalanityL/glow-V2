@@ -1,3 +1,5 @@
+import type { ThemeId } from '../themes/themes';
+
 /**
  * TOUS LES MOTS DE L'APPLICATION, ET RIEN D'AUTRE.
  *
@@ -26,10 +28,17 @@ export const LANGUE_PAR_DEFAUT: Langue = 'fr';
 
 /** Le contrat : chaque langue doit porter exactement ces clés. */
 export interface Textes {
-  accueil: {
-    surtitre: string;
-    titre: string;
-    chapeau: string;
+  /**
+   * LE NOM DE CHAQUE THÈME. `Record<ThemeId, string>` et non un objet libre :
+   * ajouter un thème sans le nommer dans CHAQUE langue ne compile pas.
+   */
+  themes: Record<ThemeId, string>;
+  onboarding: {
+    theme: {
+      surtitre: string;
+      question: string;
+    };
+    suivant: string;
   };
   /** Le bouton « retour » de la barre du bas : lu par les lecteurs d'écran. */
   retour: string;
@@ -37,18 +46,30 @@ export interface Textes {
 
 export const TEXTES: Record<Langue, Textes> = {
   fr: {
-    accueil: {
-      surtitre: 'hello world',
-      titre: 'hello world',
-      chapeau: 'hello world',
+    themes: {
+      ciel: 'Ciel',
+      'ciel-fonce': 'Ciel foncé',
+    },
+    onboarding: {
+      theme: {
+        surtitre: 'Votre thème',
+        question: 'Choisissez un thème.',
+      },
+      suivant: 'Suivant',
     },
     retour: 'Retour',
   },
   en: {
-    accueil: {
-      surtitre: 'hello world',
-      titre: 'hello world',
-      chapeau: 'hello world',
+    themes: {
+      ciel: 'Sky',
+      'ciel-fonce': 'Dark sky',
+    },
+    onboarding: {
+      theme: {
+        surtitre: 'Your theme',
+        question: 'Choose a theme.',
+      },
+      suivant: 'Next',
     },
     retour: 'Back',
   },
