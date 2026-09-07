@@ -8,20 +8,6 @@ export const OBJECTIFS = ['perdre', 'stabiliser'] as const;
 export type Objectif = (typeof OBJECTIFS)[number];
 
 /**
- * Ce qu'on souhaite pour son activité quotidienne. LE PREMIER — « conserver mon
- * rythme actuel » — EST RETENU D'AVANCE (demande du 2026-09-07) : ne rien
- * changer n'est pas un conseil, c'est le point neutre. Cocher « être plus
- * actif » d'avance, ça, en serait un.
- */
-export const SOUHAITS_ACTIVITE = [
-  'conserver',
-  'un-peu-plus',
-  'beaucoup-plus',
-  'ralentir',
-] as const;
-export type SouhaitActivite = (typeof SOUHAITS_ACTIVITE)[number];
-
-/**
  * TOUT CE QUE L'ONBOARDING RECUEILLE.
  *
  * Les mesures sont gardées EN TEXTE et AVEC UN POINT, « 95.0 » : c'est ce que
@@ -45,8 +31,6 @@ export interface Reponses {
   objectif: Objectif;
   poids: string;
   poidsCible: string;
-  /* Toujours renseigné : il a un défaut, contrairement au niveau d'activité. */
-  souhaitActivite: SouhaitActivite;
   /**
    * LE TRAITEMENT, EN TROIS RÉPONSES LIÉES. `null` veut dire « pas encore
    * répondu » et se distingue d'un « non ».
@@ -78,7 +62,6 @@ export const REPONSES_INITIALES: Reponses = {
      précisément ce qu'elle refuse. */
   poids: '95.0',
   poidsCible: '95.0',
-  souhaitActivite: SOUHAITS_ACTIVITE[0],
   traitementCommence: null,
   formeTraitement: null,
   traitement: null,

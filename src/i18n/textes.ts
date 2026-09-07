@@ -1,7 +1,7 @@
 import type { Forme } from '../domaine/traitements';
 import type { Systeme, Unite } from '../domaine/unites';
 import type { Langue } from './langues';
-import type { Objectif, SouhaitActivite } from '../screens/onboarding/reponses';
+import type { Objectif } from '../screens/onboarding/reponses';
 import type { ThemeId } from '../themes/themes';
 
 /**
@@ -39,9 +39,6 @@ export interface Textes {
   /** Les objectifs, sous le même contrat : en ajouter un l'exige dans chaque langue. */
   objectifs: Record<Objectif, string>;
   /** Les niveaux d'activité, sous le même contrat. */
-  /** Les souhaits d'activité, sous le même contrat : en ajouter un l'exige
-   *  dans chaque langue. */
-  souhaitsActivite: Record<SouhaitActivite, string>;
   /**
    * LES UNITÉS. Elles se traduisent : « lb » s'écrit « lbs » ou « livres »
    * selon la langue, et une langue non latine ne les écrit pas du tout comme
@@ -97,9 +94,6 @@ export interface Textes {
     poidsCible: {
       question: string;
     };
-    souhaitQuotidien: {
-      question: string;
-    };
     traitement: {
       question: string;
     };
@@ -135,12 +129,6 @@ export const TEXTES: Record<Langue, Textes> = {
       perdre: 'Perdre du poids',
       stabiliser: 'Stabiliser mon poids',
     },
-    souhaitsActivite: {
-      conserver: 'Conserver mon rythme actuel',
-      'un-peu-plus': 'Être un peu plus actif',
-      'beaucoup-plus': 'Être beaucoup plus actif',
-      ralentir: 'Ralentir le rythme',
-    },
     unites: {
       kg: 'kg',
       lb: 'lb',
@@ -173,9 +161,6 @@ export const TEXTES: Record<Langue, Textes> = {
       },
       poidsCible: {
         question: 'Quel poids visez-vous ?',
-      },
-      souhaitQuotidien: {
-        question: 'Par rapport à votre activité quotidienne, vous souhaiteriez…',
       },
       traitement: {
         question: 'Avez-vous commencé votre traitement GLP-1 ?',
@@ -210,12 +195,6 @@ export const TEXTES: Record<Langue, Textes> = {
       perdre: 'Lose weight',
       stabiliser: 'Keep my weight steady',
     },
-    souhaitsActivite: {
-      conserver: 'Keep my current pace',
-      'un-peu-plus': 'Be a little more active',
-      'beaucoup-plus': 'Be much more active',
-      ralentir: 'Slow down',
-    },
     unites: {
       kg: 'kg',
       lb: 'lb',
@@ -248,9 +227,6 @@ export const TEXTES: Record<Langue, Textes> = {
       },
       poidsCible: {
         question: 'What weight are you aiming for?',
-      },
-      souhaitQuotidien: {
-        question: 'About your daily activity, you would like to…',
       },
       traitement: {
         question: 'Have you started your GLP-1 treatment?',

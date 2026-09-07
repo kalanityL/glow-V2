@@ -20,8 +20,7 @@ export type EtapeId =
   | 'objectif'
   | 'poids'
   | 'poids-cible'
-  | 'traitement'
-  | 'souhait-quotidien';
+  | 'traitement';
 
 export const ETAPES: readonly Etape[] = [
   /* LE THÈME EN PREMIER, et la langue ensuite (2026-09-07). J'avais d'abord
@@ -45,9 +44,6 @@ export const ETAPES: readonly Etape[] = [
   /* Le traitement APRÈS les poids : on a dit où l'on en est et où l'on va
      avant de dire ce qu'on prend. */
   { id: 'traitement' },
-  /* Le souhait sur l'activité quotidienne. La question qui demandait le NIVEAU
-     d'activité le précédait ; elle a été supprimée le 2026-09-07. */
-  { id: 'souhait-quotidien' },
 ];
 
 /**
