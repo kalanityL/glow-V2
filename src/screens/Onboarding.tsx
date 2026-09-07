@@ -8,7 +8,6 @@ import { EtapeTheme } from './onboarding/EtapeTheme';
 import { EtapeObjectif } from './onboarding/EtapeObjectif';
 import { EtapePoids } from './onboarding/EtapePoids';
 import { EtapeTraitement } from './onboarding/EtapeTraitement';
-import { EtapeActivite } from './onboarding/EtapeActivite';
 import { EtapeSouhaitActivite } from './onboarding/EtapeSouhaitActivite';
 
 /**
@@ -91,13 +90,6 @@ export function Onboarding({ parcours }: { parcours: ReturnType<typeof useParcou
             onForme={repondreForme}
             traitement={reponses.traitement}
             onTraitement={(traitement) => repondre('traitement', traitement)}
-          />
-        ) : null}
-
-        {etape === 'activite' ? (
-          <EtapeActivite
-            activite={reponses.activite}
-            onActivite={(activite) => repondre('activite', activite)}
           />
         ) : null}
 

@@ -1,11 +1,7 @@
 import type { Forme } from '../domaine/traitements';
 import type { Systeme, Unite } from '../domaine/unites';
 import type { Langue } from './langues';
-import type {
-  NiveauActivite,
-  Objectif,
-  SouhaitActivite,
-} from '../screens/onboarding/reponses';
+import type { Objectif, SouhaitActivite } from '../screens/onboarding/reponses';
 import type { ThemeId } from '../themes/themes';
 
 /**
@@ -43,8 +39,8 @@ export interface Textes {
   /** Les objectifs, sous le même contrat : en ajouter un l'exige dans chaque langue. */
   objectifs: Record<Objectif, string>;
   /** Les niveaux d'activité, sous le même contrat. */
-  niveauxActivite: Record<NiveauActivite, string>;
-  /** Les souhaits d'activité, sous le même contrat. */
+  /** Les souhaits d'activité, sous le même contrat : en ajouter un l'exige
+   *  dans chaque langue. */
   souhaitsActivite: Record<SouhaitActivite, string>;
   /**
    * LES UNITÉS. Elles se traduisent : « lb » s'écrit « lbs » ou « livres »
@@ -101,9 +97,6 @@ export interface Textes {
     poidsCible: {
       question: string;
     };
-    activite: {
-      question: string;
-    };
     souhaitQuotidien: {
       question: string;
     };
@@ -141,11 +134,6 @@ export const TEXTES: Record<Langue, Textes> = {
     objectifs: {
       perdre: 'Perdre du poids',
       stabiliser: 'Stabiliser mon poids',
-    },
-    niveauxActivite: {
-      doux: 'Doux',
-      modere: 'Modéré',
-      intense: 'Intense',
     },
     souhaitsActivite: {
       conserver: 'Conserver mon rythme actuel',
@@ -186,9 +174,6 @@ export const TEXTES: Record<Langue, Textes> = {
       poidsCible: {
         question: 'Quel poids visez-vous ?',
       },
-      activite: {
-        question: 'Quel est votre niveau d’activité au quotidien ?',
-      },
       souhaitQuotidien: {
         question: 'Par rapport à votre activité quotidienne, vous souhaiteriez…',
       },
@@ -224,11 +209,6 @@ export const TEXTES: Record<Langue, Textes> = {
     objectifs: {
       perdre: 'Lose weight',
       stabiliser: 'Keep my weight steady',
-    },
-    niveauxActivite: {
-      doux: 'Gentle',
-      modere: 'Moderate',
-      intense: 'Intense',
     },
     souhaitsActivite: {
       conserver: 'Keep my current pace',
@@ -268,9 +248,6 @@ export const TEXTES: Record<Langue, Textes> = {
       },
       poidsCible: {
         question: 'What weight are you aiming for?',
-      },
-      activite: {
-        question: 'How active are your days?',
       },
       souhaitQuotidien: {
         question: 'About your daily activity, you would like to…',

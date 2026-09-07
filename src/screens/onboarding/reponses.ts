@@ -7,18 +7,11 @@ import { THEME_PAR_DEFAUT, type ThemeId } from '../../themes/themes';
 export const OBJECTIFS = ['perdre', 'stabiliser'] as const;
 export type Objectif = (typeof OBJECTIFS)[number];
 
-/** Les niveaux d'activité quotidienne. AUCUN n'est retenu d'avance : on ne
- *  suppose pas à la place de quelqu'un ce qu'est sa journée. */
-export const NIVEAUX_ACTIVITE = ['doux', 'modere', 'intense'] as const;
-export type NiveauActivite = (typeof NIVEAUX_ACTIVITE)[number];
-
 /**
  * Ce qu'on souhaite pour son activité quotidienne. LE PREMIER — « conserver mon
- * rythme actuel » — EST RETENU D'AVANCE (demande du 2026-09-07), à la
- * différence du niveau, qui n'a pas de défaut.
- *
- * Et c'est cohérent : ne rien changer n'est pas un conseil, c'est le point
- * neutre. Cocher « être plus actif » d'avance, ça, en serait un.
+ * rythme actuel » — EST RETENU D'AVANCE (demande du 2026-09-07) : ne rien
+ * changer n'est pas un conseil, c'est le point neutre. Cocher « être plus
+ * actif » d'avance, ça, en serait un.
  */
 export const SOUHAITS_ACTIVITE = [
   'conserver',
@@ -52,7 +45,6 @@ export interface Reponses {
   objectif: Objectif;
   poids: string;
   poidsCible: string;
-  activite: NiveauActivite | null;
   /* Toujours renseigné : il a un défaut, contrairement au niveau d'activité. */
   souhaitActivite: SouhaitActivite;
   /**
@@ -86,7 +78,6 @@ export const REPONSES_INITIALES: Reponses = {
      précisément ce qu'elle refuse. */
   poids: '95.0',
   poidsCible: '95.0',
-  activite: null,
   souhaitActivite: SOUHAITS_ACTIVITE[0],
   traitementCommence: null,
   formeTraitement: null,

@@ -21,7 +21,6 @@ export type EtapeId =
   | 'poids'
   | 'poids-cible'
   | 'traitement'
-  | 'activite'
   | 'souhait-quotidien';
 
 export const ETAPES: readonly Etape[] = [
@@ -46,9 +45,8 @@ export const ETAPES: readonly Etape[] = [
   /* Le traitement APRÈS les poids : on a dit où l'on en est et où l'on va
      avant de dire ce qu'on prend. */
   { id: 'traitement' },
-  { id: 'activite' },
-  /* Le souhait APRÈS le niveau : on dit d'abord où l'on en est, ensuite où
-     l'on veut aller. L'inverse ferait répondre dans le vide. */
+  /* Le souhait sur l'activité quotidienne. La question qui demandait le NIVEAU
+     d'activité le précédait ; elle a été supprimée le 2026-09-07. */
   { id: 'souhait-quotidien' },
 ];
 
