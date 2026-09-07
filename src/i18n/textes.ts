@@ -1,4 +1,5 @@
-import type { Objectif } from '../screens/onboarding/objectifs';
+import type { Unite } from '../domaine/unites';
+import type { NiveauActivite, Objectif } from '../screens/onboarding/reponses';
 import type { ThemeId } from '../themes/themes';
 
 /**
@@ -36,11 +37,29 @@ export interface Textes {
   themes: Record<ThemeId, string>;
   /** Les objectifs, sous le même contrat : en ajouter un l'exige dans chaque langue. */
   objectifs: Record<Objectif, string>;
+  /** Les niveaux d'activité, sous le même contrat. */
+  niveauxActivite: Record<NiveauActivite, string>;
+  /**
+   * LES UNITÉS. Elles se traduisent : « lb » s'écrit « lbs » ou « livres »
+   * selon la langue, et une langue non latine ne les écrit pas du tout comme
+   * ça. Elles ne sont donc pas dans `domaine/unites.ts`, qui ne porte que les
+   * identifiants.
+   */
+  unites: Record<Unite, string>;
   onboarding: {
     theme: {
       question: string;
     };
     objectif: {
+      question: string;
+    };
+    poids: {
+      question: string;
+    };
+    poidsCible: {
+      question: string;
+    };
+    activite: {
       question: string;
     };
     precedent: string;
@@ -60,12 +79,32 @@ export const TEXTES: Record<Langue, Textes> = {
       perdre: 'Perdre du poids',
       stabiliser: 'Stabiliser mon poids',
     },
+    niveauxActivite: {
+      doux: 'Doux',
+      modere: 'Modéré',
+      intense: 'Intense',
+    },
+    unites: {
+      kg: 'kg',
+      lb: 'lb',
+      cm: 'cm',
+      in: 'in',
+    },
     onboarding: {
       theme: {
         question: 'Choisissez',
       },
       objectif: {
         question: 'Vous souhaitez…',
+      },
+      poids: {
+        question: 'Quel est votre poids actuel ?',
+      },
+      poidsCible: {
+        question: 'Quel poids visez-vous ?',
+      },
+      activite: {
+        question: 'Quel est votre niveau d’activité au quotidien ?',
       },
       precedent: 'Précédent',
       suivant: 'Suivant',
@@ -81,12 +120,32 @@ export const TEXTES: Record<Langue, Textes> = {
       perdre: 'Lose weight',
       stabiliser: 'Keep my weight steady',
     },
+    niveauxActivite: {
+      doux: 'Gentle',
+      modere: 'Moderate',
+      intense: 'Intense',
+    },
+    unites: {
+      kg: 'kg',
+      lb: 'lb',
+      cm: 'cm',
+      in: 'in',
+    },
     onboarding: {
       theme: {
         question: 'Choose',
       },
       objectif: {
         question: 'You would like to…',
+      },
+      poids: {
+        question: 'What is your current weight?',
+      },
+      poidsCible: {
+        question: 'What weight are you aiming for?',
+      },
+      activite: {
+        question: 'How active are your days?',
       },
       precedent: 'Previous',
       suivant: 'Next',

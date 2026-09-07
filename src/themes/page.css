@@ -141,6 +141,55 @@
   box-shadow: 0 0 0 2px var(--accent);
 }
 
+/* ── UN CHAMP DE SAISIE ─────────────────────────────────────────────────── */
+
+/* Le champ et son unité, côte à côte. L'unité est DEHORS : dans le champ, elle
+   se mêlerait au texte saisi et un lecteur d'écran la dicterait comme une part
+   de la valeur. */
+.champ {
+  display: flex;
+  align-items: stretch;
+  gap: 10px;
+  margin: 20px 0 24px;
+}
+
+/* LE CHAMP NE PREND PAS TOUTE LA LARGEUR (2026-09-07) : il est taillé pour ce
+   qu'on y écrit — au plus « 999,9 », cinq signes —, avec de l'air autour. Un
+   champ large annoncerait une longue réponse là où l'on attend trois chiffres.
+   La mesure est en `ch` : elle suit la police, et tiendra encore si elle
+   change. */
+.champ__saisie {
+  flex: none;
+  width: 9ch;
+  padding: 15px 16px;
+  border: 1px solid var(--option-filet);
+  border-radius: 14px;
+  background: var(--option-fond);
+  color: var(--encre);
+  font-family: var(--font-body);
+  font-weight: 500;
+  font-size: 17px;
+  transition: box-shadow 150ms, background 150ms;
+}
+
+.champ__saisie:focus {
+  outline: none;
+  background: var(--option-choisi-fond);
+  box-shadow: 0 0 0 2px var(--accent);
+}
+
+/* L'unité : une étiquette, pas un bouton. Elle prend la largeur qu'il lui faut
+   et pas plus — « kg » et « lb » ne font pas la même. */
+.champ__unite {
+  display: flex;
+  align-items: center;
+  padding-inline: 4px;
+  font-family: var(--font-body);
+  font-weight: 500;
+  font-size: 17px;
+  color: var(--encre-chapeau);
+}
+
 /* ── LES RÉPONSES D'UNE QUESTION ────────────────────────────────────────── */
 
 /* Empilées et pleine largeur : la question se lit d'un trait, du haut vers le

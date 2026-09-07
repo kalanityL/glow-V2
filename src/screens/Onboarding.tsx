@@ -1,65 +1,82 @@
-import { useState } from 'react';
 import { Logomark } from '../components/Logomark';
 import { Wordmark } from '../components/Wordmark';
 import { useTextes } from '../i18n/useTextes';
-import { THEME_PAR_DEFAUT, classeDuTheme, type ThemeId } from '../themes/themes';
+import { classeDuTheme } from '../themes/themes';
+import type { useParcours } from '../app/useParcours';
 import { EtapeTheme } from './onboarding/EtapeTheme';
 import { EtapeObjectif } from './onboarding/EtapeObjectif';
-import { OBJECTIF_PAR_DEFAUT, type Objectif } from './onboarding/objectifs';
-
-interface OnboardingProps {
-  /** L'étape affichée, comptée à partir de zéro. */
-  etape: number;
-  /** Faux à la première étape : il n'y a rien derrière. */
-  peutRevenir: boolean;
-  /** Revenir à la précédente. */
-  onPrecedent: () => void;
-  /** Passer à la suivante. */
-  onSuivant: () => void;
-}
-
-/** Le nombre d'étapes, lu par le parcours pour savoir où s'arrêter. */
-export const NOMBRE_ETAPES = 2;
+import { EtapePoids } from './onboarding/EtapePoids';
+import { EtapeActivite } from './onboarding/EtapeActivite';
 
 /**
- * L'ONBOARDING — l'entête, l'étape courante, le bouton « Suivant ».
+ * L'ONBOARDING — l'entête, l'étape courante, la rangée des boutons.
  *
- * IL PORTE LES RÉPONSES, PAS LA NAVIGATION. Le rang de l'étape vit un cran
- * plus haut, dans `App` : le bouton « retour » est HORS de l'écran du
- * téléphone — c'est le bouton natif simulé — et il doit pouvoir reculer dans
- * le parcours. Descendre la navigation ici l'aurait mise hors de sa portée.
- *
- * Les réponses, elles, ne sortent pas d'ici tant que rien ne les attend
- * ailleurs. Elles ne sont pas encore enregistrées : un rechargement les perd.
+ * Il ne DÉCIDE de rien : le parcours (les réponses, l'étape, les gestes)
+ * arrive tout fait de `useParcours`, tenu par `App` parce que le bouton de la
+ * barre du téléphone doit pouvoir y reculer. Cet écran ne fait que le montrer.
  */
-export function Onboarding({ etape, peutRevenir, onPrecedent, onSuivant }: OnboardingProps) {
+export function Onboarding({ parcours }: { parcours: ReturnType<typeof useParcours> }) {
   const textes = useTextes();
-  const [theme, setTheme] = useState<ThemeId>(THEME_PAR_DEFAUT);
-  const [objectif, setObjectif] = useState<Objectif>(OBJECTIF_PAR_DEFAUT);
+  const { reponses, etape, repondre, repondrePoids, peutRevenir, avancer, reculer } = parcours;
 
   return (
-    <div className={`page ${classeDuTheme(theme)}`}>
+    <div className={`page ${classeDuTheme(reponses.theme)}`}>
       <div className="page__colonne">
         <div className="entete">
           <Logomark size={46} />
           <Wordmark />
         </div>
 
-        {etape === 0 ? <EtapeTheme theme={theme} onTheme={setTheme} /> : null}
-        {etape === 1 ? <EtapeObjectif objectif={objectif} onObjectif={setObjectif} /> : null}
+        {etape === 'theme' ? (
+          <EtapeTheme theme={reponses.theme} onTheme={(theme) => repondre('theme', theme)} />
+        ) : null}
 
-        {/* « PRÉCÉDENT » N'EXISTE PAS À LA PREMIÈRE ÉTAPE (2026-09-07) : il
-            n'est pas éteint, il est absent — rien ne se propose de reculer là
-            où il n'y a rien derrière. « Suivant » occupe alors toute la
-            rangée. Le bouton de la barre du téléphone, lui, ne peut pas
-            disparaître : c'est le bouton natif, il s'éteint à moitié. */}
+        {etape === 'objectif' ? (
+          <EtapeObjectif
+            objectif={reponses.objectif}
+            onObjectif={(objectif) => repondre('objectif', objectif)}
+          />
+        ) : null}
+
+        {etape === 'poids' ? (
+          <EtapePoids
+            id="poids-actuel"
+            question={textes.onboarding.poids.question}
+            poids={reponses.poids}
+            onPoids={(saisie) => repondrePoids('poids', saisie)}
+            systeme={reponses.systeme}
+          />
+        ) : null}
+
+        {etape === 'poids-cible' ? (
+          <EtapePoids
+            id="poids-cible"
+            question={textes.onboarding.poidsCible.question}
+            poids={reponses.poidsCible}
+            onPoids={(saisie) => repondrePoids('poidsCible', saisie)}
+            systeme={reponses.systeme}
+          />
+        ) : null}
+
+        {etape === 'activite' ? (
+          <EtapeActivite
+            activite={reponses.activite}
+            onActivite={(activite) => repondre('activite', activite)}
+          />
+        ) : null}
+
+        {/* « PRÉCÉDENT » N'EXISTE PAS À LA PREMIÈRE ÉTAPE : il n'est pas éteint,
+            il est absent — rien ne se propose de reculer là où il n'y a rien
+            derrière. « Suivant » occupe alors toute la rangée. Le bouton de la
+            barre du téléphone, lui, ne peut pas disparaître : c'est le bouton
+            natif, il s'éteint à moitié. */}
         <div className="boutons">
           {peutRevenir ? (
-            <button type="button" className="bouton bouton--second" onClick={onPrecedent}>
+            <button type="button" className="bouton bouton--second" onClick={reculer}>
               {textes.onboarding.precedent}
             </button>
           ) : null}
-          <button type="button" className="bouton" onClick={onSuivant}>
+          <button type="button" className="bouton" onClick={avancer}>
             {textes.onboarding.suivant}
           </button>
         </div>

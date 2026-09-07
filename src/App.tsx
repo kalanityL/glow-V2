@@ -1,6 +1,6 @@
-import { useState } from 'react';
+import { useParcours } from './app/useParcours';
 import { useTextes } from './i18n/useTextes';
-import { NOMBRE_ETAPES, Onboarding } from './screens/Onboarding';
+import { Onboarding } from './screens/Onboarding';
 /* La mise en page d'abord, les jetons des thèmes ensuite : les feuilles de
    thème doivent pouvoir battre la structure, jamais l'inverse. */
 import './themes/page.css';
@@ -20,16 +20,10 @@ import './themes/ciel-fonce/ciel-fonce.css';
 export default function App() {
   const textes = useTextes();
 
-  /* LE RANG DE L'ÉTAPE VIT ICI, et non dans l'onboarding : le bouton « retour »
-     est hors de l'écran du téléphone — il figure le bouton natif — et doit
-     pouvoir reculer dans le parcours. Il n'y a qu'un axe pour l'instant, donc
-     un simple compteur suffit ; le jour où le parcours se ramifiera, c'est ce
-     compteur qui deviendra une pile. */
-  const [etape, setEtape] = useState(0);
-  const peutRevenir = etape > 0;
-  /* Un seul geste de recul, DEUX BOUTONS qui l'appellent : celui de la page et
-     celui de la barre du téléphone. Ils ne peuvent pas diverger. */
-  const reculer = () => setEtape((rang) => Math.max(rang - 1, 0));
+  /* LE PARCOURS VIT ICI, et non dans l'onboarding : le bouton « retour » de la
+     barre est hors de l'écran du téléphone — il figure le bouton natif — et
+     doit pouvoir y reculer. */
+  const parcours = useParcours();
 
   return (
     <div className="app-root">
@@ -45,12 +39,7 @@ export default function App() {
             éléments `position: fixed` qu'il abritera : les popups s'y
             centreront, plutôt que dans la fenêtre du navigateur. */}
         <div className="phone-screen" id="phone-screen">
-          <Onboarding
-            etape={etape}
-            peutRevenir={peutRevenir}
-            onPrecedent={reculer}
-            onSuivant={() => setEtape((rang) => Math.min(rang + 1, NOMBRE_ETAPES - 1))}
-          />
+          <Onboarding parcours={parcours} />
         </div>
 
         {/* La barre du bas, hors écran : elle figure le menu natif du
@@ -63,9 +52,9 @@ export default function App() {
             className="phone-bar-back"
             title={textes.retour}
             aria-label={textes.retour}
-            aria-disabled={!peutRevenir}
-            disabled={!peutRevenir}
-            onClick={reculer}
+            aria-disabled={!parcours.peutRevenir}
+            disabled={!parcours.peutRevenir}
+            onClick={parcours.reculer}
           >
             <ArrowLeft />
           </button>
