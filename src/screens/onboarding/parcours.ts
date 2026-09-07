@@ -15,21 +15,27 @@ export interface Etape {
 }
 
 export type EtapeId =
-  | 'langue-unites'
   | 'theme'
+  | 'langue-unites'
   | 'objectif'
   | 'poids'
   | 'poids-cible'
   | 'activite';
 
 export const ETAPES: readonly Etape[] = [
-  /* LA LANGUE ET LES UNITÉS D'ABORD, ENSEMBLE (2026-09-07) : la langue décide
-     de la façon dont tout le reste se lira, et elle amène ses unités — les
-     poser sur le même écran montre ce que le choix de l'une fait à l'autre.
-     Et les unités arrivent ainsi bien AVANT toute mesure : on ne demande pas
-     un poids à quelqu'un avant de savoir dans quelle unité il le compte. */
-  { id: 'langue-unites' },
+  /* LE THÈME EN PREMIER, et la langue ensuite (2026-09-07). J'avais d'abord
+     mis la langue en tête, en lisant « en premier » comme « avant tout » ; ce
+     qu'elle voulait dire, c'est « en premier SUR CET ÉCRAN-LÀ » — l'écran des
+     unités, qui vient après le thème depuis le début (« écran apres choix du
+     theme, choix metrique »). Le défaut sautait aux yeux à l'usage : il
+     manquait un bouton « Précédent » sur l'écran langue et unités, ce qui ne
+     peut arriver qu'à la toute première page. */
   { id: 'theme' },
+  /* LA LANGUE ET LES UNITÉS, ENSEMBLE : la langue amène ses unités, et les
+     poser sur le même écran montre ce que le choix de l'une fait à l'autre.
+     Elles arrivent bien AVANT toute mesure : on ne demande pas un poids à
+     quelqu'un avant de savoir dans quelle unité il le compte. */
+  { id: 'langue-unites' },
   { id: 'objectif' },
   { id: 'poids' },
   /* Viser un poids n'a de sens que si l'on veut en changer : à « stabiliser »,
