@@ -18,6 +18,8 @@
  * l'exige dans chaque langue.
  */
 
+import type { Langue } from '../i18n/langues';
+
 export const SYSTEMES = ['metrique', 'imperial'] as const;
 
 export type Systeme = (typeof SYSTEMES)[number];
@@ -29,6 +31,22 @@ export const SYSTEME_PAR_DEFAUT: Systeme = 'metrique';
 export const UNITES = ['kg', 'lb', 'cm', 'in'] as const;
 
 export type Unite = (typeof UNITES)[number];
+
+/**
+ * LE SYSTÈME QUE CHAQUE LANGUE APPORTE AVEC ELLE (2026-09-07 : « si choix en,
+ * ça bascule le defaut de l'unité vers pound, mais on peut le changer apres ;
+ * si choix fr, rebascule vers defaut cm »).
+ *
+ * C'est un DÉFAUT, pas une règle : choisir une langue repose le système sur
+ * celui-ci, et l'on est libre d'en changer juste après, sur le même écran.
+ * L'anglais amène l'impérial parce que c'est ce que lisent la plupart de ceux
+ * qui le choisiront ; le jour où une langue de plus arrivera, sa ligne se pose
+ * ici et nulle part ailleurs.
+ */
+export const SYSTEME_PAR_LANGUE: Record<Langue, Systeme> = {
+  fr: 'metrique',
+  en: 'imperial',
+};
 
 /** L'unité de chaque grandeur, dans chaque système. */
 export const UNITES_DU_SYSTEME: Record<Systeme, { poids: Unite; taille: Unite }> = {

@@ -1,4 +1,5 @@
-import { LANGUE_PAR_DEFAUT, LANGUES, TEXTES, type Langue, type Textes } from './textes';
+import { LANGUE_PAR_DEFAUT, LANGUES, type Langue } from './langues';
+import { TEXTES, type Textes } from './textes';
 
 /**
  * LA LANGUE ACTIVE, ET LES MOTS QUI VONT AVEC.

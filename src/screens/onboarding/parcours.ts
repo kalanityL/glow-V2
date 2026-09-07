@@ -15,23 +15,21 @@ export interface Etape {
 }
 
 export type EtapeId =
-  | 'langue'
+  | 'langue-unites'
   | 'theme'
-  | 'systeme'
   | 'objectif'
   | 'poids'
   | 'poids-cible'
   | 'activite';
 
 export const ETAPES: readonly Etape[] = [
-  /* LA LANGUE D'ABORD (2026-09-07) : c'est ce qui décide de la façon dont tout
-     le reste se lira. La demander après aurait voulu dire poser les premières
-     questions dans une langue qu'on n'a pas choisie. */
-  { id: 'langue' },
+  /* LA LANGUE ET LES UNITÉS D'ABORD, ENSEMBLE (2026-09-07) : la langue décide
+     de la façon dont tout le reste se lira, et elle amène ses unités — les
+     poser sur le même écran montre ce que le choix de l'une fait à l'autre.
+     Et les unités arrivent ainsi bien AVANT toute mesure : on ne demande pas
+     un poids à quelqu'un avant de savoir dans quelle unité il le compte. */
+  { id: 'langue-unites' },
   { id: 'theme' },
-  /* Les unités AVANT toute mesure : on ne demande pas un poids à quelqu'un
-     avant de savoir dans quelle unité il le compte. */
-  { id: 'systeme' },
   { id: 'objectif' },
   { id: 'poids' },
   /* Viser un poids n'a de sens que si l'on veut en changer : à « stabiliser »,

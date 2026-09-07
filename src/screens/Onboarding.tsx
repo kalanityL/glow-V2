@@ -3,9 +3,8 @@ import { Wordmark } from '../components/Wordmark';
 import { useTextes } from '../i18n/useTextes';
 import { classeDuTheme } from '../themes/themes';
 import type { useParcours } from '../app/useParcours';
-import { EtapeLangue } from './onboarding/EtapeLangue';
+import { EtapeLangueUnites } from './onboarding/EtapeLangueUnites';
 import { EtapeTheme } from './onboarding/EtapeTheme';
-import { EtapeSysteme } from './onboarding/EtapeSysteme';
 import { EtapeObjectif } from './onboarding/EtapeObjectif';
 import { EtapePoids } from './onboarding/EtapePoids';
 import { EtapeActivite } from './onboarding/EtapeActivite';
@@ -19,7 +18,7 @@ import { EtapeActivite } from './onboarding/EtapeActivite';
  */
 export function Onboarding({ parcours }: { parcours: ReturnType<typeof useParcours> }) {
   const textes = useTextes();
-  const { reponses, etape, repondre, peutRevenir, avancer, reculer } = parcours;
+  const { reponses, etape, repondre, choisirLangue, peutRevenir, avancer, reculer } = parcours;
 
   return (
     <div className={`page ${classeDuTheme(reponses.theme)}`}>
@@ -29,19 +28,18 @@ export function Onboarding({ parcours }: { parcours: ReturnType<typeof useParcou
           <Wordmark />
         </div>
 
-        {etape === 'langue' ? (
-          <EtapeLangue langue={reponses.langue} onLangue={(langue) => repondre('langue', langue)} />
+        {etape === 'langue-unites' ? (
+          <EtapeLangueUnites
+            langue={reponses.langue}
+            /* Le geste dédié : la langue repose aussi les unités. */
+            onLangue={choisirLangue}
+            systeme={reponses.systeme}
+            onSysteme={(systeme) => repondre('systeme', systeme)}
+          />
         ) : null}
 
         {etape === 'theme' ? (
           <EtapeTheme theme={reponses.theme} onTheme={(theme) => repondre('theme', theme)} />
-        ) : null}
-
-        {etape === 'systeme' ? (
-          <EtapeSysteme
-            systeme={reponses.systeme}
-            onSysteme={(systeme) => repondre('systeme', systeme)}
-          />
         ) : null}
 
         {etape === 'objectif' ? (

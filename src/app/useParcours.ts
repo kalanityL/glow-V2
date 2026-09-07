@@ -1,4 +1,6 @@
 import { useState } from 'react';
+import { SYSTEME_PAR_LANGUE } from '../domaine/unites';
+import type { Langue } from '../i18n/langues';
 import { etapesVisibles, type EtapeId } from '../screens/onboarding/parcours';
 import { REPONSES_INITIALES, type Reponses } from '../screens/onboarding/reponses';
 
@@ -31,10 +33,29 @@ export function useParcours() {
   const repondre = <C extends keyof Reponses>(champ: C, valeur: Reponses[C]) =>
     setReponses((precedentes) => ({ ...precedentes, [champ]: valeur }));
 
+  /**
+   * LA LANGUE REPOSE LES UNITÉS SUR CELLES DE LA LANGUE (2026-09-07), et c'est
+   * pour cela qu'elle a son propre geste : deux réponses changent d'un coup,
+   * et les écrire l'une après l'autre laisserait un instant où le système ne
+   * correspondrait plus à la langue.
+   *
+   * Le dernier geste l'emporte : rechoisir la langue efface un système qu'on
+   * aurait réglé à la main juste avant. C'est le comportement le moins
+   * surprenant — on vient de dire dans quelle langue on lit — et les unités se
+   * rechoisissent sur le même écran, juste en dessous.
+   */
+  const choisirLangue = (langue: Langue) =>
+    setReponses((precedentes) => ({
+      ...precedentes,
+      langue,
+      systeme: SYSTEME_PAR_LANGUE[langue],
+    }));
+
   return {
     reponses,
     etape,
     repondre,
+    choisirLangue,
     peutRevenir: rangBorne > 0,
     avancer: () => setRang(Math.min(rangBorne + 1, visibles.length - 1)),
     reculer: () => setRang(Math.max(rangBorne - 1, 0)),

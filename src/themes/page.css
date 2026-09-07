@@ -13,8 +13,10 @@
 .page {
   flex: 1;
   min-height: 0;
-  /* Le contenu commence en haut : pas de centrage vertical. */
-  display: block;
+  /* Le contenu commence en haut : pas de centrage vertical. La colonne est en
+     `flex` pour que la rangée des boutons puisse être poussée tout en bas. */
+  display: flex;
+  flex-direction: column;
   overflow-y: auto;
   /* Marges réduites, PAS supprimées — le contenu ne doit pas venir toucher le
      bord de l'écran, y compris à 320 px de large. */
@@ -25,10 +27,13 @@
   -webkit-font-smoothing: antialiased;
 }
 
-/* La colonne de lecture, à même la page : ni contour, ni fond, ni ombre. */
+/* La colonne de lecture, à même la page : ni contour, ni fond, ni ombre.
+   Elle prend TOUTE LA HAUTEUR pour que les boutons puissent tomber au bas de
+   l'écran, quelle que soit la longueur de la question. */
 .page__colonne {
   width: 100%;
   max-width: 380px;
+  flex: 1;
   display: flex;
   flex-direction: column;
 }
@@ -278,6 +283,24 @@
   color: var(--encre-chapeau);
 }
 
+/* L'intitulé d'un groupe, quand un écran pose deux questions : plus petit que
+   le titre, en capitales espacées, pour se distinguer sans lui disputer la
+   place. */
+.libelle-groupe {
+  margin: 20px 0 0;
+  font-family: var(--font-display);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.18em;
+  font-size: 11px;
+  color: var(--encre-chapeau);
+}
+
+/* Deux groupes à la suite : le second ne reprend pas la marge du premier. */
+.libelle-groupe + .options {
+  margin-top: 10px;
+}
+
 /* ── LES RÉPONSES D'UNE QUESTION ────────────────────────────────────────── */
 
 /* Empilées et pleine largeur : la question se lit d'un trait, du haut vers le
@@ -315,10 +338,19 @@
 
 /* La rangée des deux boutons. « Précédent » prend le tiers, « Suivant » le
    reste : le geste qui avance est le plus large, et le doigt le trouve sans
-   viser. */
+   viser.
+
+   ELLE EST POUSSÉE TOUT EN BAS (2026-09-07, « bouton suivant meme position
+   pour toutes les questions d'onboarding, la position la plus basse de tout le
+   questionnaire ») : `margin-top: auto` mange l'espace restant, quelle que
+   soit la longueur de la question. Une question courte ou longue, les boutons
+   sont au même endroit — le doigt n'a plus à les chercher d'un écran à
+   l'autre. C'est aussi, par construction, la position la plus basse possible :
+   le bas de l'écran. */
 .boutons {
   display: flex;
   gap: 10px;
+  margin-top: auto;
 }
 
 .boutons .bouton--second {

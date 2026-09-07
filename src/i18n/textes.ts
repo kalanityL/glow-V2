@@ -1,4 +1,5 @@
 import type { Systeme, Unite } from '../domaine/unites';
+import type { Langue } from './langues';
 import type { NiveauActivite, Objectif } from '../screens/onboarding/reponses';
 import type { ThemeId } from '../themes/themes';
 
@@ -19,14 +20,6 @@ import type { ThemeId } from '../themes/themes';
  * Les textes sont pour l'instant des « hello world » : le thème s'installe
  * avant les mots.
  */
-
-/** Les langues servies. En ajouter une : une entrée dans `TEXTES`, et c'est tout. */
-export const LANGUES = ['fr', 'en'] as const;
-
-export type Langue = (typeof LANGUES)[number];
-
-/** La langue de repli, celle du projet. */
-export const LANGUE_PAR_DEFAUT: Langue = 'fr';
 
 /** Le contrat : chaque langue doit porter exactement ces clés. */
 export interface Textes {
@@ -78,14 +71,16 @@ export interface Textes {
    * dixièmes : le dire vraiment vaut mieux que « décimale ».
    */
   fractions: Record<Unite, string>;
+  /** Les intitulés des groupes d'un écran qui pose deux questions. */
+  groupes: {
+    langue: string;
+    unites: string;
+  };
   onboarding: {
-    langue: {
+    langueUnites: {
       question: string;
     };
     theme: {
-      question: string;
-    };
-    systeme: {
       question: string;
     };
     objectif: {
@@ -112,6 +107,10 @@ export const TEXTES: Record<Langue, Textes> = {
     langues: {
       fr: 'Français',
       en: 'English',
+    },
+    groupes: {
+      langue: 'Langue',
+      unites: 'Unités',
     },
     themes: {
       ciel: 'Ciel',
@@ -144,14 +143,11 @@ export const TEXTES: Record<Langue, Textes> = {
       in: 'Dixièmes de pouce',
     },
     onboarding: {
-      langue: {
-        question: 'Votre langue',
+      langueUnites: {
+        question: 'Langue et unités',
       },
       theme: {
         question: 'Choisissez',
-      },
-      systeme: {
-        question: 'Vos unités',
       },
       objectif: {
         question: 'Vous souhaitez…',
@@ -174,6 +170,10 @@ export const TEXTES: Record<Langue, Textes> = {
     langues: {
       fr: 'Français',
       en: 'English',
+    },
+    groupes: {
+      langue: 'Language',
+      unites: 'Units',
     },
     themes: {
       ciel: 'Sky',
@@ -206,14 +206,11 @@ export const TEXTES: Record<Langue, Textes> = {
       in: 'Tenths of an inch',
     },
     onboarding: {
-      langue: {
-        question: 'Your language',
+      langueUnites: {
+        question: 'Language and units',
       },
       theme: {
         question: 'Choose',
-      },
-      systeme: {
-        question: 'Your units',
       },
       objectif: {
         question: 'You would like to…',

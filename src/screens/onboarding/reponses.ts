@@ -1,5 +1,5 @@
 import { SYSTEME_PAR_DEFAUT, type Systeme } from '../../domaine/unites';
-import { LANGUE_PAR_DEFAUT, type Langue } from '../../i18n/textes';
+import { LANGUE_PAR_DEFAUT, type Langue } from '../../i18n/langues';
 import { THEME_PAR_DEFAUT, type ThemeId } from '../../themes/themes';
 
 /** Les objectifs proposés, dans l'ordre d'affichage. Le premier est retenu d'avance. */
