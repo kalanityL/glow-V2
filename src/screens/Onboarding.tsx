@@ -8,6 +8,7 @@ import { EtapeTheme } from './onboarding/EtapeTheme';
 import { EtapeObjectif } from './onboarding/EtapeObjectif';
 import { EtapePoids } from './onboarding/EtapePoids';
 import { EtapeActivite } from './onboarding/EtapeActivite';
+import { EtapeSouhaitActivite } from './onboarding/EtapeSouhaitActivite';
 
 /**
  * L'ONBOARDING — l'entête, l'étape courante, la rangée des boutons.
@@ -73,6 +74,13 @@ export function Onboarding({ parcours }: { parcours: ReturnType<typeof useParcou
           <EtapeActivite
             activite={reponses.activite}
             onActivite={(activite) => repondre('activite', activite)}
+          />
+        ) : null}
+
+        {etape === 'souhait-quotidien' ? (
+          <EtapeSouhaitActivite
+            souhait={reponses.souhaitActivite}
+            onSouhait={(souhait) => repondre('souhaitActivite', souhait)}
           />
         ) : null}
 

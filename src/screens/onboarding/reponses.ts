@@ -12,6 +12,22 @@ export const NIVEAUX_ACTIVITE = ['doux', 'modere', 'intense'] as const;
 export type NiveauActivite = (typeof NIVEAUX_ACTIVITE)[number];
 
 /**
+ * Ce qu'on souhaite pour son activité quotidienne. LE PREMIER — « conserver mon
+ * rythme actuel » — EST RETENU D'AVANCE (demande du 2026-09-07), à la
+ * différence du niveau, qui n'a pas de défaut.
+ *
+ * Et c'est cohérent : ne rien changer n'est pas un conseil, c'est le point
+ * neutre. Cocher « être plus actif » d'avance, ça, en serait un.
+ */
+export const SOUHAITS_ACTIVITE = [
+  'conserver',
+  'un-peu-plus',
+  'beaucoup-plus',
+  'ralentir',
+] as const;
+export type SouhaitActivite = (typeof SOUHAITS_ACTIVITE)[number];
+
+/**
  * TOUT CE QUE L'ONBOARDING RECUEILLE.
  *
  * Les mesures sont gardées EN TEXTE et AVEC UN POINT, « 95.0 » : c'est ce que
@@ -36,6 +52,8 @@ export interface Reponses {
   poids: string;
   poidsCible: string;
   activite: NiveauActivite | null;
+  /* Toujours renseigné : il a un défaut, contrairement au niveau d'activité. */
+  souhaitActivite: SouhaitActivite;
 }
 
 export const REPONSES_INITIALES: Reponses = {
@@ -56,4 +74,5 @@ export const REPONSES_INITIALES: Reponses = {
   poids: '95.0',
   poidsCible: '95.0',
   activite: null,
+  souhaitActivite: SOUHAITS_ACTIVITE[0],
 };

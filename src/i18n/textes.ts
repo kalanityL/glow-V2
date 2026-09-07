@@ -1,6 +1,10 @@
 import type { Systeme, Unite } from '../domaine/unites';
 import type { Langue } from './langues';
-import type { NiveauActivite, Objectif } from '../screens/onboarding/reponses';
+import type {
+  NiveauActivite,
+  Objectif,
+  SouhaitActivite,
+} from '../screens/onboarding/reponses';
 import type { ThemeId } from '../themes/themes';
 
 /**
@@ -39,6 +43,8 @@ export interface Textes {
   objectifs: Record<Objectif, string>;
   /** Les niveaux d'activité, sous le même contrat. */
   niveauxActivite: Record<NiveauActivite, string>;
+  /** Les souhaits d'activité, sous le même contrat. */
+  souhaitsActivite: Record<SouhaitActivite, string>;
   /**
    * LES UNITÉS. Elles se traduisent : « lb » s'écrit « lbs » ou « livres »
    * selon la langue, et une langue non latine ne les écrit pas du tout comme
@@ -95,6 +101,9 @@ export interface Textes {
     activite: {
       question: string;
     };
+    souhaitQuotidien: {
+      question: string;
+    };
     precedent: string;
     suivant: string;
   };
@@ -124,6 +133,12 @@ export const TEXTES: Record<Langue, Textes> = {
       doux: 'Doux',
       modere: 'Modéré',
       intense: 'Intense',
+    },
+    souhaitsActivite: {
+      conserver: 'Conserver mon rythme actuel',
+      'un-peu-plus': 'Être un peu plus actif',
+      'beaucoup-plus': 'Être beaucoup plus actif',
+      ralentir: 'Ralentir le rythme',
     },
     unites: {
       kg: 'kg',
@@ -161,6 +176,9 @@ export const TEXTES: Record<Langue, Textes> = {
       activite: {
         question: 'Quel est votre niveau d’activité au quotidien ?',
       },
+      souhaitQuotidien: {
+        question: 'Par rapport à votre activité quotidienne, vous souhaiteriez…',
+      },
       precedent: 'Précédent',
       suivant: 'Suivant',
     },
@@ -187,6 +205,12 @@ export const TEXTES: Record<Langue, Textes> = {
       doux: 'Gentle',
       modere: 'Moderate',
       intense: 'Intense',
+    },
+    souhaitsActivite: {
+      conserver: 'Keep my current pace',
+      'un-peu-plus': 'Be a little more active',
+      'beaucoup-plus': 'Be much more active',
+      ralentir: 'Slow down',
     },
     unites: {
       kg: 'kg',
@@ -223,6 +247,9 @@ export const TEXTES: Record<Langue, Textes> = {
       },
       activite: {
         question: 'How active are your days?',
+      },
+      souhaitQuotidien: {
+        question: 'About your daily activity, you would like to…',
       },
       precedent: 'Previous',
       suivant: 'Next',

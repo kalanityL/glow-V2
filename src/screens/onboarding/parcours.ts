@@ -20,7 +20,8 @@ export type EtapeId =
   | 'objectif'
   | 'poids'
   | 'poids-cible'
-  | 'activite';
+  | 'activite'
+  | 'souhait-quotidien';
 
 export const ETAPES: readonly Etape[] = [
   /* LE THÈME EN PREMIER, et la langue ensuite (2026-09-07). J'avais d'abord
@@ -42,6 +43,9 @@ export const ETAPES: readonly Etape[] = [
      la question se saute (demande du 2026-09-07). */
   { id: 'poids-cible', montre: (reponses) => reponses.objectif === 'perdre' },
   { id: 'activite' },
+  /* Le souhait APRÈS le niveau : on dit d'abord où l'on en est, ensuite où
+     l'on veut aller. L'inverse ferait répondre dans le vide. */
+  { id: 'souhait-quotidien' },
 ];
 
 /** Les étapes que ces réponses font voir, dans l'ordre. */
