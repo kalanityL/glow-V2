@@ -18,7 +18,7 @@ import { EtapeActivite } from './onboarding/EtapeActivite';
  */
 export function Onboarding({ parcours }: { parcours: ReturnType<typeof useParcours> }) {
   const textes = useTextes();
-  const { reponses, etape, repondre, repondrePoids, peutRevenir, avancer, reculer } = parcours;
+  const { reponses, etape, repondre, peutRevenir, avancer, reculer } = parcours;
 
   return (
     <div className={`page ${classeDuTheme(reponses.theme)}`}>
@@ -50,9 +50,8 @@ export function Onboarding({ parcours }: { parcours: ReturnType<typeof useParcou
           <EtapePoids
             id="poids-actuel"
             question={textes.onboarding.poids.question}
-            messageDepassement={textes.onboarding.poids.depassement}
             poids={reponses.poids}
-            onPoids={(saisie) => repondrePoids('poids', saisie)}
+            onPoids={(choix) => repondre('poids', choix)}
             systeme={reponses.systeme}
           />
         ) : null}
@@ -61,9 +60,8 @@ export function Onboarding({ parcours }: { parcours: ReturnType<typeof useParcou
           <EtapePoids
             id="poids-cible"
             question={textes.onboarding.poidsCible.question}
-            messageDepassement={textes.onboarding.poidsCible.depassement}
             poids={reponses.poidsCible}
-            onPoids={(saisie) => repondrePoids('poidsCible', saisie)}
+            onPoids={(choix) => repondre('poidsCible', choix)}
             systeme={reponses.systeme}
           />
         ) : null}

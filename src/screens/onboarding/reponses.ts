@@ -13,9 +13,10 @@ export type NiveauActivite = (typeof NIVEAUX_ACTIVITE)[number];
 /**
  * TOUT CE QUE L'ONBOARDING RECUEILLE.
  *
- * Les mesures sont gardées TELLES QU'ELLES SONT TAPÉES, en texte : les
- * convertir à chaque frappe empêcherait d'écrire « 72, » puis « 72,5 ». La
- * conversion se fera là où on les enregistrera.
+ * Les mesures sont gardées EN TEXTE, « 95,0 » : c'est ce que rend le
+ * sélecteur, et ce que rendrait une saisie libre. Ce qui les lit en aval n'a
+ * pas à savoir d'où elles viennent. La conversion en nombre se fera là où on
+ * les enregistrera.
  *
  * `null` veut dire « pas encore répondu », et se distingue d'une réponse vide.
  */
@@ -32,7 +33,9 @@ export const REPONSES_INITIALES: Reponses = {
   theme: THEME_PAR_DEFAUT,
   systeme: SYSTEME_PAR_DEFAUT,
   objectif: OBJECTIFS[0],
-  poids: '',
-  poidsCible: '',
+  /* 95,0 par défaut (demande du 2026-09-07) : le sélecteur s'ouvre sur une
+     valeur plausible plutôt que sur son premier cran, qui serait 1 kg. */
+  poids: '95,0',
+  poidsCible: '95,0',
   activite: null,
 };

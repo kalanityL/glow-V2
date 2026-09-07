@@ -141,29 +141,45 @@
   box-shadow: 0 0 0 2px var(--accent);
 }
 
-/* ── UN CHAMP DE SAISIE ─────────────────────────────────────────────────── */
+/* ── UN SÉLECTEUR DE MESURE ─────────────────────────────────────────────── */
 
-/* Le champ et son unité, côte à côte. L'unité est DEHORS : dans le champ, elle
-   se mêlerait au texte saisi et un lecteur d'écran la dicterait comme une part
-   de la valeur. */
-.champ {
+/* Deux listes et leur virgule, comme une heure et ses minutes, puis l'unité.
+   L'unité reste DEHORS : dans une liste, elle se répéterait à chaque cran. */
+.selecteur {
   display: flex;
-  align-items: stretch;
-  gap: 10px;
+  align-items: center;
+  gap: 6px;
   margin: 20px 0 24px;
 }
 
-/* LE CHAMP NE PREND PAS TOUTE LA LARGEUR (2026-09-07) : il est taillé pour ce
-   qu'on y écrit — au plus « 999,9 », cinq signes —, avec de l'air autour. Un
-   champ large annoncerait une longue réponse là où l'on attend trois chiffres.
-   La mesure est en `ch` : elle suit la police, et tiendra encore si elle
-   change. */
-.champ__saisie {
-  flex: none;
-  /* Assez large pour le plus long des plafonds — « 2000,5 » — sans l'être
-     pour autant. */
-  width: 11ch;
-  padding: 15px 16px;
+/* L'enveloppe porte le chevron : un `select` ne peut pas avoir de `::after`. */
+.selecteur__champ {
+  position: relative;
+  display: inline-flex;
+}
+
+.selecteur__champ::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  right: 12px;
+  width: 0;
+  height: 0;
+  margin-top: -2px;
+  border: 5px solid transparent;
+  border-top-color: var(--encre-chapeau);
+  /* Le chevron ne doit pas manger le clic : il est décoratif, la liste est
+     dessous. */
+  pointer-events: none;
+}
+
+.selecteur__liste {
+  /* `appearance: none` retire le dessin natif — flèche comprise, d'où le
+     chevron ci-dessus — pour que la liste porte la matière du thème comme
+     n'importe quel autre champ. */
+  appearance: none;
+  width: 100%;
+  padding: 15px 34px 15px 16px;
   border: 1px solid var(--option-filet);
   border-radius: 14px;
   background: var(--option-fond);
@@ -171,28 +187,25 @@
   font-family: var(--font-body);
   font-weight: 500;
   font-size: 17px;
+  cursor: pointer;
   transition: box-shadow 150ms, background 150ms;
 }
 
-.champ__saisie:focus {
+.selecteur__liste:focus {
   outline: none;
   background: var(--option-choisi-fond);
   box-shadow: 0 0 0 2px var(--accent);
 }
 
-/* LE MESSAGE DE DÉPASSEMENT : en italique et à l'accent du thème (demande du
-   2026-09-07, « message en italique et bleu »). L'accent, et non un bleu figé :
-   il restera assorti au thème le jour où un thème n'aura plus rien de bleu. */
-.message-erreur {
-  margin: -14px 0 24px;
+.selecteur__separateur {
   font-family: var(--font-body);
-  font-style: italic;
-  font-size: 14px;
-  line-height: 1.5;
-  color: var(--accent);
+  font-weight: 500;
+  font-size: 17px;
+  color: var(--encre);
 }
 
-/* L'unité : une étiquette, pas un bouton. Elle prend la largeur qu'il lui faut
+/* L'unité, commune au sélecteur et à toute saisie à venir : une étiquette, pas
+   un bouton. Elle prend la largeur qu'il lui faut
    et pas plus — « kg » et « lb » ne font pas la même. */
 .champ__unite {
   display: flex;

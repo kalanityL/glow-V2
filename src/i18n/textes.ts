@@ -51,6 +51,12 @@ export interface Textes {
    * mieux que « métrique » et « impérial ».
    */
   systemes: Record<Systeme, string>;
+  /**
+   * LE NOM DE LA FRACTION DE CHAQUE UNITÉ — ce que vaut le second cran d'un
+   * sélecteur. En kilos ce sont des centaines de grammes, en livres des
+   * dixièmes : le dire vraiment vaut mieux que « décimale ».
+   */
+  fractions: Record<Unite, string>;
   onboarding: {
     theme: {
       question: string;
@@ -63,12 +69,9 @@ export interface Textes {
     };
     poids: {
       question: string;
-      /** Dit quand le poids tapé dépasse le plafond de son unité. */
-      depassement: string;
     };
     poidsCible: {
       question: string;
-      depassement: string;
     };
     activite: {
       question: string;
@@ -105,6 +108,12 @@ export const TEXTES: Record<Langue, Textes> = {
       metrique: 'cm · kg',
       imperial: 'inch · pound',
     },
+    fractions: {
+      kg: 'Centaines de grammes',
+      lb: 'Dixièmes de livre',
+      cm: 'Millimètres',
+      in: 'Dixièmes de pouce',
+    },
     onboarding: {
       theme: {
         question: 'Choisissez',
@@ -117,11 +126,9 @@ export const TEXTES: Record<Langue, Textes> = {
       },
       poids: {
         question: 'Quel est votre poids actuel ?',
-        depassement: 'Poids saisi incorrect. Veuillez entrer votre poids actuel.',
       },
       poidsCible: {
         question: 'Quel poids visez-vous ?',
-        depassement: 'Poids saisi incorrect. Veuillez entrer votre poids cible.',
       },
       activite: {
         question: 'Quel est votre niveau d’activité au quotidien ?',
@@ -155,6 +162,12 @@ export const TEXTES: Record<Langue, Textes> = {
       metrique: 'cm · kg',
       imperial: 'inch · pound',
     },
+    fractions: {
+      kg: 'Hundreds of grams',
+      lb: 'Tenths of a pound',
+      cm: 'Millimetres',
+      in: 'Tenths of an inch',
+    },
     onboarding: {
       theme: {
         question: 'Choose',
@@ -167,11 +180,9 @@ export const TEXTES: Record<Langue, Textes> = {
       },
       poids: {
         question: 'What is your current weight?',
-        depassement: 'That weight is not valid. Please enter your current weight.',
       },
       poidsCible: {
         question: 'What weight are you aiming for?',
-        depassement: 'That weight is not valid. Please enter your target weight.',
       },
       activite: {
         question: 'How active are your days?',

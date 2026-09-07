@@ -1,5 +1,4 @@
 import { useState } from 'react';
-import { nettoyerPoids } from '../domaine/mesures';
 import { etapesVisibles, type EtapeId } from '../screens/onboarding/parcours';
 import { REPONSES_INITIALES, type Reponses } from '../screens/onboarding/reponses';
 
@@ -32,15 +31,10 @@ export function useParcours() {
   const repondre = <C extends keyof Reponses>(champ: C, valeur: Reponses[C]) =>
     setReponses((precedentes) => ({ ...precedentes, [champ]: valeur }));
 
-  /** Les mesures passent par le filtre de saisie : le plafond vaut partout. */
-  const repondrePoids = (champ: 'poids' | 'poidsCible', saisie: string) =>
-    repondre(champ, nettoyerPoids(saisie));
-
   return {
     reponses,
     etape,
     repondre,
-    repondrePoids,
     peutRevenir: rangBorne > 0,
     avancer: () => setRang(Math.min(rangBorne + 1, visibles.length - 1)),
     reculer: () => setRang(Math.max(rangBorne - 1, 0)),
