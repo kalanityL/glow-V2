@@ -1,3 +1,4 @@
+import type { Forme } from '../domaine/traitements';
 import type { Systeme, Unite } from '../domaine/unites';
 import type { Langue } from './langues';
 import type {
@@ -81,6 +82,8 @@ export interface Textes {
   groupes: {
     langue: string;
     unites: string;
+    forme: string;
+    traitement: string;
   };
   onboarding: {
     langueUnites: {
@@ -104,11 +107,19 @@ export interface Textes {
     souhaitQuotidien: {
       question: string;
     };
+    traitement: {
+      question: string;
+    };
     precedent: string;
     suivant: string;
   };
   /** Le bouton « retour » de la barre du bas : lu par les lecteurs d'écran. */
   retour: string;
+  oui: string;
+  non: string;
+  /** Les deux façons de prendre un traitement. Les NOMS des spécialités, eux,
+   *  ne se traduisent pas : voir `domaine/traitements.ts`. */
+  formes: Record<Forme, string>;
 }
 
 export const TEXTES: Record<Langue, Textes> = {
@@ -120,6 +131,8 @@ export const TEXTES: Record<Langue, Textes> = {
     groupes: {
       langue: 'Langue',
       unites: 'Unités',
+      forme: 'Forme',
+      traitement: 'Traitement',
     },
     themes: {
       ciel: 'Ciel',
@@ -179,10 +192,19 @@ export const TEXTES: Record<Langue, Textes> = {
       souhaitQuotidien: {
         question: 'Par rapport à votre activité quotidienne, vous souhaiteriez…',
       },
+      traitement: {
+        question: 'Avez-vous commencé votre traitement GLP-1 ?',
+      },
       precedent: 'Précédent',
       suivant: 'Suivant',
     },
     retour: 'Retour',
+    oui: 'Oui',
+    non: 'Non',
+    formes: {
+      injection: 'Injection',
+      comprime: 'Comprimé',
+    },
   },
   en: {
     langues: {
@@ -192,6 +214,8 @@ export const TEXTES: Record<Langue, Textes> = {
     groupes: {
       langue: 'Language',
       unites: 'Units',
+      forme: 'Form',
+      traitement: 'Treatment',
     },
     themes: {
       ciel: 'Sky',
@@ -251,9 +275,18 @@ export const TEXTES: Record<Langue, Textes> = {
       souhaitQuotidien: {
         question: 'About your daily activity, you would like to…',
       },
+      traitement: {
+        question: 'Have you started your GLP-1 treatment?',
+      },
       precedent: 'Previous',
       suivant: 'Next',
     },
     retour: 'Back',
+    oui: 'Yes',
+    non: 'No',
+    formes: {
+      injection: 'Injection',
+      comprime: 'Tablet',
+    },
   },
 };

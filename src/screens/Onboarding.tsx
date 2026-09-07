@@ -7,6 +7,7 @@ import { EtapeLangueUnites } from './onboarding/EtapeLangueUnites';
 import { EtapeTheme } from './onboarding/EtapeTheme';
 import { EtapeObjectif } from './onboarding/EtapeObjectif';
 import { EtapePoids } from './onboarding/EtapePoids';
+import { EtapeTraitement } from './onboarding/EtapeTraitement';
 import { EtapeActivite } from './onboarding/EtapeActivite';
 import { EtapeSouhaitActivite } from './onboarding/EtapeSouhaitActivite';
 
@@ -19,7 +20,18 @@ import { EtapeSouhaitActivite } from './onboarding/EtapeSouhaitActivite';
  */
 export function Onboarding({ parcours }: { parcours: ReturnType<typeof useParcours> }) {
   const textes = useTextes();
-  const { reponses, etape, repondre, choisirLangue, peutRevenir, avancer, reculer } = parcours;
+  const {
+    reponses,
+    etape,
+    repondre,
+    choisirLangue,
+    repondreTraitementCommence,
+    repondreForme,
+    peutValider,
+    peutRevenir,
+    avancer,
+    reculer,
+  } = parcours;
 
   return (
     <div className={`page ${classeDuTheme(reponses.theme)}`}>
@@ -70,6 +82,18 @@ export function Onboarding({ parcours }: { parcours: ReturnType<typeof useParcou
           />
         ) : null}
 
+        {etape === 'traitement' ? (
+          <EtapeTraitement
+            commence={reponses.traitementCommence}
+            /* Gestes dédiés : les trois réponses se défont ensemble. */
+            onCommence={repondreTraitementCommence}
+            forme={reponses.formeTraitement}
+            onForme={repondreForme}
+            traitement={reponses.traitement}
+            onTraitement={(traitement) => repondre('traitement', traitement)}
+          />
+        ) : null}
+
         {etape === 'activite' ? (
           <EtapeActivite
             activite={reponses.activite}
@@ -95,7 +119,16 @@ export function Onboarding({ parcours }: { parcours: ReturnType<typeof useParcou
               {textes.onboarding.precedent}
             </button>
           ) : null}
-          <button type="button" className="bouton" onClick={avancer}>
+          {/* Éteint tant que l'étape ne laisse pas passer — aujourd'hui, une
+              cascade de traitement incomplète. Éteint et non caché : il doit
+              rester visible pour qu'on sache où l'on va. */}
+          <button
+            type="button"
+            className="bouton"
+            onClick={avancer}
+            disabled={!peutValider}
+            aria-disabled={!peutValider}
+          >
             {textes.onboarding.suivant}
           </button>
         </div>

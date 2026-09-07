@@ -1,7 +1,8 @@
 import { useState } from 'react';
 import { SYSTEME_PAR_LANGUE } from '../domaine/unites';
 import type { Langue } from '../i18n/langues';
-import { etapesVisibles, type EtapeId } from '../screens/onboarding/parcours';
+import type { Forme } from '../domaine/traitements';
+import { etapesVisibles, peutValider, type EtapeId } from '../screens/onboarding/parcours';
 import { REPONSES_INITIALES, type Reponses } from '../screens/onboarding/reponses';
 
 /**
@@ -51,11 +52,39 @@ export function useParcours() {
       systeme: SYSTEME_PAR_LANGUE[langue],
     }));
 
+  /**
+   * LES TROIS RÉPONSES DU TRAITEMENT SE DÉFONT ENSEMBLE.
+   *
+   * Répondre « non » efface la forme et la spécialité ; changer de forme efface
+   * la spécialité. Sans cela, on garderait une réponse qui ne correspond plus à
+   * la question — un comprimé choisi, puis la forme passée à « injection » — et
+   * `peutValider` laisserait passer une cascade incohérente.
+   */
+  const repondreTraitementCommence = (commence: boolean) =>
+    setReponses((precedentes) => ({
+      ...precedentes,
+      traitementCommence: commence,
+      formeTraitement: commence ? precedentes.formeTraitement : null,
+      traitement: commence ? precedentes.traitement : null,
+    }));
+
+  const repondreForme = (forme: Forme) =>
+    setReponses((precedentes) => ({
+      ...precedentes,
+      formeTraitement: forme,
+      traitement: forme === precedentes.formeTraitement ? precedentes.traitement : null,
+    }));
+
   return {
     reponses,
     etape,
     repondre,
     choisirLangue,
+    repondreTraitementCommence,
+    repondreForme,
+    /* Vrai quand l'étape courante laisse passer : le bouton « Suivant » s'y
+       éteint quand elle ne le laisse pas. */
+    peutValider: peutValider(etape, reponses),
     peutRevenir: rangBorne > 0,
     avancer: () => setRang(Math.min(rangBorne + 1, visibles.length - 1)),
     reculer: () => setRang(Math.max(rangBorne - 1, 0)),

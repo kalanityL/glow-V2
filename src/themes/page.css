@@ -410,6 +410,17 @@
   transform: scale(0.99);
 }
 
+/* Éteint tant que l'étape ne laisse pas passer : à moitié, et sans réaction au
+   toucher — la même façon de dire « pas encore » que le bouton de la barre. */
+.bouton:disabled {
+  opacity: 0.4;
+  cursor: default;
+}
+
+.bouton:disabled:active {
+  transform: none;
+}
+
 /* LE SECOND BOUTON, celui qui recule : même forme, matière effacée. Il ne
    dispute pas l'attention à celui qui avance. */
 .bouton--second {

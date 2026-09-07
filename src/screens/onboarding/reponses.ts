@@ -1,3 +1,4 @@
+import type { Forme } from '../../domaine/traitements';
 import { SYSTEME_PAR_DEFAUT, type Systeme } from '../../domaine/unites';
 import { LANGUE_PAR_DEFAUT, type Langue } from '../../i18n/langues';
 import { THEME_PAR_DEFAUT, type ThemeId } from '../../themes/themes';
@@ -54,6 +55,18 @@ export interface Reponses {
   activite: NiveauActivite | null;
   /* Toujours renseigné : il a un défaut, contrairement au niveau d'activité. */
   souhaitActivite: SouhaitActivite;
+  /**
+   * LE TRAITEMENT, EN TROIS RÉPONSES LIÉES. `null` veut dire « pas encore
+   * répondu » et se distingue d'un « non ».
+   *
+   * Elles se défont ensemble : répondre « non » efface la forme et la
+   * spécialité, changer de forme efface la spécialité. Sinon on garderait une
+   * réponse qui ne correspond plus à la question posée — un comprimé choisi
+   * puis une forme passée à « injection ».
+   */
+  traitementCommence: boolean | null;
+  formeTraitement: Forme | null;
+  traitement: string | null;
 }
 
 export const REPONSES_INITIALES: Reponses = {
@@ -75,4 +88,7 @@ export const REPONSES_INITIALES: Reponses = {
   poidsCible: '95.0',
   activite: null,
   souhaitActivite: SOUHAITS_ACTIVITE[0],
+  traitementCommence: null,
+  formeTraitement: null,
+  traitement: null,
 };
