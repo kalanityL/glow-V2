@@ -46,8 +46,15 @@ const PAS_AFFICHE: Partial<Record<Unite, number>> = { kg: 100 };
  * POURQUOI PAS DEUX `select` NATIFS, ce qu'il y avait avant : ils s'ouvrent
  * l'un APRÈS l'autre — deux gestes, deux listes qui se recouvrent, et jamais
  * les deux nombres sous les yeux en même temps. Ici, un seul geste ouvre le
- * panneau et les deux colonnes se lisent ensemble ; on repart quand les deux
- * sont posés.
+ * panneau et les deux colonnes se lisent ensemble.
+ *
+ * COMMENT ON EN SORT (2026-09-07) : LA CENTAINE DE GRAMMES REFERME LE PANNEAU
+ * et vaut confirmation ; LE KILO, LUI, NE LE REFERME PAS. C'est l'ordre de
+ * lecture qui le veut — on pose d'abord les kilos, puis la centaine —, et la
+ * colonne de droite est donc le dernier geste : après elle, il n'y a plus rien
+ * à choisir. Refermer sur le kilo obligerait à rouvrir pour la centaine ; ne
+ * refermer sur rien laisserait un panneau ouvert sans raison.
+ * Le clic dehors et la touche Échap referment aussi, comme partout.
  *
  * CE QUI EST DU NAVIGATEUR ET DEVRA CHANGER EN NATIF, et rien d'autre :
  *   - la fermeture au clic dehors, écrite avec `document` ;
@@ -133,6 +140,8 @@ export function SelecteurPoids({ id, valeur, onValeur, unite, question }: Select
                   className={`roue__cran${valeurEntiere === entiere ? ' roue__cran--choisi' : ''}`}
                   role="option"
                   aria-selected={valeurEntiere === entiere}
+                  /* Le kilo ne referme pas : on vient d'en choisir un, il
+                     reste la centaine de grammes à poser. */
                   onClick={() => poser(valeurEntiere, dixieme)}
                 >
                   {valeurEntiere}
@@ -150,7 +159,13 @@ export function SelecteurPoids({ id, valeur, onValeur, unite, question }: Select
                   className={`roue__cran${valeurDixieme === dixieme ? ' roue__cran--choisi' : ''}`}
                   role="option"
                   aria-selected={valeurDixieme === dixieme}
-                  onClick={() => poser(entiere, valeurDixieme)}
+                  /* LA CENTAINE REFERME LE PANNEAU et vaut confirmation
+                     (2026-09-07) : c'est le dernier des deux crans, il n'y a
+                     plus rien à choisir après lui. */
+                  onClick={() => {
+                    poser(entiere, valeurDixieme);
+                    setOuvert(false);
+                  }}
                 >
                   {valeurDixieme * pas}
                 </button>
