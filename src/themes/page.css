@@ -114,12 +114,14 @@
 
 /* CHAQUE CADRE PORTE SA PROPRE CLASSE DE THÈME : son fond et son encre sont
    ceux du thème qu'il propose, pas ceux de la page. On compare les deux d'un
-   coup d'œil, et le cadre choisi n'est pas le seul à se montrer. */
+   coup d'œil, et le cadre choisi n'est pas le seul à se montrer.
+
+   Il est vide : depuis le 2026-09-07 le nom du thème n'y est plus écrit, le
+   cadre EST le thème. */
 .carte-theme {
-  display: flex;
-  align-items: flex-end;
+  display: block;
   aspect-ratio: 3 / 4;
-  padding: 12px;
+  padding: 0;
   border: 1px solid var(--carte-filet);
   border-radius: 16px;
   background: var(--fond);
@@ -137,13 +139,6 @@
 
 .carte-theme--choisi {
   box-shadow: 0 0 0 2px var(--accent);
-}
-
-.carte-theme__nom {
-  font-family: var(--font-display);
-  font-weight: 600;
-  font-size: 13px;
-  letter-spacing: -0.01em;
 }
 
 /* ── LE BOUTON ──────────────────────────────────────────────────────────── */
@@ -173,16 +168,6 @@
 }
 
 /* ── LES TEXTES ─────────────────────────────────────────────────────────── */
-
-.surtitre {
-  font-family: var(--font-display);
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.36em;
-  font-size: 11px;
-  margin: 0;
-  color: var(--encre-surtitre);
-}
 
 .titre {
   font-family: var(--font-display);

@@ -7,7 +7,8 @@ import { THEMES, THEME_PAR_DEFAUT, classeDuTheme, type ThemeId } from '../themes
 /**
  * L'ONBOARDING — ÉCRAN 1 : LE CHOIX DU THÈME.
  *
- * Un cadre par thème, le premier sélectionné à l'ouverture. Toucher un cadre
+ * Un cadre par thème, SANS SON NOM — on choisit ce qu'on voit —, le premier
+ * sélectionné à l'ouverture. Toucher un cadre
  * HABILLE AUSSITÔT TOUTE LA PAGE : le thème choisi est posé sur la page
  * elle-même, donc l'entête, les textes, les cadres et le bouton changent
  * ensemble. On voit le thème qu'on choisit, pas une vignette de ce qu'il
@@ -33,7 +34,6 @@ export function Onboarding() {
           <Wordmark />
         </div>
 
-        <p className="surtitre">{textes.onboarding.theme.surtitre}</p>
         <h1 className="titre">{textes.onboarding.theme.question}</h1>
 
         <div className="choix-themes">
@@ -45,11 +45,14 @@ export function Onboarding() {
                  qu'il est. `aria-pressed` dit lequel est retenu, pour qui
                  n'a que la voix pour le savoir. */
               className={`carte-theme ${classeDuTheme(id)}${id === theme ? ' carte-theme--choisi' : ''}`}
+              /* LE NOM DU THÈME N'EST PLUS ÉCRIT DANS LE CADRE (2026-09-07) :
+                 on choisit ce qu'on voit, pas un nom. Il reste en `aria-label`
+                 — un cadre sans texte n'est qu'un bouton muet pour qui écoute
+                 la page, et il faut bien nommer ce qu'on lui propose. */
+              aria-label={textes.themes[id]}
               aria-pressed={id === theme}
               onClick={() => setTheme(id)}
-            >
-              <span className="carte-theme__nom">{textes.themes[id]}</span>
-            </button>
+            />
           ))}
         </div>
 

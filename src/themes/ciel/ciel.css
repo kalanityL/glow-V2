@@ -19,13 +19,11 @@
   --logo-to: oklch(76.5% 0.177 163.223);
   --logo-ombre: 0 6px 18px -6px rgba(14, 165, 233, 0.8);
 
-  /* LES ENCRES. Le titre est le point le plus lumineux de l'écran ; les deux
-     gris gardent une nuance sous lui. Le surtitre est le plus clair des deux :
-     en capitales espacées, il est plus maigre à l'œil et s'éteindrait le
-     premier. Valeurs éclaircies deux fois le 2026-09-06 (chapeau 55 % -> 72 %
-     -> 86 %, surtitre 62 % -> 78 % -> 90 %). */
+  /* LES ENCRES. Le titre est le point le plus lumineux de l'écran ; le gris du
+     chapeau garde une nuance sous lui (55 % -> 72 % -> 86 % de blanc, éclairci
+     deux fois le 2026-09-06). Le gris du surtitre est parti avec le surtitre
+     lui-même le 2026-09-07 : pas de jeton sans règle qui l'emploie. */
   --encre: #ffffff;
-  --encre-surtitre: rgba(255, 255, 255, 0.9);
   --encre-chapeau: rgba(255, 255, 255, 0.86);
 
   /* Le filet d'un cadre de thème, et le bouton. L'encre du bouton est prise

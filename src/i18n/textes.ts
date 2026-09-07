@@ -35,7 +35,6 @@ export interface Textes {
   themes: Record<ThemeId, string>;
   onboarding: {
     theme: {
-      surtitre: string;
       question: string;
     };
     suivant: string;
@@ -52,8 +51,7 @@ export const TEXTES: Record<Langue, Textes> = {
     },
     onboarding: {
       theme: {
-        surtitre: 'Votre thème',
-        question: 'Choisissez un thème.',
+        question: 'Choisissez',
       },
       suivant: 'Suivant',
     },
@@ -66,8 +64,7 @@ export const TEXTES: Record<Langue, Textes> = {
     },
     onboarding: {
       theme: {
-        surtitre: 'Your theme',
-        question: 'Choose a theme.',
+        question: 'Choose',
       },
       suivant: 'Next',
     },
