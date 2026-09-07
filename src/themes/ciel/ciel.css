@@ -30,13 +30,15 @@
 
   /* LE BOUTON DE CIEL : un aplat plein de plein jour. L'accent en fond, une
      encre prise dans le noir du thème — sur un aplat aussi clair, du blanc ne
-     tiendrait pas le contraste —, pas de filet, et un halo bleu sous le
-     bouton, du même bleu que le fond. */
+     tiendrait pas le contraste —, pas de filet, et AUCUNE OMBRE : le halo bleu
+     qu'il portait a été retiré le 2026-09-07 (« enlever l'effet glow au bouton
+     suivant »). Le jeton reste, à `none` : c'est par lui qu'un thème à venir
+     pourrait en vouloir une. */
   --bouton-fond: var(--accent);
   --bouton-encre: #0b1a2b;
   --bouton-filet: transparent;
   --bouton-rayon: 14px;
-  --bouton-ombre: 0 10px 24px -12px rgba(14, 165, 233, 0.9);
+  --bouton-ombre: none;
 
   /* Les polices : Outfit pour les titres et la marque, Plus Jakarta Sans pour
      le texte courant. Embarquées, voir `src/fonts.css`. */
