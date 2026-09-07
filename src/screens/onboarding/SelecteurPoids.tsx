@@ -12,8 +12,15 @@ interface SelecteurPoidsProps {
   question: string;
 }
 
-/** Le séparateur décimal affiché. La valeur, elle, est gardée avec une virgule. */
-const SEPARATEUR = ',';
+/**
+ * LE SÉPARATEUR DE STOCKAGE — un point, toujours, quelle que soit la langue.
+ *
+ * Celui qui S'AFFICHE vient de la langue (virgule en français, point en
+ * anglais) et se lit dans le dictionnaire. Les deux sont séparés exprès : une
+ * valeur écrite « 95,1 » puis relue dans une autre langue ne voudrait plus
+ * rien dire, et c'est aussi la forme qu'un nombre prend en JSON.
+ */
+const SEPARATEUR_STOCKE = '.';
 
 /** Les dix crans de la seconde liste. */
 const DIXIEMES = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9];
@@ -60,7 +67,7 @@ export function SelecteurPoids({ id, valeur, onValeur, unite, question }: Select
   const dixieme = Number(dixiemeBrut) || 0;
 
   const poser = (nouvelleEntiere: number, nouveauDixieme: number) =>
-    onValeur(`${nouvelleEntiere}${SEPARATEUR}${nouveauDixieme}`);
+    onValeur(`${nouvelleEntiere}${SEPARATEUR_STOCKE}${nouveauDixieme}`);
 
   return (
     <div className="selecteur">
@@ -72,7 +79,7 @@ export function SelecteurPoids({ id, valeur, onValeur, unite, question }: Select
       <div className="selecteur__boite">
         <select
           id={id}
-          className="selecteur__liste"
+          className="selecteur__liste selecteur__liste--entiere"
           value={entiere}
           onChange={(evenement) => poser(Number(evenement.target.value), dixieme)}
           aria-label={question}
@@ -87,12 +94,12 @@ export function SelecteurPoids({ id, valeur, onValeur, unite, question }: Select
         </select>
 
         <span className="selecteur__separateur" aria-hidden="true">
-          {SEPARATEUR}
+          {textes.separateurDecimal}
         </span>
 
         <select
           id={`${id}-dixieme`}
-          className="selecteur__liste"
+          className="selecteur__liste selecteur__liste--fraction"
           value={dixieme}
           onChange={(evenement) => poser(entiere, Number(evenement.target.value))}
           /* Nommée par ce qu'elle est vraiment — des centaines de grammes en

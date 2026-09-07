@@ -158,7 +158,11 @@
   position: relative;
   display: inline-flex;
   align-items: center;
-  padding-right: 28px;
+  /* LE REMBOURRAGE EST SUR LA BOÎTE, PAS SUR LES LISTES (2026-09-07, « pas
+     d'écart autour de la virgule ») : quand chaque liste portait le sien, ils
+     s'additionnaient de part et d'autre de la virgule et « 97 , 100 » se lisait
+     détaché. Ici, l'air est aux deux bouts du champ et nulle part au milieu. */
+  padding: 0 28px 0 16px;
   border: 1px solid var(--option-filet);
   border-radius: 14px;
   background: var(--option-fond);
@@ -192,7 +196,9 @@
   /* `appearance: none` retire le dessin natif, flèche comprise : la matière
      est celle de la boîte, la liste n'est plus qu'un mot qu'on choisit. */
   appearance: none;
-  padding: 15px 4px 15px 16px;
+  /* Aucun rembourrage horizontal : les chiffres viennent au contact de la
+     virgule, comme dans un sélecteur d'heure. */
+  padding: 15px 0;
   border: none;
   background: none;
   color: var(--encre);
@@ -200,6 +206,19 @@
   font-weight: 500;
   font-size: 17px;
   cursor: pointer;
+}
+
+/* CHAQUE LISTE EST LARGE COMME SON PLUS LONG CRAN — « 999 », « 900 » — et non
+   comme la valeur affichée. Sans alignement, « 97 » flottait à gauche de sa
+   liste et rouvrait un écart avant la virgule. Les deux se serrent donc contre
+   elle : l'entière à droite, la fraction à gauche. C'est aussi ce que fait un
+   sélecteur d'heure. */
+.selecteur__liste--entiere {
+  text-align: right;
+}
+
+.selecteur__liste--fraction {
+  text-align: left;
 }
 
 /* La boîte porte déjà le liseré : la liste n'en met pas un second par-dessus. */

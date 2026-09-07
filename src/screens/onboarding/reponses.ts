@@ -13,8 +13,10 @@ export type NiveauActivite = (typeof NIVEAUX_ACTIVITE)[number];
 /**
  * TOUT CE QUE L'ONBOARDING RECUEILLE.
  *
- * Les mesures sont gardées EN TEXTE, « 95,0 » : c'est ce que rend le
- * sélecteur, et ce que rendrait une saisie libre. Ce qui les lit en aval n'a
+ * Les mesures sont gardées EN TEXTE et AVEC UN POINT, « 95.0 » : c'est ce que
+ * rend le sélecteur, et ce que rendrait une saisie libre. Le point n'est pas
+ * ce qu'on affiche — le séparateur affiché suit la langue —, c'est la forme
+ * stockée, la même dans toutes les langues. Ce qui les lit en aval n'a
  * pas à savoir d'où elles viennent. La conversion en nombre se fera là où on
  * les enregistrera.
  *
@@ -35,7 +37,7 @@ export const REPONSES_INITIALES: Reponses = {
   objectif: OBJECTIFS[0],
   /* 95,0 par défaut (demande du 2026-09-07) : le sélecteur s'ouvre sur une
      valeur plausible plutôt que sur son premier cran, qui serait 1 kg. */
-  poids: '95,0',
-  poidsCible: '95,0',
+  poids: '95.0',
+  poidsCible: '95.0',
   activite: null,
 };

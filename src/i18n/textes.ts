@@ -52,6 +52,20 @@ export interface Textes {
    */
   systemes: Record<Systeme, string>;
   /**
+   * LE SÉPARATEUR DÉCIMAL DE LA LANGUE (2026-09-07) : virgule en français,
+   * POINT EN ANGLAIS. Il est ici et non dans le code d'un écran parce que
+   * c'est une affaire de langue, comme un mot.
+   *
+   * L'anglais n'est pas encore une langue servie pour de bon — ses textes sont
+   * de simples jalons —, mais son séparateur est déjà juste : le jour où on
+   * ouvrira la langue, il n'y aura rien à retrouver.
+   *
+   * ATTENTION : c'est un séparateur D'AFFICHAGE. Les valeurs sont gardées avec
+   * un POINT, quelle que soit la langue — voir `SelecteurPoids` —, sans quoi
+   * changer de langue changerait la façon d'écrire un poids déjà enregistré.
+   */
+  separateurDecimal: string;
+  /**
    * LE NOM DE LA FRACTION DE CHAQUE UNITÉ — ce que vaut le second cran d'un
    * sélecteur. En kilos ce sont des centaines de grammes, en livres des
    * dixièmes : le dire vraiment vaut mieux que « décimale ».
@@ -108,6 +122,7 @@ export const TEXTES: Record<Langue, Textes> = {
       metrique: 'cm · kg',
       imperial: 'inch · pound',
     },
+    separateurDecimal: ',',
     fractions: {
       kg: 'Centaines de grammes',
       lb: 'Dixièmes de livre',
@@ -162,6 +177,7 @@ export const TEXTES: Record<Langue, Textes> = {
       metrique: 'cm · kg',
       imperial: 'inch · pound',
     },
+    separateurDecimal: '.',
     fractions: {
       kg: 'Hundreds of grams',
       lb: 'Tenths of a pound',
