@@ -155,10 +155,15 @@
   border-radius: 14px;
   background: var(--bouton-fond);
   color: var(--bouton-encre);
-  font-family: var(--font-display);
-  font-weight: 800;
+  /* LE BOUTON EST EN TEXTE COURANT, PAS EN POLICE DE TITRE (2026-09-07) : il
+     porte une action, pas un titre. D'où `--font-body` (Plus Jakarta Sans) en
+     700 — la graisse la plus forte de cette famille dans le dépôt, celle qui
+     tient le rôle qu'Outfit tenait en 800. L'interlettrage tombe à zéro :
+     Plus Jakarta Sans est déjà plus large qu'Outfit, l'espacer la délaverait. */
+  font-family: var(--font-body);
+  font-weight: 700;
   font-size: 14px;
-  letter-spacing: 0.02em;
+  letter-spacing: 0;
   cursor: pointer;
   transition: transform 150ms, opacity 150ms;
 }

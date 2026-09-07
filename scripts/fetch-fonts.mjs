@@ -30,7 +30,7 @@ const CSS_FILE = resolve(ROOT, 'src/fonts.css');
 /* Les familles et les SEULES graisses employées par les thèmes. En ajouter une
    à un thème demande de l'ajouter ici, et de relancer le script. */
 const QUERY =
-  'family=Outfit:wght@600;800;900&family=Plus+Jakarta+Sans:wght@400;500&display=swap';
+  'family=Outfit:wght@600;800;900&family=Plus+Jakarta+Sans:wght@400;500;700&display=swap';
 
 /* Sans un agent moderne, Google sert des `.ttf` : c'est le même agent qui
    décide du format, et on veut le woff2, quatre fois plus léger. */
