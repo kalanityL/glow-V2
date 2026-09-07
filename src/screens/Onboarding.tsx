@@ -4,6 +4,7 @@ import { useTextes } from '../i18n/useTextes';
 import { classeDuTheme } from '../themes/themes';
 import type { useParcours } from '../app/useParcours';
 import { EtapeTheme } from './onboarding/EtapeTheme';
+import { EtapeSysteme } from './onboarding/EtapeSysteme';
 import { EtapeObjectif } from './onboarding/EtapeObjectif';
 import { EtapePoids } from './onboarding/EtapePoids';
 import { EtapeActivite } from './onboarding/EtapeActivite';
@@ -31,6 +32,13 @@ export function Onboarding({ parcours }: { parcours: ReturnType<typeof useParcou
           <EtapeTheme theme={reponses.theme} onTheme={(theme) => repondre('theme', theme)} />
         ) : null}
 
+        {etape === 'systeme' ? (
+          <EtapeSysteme
+            systeme={reponses.systeme}
+            onSysteme={(systeme) => repondre('systeme', systeme)}
+          />
+        ) : null}
+
         {etape === 'objectif' ? (
           <EtapeObjectif
             objectif={reponses.objectif}
@@ -42,6 +50,7 @@ export function Onboarding({ parcours }: { parcours: ReturnType<typeof useParcou
           <EtapePoids
             id="poids-actuel"
             question={textes.onboarding.poids.question}
+            messageDepassement={textes.onboarding.poids.depassement}
             poids={reponses.poids}
             onPoids={(saisie) => repondrePoids('poids', saisie)}
             systeme={reponses.systeme}
@@ -52,6 +61,7 @@ export function Onboarding({ parcours }: { parcours: ReturnType<typeof useParcou
           <EtapePoids
             id="poids-cible"
             question={textes.onboarding.poidsCible.question}
+            messageDepassement={textes.onboarding.poidsCible.depassement}
             poids={reponses.poidsCible}
             onPoids={(saisie) => repondrePoids('poidsCible', saisie)}
             systeme={reponses.systeme}

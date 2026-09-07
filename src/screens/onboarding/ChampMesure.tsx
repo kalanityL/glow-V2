@@ -8,6 +8,8 @@ interface ChampMesureProps {
   unite: Unite;
   /** La question, qui nomme le champ à qui écoute la page. */
   question: string;
+  /** Ce qui ne va pas, s'il y a lieu. Rien tant que la saisie tient. */
+  erreur?: string;
 }
 
 /**
@@ -30,10 +32,18 @@ interface ChampMesureProps {
  * qu'elle est tapée ; sa conversion en nombre viendra là où on l'enregistrera,
  * et acceptera les deux séparateurs.
  */
-export function ChampMesure({ id, valeur, onValeur, unite, question }: ChampMesureProps) {
+export function ChampMesure({
+  id,
+  valeur,
+  onValeur,
+  unite,
+  question,
+  erreur,
+}: ChampMesureProps) {
   const textes = useTextes();
 
   return (
+    <>
     <div className="champ">
       <input
         id={id}
@@ -44,11 +54,19 @@ export function ChampMesure({ id, valeur, onValeur, unite, question }: ChampMesu
         value={valeur}
         onChange={(evenement) => onValeur(evenement.target.value)}
         aria-label={question}
-        aria-describedby={`${id}-unite`}
+        aria-describedby={erreur ? `${id}-unite ${id}-erreur` : `${id}-unite`}
       />
       <span className="champ__unite" id={`${id}-unite`}>
         {textes.unites[unite]}
       </span>
     </div>
+    {/* `role="alert"` : le message est dit dès qu'il paraît, sans attendre que
+        le champ soit quitté — c'est pendant qu'on tape qu'il sert. */}
+    {erreur ? (
+      <p className="message-erreur" id={`${id}-erreur`} role="alert">
+        {erreur}
+      </p>
+    ) : null}
+    </>
   );
 }

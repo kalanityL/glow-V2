@@ -160,7 +160,9 @@
    change. */
 .champ__saisie {
   flex: none;
-  width: 9ch;
+  /* Assez large pour le plus long des plafonds — « 2000,5 » — sans l'être
+     pour autant. */
+  width: 11ch;
   padding: 15px 16px;
   border: 1px solid var(--option-filet);
   border-radius: 14px;
@@ -176,6 +178,18 @@
   outline: none;
   background: var(--option-choisi-fond);
   box-shadow: 0 0 0 2px var(--accent);
+}
+
+/* LE MESSAGE DE DÉPASSEMENT : en italique et à l'accent du thème (demande du
+   2026-09-07, « message en italique et bleu »). L'accent, et non un bleu figé :
+   il restera assorti au thème le jour où un thème n'aura plus rien de bleu. */
+.message-erreur {
+  margin: -14px 0 24px;
+  font-family: var(--font-body);
+  font-style: italic;
+  font-size: 14px;
+  line-height: 1.5;
+  color: var(--accent);
 }
 
 /* L'unité : une étiquette, pas un bouton. Elle prend la largeur qu'il lui faut

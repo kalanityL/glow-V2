@@ -14,10 +14,19 @@ export interface Etape {
   montre?: (reponses: Reponses) => boolean;
 }
 
-export type EtapeId = 'theme' | 'objectif' | 'poids' | 'poids-cible' | 'activite';
+export type EtapeId =
+  | 'theme'
+  | 'systeme'
+  | 'objectif'
+  | 'poids'
+  | 'poids-cible'
+  | 'activite';
 
 export const ETAPES: readonly Etape[] = [
   { id: 'theme' },
+  /* Les unités AVANT toute mesure : on ne demande pas un poids à quelqu'un
+     avant de savoir dans quelle unité il le compte. */
+  { id: 'systeme' },
   { id: 'objectif' },
   { id: 'poids' },
   /* Viser un poids n'a de sens que si l'on veut en changer : à « stabiliser »,

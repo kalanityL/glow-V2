@@ -1,27 +1,31 @@
-import { useTextes } from '../../i18n/useTextes';
 import { UNITES_DU_SYSTEME, type Systeme } from '../../domaine/unites';
+import { poidsDepasse } from '../../domaine/mesures';
 import { ChampMesure } from './ChampMesure';
 
 /**
  * ÉTAPE : LE POIDS — l'actuel, ou celui qu'on vise.
  *
- * Le même écran sert aux deux : seule la question change. Deux copies auraient
- * divergé au premier réglage du champ.
+ * Le même écran sert aux deux : seules la question et le message de
+ * dépassement changent. Deux copies auraient divergé au premier réglage du
+ * champ.
  */
 export function EtapePoids({
   id,
   question,
+  messageDepassement,
   poids,
   onPoids,
   systeme,
 }: {
   id: string;
   question: string;
+  /** Ce qui se dit quand le poids dépasse le plafond de son unité. */
+  messageDepassement: string;
   poids: string;
   onPoids: (poids: string) => void;
   systeme: Systeme;
 }) {
-  useTextes();
+  const unite = UNITES_DU_SYSTEME[systeme].poids;
 
   return (
     <>
@@ -30,8 +34,9 @@ export function EtapePoids({
         id={id}
         valeur={poids}
         onValeur={onPoids}
-        unite={UNITES_DU_SYSTEME[systeme].poids}
+        unite={unite}
         question={question}
+        erreur={poidsDepasse(poids, unite) ? messageDepassement : undefined}
       />
     </>
   );

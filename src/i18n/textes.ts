@@ -1,4 +1,4 @@
-import type { Unite } from '../domaine/unites';
+import type { Systeme, Unite } from '../domaine/unites';
 import type { NiveauActivite, Objectif } from '../screens/onboarding/reponses';
 import type { ThemeId } from '../themes/themes';
 
@@ -46,8 +46,16 @@ export interface Textes {
    * identifiants.
    */
   unites: Record<Unite, string>;
+  /**
+   * LES SYSTÈMES, tels qu'ils se proposent : par leurs unités, qui parlent
+   * mieux que « métrique » et « impérial ».
+   */
+  systemes: Record<Systeme, string>;
   onboarding: {
     theme: {
+      question: string;
+    };
+    systeme: {
       question: string;
     };
     objectif: {
@@ -55,9 +63,12 @@ export interface Textes {
     };
     poids: {
       question: string;
+      /** Dit quand le poids tapé dépasse le plafond de son unité. */
+      depassement: string;
     };
     poidsCible: {
       question: string;
+      depassement: string;
     };
     activite: {
       question: string;
@@ -90,18 +101,27 @@ export const TEXTES: Record<Langue, Textes> = {
       cm: 'cm',
       in: 'in',
     },
+    systemes: {
+      metrique: 'cm · kg',
+      imperial: 'inch · pound',
+    },
     onboarding: {
       theme: {
         question: 'Choisissez',
+      },
+      systeme: {
+        question: 'Vos unités',
       },
       objectif: {
         question: 'Vous souhaitez…',
       },
       poids: {
         question: 'Quel est votre poids actuel ?',
+        depassement: 'Poids saisi incorrect. Veuillez entrer votre poids actuel.',
       },
       poidsCible: {
         question: 'Quel poids visez-vous ?',
+        depassement: 'Poids saisi incorrect. Veuillez entrer votre poids cible.',
       },
       activite: {
         question: 'Quel est votre niveau d’activité au quotidien ?',
@@ -131,18 +151,27 @@ export const TEXTES: Record<Langue, Textes> = {
       cm: 'cm',
       in: 'in',
     },
+    systemes: {
+      metrique: 'cm · kg',
+      imperial: 'inch · pound',
+    },
     onboarding: {
       theme: {
         question: 'Choose',
+      },
+      systeme: {
+        question: 'Your units',
       },
       objectif: {
         question: 'You would like to…',
       },
       poids: {
         question: 'What is your current weight?',
+        depassement: 'That weight is not valid. Please enter your current weight.',
       },
       poidsCible: {
         question: 'What weight are you aiming for?',
+        depassement: 'That weight is not valid. Please enter your target weight.',
       },
       activite: {
         question: 'How active are your days?',
