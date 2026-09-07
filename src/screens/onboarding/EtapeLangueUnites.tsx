@@ -51,6 +51,8 @@ export function EtapeLangueUnites({
         valeur={langue}
         onChoix={onLangue}
         question={textes.groupes.langue}
+        /* Deux mots chacun : ils tiennent sur une ligne (2026-09-07). */
+        enLigne
       />
 
       <p className="libelle-groupe">{textes.groupes.unites}</p>
@@ -60,6 +62,7 @@ export function EtapeLangueUnites({
         valeur={systeme}
         onChoix={onSysteme}
         question={textes.groupes.unites}
+        enLigne
       />
     </>
   );

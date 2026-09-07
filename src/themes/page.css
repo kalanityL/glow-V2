@@ -312,6 +312,20 @@
   margin: 20px 0 24px;
 }
 
+/* CÔTE À CÔTE, pour des réponses d'un ou deux mots. Les colonnes sont égales
+   (`flex: 1 1 0`) et non proportionnelles au texte : deux réponses de longueurs
+   différentes doivent peser pareil, sinon la plus large a l'air d'être la
+   bonne. */
+.options--ligne {
+  flex-direction: row;
+}
+
+.options--ligne .option {
+  flex: 1 1 0;
+  min-width: 0;
+  text-align: center;
+}
+
 .option {
   width: 100%;
   padding: 15px 16px;
