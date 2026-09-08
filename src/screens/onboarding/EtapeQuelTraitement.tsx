@@ -30,14 +30,15 @@ export function EtapeQuelTraitement({
   onTraitement,
 }: EtapeQuelTraitementProps) {
   const textes = useTextes();
-  const question = textes.onboarding.quelTraitement.question;
   const disponibles = forme ? traitementsDeLaForme(forme) : [];
 
   return (
     <>
-      <h1 className="titre">{question}</h1>
-
-      <p className="libelle-groupe">{textes.groupes.forme}</p>
+      {/* PAS DE TITRE SUR CET ÉCRAN (2026-09-08) : les deux intitulés de
+          groupe, « Forme » et « Traitement », disent déjà ce qu'on demande, et
+          un titre par-dessus les répétait. C'est le premier écran du parcours
+          sans titre — l'écran EST la question. */}
+      <p className="libelle-groupe libelle-groupe--premier">{textes.groupes.forme}</p>
       <ChoixUnique
         options={FORMES}
         libelle={(id) => textes.formes[id]}

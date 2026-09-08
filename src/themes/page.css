@@ -296,6 +296,12 @@
   color: var(--encre-chapeau);
 }
 
+/* Sans titre au-dessus, le premier groupe n'a pas à s'en écarter : il prend la
+   place du titre. */
+.libelle-groupe--premier {
+  margin-top: 0;
+}
+
 /* Deux groupes à la suite : le second ne reprend pas la marge du premier. */
 .libelle-groupe + .options {
   margin-top: 10px;
