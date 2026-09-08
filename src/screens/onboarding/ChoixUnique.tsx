@@ -13,6 +13,12 @@ interface ChoixUniqueProps<T extends string> {
    * COURTES : deux mots tiennent sur une ligne de téléphone, une phrase non.
    */
   enLigne?: boolean;
+  /**
+   * Les réponses en grille de deux par ligne. Pour une LISTE LONGUE de
+   * réponses courtes — les noms de spécialités —, où l'empilement ne tiendrait
+   * pas dans l'écran et où `enLigne` les serrerait toutes sur une seule ligne.
+   */
+  enGrille?: boolean;
 }
 
 /**
@@ -22,6 +28,8 @@ interface ChoixUniqueProps<T extends string> {
  * d'un trait, du haut vers le bas, là où deux colonnes obligeraient à comparer.
  * `enLigne` les met côte à côte pour les réponses d'un ou deux mots — la langue,
  * les unités —, où l'empilement gâcherait une hauteur d'écran pour rien.
+ * `enGrille` les range deux par ligne, pour une liste longue de réponses
+ * courtes : les noms de spécialités.
  *
  * `role="radiogroup"` et `aria-checked`, et NON `aria-pressed` : ce n'est pas
  * un interrupteur par réponse, c'est UN choix parmi plusieurs — la nuance
@@ -34,10 +42,11 @@ export function ChoixUnique<T extends string>({
   onChoix,
   question,
   enLigne = false,
+  enGrille = false,
 }: ChoixUniqueProps<T>) {
   return (
     <div
-      className={`options${enLigne ? ' options--ligne' : ''}`}
+      className={`options${enLigne ? ' options--ligne' : ''}${enGrille ? ' options--grille' : ''}`}
       role="radiogroup"
       aria-label={question}
     >

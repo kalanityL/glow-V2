@@ -20,7 +20,8 @@ export type EtapeId =
   | 'objectif'
   | 'poids'
   | 'poids-cible'
-  | 'traitement';
+  | 'traitement'
+  | 'quel-traitement';
 
 export const ETAPES: readonly Etape[] = [
   /* LE THÈME EN PREMIER, et la langue ensuite (2026-09-07). J'avais d'abord
@@ -44,6 +45,11 @@ export const ETAPES: readonly Etape[] = [
   /* Le traitement APRÈS les poids : on a dit où l'on en est et où l'on va
      avant de dire ce qu'on prend. */
   { id: 'traitement' },
+  /* La forme et la spécialité, SUR LEUR PROPRE ÉCRAN (2026-09-07) : elles se
+     posaient en cascade sous la question précédente, et trois questions
+     empilées dépassaient la hauteur de l'écran. Elle ne se montre qu'à qui a
+     commencé — la poser à qui n'a pas commencé n'aurait pas de sens. */
+  { id: 'quel-traitement', montre: (reponses) => reponses.traitementCommence },
 ];
 
 /**
@@ -54,18 +60,19 @@ export const ETAPES: readonly Etape[] = [
  * qu'une réponse exige.
  *
  * Une seule étape bloque aujourd'hui (2026-09-07, « on ne peut pas valider
- * avant d'avoir selectionné la réponse à la question suivante ») : celle du
- * traitement, et seulement quand on a répondu « oui ». La cascade doit alors
- * être complète — la forme ET la spécialité — car dire « j'ai commencé » sans
- * dire quoi ne renseigne rien. Répondre « non » suffit et laisse passer.
+ * avant d'avoir selectionné la réponse à la question suivante ») : celle qui
+ * demande QUEL traitement. La forme ET la spécialité doivent y être choisies —
+ * dire qu'on a commencé sans dire quoi ne renseigne rien.
+ *
+ * L'étape « avez-vous commencé », elle, ne bloque plus rien : « oui » y est
+ * retenu d'avance, il y a donc toujours une réponse. Et qui répond « non » ne
+ * voit jamais l'étape suivante.
  *
  * Ailleurs, rien ne bloque : une question sans réponse se saute, c'est la
  * règle de l'onboarding depuis le premier jour.
  */
 export function peutValider(etape: EtapeId, reponses: Reponses): boolean {
-  if (etape !== 'traitement') return true;
-  if (reponses.traitementCommence === null) return false;
-  if (!reponses.traitementCommence) return true;
+  if (etape !== 'quel-traitement') return true;
   return reponses.formeTraitement !== null && reponses.traitement !== null;
 }
 

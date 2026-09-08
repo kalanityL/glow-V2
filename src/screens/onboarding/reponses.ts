@@ -32,15 +32,18 @@ export interface Reponses {
   poids: string;
   poidsCible: string;
   /**
-   * LE TRAITEMENT, EN TROIS RÉPONSES LIÉES. `null` veut dire « pas encore
-   * répondu » et se distingue d'un « non ».
+   * LE TRAITEMENT, EN TROIS RÉPONSES LIÉES, sur deux écrans.
    *
-   * Elles se défont ensemble : répondre « non » efface la forme et la
+   * `traitementCommence` vaut « oui » d'avance (2026-09-07) : c'est le cas de
+   * la plupart de celles qui installent l'application. Il n'est donc jamais
+   * `null` — il y a toujours une réponse.
+   *
+   * Les trois se défont ensemble : répondre « non » efface la forme et la
    * spécialité, changer de forme efface la spécialité. Sinon on garderait une
    * réponse qui ne correspond plus à la question posée — un comprimé choisi
    * puis une forme passée à « injection ».
    */
-  traitementCommence: boolean | null;
+  traitementCommence: boolean;
   formeTraitement: Forme | null;
   traitement: string | null;
 }
@@ -62,7 +65,7 @@ export const REPONSES_INITIALES: Reponses = {
      précisément ce qu'elle refuse. */
   poids: '95.0',
   poidsCible: '95.0',
-  traitementCommence: null,
+  traitementCommence: true,
   formeTraitement: null,
   traitement: null,
 };

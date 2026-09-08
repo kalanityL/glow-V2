@@ -97,6 +97,9 @@ export interface Textes {
     traitement: {
       question: string;
     };
+    quelTraitement: {
+      question: string;
+    };
     precedent: string;
     suivant: string;
   };
@@ -165,6 +168,9 @@ export const TEXTES: Record<Langue, Textes> = {
       traitement: {
         question: 'Avez-vous commencé votre traitement GLP-1 ?',
       },
+      quelTraitement: {
+        question: 'Lequel prenez-vous ?',
+      },
       precedent: 'Précédent',
       suivant: 'Suivant',
     },
@@ -230,6 +236,9 @@ export const TEXTES: Record<Langue, Textes> = {
       },
       traitement: {
         question: 'Have you started your GLP-1 treatment?',
+      },
+      quelTraitement: {
+        question: 'Which one are you taking?',
       },
       precedent: 'Previous',
       suivant: 'Next',

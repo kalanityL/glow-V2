@@ -312,6 +312,15 @@
   margin: 20px 0 24px;
 }
 
+/* DEUX PAR LIGNE, pour une liste longue de réponses courtes : treize noms de
+   spécialités empilés ne tenaient pas dans un écran. Les colonnes sont égales
+   (`1fr 1fr`) et non ajustées au texte, pour la même raison qu'en ligne : une
+   colonne plus large aurait l'air d'être la bonne réponse. */
+.options--grille {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+}
+
 /* CÔTE À CÔTE, pour des réponses d'un ou deux mots. Les colonnes sont égales
    (`flex: 1 1 0`) et non proportionnelles au texte : deux réponses de longueurs
    différentes doivent peser pareil, sinon la plus large a l'air d'être la

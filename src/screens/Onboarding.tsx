@@ -8,6 +8,7 @@ import { EtapeTheme } from './onboarding/EtapeTheme';
 import { EtapeObjectif } from './onboarding/EtapeObjectif';
 import { EtapePoids } from './onboarding/EtapePoids';
 import { EtapeTraitement } from './onboarding/EtapeTraitement';
+import { EtapeQuelTraitement } from './onboarding/EtapeQuelTraitement';
 
 /**
  * L'ONBOARDING — l'entête, l'étape courante, la rangée des boutons.
@@ -83,9 +84,15 @@ export function Onboarding({ parcours }: { parcours: ReturnType<typeof useParcou
         {etape === 'traitement' ? (
           <EtapeTraitement
             commence={reponses.traitementCommence}
-            /* Gestes dédiés : les trois réponses se défont ensemble. */
+            /* Geste dédié : répondre « non » efface la forme et la spécialité. */
             onCommence={repondreTraitementCommence}
+          />
+        ) : null}
+
+        {etape === 'quel-traitement' ? (
+          <EtapeQuelTraitement
             forme={reponses.formeTraitement}
+            /* Geste dédié : changer de forme efface la spécialité. */
             onForme={repondreForme}
             traitement={reponses.traitement}
             onTraitement={(traitement) => repondre('traitement', traitement)}
