@@ -39,10 +39,21 @@ const LP1_LEADING_PX = 5.3;
 const GAP_PX = 1;
 const LP1_SIDE_PX = 0.5;
 
-export function Wordmark() {
-  return (
-    <div className="wordmark">
-      <span className="wordmark__lockup" style={{ columnGap: `${GAP_PX / BASE_PX}em` }}>
+interface WordmarkProps {
+  /**
+   * AU FIL D'UNE LIGNE — dans un bouton, dans une phrase. Le mot-symbole hérite
+   * alors de la taille et de l'encre de ce qui l'entoure, et ne rend que son
+   * lockup : une enveloppe en bloc casserait la ligne.
+   */
+  enLigne?: boolean;
+}
+
+export function Wordmark({ enLigne = false }: WordmarkProps) {
+  const lockup = (
+    <span
+      className={enLigne ? 'wordmark wordmark--enligne' : 'wordmark__lockup'}
+      style={{ columnGap: `${GAP_PX / BASE_PX}em` }}
+    >
         <span className="wordmark__g">G</span>
         <span
           className="wordmark__lp1"
@@ -57,8 +68,9 @@ export function Wordmark() {
           <span>P</span>
           <span>1</span>
         </span>
-        <span className="wordmark__low">LOW</span>
-      </span>
-    </div>
+      <span className="wordmark__low">LOW</span>
+    </span>
   );
+
+  return enLigne ? lockup : <div className="wordmark">{lockup}</div>;
 }

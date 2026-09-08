@@ -9,11 +9,12 @@ export const OBJECTIFS = ['perdre', 'stabiliser'] as const;
 export type Objectif = (typeof OBJECTIFS)[number];
 
 /**
- * Les genres proposés. « Je le garde pour moi » N'EST PAS UN REFUS DE RÉPONDRE
- * mais une réponse : elle dit qu'on ne veut pas le dire, et l'application n'a
- * pas à revenir à la charge.
+ * Les genres proposés. TROIS RÉPONSES, ET NON QUATRE (2026-09-08) : « neutre »
+ * et « je le garde pour moi » tiennent sur LE MÊME BOUTON. Les distinguer
+ * revenait à demander de justifier son silence ; réunies, elles disent la seule
+ * chose dont l'application a besoin — ne pas trancher entre femme et homme.
  */
-export const GENRES = ['femme', 'homme', 'neutre', 'prive'] as const;
+export const GENRES = ['femme', 'homme', 'neutre-ou-prive'] as const;
 export type Genre = (typeof GENRES)[number];
 
 /**

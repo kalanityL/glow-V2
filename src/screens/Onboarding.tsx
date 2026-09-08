@@ -151,10 +151,11 @@ export function Onboarding({ parcours }: { parcours: ReturnType<typeof useParcou
             onClick={avancer}
             disabled={!peutValider}
             aria-disabled={!peutValider}
+            /* Sur le dernier écran, le bouton ne porte QUE le mot-symbole : son
+               nom se dit alors ici, faute de texte à lire dedans. */
+            aria-label={estDerniere ? textes.onboarding.entrer : undefined}
           >
-            {/* Sur le dernier écran, le bouton n'annonce plus la suite du
-                questionnaire mais l'entrée dans l'application. */}
-            {estDerniere ? textes.onboarding.entrer : textes.onboarding.suivant}
+            {estDerniere ? <Wordmark enLigne /> : textes.onboarding.suivant}
           </button>
         </div>
       </div>

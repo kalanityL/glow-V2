@@ -110,7 +110,12 @@ export interface Textes {
     };
     precedent: string;
     suivant: string;
-    /** Le bouton du dernier écran, qui fait entrer dans l'application. */
+    /**
+     * LE BOUTON DU DERNIER ÉCRAN. Il n'affiche plus ce texte (2026-09-08 :
+     * « juste le logo glp1low sur le bouton ») — il porte le mot-symbole
+     * dessiné. La phrase reste ici et sert d'`aria-label` : un bouton dont le
+     * contenu est un dessin n'a pas de nom pour qui écoute la page.
+     */
     entrer: string;
   };
   /** Le bouton « retour » de la barre du bas : lu par les lecteurs d'écran. */
@@ -196,7 +201,7 @@ export const TEXTES: Record<Langue, Textes> = {
         question: 'Choisissez votre avatar',
       },
       profil: {
-        question: 'Encore un mot sur vous',
+        question: 'Dernière étape',
       },
       precedent: 'Précédent',
       suivant: 'Suivant',
@@ -217,8 +222,7 @@ export const TEXTES: Record<Langue, Textes> = {
     genres: {
       femme: 'Femme',
       homme: 'Homme',
-      neutre: 'Neutre',
-      prive: 'Je le garde pour moi',
+      'neutre-ou-prive': 'Neutre / Je le garde pour moi',
     },
     formes: {
       injection: 'Injection',
@@ -288,7 +292,7 @@ export const TEXTES: Record<Langue, Textes> = {
         question: 'Choose your avatar',
       },
       profil: {
-        question: 'One last word about you',
+        question: 'Last step',
       },
       precedent: 'Previous',
       suivant: 'Next',
@@ -309,8 +313,7 @@ export const TEXTES: Record<Langue, Textes> = {
     genres: {
       femme: 'Woman',
       homme: 'Man',
-      neutre: 'Neutral',
-      prive: 'I would rather not say',
+      'neutre-ou-prive': 'Neutral / I would rather not say',
     },
     formes: {
       injection: 'Injection',

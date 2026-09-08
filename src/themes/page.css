@@ -103,6 +103,28 @@
   align-items: center;
 }
 
+/* LE MOT-SYMBOLE AU FIL D'UNE LIGNE — dans le bouton du dernier écran. Il
+   hérite de l'encre de ce qui l'entoure et n'impose que son dessin : la fonte
+   d'affichage, la graisse, l'interlettrage. `inline-flex` et non `flex` : en
+   bloc, il pousserait le reste de la ligne. */
+.wordmark--enligne {
+  display: inline-flex;
+  align-items: center;
+  direction: ltr;
+  font-family: var(--font-display);
+  font-weight: 900;
+  letter-spacing: -0.025em;
+  line-height: 1;
+  font-size: 20px;
+  color: inherit;
+}
+
+/* Dans le bouton, la colonne L/P/1 prend l'encre du bouton et non l'accent :
+   sur un aplat d'accent, l'accent sur l'accent disparaîtrait. */
+.bouton .wordmark__lp1 {
+  color: inherit;
+}
+
 /* G et LOW étirés en hauteur SEULEMENT, pour couvrir la colonne L/P/1 qui les
    dépasse. La largeur ne bouge pas. L'étirement se voit : c'est voulu. */
 .wordmark__g,
@@ -424,6 +446,13 @@
 .options--grille {
   display: grid;
   grid-template-columns: 1fr 1fr;
+}
+
+/* UNE RÉPONSE ORPHELINE PREND TOUTE LA LARGEUR : à trois réponses, la
+   troisième laisserait sinon un trou à côté d'elle, qu'on lirait comme une
+   quatrième réponse manquante. */
+.options--grille .option:last-child:nth-child(odd) {
+  grid-column: span 2;
 }
 
 /* CÔTE À CÔTE, pour des réponses d'un ou deux mots. Les colonnes sont égales
