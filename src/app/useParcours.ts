@@ -2,7 +2,12 @@ import { useState } from 'react';
 import { SYSTEME_PAR_LANGUE } from '../domaine/unites';
 import type { Langue } from '../i18n/langues';
 import type { Forme } from '../domaine/traitements';
-import { etapesVisibles, peutValider, type EtapeId } from '../screens/onboarding/parcours';
+import {
+  ETAPE_DEBUT_DECOMPTE,
+  etapesVisibles,
+  peutValider,
+  type EtapeId,
+} from '../screens/onboarding/parcours';
 import { REPONSES_INITIALES, type Reponses } from '../screens/onboarding/reponses';
 
 /**
@@ -75,9 +80,21 @@ export function useParcours() {
       traitement: forme === precedentes.formeTraitement ? precedentes.traitement : null,
     }));
 
+  /* LE DÉCOMPTE. Il compte les étapes VISIBLES : sauter « Quel poids
+     visez-vous ? » ou l'écran du traitement raccourcit le chemin, et les
+     billes doivent le dire — sinon on promettrait des écrans qui ne viendront
+     pas. L'étape courante compte parmi celles qui restent : elle n'est pas
+     encore remplie. */
+  const decompte = {
+    passees: rangBorne,
+    total: visibles.length,
+    montrer: rangBorne >= visibles.indexOf(ETAPE_DEBUT_DECOMPTE),
+  };
+
   return {
     reponses,
     etape,
+    decompte,
     repondre,
     choisirLangue,
     repondreTraitementCommence,

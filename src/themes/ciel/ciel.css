@@ -40,6 +40,10 @@
   --panneau-filet: rgba(255, 255, 255, 0.22);
   --panneau-ombre: 0 18px 40px -18px rgba(0, 0, 0, 0.7);
 
+  /* La bille éteinte du décompte. L'allumée prend l'accent, commun aux deux
+     thèmes ; l'éteinte est un blanc voilé, plus discret sur un fond de nuit. */
+  --bille-eteinte: rgba(255, 255, 255, 0.3);
+
   --carte-filet: rgba(255, 255, 255, 0.25);
 
   /* LE BOUTON DE CIEL : un aplat plein de plein jour. L'accent en fond, une

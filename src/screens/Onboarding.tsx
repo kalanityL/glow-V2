@@ -9,6 +9,8 @@ import { EtapeObjectif } from './onboarding/EtapeObjectif';
 import { EtapePoids } from './onboarding/EtapePoids';
 import { EtapeTraitement } from './onboarding/EtapeTraitement';
 import { EtapeQuelTraitement } from './onboarding/EtapeQuelTraitement';
+import { EtapeAvatar } from './onboarding/EtapeAvatar';
+import { Progression } from './onboarding/Progression';
 
 /**
  * L'ONBOARDING — l'entête, l'étape courante, la rangée des boutons.
@@ -22,6 +24,7 @@ export function Onboarding({ parcours }: { parcours: ReturnType<typeof useParcou
   const {
     reponses,
     etape,
+    decompte,
     repondre,
     choisirLangue,
     repondreTraitementCommence,
@@ -35,9 +38,15 @@ export function Onboarding({ parcours }: { parcours: ReturnType<typeof useParcou
   return (
     <div className={`page ${classeDuTheme(reponses.theme)}`}>
       <div className="page__colonne">
+        {/* Le décompte tient SUR LA LIGNE DE LA MARQUE, à droite (2026-09-08).
+            Il n'apparaît qu'à partir de l'écran du traitement ; avant, la
+            ligne ne porte que la marque. */}
         <div className="entete">
           <Logomark size={46} />
           <Wordmark />
+          {decompte.montrer ? (
+            <Progression passees={decompte.passees} total={decompte.total} />
+          ) : null}
         </div>
 
         {etape === 'langue-unites' ? (
@@ -96,6 +105,13 @@ export function Onboarding({ parcours }: { parcours: ReturnType<typeof useParcou
             onForme={repondreForme}
             traitement={reponses.traitement}
             onTraitement={(traitement) => repondre('traitement', traitement)}
+          />
+        ) : null}
+
+        {etape === 'avatar' ? (
+          <EtapeAvatar
+            avatar={reponses.avatar}
+            onAvatar={(avatar) => repondre('avatar', avatar)}
           />
         ) : null}
 

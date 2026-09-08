@@ -47,6 +47,26 @@
   margin-bottom: 26px;
 }
 
+/* LE DÉCOMPTE, poussé à droite de la ligne de la marque. `margin-left: auto`
+   mange l'espace entre les deux : la marque reste à gauche quoi qu'il arrive. */
+.progression {
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.bille {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--bille-eteinte);
+}
+
+.bille--allumee {
+  background: var(--accent);
+}
+
 .logomark {
   flex: none;
   width: var(--logo-size, 36px);
@@ -104,6 +124,43 @@
   text-align: center;
   user-select: none;
   color: var(--accent);
+}
+
+/* ── LE CHOIX DE L'AVATAR ───────────────────────────────────────────────── */
+
+/* Trois par ligne : ce sont des images, elles se comparent d'un coup d'œil, et
+   une colonne unique aurait fait défiler six pastilles. */
+.avatars {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 14px;
+  margin: 20px 0 24px;
+}
+
+.avatar-choix {
+  padding: 6px;
+  border: none;
+  border-radius: 50%;
+  background: none;
+  cursor: pointer;
+  /* Le liseré du choix est une `box-shadow` : une bordure qui s'épaissit
+     déplacerait la pastille au moment du clic. */
+  box-shadow: none;
+  transition: box-shadow 150ms, transform 150ms;
+}
+
+.avatar-choix:active {
+  transform: scale(0.96);
+}
+
+.avatar-choix--choisi {
+  box-shadow: 0 0 0 2px var(--accent);
+}
+
+.avatar {
+  display: block;
+  width: 100%;
+  height: auto;
 }
 
 /* ── LE CHOIX DU THÈME ──────────────────────────────────────────────────── */

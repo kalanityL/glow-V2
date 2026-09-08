@@ -1,3 +1,4 @@
+import type { AvatarId } from '../domaine/avatars';
 import type { Forme } from '../domaine/traitements';
 import type { Systeme, Unite } from '../domaine/unites';
 import type { Langue } from './langues';
@@ -97,6 +98,9 @@ export interface Textes {
     traitement: {
       question: string;
     };
+    avatar: {
+      question: string;
+    };
     precedent: string;
     suivant: string;
   };
@@ -104,6 +108,14 @@ export interface Textes {
   retour: string;
   oui: string;
   non: string;
+  /**
+   * LE DÉCOMPTE DES ÉCRANS, pour qui écoute la page : les billes ne se voient
+   * pas. Ce texte ne s'affiche jamais.
+   */
+  progression: string;
+  /** Le nom de chaque avatar. Il ne s'affiche pas : il se dit aux lecteurs
+   *  d'écran, à qui une pastille ne montre rien. */
+  avatars: Record<AvatarId, string>;
   /** Les deux façons de prendre un traitement. Les NOMS des spécialités, eux,
    *  ne se traduisent pas : voir `domaine/traitements.ts`. */
   formes: Record<Forme, string>;
@@ -165,12 +177,24 @@ export const TEXTES: Record<Langue, Textes> = {
       traitement: {
         question: 'Avez-vous commencé votre traitement GLP-1 ?',
       },
+      avatar: {
+        question: 'Choisissez votre avatar',
+      },
       precedent: 'Précédent',
       suivant: 'Suivant',
     },
     retour: 'Retour',
     oui: 'Oui',
     non: 'Non',
+    progression: 'Avancement du questionnaire',
+    avatars: {
+      aurore: 'Aurore',
+      ocean: 'Océan',
+      menthe: 'Menthe',
+      prune: 'Prune',
+      sable: 'Sable',
+      nuit: 'Nuit',
+    },
     formes: {
       injection: 'Injection',
       comprime: 'Comprimé',
@@ -231,12 +255,24 @@ export const TEXTES: Record<Langue, Textes> = {
       traitement: {
         question: 'Have you started your GLP-1 treatment?',
       },
+      avatar: {
+        question: 'Choose your avatar',
+      },
       precedent: 'Previous',
       suivant: 'Next',
     },
     retour: 'Back',
     oui: 'Yes',
     non: 'No',
+    progression: 'Questionnaire progress',
+    avatars: {
+      aurore: 'Dawn',
+      ocean: 'Ocean',
+      menthe: 'Mint',
+      prune: 'Plum',
+      sable: 'Sand',
+      nuit: 'Night',
+    },
     formes: {
       injection: 'Injection',
       comprime: 'Tablet',

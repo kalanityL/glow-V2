@@ -1,3 +1,4 @@
+import type { AvatarId } from '../../domaine/avatars';
 import type { Forme } from '../../domaine/traitements';
 import { SYSTEME_PAR_DEFAUT, type Systeme } from '../../domaine/unites';
 import { LANGUE_PAR_DEFAUT, type Langue } from '../../i18n/langues';
@@ -46,6 +47,9 @@ export interface Reponses {
   traitementCommence: boolean;
   formeTraitement: Forme | null;
   traitement: string | null;
+  /** Aucun avatar d'avance : c'est une figure de soi, on ne la choisit pas
+   *  à la place de quelqu'un. */
+  avatar: AvatarId | null;
 }
 
 export const REPONSES_INITIALES: Reponses = {
@@ -68,4 +72,5 @@ export const REPONSES_INITIALES: Reponses = {
   traitementCommence: true,
   formeTraitement: null,
   traitement: null,
+  avatar: null,
 };

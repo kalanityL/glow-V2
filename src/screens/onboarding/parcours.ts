@@ -21,7 +21,8 @@ export type EtapeId =
   | 'poids'
   | 'poids-cible'
   | 'traitement'
-  | 'quel-traitement';
+  | 'quel-traitement'
+  | 'avatar';
 
 export const ETAPES: readonly Etape[] = [
   /* LE THÈME EN PREMIER, et la langue ensuite (2026-09-07). J'avais d'abord
@@ -50,7 +51,22 @@ export const ETAPES: readonly Etape[] = [
      empilées dépassaient la hauteur de l'écran. Elle ne se montre qu'à qui a
      commencé — la poser à qui n'a pas commencé n'aurait pas de sens. */
   { id: 'quel-traitement', montre: (reponses) => reponses.traitementCommence },
+  /* L'avatar EN DERNIER, quel que soit le chemin : après la forme et la
+     spécialité pour qui a commencé, tout de suite après le « non » pour qui
+     n'a pas commencé (2026-09-08). */
+  { id: 'avatar' },
 ];
+
+/**
+ * L'ÉTAPE À PARTIR DE LAQUELLE LE DÉCOMPTE S'AFFICHE (2026-09-08 : « a partir
+ * de avez-vous commencé votre traitement »).
+ *
+ * Les premiers écrans ne le portent pas : on y règle l'application — le thème,
+ * la langue, les unités — plus qu'on ne remplit un questionnaire, et annoncer
+ * un décompte dès la première page ferait paraître le chemin plus long qu'il
+ * n'est.
+ */
+export const ETAPE_DEBUT_DECOMPTE: EtapeId = 'traitement';
 
 /**
  * CE QUI EMPÊCHE D'AVANCER, étape par étape.
