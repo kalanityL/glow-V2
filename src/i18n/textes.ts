@@ -1,8 +1,13 @@
-import type { AvatarId } from '../domaine/avatars';
+import type {
+  Coiffure,
+  Expression,
+  FormeVisage,
+  Genre,
+} from '../domaine/avatar';
 import type { Forme } from '../domaine/traitements';
 import type { Systeme, Unite } from '../domaine/unites';
 import type { Langue } from './langues';
-import type { Genre, Objectif } from '../screens/onboarding/reponses';
+import type { Objectif } from '../screens/onboarding/reponses';
 import type { ThemeId } from '../themes/themes';
 
 /**
@@ -80,8 +85,17 @@ export interface Textes {
     traitement: string;
     age: string;
     taille: string;
-    nom: string;
+    prenom: string;
+    email: string;
+    motDePasse: string;
     genre: string;
+    peau: string;
+    cheveux: string;
+    yeux: string;
+    coiffure: string;
+    visage: string;
+    expression: string;
+    lunettes: string;
   };
   onboarding: {
     langueUnites: {
@@ -107,6 +121,8 @@ export interface Textes {
     };
     profil: {
       question: string;
+      /** La règle du mot de passe, dite avant la faute et non après. */
+      regleMotDePasse: string;
     };
     precedent: string;
     suivant: string;
@@ -127,11 +143,13 @@ export interface Textes {
    * pas. Ce texte ne s'affiche jamais.
    */
   progression: string;
-  /** Le nom de chaque avatar. Il ne s'affiche pas : il se dit aux lecteurs
-   *  d'écran, à qui une pastille ne montre rien. */
-  avatars: Record<AvatarId, string>;
-  /** Les genres proposés, sous le même contrat que les autres listes. */
+  /** Les réglages de l'avatar. Les COULEURS n'ont pas de libellé visible — une
+   *  pastille se voit —, mais leur nom se dit à qui écoute la page. */
   genres: Record<Genre, string>;
+  coiffures: Record<Coiffure, string>;
+  formesVisage: Record<FormeVisage, string>;
+  expressions: Record<Expression, string>;
+  couleurs: Record<string, string>;
   /** Les deux façons de prendre un traitement. Les NOMS des spécialités, eux,
    *  ne se traduisent pas : voir `domaine/traitements.ts`. */
   formes: Record<Forme, string>;
@@ -150,8 +168,17 @@ export const TEXTES: Record<Langue, Textes> = {
       traitement: 'Traitement',
       age: 'Âge',
       taille: 'Taille',
-      nom: 'Nom',
+      prenom: 'Prénom',
+      email: 'Adresse e-mail',
+      motDePasse: 'Mot de passe',
       genre: 'Genre',
+      peau: 'Peau',
+      cheveux: 'Cheveux',
+      yeux: 'Yeux',
+      coiffure: 'Coiffure',
+      visage: 'Visage',
+      expression: 'Expression',
+      lunettes: 'Lunettes',
     },
     themes: {
       ciel: 'Ciel',
@@ -198,10 +225,11 @@ export const TEXTES: Record<Langue, Textes> = {
         question: 'Avez-vous commencé votre traitement GLP-1 ?',
       },
       avatar: {
-        question: 'Choisissez votre avatar',
+        question: 'Composez votre avatar',
       },
       profil: {
         question: 'Dernière étape',
+        regleMotDePasse: 'Huit caractères au moins.',
       },
       precedent: 'Précédent',
       suivant: 'Suivant',
@@ -211,18 +239,49 @@ export const TEXTES: Record<Langue, Textes> = {
     oui: 'Oui',
     non: 'Non',
     progression: 'Avancement du questionnaire',
-    avatars: {
-      aurore: 'Aurore',
-      ocean: 'Océan',
-      menthe: 'Menthe',
-      prune: 'Prune',
-      sable: 'Sable',
-      nuit: 'Nuit',
-    },
     genres: {
       femme: 'Femme',
       homme: 'Homme',
-      'neutre-ou-prive': 'Neutre / Je le garde pour moi',
+      neutre: 'Neutre',
+    },
+    coiffures: {
+      court: 'Courts',
+      long: 'Longs',
+      boucle: 'Bouclés',
+      frange: 'Frange',
+      brosse: 'En brosse',
+      chauve: 'Sans cheveux',
+    },
+    formesVisage: {
+      ovale: 'Ovale',
+      rond: 'Rond',
+      carre: 'Carré',
+      coeur: 'Cœur',
+    },
+    expressions: {
+      joyeuse: 'Joyeuse',
+      determinee: 'Déterminée',
+      fiere: 'Fière',
+      calme: 'Calme',
+    },
+    couleurs: {
+      '#FFE5D9': 'Clair',
+      '#F7D1BA': 'Beige',
+      '#E8AC80': 'Doré',
+      '#B57E58': 'Café',
+      '#724A30': 'Chocolat',
+      '#43291F': 'Ébène',
+      '#4682B4': 'Bleu',
+      '#2E8B57': 'Vert d’eau',
+      '#CD853F': 'Noisette',
+      '#5C3A21': 'Brun intense',
+      '#708090': 'Gris azur',
+      '#E9C46A': 'Blond',
+      '#4E3629': 'Brun',
+      '#8D5B4C': 'Châtain',
+      '#1A1A1A': 'Noir',
+      '#E76F51': 'Roux',
+      '#DFE2E6': 'Gris polaire',
     },
     formes: {
       injection: 'Injection',
@@ -241,8 +300,17 @@ export const TEXTES: Record<Langue, Textes> = {
       traitement: 'Treatment',
       age: 'Age',
       taille: 'Height',
-      nom: 'Name',
+      prenom: 'First name',
+      email: 'Email address',
+      motDePasse: 'Password',
       genre: 'Gender',
+      peau: 'Skin',
+      cheveux: 'Hair',
+      yeux: 'Eyes',
+      coiffure: 'Hairstyle',
+      visage: 'Face',
+      expression: 'Expression',
+      lunettes: 'Glasses',
     },
     themes: {
       ciel: 'Sky',
@@ -289,10 +357,11 @@ export const TEXTES: Record<Langue, Textes> = {
         question: 'Have you started your GLP-1 treatment?',
       },
       avatar: {
-        question: 'Choose your avatar',
+        question: 'Build your avatar',
       },
       profil: {
         question: 'Last step',
+        regleMotDePasse: 'At least eight characters.',
       },
       precedent: 'Previous',
       suivant: 'Next',
@@ -302,18 +371,49 @@ export const TEXTES: Record<Langue, Textes> = {
     oui: 'Yes',
     non: 'No',
     progression: 'Questionnaire progress',
-    avatars: {
-      aurore: 'Dawn',
-      ocean: 'Ocean',
-      menthe: 'Mint',
-      prune: 'Plum',
-      sable: 'Sand',
-      nuit: 'Night',
-    },
     genres: {
       femme: 'Woman',
       homme: 'Man',
-      'neutre-ou-prive': 'Neutral / I would rather not say',
+      neutre: 'Neutral',
+    },
+    coiffures: {
+      court: 'Short',
+      long: 'Long',
+      boucle: 'Curly',
+      frange: 'Fringe',
+      brosse: 'Buzz cut',
+      chauve: 'No hair',
+    },
+    formesVisage: {
+      ovale: 'Oval',
+      rond: 'Round',
+      carre: 'Square',
+      coeur: 'Heart',
+    },
+    expressions: {
+      joyeuse: 'Joyful',
+      determinee: 'Determined',
+      fiere: 'Proud',
+      calme: 'Calm',
+    },
+    couleurs: {
+      '#FFE5D9': 'Fair',
+      '#F7D1BA': 'Beige',
+      '#E8AC80': 'Golden',
+      '#B57E58': 'Coffee',
+      '#724A30': 'Chocolate',
+      '#43291F': 'Ebony',
+      '#4682B4': 'Blue',
+      '#2E8B57': 'Sea green',
+      '#CD853F': 'Hazel',
+      '#5C3A21': 'Deep brown',
+      '#708090': 'Slate grey',
+      '#E9C46A': 'Blond',
+      '#4E3629': 'Brown',
+      '#8D5B4C': 'Chestnut',
+      '#1A1A1A': 'Black',
+      '#E76F51': 'Red',
+      '#DFE2E6': 'Polar grey',
     },
     formes: {
       injection: 'Injection',

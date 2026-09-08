@@ -150,39 +150,45 @@
 
 /* ── LE CHOIX DE L'AVATAR ───────────────────────────────────────────────── */
 
-/* Trois par ligne : ce sont des images, elles se comparent d'un coup d'œil, et
-   une colonne unique aurait fait défiler six pastilles. */
-.avatars {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 14px;
-  margin: 20px 0 24px;
-}
-
-.avatar-choix {
-  padding: 6px;
-  border: none;
-  border-radius: 50%;
-  background: none;
-  cursor: pointer;
-  /* Le liseré du choix est une `box-shadow` : une bordure qui s'épaissit
-     déplacerait la pastille au moment du clic. */
-  box-shadow: none;
-  transition: box-shadow 150ms, transform 150ms;
-}
-
-.avatar-choix:active {
-  transform: scale(0.96);
-}
-
-.avatar-choix--choisi {
-  box-shadow: 0 0 0 2px var(--accent);
+/* LE PORTRAIT, EN HAUT ET AU MILIEU : on se voit pendant qu'on se compose, et
+   il change à chaque touche. */
+.avatar-portrait {
+  display: flex;
+  justify-content: center;
+  margin: 14px 0 4px;
 }
 
 .avatar {
   display: block;
-  width: 100%;
-  height: auto;
+}
+
+/* LES PASTILLES DE COULEUR. Elles n'ont pas de libellé visible : une couleur se
+   voit, et écrire « Châtain » à côté d'un carré châtain n'apprend rien. */
+.pastilles {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin: 10px 0 0;
+}
+
+.pastille {
+  width: 34px;
+  height: 34px;
+  border: 1px solid var(--option-filet);
+  border-radius: 50%;
+  cursor: pointer;
+  /* Le liseré du choix est une `box-shadow` posée à distance : sur une
+     pastille sombre, un liseré collé disparaîtrait dans la couleur. */
+  box-shadow: none;
+  transition: box-shadow 150ms, transform 150ms;
+}
+
+.pastille:active {
+  transform: scale(0.94);
+}
+
+.pastille--choisie {
+  box-shadow: 0 0 0 2px var(--fond-page, transparent), 0 0 0 4px var(--accent);
 }
 
 /* ── LE CHOIX DU THÈME ──────────────────────────────────────────────────── */
@@ -400,6 +406,20 @@
    qu'un peu d'air en dessous. */
 .duo .selecteur {
   margin: 8px 0 0;
+}
+
+/* LA RÈGLE D'UN CHAMP — dite avant la faute, pas après. Discrète tant qu'elle
+   est tenue, à l'accent quand elle ne l'est pas encore. */
+.regle {
+  margin: 8px 0 0;
+  font-family: var(--font-body);
+  font-size: 13px;
+  color: var(--encre-chapeau);
+}
+
+.regle--manquee {
+  font-style: italic;
+  color: var(--accent);
 }
 
 /* UN CHAMP DE TEXTE LIBRE — le nom. Même matière qu'une réponse à choisir, pour

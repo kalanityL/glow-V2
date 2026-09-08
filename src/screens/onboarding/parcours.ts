@@ -1,3 +1,4 @@
+import { motDePasseValide } from '../../domaine/compte';
 import type { Reponses } from './reponses';
 
 /**
@@ -93,8 +94,17 @@ export const ETAPE_DEBUT_DECOMPTE: EtapeId = 'traitement';
  * règle de l'onboarding depuis le premier jour.
  */
 export function peutValider(etape: EtapeId, reponses: Reponses): boolean {
-  if (etape !== 'quel-traitement') return true;
-  return reponses.formeTraitement !== null && reponses.traitement !== null;
+  if (etape === 'quel-traitement') {
+    return reponses.formeTraitement !== null && reponses.traitement !== null;
+  }
+  /* Le dernier écran ouvre un compte : un mot de passe commencé doit tenir la
+     règle des huit signes avant qu'on entre. Un mot de passe VIDE ne bloque
+     pas — rien n'est obligatoire dans cet onboarding, et forcer la main ici
+     serait un choix qu'elle n'a pas fait. */
+  if (etape === 'profil') {
+    return reponses.motDePasse.length === 0 || motDePasseValide(reponses.motDePasse);
+  }
+  return true;
 }
 
 /** Les étapes que ces réponses font voir, dans l'ordre. */

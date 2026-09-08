@@ -111,10 +111,7 @@ export function Onboarding({ parcours }: { parcours: ReturnType<typeof useParcou
         ) : null}
 
         {etape === 'avatar' ? (
-          <EtapeAvatar
-            avatar={reponses.avatar}
-            onAvatar={(avatar) => repondre('avatar', avatar)}
-          />
+          <EtapeAvatar avatar={reponses.avatar} onAvatar={(avatar) => repondre('avatar', avatar)} />
         ) : null}
 
         {etape === 'profil' ? (
@@ -123,10 +120,12 @@ export function Onboarding({ parcours }: { parcours: ReturnType<typeof useParcou
             onAge={(age) => repondre('age', age)}
             taille={reponses.taille}
             onTaille={(taille) => repondre('taille', taille)}
-            nom={reponses.nom}
-            onNom={(nom) => repondre('nom', nom)}
-            genre={reponses.genre}
-            onGenre={(genre) => repondre('genre', genre)}
+            prenom={reponses.prenom}
+            onPrenom={(prenom) => repondre('prenom', prenom)}
+            email={reponses.email}
+            onEmail={(email) => repondre('email', email)}
+            motDePasse={reponses.motDePasse}
+            onMotDePasse={(motDePasse) => repondre('motDePasse', motDePasse)}
             systeme={reponses.systeme}
           />
         ) : null}

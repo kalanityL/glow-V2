@@ -1,4 +1,4 @@
-import type { AvatarId } from '../../domaine/avatars';
+import { AVATAR_INITIAL, type Avatar } from '../../domaine/avatar';
 import type { Forme } from '../../domaine/traitements';
 import { SYSTEME_PAR_DEFAUT, type Systeme } from '../../domaine/unites';
 import { LANGUE_PAR_DEFAUT, type Langue } from '../../i18n/langues';
@@ -7,15 +7,6 @@ import { THEME_PAR_DEFAUT, type ThemeId } from '../../themes/themes';
 /** Les objectifs proposés, dans l'ordre d'affichage. Le premier est retenu d'avance. */
 export const OBJECTIFS = ['perdre', 'stabiliser'] as const;
 export type Objectif = (typeof OBJECTIFS)[number];
-
-/**
- * Les genres proposés. TROIS RÉPONSES, ET NON QUATRE (2026-09-08) : « neutre »
- * et « je le garde pour moi » tiennent sur LE MÊME BOUTON. Les distinguer
- * revenait à demander de justifier son silence ; réunies, elles disent la seule
- * chose dont l'application a besoin — ne pas trancher entre femme et homme.
- */
-export const GENRES = ['femme', 'homme', 'neutre-ou-prive'] as const;
-export type Genre = (typeof GENRES)[number];
 
 /**
  * TOUT CE QUE L'ONBOARDING RECUEILLE.
@@ -56,14 +47,20 @@ export interface Reponses {
   traitementCommence: boolean;
   formeTraitement: Forme | null;
   traitement: string | null;
-  /** Aucun avatar d'avance : c'est une figure de soi, on ne la choisit pas
-   *  à la place de quelqu'un. */
-  avatar: AvatarId | null;
-  /* Qui l'on est. Rien n'est obligatoire : les trois premiers partent vides. */
+  /**
+   * L'AVATAR, COMPOSÉ ET NON CHOISI (2026-09-08) : c'est la fonctionnalité de
+   * GLOW V1. LE GENRE EN FAIT PARTIE — il se voit, sur le vêtement et la
+   * coiffure — et n'est donc plus une question de l'écran suivant.
+   */
+  avatar: Avatar;
+  /* Qui l'on est. L'âge, la taille et le prénom partent vides. */
   age: number | null;
   taille: number | null;
-  nom: string;
-  genre: Genre | null;
+  prenom: string;
+  /* Le compte. Le mot de passe fait huit signes au moins, et c'est la seule
+     contrainte (2026-09-08). */
+  email: string;
+  motDePasse: string;
 }
 
 export const REPONSES_INITIALES: Reponses = {
@@ -86,9 +83,10 @@ export const REPONSES_INITIALES: Reponses = {
   traitementCommence: true,
   formeTraitement: null,
   traitement: null,
-  avatar: null,
+  avatar: AVATAR_INITIAL,
   age: null,
   taille: null,
-  nom: '',
-  genre: null,
+  prenom: '',
+  email: '',
+  motDePasse: '',
 };
