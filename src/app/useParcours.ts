@@ -103,6 +103,8 @@ export function useParcours() {
        éteint quand elle ne le laisse pas. */
     peutValider: peutValider(etape, reponses),
     peutRevenir: rangBorne > 0,
+    /* Vrai sur le dernier écran : son bouton porte alors un autre mot. */
+    estDerniere: rangBorne === visibles.length - 1,
     avancer: () => setRang(Math.min(rangBorne + 1, visibles.length - 1)),
     reculer: () => setRang(Math.max(rangBorne - 1, 0)),
   };

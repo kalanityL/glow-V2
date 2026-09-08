@@ -22,7 +22,8 @@ export type EtapeId =
   | 'poids-cible'
   | 'traitement'
   | 'quel-traitement'
-  | 'avatar';
+  | 'avatar'
+  | 'profil';
 
 export const ETAPES: readonly Etape[] = [
   /* LE THÈME EN PREMIER, et la langue ensuite (2026-09-07). J'avais d'abord
@@ -55,6 +56,10 @@ export const ETAPES: readonly Etape[] = [
      spécialité pour qui a commencé, tout de suite après le « non » pour qui
      n'a pas commencé (2026-09-08). */
   { id: 'avatar' },
+  /* QUI L'ON EST, en dernier (2026-09-08) : c'est l'écran qui précède
+     l'application, et son bouton n'annonce plus la suite du questionnaire mais
+     l'entrée dans l'application. */
+  { id: 'profil' },
 ];
 
 /**

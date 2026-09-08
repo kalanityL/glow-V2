@@ -1,4 +1,4 @@
-import type { Unite } from './unites';
+import type { UnitePoids, UniteTaille } from './unites';
 
 /**
  * LES BORNES D'UN POIDS.
@@ -19,7 +19,24 @@ import type { Unite } from './unites';
  * plafond BORNE LA LISTE : il n'y a plus de valeur incorrecte à refuser, il n'y
  * en a plus d'atteignable. C'est le même nombre qui servait à juger la saisie.
  */
-export const POIDS_MAX: Partial<Record<Unite, number>> = {
+export const POIDS_MAX: Record<UnitePoids, number> = {
   kg: 999,
   lb: 2000,
+};
+
+/**
+ * LES BORNES DE L'ÂGE. Large exprès : l'application n'a pas à décider qui est
+ * trop jeune ou trop vieux pour se peser — elle borne une roue, rien de plus.
+ */
+export const AGE_MIN = 12;
+export const AGE_MAX = 110;
+
+/**
+ * LES BORNES DE LA TAILLE, dans chaque unité. Comme pour le poids, ce ne sont
+ * pas les conversions l'une de l'autre : deux fourchettes rondes, chacune
+ * choisie dans son unité.
+ */
+export const TAILLE_BORNES: Record<UniteTaille, { min: number; max: number }> = {
+  cm: { min: 100, max: 250 },
+  in: { min: 40, max: 98 },
 };

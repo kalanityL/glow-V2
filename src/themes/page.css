@@ -340,11 +340,11 @@
   color: var(--encre-chapeau);
 }
 
-/* L'intitulé d'un groupe, quand un écran pose deux questions : plus petit que
-   le titre, en capitales espacées, pour se distinguer sans lui disputer la
+/* L'intitulé d'un groupe, quand un écran pose plusieurs questions : plus petit
+   que le titre, en capitales espacées, pour se distinguer sans lui disputer la
    place. */
 .libelle-groupe {
-  margin: 20px 0 0;
+  margin: 16px 0 0;
   font-family: var(--font-display);
   font-weight: 600;
   text-transform: uppercase;
@@ -364,6 +364,44 @@
   margin-top: 10px;
 }
 
+/* DEUX CHAMPS CÔTE À CÔTE, chacun avec son intitulé. Les colonnes sont égales,
+   comme partout : une colonne plus large ferait croire à une réponse plus
+   importante. */
+.duo {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin-top: 12px;
+}
+
+/* Dans une colonne, le sélecteur se serre contre son intitulé et ne garde
+   qu'un peu d'air en dessous. */
+.duo .selecteur {
+  margin: 8px 0 0;
+}
+
+/* UN CHAMP DE TEXTE LIBRE — le nom. Même matière qu'une réponse à choisir, pour
+   qu'un écran qui mêle les deux n'ait pas l'air d'en mêler deux sortes. */
+.champ-texte {
+  width: 100%;
+  margin: 10px 0 0;
+  padding: 15px 16px;
+  border: 1px solid var(--option-filet);
+  border-radius: 14px;
+  background: var(--option-fond);
+  color: var(--encre);
+  font-family: var(--font-body);
+  font-weight: 500;
+  font-size: 17px;
+  transition: box-shadow 150ms, background 150ms;
+}
+
+.champ-texte:focus {
+  outline: none;
+  background: var(--option-choisi-fond);
+  box-shadow: 0 0 0 2px var(--accent);
+}
+
 /* ── LES RÉPONSES D'UNE QUESTION ────────────────────────────────────────── */
 
 /* Empilées et pleine largeur : la question se lit d'un trait, du haut vers le
@@ -372,7 +410,11 @@
   display: flex;
   flex-direction: column;
   gap: 10px;
-  margin: 20px 0 24px;
+  /* Marges resserrées le 2026-09-08 : l'écran « Encore un mot sur vous » pose
+     quatre questions, et l'air d'origine faisait passer les boutons sous le
+     pli. Les écrans à une seule question ont de la place à revendre, ils ne
+     perdent rien à ce resserrement. */
+  margin: 14px 0 18px;
 }
 
 /* DEUX PAR LIGNE, pour une liste longue de réponses courtes : treize noms de

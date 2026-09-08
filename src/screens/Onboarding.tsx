@@ -10,6 +10,7 @@ import { EtapePoids } from './onboarding/EtapePoids';
 import { EtapeTraitement } from './onboarding/EtapeTraitement';
 import { EtapeQuelTraitement } from './onboarding/EtapeQuelTraitement';
 import { EtapeAvatar } from './onboarding/EtapeAvatar';
+import { EtapeProfil } from './onboarding/EtapeProfil';
 import { Progression } from './onboarding/Progression';
 
 /**
@@ -31,6 +32,7 @@ export function Onboarding({ parcours }: { parcours: ReturnType<typeof useParcou
     repondreForme,
     peutValider,
     peutRevenir,
+    estDerniere,
     avancer,
     reculer,
   } = parcours;
@@ -115,6 +117,20 @@ export function Onboarding({ parcours }: { parcours: ReturnType<typeof useParcou
           />
         ) : null}
 
+        {etape === 'profil' ? (
+          <EtapeProfil
+            age={reponses.age}
+            onAge={(age) => repondre('age', age)}
+            taille={reponses.taille}
+            onTaille={(taille) => repondre('taille', taille)}
+            nom={reponses.nom}
+            onNom={(nom) => repondre('nom', nom)}
+            genre={reponses.genre}
+            onGenre={(genre) => repondre('genre', genre)}
+            systeme={reponses.systeme}
+          />
+        ) : null}
+
         {/* « PRÉCÉDENT » N'EXISTE PAS À LA PREMIÈRE ÉTAPE : il n'est pas éteint,
             il est absent — rien ne se propose de reculer là où il n'y a rien
             derrière. « Suivant » occupe alors toute la rangée. Le bouton de la
@@ -136,7 +152,9 @@ export function Onboarding({ parcours }: { parcours: ReturnType<typeof useParcou
             disabled={!peutValider}
             aria-disabled={!peutValider}
           >
-            {textes.onboarding.suivant}
+            {/* Sur le dernier écran, le bouton n'annonce plus la suite du
+                questionnaire mais l'entrée dans l'application. */}
+            {estDerniere ? textes.onboarding.entrer : textes.onboarding.suivant}
           </button>
         </div>
       </div>

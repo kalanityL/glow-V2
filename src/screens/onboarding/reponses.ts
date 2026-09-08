@@ -9,6 +9,14 @@ export const OBJECTIFS = ['perdre', 'stabiliser'] as const;
 export type Objectif = (typeof OBJECTIFS)[number];
 
 /**
+ * Les genres proposés. « Je le garde pour moi » N'EST PAS UN REFUS DE RÉPONDRE
+ * mais une réponse : elle dit qu'on ne veut pas le dire, et l'application n'a
+ * pas à revenir à la charge.
+ */
+export const GENRES = ['femme', 'homme', 'neutre', 'prive'] as const;
+export type Genre = (typeof GENRES)[number];
+
+/**
  * TOUT CE QUE L'ONBOARDING RECUEILLE.
  *
  * Les mesures sont gardées EN TEXTE et AVEC UN POINT, « 95.0 » : c'est ce que
@@ -50,6 +58,11 @@ export interface Reponses {
   /** Aucun avatar d'avance : c'est une figure de soi, on ne la choisit pas
    *  à la place de quelqu'un. */
   avatar: AvatarId | null;
+  /* Qui l'on est. Rien n'est obligatoire : les trois premiers partent vides. */
+  age: number | null;
+  taille: number | null;
+  nom: string;
+  genre: Genre | null;
 }
 
 export const REPONSES_INITIALES: Reponses = {
@@ -73,4 +86,8 @@ export const REPONSES_INITIALES: Reponses = {
   formeTraitement: null,
   traitement: null,
   avatar: null,
+  age: null,
+  taille: null,
+  nom: '',
+  genre: null,
 };

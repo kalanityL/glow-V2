@@ -2,7 +2,7 @@ import type { AvatarId } from '../domaine/avatars';
 import type { Forme } from '../domaine/traitements';
 import type { Systeme, Unite } from '../domaine/unites';
 import type { Langue } from './langues';
-import type { Objectif } from '../screens/onboarding/reponses';
+import type { Genre, Objectif } from '../screens/onboarding/reponses';
 import type { ThemeId } from '../themes/themes';
 
 /**
@@ -78,6 +78,10 @@ export interface Textes {
     unites: string;
     forme: string;
     traitement: string;
+    age: string;
+    taille: string;
+    nom: string;
+    genre: string;
   };
   onboarding: {
     langueUnites: {
@@ -101,8 +105,13 @@ export interface Textes {
     avatar: {
       question: string;
     };
+    profil: {
+      question: string;
+    };
     precedent: string;
     suivant: string;
+    /** Le bouton du dernier écran, qui fait entrer dans l'application. */
+    entrer: string;
   };
   /** Le bouton « retour » de la barre du bas : lu par les lecteurs d'écran. */
   retour: string;
@@ -116,6 +125,8 @@ export interface Textes {
   /** Le nom de chaque avatar. Il ne s'affiche pas : il se dit aux lecteurs
    *  d'écran, à qui une pastille ne montre rien. */
   avatars: Record<AvatarId, string>;
+  /** Les genres proposés, sous le même contrat que les autres listes. */
+  genres: Record<Genre, string>;
   /** Les deux façons de prendre un traitement. Les NOMS des spécialités, eux,
    *  ne se traduisent pas : voir `domaine/traitements.ts`. */
   formes: Record<Forme, string>;
@@ -132,6 +143,10 @@ export const TEXTES: Record<Langue, Textes> = {
       unites: 'Unités',
       forme: 'Forme',
       traitement: 'Traitement',
+      age: 'Âge',
+      taille: 'Taille',
+      nom: 'Nom',
+      genre: 'Genre',
     },
     themes: {
       ciel: 'Ciel',
@@ -180,8 +195,12 @@ export const TEXTES: Record<Langue, Textes> = {
       avatar: {
         question: 'Choisissez votre avatar',
       },
+      profil: {
+        question: 'Encore un mot sur vous',
+      },
       precedent: 'Précédent',
       suivant: 'Suivant',
+      entrer: 'Entre dans la galaxie GLP1LOW',
     },
     retour: 'Retour',
     oui: 'Oui',
@@ -194,6 +213,12 @@ export const TEXTES: Record<Langue, Textes> = {
       prune: 'Prune',
       sable: 'Sable',
       nuit: 'Nuit',
+    },
+    genres: {
+      femme: 'Femme',
+      homme: 'Homme',
+      neutre: 'Neutre',
+      prive: 'Je le garde pour moi',
     },
     formes: {
       injection: 'Injection',
@@ -210,6 +235,10 @@ export const TEXTES: Record<Langue, Textes> = {
       unites: 'Units',
       forme: 'Form',
       traitement: 'Treatment',
+      age: 'Age',
+      taille: 'Height',
+      nom: 'Name',
+      genre: 'Gender',
     },
     themes: {
       ciel: 'Sky',
@@ -258,8 +287,12 @@ export const TEXTES: Record<Langue, Textes> = {
       avatar: {
         question: 'Choose your avatar',
       },
+      profil: {
+        question: 'One last word about you',
+      },
       precedent: 'Previous',
       suivant: 'Next',
+      entrer: 'Enter the GLP1LOW galaxy',
     },
     retour: 'Back',
     oui: 'Yes',
@@ -272,6 +305,12 @@ export const TEXTES: Record<Langue, Textes> = {
       prune: 'Plum',
       sable: 'Sand',
       nuit: 'Night',
+    },
+    genres: {
+      femme: 'Woman',
+      homme: 'Man',
+      neutre: 'Neutral',
+      prive: 'I would rather not say',
     },
     formes: {
       injection: 'Injection',

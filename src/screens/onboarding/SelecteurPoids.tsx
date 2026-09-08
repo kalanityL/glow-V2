@@ -1,14 +1,14 @@
-import { useEffect, useRef, useState } from 'react';
 import { useTextes } from '../../i18n/useTextes';
 import { POIDS_MAX } from '../../domaine/mesures';
-import type { Unite } from '../../domaine/unites';
+import type { Unite, UnitePoids } from '../../domaine/unites';
+import { useSelecteurOuvert } from './useSelecteurOuvert';
 
 interface SelecteurPoidsProps {
   id: string;
   /** Le poids, tel qu'il est gardé : « 95.0 ». */
   valeur: string;
   onValeur: (valeur: string) => void;
-  unite: Unite;
+  unite: UnitePoids;
   /** La question, qui nomme le sélecteur à qui écoute la page. */
   question: string;
 }
@@ -56,22 +56,16 @@ const PAS_AFFICHE: Partial<Record<Unite, number>> = { kg: 100 };
  * refermer sur rien laisserait un panneau ouvert sans raison.
  * Le clic dehors et la touche Échap referment aussi, comme partout.
  *
- * CE QUI EST DU NAVIGATEUR ET DEVRA CHANGER EN NATIF, et rien d'autre :
- *   - la fermeture au clic dehors, écrite avec `document` ;
- *   - la touche Échap ;
- *   - `scrollIntoView`, qui amène le cran retenu au milieu de sa colonne à
- *     l'ouverture.
- * Tout le reste — l'état, les bornes, l'affichage — est ordinaire.
+ * CE QUI EST DU NAVIGATEUR vit dans `useSelecteurOuvert`, partagé avec les
+ * autres sélecteurs à roues : le clic dehors, la touche Échap, le placement du
+ * cran retenu. Ici, tout est ordinaire — l'état, les bornes, l'affichage.
  */
 export function SelecteurPoids({ id, valeur, onValeur, unite, question }: SelecteurPoidsProps) {
   const textes = useTextes();
-  const max = POIDS_MAX[unite] ?? 999;
+  const max = POIDS_MAX[unite];
   const pas = PAS_AFFICHE[unite] ?? 1;
 
-  const [ouvert, setOuvert] = useState(false);
-  const enveloppe = useRef<HTMLDivElement>(null);
-  const cranEntiere = useRef<HTMLButtonElement>(null);
-  const cranDixieme = useRef<HTMLButtonElement>(null);
+  const { ouvert, setOuvert, enveloppe, cranRetenu } = useSelecteurOuvert();
 
   const [entiereBrute = '', dixiemeBrut = '0'] = valeur.split(/[.,]/);
   const entiere = Number(entiereBrute) || 1;
@@ -79,34 +73,6 @@ export function SelecteurPoids({ id, valeur, onValeur, unite, question }: Select
 
   const poser = (nouvelleEntiere: number, nouveauDixieme: number) =>
     onValeur(`${nouvelleEntiere}${SEPARATEUR_STOCKE}${nouveauDixieme}`);
-
-  /* À l'ouverture, chaque colonne se place sur son cran retenu : sans cela, on
-     tomberait sur le début de la liste, à 1 kg. */
-  useEffect(() => {
-    if (!ouvert) return;
-    cranEntiere.current?.scrollIntoView({ block: 'center' });
-    cranDixieme.current?.scrollIntoView({ block: 'center' });
-  }, [ouvert]);
-
-  /* Le panneau se referme au clic dehors et sur Échap — les deux façons
-     ordinaires de dire « j'ai fini », l'une à la souris, l'autre au clavier. */
-  useEffect(() => {
-    if (!ouvert) return;
-
-    const auClic = (evenement: MouseEvent) => {
-      if (!enveloppe.current?.contains(evenement.target as Node)) setOuvert(false);
-    };
-    const auClavier = (evenement: KeyboardEvent) => {
-      if (evenement.key === 'Escape') setOuvert(false);
-    };
-
-    document.addEventListener('mousedown', auClic);
-    document.addEventListener('keydown', auClavier);
-    return () => {
-      document.removeEventListener('mousedown', auClic);
-      document.removeEventListener('keydown', auClavier);
-    };
-  }, [ouvert]);
 
   const entieres = Array.from({ length: max }, (_, rang) => rang + 1);
 
@@ -136,7 +102,7 @@ export function SelecteurPoids({ id, valeur, onValeur, unite, question }: Select
               <li key={valeurEntiere}>
                 <button
                   type="button"
-                  ref={valeurEntiere === entiere ? cranEntiere : undefined}
+                  ref={valeurEntiere === entiere ? cranRetenu(0) : undefined}
                   className={`roue__cran${valeurEntiere === entiere ? ' roue__cran--choisi' : ''}`}
                   role="option"
                   aria-selected={valeurEntiere === entiere}
@@ -155,7 +121,7 @@ export function SelecteurPoids({ id, valeur, onValeur, unite, question }: Select
               <li key={valeurDixieme}>
                 <button
                   type="button"
-                  ref={valeurDixieme === dixieme ? cranDixieme : undefined}
+                  ref={valeurDixieme === dixieme ? cranRetenu(1) : undefined}
                   className={`roue__cran${valeurDixieme === dixieme ? ' roue__cran--choisi' : ''}`}
                   role="option"
                   aria-selected={valeurDixieme === dixieme}

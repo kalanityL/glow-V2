@@ -32,6 +32,12 @@ export const UNITES = ['kg', 'lb', 'cm', 'in'] as const;
 
 export type Unite = (typeof UNITES)[number];
 
+/* Les deux familles, nommées : elles n'ont ni les mêmes bornes ni les mêmes
+   sélecteurs, et un poids ne doit jamais pouvoir se glisser là où une taille
+   est attendue. */
+export type UnitePoids = Extract<Unite, 'kg' | 'lb'>;
+export type UniteTaille = Extract<Unite, 'cm' | 'in'>;
+
 /**
  * LE SYSTÈME QUE CHAQUE LANGUE APPORTE AVEC ELLE (2026-09-07 : « si choix en,
  * ça bascule le defaut de l'unité vers pound, mais on peut le changer apres ;
@@ -49,7 +55,7 @@ export const SYSTEME_PAR_LANGUE: Record<Langue, Systeme> = {
 };
 
 /** L'unité de chaque grandeur, dans chaque système. */
-export const UNITES_DU_SYSTEME: Record<Systeme, { poids: Unite; taille: Unite }> = {
+export const UNITES_DU_SYSTEME: Record<Systeme, { poids: UnitePoids; taille: UniteTaille }> = {
   metrique: { poids: 'kg', taille: 'cm' },
   imperial: { poids: 'lb', taille: 'in' },
 };
