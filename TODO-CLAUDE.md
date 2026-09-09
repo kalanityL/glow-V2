@@ -25,11 +25,13 @@ que de te faire lire le fichier. Le TODO de la V1 est importé tel quel dans
       derrière des onglets ; à voir si cela gêne.
 - [ ] **De la V1, non repris dans l'avatar** : l'import d'une photo (demande
       de stocker un fichier) et le tirage au hasard.
-- [ ] **Le TODO et les TIPS UX/UI de la V1 sont-ils à importer aussi ?**
-      Seul mon TODO l'a été (ta demande). Ton `TODO.md` et `TIPS-UX-UI.md`
-      de la V1 contiennent des points qui parlent directement de l'onboarding
-      (finir par un premier enregistrement, féliciter, « avancer, pas
-      configurer ») — leurs principes sont résumés dans GUIDELINES § 4.
+
+## Sur sa demande, plus tard — ne pas dépiler seul
+
+- [ ] **Importer son `TODO.md` et `TIPS-UX-UI.md` de la V1** — tranché le
+      2026-09-09 : « on les importera plus tard ». C'est elle qui dira quand.
+      En attendant, leurs principes d'onboarding sont résumés dans
+      GUIDELINES § 4.
 
 ## À faire (je dépile sans demander, un commit par point)
 
