@@ -1,7 +1,9 @@
+import { useEffect, useRef } from 'react';
 import { Logomark } from '../components/Logomark';
 import { Wordmark } from '../components/Wordmark';
 import { useTextes } from '../i18n/useTextes';
 import { classeDuTheme } from '../themes/themes';
+import { remonterEnHaut } from '../plateforme/navigateur';
 import type { useParcours } from '../app/useParcours';
 import { EtapeLangueUnites } from './onboarding/EtapeLangueUnites';
 import { EtapeTheme } from './onboarding/EtapeTheme';
@@ -23,6 +25,7 @@ import { Progression } from './onboarding/Progression';
  */
 export function Onboarding({ parcours }: { parcours: ReturnType<typeof useParcours> }) {
   const textes = useTextes();
+  const defilant = useRef<HTMLDivElement>(null);
   const {
     reponses,
     etape,
@@ -37,6 +40,14 @@ export function Onboarding({ parcours }: { parcours: ReturnType<typeof useParcou
     avancer,
     reculer,
   } = parcours;
+
+  /* CHAQUE ÉCRAN S'OUVRE EN HAUT (2026-09-09) : la zone qui défile est la
+     même d'une étape à l'autre, elle garderait donc sa position — on
+     arriverait au milieu de la question suivante. Elle remonte à chaque
+     changement d'étape, dans un sens comme dans l'autre. */
+  useEffect(() => {
+    remonterEnHaut(defilant.current);
+  }, [etape]);
 
   return (
     <div className={`page ${classeDuTheme(reponses.theme)}`}>
@@ -75,7 +86,7 @@ export function Onboarding({ parcours }: { parcours: ReturnType<typeof useParcou
         {/* LA ZONE QUI DÉFILE (2026-09-09) : seul le contenu de l'étape défile.
             L'entête, le portrait et les boutons sont hors d'elle, et restent
             donc en place quoi qu'il arrive. */}
-        <div className="page__defilant">
+        <div className="page__defilant" ref={defilant}>
         {etape === 'theme' ? (
           <EtapeTheme theme={reponses.theme} onTheme={(theme) => repondre('theme', theme)} />
         ) : null}

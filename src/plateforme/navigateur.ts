@@ -40,3 +40,8 @@ export function surClicDehors(dedans: () => Element | null, quand: () => void): 
 export function centrerDansSaListe(element: Element | null): void {
   element?.scrollIntoView({ block: 'center' });
 }
+
+/** Ramène une zone de défilement à son haut. */
+export function remonterEnHaut(element: Element | null): void {
+  if (element) element.scrollTop = 0;
+}
