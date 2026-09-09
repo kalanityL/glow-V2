@@ -25,18 +25,19 @@ export const POIDS_MAX: Record<UnitePoids, number> = {
 };
 
 /**
- * LES BORNES DE L'ÂGE. Large exprès : l'application n'a pas à décider qui est
- * trop jeune ou trop vieux pour se peser — elle borne une roue, rien de plus.
+ * LES BORNES DE L'ÂGE ET DE LA TAILLE — celles de la spécification de la V1
+ * (§ 10, « Contraintes ») : « les bornes n'écartent que l'absurde — jamais
+ * elles ne disent à quelqu'un quel corps il a le droit d'avoir ». Âge de 1 à
+ * 130 ans, taille de 50 à 300 cm. Mes premières bornes (12–110, 100–250)
+ * décidaient à la place des gens ; reprises le 2026-09-09.
+ *
+ * En pouces, la fourchette est la conversion arrondie de celle en
+ * centimètres : ici la règle EST la fourchette, elle ne change pas d'unité.
  */
-export const AGE_MIN = 12;
-export const AGE_MAX = 110;
+export const AGE_MIN = 1;
+export const AGE_MAX = 130;
 
-/**
- * LES BORNES DE LA TAILLE, dans chaque unité. Comme pour le poids, ce ne sont
- * pas les conversions l'une de l'autre : deux fourchettes rondes, chacune
- * choisie dans son unité.
- */
 export const TAILLE_BORNES: Record<UniteTaille, { min: number; max: number }> = {
-  cm: { min: 100, max: 250 },
-  in: { min: 40, max: 98 },
+  cm: { min: 50, max: 300 },
+  in: { min: 20, max: 118 },
 };

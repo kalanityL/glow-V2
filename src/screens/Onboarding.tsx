@@ -44,7 +44,7 @@ export function Onboarding({ parcours }: { parcours: ReturnType<typeof useParcou
             Il n'apparaît qu'à partir de l'écran du traitement ; avant, la
             ligne ne porte que la marque. */}
         <div className="entete">
-          <Logomark size={46} />
+          <Logomark />
           <Wordmark />
           {decompte.montrer ? (
             <Progression passees={decompte.passees} total={decompte.total} />

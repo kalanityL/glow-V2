@@ -1,9 +1,4 @@
-import {
-  COULEUR_VETEMENT,
-  type Avatar as AvatarModele,
-  type Expression,
-  type FormeVisage,
-} from '../domaine/avatar';
+import type { Avatar as AvatarModele, Expression, FormeVisage } from '../domaine/avatar';
 
 /**
  * LE DESSIN DE L'AVATAR — repris trait pour trait de GLOW V1.
@@ -12,38 +7,43 @@ import {
  * l'ancien dépôt. NE PAS LES « ARRONDIR » : ce sont eux qui font le visage, et
  * une coordonnée déplacée décale un œil ou creuse une joue.
  *
- * Ce qui a changé en le reprenant : plus de classes Tailwind ni de photo
- * importée, et les noms sont en français comme le reste du projet.
+ * DEUX SORTES DE COULEURS, ET ELLES NE VIVENT PAS AU MÊME ENDROIT :
+ *   - celles que la personne CHOISIT — peau, yeux, cheveux — sont des DONNÉES
+ *     (elles seront enregistrées avec son profil) : elles arrivent par
+ *     `avatar` et se posent en attribut. C'est l'exception consignée dans la
+ *     V1 (« nuancier de l'avatar — des données enregistrées »).
+ *   - celles du DESSIN — le blanc de l'œil, la pupille, la bouche, les
+ *     lunettes, l'ombre du nez, le fard, le vêtement de chaque genre — sont
+ *     des CLASSES, peintes dans `themes/dessins.css`. Rien de style en dur
+ *     dans un template : c'est la règle, reprise de la V1 le 2026-09-09.
+ * La taille non plus n'est pas ici : c'est la feuille de l'endroit qui la
+ * donne.
  */
 
-/** Les traits qui changent avec l'expression : les sourcils, la bouche, le fard. */
+/** Les traits qui changent avec l'expression : les sourcils et la bouche. */
 const TRAITS_EXPRESSION: Record<
   Expression,
-  { sourcilGauche: string; sourcilDroit: string; bouche: string; fard: string }
+  { sourcilGauche: string; sourcilDroit: string; bouche: string }
 > = {
   joyeuse: {
     sourcilGauche: 'M53 77 Q60 67 67 77',
     sourcilDroit: 'M113 77 Q120 67 127 77',
     bouche: 'M60 105 Q90 135 120 105',
-    fard: 'rgba(239, 68, 68, 0.2)',
   },
   determinee: {
     sourcilGauche: 'M55 77 L65 73',
     sourcilDroit: 'M115 73 L125 77',
     bouche: 'M70 112 Q90 105 110 112',
-    fard: 'transparent',
   },
   fiere: {
     sourcilGauche: 'M54 75 Q60 68 66 75',
     sourcilDroit: 'M114 75 Q120 68 126 75',
     bouche: 'M62 108 Q90 132 118 108',
-    fard: 'rgba(244, 63, 94, 0.3)',
   },
   calme: {
     sourcilGauche: 'M55 76 H65',
     sourcilDroit: 'M115 76 H125',
     bouche: 'M72 110 Q90 118 108 110',
-    fard: 'transparent',
   },
 };
 
@@ -56,24 +56,21 @@ const TRACE_VISAGE: Record<FormeVisage, string> = {
     'M40 50 Q40 110 90 150 Q140 110 140 50 Q140 30 115 35 Q90 40 90 40 Q90 40 65 35 Q40 30 40 50',
 };
 
-export function Avatar({ avatar, taille = 180 }: { avatar: AvatarModele; taille?: number }) {
+export function Avatar({ avatar }: { avatar: AvatarModele }) {
   const { genre, formeVisage, couleurPeau, couleurYeux, coiffure, couleurCheveux, lunettes } =
     avatar;
   const traits = TRAITS_EXPRESSION[avatar.expression];
+  /* Le fard suit l'expression : c'est la classe qui le dit, la feuille qui le
+     peint — et qui ne peint rien pour « déterminée » et « calme ». */
+  const fard = `avatar__fard avatar__fard--${avatar.expression}`;
 
   return (
-    <svg
-      className="avatar"
-      width={taille}
-      height={taille}
-      viewBox="0 0 180 180"
-      aria-hidden="true"
-    >
+    <svg className="avatar" viewBox="0 0 180 180" aria-hidden="true">
       {/* Le cou, puis les épaules : le vêtement porte la couleur du genre. */}
       <rect x="75" y="120" width="30" height="40" rx="10" fill={couleurPeau} />
       <path
         d="M30 180 C30 150 60 140 90 140 C120 140 150 150 150 180 Z"
-        fill={COULEUR_VETEMENT[genre]}
+        className={`avatar__vetement avatar__vetement--${genre}`}
       />
       <path d="M75 140 L90 155 L105 140 Z" fill={couleurPeau} />
 
@@ -83,19 +80,19 @@ export function Avatar({ avatar, taille = 180 }: { avatar: AvatarModele; taille?
 
       <path d={TRACE_VISAGE[formeVisage]} fill={couleurPeau} />
 
-      <circle cx="54" cy="95" r="12" fill={traits.fard} />
-      <circle cx="126" cy="95" r="12" fill={traits.fard} />
+      <circle cx="54" cy="95" r="12" className={fard} />
+      <circle cx="126" cy="95" r="12" className={fard} />
 
       {/* Les yeux : le blanc, l'iris, la pupille, et le reflet qui les anime. */}
       <g>
-        <ellipse cx="60" cy="76" rx="9" ry="5" fill="#FFFFFF" />
-        <ellipse cx="120" cy="76" rx="9" ry="5" fill="#FFFFFF" />
+        <ellipse cx="60" cy="76" rx="9" ry="5" className="avatar__blanc" />
+        <ellipse cx="120" cy="76" rx="9" ry="5" className="avatar__blanc" />
         <circle cx="60" cy="76" r="5" fill={couleurYeux} />
         <circle cx="120" cy="76" r="5" fill={couleurYeux} />
-        <circle cx="60" cy="76" r="2.5" fill="#1A1A1A" />
-        <circle cx="120" cy="76" r="2.5" fill="#1A1A1A" />
-        <circle cx="58" cy="74" r="1" fill="#FFFFFF" />
-        <circle cx="118" cy="74" r="1" fill="#FFFFFF" />
+        <circle cx="60" cy="76" r="2.5" className="avatar__pupille" />
+        <circle cx="120" cy="76" r="2.5" className="avatar__pupille" />
+        <circle cx="58" cy="74" r="1" className="avatar__blanc" />
+        <circle cx="118" cy="74" r="1" className="avatar__blanc" />
       </g>
 
       {/* Les sourcils prennent la couleur des cheveux. */}
@@ -116,15 +113,21 @@ export function Avatar({ avatar, taille = 180 }: { avatar: AvatarModele; taille?
 
       <path
         d="M86 85 Q90 98 94 95"
+        className="avatar__nez"
         fill="none"
-        stroke="rgba(0,0,0,0.15)"
         strokeWidth="2.5"
         strokeLinecap="round"
       />
-      <path d={traits.bouche} fill="none" stroke="#D32F2F" strokeWidth="3" strokeLinecap="round" />
+      <path
+        d={traits.bouche}
+        className="avatar__bouche"
+        fill="none"
+        strokeWidth="3"
+        strokeLinecap="round"
+      />
 
       {lunettes ? (
-        <g stroke="#333333" strokeWidth="2.5" fill="none">
+        <g className="avatar__lunettes" strokeWidth="2.5" fill="none">
           <circle cx="60" cy="76" r="14" strokeWidth="3" />
           <circle cx="120" cy="76" r="14" strokeWidth="3" />
           <line x1="74" y1="76" x2="106" y2="76" strokeWidth="3" />

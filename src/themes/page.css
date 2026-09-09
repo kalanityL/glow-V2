@@ -45,6 +45,10 @@
   align-items: center;
   gap: 12px;
   margin-bottom: 26px;
+  /* LA TAILLE DU LOGO EST ICI, pas dans le template : c'est l'endroit qui
+     décide de la taille de ce qu'il abrite. L'arrondi et le dessin s'en
+     déduisent (voir `.logomark`). */
+  --logo-size: 46px;
 }
 
 /* LE DÉCOMPTE, poussé à droite de la ligne de la marque. `margin-left: auto`
@@ -69,11 +73,11 @@
 
 .logomark {
   flex: none;
-  width: var(--logo-size, 36px);
-  height: var(--logo-size, 36px);
+  width: var(--logo-size);
+  height: var(--logo-size);
   /* L'arrondi et le dessin se déduisent de la taille : la pastille garde sa
      forme à n'importe quelle échelle, y compris fluide. */
-  border-radius: calc(var(--logo-size, 36px) * 0.263);
+  border-radius: calc(var(--logo-size) * 0.263);
   display: grid;
   place-items: center;
   background: linear-gradient(to top right, var(--logo-from) 0%, var(--logo-via) 50%, var(--logo-to) 100%);
@@ -160,6 +164,9 @@
 
 .avatar {
   display: block;
+  /* La taille du portrait est celle de son endroit, pas du dessin. */
+  width: 150px;
+  height: 150px;
 }
 
 /* LES PASTILLES DE COULEUR. Elles n'ont pas de libellé visible : une couleur se

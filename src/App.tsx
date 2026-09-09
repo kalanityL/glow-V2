@@ -4,6 +4,7 @@ import { Onboarding } from './screens/Onboarding';
 /* La mise en page d'abord, les jetons des thèmes ensuite : les feuilles de
    thème doivent pouvoir battre la structure, jamais l'inverse. */
 import './themes/page.css';
+import './themes/dessins.css';
 import './themes/ciel/ciel.css';
 import './themes/ciel-fonce/ciel-fonce.css';
 

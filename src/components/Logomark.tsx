@@ -1,15 +1,4 @@
-import { useId, type CSSProperties } from 'react';
-
-interface LogomarkProps {
-  /**
-   * Côté de la pastille, en pixels. ABSENT, LE COMPOSANT NE POSE RIEN et la
-   * taille vient de la feuille, par le jeton `--logo-size` : un style en ligne
-   * l'emporterait sur toute règle, y compris celle qui accorde la pastille à
-   * son titre.
-   */
-  size?: number;
-  className?: string;
-}
+import { useId } from 'react';
 
 /**
  * LE BLOC-LOGO DE GLOW — la pastille dégradée aux trois étoiles d'argent.
@@ -24,8 +13,11 @@ interface LogomarkProps {
  * dessin, celui du premier démonté emportant l'autre. D'où `useId`, sans
  * ponctuation — deux-points et chevrons n'ont rien à faire dans une `url(#…)`.
  *
- * Aucune couleur ici : les trois teintes de la boîte sont les jetons
- * `--logo-from/-via/-to` de la feuille du thème.
+ * AUCUNE COULEUR NI AUCUNE TAILLE ICI (règle de la V1 reprise le 2026-09-09 :
+ * rien de style en dur dans un template). Les quatre teintes de l'argent et le
+ * filet des étoiles sont des CLASSES, peintes dans `themes/dessins.css` ; la
+ * boîte prend ses trois teintes des jetons `--logo-*` du thème ; la taille est
+ * `--logo-size`, posée par la feuille de l'endroit où le logo se trouve.
  */
 
 /** Les trois tracés : la grande étoile à quatre branches et ses deux satellites. */
@@ -38,25 +30,22 @@ const STAR_PATHS = [
 /** La fenêtre qui recadre le motif sur sa bande commune. */
 const STAR_VIEWBOX = '-1.2 -0.7 26.4 26.4';
 
-export function Logomark({ size, className }: LogomarkProps) {
+export function Logomark() {
   const gradientId = `glow-silver-${useId().replace(/[^a-zA-Z0-9]/g, '')}`;
 
   return (
-    <div
-      className={className ? `logomark ${className}` : 'logomark'}
-      style={size === undefined ? undefined : ({ '--logo-size': `${size}px` } as CSSProperties)}
-    >
+    <div className="logomark">
       <svg viewBox={STAR_VIEWBOX} fill="none" aria-hidden="true">
         <defs>
           <linearGradient id={gradientId} x1="0%" y1="0%" x2="100%" y2="100%">
-            <stop offset="0%" stopColor="#ffffff" />
-            <stop offset="35%" stopColor="#e2e8f0" />
-            <stop offset="65%" stopColor="#94a3b8" />
-            <stop offset="100%" stopColor="#475569" />
+            <stop offset="0%" className="logomark__argent-1" />
+            <stop offset="35%" className="logomark__argent-2" />
+            <stop offset="65%" className="logomark__argent-3" />
+            <stop offset="100%" className="logomark__argent-4" />
           </linearGradient>
         </defs>
         {STAR_PATHS.map((d) => (
-          <path key={d} d={d} fill={`url(#${gradientId})`} stroke="#f8fafc" strokeWidth={0.5} />
+          <path key={d} d={d} className="logomark__etoile" fill={`url(#${gradientId})`} />
         ))}
       </svg>
     </div>

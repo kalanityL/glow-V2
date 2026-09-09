@@ -8,6 +8,13 @@
  * DICTIONNAIRE — « Blond », « Noisette » se traduisent, les codes hexadécimaux
  * non.
  *
+ * LES TABLES DE COULEURS CI-DESSOUS SONT DES DONNÉES, pas du style : ce que la
+ * personne choisit sera enregistré avec son profil. C'est pour cela qu'elles
+ * sont ici, en code, et non dans une feuille — l'exception consignée dans la
+ * V1 (« nuancier de l'avatar — des données enregistrées »). Les couleurs du
+ * dessin lui-même (pupille, bouche, vêtement…) sont, elles, dans
+ * `themes/dessins.css`.
+ *
  * LE GENRE FAIT PARTIE DE L'AVATAR, et n'est plus une question à part
  * (demande du 2026-09-08) : il choisit la couleur du vêtement et la coiffure de
  * départ, c'est-à-dire qu'il se VOIT. Le demander deux fois — une fois en
@@ -46,13 +53,6 @@ export const COULEURS_CHEVEUX = [
   '#E76F51',
   '#DFE2E6',
 ] as const;
-
-/** La couleur du vêtement, qui suit le genre — c'est ce qui le rend visible. */
-export const COULEUR_VETEMENT: Record<Genre, string> = {
-  homme: '#3B82F6',
-  femme: '#EC4899',
-  neutre: '#8B5CF6',
-};
 
 /** La coiffure que le genre amène avec lui, tant qu'on n'en a pas choisi une. */
 export const COIFFURE_DU_GENRE: Record<Genre, Coiffure> = {

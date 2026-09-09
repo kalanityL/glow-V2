@@ -1,0 +1,39 @@
+/* LES COULEURS FIXES DES DESSINS — le logo, l'avatar.
+
+   Ce sont des COULEURS DE DONNÉES STABLES, au sens de la V1 : elles ne suivent
+   pas le thème, un thème ne les repeint pas, et elles ne sont pas non plus
+   dans les templates — rien de style en dur dans un `.tsx`, c'est la règle.
+   D'où cette feuille à part, ni structure (`page.css` ne nomme aucune
+   couleur) ni thème (un thème ne pose que ses jetons).
+
+   Les valeurs sont celles de la V1, à l'octet près. */
+
+/* ── Le logo : l'argent des étoiles ─────────────────────────────────────── */
+
+.logomark__argent-1 { stop-color: #ffffff; }
+.logomark__argent-2 { stop-color: #e2e8f0; }
+.logomark__argent-3 { stop-color: #94a3b8; }
+.logomark__argent-4 { stop-color: #475569; }
+
+.logomark__etoile {
+  stroke: #f8fafc;
+  stroke-width: 0.5;
+}
+
+/* ── L'avatar : ce que la personne ne choisit pas ───────────────────────── */
+
+.avatar__blanc { fill: #ffffff; }
+.avatar__pupille { fill: #1a1a1a; }
+.avatar__bouche { stroke: #d32f2f; }
+.avatar__nez { stroke: rgba(0, 0, 0, 0.15); }
+.avatar__lunettes { stroke: #333333; }
+
+/* Le fard suit l'expression : rien pour « déterminée » et « calme ». */
+.avatar__fard { fill: transparent; }
+.avatar__fard--joyeuse { fill: rgba(239, 68, 68, 0.2); }
+.avatar__fard--fiere { fill: rgba(244, 63, 94, 0.3); }
+
+/* Le vêtement porte la couleur du genre — c'est ce qui le rend visible. */
+.avatar__vetement--homme { fill: #3b82f6; }
+.avatar__vetement--femme { fill: #ec4899; }
+.avatar__vetement--neutre { fill: #8b5cf6; }

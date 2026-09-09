@@ -104,7 +104,9 @@ body {
   border-radius: 0.5rem;
   background: #1e293b;
   color: #e2e8f0;
-  transition: all 150ms;
+  /* Les seules propriétés qui bougent, nommées : `all` animerait aussi ce qui
+     ne doit pas l'être, et c'est le genre de raccourci que la V1 a proscrit. */
+  transition: opacity 150ms, transform 150ms;
 }
 
 /* Sans historique : à moitié éteint, et sans main au survol. */

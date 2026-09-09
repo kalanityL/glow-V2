@@ -44,7 +44,7 @@ export function EtapeAvatar({ avatar, onAvatar }: EtapeAvatarProps) {
       <h1 className="titre">{textes.onboarding.avatar.question}</h1>
 
       <div className="avatar-portrait">
-        <Avatar avatar={avatar} taille={150} />
+        <Avatar avatar={avatar} />
       </div>
 
       <p className="libelle-groupe">{textes.groupes.genre}</p>
