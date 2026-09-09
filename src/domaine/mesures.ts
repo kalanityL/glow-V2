@@ -37,6 +37,20 @@ export const POIDS_MAX: Record<UnitePoids, number> = {
 export const AGE_MIN = 1;
 export const AGE_MAX = 130;
 
+/**
+ * L'ANNÉE DE NAISSANCE REMPLACE L'ÂGE (2026-09-09) : un âge se périme, une
+ * année de naissance non. Ses bornes sont celles de l'âge, rapportées à
+ * l'année en cours — l'appelant la passe, ce fichier ne lit pas l'horloge.
+ */
+export const ANNEE_NAISSANCE_PAR_DEFAUT = 1980;
+
+export function bornesAnneeNaissance(anneeCourante: number): { min: number; max: number } {
+  return { min: anneeCourante - AGE_MAX, max: anneeCourante - AGE_MIN };
+}
+
+/** La taille de départ, en centimètres — l'unité de stockage (2026-09-09). */
+export const TAILLE_PAR_DEFAUT_CM = 165;
+
 export const TAILLE_BORNES: Record<UniteTaille, { min: number; max: number }> = {
   cm: { min: 50, max: 300 },
   in: { min: 20, max: 118 },

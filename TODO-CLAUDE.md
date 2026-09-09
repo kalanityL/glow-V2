@@ -21,8 +21,6 @@ que de te faire lire le fichier. Le TODO de la V1 est importé tel quel dans
       d'un mot si le compte doit être obligatoire.
 - [ ] **Le titre de l'écran des unités** (« Langue et unités ») et celui de
       l'avatar (« Composez votre avatar ») sont de moi.
-- [ ] **L'écran de l'avatar défile** (sept réglages). La V1 les rangeait
-      derrière des onglets ; à voir si cela gêne.
 - [ ] **De la V1, non repris dans l'avatar** : l'import d'une photo (demande
       de stocker un fichier) et le tirage au hasard.
 

@@ -1,14 +1,22 @@
 import { useTextes } from '../../i18n/useTextes';
-import { UNITES_DU_SYSTEME, type Systeme } from '../../domaine/unites';
-import { AGE_MAX, AGE_MIN, TAILLE_BORNES } from '../../domaine/mesures';
+import {
+  UNITES_DU_SYSTEME,
+  tailleAffichee,
+  tailleEnCm,
+  type Systeme,
+} from '../../domaine/unites';
+import { TAILLE_BORNES, bornesAnneeNaissance } from '../../domaine/mesures';
 import { LONGUEUR_MOT_DE_PASSE } from '../../domaine/compte';
 import { SelecteurNombre } from './SelecteurNombre';
 
 interface EtapeProfilProps {
-  age: number | null;
-  onAge: (age: number) => void;
-  taille: number | null;
-  onTaille: (taille: number) => void;
+  anneeNaissance: number;
+  onAnneeNaissance: (annee: number) => void;
+  /** En centimètres, toujours — l'écran convertit vers l'unité choisie. */
+  tailleCm: number;
+  onTailleCm: (cm: number) => void;
+  /** L'année en cours, passée par l'appelant : l'écran ne lit pas l'horloge. */
+  anneeCourante: number;
   prenom: string;
   onPrenom: (prenom: string) => void;
   email: string;
@@ -21,8 +29,9 @@ interface EtapeProfilProps {
 /**
  * ÉTAPE : QUI VOUS ÊTES — la dernière avant l'application.
  *
- * Cinq champs sur un écran : l'âge, la taille, le prénom, puis l'adresse et le
- * mot de passe qui ouvriront le compte.
+ * Cinq champs sur un écran : l'année de naissance, la taille, le prénom, puis
+ * l'adresse et le mot de passe qui ouvriront le compte. L'ANNÉE DE NAISSANCE
+ * REMPLACE L'ÂGE (2026-09-09) : un âge se périme, une année non.
  *
  * LE GENRE N'EST PLUS ICI (2026-09-08) : il fait partie de l'avatar, à l'écran
  * précédent, où il se voit. Le demander deux fois n'avait pas de sens.
@@ -35,10 +44,11 @@ interface EtapeProfilProps {
  * centimètres ou des pouces, avec les bornes qui vont avec.
  */
 export function EtapeProfil({
-  age,
-  onAge,
-  taille,
-  onTaille,
+  anneeNaissance,
+  onAnneeNaissance,
+  tailleCm,
+  onTailleCm,
+  anneeCourante,
   prenom,
   onPrenom,
   email,
@@ -50,6 +60,7 @@ export function EtapeProfil({
   const textes = useTextes();
   const uniteTaille = UNITES_DU_SYSTEME[systeme].taille;
   const bornes = TAILLE_BORNES[uniteTaille];
+  const annees = bornesAnneeNaissance(anneeCourante);
 
   return (
     <>
@@ -60,22 +71,27 @@ export function EtapeProfil({
           passait sous le pli. */}
       <div className="duo">
         <div>
-          <p className="libelle-groupe libelle-groupe--premier">{textes.groupes.age}</p>
+          <p className="libelle-groupe libelle-groupe--premier">
+            {textes.groupes.anneeNaissance}
+          </p>
           <SelecteurNombre
-            id="age"
-            valeur={age}
-            onValeur={onAge}
-            min={AGE_MIN}
-            max={AGE_MAX}
-            question={textes.groupes.age}
+            id="annee-naissance"
+            valeur={anneeNaissance}
+            onValeur={onAnneeNaissance}
+            min={annees.min}
+            max={annees.max}
+            question={textes.groupes.anneeNaissance}
           />
         </div>
         <div>
           <p className="libelle-groupe libelle-groupe--premier">{textes.groupes.taille}</p>
+          {/* La taille est stockée en centimètres et convertie aux deux
+              bouts : ce que la roue montre est dans l'unité choisie, ce
+              qu'elle rend repart en centimètres. */}
           <SelecteurNombre
             id="taille"
-            valeur={taille}
-            onValeur={onTaille}
+            valeur={tailleAffichee(tailleCm, uniteTaille)}
+            onValeur={(valeur) => onTailleCm(tailleEnCm(valeur, uniteTaille))}
             min={bornes.min}
             max={bornes.max}
             unite={uniteTaille}

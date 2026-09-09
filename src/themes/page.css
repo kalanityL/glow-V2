@@ -17,7 +17,9 @@
      `flex` pour que la rangée des boutons puisse être poussée tout en bas. */
   display: flex;
   flex-direction: column;
-  overflow-y: auto;
+  /* La page ne défile plus elle-même (2026-09-09) : c'est `.page__defilant`
+     qui défile, entre l'entête et les boutons, qui restent en place. */
+  overflow: hidden;
   /* Marges réduites, PAS supprimées — le contenu ne doit pas venir toucher le
      bord de l'écran, y compris à 320 px de large. */
   padding: 16px;
@@ -34,8 +36,23 @@
   width: 100%;
   max-width: 380px;
   flex: 1;
+  /* `min-height: 0` : sans lui la colonne grandit avec son contenu au lieu
+     d'être bornée par l'écran, et la zone du milieu ne défile jamais — les
+     boutons passaient sous le pli (constaté à la capture le 2026-09-09). */
+  min-height: 0;
   display: flex;
   flex-direction: column;
+}
+
+/* LA ZONE QUI DÉFILE (2026-09-09, « header reste figé au scroll », « les
+   boutons precedent suivant restent figés au scroll ») : elle prend tout ce
+   que l'entête, le portrait et les boutons lui laissent, et défile seule. Le
+   `min-height: 0` est ce qui l'autorise à être plus petite que son contenu —
+   sans lui, un enfant flex refuse de rétrécir et rien ne défile. */
+.page__defilant {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
 }
 
 /* ── L'ENTÊTE ───────────────────────────────────────────────────────────── */
@@ -159,7 +176,8 @@
 .avatar-portrait {
   display: flex;
   justify-content: center;
-  margin: 14px 0 4px;
+  /* Hors de la zone qui défile, entre l'entête et les réglages : figé. */
+  margin: 0 0 8px;
 }
 
 .avatar {
@@ -530,11 +548,12 @@
    soit la longueur de la question. Une question courte ou longue, les boutons
    sont au même endroit — le doigt n'a plus à les chercher d'un écran à
    l'autre. C'est aussi, par construction, la position la plus basse possible :
-   le bas de l'écran. */
+   le bas de l'écran. Et depuis que seule la zone du milieu défile
+   (2026-09-09), ils y restent quoi qu'on fasse défiler. */
 .boutons {
   display: flex;
   gap: 10px;
-  margin-top: auto;
+  margin-top: 12px;
 }
 
 .boutons .bouton--second {

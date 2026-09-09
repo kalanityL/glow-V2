@@ -9,6 +9,7 @@ import { EtapeObjectif } from './onboarding/EtapeObjectif';
 import { EtapePoids } from './onboarding/EtapePoids';
 import { EtapeTraitement } from './onboarding/EtapeTraitement';
 import { EtapeQuelTraitement } from './onboarding/EtapeQuelTraitement';
+import { Avatar } from '../components/Avatar';
 import { EtapeAvatar } from './onboarding/EtapeAvatar';
 import { EtapeProfil } from './onboarding/EtapeProfil';
 import { Progression } from './onboarding/Progression';
@@ -61,6 +62,20 @@ export function Onboarding({ parcours }: { parcours: ReturnType<typeof useParcou
           />
         ) : null}
 
+        {/* LE PORTRAIT DE L'AVATAR RESTE FIGÉ AU DÉFILEMENT (2026-09-09) : il
+            est posé ICI, hors de la zone qui défile, entre l'entête et les
+            réglages — on se voit changer pendant qu'on fait défiler les
+            réglages. L'écran de l'avatar, lui, ne rend que les réglages. */}
+        {etape === 'avatar' ? (
+          <div className="avatar-portrait">
+            <Avatar avatar={reponses.avatar} />
+          </div>
+        ) : null}
+
+        {/* LA ZONE QUI DÉFILE (2026-09-09) : seul le contenu de l'étape défile.
+            L'entête, le portrait et les boutons sont hors d'elle, et restent
+            donc en place quoi qu'il arrive. */}
+        <div className="page__defilant">
         {etape === 'theme' ? (
           <EtapeTheme theme={reponses.theme} onTheme={(theme) => repondre('theme', theme)} />
         ) : null}
@@ -116,10 +131,11 @@ export function Onboarding({ parcours }: { parcours: ReturnType<typeof useParcou
 
         {etape === 'profil' ? (
           <EtapeProfil
-            age={reponses.age}
-            onAge={(age) => repondre('age', age)}
-            taille={reponses.taille}
-            onTaille={(taille) => repondre('taille', taille)}
+            anneeNaissance={reponses.anneeNaissance}
+            onAnneeNaissance={(annee) => repondre('anneeNaissance', annee)}
+            tailleCm={reponses.tailleCm}
+            onTailleCm={(cm) => repondre('tailleCm', cm)}
+            anneeCourante={new Date().getFullYear()}
             prenom={reponses.prenom}
             onPrenom={(prenom) => repondre('prenom', prenom)}
             email={reponses.email}
@@ -129,6 +145,8 @@ export function Onboarding({ parcours }: { parcours: ReturnType<typeof useParcou
             systeme={reponses.systeme}
           />
         ) : null}
+
+        </div>
 
         {/* « PRÉCÉDENT » N'EXISTE PAS À LA PREMIÈRE ÉTAPE : il n'est pas éteint,
             il est absent — rien ne se propose de reculer là où il n'y a rien

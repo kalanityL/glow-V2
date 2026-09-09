@@ -1,4 +1,3 @@
-import { Avatar } from '../../components/Avatar';
 import {
   COIFFURES,
   COIFFURE_DU_GENRE,
@@ -24,6 +23,9 @@ interface EtapeAvatarProps {
  * ON SE VOIT PENDANT QU'ON SE COMPOSE : le portrait est en haut, les réglages
  * dessous, et il change à chaque touche. C'était déjà le principe de la V1, et
  * c'est tout l'intérêt — un avatar ne se choisit pas dans une liste de noms.
+ * Le portrait n'est PAS rendu ici mais par `Onboarding`, hors de la zone qui
+ * défile : il reste en place pendant qu'on fait défiler les réglages
+ * (2026-09-09).
  *
  * LE GENRE EST ICI, ET PLUS SUR L'ÉCRAN SUIVANT (demande du 2026-09-08) : il
  * choisit la couleur du vêtement et la coiffure de départ, c'est-à-dire qu'il
@@ -42,10 +44,6 @@ export function EtapeAvatar({ avatar, onAvatar }: EtapeAvatarProps) {
   return (
     <>
       <h1 className="titre">{textes.onboarding.avatar.question}</h1>
-
-      <div className="avatar-portrait">
-        <Avatar avatar={avatar} />
-      </div>
 
       <p className="libelle-groupe">{textes.groupes.genre}</p>
       <ChoixUnique

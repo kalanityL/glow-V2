@@ -83,7 +83,7 @@ export interface Textes {
     unites: string;
     forme: string;
     traitement: string;
-    age: string;
+    anneeNaissance: string;
     taille: string;
     prenom: string;
     email: string;
@@ -166,7 +166,7 @@ export const TEXTES: Record<Langue, Textes> = {
       unites: 'Unités',
       forme: 'Forme',
       traitement: 'Traitement',
-      age: 'Âge',
+      anneeNaissance: 'Année de naissance',
       taille: 'Taille',
       prenom: 'Prénom',
       email: 'Adresse e-mail',
@@ -298,7 +298,7 @@ export const TEXTES: Record<Langue, Textes> = {
       unites: 'Units',
       forme: 'Form',
       traitement: 'Treatment',
-      age: 'Age',
+      anneeNaissance: 'Year of birth',
       taille: 'Height',
       prenom: 'First name',
       email: 'Email address',

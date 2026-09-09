@@ -59,3 +59,19 @@ export const UNITES_DU_SYSTEME: Record<Systeme, { poids: UnitePoids; taille: Uni
   metrique: { poids: 'kg', taille: 'cm' },
   imperial: { poids: 'lb', taille: 'in' },
 };
+
+/** Un pouce, en centimètres. */
+const CM_PAR_POUCE = 2.54;
+
+/**
+ * LA TAILLE SE STOCKE EN CENTIMÈTRES, ET SE CONVERTIT AUX DEUX BOUTS — à
+ * l'affichage et à la saisie, jamais au stockage (règle de la V1, reprise). Ces
+ * deux fonctions sont les seuls endroits où le pouce existe.
+ */
+export function tailleAffichee(cm: number, unite: UniteTaille): number {
+  return unite === 'in' ? Math.round(cm / CM_PAR_POUCE) : cm;
+}
+
+export function tailleEnCm(valeur: number, unite: UniteTaille): number {
+  return unite === 'in' ? Math.round(valeur * CM_PAR_POUCE) : valeur;
+}

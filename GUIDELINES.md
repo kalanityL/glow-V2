@@ -264,10 +264,16 @@ thèmes ne repeignent pas, et qui ne sont pas dans les templates non plus.
   une liste longue de mots courts, empilé sinon), `SelecteurPoids` (deux
   roues), `SelecteurNombre` (une roue), `useSelecteurOuvert` (leur ouverture
   commune). Ne pas réécrire un sélecteur local.
-- **Boutons** : la rangée est **au bas de l'écran** sur toutes les pages
-  (`margin-top: auto`). « Précédent » est **absent** de la première page,
-  pas éteint. « Suivant » s'**éteint** (jamais caché) quand `peutValider`
-  refuse. Sur la dernière page, il ne porte que le mot-symbole dessiné.
+- **Trois zones sur chaque page (2026-09-09) : l'entête, le portrait de
+  l'avatar (sur son écran) et la rangée des boutons sont FIGÉS ; seule la
+  zone du milieu (`.page__defilant`) défile.** L'entête et le portrait vivent
+  dans `Onboarding`, hors de la zone qui défile ; un écran ne rend que son
+  contenu. `min-height: 0` sur la colonne et sur la zone, sans quoi rien ne
+  défile et les boutons passent sous le pli.
+- **Boutons** : la rangée est **au bas de l'écran** sur toutes les pages.
+  « Précédent » est **absent** de la première page, pas éteint. « Suivant »
+  s'**éteint** (jamais caché) quand `peutValider` refuse. Sur la dernière
+  page, il ne porte que le mot-symbole dessiné.
 - Une règle de saisie se dit **AVANT la faute**, sous le champ, et passe à
   l'accent quand elle n'est pas tenue — seulement une fois qu'on a commencé à
   taper. Validation en temps réel, jamais après un clic sur « Valider ».
@@ -280,9 +286,12 @@ thèmes ne repeignent pas, et qui ne sont pas dans les templates non plus.
 - **Séparateur décimal : affichage selon la langue** (virgule en français,
   point en anglais, dans le dictionnaire), **stockage avec un point**.
 - **Bornes** (`src/domaine/mesures.ts`) : elles n'écartent que l'ABSURDE et ne
-  disent jamais à quelqu'un quel corps il a le droit d'avoir — âge 1–130,
-  taille 50–300 cm ; poids 1–999 kg / 1–2000 lb (deux plafonds ronds d'elle,
-  pas la conversion l'un de l'autre).
+  disent jamais à quelqu'un quel corps il a le droit d'avoir — année de
+  naissance dans les bornes de l'âge 1–130 (rapportées à l'année en cours,
+  passée par l'appelant), taille 50–300 cm ; poids 1–999 kg / 1–2000 lb
+  (deux plafonds ronds d'elle, pas la conversion l'un de l'autre). **La
+  taille est stockée en centimètres** (`tailleCm`) et convertie aux deux
+  bouts par `tailleAffichee` / `tailleEnCm`.
 - **Rien de dérivable n'est stocké ; on référence par identifiant, jamais par
   nom ; supprimer supprime ; les dates sont locales** (`AAAA-MM-JJ`, `HH:MM`,
   jamais `toISOString().split('T')`, qui recule d'un jour en soirée) ;
@@ -329,9 +338,10 @@ L'onboarding, dans l'ordre (état au 2026-09-09) :
    puis spécialité à deux par ligne ; bloque tant que les deux manquent.
 8. **Avatar** — le créateur de la V1 (genre inclus, il se voit sur le vêtement
    et la coiffure). Pas de photo, pas de tirage au hasard.
-9. **Dernière étape** — âge et taille côte à côte, prénom, e-mail, mot de
-   passe (huit signes au moins, **seule** contrainte ; vide ne bloque pas).
-   Bouton = le mot-symbole.
+9. **Dernière étape** — année de naissance (défaut 1980, remplace l'âge) et
+   taille (défaut 165 cm) côte à côte, prénom, e-mail, mot de passe (huit
+   signes au moins, **seule** contrainte ; vide ne bloque pas). Bouton = le
+   mot-symbole.
 
 Supprimées, ne pas réintroduire ni reproposer : le niveau d'activité, le
 souhait d'activité, le message « Poids saisi incorrect » (rendu inatteignable
@@ -352,6 +362,6 @@ injection, un comprimé, un repas, une séance) et le féliciter.
 - Pas de page d'accueil : le bouton du dernier écran ne mène nulle part.
 - Pas de déploiement configuré.
 - Les roues ne se parcourent pas aux flèches du clavier.
-- L'écran de l'avatar défile (sept réglages) — la V1 les rangeait derrière
-  des onglets.
+- L'écran de l'avatar défile (sept réglages) — le portrait et les boutons
+  restent en place, seuls les réglages défilent.
 - La langue est une maquette.

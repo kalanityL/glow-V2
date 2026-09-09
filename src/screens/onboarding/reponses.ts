@@ -1,5 +1,6 @@
 import { AVATAR_INITIAL, type Avatar } from '../../domaine/avatar';
 import type { Forme } from '../../domaine/traitements';
+import { ANNEE_NAISSANCE_PAR_DEFAUT, TAILLE_PAR_DEFAUT_CM } from '../../domaine/mesures';
 import { SYSTEME_PAR_DEFAUT, type Systeme } from '../../domaine/unites';
 import { LANGUE_PAR_DEFAUT, type Langue } from '../../i18n/langues';
 import { THEME_PAR_DEFAUT, type ThemeId } from '../../themes/themes';
@@ -53,9 +54,11 @@ export interface Reponses {
    * coiffure — et n'est donc plus une question de l'écran suivant.
    */
   avatar: Avatar;
-  /* Qui l'on est. L'âge, la taille et le prénom partent vides. */
-  age: number | null;
-  taille: number | null;
+  /* Qui l'on est. L'année de naissance et la taille ont un défaut (1980,
+     165 cm — demande du 2026-09-09) ; le prénom part vide. LA TAILLE EST
+     TOUJOURS EN CENTIMÈTRES ici, quelle que soit l'unité de saisie. */
+  anneeNaissance: number;
+  tailleCm: number;
   prenom: string;
   /* Le compte. Le mot de passe fait huit signes au moins, et c'est la seule
      contrainte (2026-09-08). */
@@ -84,8 +87,8 @@ export const REPONSES_INITIALES: Reponses = {
   formeTraitement: null,
   traitement: null,
   avatar: AVATAR_INITIAL,
-  age: null,
-  taille: null,
+  anneeNaissance: ANNEE_NAISSANCE_PAR_DEFAUT,
+  tailleCm: TAILLE_PAR_DEFAUT_CM,
   prenom: '',
   email: '',
   motDePasse: '',
