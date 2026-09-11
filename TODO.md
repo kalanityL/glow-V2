@@ -17,3 +17,4 @@ Règles de tenue (voir GUIDELINES.md, « Manière de travailler ») :
 
 ---
 
+- [ ] finir équivalence poid/portion et inclure somehow aux formulaires
