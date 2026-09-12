@@ -1,0 +1,68 @@
+/* La feuille commune des quatre documents. Un seul souci : la lecture. */
+:root {
+  --encre: #1c2733;
+  --encre-douce: #5b6b7b;
+  --filet: #dfe5ec;
+  --fond: #ffffff;
+  --fond-doux: #f4f7fa;
+  --accent: #0b6fb8;
+  --accent-doux: #e6f1fa;
+  --code: #f0f3f6;
+  --largeur: 860px;
+}
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+body {
+  margin: 0;
+  color: var(--encre);
+  background: var(--fond);
+  font: 16px/1.6 -apple-system, "Segoe UI", Roboto, "Helvetica Neue", sans-serif;
+}
+main { max-width: var(--largeur); margin: 0 auto; padding: 32px 24px 96px; }
+h1 { font-size: 34px; line-height: 1.15; margin: 0 0 6px; letter-spacing: -0.01em; }
+h2 { font-size: 24px; margin: 56px 0 12px; padding-top: 16px; border-top: 1px solid var(--filet); }
+h3 { font-size: 18px; margin: 28px 0 8px; }
+h4 { font-size: 15px; margin: 18px 0 6px; color: var(--encre-douce); text-transform: uppercase; letter-spacing: 0.06em; }
+p, li { max-width: 72ch; }
+a { color: var(--accent); text-decoration: none; }
+a:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.sous-titre { color: var(--encre-douce); margin: 0 0 24px; font-size: 17px; }
+.bandeau { display: flex; flex-wrap: wrap; gap: 8px 18px; font-size: 14px; color: var(--encre-douce); margin: 0 0 32px; }
+.bandeau a { padding: 4px 10px; border: 1px solid var(--filet); border-radius: 999px; }
+.bandeau a[aria-current] { background: var(--accent-doux); border-color: transparent; color: var(--accent); }
+nav.sommaire { background: var(--fond-doux); border-radius: 12px; padding: 18px 22px; margin: 0 0 40px; }
+nav.sommaire h2 { margin: 0 0 8px; padding: 0; border: 0; font-size: 15px; text-transform: uppercase; letter-spacing: 0.08em; color: var(--encre-douce); }
+nav.sommaire ol { margin: 0; padding-left: 22px; columns: 2; column-gap: 32px; }
+nav.sommaire li { break-inside: avoid; margin: 2px 0; }
+nav.sommaire ol ol { columns: 1; padding-left: 18px; font-size: 14px; color: var(--encre-douce); }
+.retour { font-size: 13px; float: right; margin-top: 22px; }
+figure { margin: 20px 0; }
+figure img { display: block; max-width: 100%; height: auto; border: 1px solid var(--filet); border-radius: 12px; }
+figure.telephone img { max-width: 320px; }
+figure.deux { display: flex; gap: 16px; flex-wrap: wrap; }
+figure.deux img { max-width: 300px; }
+figcaption { font-size: 14px; color: var(--encre-douce); margin-top: 8px; }
+details { border: 1px solid var(--filet); border-radius: 10px; padding: 10px 16px; margin: 12px 0; background: var(--fond-doux); }
+details > summary { cursor: pointer; font-weight: 600; }
+details[open] > summary { margin-bottom: 8px; }
+code, kbd { font: 14px/1.4 "SF Mono", Menlo, Consolas, monospace; background: var(--code); padding: 1px 5px; border-radius: 4px; }
+pre { background: var(--code); padding: 12px 16px; border-radius: 10px; overflow-x: auto; font-size: 14px; line-height: 1.5; }
+pre code { background: none; padding: 0; }
+table { border-collapse: collapse; width: 100%; margin: 14px 0; font-size: 15px; }
+th, td { text-align: left; vertical-align: top; padding: 8px 10px; border-bottom: 1px solid var(--filet); }
+th { font-weight: 600; color: var(--encre-douce); font-size: 13px; text-transform: uppercase; letter-spacing: 0.05em; }
+.exemple { border-left: 3px solid var(--accent); padding: 8px 16px; margin: 14px 0; background: var(--accent-doux); border-radius: 0 10px 10px 0; }
+.exemple p:first-child { margin-top: 0; }
+.exemple p:last-child { margin-bottom: 0; }
+.ancre { font-size: 12px; color: var(--encre-douce); font-family: "SF Mono", Menlo, monospace; }
+.marque { display: inline-block; font-size: 12px; padding: 1px 8px; border-radius: 999px; background: #fff3d6; color: #7a5200; margin-left: 6px; vertical-align: middle; }
+.marque.non { background: #f3e8ff; color: #5b21b6; }
+.marque.v2 { background: #e0f2fe; color: #075985; }
+.index { columns: 2; column-gap: 32px; font-size: 15px; }
+.index dt { font-weight: 600; margin-top: 6px; break-after: avoid; }
+.index dd { margin: 0 0 4px; color: var(--encre-douce); }
+.note { color: var(--encre-douce); font-size: 14px; }
+.etat { border: 1px dashed var(--filet); border-radius: 10px; padding: 12px 16px; color: var(--encre-douce); font-size: 14px; }
+svg.schema { width: 100%; height: auto; display: block; margin: 16px 0; }
+@media (max-width: 720px) { nav.sommaire ol, .index { columns: 1; } h1 { font-size: 28px; } }
+@media print { .bandeau, .retour { display: none; } details { break-inside: avoid; } }
