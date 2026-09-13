@@ -3,8 +3,7 @@
   <p>Ce domaine réunit ce que l'utilisatrice règle sur elle-même — connexion, profil, avatar, modules, rappels, compte — et ce qu'elle échange avec l'équipe : avis, sondage, FAQ, information médicale. Tout part de l'onglet « Configuration &amp; Plus » du menu du bas ou du menu Paramètres du panneau « + ». Le suivi reste sur l'appareil ; seuls les avis et le sondage partent en base, sans aucune donnée de santé.</p>
 
   <h3 id="profil-page-de-connexion">Page de connexion</h3>
-  <figure class="telephone" data-capture="profil-compte/page-de-connexion"><figcaption>Camille se connecte : mot-symbole, e-mail, mot de passe, « Continuer avec Google ».</figcaption></figure>
-  <p>Tant qu'aucune session n'est ouverte, c'est la seule vue de l'application. Le mot-symbole, « Accès privé — connectez-vous pour continuer », les champs E-mail et Mot de passe, le bouton « Se connecter », un séparateur « ou », le bouton « Continuer avec Google » et, en pied, « Les comptes sont créés par l'administratrice — pas d'inscription libre. » Un champ vide arrête l'envoi avant tout appel réseau. Les deux boutons sont désactivés pendant la tentative. La session est mémorisée par le navigateur : la page ne revient qu'après une déconnexion. Sans configuration Firebase, elle ne paraît jamais.</p>
+  <p>Cet écran ne s'observe pas sur le banc de capture : le verrou de session y est désarmé. Tant qu'aucune session n'est ouverte, c'est la seule vue de l'application. Le mot-symbole, « Accès privé — connectez-vous pour continuer », les champs E-mail et Mot de passe, le bouton « Se connecter », un séparateur « ou », le bouton « Continuer avec Google » et, en pied, « Les comptes sont créés par l'administratrice — pas d'inscription libre. » Un champ vide arrête l'envoi avant tout appel réseau. Les deux boutons sont désactivés pendant la tentative. La session est mémorisée par le navigateur : la page ne revient qu'après une déconnexion. Sans configuration Firebase, elle ne paraît jamais.</p>
   <details><summary>Les règles derrière les chiffres</summary>
     <ul>
       <li>E-mail ou mot de passe vide : « Renseignez l'e-mail et le mot de passe. », sans appel réseau ; l'e-mail est débarrassé de ses espaces avant envoi. <a href="spec-technique.html#profil-connexion-champs-requis">→ technique</a></li>
@@ -14,8 +13,7 @@
   </details>
 
   <h3 id="profil-ecran-d-attente-de-session">Écran d'attente de session</h3>
-  <figure class="telephone" data-capture="profil-compte/ecran-d-attente-de-session"><figcaption>Le point animé sur le dégradé, pendant que la session de Camille est restaurée.</figcaption></figure>
-  <p>Au démarrage, un point animé seul sur le fond dégradé — étiqueté « Chargement », sans autre donnée — le temps que la session mémorisée soit restaurée : la page de connexion ne s'allume pas devant quelqu'un qui est déjà connecté. Sans configuration Firebase, ni cet écran ni la connexion : l'application s'ouvre directement et sans compte, ce qui commande aussi la suppression de compte plus bas.</p>
+  <p>Cet écran ne s'observe pas sur le banc de capture : le verrou de session y est désarmé. Au démarrage, un point animé seul sur le fond dégradé — étiqueté « Chargement », sans autre donnée — le temps que la session mémorisée soit restaurée : la page de connexion ne s'allume pas devant quelqu'un qui est déjà connecté. Sans configuration Firebase, ni cet écran ni la connexion : l'application s'ouvre directement et sans compte, ce qui commande aussi la suppression de compte plus bas.</p>
 
   <h3 id="profil-configuration-plus">Configuration &amp; Plus</h3>
   <figure class="telephone" data-capture="profil-compte/page-configuration-plus-plusmenu"><figcaption>L'aperçu de Camille : avatar, « Camille », étiquette « Ozempic », « -4.6 kg », « 1 mg », puis les cartes et la notice.</figcaption></figure>

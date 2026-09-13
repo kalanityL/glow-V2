@@ -219,7 +219,7 @@
   </details>
 
   <h3 id="poids-menu-carte-d-identite">Menu « + » : carte d'identité</h3>
-  <figure class="telephone" data-capture="poids/menu-carte-d-identite"><figcaption>La carte du menu « + » : le prénom de Camille, la pastille « Ozempic », « -11.5 kg » et « 0.25 mg ».</figcaption></figure>
+  <figure class="telephone" data-capture="profil-compte/page-configuration-plus-plusmenu"><figcaption>La carte du menu « + » : le prénom de Camille, la pastille « Ozempic », « -10.1 kg » et « 1.7 mg ».</figcaption></figure>
   <p>La carte en tête du menu « + » porte le prénom, le traitement, la perte de poids et la dernière dose. Rien ne s'y clique côté poids.</p>
   <details><summary>Les règles derrière les chiffres</summary>
     <ul>
@@ -241,8 +241,7 @@
   </details>
 
   <h3 id="poids-rapport-medical-pdf-poids-et-mensurations">Rapport médical : poids et mensurations</h3>
-  <figure class="telephone" data-capture="poids/rapport-medical-pdf-poids-et-mensurations"><figcaption>L'encart d'identité du rapport de Camille : Poids de départ 96 kg le 04/05/2026, Taille 168 cm, Poids actuel 84.5 kg, IMC actuel 29.9 kg/m², Objectif 70 kg, Variation totale -11.5, Reste à l'objectif 14.5 kg.</figcaption></figure>
-  <p>Le PDF reprend les pesées et les mensurations en trois endroits : l'encart d'identité, les tuiles de synthèse de la période et l'annexe B. La section « Le poids et les mensurations » se coche avant l'export, avec la période. Le document lui-même est au chapitre du rapport.</p>
+  <p>Cet écran ne s'observe pas sur le banc de capture : la spécification décrit les pages du PDF sans capture inventée, le document lui-même étant au chapitre du rapport. Le PDF reprend les pesées et les mensurations en trois endroits : l'encart d'identité, les tuiles de synthèse de la période et l'annexe B. La section « Le poids et les mensurations » se coche avant l'export, avec la période. L'encart d'identité de Camille y porterait par exemple Poids de départ 96 kg le 04/05/2026, Taille 168 cm, Poids actuel 84.5 kg, IMC actuel 29.9 kg/m², Objectif 70 kg, Variation totale -11.5, Reste à l'objectif 14.5 kg.</p>
   <details><summary>Les règles derrière les chiffres</summary>
     <ul>
       <li>Encart : poids actuel = dernière ligne après tri par date (départ si le journal est vide) ; IMC = actuel / taille², « Non calculable » sans taille ; « Variation totale » = départ − actuel signé ; « Reste à l'objectif » = max(0, actuel − cible) ; la tuile « Depuis le JJ/MM/AAAA » n'existe que si la pesée à drapeau existe. <a href="spec-technique.html#poids-rapport-encart-et-synthese">→ technique</a></li>
