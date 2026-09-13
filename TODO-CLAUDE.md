@@ -50,6 +50,16 @@ agents finis rejouent depuis le cache :**
   puis glossaire, index, table des écrans ; puis spec technique, abstraite,
   inspirations (mêmes méthodes). Ne publier un chapitre qu'une fois réfuté et
   corrigé.
+- **À l'assemblage, rapprocher les noms de figures** (relevé le 2026-09-13,
+  captures finies) : sur 175 `data-capture` cités par les chapitres, 20 n'ont
+  pas de fichier. 8 ne sont qu'une variante de tiret — les rédacteurs gardent
+  l'apostrophe comme tiret (`bloc-de-quoi-c-est-fait`), les captureurs la
+  retirent (`bloc-de-quoi-cest-fait`) ; rapprocher en comparant les slugs
+  tirets retirés, et corriger le chapitre, pas le fichier. Les 12 autres sont
+  vraiment absentes, dont certaines par construction : la page de connexion et
+  l'écran d'attente de session (le verrou est désarmé sur le banc), les
+  maquettes de partage. Trancher figure par figure : capturer, ou retirer la
+  figure du chapitre.
 - Piège : les plafonds d'usage coupent les agents (« session limit ») ; les
   workflows se relancent à l'identique après la remise à zéro.
 - **Piège de la reprise, vu le 2026-09-13 : `resumeFromRunId` ne lit le cache
