@@ -1,0 +1,265 @@
+{
+ "inventions": [
+  {
+   "categorie": "Amélioration",
+   "fonctionnalite": "Objectif quotidien de pas",
+   "texte": "Un objectif réglable par la personne au lieu des 8 000 fixes.",
+   "origine": "StepsTracker et StepsJournalRow acceptent une prop dailyGoalSteps que rien ne passe ; aucun réglage n'existe dans l'application lue."
+  },
+  {
+   "categorie": "Fonctionnalité supposée",
+   "fonctionnalite": "Cartes journalières défilables",
+   "texte": "Un carrousel d'une carte par jour (date, pas, calories, pourcentage atteint) sous les cartes de tête.",
+   "origine": "computeDailySwipeList est calculé par useStepsStats (au moins 14 cartes) mais aucun composant Mixte ne le monte."
+  },
+  {
+   "categorie": "Fonctionnalité supposée",
+   "fonctionnalite": "Modification d'un relevé",
+   "texte": "Corriger le nombre de pas d'une journée depuis le journal.",
+   "origine": "handleUpdateStep est passé à StepsTracker (onUpdateStep) mais la page ne l'utilise nulle part."
+  },
+  {
+   "categorie": "Comportement supposé",
+   "fonctionnalite": "Mention « Journée simulée »",
+   "texte": "Que les relevés semés portent le drapeau isSimulated et montrent la mention dans la bulle du calendrier.",
+   "origine": "Seuls src/types.ts et StepsCalendar citent isSimulated ; aucun producteur lu ne le pose, la mention n'a donc pas été observée."
+  },
+  {
+   "categorie": "Règle plausible",
+   "fonctionnalite": "Suppression d'un relevé",
+   "texte": "Une suppression douce qui garde la ligne et la filtre à la lecture.",
+   "origine": "Le commentaire de StepLog dans src/types.ts l'annonce (« l'utilisateur ne supprime jamais vraiment »), mais l'interface n'a pas le champ et removeLogById supprime franchement."
+  },
+  {
+   "categorie": "Comportement supposé",
+   "fonctionnalite": "Navigation vers la page",
+   "texte": "Le libellé et la place de l'entrée des pas dans le menu du bas.",
+   "origine": "Le menu n'a pas été lu (doute de l'inventaire) ; seul le titre de bande « Marche » (PAGE_TITLES) est établi."
+  },
+  {
+   "categorie": "Amélioration",
+   "fonctionnalite": "Tendance des pas (tiroir Tendances)",
+   "texte": "Diviser la moyenne en Kpas/j par les journées relevées, comme les kcal/j de la même carte.",
+   "origine": "stepsTrend met 0 les jours sans relevé et informedTrendMean divise par 14, alors que stepsTrendKcalPerDay divise par les journées relevées ; c'est le code tel quel, aucune décision ne le tranche."
+  },
+  {
+   "categorie": "Fonctionnalité supposée",
+   "fonctionnalite": "Source des relevés",
+   "texte": "D'où viennent les pas en usage réel de la V1 (import, saisie cachée, générateur).",
+   "origine": "Aucune source de pas hors le jeu de données semé n'a été lue ; le générateur est administratif, hors périmètre du chapitre."
+  },
+  {
+   "categorie": "Comportement supposé",
+   "fonctionnalite": "Réglage du module",
+   "texte": "Le fonctionnement de la bascule « Nombre de Pas » sur la page Modules et l'effet du masquage stepsModuleHidden.",
+   "origine": "La page Modules n'a pas été lue par l'inventaire ; seuls la cible module-steps-tracking et les drapeaux du profil sont établis."
+  },
+  {
+   "categorie": "Règle plausible",
+   "fonctionnalite": "Un relevé par jour",
+   "texte": "Que l'application refuse deux relevés à la même date.",
+   "origine": "La SPEC V1 § 4.6 dit « une entrée par jour », mais le code additionne plusieurs relevés d'une date (calendrier, moyennes de l'accueil) et rien ne l'interdit."
+  }
+ ],
+ "glossaire": [
+  {
+   "terme": "Relevé de pas",
+   "definition": "Ligne datée portant un nombre de pas ; au plus une par jour dans le jeu de données semé."
+  },
+  {
+   "terme": "Objectif quotidien",
+   "definition": "8 000 pas, constante de tout le suivi, non réglable."
+  },
+  {
+   "terme": "Journée relevée",
+   "definition": "Date qui a un relevé à plus de zéro pas ; seule unité des moyennes de l'accueil et des kcal/j du tiroir Tendances."
+  },
+  {
+   "terme": "Statistiques/j",
+   "definition": "Moyennes par relevé sur une fenêtre : les 30 derniers jours sur la page, depuis la date du cumul sous la couche vitrée."
+  },
+  {
+   "terme": "Cumul",
+   "definition": "Total de pas, distance, durée et vitesse moyenne depuis une date de départ."
+  },
+  {
+   "terme": "Date de départ du cumul",
+   "definition": "Date choisie dans le bandeau « Depuis le … », retenue localement ; à défaut, le plus ancien relevé."
+  },
+  {
+   "terme": "Durée de marche estimée",
+   "definition": "Pas divisés par 95, écrite « Nmin » sous l'heure, « HhMM » au-delà."
+  },
+  {
+   "terme": "Vitesse de référence",
+   "definition": "4.2 km/h, constante affichée sur les cartes et dans la bulle du calendrier ; le cumul calcule la sienne."
+  },
+  {
+   "terme": "Couche vitrée",
+   "definition": "Blocs d'une page montés par-dessus l'accueil sous un verre, avec un lien vers la page."
+  },
+  {
+   "terme": "Curseur calendrier / journal",
+   "definition": "Commutateur à deux vues de la page, calendrier par défaut, choix retenu par page."
+  },
+  {
+   "terme": "Sélecteur de période",
+   "definition": "7, 14, 30, 90 derniers jours, Depuis le début, Choisir ; bornes « du … au … » éditables ; 30 jours par défaut."
+  },
+  {
+   "terme": "Tiroir Journal",
+   "definition": "Tiroir de la barre qui liste les derniers relevés de chaque journal et ouvre le journal complet."
+  },
+  {
+   "terme": "Tiroir Tendances",
+   "definition": "Tiroir de la barre qui montre 14 jours par module allumé et ouvre le graphe de la page."
+  },
+  {
+   "terme": "Sens (Dynamique)",
+   "definition": "Hausse, baisse ou stable des 7 derniers jours contre les 7 précédents, seuil de 5 %."
+  },
+  {
+   "terme": "Module",
+   "definition": "Suivi que la personne allume ou éteint ; les pas sont le module « Nombre de Pas »."
+  },
+  {
+   "terme": "Kpas",
+   "definition": "Millier de pas, unité de la carte Pas du tiroir Tendances."
+  }
+ ],
+ "index": [
+  {
+   "terme": "Pas (page)",
+   "ancre": "pas-page-pas-stepstracker"
+  },
+  {
+   "terme": "Marche (bande de titre)",
+   "ancre": "pas-page-pas-stepstracker"
+  },
+  {
+   "terme": "Module Nombre de Pas",
+   "ancre": "pas"
+  },
+  {
+   "terme": "Podomètre",
+   "ancre": "pas"
+  },
+  {
+   "terme": "Objectif quotidien (8 000)",
+   "ancre": "pas-carte-aujourd-hui"
+  },
+  {
+   "terme": "Calories des pas",
+   "ancre": "pas-carte-aujourd-hui"
+  },
+  {
+   "terme": "Distance par pas",
+   "ancre": "pas-carte-aujourd-hui"
+  },
+  {
+   "terme": "Durée de marche estimée",
+   "ancre": "pas-carte-aujourd-hui"
+  },
+  {
+   "terme": "Vitesse 4.2 km/h",
+   "ancre": "pas-carte-aujourd-hui"
+  },
+  {
+   "terme": "Poids à une date",
+   "ancre": "pas-carte-aujourd-hui"
+  },
+  {
+   "terme": "Statistiques/j",
+   "ancre": "pas-carte-statistiques-j"
+  },
+  {
+   "terme": "Bravo ! (face de carte)",
+   "ancre": "pas-carte-statistiques-j"
+  },
+  {
+   "terme": "Calendrier des pas",
+   "ancre": "pas-calendrier-des-pas"
+  },
+  {
+   "terme": "Journée simulée",
+   "ancre": "pas-calendrier-des-pas"
+  },
+  {
+   "terme": "Journal des pas",
+   "ancre": "pas-journal-des-pas"
+  },
+  {
+   "terme": "Tout supprimer (journal de marche)",
+   "ancre": "pas-journal-des-pas"
+  },
+  {
+   "terme": "Sélecteur de période",
+   "ancre": "pas-journal-des-pas"
+  },
+  {
+   "terme": "Depuis le … (cumul)",
+   "ancre": "pas-bloc-depuis-le"
+  },
+  {
+   "terme": "Date de départ du cumul",
+   "ancre": "pas-bloc-depuis-le"
+  },
+  {
+   "terme": "Graphe des pas",
+   "ancre": "pas-graphe-suivi-de-votre-nombre-de-pas-par-jour"
+  },
+  {
+   "terme": "Infobulle (objectif atteint / pas restants)",
+   "ancre": "pas-graphe-suivi-de-votre-nombre-de-pas-par-jour"
+  },
+  {
+   "terme": "Couche vitrée Pas",
+   "ancre": "pas-couche-vitree-pas"
+  },
+  {
+   "terme": "En direct (tuile pas)",
+   "ancre": "pas-tuiles-home-du-domaine-pas"
+  },
+  {
+   "terme": "Dynamique (sens des pas)",
+   "ancre": "pas-tuiles-home-du-domaine-pas"
+  },
+  {
+   "terme": "Côte à côte (moyennes de pas)",
+   "ancre": "pas-tuiles-home-du-domaine-pas"
+  },
+  {
+   "terme": "Mes pas (accueil standard)",
+   "ancre": "pas-tuiles-home-du-domaine-pas"
+  },
+  {
+   "terme": "Journée relevée",
+   "ancre": "pas-tuiles-home-du-domaine-pas"
+  },
+  {
+   "terme": "Tiroir Journal",
+   "ancre": "pas-tiroir-journal"
+  },
+  {
+   "terme": "Tiroir Tendances",
+   "ancre": "pas-tiroir-tendances"
+  },
+  {
+   "terme": "Kpas",
+   "ancre": "pas-tiroir-tendances"
+  }
+ ],
+ "ecrans_illustres": [
+  "activite/page-pas-stepstracker",
+  "activite/carte-aujourd-hui-stepsherocards-carte-gauche",
+  "activite/carte-statistiques-j-cartestatistiquespas-et-face-bravo",
+  "activite/calendrier-des-pas-stepscalendar-et-sa-bulle",
+  "activite/journal-des-pas-stepsjournal-stepsjournalrow",
+  "activite/bloc-depuis-le-cumulativestepsstats",
+  "activite/graphe-suivi-de-votre-nombre-de-pas-par-jour-stepstrendchart",
+  "activite/couche-vitree-pas-surimpressionpas",
+  "activite/tuiles-home-du-domaine-pas",
+  "activite/tiroir-journal-lignes-des-quatre-journaux",
+  "activite/tiroir-tendances-cartes-activite-physique-temps-pour-soi-som"
+ ]
+}

@@ -1,0 +1,95 @@
+<section id="temps-pour-soi">
+  <h2>12. Un temps pour soi <a class="retour" href="#sommaire">↑ sommaire</a></h2>
+  <p>Le domaine enregistre les moments que l'utilisatrice s'accorde — un spa, une manucure, une sortie — avec une activité, une durée et une heure. Rien ne s'y convertit en calories : le journal compte des moments et des minutes, la page en tire un score quotidien et l'accueil un rythme hebdomadaire. Le module est éteint par défaut ; la V2 (GUIDELINES § 4, onboarding) ne touche pas à ce domaine.</p>
+
+  <h3 id="temps-pour-soi-page-un-temps-pour-soi-metimetracker">Page « Un temps pour soi »</h3>
+  <figure class="telephone" data-capture="activite/page-un-temps-pour-soi-metimetracker"><figcaption>La page de Camille le 12/09/2026 : ligne d'outils Calendrier/Journal, calendrier de septembre avec « 45min » le 6, « 2h00 » le 9 et « 1h15 » le 12, puis le graphe « Suivi » et le bloc des moments.</figcaption></figure>
+  <p>Onglet « Un temps pour soi » du menu bas quand le module est allumé ; l'ajout rapide « Ajouter un temps pour soi » y arrive avec le formulaire déjà ouvert. Module éteint (drapeau <code>meTimeTrackingEnabled</code> absent, l'état initial), la page s'affiche vitrée sous le nom « Un Temps pour Soi » avec un lien vers son réglage ; y naviguer ne l'allume pas, à la différence des pas et de l'activité physique. De haut en bas : le bandeau de confirmation après une saisie (« Le moment pour soi a bien été ajouté à votre journal. » ou « … mis à jour. », effacé après trois secondes ou dès qu'il sort de l'écran), la ligne d'outils avec le curseur Calendrier/Journal et « + ajouter », l'historique dans la vue choisie (calendrier par défaut, choix retenu d'une visite à l'autre), le graphe « Suivi », le bloc des moments. Un « + » flottant prend le relais dès que la ligne d'outils sort de l'écran.</p>
+  <details><summary>Les règles derrière les chiffres</summary>
+    <ul>
+      <li>Quinze moments par jour au plus ; au seizième, l'avis « Limite atteinte » (« Limite atteinte pour aujourd'hui : cette saisie remplace la dernière. ») s'affiche et la dernière ligne du jour est remplacée par la nouvelle. <a href="spec-technique.html#temps-pour-soi-plafond-quotidien-sport-et-temps-pour-soi">→ technique</a></li>
+      <li>Naviguer vers la page n'allume pas le module, contrairement aux pas et au sport. <a href="spec-technique.html#temps-pour-soi-activation-automatique-des-modules-pas-et-sport">→ technique</a></li>
+    </ul>
+  </details>
+
+  <h3 id="temps-pour-soi-formulaire-nouveau-moment-pour-soi-modifier-le-moment-pour-s">Formulaire « Nouveau moment pour soi »</h3>
+  <figure class="telephone" data-capture="activite/formulaire-nouveau-moment-pour-soi-modifier-le-moment-pour-s"><figcaption>Le formulaire de Camille : 12/09/2026, 18:30, Manucure, 30 minutes, notes fermées.</figcaption></figure>
+  <p>Il s'ouvre par « + ajouter », le « + » flottant, un jour vide du calendrier ou « Modifier » d'une ligne. Date et heure s'éditent en place ; par défaut, aujourd'hui et l'heure locale arrondie vers le bas à la minute ronde (0, 10, 15, 20, 30, 40, 45, 50). Activité : la liste des activités actives, « Spa » d'office, suivie de « Ajouter/Gérer ». Durée : 15, 30 (défaut), 45, 60 ou « Autre », qui ouvre un champ en minutes. Notes facultatives. « Valider » enregistre et referme ; en modification, le titre devient « Modifier le moment pour soi » et le bouton « Mettre à jour le moment ». Un clic hors de la carte l'annule. Une durée « Autre » hors de 1 à 480 est refusée au clic sur Valider : « Une durée entre 1 et 480 minutes est attendue. », écrit avant le bouton, effacé dès que la durée est retouchée.</p>
+  <details><summary>Les règles derrière les chiffres</summary>
+    <ul>
+      <li>Défauts du formulaire : Spa, 30 minutes, aujourd'hui, heure arrondie ; l'heure enregistrée est ramenée à la minute ronde à l'ajout comme à la modification. <a href="spec-technique.html#temps-pour-soi-catalogue-et-defauts-du-temps-pour-soi">→ technique</a></li>
+      <li>La durée accepte 1 à 480 minutes. <a href="spec-technique.html#temps-pour-soi-bornes-numeriques-du-sport-et-du-temps-pour-soi">→ technique</a></li>
+      <li>Le refus est jugé au clic sur Valider ; une durée illisible ou nulle est ignorée sans message. <a href="spec-technique.html#temps-pour-soi-refus-de-la-duree-autre-d-un-moment">→ technique</a></li>
+    </ul>
+  </details>
+  <div class="exemple"><p>Camille tape 500 dans « Autre » : Valider affiche le refus et garde sa saisie ; elle corrige à 45, Valider enregistre « 45 min · Beauté des pieds · 12/09 · 19:10 ».</p></div>
+
+  <h3 id="temps-pour-soi-panneau-moments-pour-soi-disponibles-managemetimeblock">Panneau « Moments pour soi disponibles »</h3>
+  <figure class="telephone" data-capture="activite/panneau-moments-pour-soi-disponibles-managemetimeblock"><figcaption>Le panneau ouvert depuis « Ajouter/Gérer » : neuf activités sur deux colonnes, les six actives cochées.</figcaption></figure>
+  <p>Le catalogue compte neuf activités : Beauté des pieds, Jeu de société, Manucure, Partie de cartes, Regarder du sport entre amis, Soin du visage, Sortie cinéma, Sortie théâtre, Spa. Six sont actives d'office : Spa, Manucure, Beauté des pieds, Soin du visage, Sortie cinéma, Sortie théâtre. Recherche par nom, « Tout cocher » / « Tout décocher » sur les lignes visibles (soulignés tant qu'ils ont un effet), « Enregistrer la sélection ». Une sélection vide est refusée : « Au moins une activité doit être sélectionnée ». Le choix est conservé sur l'appareil. Si l'activité choisie dans le formulaire vient d'être désactivée, le formulaire passe à la première active ; les moments déjà enregistrés gardent la leur. Ce panneau s'ouvre en fenêtre : les trois panneaux « Ajouter/Gérer » sont la seule exception du site à l'absence de popup (décision du 2026-08-16).</p>
+  <details><summary>Les règles derrière les chiffres</summary>
+    <ul>
+      <li>Catalogue, défauts et clé de stockage des activités actives. <a href="spec-technique.html#temps-pour-soi-catalogue-et-defauts-du-temps-pour-soi">→ technique</a></li>
+    </ul>
+  </details>
+
+  <h3 id="temps-pour-soi-journal-un-temps-pour-soi-et-sa-ligne-journalentrycard-me-ti">Journal</h3>
+  <figure class="telephone" data-capture="activite/journal-un-temps-pour-soi-et-sa-ligne-journalentrycard-me-ti"><figcaption>« Journal (7) » de Camille sur 30 jours : « 45 min · Beauté des pieds · 12/09 · 19:10 » en tête, « 60 min · Spa · 20/08 · 10:00 » en queue.</figcaption></figure>
+  <p>Vue Journal de l'historique. Le bandeau « Journal (N) » porte les bornes « du … au … » et le sélecteur de période : 7, 14, 30 ou 90 derniers jours, Depuis le début, Choisir ; 30 jours d'office, choix retenu pour ce bloc seul. Modifier une borne bascule en « Choisir ». Les lignes sont triées par date et heure décroissantes : « N min », activité, date, heure, puis les notes. Chaque champ s'édite en place ; une durée hors bornes est refusée sous la ligne. Le menu de la ligne offre Modifier (ouvre le formulaire) et Supprimer. La corbeille du bandeau propose « Tout supprimer », confirmé dans la page (« Voulez-vous supprimer définitivement tout le journal des moments pour soi ? Cette action est irréversible. ») ; elle disparaît si le profil a éteint les boutons « tout supprimer ». Vide : « Aucun moment pour soi enregistré pour l'instant. » ou, sur une période sans moment, « Aucun moment enregistré sur cette période. ».</p>
+  <details><summary>Les règles derrière les chiffres</summary>
+    <ul>
+      <li>Fenêtre inclusive : 7 derniers jours = aujourd'hui et les six jours précédents ; comparaison sur des dates locales. <a href="spec-technique.html#temps-pour-soi-selecteur-de-periode-commun">→ technique</a></li>
+      <li>Une modification fusionne les champs et arrondit l'heure ; une suppression retire la ligne de la sauvegarde ; « Tout supprimer » vide le journal. <a href="spec-technique.html#temps-pour-soi-modification-et-suppression-d-une-ligne">→ technique</a></li>
+    </ul>
+  </details>
+
+  <h3 id="temps-pour-soi-calendrier-un-temps-pour-soi-metimecalendar-et-bulle-daymeti">Calendrier</h3>
+  <figure class="telephone" data-capture="activite/calendrier-un-temps-pour-soi-metimecalendar-et-bulle-daymeti"><figcaption>Septembre 2026 chez Camille : « 45min » le 6, « 2h00 » le 9, « 1h15 » le 12 ; la bulle du 12 détaille Manucure 30 min à 18:30 et Beauté des pieds 45 min à 19:10.</figcaption></figure>
+  <p>Vue par défaut de l'historique. Grille mensuelle ; chaque tuile porte la durée totale du jour (« 45min », « 1h15 »). Journal vide, une invite précède la grille : « Cliquez sur la date choisie pour saisir votre premier moment à soi ». Un jour rempli ouvre une bulle : pour chaque moment, Activité, Durée, Date et Heure éditables en place, puis Modifier (ouvre le formulaire) et Supprimer ; « Ajouter un enregistrement » au pied ouvre le formulaire à cette date. Un jour vide ouvre le formulaire à cette date, heure courante. La bulle n'affiche pas les notes et son sélecteur d'activité n'a pas d'entrée « Ajouter/Gérer ». <span class="marque">arbitrage non validé</span></p>
+  <details><summary>Les règles derrière les chiffres</summary>
+    <ul>
+      <li>Durée du jour = somme des durées des moments datés de ce jour ; « 45min » sous l'heure, « 1h15 » au-delà. <a href="spec-technique.html#temps-pour-soi-duree-d-un-jour-calendrier-temps-pour-soi">→ technique</a></li>
+    </ul>
+  </details>
+
+  <h3 id="temps-pour-soi-graphe-suivi-du-temps-pour-soi-metimechart">Graphe « Suivi »</h3>
+  <figure class="telephone" data-capture="activite/graphe-suivi-du-temps-pour-soi-metimechart"><figcaption>Le « Suivi » de Camille sur 30 jours : barres à 10 les 20/08, 30/08, 09/09 et 12/09, 5 le 27/08, 7.5 le 06/09 ; « Total : 6h30 de temps pour soi sur 6 jours ».</figcaption></figure>
+  <p>Une barre par jour, score de 0 à 10 : les minutes du jour rapportées à une heure et plafonnées — 60 minutes ou plus valent 10, 30 minutes valent 5. Sous le titre : « Total : XhMM de temps pour soi sur N jours », minutes de la période et journées portant au moins un moment. Sans moment : « Aucun moment enregistré sur cette période. ». Le bandeau porte ses bornes et son sélecteur de période, indépendants de ceux du journal (30 jours d'office). Un clic sur une barre ouvre « Score Temps pour soi : 7.5 / 10 » ; un second clic la ferme. Légende : « Score quotidien de 0 à 10 (où 10 vaut pour 1h de temps pour soi ou plus) ». Le tiroir Tendances ouvre ce même graphe par-dessus l'accueil.</p>
+  <details><summary>Les règles derrière les chiffres</summary>
+    <ul>
+      <li>Score = min(minutes du jour ÷ 60 × 10, 10), arrondi au dixième ; sur une période d'environ 120 jours ou plus, un jour sur deux est tracé (un sur trois vers 180) et les jours sautés n'apparaissent pas. <a href="spec-technique.html#temps-pour-soi-score-quotidien-du-temps-pour-soi">→ technique</a></li>
+      <li>Total = somme des durées de la période ; jours = dates distinctes de ces moments ; « 1h30 », « 2h », « 45 min ». <a href="spec-technique.html#temps-pour-soi-total-et-journees-du-graphe-temps-pour-soi">→ technique</a></li>
+      <li>Même sélecteur de période que le journal, avec sa propre mémoire. <a href="spec-technique.html#temps-pour-soi-selecteur-de-periode-commun">→ technique</a></li>
+    </ul>
+  </details>
+  <div class="exemple"><p>Le 12/09, Camille cumule 30 + 45 = 75 minutes : la barre vaut 10. Le 06/09, 45 minutes de spa donnent 7.5. Sur 30 jours, 390 minutes réparties sur six journées : « Total : 6h30 de temps pour soi sur 6 jours ».</p></div>
+
+  <h3 id="temps-pour-soi-bloc-mes-moments-blocmesmoments">Bloc des moments</h3>
+  <figure class="telephone" data-capture="activite/bloc-mes-moments-blocmesmoments"><figcaption>Le bloc de Camille : « 7 derniers jours » — Beauté des pieds, Manucure, Sortie cinéma, Spa, 1 fois chacune ; « Depuis le début » — Spa 3 fois, Manucure 2 fois, Beauté des pieds 1 fois, Sortie cinéma 1 fois.</figcaption></figure>
+  <p>Bas de la page, sans bandeau. Deux séries à fenêtres fixes : « 7 derniers jours », un filet, « Depuis le début ». Une ligne par activité : nom complet, barre unie, « N fois ». La longueur dit le nombre de moments, pas la durée : la plus fréquente de la série occupe toute la piste, les autres en proportion, jamais sous 6 %. Tri par fréquence décroissante, puis alphabétique. Série vide : « Aucun moment enregistré ces 7 derniers jours. » ou « Aucun moment enregistré depuis le début. » <span class="marque">arbitrage non validé</span>. Le même bloc est le contenu de la couche vitrée « Un temps pour soi » de l'accueil.</p>
+  <details><summary>Les règles derrière les chiffres</summary>
+    <ul>
+      <li>Comptage des entrées par activité (deux moments le même jour font deux), largeur = fois ÷ maximum de la série, plancher 6 %. <a href="spec-technique.html#temps-pour-soi-comptage-mes-moments">→ technique</a></li>
+    </ul>
+  </details>
+
+  <h3 id="temps-pour-soi-tuiles-home-du-domaine-temps-pour-soi">Tuiles de l'accueil</h3>
+  <figure class="telephone" data-capture="activite/tuiles-home-du-domaine-temps-pour-soi"><figcaption>La rangée du domaine sous « (moyenne / semaine) » chez Camille le 12/09 : « 2 moments » depuis le début, « 4 moments » sur 7 jours.</figcaption></figure>
+  <p>Sur la home Mixte, sous le sous-titre « (moyenne / semaine) », la rangée montre à gauche les moments par semaine depuis la première entrée, à droite les moments des 7 derniers jours. Elle n'apparaît que si le module est allumé et qu'une des deux valeurs existe ; la tuile de gauche se tait avant sept jours de recul. Les deux comptent des entrées, jamais des journées. Un clic sur une tuile ouvre la couche vitrée « Un temps pour soi » (le bloc des moments, lien « Voir la page ») ; le médaillon mène à la page ; le pied propose « Ajouter une entrée » et « Voir la page Un temps pour soi ».</p>
+  <details><summary>Les règles derrière les chiffres</summary>
+    <ul>
+      <li>7 jours = entrées datées d'aujourd'hui moins six ou après ; moyenne = entrées ÷ (jours depuis la première entrée, bornes comprises ÷ 7), absente sous sept jours. <a href="spec-technique.html#temps-pour-soi-moments-pour-soi-sur-la-home">→ technique</a></li>
+    </ul>
+  </details>
+  <div class="exemple"><p>Première entrée le 20/08, sept moments au 12/09 : 24 jours bornes comprises, 7 ÷ (24 ÷ 7) = 2,04, affiché « 2 moments ». Quatre entrées du 06 au 12/09 : « 4 moments ».</p></div>
+
+  <h3 id="temps-pour-soi-tiroirs-journal-et-tendances">Tiroirs Journal et Tendances</h3>
+  <figure class="telephone" data-capture="activite/tiroir-journal-lignes-des-quatre-journaux"><figcaption>Le tiroir Journal de Camille, bloc Temps pour soi : « 12/09 · Beauté des pieds », « 12/09 · Manucure », « 09/09 · Sortie cinéma ».</figcaption></figure>
+  <figure class="telephone" data-capture="activite/tiroir-tendances-cartes-activite-physique-temps-pour-soi-som"><figcaption>La carte « Temps pour soi » du tiroir Tendances de Camille : silhouette des 14 derniers jours et « total : 5h00 ».</figcaption></figure>
+  <p>Le tiroir Journal de l'accueil liste les derniers moments « JJ/MM · activité » ; un clic ouvre le journal complet, mêmes lignes que la page, Modifier, Supprimer et Ajouter/Gérer renvoyant à la page. Le tiroir Tendances montre, module allumé, une carte « Temps pour soi » : silhouette des minutes par jour sur 14 jours et « total : XhMM » ; sans donnée, l'invite « Ajouter un moment ». Le clic ouvre le graphe « Suivi » par-dessus. Module éteint, la carte ne montre que son titre et son clic écrit le message d'activation ; le tiroir Journal, lui, ouvre la page vitrée.</p>
+  <details><summary>Les règles derrière les chiffres</summary>
+    <ul>
+      <li>Série des 14 derniers jours, aujourd'hui compris, 0 les jours sans moment ; total en « XhMM ». <a href="spec-technique.html#temps-pour-soi-tendance-du-temps-pour-soi-tiroir">→ technique</a></li>
+    </ul>
+  </details>
+</section>

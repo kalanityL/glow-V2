@@ -1,0 +1,153 @@
+{
+ "inventions": [
+  {
+   "categorie": "jeu",
+   "fonctionnalite": "Fonctionnalité cachée",
+   "texte": "Dire ce qu'est la fonctionnalité cachée que le jeu invite à découvrir, ou qu'elle apparaît à l'échéance du compte à rebours.",
+   "origine": "La phrase et le règlement en promettent une ; le code de MonCiel.tsx ne la nomme pas et ne déclenche rien quand l'écart atteint zéro (max(0, …) fige l'affichage)."
+  },
+  {
+   "categorie": "compte à rebours",
+   "fonctionnalite": "Modification de la date cible par l'utilisateur",
+   "texte": "Écrire que l'utilisateur peut régler la date cible depuis son profil.",
+   "origine": "countdownTargetDate est un champ de UserProfile (src/types.ts) avec un défaut dans useAppData.ts ; aucun écran du périmètre ne l'écrit."
+  },
+  {
+   "categorie": "étoiles",
+   "fonctionnalite": "Étoiles liées à la progression",
+   "texte": "Relier les dix étoiles aux badges, aux pesées ou à une progression quelconque (étoiles qui s'allument, citations qui changent).",
+   "origine": "Les positions et l'affectation des citations sont fixes dans MonCiel.tsx ; aucune donnée d'appData n'entre dans le composant hormis la date cible."
+  },
+  {
+   "categorie": "hibou",
+   "fonctionnalite": "Action au clic du hibou",
+   "texte": "Donner une action au hibou (message, secret, lien vers le jeu).",
+   "origine": "SleepingOwl accepte une propriété onClick que MonCiel ne renseigne pas ; seul l'effet d'appui (whileTap) joue."
+  },
+  {
+   "categorie": "jeu",
+   "fonctionnalite": "Participation suivie dans l'application",
+   "texte": "Décrire une preuve générée, une capture proposée ou une participation mémorisée par l'application.",
+   "origine": "Le règlement demande une preuve ou capture ; aucun état, aucun stockage ni partage n'est écrit dans MonCiel.tsx."
+  },
+  {
+   "categorie": "jeu",
+   "fonctionnalite": "Lien vers le compte Instagram officiel",
+   "texte": "Écrire que le lien mène au compte Instagram de GLP1LOW.",
+   "origine": "Le règlement parle d'un « compte Instagram officiel » ; le lien du panneau pointe vers https://www.instagram.com sans identifiant de compte."
+  },
+  {
+   "categorie": "compte à rebours",
+   "fonctionnalite": "Format à deux chiffres",
+   "texte": "Affirmer que les jours sont bornés à 99.",
+   "origine": "padStart(2, '0') complète à deux chiffres mais ne tronque pas ; au-delà de 99 jours le nombre s'affiche en entier. Je l'ai écrit « deux chiffres au moins », sans prétendre à une borne."
+  }
+ ],
+ "glossaire": [
+  {
+   "terme": "Mon Ciel",
+   "definition": "Scène nocturne plein écran de la Mixte (onglet mon-ciel) : compte à rebours, dix étoiles, hibou, jeu-concours."
+  },
+  {
+   "terme": "Compte à rebours",
+   "definition": "Temps restant, en jours, heures, minutes et secondes, jusqu'à la date cible à minuit heure locale, recalculé chaque seconde et figé à zéro une fois la date passée."
+  },
+  {
+   "terme": "Date cible (countdownTargetDate)",
+   "definition": "Champ du profil au format AAAA-MM-JJ qui fixe la fin du compte à rebours ; 2026-11-15 par défaut."
+  },
+  {
+   "terme": "Étoile dorée / étoile argentée",
+   "definition": "Les cinq étoiles d'or et les cinq d'argent de la scène, numérotées de 1 à 5 dans leur couleur, chacune ouvrant une citation."
+  },
+  {
+   "terme": "Message Étoilé",
+   "definition": "Panneau en bas de la scène qui affiche « Étoile Dorée|Argentée #n : « citation » » après un toucher sur une étoile."
+  },
+  {
+   "terme": "Étoiles de l'entête",
+   "definition": "Les quatre étoiles d'argent de l'entête des autres pages ; chacune ouvre Mon Ciel."
+  },
+  {
+   "terme": "Fonctionnalité cachée",
+   "definition": "Objet du jeu-concours, annoncé par la phrase du compte à rebours et le règlement ; le code ne le définit pas."
+  },
+  {
+   "terme": "Panneau « Ciel ! »",
+   "definition": "Panneau du jeu ouvert par « Jouez ! » : invitation à écrire sur Instagram, lien vers le règlement, bouton Fermer."
+  },
+  {
+   "terme": "Règlement du jeu",
+   "definition": "Panneau de quatre puces qui remplace le panneau « Ciel ! » : ouvert à tous, participation par message direct avec preuve, abonnements tirés au sort, sans obligation d'achat."
+  }
+ ],
+ "index": [
+  {
+   "terme": "Mon Ciel",
+   "ancre": "ciel-mon-ciel"
+  },
+  {
+   "terme": "Compte à rebours",
+   "ancre": "ciel-mon-ciel"
+  },
+  {
+   "terme": "countdownTargetDate",
+   "ancre": "ciel-mon-ciel"
+  },
+  {
+   "terme": "Date cible",
+   "ancre": "ciel-mon-ciel"
+  },
+  {
+   "terme": "Étoiles de l'entête",
+   "ancre": "ciel-mon-ciel"
+  },
+  {
+   "terme": "Hibou endormi",
+   "ancre": "ciel-mon-ciel"
+  },
+  {
+   "terme": "Fonctionnalité cachée",
+   "ancre": "ciel-mon-ciel"
+  },
+  {
+   "terme": "Message Étoilé",
+   "ancre": "ciel-le-message-d-une-etoile"
+  },
+  {
+   "terme": "Citations des étoiles",
+   "ancre": "ciel-le-message-d-une-etoile"
+  },
+  {
+   "terme": "Étoile dorée",
+   "ancre": "ciel-le-message-d-une-etoile"
+  },
+  {
+   "terme": "Étoile argentée",
+   "ancre": "ciel-le-message-d-une-etoile"
+  },
+  {
+   "terme": "Jouez !",
+   "ancre": "ciel-le-jeu-et-son-reglement"
+  },
+  {
+   "terme": "Panneau « Ciel ! »",
+   "ancre": "ciel-le-jeu-et-son-reglement"
+  },
+  {
+   "terme": "Règlement du jeu",
+   "ancre": "ciel-le-jeu-et-son-reglement"
+  },
+  {
+   "terme": "Instagram",
+   "ancre": "ciel-le-jeu-et-son-reglement"
+  },
+  {
+   "terme": "Jeu-concours",
+   "ancre": "ciel-le-jeu-et-son-reglement"
+  }
+ ],
+ "ecrans_illustres": [
+  "metabolisme-rapport-badges/mon-ciel"
+ ]
+}

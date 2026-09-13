@@ -1,0 +1,224 @@
+<section id="alimentation">
+  <h2>8. L'alimentation <a class="retour" href="#sommaire">↑ sommaire</a></h2>
+  <p>Le domaine enregistre ce que la personne mange : des repas et des en-cas composés d'aliments pesés en grammes ou millilitres, avec la faim ressentie avant et après. Il en tire cinq valeurs — kcal, protéines, glucides, lipides, fibres — depuis la table Ciqual de l'Anses ou des aliments qu'elle crée, et les restitue en journal, calendrier, graphiques, objectifs du jour et couche vitrée de l'accueil. Les fibres sont un nutriment à part entière partout, jamais une part des glucides <span class="marque v2">V2</span>.</p>
+
+  <h3 id="alimentation-page-menus-repas-et-en-cas">Page « Menus »</h3>
+  <figure class="telephone" data-capture="alimentation/page-menus-repas-et-en-cas"><figcaption>La page Menus de Camille le 12 mai 2026 : le calendrier de mai affiche 1409 sous le 12, les boutons « Mes favoris », « Mes aliments », « Mes recettes », puis le début du bloc « Moyenne / j ».</figcaption></figure>
+  <p>Page hôte du domaine, atteinte par l'onglet « Menus » du menu bas, la tuile « Repas » de l'ajout rapide, le médaillon repas de l'accueil ou le lien « Voir la page » de la couche vitrée. La tuile d'ajout rapide est un modèle de la V1 que la V2 ne reprend pas <span class="marque v2">V2</span>. De haut en bas : bandeau de confirmation après un enregistrement (« Le repas a bien été ajouté à votre journal. », « … mis à jour. », plus « … ajouté comme menu à vos favoris. »), boutons « Mes favoris » (seulement s'il existe un favori), « Mes aliments », « Mes recettes », curseur Journal / Calendrier (position retenue, défaut calendrier) avec « + ajouter », puis le journal ou le calendrier, puis cinq blocs dans l'ordre : Moyenne / j, Appétit, Repas vs en-cas, Composition moy. / h, Répartition. La mention « Anses. 2025. Table de composition nutritionnelle des aliments Ciqual » ferme la page. La page n'existe que si le module repas du profil est actif ; l'onboarding V2 ne pose aucune question sur ce module <span class="marque v2">V2</span>.</p>
+  <details><summary>Les règles derrière les chiffres</summary>
+    <ul>
+      <li>Les boutons de suppression totale n'apparaissent que si le profil ne les a pas éteints ; la confirmation se fait dans la page, jamais en popup. <a href="spec-technique.html#alimentation-suppression-totale-et-boutons-de-suppression">→ technique</a></li>
+      <li>Les repas d'avant la bascule (sans liste d'aliments) sont écartés au chargement ; une faim manquante reçoit une valeur déduite du moment et de la taille du repas. <span class="marque">arbitrage non validé</span> La V2 décide qu'une valeur absente se tait, jamais remplacée par une valeur calculée <span class="marque v2">V2</span>. <a href="spec-technique.html#alimentation-chargement-de-la-sauvegarde-des-repas">→ technique</a></li>
+    </ul>
+  </details>
+
+  <h3 id="alimentation-formulaire-repas-en-cas-ajout-et-modification">Formulaire repas / en-cas</h3>
+  <figure class="telephone" data-capture="alimentation/formulaire-repas-en-cas-ajout-et-modification"><figcaption>Camille saisit son déjeuner du 12/05/2026 à 12:30 : 150 g Poulet, 200 g Lentilles cuites, 100 g Tomate crue ; « Total : 475 kcal Prot : 63g Gluc : 37g Lip : 6g Fib : 17g » ; faim avant 4, après 1.</figcaption></figure>
+  <p>Une prise se saisit avec sa famille (bascule Repas / En-cas), sa date et son heure (aujourd'hui et l'heure courante arrondie par défaut), ses lignes d'aliments (nom, quantité, unité g ou ml selon l'aliment) et deux curseurs de faim gradués 0 à 5 : « Faim avant le repas » (défaut 2), « Faim après le repas » (défaut 0), de « Pas faim » à « Faim de loup ». Sous chaque ligne résolue : kcal, Prot, Gluc, Lip, Fib arrondis, masquables. La ligne « Total : … » se place après les aliments choisis. Un interrupteur « favori » et un « Titre du favori » enregistrent la même composition comme menu. Le lien « Mes menus favoris » reprend un favori comme base. « Valider » ou « Mettre à jour le repas » écrit la prise ; le bouton est désactivé seulement quand la date visée compte déjà 30 prises. On y arrive par « + ajouter », un clic sur un jour du calendrier, « Ajouter un enregistrement » dans la bulle, le menu « … » d'un repas, ou sous la couche vitrée de l'accueil.</p>
+  <details><summary>Les règles derrière les chiffres</summary>
+    <ul>
+      <li>Apport d'une quantité : valeur pour 100 × quantité / 100, même formule pour un solide (g) et un liquide (ml). <a href="spec-technique.html#alimentation-apport-d-une-quantite">→ technique</a></li>
+      <li>Apport d'une composition : somme des lignes ; un aliment supprimé est ignoré, pas compté zéro. <a href="spec-technique.html#alimentation-apport-d-une-composition">→ technique</a></li>
+      <li>Une ligne ne compte que si l'aliment a été choisi dans la liste ; toute frappe dans le nom annule le choix ; quantité par défaut 100. <a href="spec-technique.html#alimentation-ligne-de-saisie-valide">→ technique</a></li>
+      <li>Refus : « Ajoutez au moins un aliment avant de valider votre repas. », « « x » n'est pas reconnu. », « Un titre est requis pour enregistrer le favori. ». <a href="spec-technique.html#alimentation-refus-de-validation-du-formulaire-de-repas">→ technique</a></li>
+      <li>30 repas ou en-cas au plus par date visée ; déplacer un repas vers une journée pleine est refusé et le repas reste à sa date. <a href="spec-technique.html#alimentation-plafond-de-30-repas-ou-en-cas-par-jour">→ technique</a></li>
+      <li>Heure ramenée à la minute ronde inférieure parmi 0, 10, 15, 20, 30, 40, 45, 50 ; jamais vers le haut <span class="marque v2">V2</span>. <a href="spec-technique.html#alimentation-heure-arrondie-vers-le-bas">→ technique</a></li>
+      <li>Date et heure par défaut : aujourd'hui et l'heure courante arrondie ; en modification, celles du repas ; depuis le calendrier, le jour cliqué. <a href="spec-technique.html#alimentation-date-et-heure-par-defaut-du-formulaire">→ technique</a></li>
+      <li>Faim : entiers 0 à 5, défaut 2 avant et 0 après. <a href="spec-technique.html#alimentation-faim-avant-apres">→ technique</a></li>
+      <li>À l'écriture, les cinq valeurs sont recalculées depuis la composition et stockées avec la prise ; la V2 ne stocke rien de dérivable <span class="marque v2">V2</span>. <a href="spec-technique.html#alimentation-valeurs-nutritionnelles-d-un-repas-ecrit">→ technique</a></li>
+      <li>Est un en-cas toute prise de type snack ou inconnu ; tout le reste est un repas ; Petit-déjeuner, Déjeuner et Dîner ne s'affichent plus. <a href="spec-technique.html#alimentation-famille-repas-en-cas">→ technique</a></li>
+      <li>Quantité : champ texte, virgule acceptée. <a href="spec-technique.html#alimentation-quantite-d-un-item">→ technique</a></li>
+      <li>Rappel « Mode Modification active » tant que « Ne plus afficher » n'a pas été choisi. <a href="spec-technique.html#alimentation-rappel-du-mode-modification">→ technique</a></li>
+    </ul>
+  </details>
+  <div class="exemple"><p>Camille ouvre le formulaire à 12:37 : l'heure proposée est 12:30. Elle tape « len », choisit « Lentilles cuites », la quantité reçoit le curseur et elle écrit 200. Sous la ligne : 232 kcal, Prot 18g, Gluc 34g, Lip 1g, Fib 16g.</p></div>
+
+  <h3 id="alimentation-liste-de-suggestions-d-aliments">Liste de suggestions d'aliments</h3>
+  <figure class="telephone" data-capture="alimentation/liste-de-suggestions-d-aliments"><figcaption>Camille a tapé « tom » : « Tomate crue » en tête avec sa coche « 6 fois sélectionné et validé », « 18 kcal Prot : 1g Gluc : 3g Lip : 0g Fib : 1g », badge « /100g ».</figcaption></figure>
+  <p>Dès qu'un texte est tapé dans un champ nom, un panneau propose jusqu'à 20 aliments : nom court, coche si l'aliment a déjà été validé, ligne des cinq valeurs pour 100 g ou 100 ml et badge « /100g » ou « /100ml ». Flèches, Entrée et Échap suffisent au clavier. Sans résultat : « Aucun résultat » et le bouton « Ajouter cet aliment », qui ouvre le formulaire d'aliment prérempli du nom tapé ; l'aliment créé résout la ligne.</p>
+  <details><summary>Les règles derrière les chiffres</summary>
+    <ul>
+      <li>Base : 3 479 entrées Ciqual plus deux shakes de whey ; requête et noms comparés sans accents ni casse ; score 1000 si égal, 500 si préfixe, 400 si un mot égal, 300 si un mot commence par la requête, sinon position ; +2000 pour un aliment personnel ; départage par compteur de sélection puis nom le plus court. <a href="spec-technique.html#alimentation-base-alimentaire-et-recherche">→ technique</a></li>
+      <li>Nom affiché : nom court s'il existe, sinon le libellé officiel. <a href="spec-technique.html#alimentation-nom-affiche-d-un-aliment">→ technique</a></li>
+      <li>Chaque aliment validé (repas, favori, item du journal) incrémente son compteur, qui le fait remonter. <a href="spec-technique.html#alimentation-compteur-de-selection">→ technique</a></li>
+    </ul>
+  </details>
+
+  <h3 id="alimentation-journal-des-repas">Journal des repas</h3>
+  <figure class="telephone" data-capture="alimentation/journal-des-repas"><figcaption>« Journal (23) » sur 30 jours ; la journée « Aujourd'hui (Mardi 12 mai 2026) » affiche 1409 kcal et sa barre ; dépliée, ses quatre prises : 07:30 Repas 324 kcal, 12:30 Repas 475 kcal, 16:00 En-cas 240 kcal, 19:30 Repas 370 kcal.</figcaption></figure>
+  <p>Historique groupé par jour, du plus récent au plus ancien, sur une période choisie (7, 14, 30, 90 jours, Depuis le début, Choisir ; défaut 30 jours, bornes « du … au … » éditables). Par journée : kcal du jour, en-tête « Aujourd'hui (…) », « Hier (…) » ou date longue, barre à quatre parts ; un clic sur la barre écrit Prot./Gluc./Lip./Fibr. et les grammes. Par repas : heure, famille, titre (celui du favori si la composition lui est identique, sinon les noms d'aliments), kcal et barre ; « Faim : 4/5 -> 1/5 » ou « + Ajouter faim avant/après ». Tout s'édite en place : date et heure, faim, chaque item (quantité 1 à 10000, aliment via suggestions), ajout ou suppression d'item. Le menu « … » offre Ajouter aux favoris, Voir/Masquer les détails nutritionnels, Ajouter un élément, Supprimer. Pagination en bas ; poubelle « Supprimer définitivement tous les repas » avec confirmation « Supprimer tout ? ».</p>
+  <details><summary>Les règles derrière les chiffres</summary>
+    <ul>
+      <li>Pages de 10 repas visés sans couper une journée ; changer de période ramène à la page 1. <a href="spec-technique.html#alimentation-tri-et-pagination-du-journal">→ technique</a></li>
+      <li>Date et heure enregistrées seulement si les deux sont remplies ; faim enregistrée au premier appui hors du bloc ; supprimer le dernier item supprime le repas. <a href="spec-technique.html#alimentation-editions-en-place-du-journal">→ technique</a></li>
+      <li>Kcal du jour = somme des kcal arrondis de chaque repas ; la barre répartit les MASSES en grammes et n'est pas dessinée sans masse. <span class="marque">arbitrage non validé</span> <a href="spec-technique.html#alimentation-totaux-d-une-journee-dans-le-journal">→ technique</a></li>
+      <li>Un repas porte le titre d'un favori si même nombre de lignes et, rang par rang, même aliment et même quantité ; le premier favori qui correspond l'emporte. <a href="spec-technique.html#alimentation-correspondance-repas-favori">→ technique</a></li>
+      <li>Quantité d'un item : 1 à 10000, une décimale, « Une quantité entre 1 et 10000 est attendue. ». <a href="spec-technique.html#alimentation-quantite-d-un-item">→ technique</a></li>
+      <li>Texte d'une composition : « 50g Pain pita, 250ml Jus d'orange » ; aliment introuvable écrit « aliment supprimé ». <a href="spec-technique.html#alimentation-texte-d-une-composition">→ technique</a></li>
+    </ul>
+  </details>
+  <div class="exemple"><p>La barre du 12 mai est proportionnelle aux masses : 115 g de protéines, 126 g de glucides, 46 g de lipides, 34 g de fibres ; un clic écrit ces grammes. La bulle du calendrier, elle, dit 32 %, 35 %, 28 %, 5 % : des parts caloriques.</p></div>
+
+  <h3 id="alimentation-calendrier-des-repas">Calendrier des repas</h3>
+  <figure class="telephone" data-capture="alimentation/calendrier-des-repas"><figcaption>Mai 2026 : 1409 sous le 12 ; la bulle du 12 dit « Total 1409 kcal », « prot 32 % gluc 35 % lip 28 % fib 5 % », « 3 repas · 1 snack », puis « Voir les menus de la journée » et « Ajouter un enregistrement ».</figcaption></figure>
+  <p>Vue mensuelle par défaut : chaque jour porte son total kcal entier. Un jour vide cliqué ouvre le formulaire à cette date ; un jour renseigné ouvre une bulle avec le total, les parts caloriques, le compte « 3 repas · 1 snack » et deux liens. « Voir les menus de la journée » affiche sous la grille le bloc « Menus du 12/05/2026 (4) », le même groupe de journée que le journal, avec toutes ses éditions en place. Journal vide : « cliquez sur la date choisie pour saisir votre premier repas ou snack ».</p>
+  <details><summary>Les règles derrière les chiffres</summary>
+    <ul>
+      <li>Total kcal d'un jour = somme des calories des prises de la date, arrondie. <a href="spec-technique.html#alimentation-total-kcal-d-un-jour-calendrier-couche-tuiles">→ technique</a></li>
+      <li>Parts caloriques : protéines × 4, glucides × 4, lipides × 9, fibres × 2 ; entiers sommant à 100 ; ligne muette sans masse. <a href="spec-technique.html#alimentation-parts-caloriques-des-nutriments">→ technique</a></li>
+      <li>« repas » invariable, « snacks » au pluriel, famille à zéro omise. <a href="spec-technique.html#alimentation-compte-repas-snacks-d-un-jour">→ technique</a></li>
+    </ul>
+  </details>
+
+  <h3 id="alimentation-bloc-mes-menus-favoris">Bloc « Mes menus favoris »</h3>
+  <figure class="telephone" data-capture="alimentation/bloc-mes-menus-favoris"><figcaption>Le favori « Petit-déj avoine » de Camille : badge Repas, « (324 kcal) », « 40g Flocons d'avoine, 150ml Lait demi-écrémé, 120g Banane », menu « … ».</figcaption></figure>
+  <p>Ouvert par « Mes favoris ». Liste des menus avec titre, badge Repas / En-cas, kcal et composition en clair ; champ « Rechercher un favori... » sur le titre et les aliments ; boutons « Ajouter » et « Tout effacer ». Le menu « … » d'un favori propose Ajouter rapide, reprendre comme base dans le formulaire de repas, Modifier, Supprimer. « Ajouter rapide » ouvre un bloc qui confirme date (aujourd'hui), heure (arrondie) et faim (2 et 0) avant d'écrire la prise ; « Repas ajouté au journal ! » s'affiche 7 s. Le formulaire de favori reprend les gestes du formulaire de repas (suggestions, quantité, glisser-déposer, bandeau Total). Depuis le journal, « Ajouter aux favoris » ouvre un bloc « Titre du menu » prérempli des noms d'aliments, puis « Menu ajouté aux favoris ! Retrouvez-le dans vos menus favoris. ».</p>
+  <details><summary>Les règles derrière les chiffres</summary>
+    <ul>
+      <li>Titre : saisi, sinon les noms d'aliments tronqués à 30 caractères ; doublon refusé sans casse ni espaces de bord : « Ce titre existe déjà dans vos favoris. ». <a href="spec-technique.html#alimentation-titre-d-un-favori">→ technique</a></li>
+      <li>50 favoris créés par jour au plus ; la modification ne consomme rien. <a href="spec-technique.html#alimentation-plafond-de-50-favoris-crees-par-jour">→ technique</a></li>
+      <li>Un favori ne porte que ses aliments et son type ; les items sont recopiés avec de nouveaux identifiants dans les deux sens. <a href="spec-technique.html#alimentation-contenu-et-copie-d-un-favori">→ technique</a></li>
+      <li>Reprise comme base : formulaire ouvert, date, heure et faim conservées ; formulaire fermé, remise à zéro puis date du jour. <a href="spec-technique.html#alimentation-reprise-d-un-favori-comme-base">→ technique</a></li>
+      <li>Seuls les favoris portant une liste d'aliments sont chargés ; les six préréglages d'exemple sont écartés. <a href="spec-technique.html#alimentation-chargement-des-favoris">→ technique</a></li>
+    </ul>
+  </details>
+
+  <h3 id="alimentation-bloc-mes-aliments-boissons-et-mes-recettes">Blocs « Mes aliments / boissons » et « Mes recettes »</h3>
+  <figure class="telephone" data-capture="alimentation/bloc-mes-aliments-boissons-et-mes-recettes"><figcaption>Les aliments de Camille : « Dahl de lentilles (pour 100g) » avec l'icône recette, « 108 kcal Prot : 6g Gluc : 14g Lip : 4g Fib : 5g » ; « Yaourt grec du marché (pour 100g) » avec l'icône code-barres.</figcaption></figure>
+  <p>Bibliothèque des aliments créés, en deux modes. Mode aliments : boutons « Ajout manuel » et « Code-barres », recherche « Rechercher un aliment enregistré... ». Mode recettes : bouton « Recette », recherche « Rechercher une recette... ». Chaque entrée montre son nom, « (pour 100g) » ou « (pour 100ml) », ses icônes recette ou code-barres et ses cinq valeurs ; menu « … » : « Modifier » ou « Mettre à jour la recette », « Supprimer ».</p>
+  <details><summary>Les règles derrière les chiffres</summary>
+    <ul>
+      <li>Recherche sans accents ni casse, séparée entre aliments et recettes. <a href="spec-technique.html#alimentation-aliment-personnalise-validation-et-identite">→ technique</a></li>
+      <li>Suppression refusée si une recette utilise l'aliment : « Cet aliment est un ingrédient de la recette « … ». Retirez-l'en avant de le supprimer. » ; les aliments Ciqual ne se suppriment pas. <a href="spec-technique.html#alimentation-suppression-d-un-aliment-personnalise">→ technique</a></li>
+      <li>50 aliments et 20 recettes créés par jour, quotas indépendants. <a href="spec-technique.html#alimentation-plafonds-de-creation-de-la-bibliotheque">→ technique</a></li>
+    </ul>
+  </details>
+
+  <h3 id="alimentation-formulaire-d-aliment-personnalise-page-pleine-ou-bloc-ajout-">Formulaire d'aliment personnalisé</h3>
+  <figure class="telephone" data-capture="alimentation/formulaire-d-aliment-personnalise-page-pleine-ou-bloc-ajout-"><figcaption>Camille crée « Yaourt grec du marché » : « Aliment solide ou liquide (valeurs pour 100g / 100ml) », Kcal 97, Prot. 9, Gluc. 4, Lip. 5, Fib. 0, bascule « solide » retenue.</figcaption></figure>
+  <p>Un aliment se décrit par son nom, cinq valeurs pour 100 g ou 100 ml (champs vides permis) et la bascule « solide » / « liquide ». Il existe en page pleine (depuis « Ajouter cet aliment » d'une ligne de repas, avec un bouton scanner « OU ») et en bloc « Ajout manuel » / « Modifier l'aliment ». Quand les valeurs viennent d'un scan, la mention « Valeurs préremplies via code-barres (Open Food Facts) » l'annonce et la figure du code-barres surmonte le formulaire.</p>
+  <details><summary>Les règles derrière les chiffres</summary>
+    <ul>
+      <li>Nom obligatoire et unique sans accents ni casse contre la base et les aliments personnels ; valeurs 0 à 10000 avec une décimale, vide vaut 0 ; unité ml si liquide ; nouvel aliment placé en tête. <span class="marque">arbitrage non validé</span> (borne haute 10000) <a href="spec-technique.html#alimentation-aliment-personnalise-validation-et-identite">→ technique</a></li>
+      <li>Refus : « Veuillez indiquer le nom de l'aliment / boisson. », « Un aliment ou une boisson avec ce nom existe déjà. », « Une valeur entre 0 et 10000 est attendue, ou rien. », « Limite atteinte : pas plus de 50 aliments créés par jour. La création reprend demain. ». <a href="spec-technique.html#alimentation-plafonds-de-creation-de-la-bibliotheque">→ technique</a></li>
+      <li>Étiquettes g / ml en métrique, oz / fl oz en impérial ; stockage toujours en g ou ml <span class="marque v2">V2</span> ; aucun appel ne passe le système impérial. <a href="spec-technique.html#alimentation-unites-et-conversions">→ technique</a></li>
+    </ul>
+  </details>
+
+  <h3 id="alimentation-bloc-ajout-par-code-barres">Bloc « Ajout par code-barres »</h3>
+  <figure class="telephone" data-capture="alimentation/bloc-ajout-par-code-barres"><figcaption>Camille a tapé 3017620422003 dans « Numéro de code-barres (EAN) » ; le bouton affiche « Recherche du produit en cours... ».</figcaption></figure>
+  <p>Le numéro EAN se tape à la main ; « Rechercher le produit » interroge Open Food Facts et ouvre le formulaire d'aliment prérempli, surmonté du dessin normalisé du code (EAN-13, EAN-8 ou UPC-A) et de son numéro. Un code déjà porté par un aliment personnel rouvre cet aliment en modification. La lecture par l'appareil photo est consignée pour la conversion native, pas dans le code <span class="marque non">non implémenté</span>.</p>
+  <details><summary>Les règles derrière les chiffres</summary>
+    <ul>
+      <li>Chemin : code vide refusé ; aliment personnel porteur du code → modification ; entrée de la base porteuse du code → création préremplie ; sinon Open Food Facts ; produit inconnu → formulaire vierge nommé « Produit &lt;code&gt; ». <a href="spec-technique.html#alimentation-recherche-par-code-barres-chemin">→ technique</a></li>
+      <li>Fiche vérifiée : délai 10 s ; chaque nutriment gardé seulement s'il est un nombre fini entre 0 et 900 kcal ou 100 g, sinon champ vide ; nom nettoyé et tronqué à 120 caractères ; valeurs arrondies à l'entier. <a href="spec-technique.html#alimentation-fiche-open-food-facts-verification">→ technique</a></li>
+      <li>Erreurs : connexion (« La recherche n'a pas abouti. Vérifiez votre connexion et réessayez. »), service (« Open Food Facts ne répond pas correctement en ce moment. … »), autre. <a href="spec-technique.html#alimentation-erreurs-de-recherche-par-code-barres">→ technique</a></li>
+      <li>Dessin : chiffres seuls, clé de contrôle vérifiée, 95 modules en EAN-13, 67 en EAN-8 ; aucune image si le code est invalide. <a href="spec-technique.html#alimentation-dessin-du-code-barres">→ technique</a></li>
+    </ul>
+  </details>
+
+  <h3 id="alimentation-formulaire-de-recette">Formulaire de recette</h3>
+  <figure class="telephone" data-capture="alimentation/formulaire-de-recette"><figcaption>« Dahl de lentilles » : 300 g Lentilles cuites, 200 g Tomate crue, 20 g Huile d'olive ; « Total recette — Poids total : 520g », « Valeurs pour 100g : 108 kcal Prot : 6g Gluc : 14g Lip : 4g Fib : 5g ».</figcaption></figure>
+  <p>« Ajouter à partir d'une recette » compose un plat à partir d'ingrédients choisis dans la liste, chacun avec sa quantité, et l'enregistre comme aliment personnalisé marqué recette, valeurs ramenées à 100 g. Le récapitulatif donne le poids total et les cinq valeurs pour 100 g. Une recette se rouvre par « Mettre à jour la recette ».</p>
+  <details><summary>Les règles derrière les chiffres</summary>
+    <ul>
+      <li>Valeurs pour 100 g = total × 100 / poids total, arrondies à l'entier ; poids nul → zéros. <a href="spec-technique.html#alimentation-valeurs-d-une-recette-pour-100-g">→ technique</a></li>
+      <li>Nom obligatoire et unique, au moins un ingrédient, tous choisis dans la liste ; 20 recettes par jour ; une recette d'avant la bascule se rouvre vide. <a href="spec-technique.html#alimentation-recette-validation-et-identite">→ technique</a></li>
+      <li>Un ingrédient personnalisé supprimé est ignoré au recalcul : rouvrir puis ré-enregistrer abaisse les valeurs sans le dire. <span class="marque">arbitrage non validé</span> <a href="spec-technique.html#alimentation-apport-d-une-composition">→ technique</a></li>
+    </ul>
+  </details>
+
+  <h3 id="alimentation-bloc-graphique-moyenne-j-apports-par-jour">Bloc « Moyenne / j »</h3>
+  <figure class="telephone" data-capture="alimentation/bloc-graphique-moyenne-j-apports-par-jour"><figcaption>Du 13/04/2026 au 12/05/2026 : barres empilées par jour, courbe des kcal, bloc « Moyenne » à 1352 kcal, Prot. 108 g, Gluc. 131 g, Lip. 44 g, Fibr. 29 g.</figcaption></figure>
+  <p>Une barre par journée renseignée, protéines, glucides, lipides et fibres empilés en grammes (axe droit), et la courbe des kcal (axe gauche) ; abscisses JJ/MM. Un clic sur un point ouvre l'infobulle : date, « Kcal : N kcal », « Prot. : Ng », « Gluc. : Ng », « Lip. : Ng », « Fibr. : Ng ». Sous le graphe : « Double échelle : Calories (gauche) vs Grammes empilés (droite) », le bloc « Moyenne » par journée renseignée, « *Valeurs estimées ». Dans le tiroir « Tendances » de l'accueil, le même graphe se lit en diaporama de six vues : Calories seules, Protéines seules, Lipides seuls, Glucides seuls, Fibres seules, Tout — chevrons, points et glissé au doigt.</p>
+  <details><summary>Les règles derrière les chiffres</summary>
+    <ul>
+      <li>Un point par jour ayant au moins un repas ; moyennes = sommes / nombre de points ; axe kcal = plafond de max × 1,15 au 100 supérieur, axe grammes au 10 supérieur ; sans point, 2000 kcal et 200 g. <a href="spec-technique.html#alimentation-graphe-des-apports-par-jour">→ technique</a></li>
+      <li>Les axes de chaque graphe suivent ses propres données : le rapport kcal / gramme varie d'un graphe et d'une période à l'autre. <span class="marque">arbitrage non validé</span> <a href="spec-technique.html#alimentation-graphe-des-apports-par-jour">→ technique</a></li>
+      <li>Ordre des vues du diaporama, la dernière étant celle de la page. <a href="spec-technique.html#alimentation-ordre-des-vues-du-diaporama">→ technique</a></li>
+      <li>Fenêtres : 7, 14, 30, 90 derniers jours (jour courant inclus), Depuis le début, Choisir ; chaque bloc retient la sienne. <a href="spec-technique.html#alimentation-fenetres-de-periode">→ technique</a></li>
+    </ul>
+  </details>
+  <div class="exemple"><p>Le jour le plus haut de Camille fait 1840 kcal : l'axe monte à 2200 kcal. Ses 187 g empilés ce jour-là donnent un axe à 220 g.</p></div>
+
+  <h3 id="alimentation-bloc-graphique-appetit-faim-par-creneau-horaire">Bloc « Appétit »</h3>
+  <figure class="telephone" data-capture="alimentation/bloc-graphique-appetit-faim-par-creneau-horaire"><figcaption>Huit créneaux de 0-3h à 21-24h ; l'infobulle du créneau 12-15h dit « Faim avant : 3.8 / 5 (21) », « Faim après : 0.9 / 5 (21) », « Kcal (moy.) : ≈ 468 kcal (21) ».</figcaption></figure>
+  <p>Trois courbes sur huit créneaux de trois heures : « Faim avant repas », « Faim après repas » (axe gauche gradué 1, 3, 5) et « Kcal (moy. / prise) » (axe droit). Les huit créneaux sont toujours dessinés ; une courbe s'interrompt sur un créneau sans note. Une note signale « N prise(s) sans heure exploitable, non placée(s) sur l'axe. ».</p>
+  <details><summary>Les règles derrière les chiffres</summary>
+    <ul>
+      <li>Créneau = partie entière de l'heure / 3 ; heure absente ou hors 0-23 → prise écartée et comptée à part. <a href="spec-technique.html#alimentation-creneaux-horaires">→ technique</a></li>
+      <li>Chaque moyenne ne compte que les prises où le curseur est renseigné (0 compte) ; arrondie au dixième ; absente, jamais 0, sans note ; kcal = moyenne par prise du créneau. <a href="spec-technique.html#alimentation-faim-par-creneau">→ technique</a></li>
+      <li>La faim par jour est calculée mais non dessinée dans cette version. <a href="spec-technique.html#alimentation-faim-par-jour-calculee-non-dessinee-en-mixte">→ technique</a></li>
+    </ul>
+  </details>
+
+  <h3 id="alimentation-bloc-repas-vs-en-cas">Bloc « Repas vs en-cas »</h3>
+  <figure class="telephone" data-capture="alimentation/bloc-repas-vs-en-cas"><figcaption>« REPAS · ≈ 402 kcal » puis une barre 33 % / 36 % / 26 % / 5 % ; « EN-CAS · ≈ 214 kcal » puis 17 % / 22 % / 57 % / 4 %.</figcaption></figure>
+  <p>Deux barres horizontales à 100 %, une par famille, découpées en parts caloriques Prot. / Gluc. / Lip. / Fibr., précédées de la moyenne de kcal par prise. Une famille absente sur la période le dit : « Aucun en-cas sur cette période. », « Aucun repas (hors en-cas) sur cette période. ». La forme a été choisie par Claude sur délégation. <span class="marque">arbitrage non validé</span></p>
+  <details><summary>Les règles derrière les chiffres</summary>
+    <ul>
+      <li>Par famille : kcal par prise = somme / nombre de prises ; parts sur les calories des nutriments (4 / 4 / 9 / 2) ; les trois plus petites arrondies, la plus grande absorbe le reste. <a href="spec-technique.html#alimentation-composition-repas-vs-en-cas">→ technique</a></li>
+    </ul>
+  </details>
+
+  <h3 id="alimentation-bloc-composition-moy-h-tableau-ou-barres">Bloc « Composition moy. / h »</h3>
+  <figure class="telephone" data-capture="alimentation/bloc-composition-moy-h-tableau-ou-barres"><figcaption>Tableau sur 7 jours : la ligne 12-15h donne Prot. 38 %, Gluc. 41 %, Lip. 9 %, Fibr. 12 %, Total 100 %, Kcal ≈ 470 ; la ligne 0-3h ne porte que des « — ».</figcaption></figure>
+  <p>De quoi se compose une prise moyenne sur chaque créneau, en parts de masse. Tableau de huit lignes × Prot., Gluc., Lip., Fibr., Total, Kcal, ou barres à quatre parts titrées « 0-3H · ≈ N kcal » ; bascule mémorisée, défaut tableau ; période partagée avec « Répartition », défaut 7 jours. Note : « En % de la masse de macronutriments du créneau — chaque ligne totalise 100 %. La colonne kcal donne la moyenne d'une prise du créneau sur la période. »</p>
+  <details><summary>Les règles derrière les chiffres</summary>
+    <ul>
+      <li>Part = masse du nutriment / masse totale du créneau ; kcal = moyenne par prise ; repas et en-cas confondus. La base est la masse, non l'énergie. <span class="marque">arbitrage non validé</span> <a href="spec-technique.html#alimentation-composition-par-creneau">→ technique</a></li>
+      <li>Cellule : « — » sans valeur, « 0 % », « &lt;1 % » sous 0,5, sinon l'entier ; les deux plus hautes valeurs de chaque colonne sont surlignées. <a href="spec-technique.html#alimentation-ecriture-d-une-cellule-de-pourcentage">→ technique</a></li>
+      <li>Barres : parts entières par la méthode des plus forts restes ; une part peut s'écarter d'un point de la cellule du tableau. <span class="marque">arbitrage non validé</span> <a href="spec-technique.html#alimentation-parts-entieres-des-barres">→ technique</a></li>
+      <li>Bascule tableau / barres retenue par bloc, défaut tableau. <a href="spec-technique.html#alimentation-presentation-tableau-barres">→ technique</a></li>
+    </ul>
+  </details>
+
+  <h3 id="alimentation-bloc-repartition-tableau-ou-barres">Bloc « Répartition »</h3>
+  <figure class="telephone" data-capture="alimentation/bloc-repartition-tableau-ou-barres"><figcaption>« Créneaux hauts en kcal : 12-15h et 18-21h », idem glucides et lipides ; la colonne Kcal donne 6-9h 23 %, 12-15h 34 %, 15-18h 17 %, 18-21h 26 %, Total 100 %.</figcaption></figure>
+  <p>Quelle part de chaque apport de la période est prise sur chaque créneau : colonnes Prot., Gluc., Lip., Fibr., Kcal sommant à 100 %. Trois lignes de tête nomment les créneaux hauts en kcal, glucides et lipides. Vue barres : cinq barres découpées par créneau, avec la mention « Un créneau qui ne figure pas sur une barre n'a rien apporté sur la période : sa part est de 0 %. ». Note : « 1 prise sans heure n'est pas comptée. ».</p>
+  <details><summary>Les règles derrière les chiffres</summary>
+    <ul>
+      <li>Part = cumul du créneau / total de la période ; absente si le total est 0. <a href="spec-technique.html#alimentation-repartition-par-creneau">→ technique</a></li>
+      <li>Créneaux hauts : valeurs &gt; 0 triées décroissant puis heure croissante ; les deux premiers plus les ex æquo du second rang ; surlignage à partir de la deuxième plus haute valeur. <a href="spec-technique.html#alimentation-creneaux-hauts-et-surlignage">→ technique</a></li>
+    </ul>
+  </details>
+
+  <h3 id="alimentation-carre-aujourd-hui-de-l-accueil-standard">Carré « Aujourd'hui » de l'accueil standard</h3>
+  <figure class="telephone" data-capture="alimentation/carre-aujourd-hui-de-l-accueil-standard"><figcaption>« Aujourd'hui », badge « En direct » : 1409 kcal, Prot. 115 g, Gluc. 126 g, Lip. 46 g, Fibr. 34 g ; barre Prot. à 80 % vers « 144 g », barre Fib. pleine vers « 25 g ».</figcaption></figure>
+  <p>Bilan du jour sur l'accueil standard : les cinq valeurs entières, puis deux barres d'objectif « Prot. » et « Fib. » avec leur cible en grammes. Sans repas : « Enregistrez votre 1er repas aujourd'hui ». Un clic ouvre le formulaire si la journée est vide, sinon la page Menus.</p>
+  <details><summary>Les règles derrière les chiffres</summary>
+    <ul>
+      <li>Objectifs : kcal du profil ou 1400 ; protéines du profil ou poids actuel × 1,5 arrondi ; fibres du profil ou 25 g. <a href="spec-technique.html#alimentation-objectifs-nutritionnels-du-jour">→ technique</a></li>
+      <li>Pourcentage = valeur / objectif × 100 arrondi, borné à 100 ici. <a href="spec-technique.html#alimentation-pourcentage-d-objectif">→ technique</a></li>
+    </ul>
+  </details>
+  <div class="exemple"><p>Camille pèse 96 kg et n'a saisi aucun objectif : sa cible protéines vaut 144 g. Avec 115 g, la barre marque 80 % ; avec 34 g de fibres sur 25, la barre est pleine.</p></div>
+
+  <h3 id="alimentation-tuiles-repas-de-l-accueil-maisonsections">Tuiles repas de l'accueil « MaisonSections »</h3>
+  <figure class="telephone" data-capture="alimentation/tuiles-repas-de-l-accueil-maisonsections"><figcaption>Bloc « En direct » à 1409 kcal avec barres Prot. 80 % et Fib. 136 % ; tuile « Dynamique » repas en baisse ; zone comparée « 1352 kcal » depuis le début / « 1290 kcal » sur 7 jours, « protéine : 108 g / fibre : 29 g ».</figcaption></figure>
+  <p>Sur l'autre accueil : un bloc kcal « En direct » avec les barres protéines et fibres (le chiffre n'est pas borné, la barre l'est), le bouton « Ajouter un repas ou un en-cas », une tuile « Dynamique » qui donne le sens de la tendance des kcal, et une zone comparée « Depuis le début / 7 derniers jours » : kcal par journée renseignée, protéines et fibres par jour avec « (X % de la recommandation) » dans l'infobulle. Chaque bloc ouvre la couche vitrée sur la vue correspondante.</p>
+  <details><summary>Les règles derrière les chiffres</summary>
+    <ul>
+      <li>Depuis le début : sommes divisées par les journées renseignées ; absent sans journée. <a href="spec-technique.html#alimentation-moyennes-depuis-le-debut">→ technique</a></li>
+      <li>7 derniers jours : d'hier à J−7, jour courant écarté, journées renseignées seules. <a href="spec-technique.html#alimentation-moyennes-des-7-derniers-jours">→ technique</a></li>
+      <li>Pourcentage de la recommandation = moyenne / objectif du jour × 100 arrondi. <a href="spec-technique.html#alimentation-pourcentage-de-la-recommandation-accueil">→ technique</a></li>
+      <li>Tendance : kcal par jour sur 14 jours (0 les jours sans repas) ; hausse ou baisse si les deux moitiés diffèrent de plus de 5 %, sinon stable. <a href="spec-technique.html#alimentation-tendance-des-kcal">→ technique</a></li>
+    </ul>
+  </details>
+  <div class="exemple"><p>Trois journées renseignées totalisant 3600 kcal donnent 1200 kcal/j, même si la cure dure 30 jours.</p></div>
+
+  <h3 id="alimentation-couche-vitree-menus-de-l-accueil">Couche vitrée « Menus »</h3>
+  <figure class="telephone" data-capture="alimentation/couche-vitree-menus-de-l-accueil"><figcaption>« Bravo ! Vos fibres du jour atteignent la recommandation : 34 g sur 25 g. » ; sous « Aujourd'hui », « 07:30 · REPAS · 324 kcal », « 12:30 · REPAS · 475 kcal », « 16:00 · EN-CAS · 240 kcal », « 19:30 · REPAS · 370 kcal » ; sous-bloc 7 derniers jours « ≈ 361 kcal ».</figcaption></figure>
+  <p>Ouverte depuis l'accueil sans le quitter. Sous-bloc « Aujourd'hui » : une ligne par prise « HH:MM · REPAS · N kcal » avec sa barre de parts caloriques et un menu « … » (Modifier, Supprimer avec confirmation dans la page), puis « Ajouter un autre repas ». Sous-bloc de comparaison : sélecteur de période (défaut 7 jours), « ≈ N kcal » par prise, barre et phrase « Moyenne sur X repas et Y en-cas entre le JJ/MM/AAAA et aujourd'hui. ». Ouverte depuis une tuile de moyenne, le premier sous-bloc porte « 7 derniers jours » ou « Depuis le début ». La saisie se fait dans le formulaire complet monté sous la vitre ; créer un aliment absent renvoie vers la page Menus et perd la saisie en cours. <span class="marque">arbitrage non validé</span></p>
+  <details><summary>Les règles derrière les chiffres</summary>
+    <ul>
+      <li>Ouverte en saisie d'emblée par le bouton d'ajout ou quand la journée est à 0 kcal ; jamais depuis une tuile de moyenne. <a href="spec-technique.html#alimentation-ouverture-de-la-couche-menus-en-saisie-ou-en-lecture">→ technique</a></li>
+      <li>Prises du jour triées par heure, sans heure en dernier ; parts caloriques par prise. <a href="spec-technique.html#alimentation-prises-du-jour-dans-la-couche-vitree">→ technique</a></li>
+      <li>Moyenne par prise = kcal / nombre de prises entre les bornes incluses ; début = coupure de la fenêtre ou plus ancienne prise. <a href="spec-technique.html#alimentation-moyenne-par-prise-sur-une-periode">→ technique</a></li>
+      <li>Phrase : famille à zéro omise, borne du jour écrite « aujourd'hui ». <a href="spec-technique.html#alimentation-phrase-de-moyenne">→ technique</a></li>
+      <li>Comparaison débloquée dès 2 repas dans tout le journal ; sinon barre floutée et « Enregistrez un nouveau repas ou en-cas pour débloquer la comparaison nutritionnelle ». <a href="spec-technique.html#alimentation-deblocage-de-la-comparaison">→ technique</a></li>
+      <li>Paliers : félicitation une fois par jour et par nutriment quand le total atteint la recommandation, protéines et fibres évalués séparément, à l'ouverture et après chaque saisie <span class="marque v2">V2</span>. <a href="spec-technique.html#alimentation-paliers-proteines-et-fibres">→ technique</a></li>
+    </ul>
+  </details>
+  <div class="exemple"><p>Le 12 mai, après le dîner, Camille dépasse 25 g de fibres : la couche la félicite une fois. Ses 115 g de protéines restent sous les 144 g ; aucun message. Le lendemain, la mémoire des paliers repart de zéro.</p></div>
+</section>

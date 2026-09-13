@@ -1,0 +1,82 @@
+<section id="partage">
+  <h2>20. Le partage <a class="retour" href="#sommaire">↑ sommaire</a></h2>
+  <p>Le partage sort une donnée du carnet vers une autre application du téléphone : messagerie, réseau social. Un seul partage est branché, celui d'un badge, en texte et en image. Quinze cartes de partage existent pour les autres données (pesée, injection, repas, ressenti, séance, recette…), mais ce sont des maquettes : aucune ne produit d'image ni ne s'envoie.</p>
+
+  <h3 id="partage-partager-un-badge">Partager un badge</h3>
+  <figure class="telephone" data-capture="metabolisme-rapport-badges/page-badges"><figcaption>La page Badges de Camille : le Hérisson Marcheur, gagné au palier bronze, ouvert en grand avec son bouton Partager.</figcaption></figure>
+  <p>Le bouton « Partager » existe à deux endroits : dans le badge en grand de la page Badges (ouvert par un clic sur le dessin d'un badge gagné) et dans le bloc de célébration affiché quand un palier monte. Il remet à la feuille de partage du système (navigator.share) un titre « Badge {titre} - GLP1LOW », le texte « 🏆 J'ai débloqué le badge "{titre}" Niveau {PALIER} sur G(lp1)LOW », l'adresse de la page en cours et, si le système accepte les fichiers, une image JPEG carrée de 600 × 600 px (peinte à l'échelle 2) nommée badge-{id}-{palier}.jpg.</p>
+  <p>L'image : fond dégradé gris clair, carte blanche, pastille « ★ NIVEAU BRONZE ★ » (ou ÉVEIL, ARGENT, OR), le dessin du badge, son titre, la règle du palier atteint (le Kangourou Musclé porte toujours « Récompense votre régularité dans la pratique d'une activité physique »), le logo, GLP1LOW avec « READY, SHINE, GLOW! », et « © Partagé depuis l'application officielle GLP1LOW ». Si l'image n'a pas pu être peinte, le partage part en texte seul. Une annulation par la personne est silencieuse.</p>
+  <p>Sans feuille de partage (navigateur de bureau), le texte seul est copié dans le presse-papier et la page Badges affiche « Lien et texte de partage copiés dans le presse-papier. » ; le lien n'est pas copié, la notice le dit à tort. Le bloc de célébration ne montre pas cette notice. Ce partage appelle navigator.share directement, sans passer par la couche de plateforme prévue pour cela, qu'aucun écran n'utilise. <span class="marque">arbitrage non validé</span></p>
+  <details><summary>Les règles derrière les chiffres</summary>
+    <ul>
+      <li>Texte, image 600 × 600 rendue en 2× en JPEG qualité 0,95, titre, adresse de la page, fichier joint si le système l'accepte, repli presse-papier avec notice. <a href="spec-technique.html#partage-partage-d-un-badge">→ technique</a></li>
+    </ul>
+  </details>
+  <div class="exemple"><p>Camille dépasse 8 000 pas trois jours sur sept : le Hérisson Marcheur passe bronze. Elle touche Partager ; son téléphone propose ses messageries avec le texte « 🏆 J'ai débloqué le badge "Hérisson Marcheur" Niveau BRONZE sur G(lp1)LOW » et l'image badge-herisson-bronze.jpg, qui porte « ★ NIVEAU BRONZE ★ » et « 8 000 pas par jour pendant 3 jours /7j ».</p></div>
+
+  <h3 id="partage-les-cartes-de-partage">Les cartes de partage (maquettes)</h3>
+  <figure class="telephone" data-capture="metabolisme-rapport-badges/cartes-de-partage-15-maquettes"><figcaption>La carte « Une pesée » de Camille : 92.4 kg, -0.7 kg depuis la précédente, -3.6 kg depuis ses 96 kg de départ, sous son prénom et son avatar, au-dessus du pied logo, GLP1LOW et QR code.</figcaption></figure>
+  <p>Quinze cartes dessinées à l'écran, dix-neuf entrées de liste (une par badge, le graphe avec et sans analyse). Elles montrent ce qu'un partage contiendra ; aucune ne fabrique d'image, ne se télécharge ni n'appelle le partage du système, et aucune page du parcours utilisatrice ne les affiche.</p>
+  <p>Cadre commun : carte verticale de proportion 4/5 au minimum, qui s'allonge si le contenu déborde. En tête, l'avatar et le prénom (« Moi » s'il est vide) avec la mention « Mon carnet GLP-1 » ; puis, sauf pour la pesée et l'injection, une bande de titre avec, pour les entrées datées, le tampon « JJ/MM/AAAA · HH:MM » ; en pied, le logo, GLP1LOW et le QR code.</p>
+  <p>Chaque carte prend la dernière entrée de son journal, la plus récente par date puis par heure. Journal vide : elle montre un exemple figé daté du 18/08/2026, sans le signaler. Le niveau de faim des repas n'apparaît jamais. Les décimales s'écrivent avec un point (« 92.4 »).</p>
+  <details><summary>Le contenu des quinze cartes</summary>
+    <table>
+      <thead><tr><th>Carte</th><th>Titre</th><th>Contenu</th></tr></thead>
+      <tbody>
+        <tr><td>Équivalence début</td><td>« Depuis le début »</td><td>« Perte totale » -X.X kg, dessin de l'objet, « soit l'équivalent de … ».</td></tr>
+        <tr><td>Équivalence dernière perte</td><td>« Ma dernière perte »</td><td>« Depuis la pesée précédente » -X.X kg, dessin, phrase.</td></tr>
+        <tr><td>Les deux équivalences</td><td>« Mes deux équivalences »</td><td>Les deux blocs, en plus petit.</td></tr>
+        <tr><td>Badge (une carte par badge)</td><td>« Badge débloqué »</td><td>Dessin, titre, catégorie, « Niveau bronze » (éveil, argent, or), « Progression … » et l'objectif suivant. Badge non gagné : montré bronze avec la règle du bronze.</td></tr>
+        <tr><td>Ensemble de badges</td><td>« Ma collection de badges »</td><td>Jusqu'à quatre badges gagnés (dessin, titre, palier) — les quatre s'il n'y en a aucun —, « N badge(s) sur 4 ».</td></tr>
+        <tr><td>Repas ou en-cas</td><td>Type du repas, tampon</td><td>kcal, Prot., Gluc., Lip., Fibr. ; composition avec, par aliment, quantité, kcal et P G L F.</td></tr>
+        <tr><td>Journée d'alimentation</td><td>« Ma journée d'alimentation », date</td><td>« Total de la journée » (les cinq valeurs), puis chaque repas du jour : type, heure · kcal, composition.</td></tr>
+        <tr><td>Recette</td><td>Nom de la recette</td><td>Valeurs « Pour 100 g » (ou ml), ingrédients avec leurs valeurs, « Poids total », « Recette entière N kcal ».</td></tr>
+        <tr><td>Pesée</td><td>Sans titre</td><td>Balance devant le poids, « Poids du jour » ou « Poids de départ », « Depuis la précédente » (« — » sans précédente) et « Depuis le début » signés, mensurations saisies en cm.</td></tr>
+        <tr><td>Injection / prise</td><td>Sans titre</td><td>Voir ci-dessous.</td></tr>
+        <tr><td>Temps pour soi</td><td>« Un temps pour soi », tampon</td><td>Activité, « N min », « Rien que pour moi », note.</td></tr>
+        <tr><td>Activité physique</td><td>« Mon activité physique », tampon</td><td>Sport, « N min » ou « N étage(s) », Intensité (Activité douce / modérée / intensive), Distance si le sport en a une, « Dépense estimée N kcal », note, mention « Dépense estimée à partir du poids, de la durée et de l'intensité. »</td></tr>
+        <tr><td>Graphe, avec ou sans analyse</td><td>« Mon graphe et son analyse » / « Mon graphe »</td><td>« Mon sommeil sur 30 jours » : durée (h) et qualité (0-5), quatre dates ; avec analyse, les paragraphes de l'analyse du sommeil sous « Analyse ».</td></tr>
+        <tr><td>Temps de sommeil</td><td>« Mon temps de sommeil — Nuit du 18 au 19/07 » ou « — Sieste », tampon</td><td>Durée déduite (« 7 h 30 »), Nuit ou Sieste, Endormissement et Réveil (date · heure), Qualité « Bonne (4/5) », note.</td></tr>
+        <tr><td>Effet secondaire</td><td>« Mon ressenti », tampon</td><td>Voir ci-dessous.</td></tr>
+      </tbody>
+    </table>
+  </details>
+  <details><summary>Les règles derrière les chiffres</summary>
+    <ul>
+      <li>Proportion 4/5 minimale, bande de titre absente sans titre, pied logo 36 px, mot-symbole corps 40, QR 40 px. <a href="spec-technique.html#partage-cadre-de-partage">→ technique</a></li>
+      <li>Dernière entrée par date puis heure ; journal vide → exemple figé du 18/08/2026 ; niveau de faim jamais affiché. <a href="spec-technique.html#partage-maquettes-de-partage-source-des-donnees">→ technique</a></li>
+      <li>Badge sans palier montré bronze avec la règle du bronze ; ensemble = badges gagnés, sinon les quatre, quatre au plus. <a href="spec-technique.html#partage-maquettes-badges">→ technique</a></li>
+      <li>Recette = aliment personnalisé avec ingrédients, la plus récente ; valeurs pour 100 g/ml ; poids total = somme des quantités ; recette entière recalculée. <a href="spec-technique.html#partage-recette-partagee">→ technique</a></li>
+      <li>Graphe du sommeil sur 30 jours fixes, quatre dates au plus, qualité graduée de 1 à 5, nuits manquantes non reliées. <a href="spec-technique.html#partage-maquette-graphe-sommeil">→ technique</a></li>
+    </ul>
+  </details>
+  <div class="exemple"><p>Camille pèse 92.4 kg le 12/09/2026 après 93.1 kg la veille : sa carte « Une pesée » écrit « 92.4 kg », « Poids du jour », « -0.7 kg Depuis la précédente », « -3.6 kg Depuis le début ». Sa carte « Depuis le début » traduit ces 3,6 kg en un objet du catalogue des équivalences, le même que sur son accueil.</p></div>
+
+  <h3 id="partage-la-carte-d-une-injection-ou-d-une-prise">La carte d'une injection ou d'une prise</h3>
+  <figure class="telephone" data-capture="traitement/carte-de-partage-une-injection-prise-de-comprime-domaine-voi"><figcaption>La carte de la dernière injection de Camille : seringue, « 0.3 mg », « Dose injectée », Ozempic, sémaglutide, Abdomen Gauche, et le graphe de son niveau sanguin sur 14 jours.</figcaption></figure>
+  <p>Sans titre ni tampon : la seringue ou le comprimé devant la dose à une décimale et « mg », sous-titre « Dose injectée » ou « Prise » ; puis Traitement, Molécule (« — » si le traitement n'en déclare pas), Zone ou Voie, la note. Le graphe « Mon niveau sanguin sur 14 jours » (aire du niveau actif en mg, pastille sur chaque jour de prise, quatre dates) s'ajoute quand la première prise du journal date de plus de quatre jours et que la courbe compte au moins deux points ; la courbe est celle de la molécule du traitement en cours, arrêtée à aujourd'hui.</p>
+  <details><summary>Les règles derrière les chiffres</summary>
+    <ul>
+      <li>Graphe si plus de 4 jours depuis la première prise et au moins 2 points ; fenêtre des 14 derniers jours, aujourd'hui compris, rien après ; plafond = max(niveau affiché, 0,25) × 1,15 ; pastille sur les seuls jours de prise ; 4 dates. <a href="spec-technique.html#partage-maquette-injection-graphe">→ technique</a></li>
+      <li>Dose à une décimale ; courbe des 14 derniers jours de la première molécule active. <a href="spec-technique.html#partage-partage-d-une-injection">→ technique</a></li>
+    </ul>
+  </details>
+  <div class="exemple"><p>Camille, 0,25 mg d'Ozempic : la carte écrit « 0.3 mg », l'arrondi à une décimale montant 0,25 à 0,3. À sa première injection, pas de graphe ; à partir du cinquième jour, la courbe des 14 derniers jours avec une pastille sur chaque jour d'injection.</p></div>
+
+  <h3 id="partage-la-carte-d-un-ressenti">La carte d'un ressenti</h3>
+  <figure class="telephone" data-capture="effets-secondaires/maquette-de-partage-un-effet-secondaire-mon-ressenti"><figcaption>Le ressenti de Camille : « Nausées », « 2 / 5 », « Léger », deux pastilles pleines sur cinq, et sa note.</figcaption></figure>
+  <p>Titre « Mon ressenti », tampon ; le type de l'effet, « N / 5 », le mot d'intensité (Imperceptible, Léger, Modéré, Marqué, Fort, Élevé ; « Intensité » hors échelle), cinq pastilles dont les N premières sont pleines, la note. Les mots d'intensité sont recopiés du formulaire des effets, pas partagés avec lui. <span class="marque">arbitrage non validé</span></p>
+  <details><summary>Les règles derrière les chiffres</summary>
+    <ul>
+      <li>Dernier ressenti par date puis heure, sinon l'exemple (Nausées, 2) ; mot d'intensité par rang ; pastilles pleines jusqu'au rang de la sévérité. <a href="spec-technique.html#partage-partage-dernier-ressenti">→ technique</a></li>
+    </ul>
+  </details>
+
+  <h3 id="partage-le-faux-qr-code">Le faux QR code</h3>
+  <p>Le QR code du pied de carte est un motif fixe, non scannable : 25 modules de côté, marge de 2, trois carrés de repérage, une trame déterministe à 48 % de modules noirs, identique à chaque rendu. Il tient la place du code vers l'application sur les magasins, demandé mais absent. <span class="marque non">non implémenté</span> Le choix de l'encodeur (bibliothèque, code écrit à la main, image externe) n'est pas pris. <span class="marque">arbitrage non validé</span></p>
+  <details><summary>Les règles derrière les chiffres</summary>
+    <ul>
+      <li>25 modules, marge 2, 3 carrés de repérage de 7, trame par générateur congruentiel à graine fixe (20260819), 48 % de noir. <a href="spec-technique.html#partage-faux-qr-code">→ technique</a></li>
+    </ul>
+  </details>
+</section>

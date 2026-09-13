@@ -1,0 +1,30 @@
+<section id="ciel">
+  <h2>15. Mon Ciel <a class="retour" href="#sommaire">↑ sommaire</a></h2>
+  <p>Mon Ciel est une scène nocturne plein écran, sans donnée de suivi : un compte à rebours vers une date cible, dix étoiles qui livrent chacune une citation, un hibou endormi et un jeu-concours ouvert par le lien « Jouez ! ». Elle est identique pour tous les utilisateurs et n'enregistre rien.</p>
+
+  <h3 id="ciel-mon-ciel">Mon Ciel</h3>
+  <figure class="telephone" data-capture="metabolisme-rapport-badges/mon-ciel"><figcaption>La scène ouverte par Camille le 12 septembre 2026 à 10 h 00 : « 63 : 14 : 00 : 00 » jusqu'au 15 novembre 2026, cinq étoiles d'or et cinq d'argent, le hibou en bas, le lien « Jouez ! » à droite sous le compteur.</figcaption></figure>
+  <p>On y arrive par le menu Paramètres → « GLP1LOW et vous » → « Ciel », ou en touchant l'une des quatre étoiles d'argent de l'entête, présentes sur toutes les autres pages. Sur Mon Ciel, l'entête et la bande de titre disparaissent ; la barre du bas reste, sans onglet mis en avant, et permet d'en sortir, comme le bouton retour.</p>
+  <p>Au centre, la phrase « Découvrez la fonctionnalité cachée de GLP1LOW dans », puis le compte à rebours sur quatre cases Jours : Heures : Min : Sec, chaque nombre sur deux chiffres au moins, rafraîchi chaque seconde. La cible est la date <code>countdownTargetDate</code> du profil, prise à 0 h 00 locale, 15 novembre 2026 par défaut ; aucun écran du périmètre ne la modifie. Une fois la cible passée, l'affichage reste à « 00 : 00 : 00 : 00 ». Le code ne définit pas la fonctionnalité cachée et rien ne se produit à l'échéance.</p>
+  <p>Cinq étoiles d'or et cinq d'argent occupent des positions fixes et flottent en continu ; 45 points blancs scintillent à des positions tirées au hasard à chaque ouverture de la page. Le hibou endormi, en bas, s'anime sous le doigt et ne fait rien d'autre.</p>
+  <details><summary>Les règles derrière les chiffres</summary>
+    <ul>
+      <li>Compte à rebours : cible = <code>countdownTargetDate</code> (AAAA-MM-JJ) à 00:00 local, 15/11/2026 par défaut ou si la date est mal formée ; écart = max(0, cible − maintenant) décomposé en jours, heures, minutes, secondes ; recalcul chaque seconde. <a href="spec-technique.html#ciel-compte-a-rebours-de-mon-ciel">→ technique</a></li>
+    </ul>
+  </details>
+  <div class="exemple"><p>Camille ouvre Mon Ciel le 12 septembre 2026 à 10 h 00 : il reste 63 jours et 14 heures avant le 15 novembre à minuit, le compteur affiche « 63 : 14 : 00 : 00 » et descend seconde après seconde. Le 16 novembre, il affichera « 00 : 00 : 00 : 00 ».</p></div>
+
+  <h3 id="ciel-le-message-d-une-etoile">Le message d'une étoile</h3>
+  <p>Toucher une étoile ouvre en bas de la scène le panneau « Message Étoilé » : « Étoile Dorée #n : « citation » » ou « Étoile Argentée #n : « citation » », n de 1 à 5 selon la place de l'étoile dans sa couleur. « Fermer » le referme ; toucher une autre étoile remplace le texte. Sept citations existent : l'étoile d'or n donne la n-ième, l'étoile d'argent n donne la (n + 3)-ième, en reprenant au début après la septième.</p>
+  <details><summary>Les règles derrière les chiffres</summary>
+    <ul>
+      <li>Citations des étoiles : 7 citations ; index = (n + (argent ? 3 : 0)) mod 7 avec n de 0 à 4 ; libellé « Étoile Dorée|Argentée #{n+1} : « … » ». <a href="spec-technique.html#ciel-citations-des-etoiles">→ technique</a></li>
+      <li>Les sept citations, dans l'ordre : « Chaque petit pas est une grande victoire. » ; « Prenez soin de vous avec douceur et patience. » ; « La persévérance transforme chaque effort en succès. » ; « Écoutez votre corps, il sait ce dont il a besoin. » ; « Vous êtes plus fort(e) que vous ne le pensez ! » ; « La santé est un voyage, pas une destination. » ; « Dormez bien, votre corps se régénère cette nuit. »</li>
+    </ul>
+  </details>
+  <div class="exemple"><p>Camille touche la première étoile d'argent : « Étoile Argentée #1 : « Écoutez votre corps, il sait ce dont il a besoin. » ». La quatrième étoile d'or donne la même citation ; la première étoile d'or donne « Chaque petit pas est une grande victoire. », que rend aussi la cinquième étoile d'argent.</p></div>
+
+  <h3 id="ciel-le-jeu-et-son-reglement">Le jeu et son règlement</h3>
+  <p>Le lien « Jouez ! », sous le compte à rebours, ouvre en bas de la scène le panneau « Ciel ! » : « Envoyez-nous un message sur Instagram en découvrant la fonctionnalité cachée. Des années d'abonnement à gagner ! ». Le mot « Instagram » ouvre https://www.instagram.com dans un nouvel onglet, sans compte désigné. « Voir le Règlement » remplace ce panneau par « Règlement du jeu », quatre puces : jeu ouvert à tous les utilisateurs de l'application GLP1LOW ; participation par message direct sur le compte Instagram officiel avec preuve ou capture ; plusieurs abonnements, de un an à plusieurs années, attribués par tirage au sort parmi les participants ayant découvert la fonctionnalité ; jeu sans obligation d'achat. « Fermer » sur le règlement ramène au panneau « Ciel ! » ; « Fermer » sur celui-ci le referme.</p>
+  <p>Les panneaux ne posent aucun voile : la scène reste active derrière eux, et un message étoilé peut s'ouvrir par-dessus le panneau du jeu. L'application n'enregistre aucune participation.</p>
+</section>

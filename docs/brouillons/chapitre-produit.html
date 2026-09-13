@@ -1,0 +1,67 @@
+<section id="produit">
+  <h2>1. Le produit <a class="retour" href="#sommaire">↑ sommaire</a></h2>
+  <p>GLP1LOW est un carnet de suivi personnel pour une personne sous traitement GLP-1, en injection ou en comprimé. Il enregistre ce qui se passe pendant la cure — prises, poids, effets secondaires, alimentation, pas, activité physique, sommeil, temps pour soi —, le restitue en totaux, moyennes, courbes et échéances, et produit un document PDF à remettre à un professionnel de santé. Une seule personne par installation.</p>
+
+  <h3 id="produit-objet-et-posture">Objet et posture</h3>
+  <p>Le produit ne pose pas de diagnostic et ne touche pas aux posologies : l'avertissement médical, accepté obligatoirement au premier lancement, le dit (« l'application n'intervient pas dans les posologies »), et le document PDF porte en pied « document de suivi personnel, ne constitue pas un avis médical ». Le traitement se choisit dans un catalogue, jamais saisi à la main ; chaque forme finit par « Autre ». Dans la V1 le catalogue porte aussi les doses usuelles et la cinétique de chaque molécule, qui servent à la courbe de concentration ; dans la V2 il ne porte que les noms et la forme. <span class="marque v2">V2</span></p>
+  <p>Une seule personne : un profil, une sauvegarde sous une clé unique qui ne porte pas l'identifiant du compte — la sauvegarde appartient à l'appareil, pas au compte. Le compte (V1) ouvre l'application quand Firebase est configuré : courriel et mot de passe, ou Google ; pas d'inscription libre. La V2 recueille un courriel et un mot de passe de huit signes au moins, seule contrainte, et ne crée rien. <span class="marque v2">V2</span></p>
+  <details><summary>Les règles derrière</summary>
+    <ul>
+      <li>L'avertissement occupe seul l'écran tant qu'il n'est pas accepté. <a href="spec-technique.html#produit-avertissement-medical">→ technique</a></li>
+      <li>Le catalogue : treize traitements plus « aucun », identifiants stables. <a href="spec-technique.html#produit-catalogue-des-traitements">→ technique</a></li>
+      <li>Sans configuration Firebase, l'application s'ouvre sans compte. <a href="spec-technique.html#produit-verrou-et-session-firebase">→ technique</a></li>
+      <li>Toute la sauvegarde est un seul JSON sous une clé. <a href="spec-technique.html#produit-cle-et-format-de-la-sauvegarde">→ technique</a></li>
+    </ul>
+  </details>
+
+  <h3 id="produit-les-principes">Les principes</h3>
+  <p><strong>Rien de dérivable n'est stocké.</strong> La durée d'un sommeil se déduit de ses deux instants complets ; une séance ne porte pas ses calories ; une pesée ne porte pas son IMC. Les valeurs nutritionnelles d'un repas sont recalculées depuis sa composition à chaque écriture, mais restent stockées comme cache. <span class="marque non">non implémenté</span></p>
+  <p><strong>On référence par identifiant.</strong> Un traitement est enregistré par son identifiant (<code>ozempic</code>), un aliment par le sien ; une sauvegarde qui portait encore un nom est convertie au chargement. Les effets secondaires, les sports et les activités pour soi sont enregistrés par leur nom. <span class="marque non">non implémenté</span></p>
+  <p><strong>Les unités sont canoniques en base.</strong> Kilogrammes, centimètres, grammes ou millilitres, milligrammes, minutes, mètres, années ; aucune étiquette d'unité n'est stockée. Un aliment saisi en litres ou en kilos est multiplié par mille avant enregistrement. Le profil V1 porte un système de mesure, mais rien ne le lit : l'affichage est toujours métrique. <span class="marque non">non implémenté</span> La V2 choisit le système avec la langue — le français amène cm · kg, l'anglais inch · pound, rechoisissable — et stocke la taille en centimètres ; le poids reste le texte saisi dans l'unité choisie. <span class="marque v2">V2</span></p>
+  <p><strong>Les dates sont locales.</strong> Un jour s'écrit <code>AAAA-MM-JJ</code>, une heure <code>HH:MM</code>, lus sur l'horloge de l'appareil, sans fuseau ; l'arithmétique des jours se fait champ par champ. Toute heure enregistrée est ramenée à la minute ronde inférieure (0, 10, 15, 20, 30, 40, 45, 50). Seules les dates relatives (« lundi 3 août ») construisent une date depuis la chaîne, ce que la couche de dates interdit ailleurs.</p>
+  <p><strong>Supprimer supprime.</strong> Une ligne effacée quitte la sauvegarde ; les lignes marquées supprimées par l'ancien modèle sont purgées au chargement. La suppression du compte efface tout le stockage local. Vider les pesées épargne la pesée de départ.</p>
+  <p><strong>Une valeur absente se tait.</strong> Aucun rythme hebdomadaire avant sept jours de recul ou avec moins de deux pesées ; aucune moyenne par semaine avant sept jours d'historique ; dans ces cas la fonction rend <code>null</code> et rien n'est écrit — ni zéro, ni tiret.</p>
+  <p><strong>Aucune branche ne se ferme sur un silence.</strong> Dans le questionnaire V1, le poids actuel est demandé tant que « j'ai déjà commencé » n'est pas un oui explicite, question passée comprise ; passer une étape efface ses réponses et referme ce qu'elles avaient ouvert ; le questionnaire n'écrit rien hormis le thème. Dans la V2, chaque branche se ferme sur une valeur toujours présente — « perdre du poids » et « traitement commencé : oui » sont retenus d'avance — et une seule étape bloque, celle qui demande quel traitement. Les réponses ne sont pas enregistrées : un rechargement perd tout. <span class="marque v2">V2</span></p>
+  <details><summary>Les règles derrière les principes</summary>
+    <ul>
+      <li>Durée de sommeil = réveil − endormissement, zéro si le réveil précède. <a href="spec-technique.html#produit-sommeil-duree-plage-plafond">→ technique</a></li>
+      <li>Nutrition du repas recalculée à chaque écriture. <a href="spec-technique.html#produit-ecriture-d-un-repas">→ technique</a></li>
+      <li>Libellés hérités de traitement convertis en identifiants. <a href="spec-technique.html#produit-conversion-des-traitements-en-identifiants">→ technique</a></li>
+      <li>Points 1 à 11 du modèle de données. <a href="spec-technique.html#produit-conventions-du-modele-conventions-md">→ technique</a></li>
+      <li>Dates locales, jamais UTC. <a href="spec-technique.html#produit-dates-locales-jamais-utc">→ technique</a></li>
+      <li>Minutes rondes à l'enregistrement. <a href="spec-technique.html#produit-minutes-rondes">→ technique</a></li>
+      <li>Dates relatives via <code>new Date(chaîne)</code>. <a href="spec-technique.html#produit-formats-de-date">→ technique</a></li>
+      <li>Suppression franche. <a href="spec-technique.html#produit-suppression-franche">→ technique</a></li>
+      <li>Purge des lignes marquées, sept journaux. <a href="spec-technique.html#produit-purge-des-lignes-marquees-supprimees">→ technique</a></li>
+      <li>Vider les pesées épargne le départ. <a href="spec-technique.html#produit-vider-les-pesees-epargne-le-depart">→ technique</a></li>
+      <li>Questionnaire : visibilité et effacement des étapes. <a href="spec-technique.html#produit-questionnaire-visibilite-et-effacement-des-etapes">→ technique</a></li>
+      <li>Identifiants : UUID v7 pour les repas, préfixe + horodatage ailleurs. <a href="spec-technique.html#produit-identifiants-des-lignes">→ technique</a></li>
+      <li>Nombres écrits avec un point décimal, virgule acceptée à la saisie. <a href="spec-technique.html#produit-ecriture-des-nombres">→ technique</a></li>
+    </ul>
+  </details>
+  <div class="exemple"><p>Camille enregistre une prise d'Ozempic 0,25 mg le 4 mai 2026 à 00 h 37 : la ligne porte <code>2026-05-04</code>, <code>00:30</code> et l'identifiant <code>ozempic</code>. Partie de 96 kg le 4 mai, pesée à 95,2 kg le 7 mai, elle ne voit aucun rythme hebdomadaire : trois jours de recul. Le 11 mai, il apparaît.</p></div>
+
+  <h3 id="produit-contraintes">Contraintes</h3>
+  <p>Les données de suivi vivent dans le stockage local de l'appareil, écrites à chaque changement ; il n'y a ni base distante ni synchronisation. Ce qui en sort : le PDF que la personne exporte ou partage ; les avis, retours et réponses au sondage, envoyés avec le contexte technique de l'envoi et aucune donnée de santé ; un code-barres interrogé sur Open Food Facts ; la connexion, qui passe par Google. Une sauvegarde illisible est mise à l'abri sous une clé de secours et la session passe en lecture seule.</p>
+  <p>Les bornes n'écartent que l'absurde : âge de 1 à 130 ans, taille de 50 à 300 cm, poids de 0,1 à 1 000 kg. Les autres bornes de saisie (mensurations, distances, nutriments, poids d'objet) sont des propositions. <span class="marque">arbitrage non validé</span> La V2 reprend l'âge et la taille, remplace l'âge par l'année de naissance, et borne la liste des poids à 999 kg ou 2 000 lb — deux plafonds ronds, pas la conversion l'un de l'autre. <span class="marque v2">V2</span> Une saisie impossible se refuse : un réveil antérieur à l'endormissement, une date incomplète.</p>
+  <details><summary>Les règles derrière les contraintes</summary>
+    <ul>
+      <li>Couche de stockage : erreurs avalées, écriture silencieuse, effacement en bloc. <a href="spec-technique.html#produit-couche-de-stockage">→ technique</a></li>
+      <li>Garde-fou du chargement. <a href="spec-technique.html#produit-garde-fou-du-chargement">→ technique</a></li>
+      <li>Contexte d'un envoi : aucune donnée de santé. <a href="spec-technique.html#produit-contexte-d-un-envoi-de-formulaire">→ technique</a></li>
+      <li>Bornes des champs numériques. <a href="spec-technique.html#produit-bornes-des-champs-numeriques-de-la-mixte">→ technique</a></li>
+      <li>Calendrier : la date n'est enregistrée qu'une fois complète et possible. <a href="spec-technique.html#produit-calendrier-maison">→ technique</a></li>
+      <li>Suppression du compte : compte d'abord, puis stockage, puis rechargement. <a href="spec-technique.html#produit-suppression-du-compte-ordre">→ technique</a></li>
+    </ul>
+  </details>
+  <div class="exemple"><p>Camille, née en 1978, 168 cm, 96 kg : tout passe. Un poids tapé « 1200 » est refusé avec « Un poids entre 0,1 et 1000 kg est attendu. » ; dans la V2 la roue s'arrête à 999.</p></div>
+
+  <h3 id="produit-non-buts">Non-buts</h3>
+  <p>Pas de synchronisation, de compte partagé ni d'accès soignant. Pas d'objet connecté : les pas se saisissent à la main, une entrée peut être marquée simulée. Pas de conseil nutritionnel, sportif ou posologique : les paliers de dose proposés sont ceux du catalogue, les objectifs quotidiens par défaut (1 400 kcal, poids × 1,5 g de protéines, 25 g de fibres) se modifient. Pas de réseau social : le seul lien nommé « Social » ouvre un gabarit statique de carte pour les réseaux sociaux, depuis une page qu'aucune entrée de menu relevée n'atteint. Le suivi hydrique et les objectifs de poids à paliers ont été supprimés ; leurs traces sont écartées au chargement, et la V2 ne les réintroduit pas, ni les saisies rapides comme modèle. <span class="marque v2">V2</span></p>
+
+  <h3 id="produit-la-v2">La V2</h3>
+  <p>Repartie de zéro le 6 septembre 2026 dans son propre dépôt, sans rien copier de la V1 : ce qui en vient est repris pièce par pièce — le cadre du téléphone, les noms et formes des traitements, le dessin de l'avatar. Deux contraintes décident de la forme du code : le passage à React Native (aucune API du navigateur hors d'un seul fichier) et le multilingue (aucun texte dans un écran, français et anglais). À ce jour elle ne porte que l'onboarding ; rien n'est enregistré, aucune page ne suit le dernier écran. <span class="marque v2">V2</span></p>
+
+  <h3 id="produit-hors-perimetre">Hors périmètre</h3>
+  <p>L'administration et les thèmes ne font pas partie de cette spécification.</p>
+</section>

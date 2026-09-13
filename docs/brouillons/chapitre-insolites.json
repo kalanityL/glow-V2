@@ -1,0 +1,157 @@
+{
+ "inventions": [
+  {
+   "categorie": "amélioration",
+   "fonctionnalite": "Revoir le catalogue des objets insolites",
+   "texte": "Afficher les poids de 1 kg et plus avec leur décimale (« 3.6 kg ») plutôt que le kilo arrondi.",
+   "origine": "InsolitesPage.tsx appelle formatNumber(item.weight) sans décimales : 3,6 kg s'affiche « 4 kg » et se copie « 4kg » ; rien ne dit si c'est voulu, le chapitre décrit l'arrondi tel quel."
+  },
+  {
+   "categorie": "comportement supposé",
+   "fonctionnalite": "Revoir le catalogue des objets insolites",
+   "texte": "Un lien en bas de « Mon profil » mènerait à la page Objets Insolites.",
+   "origine": "App.tsx passe onViewInsolitesList à ProfileSettings et un commentaire y cite « le lien vers la bibliothèque d'insolites juste au-dessus », mais ProfileSettings.tsx (Mixte) déclare la prop sans jamais la rendre."
+  },
+  {
+   "categorie": "règle plausible",
+   "fonctionnalite": "Assigner et compter les objets insolites à chaque pesée",
+   "texte": "Sur la home sections, la tuile de la dernière perte se tairait quand les deux pertes sont égales au dixième, comme sur la home standard et la carte de confirmation.",
+   "origine": "Le commentaire de MaisonSections.tsx l'affirme (« ne paraît que si elle diffère de la perte totale ») et l'inventaire le reprend, mais showLastLoss n'a pas ce test : les deux tuiles s'affichent."
+  },
+  {
+   "categorie": "comportement supposé",
+   "fonctionnalite": "Équivalence insolite dans le PDF",
+   "texte": "Le PDF reprendrait les objets assignés, ceux de la home, plutôt qu'un calcul nu.",
+   "origine": "Toutes les autres surfaces lisent l'assignation depuis le 2026-08-16 ; le PDF appelle getLudicEquivalence(−delta) sur la variation de la période, qui n'est pas une perte de l'assignation."
+  },
+  {
+   "categorie": "comportement supposé",
+   "fonctionnalite": "Traduire un poids en objets (équivalence insolite)",
+   "texte": "Un widget de félicitation « Une équivalence insolite » annoncerait l'équivalence de la perte totale après une pesée.",
+   "origine": "celebrations.ts a un type « autre » avec ce texte ; dans la Mixte, seule la page d'essai des félicitations (administration, hors périmètre) le déclenche."
+  },
+  {
+   "categorie": "règle plausible",
+   "fonctionnalite": "Assigner et compter les objets insolites à chaque pesée",
+   "texte": "Les compteurs d'usage seraient plafonnés ou remis à zéro.",
+   "origine": "Rien dans ludicUsage.ts ne les borne ni ne les réinitialise ; ils croissent avec les pesées et ne se lisent nulle part."
+  }
+ ],
+ "glossaire": [
+  {
+   "terme": "Équivalence insolite",
+   "definition": "Traduction d'un poids perdu en un ou deux objets du catalogue de même masse, dessinés et nommés."
+  },
+  {
+   "terme": "Catalogue",
+   "definition": "Les 222 objets nommés, avec masse, pluriel, émoji et catégorie (courant ou insolite)."
+  },
+  {
+   "terme": "Objet insolite",
+   "definition": "Objet du catalogue marqué « insolite » ; à 1 kg ou plus, il n'apparaît qu'avec un insolite de moins de 1 kg."
+  },
+  {
+   "terme": "Équivalence vraie",
+   "definition": "Combinaison dont la masse s'écarte du poids de 200 g au plus."
+  },
+  {
+   "terme": "Assignation",
+   "definition": "Les objets retenus pour « Depuis le début » et « dernière perte enregistrée », rattachés à la pesée la plus récente et conservés sur l'appareil."
+  },
+  {
+   "terme": "Turn-over",
+   "definition": "Règle qui préfère, parmi les équivalences vraies, l'objet le moins souvent assigné."
+  },
+  {
+   "terme": "Exclusion",
+   "definition": "Règle qui écarte de la dernière perte les objets déjà pris par « Depuis le début »."
+  },
+  {
+   "terme": "Signature de pesée",
+   "definition": "Identifiant, date et heure de la pesée la plus récente ; son changement déclenche une nouvelle assignation comptée."
+  },
+  {
+   "terme": "Depuis le début",
+   "definition": "Perte entre le poids de départ et la pesée la plus récente."
+  },
+  {
+   "terme": "Dernière perte enregistrée",
+   "definition": "Perte entre l'avant-dernière et la dernière pesée."
+  }
+ ],
+ "index": [
+  {
+   "terme": "Équivalence insolite",
+   "ancre": "insolites"
+  },
+  {
+   "terme": "Catalogue des objets",
+   "ancre": "insolites-le-catalogue-et-le-calcul"
+  },
+  {
+   "terme": "Équivalence vraie (200 g)",
+   "ancre": "insolites-le-catalogue-et-le-calcul"
+  },
+  {
+   "terme": "Turn-over",
+   "ancre": "insolites-le-catalogue-et-le-calcul"
+  },
+  {
+   "terme": "Exclusion entre les deux blocs",
+   "ancre": "insolites-le-catalogue-et-le-calcul"
+  },
+  {
+   "terme": "Assignation des objets",
+   "ancre": "insolites-le-catalogue-et-le-calcul"
+  },
+  {
+   "terme": "Signature de pesée",
+   "ancre": "insolites-le-catalogue-et-le-calcul"
+  },
+  {
+   "terme": "Dessin des objets",
+   "ancre": "insolites-bloc-equivalence-insolite-dessin-phrase"
+  },
+  {
+   "terme": "Phrase d'équivalence",
+   "ancre": "insolites-bloc-equivalence-insolite-dessin-phrase"
+  },
+  {
+   "terme": "Confirmation de pesée (équivalences)",
+   "ancre": "insolites-carte-de-confirmation-de-pesee-equivalences-insolites"
+  },
+  {
+   "terme": "Depuis le début (tuile)",
+   "ancre": "insolites-tuiles-d-equivalence-insolite-de-la-home-standard-depuis-le"
+  },
+  {
+   "terme": "Dernière perte enregistrée (tuile)",
+   "ancre": "insolites-tuiles-d-equivalence-insolite-de-la-home-standard-depuis-le"
+  },
+  {
+   "terme": "Progrès (rangée, équivalences)",
+   "ancre": "insolites-rangee-progres-evolution-de-la-home-sections"
+  },
+  {
+   "terme": "Soit l'équivalent de",
+   "ancre": "insolites-surimpression-d-une-equivalence-insolite-home-sections"
+  },
+  {
+   "terme": "Rapport PDF (équivalence insolite)",
+   "ancre": "insolites-pdf-ii-poids-et-doses"
+  },
+  {
+   "terme": "Objets Insolites (page)",
+   "ancre": "insolites-page-objets-insolites-revue-du-catalogue"
+  }
+ ],
+ "ecrans_illustres": [
+  "metabolisme-rapport-badges/bloc-equivalence-insolite-dessin-phrase",
+  "poids/carte-de-confirmation-de-pesee-equivalences-insolites",
+  "poids/tuiles-d-equivalence-insolite-de-la-home-standard-depuis-le",
+  "poids/rangee-progres-evolution-de-la-home-sections",
+  "accueil/surimpression-d-une-equivalence-insolite-home-sections",
+  "metabolisme-rapport-badges/pdf-ii-poids-et-doses",
+  "metabolisme-rapport-badges/page-objets-insolites-revue-du-catalogue"
+ ]
+}

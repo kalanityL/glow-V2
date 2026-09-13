@@ -1,0 +1,1975 @@
+[
+ {
+  "domaine": "profil-compte",
+  "captures": [
+   {
+    "ecran": "Page « Configuration & Plus » (PlusMenu)",
+    "slug": "page-configuration-plus-plusmenu",
+    "fichier": "/Users/beauty/Desktop/GLOW/GIT-APP-V2/docs/captures/profil-compte/page-configuration-plus-plusmenu.png",
+    "ce_quon_voit": "Bande de titre « Configuration & Plus », carte de profil (avatar, Camille, étiquette OZEMPIC, -10.1 kg, 1.7 mg, bouton « Mon profil ») puis les entrées Modules, Notifications, Avis & Feedbacks, Sondage, Sécurité/Avertissements & Confidentialité, Social, Administration ; l'onglet 'plus' n'ayant aucun bouton dans le menu du bas, la page a été rouverte par la clé de retour de thème de l'application (glow_theme_return_tab_mixte = 'plus')."
+   },
+   {
+    "ecran": "Page « Configuration & Plus » (PlusMenu)",
+    "slug": "page-configuration-plus-plusmenu-bas",
+    "fichier": "/Users/beauty/Desktop/GLOW/GIT-APP-V2/docs/captures/profil-compte/page-configuration-plus-plusmenu-bas.png",
+    "ce_quon_voit": "Bas de la même page : entrées Social et Administration puis la notice grise « © 2026 HOPTID-GLOW — Conçu pour votre confort. / Ce service sauvegarde vos données localement… » et le bouton Info Santé & Confidentialité."
+   },
+   {
+    "ecran": "Menu Paramètres (sections Préférences · Export · GLP1LOW et vous)",
+    "slug": "menu-parametres-sections-preferences-export-glp1low-et-vous",
+    "fichier": "/Users/beauty/Desktop/GLOW/GIT-APP-V2/docs/captures/profil-compte/menu-parametres-sections-preferences-export-glp1low-et-vous.png",
+    "ce_quon_voit": "Panneau de la roue ouvert sur l'accueil (menu standard, en lignes) : Préférences (Activation Modules, Notifications, Apparence, Polices, Badges), Export (Rapport médical), GLOW et vous (Mon compte, Avis et Feedback, Sondage, FAQ, Ciel) et la section Ajout rapide ; pas d'entrée Admin (compte non administrateur)."
+   },
+   {
+    "ecran": "Menu Paramètres (sections Préférences · Export · GLP1LOW et vous)",
+    "slug": "menu-parametres-sections-preferences-export-glp1low-et-vous-tiroir",
+    "fichier": "/Users/beauty/Desktop/GLOW/GIT-APP-V2/docs/captures/profil-compte/menu-parametres-sections-preferences-export-glp1low-et-vous-tiroir.png",
+    "ce_quon_voit": "Même menu rendu en cases dans le tiroir de droite du menu simplifié (barre Accueil / Journal / + / Tendances / Menu), page d'accueil floutée derrière ; capture issue d'une série antérieure du même banc (19:24), vérifiée à l'œil."
+   },
+   {
+    "ecran": "Page « Mon Profil » — bloc récapitulatif",
+    "slug": "page-mon-profil-bloc-recapitulatif",
+    "fichier": "/Users/beauty/Desktop/GLOW/GIT-APP-V2/docs/captures/profil-compte/page-mon-profil-bloc-recapitulatif.png",
+    "ce_quon_voit": "Page « Mon Profil » ouverte par l'avatar du header : carte Mon Profil avec Prénom ou pseudo Camille, Médicament prescrit Ozempic, Âge 48 ans, Taille 168 cm, Poids de départ 96 kg, Objectif final 72 kg et le bouton « … » ; dessous le bloc Mon Avatar et le début du Miroir."
+   },
+   {
+    "ecran": "Formulaire « Modifier mon profil »",
+    "slug": "formulaire-modifier-mon-profil",
+    "fichier": "/Users/beauty/Desktop/GLOW/GIT-APP-V2/docs/captures/profil-compte/formulaire-modifier-mon-profil.png",
+    "ce_quon_voit": "Formulaire « Modifier mon profil » ouvert par le « … », page floutée derrière : champs Prénom ou pseudo (Camille, en focus), Médicament prescrit (Ozempic (Sémaglutide)), Âge 48, Taille 168, Poids de départ 96, Objectif final 72, bouton Valider et croix de fermeture."
+   },
+   {
+    "ecran": "Bloc « Mon Avatar »",
+    "slug": "bloc-mon-avatar",
+    "fichier": "/Users/beauty/Desktop/GLOW/GIT-APP-V2/docs/captures/profil-compte/bloc-mon-avatar.png",
+    "ce_quon_voit": "Carte Mon Avatar avec la vignette de l'avatar, « Avatar personnalisé », « Genre : Femme » et le bouton « … », suivie du Miroir de GLOW, du message de remerciement et du lien Mes préférences de compte."
+   },
+   {
+    "ecran": "Créateur d'avatar — onglet « Composer l'avatar »",
+    "slug": "createur-davatar-onglet-composer-lavatar",
+    "fichier": "/Users/beauty/Desktop/GLOW/GIT-APP-V2/docs/captures/profil-compte/createur-davatar-onglet-composer-lavatar.png",
+    "ce_quon_voit": "Créateur ouvert dans la page : aperçu 140 px de l'avatar, bouton Aléatoire, onglets Composer l'avatar (actif) / Utiliser ma photo, Profil de silhouette Femme (sélectionné) / Homme / Neutre, 6 pastilles Couleur de peau (Clair cochée), Coupe de cheveux Classique (sélectionnée) / Bouclé / Chauve, 6 pastilles Couleur des cheveux (Brun cochée), bouton Valider les modifications ; le même écran existe aussi sous le slug createur-d-avatar-onglet-composer-l-avatar.png (variante d'une série antérieure, vérifiée)."
+   },
+   {
+    "ecran": "Créateur d'avatar — onglet « Utiliser ma photo »",
+    "slug": "createur-davatar-onglet-utiliser-ma-photo",
+    "fichier": "/Users/beauty/Desktop/GLOW/GIT-APP-V2/docs/captures/profil-compte/createur-davatar-onglet-utiliser-ma-photo.png",
+    "ce_quon_voit": "Onglet Utiliser ma photo actif : zone en pointillés « Téléverser une photo de visage » avec le texte explicatif (recadrage carré, réduction dans le navigateur, ne quitte pas l'appareil), bouton Parcourir mes fichiers, puis Valider les modifications ; existe aussi sous le slug createur-d-avatar-onglet-utiliser-ma-photo.png."
+   },
+   {
+    "ecran": "Bloc « Le Miroir de GLP1LOW » et message de remerciement",
+    "slug": "bloc-le-miroir-de-glp1low-et-message-de-remerciement",
+    "fichier": "/Users/beauty/Desktop/GLOW/GIT-APP-V2/docs/captures/profil-compte/bloc-le-miroir-de-glp1low-et-message-de-remerciement.png",
+    "ce_quon_voit": "Bas de Mon Profil : carte-titre « Le Miroir de GLOW », le miroir SVG argenté « You Are Beautiful », le bloc « Thank you for trusting GLOW — Together we all can make it happen », puis la carte-lien Mes préférences de compte et le bouton Info Santé & Confidentialité."
+   },
+   {
+    "ecran": "Lien « Mes préférences de compte »",
+    "slug": "lien-mes-preferences-de-compte",
+    "fichier": "/Users/beauty/Desktop/GLOW/GIT-APP-V2/docs/captures/profil-compte/lien-mes-preferences-de-compte.png",
+    "ce_quon_voit": "Bas de page de Mon Profil, tout en bas du défilement : la carte blanche portant le lien souligné « Mes préférences de compte » sous le miroir et le message de remerciement."
+   },
+   {
+    "ecran": "Page « Mon compte »",
+    "slug": "page-mon-compte",
+    "fichier": "/Users/beauty/Desktop/GLOW/GIT-APP-V2/docs/captures/profil-compte/page-mon-compte.png",
+    "ce_quon_voit": "Page « Mon compte » atteinte par le lien du bas de Mon Profil : sections Mon abonnement (« GLOW ne propose aucun abonnement pour l'instant. » + deux paragraphes), Moyens de paiement (« Aucun moyen de paiement n'est enregistré. »), Factures et reçus (« Il n'y a aucune facture… » + renvoi au rapport médical) et le haut du bloc Supprimer mon compte."
+   },
+   {
+    "ecran": "Bloc « Supprimer mon compte »",
+    "slug": "bloc-supprimer-mon-compte",
+    "fichier": "/Users/beauty/Desktop/GLOW/GIT-APP-V2/docs/captures/profil-compte/bloc-supprimer-mon-compte.png",
+    "ce_quon_voit": "État de repos du bloc, en bas de Mon compte : titre avec triangle d'alerte, phrase « Vous pouvez fermer votre compte et effacer tout ce que l'application a enregistré sur cet appareil. » et le bouton « Supprimer mon compte et mes données »."
+   },
+   {
+    "ecran": "Bloc « Supprimer mon compte »",
+    "slug": "bloc-supprimer-mon-compte-confirmation",
+    "fichier": "/Users/beauty/Desktop/GLOW/GIT-APP-V2/docs/captures/profil-compte/bloc-supprimer-mon-compte-confirmation.png",
+    "ce_quon_voit": "État de confirmation après le premier bouton : « Prenez un instant avant de confirmer. », les trois puces (compte n'existera plus ; tout le suivi effacé : balance, menus, injections ou comprimés… ; rien gardé en réserve), le conseil pause/export, les boutons « Supprimer définitivement » et « Annuler » et la croix ; rien n'a été supprimé (Annuler cliqué ensuite)."
+   },
+   {
+    "ecran": "Page « Modules »",
+    "slug": "page-modules",
+    "fichier": "/Users/beauty/Desktop/GLOW/GIT-APP-V2/docs/captures/profil-compte/page-modules.png",
+    "ce_quon_voit": "Page Modules avec la phrase « Activez ici les modules que vous souhaitez utiliser. » et les 7 cartes Injections, Effets secondaires, Repas et en-cas, Nombre de pas, Activité physique, Un temps pour soi, Sommeil, toutes « Activé » avec leur interrupteur allumé (données de la graine)."
+   },
+   {
+    "ecran": "Page « Modules »",
+    "slug": "page-modules-module-desactive",
+    "fichier": "/Users/beauty/Desktop/GLOW/GIT-APP-V2/docs/captures/profil-compte/page-modules-module-desactive.png",
+    "ce_quon_voit": "Même page après avoir éteint Sommeil par son interrupteur : la carte passe « Désactivé », grisée, et la case « Masquer dans l'application. » apparaît dessous ; l'icône Sommeil a quitté le menu du bas."
+   },
+   {
+    "ecran": "Page « Notifications »",
+    "slug": "page-notifications",
+    "fichier": "/Users/beauty/Desktop/GLOW/GIT-APP-V2/docs/captures/profil-compte/page-notifications.png",
+    "ce_quon_voit": "Page Notifications telle que semée : titre, phrase « Le rappel de votre traitement et la notification de votre rendez-vous médecin. », cartes Injections et Prochain rendez-vous médical toutes deux « Rappels désactivés », repliées."
+   },
+   {
+    "ecran": "Page « Notifications »",
+    "slug": "page-notifications-rappels-actives",
+    "fichier": "/Users/beauty/Desktop/GLOW/GIT-APP-V2/docs/captures/profil-compte/page-notifications-rappels-actives.png",
+    "ce_quon_voit": "Les deux rappels basculés sur activé : carte Injections dépliée (Type de planification Hebdomadaire (Jour fixe) / Personnalisé, Jour de rappel Dimanche, Heure de rappel 20:00) et carte Prochain rendez-vous médical dépliée (Nom du Dr. ou spécialiste vide, « 1 jour avant », Date du rendez-vous JJ/MM/AAAA, Heure 10:00)."
+   },
+   {
+    "ecran": "Page « Avis et Feedback » — formulaire",
+    "slug": "page-avis-et-feedback-formulaire",
+    "fichier": "/Users/beauty/Desktop/GLOW/GIT-APP-V2/docs/captures/profil-compte/page-avis-et-feedback-formulaire.png",
+    "ce_quon_voit": "Formulaire vierge : Votre ressenti global (Content sélectionné / Neutre / Pas content), Que souhaitez-vous partager ? (Avis sélectionné / Idée / Bug), zone « Votre message / commentaire » avec son placeholder, case de consentement décochée et bouton Envoyer mon message."
+   },
+   {
+    "ecran": "Page « Avis et Feedback » — formulaire",
+    "slug": "page-avis-et-feedback-formulaire-bug",
+    "fichier": "/Users/beauty/Desktop/GLOW/GIT-APP-V2/docs/captures/profil-compte/page-avis-et-feedback-formulaire-bug.png",
+    "ce_quon_voit": "Même formulaire avec le type Bug choisi : apparition du sélecteur « Section concernée par le bug » (Sélectionner une catégorie) et de la zone « Description du problème / bug rencontré » avec son placeholder propre."
+   },
+   {
+    "ecran": "Page « Avis et Feedback » — « Vos messages récents (N) »",
+    "slug": "page-avis-et-feedback-vos-messages-recents-n",
+    "fichier": "/Users/beauty/Desktop/GLOW/GIT-APP-V2/docs/captures/profil-compte/page-avis-et-feedback-vos-messages-recents-n.png",
+    "ce_quon_voit": "Bloc « Vos messages récents (2) » sous le formulaire, après deux envois faits par le formulaire lui-même : « Idée » (« Un rappel pour boire de l'eau dans la journée. ») et « Avis : Content » (« Merci pour l'application, le suivi des pesées m'aide beaucoup. »), chacun daté 12 sept. 2026, 23:18 avec sa corbeille ; ces deux textes sont les seules données saisies par moi."
+   },
+   {
+    "ecran": "Page « Sondage » — formulaire",
+    "slug": "page-sondage-formulaire",
+    "fichier": "/Users/beauty/Desktop/GLOW/GIT-APP-V2/docs/captures/profil-compte/page-sondage-formulaire.png",
+    "ce_quon_voit": "Haut du sondage vierge : « Nous construisons l'avenir de votre application ensemble », la question et la consigne 0 à 5, puis les propositions Album photos silhouette, Album photos repas et en-cas, Porte-monnaie traitement, Journal de bord émotionnel, Suivi hydratation, Rendre public votre journal GLOW avec leur curseur à 0 (« 0 — Pas intéressé »)."
+   },
+   {
+    "ecran": "Page « Sondage » — formulaire",
+    "slug": "page-sondage-formulaire-bas",
+    "fichier": "/Users/beauty/Desktop/GLOW/GIT-APP-V2/docs/captures/profil-compte/page-sondage-formulaire-bas.png",
+    "ce_quon_voit": "Bas du sondage vierge : Suivi hydratation, Rendre public votre journal GLOW, Version imprimable en format livre à 0, la zone « Autres suggestions » avec son placeholder et le bouton Valider mes réponses."
+   },
+   {
+    "ecran": "Page « Sondage » — formulaire",
+    "slug": "page-sondage-formulaire-rempli",
+    "fichier": "/Users/beauty/Desktop/GLOW/GIT-APP-V2/docs/captures/profil-compte/page-sondage-formulaire-rempli.png",
+    "ce_quon_voit": "Haut du sondage après déplacement des curseurs : libellés de note 4 — Très utile, 3 — Intéressé, 5 — Indispensable !, 2 — Pourquoi pas, 4 — Très utile, avec les curseurs déplacés et colorés en conséquence."
+   },
+   {
+    "ecran": "Page « Sondage » — écran de remerciement",
+    "slug": "page-sondage-ecran-de-remerciement",
+    "fichier": "/Users/beauty/Desktop/GLOW/GIT-APP-V2/docs/captures/profil-compte/page-sondage-ecran-de-remerciement.png",
+    "ce_quon_voit": "Après Valider : carte au cœur « Merci pour votre participation ! », « Nous lisons chaque retour et adapterons les développements de l'application en fonction de vos réponses. » et le bouton Modifier mes réponses."
+   },
+   {
+    "ecran": "Page « FAQ »",
+    "slug": "page-faq",
+    "fichier": "/Users/beauty/Desktop/GLOW/GIT-APP-V2/docs/captures/profil-compte/page-faq.png",
+    "ce_quon_voit": "Page FAQ tout refermée : phrase d'intro et les 6 questions (niveau sanguin actif, où sont stockées mes données, modifier/supprimer une entrée de journal, activer repas/pas/activité, à quoi servent les badges, partager une idée ou signaler un problème) avec leur chevron."
+   },
+   {
+    "ecran": "Page « FAQ »",
+    "slug": "page-faq-reponse-ouverte",
+    "fichier": "/Users/beauty/Desktop/GLOW/GIT-APP-V2/docs/captures/profil-compte/page-faq-reponse-ouverte.png",
+    "ce_quon_voit": "Première question dépliée : la réponse sur l'estimation fondée sur la pharmacocinétique de la molécule et l'historique d'injections (« elle donne une tendance, pas une mesure médicale »), les cinq autres restant fermées."
+   },
+   {
+    "ecran": "Page « Information Médicale » / « Avertissement Médical »",
+    "slug": "page-information-medicale-avertissement-medical",
+    "fichier": "/Users/beauty/Desktop/GLOW/GIT-APP-V2/docs/captures/profil-compte/page-information-medicale-avertissement-medical.png",
+    "ce_quon_voit": "Page hors premier lancement (titre « Avertissement médical », sous-titre « Vie privée, sécurité & cadre clinique »), ouverte par le bouton de pied de page depuis la FAQ, onglet Cadre par défaut : bannière « Carnet personnel - Aucun conseil ni prescription », 1. Suivi personnel uniquement, 2. Pas d'auto-médication, 3. Conduite en cas d'urgence (15 / 112), pied « Données 100 % locales » et bouton Fermer ; copie identique à la variante -cadre."
+   },
+   {
+    "ecran": "Page « Information Médicale » / « Avertissement Médical »",
+    "slug": "page-information-medicale-avertissement-medical-cadre",
+    "fichier": "/Users/beauty/Desktop/GLOW/GIT-APP-V2/docs/captures/profil-compte/page-information-medicale-avertissement-medical-cadre.png",
+    "ce_quon_voit": "Onglet Cadre de l'Avertissement médical (même vue que le fichier de base) avec la croix de fermeture en haut à droite."
+   },
+   {
+    "ecran": "Page « Information Médicale » / « Avertissement Médical »",
+    "slug": "page-information-medicale-avertissement-medical-vie-privee",
+    "fichier": "/Users/beauty/Desktop/GLOW/GIT-APP-V2/docs/captures/profil-compte/page-information-medicale-avertissement-medical-vie-privee.png",
+    "ce_quon_voit": "Onglet Vie Privée : bannière « Données 100% locales & souveraines », 1. Stockage local (Local Storage) avec la mention de l'hébergement Google (Firebase) et de l'e-mail seul connu, 2. Zéro revente ni traçage (Google pour la connexion, Open Food Facts pour le scan), 3. Droit d'effacement."
+   },
+   {
+    "ecran": "Page « Information Médicale » / « Avertissement Médical »",
+    "slug": "page-information-medicale-avertissement-medical-securite",
+    "fichier": "/Users/beauty/Desktop/GLOW/GIT-APP-V2/docs/captures/profil-compte/page-information-medicale-avertissement-medical-securite.png",
+    "ce_quon_voit": "Onglet Sécurité : bannière « Vos données restent sur votre appareil », Stockage sur votre appareil (At Rest), Chiffrement en transit (In Transit), bloc Minimisation des Données (badge Sovereign) avec Symptômes & Effets et Traitements & Doses marqués Local."
+   },
+   {
+    "ecran": "Page « Information Médicale » / « Avertissement Médical »",
+    "slug": "page-information-medicale-avertissement-medical-premier-lancement",
+    "fichier": "/Users/beauty/Desktop/GLOW/GIT-APP-V2/docs/captures/profil-compte/page-information-medicale-avertissement-medical-premier-lancement.png",
+    "ce_quon_voit": "Premier lancement (graine sans hasAcceptedMedicalDisclaimer_v1) : titre « Information médicale », pas de croix, onglet Cadre, puis la case d'attestation « J'atteste avoir lu que cette application est un outil de suivi personnel… » décochée et le bouton « J'accepte et j'accède » grisé ; la page occupe seule l'écran sous le bandeau de l'accueil."
+   },
+   {
+    "ecran": "Bouton avatar du header",
+    "slug": "bouton-avatar-du-header",
+    "fichier": "/Users/beauty/Desktop/GLOW/GIT-APP-V2/docs/captures/profil-compte/bouton-avatar-du-header.png",
+    "ce_quon_voit": "Accueil de Camille (Nostalgic) : l'avatar rond en haut à droite du header, 32 px, title « Configuration », qui ouvre Mon Profil ; le reste de l'écran est la home (Salut Camille, dernière perte, aujourd'hui…)."
+   }
+  ],
+  "non_capturables": [
+   {
+    "ecran": "Page de connexion",
+    "pourquoi": "Le banc désarme volontairement le verrou Firebase (apiKey vidée dans rig-v1) : AuthGate laisse passer sans jamais rendre LoginPage. L'afficher exigerait une configuration Firebase réelle, ce que le banc interdit."
+   },
+   {
+    "ecran": "Écran d'attente de session",
+    "pourquoi": "Même cause : sans configuration Firebase, auth.status ne passe jamais par 'loading', l'écran (un point animé, sans donnée) n'existe pas sur le banc."
+   }
+  ]
+ },
+ {
+  "domaine": "traitement",
+  "captures": [
+   {
+    "ecran": "Page « Injections » / « Comprimés »",
+    "slug": "page-injections-comprimes",
+    "fichier": "/Users/beauty/Desktop/GLOW/GIT-APP-V2/docs/captures/traitement/page-injections-comprimes.png",
+    "ce_quon_voit": "La page « Injections » à l'arrivée : lien souligné « Indiquer un changement de traitement », curseur Calendrier/Journal (calendrier actif) avec « + AJOUTER », calendrier de septembre 2026 (1.7 les jeudis 3 et 10, le 12 surligné), puis le bloc « Niveau sanguin actif » Ozempic, En direct 3.503 mg, dernier pic il y a 20 h."
+   },
+   {
+    "ecran": "Page « Injections » / « Comprimés »",
+    "slug": "page-injections-comprimes-journal",
+    "fichier": "/Users/beauty/Desktop/GLOW/GIT-APP-V2/docs/captures/traitement/page-injections-comprimes-journal.png",
+    "ce_quon_voit": "La même page en vue Journal : carte « JOURNAL (4) » du 14/08/2026 à aujourd'hui avec les lignes 1.7 mg Ozempic (Bras Gauche 10/09 09:45, Cuisse Droite 03/09 09:10, Cuisse Gauche 27/08 08:30), puis le graphe du niveau sanguin actif."
+   },
+   {
+    "ecran": "Bloc de suivi des prises (InjectionTracker)",
+    "slug": "bloc-de-suivi-des-prises-injectiontracker",
+    "fichier": "/Users/beauty/Desktop/GLOW/GIT-APP-V2/docs/captures/traitement/bloc-de-suivi-des-prises-injectiontracker.png",
+    "ce_quon_voit": "Le haut de la page Injections : bouton de changement de traitement, ligne d'outils Calendrier/Journal + ajouter, et le calendrier de septembre 2026 (vue par défaut)."
+   },
+   {
+    "ecran": "Bloc de suivi des prises (InjectionTracker)",
+    "slug": "bloc-de-suivi-des-prises-injectiontracker-calendrier",
+    "fichier": "/Users/beauty/Desktop/GLOW/GIT-APP-V2/docs/captures/traitement/bloc-de-suivi-des-prises-injectiontracker-calendrier.png",
+    "ce_quon_voit": "Le bloc de suivi en vue Calendrier (identique à la page d'arrivée) : tuiles des jours avec la dose 1.7 les 3 et 10 septembre, tiret pour les jours sans prise, unité (mg) sous le mois."
+   },
+   {
+    "ecran": "Bloc de suivi des prises (InjectionTracker)",
+    "slug": "bloc-de-suivi-des-prises-injectiontracker-journal",
+    "fichier": "/Users/beauty/Desktop/GLOW/GIT-APP-V2/docs/captures/traitement/bloc-de-suivi-des-prises-injectiontracker-journal.png",
+    "ce_quon_voit": "Le bloc de suivi en vue Journal : bandeau « JOURNAL (4) » avec bornes de période éditables, icône calendrier et poubelle « Tout supprimer », trois lignes de prises Ozempic 1.7 mg visibles (liste défilante)."
+   },
+   {
+    "ecran": "Formulaire « Nouvelle injection » / « Nouvelle prise de comprimé » / « Modifier l'injection » / « Modifier la prise »",
+    "slug": "formulaire-nouvelle-injection-nouvelle-prise-de-comprime-mod",
+    "fichier": "/Users/beauty/Desktop/GLOW/GIT-APP-V2/docs/captures/traitement/formulaire-nouvelle-injection-nouvelle-prise-de-comprime-mod.png",
+    "ce_quon_voit": "Le formulaire « NOUVELLE INJECTION Ozempic » ouvert par « + ajouter » avec ses valeurs par défaut : date 12/09/2026, heure 23:20, zone proposée « Bras Droit », dose « 0.25 mg (Initiation) », lien « Autre dose », « + Notes », bouton VALIDER ; le reste de la page est flouté derrière. (Camille étant sous Ozempic, les variantes « prise de comprimé » ne s'affichent pas.)"
+   },
+   {
+    "ecran": "Formulaire « Nouvelle injection » / « Nouvelle prise de comprimé » / « Modifier l'injection » / « Modifier la prise »",
+    "slug": "formulaire-nouvelle-injection-nouvelle-prise-de-comprime-mod-modifier",
+    "fichier": "/Users/beauty/Desktop/GLOW/GIT-APP-V2/docs/captures/traitement/formulaire-nouvelle-injection-nouvelle-prise-de-comprime-mod-modifier.png",
+    "ce_quon_voit": "Le même formulaire en mode « MODIFIER L'INJECTION Ozempic », ouvert depuis « Modifier » d'une ligne du journal : 10/09/2026, 09:45, Bras Gauche, 1.7 mg, bouton « METTRE À JOUR L'INJECTION »."
+   },
+   {
+    "ecran": "Sélecteur de dose (DoseSelector)",
+    "slug": "selecteur-de-dose-doseselector",
+    "fichier": "/Users/beauty/Desktop/GLOW/GIT-APP-V2/docs/captures/traitement/selecteur-de-dose-doseselector.png",
+    "ce_quon_voit": "Dans le formulaire de prise, le sélecteur de dose replié sur le palier par défaut « 0.25 mg (Initiation) » (liste native, non dessinée en capture) et le lien « Autre dose » dessous."
+   },
+   {
+    "ecran": "Sélecteur de dose (DoseSelector)",
+    "slug": "selecteur-de-dose-doseselector-autre-dose",
+    "fichier": "/Users/beauty/Desktop/GLOW/GIT-APP-V2/docs/captures/traitement/selecteur-de-dose-doseselector-autre-dose.png",
+    "ce_quon_voit": "Après « Autre dose » : le champ libre « Autre dose de GLP-1 (mg) » prend la place du palier (curseur dedans), et le lien devient « Préréglages » pour revenir aux paliers."
+   },
+   {
+    "ecran": "Bloc « Indiquer un changement de traitement » (ChangeTreatmentBlock)",
+    "slug": "bloc-indiquer-un-changement-de-traitement-changetreatmentblo",
+    "fichier": "/Users/beauty/Desktop/GLOW/GIT-APP-V2/docs/captures/traitement/bloc-indiquer-un-changement-de-traitement-changetreatmentblo.png",
+    "ce_quon_voit": "La carte « INDIQUER UN CHANGEMENT DE TRAITEMENT » ouverte dans le flux sous le lien souligné : phrase d'explication, champ « MÉDICAMENT / TRAITEMENT » affichant « Ozempic (Sémaglutide) », croix de fermeture ; le journal reste visible dessous."
+   },
+   {
+    "ecran": "Sélecteur de traitement (TreatmentSelect)",
+    "slug": "selecteur-de-traitement-treatmentselect",
+    "fichier": "/Users/beauty/Desktop/GLOW/GIT-APP-V2/docs/captures/traitement/selecteur-de-traitement-treatmentselect.png",
+    "ce_quon_voit": "La liste maison du catalogue dépliée dans le bloc de changement : groupe « STYLOS INJECTABLES » avec Ozempic (sélectionné), Wegovy, Mounjaro, Zepbound, Saxenda… chacun avec le picto seringue."
+   },
+   {
+    "ecran": "Sélecteur de traitement (TreatmentSelect)",
+    "slug": "selecteur-de-traitement-treatmentselect-suite",
+    "fichier": "/Users/beauty/Desktop/GLOW/GIT-APP-V2/docs/captures/traitement/selecteur-de-traitement-treatmentselect-suite.png",
+    "ce_quon_voit": "La même liste défilée en bas : groupe « COMPRIMÉS ORAUX » (Rybelsus, Wegovy oral, Foundayo, Autre traitement comprimé) et l'entrée « Pas de traitement / Aucun »."
+   },
+   {
+    "ecran": "Ligne du journal (JournalEntryCard)",
+    "slug": "ligne-du-journal-journalentrycard",
+    "fichier": "/Users/beauty/Desktop/GLOW/GIT-APP-V2/docs/captures/traitement/ligne-du-journal-journalentrycard.png",
+    "ce_quon_voit": "Les lignes du journal : dose en bleu (1.7 mg), traitement Ozempic avec picto, zone en italique (Bras Gauche…), date, heure et bouton « … » (Plus d'options) par ligne."
+   },
+   {
+    "ecran": "Ligne du journal (JournalEntryCard)",
+    "slug": "ligne-du-journal-journalentrycard-menu",
+    "fichier": "/Users/beauty/Desktop/GLOW/GIT-APP-V2/docs/captures/traitement/ligne-du-journal-journalentrycard-menu.png",
+    "ce_quon_voit": "Le menu « … » d'une ligne ouvert : « Modifier » et « Supprimer » sous la ligne du 10/09/2026."
+   },
+   {
+    "ecran": "Calendrier des prises (InjectionCalendar sur CalendarBlock)",
+    "slug": "calendrier-des-prises-injectioncalendar-sur-calendarblock",
+    "fichier": "/Users/beauty/Desktop/GLOW/GIT-APP-V2/docs/captures/traitement/calendrier-des-prises-injectioncalendar-sur-calendarblock.png",
+    "ce_quon_voit": "Le calendrier « SEPTEMBRE 2026 (mg) » avec flèches mois précédent/suivant, tuiles des jours portant la dose 1.7 (jeudis 3 et 10) ou un tiret, le 12 (aujourd'hui) surligné."
+   },
+   {
+    "ecran": "Calendrier des prises (InjectionCalendar sur CalendarBlock)",
+    "slug": "calendrier-des-prises-injectioncalendar-sur-calendarblock-bulle",
+    "fichier": "/Users/beauty/Desktop/GLOW/GIT-APP-V2/docs/captures/traitement/calendrier-des-prises-injectioncalendar-sur-calendarblock-bulle.png",
+    "ce_quon_voit": "La bulle de détail du 10 septembre (tuile encadrée) : TRAITEMENT Ozempic, DOSE 1.7 mg, ZONE Bras Gauche, DATE 10/09/2026, HEURE 09:45, actions MODIFIER / SUPPRIMER et « + AJOUTER UN ENREGISTREMENT »."
+   },
+   {
+    "ecran": "Niveau sanguin actif (BloodLevelPlot)",
+    "slug": "niveau-sanguin-actif-bloodlevelplot",
+    "fichier": "/Users/beauty/Desktop/GLOW/GIT-APP-V2/docs/captures/traitement/niveau-sanguin-actif-bloodlevelplot.png",
+    "ce_quon_voit": "La section « NIVEAU SANGUIN ACTIF » du 14/08/2026 à aujourd'hui : carte Ozempic avec « EN DIRECT : 3.503 mg », « dernier pic il y a 20 h* », la courbe en dents de scie (max 4.15) avec les points d'injection, la légende, la note d'estimation, puis les deux accordéons repliés."
+   },
+   {
+    "ecran": "Niveau sanguin actif (BloodLevelPlot)",
+    "slug": "niveau-sanguin-actif-bloodlevelplot-surimpression",
+    "fichier": "/Users/beauty/Desktop/GLOW/GIT-APP-V2/docs/captures/traitement/niveau-sanguin-actif-bloodlevelplot-surimpression.png",
+    "ce_quon_voit": "La même section en surimpression vitrée sur la home sections (ouverte depuis la tuile « En direct ») : carte « NIVEAU SANGUIN ACTIF » avec période, En direct 3.502 mg, courbe, accordéons repliés et lien « Voir la page »."
+   },
+   {
+    "ecran": "Graphe « Niveau Sanguin Actif » (MoleculeConcentrationChart)",
+    "slug": "graphe-niveau-sanguin-actif-moleculeconcentrationchart",
+    "fichier": "/Users/beauty/Desktop/GLOW/GIT-APP-V2/docs/captures/traitement/graphe-niveau-sanguin-actif-moleculeconcentrationchart.png",
+    "ce_quon_voit": "La courbe cumulée d'Ozempic du 14/08 au 20/09 : cinq pics hebdomadaires entre 2 et 4.15 mg, points d'injection sur les creux, encart « EN DIRECT : 3.503 mg », phrase du pic « dernier pic il y a 20 h* »."
+   },
+   {
+    "ecran": "Graphe « Niveau Sanguin Actif » (MoleculeConcentrationChart)",
+    "slug": "graphe-niveau-sanguin-actif-moleculeconcentrationchart-infobulle",
+    "fichier": "/Users/beauty/Desktop/GLOW/GIT-APP-V2/docs/captures/traitement/graphe-niveau-sanguin-actif-moleculeconcentrationchart-infobulle.png",
+    "ce_quon_voit": "Après un clic sur la courbe : curseur pointillé et infobulle refermable « mar. 1 sept. 15:00 — Actif : 2.731 mg »."
+   },
+   {
+    "ecran": "Accordéon « Évolution du niveau sanguin »",
+    "slug": "accordeon-evolution-du-niveau-sanguin",
+    "fichier": "/Users/beauty/Desktop/GLOW/GIT-APP-V2/docs/captures/traitement/accordeon-evolution-du-niveau-sanguin.png",
+    "ce_quon_voit": "L'accordéon ouvert « ÉVOLUTION DU NIVEAU SANGUIN — Ozempic · demi-vie : 7 jours » : question « Pourquoi la courbe varie… » puis les paragraphes « Le pic (entre le 1er et le 3e jour) », « La demi-vie (7 jours) », « Entre deux injections (une fois par semaine) », « Le cumul des doses (équilibre après ~4 semaines) »."
+   },
+   {
+    "ecran": "Accordéon « Comprendre vos sensations physiologiques »",
+    "slug": "accordeon-comprendre-vos-sensations-physiologiques",
+    "fichier": "/Users/beauty/Desktop/GLOW/GIT-APP-V2/docs/captures/traitement/accordeon-comprendre-vos-sensations-physiologiques.png",
+    "ce_quon_voit": "L'accordéon ouvert « COMPRENDRE VOS SENSATIONS PHYSIOLOGIQUES — Ozempic · demi-vie : 7 jours » avec ses trois phases : « Pics de concentration (jours 1 à 3) », « Phase d'élimination (jours 5 à 7) », « État d'équilibre (steady state après ~4 semaines) » ; la fin de l'accordéon précédent est visible au-dessus."
+   },
+   {
+    "ecran": "Tuile « En direct » du niveau sanguin (home sections)",
+    "slug": "tuile-en-direct-du-niveau-sanguin-home-sections",
+    "fichier": "/Users/beauty/Desktop/GLOW/GIT-APP-V2/docs/captures/traitement/tuile-en-direct-du-niveau-sanguin-home-sections.png",
+    "ce_quon_voit": "La home sections, rangée « EN DIRECT » : tuile centrale « 3.5 mg » avec le picto seringue et la mention « niveau sanguin actif », entre les pas (6 940) et le ressenti du jour ; dessous Dynamique, Progrès et le début de « Côte à côte »."
+   },
+   {
+    "ecran": "Carré traitement (home sections et home standard)",
+    "slug": "carre-traitement-home-sections-et-home-standard",
+    "fichier": "/Users/beauty/Desktop/GLOW/GIT-APP-V2/docs/captures/traitement/carre-traitement-home-sections-et-home-standard.png",
+    "ce_quon_voit": "Le carré traitement de la home standard : bandeau « SEMAINE N° 18 (121 jours) — Dernière (seringue) il y a 2 jours », INITIAL 0.25 mg, ACTUEL 1.7 mg (smiley vert, « pas ou très peu d'effet secondaire aujourd'hui »), ACTIF 3.5 mg, ligne « Ozempic · 17 injections · 16.95mg cumulé ». (Les homes sections et blocs n'affichent pas ce carré avec ces données ; la home sections montre « Côte à côte » à la place.)"
+   },
+   {
+    "ecran": "« Côte à côte » — mini-tuiles Début / Actuel du dosage",
+    "slug": "cote-a-cote-mini-tuiles-debut-actuel-du-dosage",
+    "fichier": "/Users/beauty/Desktop/GLOW/GIT-APP-V2/docs/captures/traitement/cote-a-cote-mini-tuiles-debut-actuel-du-dosage.png",
+    "ce_quon_voit": "La section « CÔTE À CÔTE » de la home sections, colonnes DÉBUT / AUJOURD'HUI : première rangée dosage « 0.25 mg Ozempic » | médaillon seringue | « 1.7 mg Ozempic », liens « Ajouter une entrée » et « Voir la page Injections » ; dessous les rangées poids (96 kg | 85.9 kg), repas, pas, sommeil."
+   },
+   {
+    "ecran": "Surimpression « L'escalier des doses » (SurimpressionDoses)",
+    "slug": "surimpression-l-escalier-des-doses-surimpressiondoses",
+    "fichier": "/Users/beauty/Desktop/GLOW/GIT-APP-V2/docs/captures/traitement/surimpression-l-escalier-des-doses-surimpressiondoses.png",
+    "ce_quon_voit": "La surimpression « PALIERS DE DOSE — Parcours de doses · Ozempic » ouverte depuis la tuile Début (premier palier mis en avant) : 14/05 Début à 0.25 mg · 4 semaines · 3 injections · ≈ −0.5 kg/semaine ; 11/06 Passage à 0.5 mg ; 09/07 Passage à 1 mg ; 06/08 Passage à 1.7 mg · en cours depuis 5 semaines · 6 injections ; lien « Voir la page »."
+   },
+   {
+    "ecran": "Surimpression « L'escalier des doses » (SurimpressionDoses)",
+    "slug": "surimpression-lescalier-des-doses-surimpressiondoses",
+    "fichier": "/Users/beauty/Desktop/GLOW/GIT-APP-V2/docs/captures/traitement/surimpression-lescalier-des-doses-surimpressiondoses.png",
+    "ce_quon_voit": "Copie identique de la capture précédente sous la graphie de slug sans tiret pour l'apostrophe (les deux conventions coexistent dans les autres dossiers de captures)."
+   },
+   {
+    "ecran": "Surimpression « L'escalier des doses » (SurimpressionDoses)",
+    "slug": "surimpression-l-escalier-des-doses-surimpressiondoses-actuel",
+    "fichier": "/Users/beauty/Desktop/GLOW/GIT-APP-V2/docs/captures/traitement/surimpression-l-escalier-des-doses-surimpressiondoses-actuel.png",
+    "ce_quon_voit": "La même frise ouverte depuis la tuile Actuel : c'est le dernier palier (06/08, passage à 1.7 mg) qui est surligné."
+   },
+   {
+    "ecran": "Ligne « Cure » du bloc Salut",
+    "slug": "ligne-cure-du-bloc-salut",
+    "fichier": "/Users/beauty/Desktop/GLOW/GIT-APP-V2/docs/captures/traitement/ligne-cure-du-bloc-salut.png",
+    "ce_quon_voit": "Le haut de la home standard avec le bloc « Salut Camille » : −13.9 kg, 42 %, et la ligne « Cure : (seringue) Ozempic • Rappels : Non », médaille Argent à droite."
+   },
+   {
+    "ecran": "Ligne « Cure » du bloc Salut",
+    "slug": "ligne-cure-du-bloc-salut-selecteur",
+    "fichier": "/Users/beauty/Desktop/GLOW/GIT-APP-V2/docs/captures/traitement/ligne-cure-du-bloc-salut-selecteur.png",
+    "ce_quon_voit": "Après un clic sur « Cure : » : le sélecteur de traitement en place, « Ozempic (Sémaglutide) » avec chevron ouvert et la liste « STYLOS INJECTABLES » déroulée par-dessus le bloc suivant (Ozempic, Wegovy, Mounjaro, Zepbound, Saxenda…)."
+   },
+   {
+    "ecran": "« Médicament prescrit » (Mon Profil / ProfileForm)",
+    "slug": "medicament-prescrit-mon-profil-profileform",
+    "fichier": "/Users/beauty/Desktop/GLOW/GIT-APP-V2/docs/captures/traitement/medicament-prescrit-mon-profil-profileform.png",
+    "ce_quon_voit": "La page « MON PROFIL » (ouverte par l'avatar du bandeau) : bloc récapitulatif avec PRÉNOM OU PSEUDO Camille, MÉDICAMENT PRESCRIT Ozempic, ÂGE 48 ans, TAILLE 168 cm, POIDS DE DÉPART 96 kg, OBJECTIF FINAL 72 kg, puis MON AVATAR."
+   },
+   {
+    "ecran": "« Médicament prescrit » (Mon Profil / ProfileForm)",
+    "slug": "medicament-prescrit-mon-profil-profileform-edition",
+    "fichier": "/Users/beauty/Desktop/GLOW/GIT-APP-V2/docs/captures/traitement/medicament-prescrit-mon-profil-profileform-edition.png",
+    "ce_quon_voit": "Après un clic sur la valeur : le champ « MÉDICAMENT PRESCRIT » passe en sélecteur de traitement ouvert (« Ozempic (Sémaglutide) » et la liste STYLOS INJECTABLES déroulée)."
+   },
+   {
+    "ecran": "Module « Injections / Comprimé » et rappels (NotificationsSettings)",
+    "slug": "module-injections-comprime-et-rappels-notificationssettings",
+    "fichier": "/Users/beauty/Desktop/GLOW/GIT-APP-V2/docs/captures/traitement/module-injections-comprime-et-rappels-notificationssettings.png",
+    "ce_quon_voit": "La page « MODULES » (Préférences et raccourcis → Activation Modules) : « Activez ici les modules… », carte « Injections — ACTIVÉ » avec interrupteur en tête, suivie des autres modules tous activés."
+   },
+   {
+    "ecran": "Module « Injections / Comprimé » et rappels (NotificationsSettings)",
+    "slug": "module-injections-comprime-et-rappels-notificationssettings-modules",
+    "fichier": "/Users/beauty/Desktop/GLOW/GIT-APP-V2/docs/captures/traitement/module-injections-comprime-et-rappels-notificationssettings-modules.png",
+    "ce_quon_voit": "La même page Modules (seconde prise, identique à l'œil) avec la carte du module Injections activée."
+   },
+   {
+    "ecran": "Module « Injections / Comprimé » et rappels (NotificationsSettings)",
+    "slug": "module-injections-comprime-et-rappels-notificationssettings-notifications",
+    "fichier": "/Users/beauty/Desktop/GLOW/GIT-APP-V2/docs/captures/traitement/module-injections-comprime-et-rappels-notificationssettings-notifications.png",
+    "ce_quon_voit": "La page « NOTIFICATIONS » telle que semée : cartes « Injections — RAPPELS DÉSACTIVÉS » et « Prochain rendez-vous médical — RAPPELS DÉSACTIVÉS », interrupteurs éteints."
+   },
+   {
+    "ecran": "Module « Injections / Comprimé » et rappels (NotificationsSettings)",
+    "slug": "module-injections-comprime-et-rappels-notificationssettings-notifications-actives",
+    "fichier": "/Users/beauty/Desktop/GLOW/GIT-APP-V2/docs/captures/traitement/module-injections-comprime-et-rappels-notificationssettings-notifications-actives.png",
+    "ce_quon_voit": "Après bascule de l'interrupteur Injections : « RAPPELS ACTIVÉS », TYPE DE PLANIFICATION « Hebdomadaire (Jour fixe) » / « Personnalisé », JOUR DE RAPPEL Dimanche, HEURE DE RAPPEL 20:00."
+   },
+   {
+    "ecran": "Tiroir « Journal » — lignes de traitement",
+    "slug": "tiroir-journal-lignes-de-traitement",
+    "fichier": "/Users/beauty/Desktop/GLOW/GIT-APP-V2/docs/captures/traitement/tiroir-journal-lignes-de-traitement.png",
+    "ce_quon_voit": "Le tiroir « JOURNAL » du menu simplifié (Accueil · Journal · + · Tendances · Menu) : demi-carte « Injections » en haut à gauche avec « 10/09 · 1.7 mg · Ozempic · … », « 03/09 · 1.7 mg · Ozempic · … », « 27/08 · 1.7 mg · Ozempic · … », à côté des cartes Balance, Effets secondaires, Activité, Menus, Sommeil, Un temps pour soi, Pas."
+   },
+   {
+    "ecran": "Tiroir « Journal » — lignes de traitement",
+    "slug": "tiroir-journal-lignes-de-traitement-surimpression",
+    "fichier": "/Users/beauty/Desktop/GLOW/GIT-APP-V2/docs/captures/traitement/tiroir-journal-lignes-de-traitement-surimpression.png",
+    "ce_quon_voit": "Après clic sur la carte Injections : la surimpression « Injections » liste toutes les prises (1.7 mg du 10/09 au 06/08, 1 mg de juillet, 0.5 mg du 02/07…) avec zone, date, heure et « … », et le lien « Ouvrir la page Injections »."
+   },
+   {
+    "ecran": "Défilé des dernières actions (RecentJournalStrip)",
+    "slug": "defile-des-dernieres-actions-recentjournalstrip",
+    "fichier": "/Users/beauty/Desktop/GLOW/GIT-APP-V2/docs/captures/traitement/defile-des-dernieres-actions-recentjournalstrip.png",
+    "ce_quon_voit": "La home standard, sous « AUJOURD'HUI » : le défilé horizontal des dernières entrées avancé jusqu'au carré « 10/09 (seringue) Ozempic 09:45 1.7 mg », entre Déjeuner et Petit-déjeuner."
+   },
+   {
+    "ecran": "Menu « + » de la home — entrée traitement",
+    "slug": "menu-de-la-home-entree-traitement",
+    "fichier": "/Users/beauty/Desktop/GLOW/GIT-APP-V2/docs/captures/traitement/menu-de-la-home-entree-traitement.png",
+    "ce_quon_voit": "Le petit menu du « + » flottant de la home standard (apparu après défilement) déplié : première entrée « Ajouter une injection » avec la seringue, puis Ajouter un poids, un effet secondaire, une activité physique, un repas, un sommeil, un temps pour soi."
+   },
+   {
+    "ecran": "Surimpressions du tiroir Tendances (TrendGraphOverlay)",
+    "slug": "surimpressions-du-tiroir-tendances-trendgraphoverlay-tiroir",
+    "fichier": "/Users/beauty/Desktop/GLOW/GIT-APP-V2/docs/captures/traitement/surimpressions-du-tiroir-tendances-trendgraphoverlay-tiroir.png",
+    "ce_quon_voit": "Le tiroir « TENDANCE DES 15 DERNIERS JOURS » : carte « Actif sanguin » (mini-courbe en dents de scie) en tête, avec Balance, Calories, Activité physique, Temps pour soi, Sommeil, Pas, Effets secondaires."
+   },
+   {
+    "ecran": "Surimpressions du tiroir Tendances (TrendGraphOverlay)",
+    "slug": "surimpressions-du-tiroir-tendances-trendgraphoverlay",
+    "fichier": "/Users/beauty/Desktop/GLOW/GIT-APP-V2/docs/captures/traitement/surimpressions-du-tiroir-tendances-trendgraphoverlay.png",
+    "ce_quon_voit": "La carte « blood » ouverte : surimpression « ACTIF SANGUIN » du 14/08/2026 à aujourd'hui, « Niveau sanguin actif », Ozempic, En direct 3.502 mg, dernier pic il y a 20 h, la courbe, la note, les deux accordéons repliés et « Voir la page »."
+   }
+  ],
+  "non_capturables": [
+   {
+    "ecran": "Carte profil du menu « Configuration & Plus » (PlusMenu)",
+    "pourquoi": "Dans ce build, aucun bouton ne mène à l'onglet « plus » : le bouton « Préférences et raccourcis » du menu du bas ouvre un panneau (Ciel, Activation Modules, Notifications… + Ajout rapide) qui ne contient pas la carte profil ; le rendu de PlusMenu (activeTab === 'plus') n'est atteint que par le retour de la page Administration (exclue)."
+   },
+   {
+    "ecran": "Données de traitement dans l'export PDF (domaine voisin)",
+    "pourquoi": "domaine voisin (rapport médical)."
+   },
+   {
+    "ecran": "Carte de partage « Une injection / prise de comprimé » (domaine voisin)",
+    "pourquoi": "domaine voisin (partages)."
+   }
+  ]
+ },
+ {
+  "domaine": "poids",
+  "captures": [
+   {
+    "ecran": "Page « Balance » (onglet history)",
+    "slug": "page-balance-onglet-history",
+    "fichier": "/Users/beauty/Desktop/GLOW/GIT-APP-V2/docs/captures/poids/page-balance-onglet-history.png",
+    "ce_quon_voit": "La page Balance à l'arrivée (vue calendrier par défaut) : barre d'outils calendrier/journal + AJOUTER, calendrier de septembre 2026 avec les poids du mois (12 → 85.9 surligné), puis le bloc Cadence du 14/08 à aujourd'hui (-2.1 kg / -2.4 %, -0.4 kg/semaine)."
+   },
+   {
+    "ecran": "Page « Balance » (onglet history)",
+    "slug": "page-balance-onglet-history-journal",
+    "fichier": "/Users/beauty/Desktop/GLOW/GIT-APP-V2/docs/captures/poids/page-balance-onglet-history-journal.png",
+    "ce_quon_voit": "La même page en vue Journal : « JOURNAL (6) » du 14/08/2026 à aujourd'hui avec les lignes 85.9 / 86.1 / 86.2 kg, la poubelle Tout supprimer, puis Cadence et le haut de Courbe de poids."
+   },
+   {
+    "ecran": "Formulaire « Nouvelle saisie » / « Modifier la saisie »",
+    "slug": "formulaire-nouvelle-saisie-modifier-la-saisie",
+    "fichier": "/Users/beauty/Desktop/GLOW/GIT-APP-V2/docs/captures/poids/formulaire-nouvelle-saisie-modifier-la-saisie.png",
+    "ce_quon_voit": "Le formulaire « NOUVELLE SAISIE » ouvert par « + ajouter » avec ses valeurs par défaut : date du jour 12/09/2026, heure 19:20, champ « Poids (kg) » vide en focus, bouton « + Ajouter des mensurations », bouton VALIDER, le reste de la page flouté derrière."
+   },
+   {
+    "ecran": "Formulaire « Nouvelle saisie » / « Modifier la saisie »",
+    "slug": "formulaire-nouvelle-saisie-modifier-la-saisie-mensurations",
+    "fichier": "/Users/beauty/Desktop/GLOW/GIT-APP-V2/docs/captures/poids/formulaire-nouvelle-saisie-modifier-la-saisie-mensurations.png",
+    "ce_quon_voit": "Le même formulaire après clic sur « + Ajouter des mensurations » : la grille « SILHOUETTE (CM - FACULTATIF) » avec « Masquer », la note sur le rapport « téléchargeable », et les neuf champs Poitrine, Taille, Hanches, Bras, Sous-poitrine, Fesses, Cuisses, Genoux, Mollets."
+   },
+   {
+    "ecran": "Formulaire « Nouvelle saisie » / « Modifier la saisie »",
+    "slug": "formulaire-nouvelle-saisie-modifier-la-saisie-modifier",
+    "fichier": "/Users/beauty/Desktop/GLOW/GIT-APP-V2/docs/captures/poids/formulaire-nouvelle-saisie-modifier-la-saisie-modifier.png",
+    "ce_quon_voit": "La variante « MODIFIER LA SAISIE » ouverte depuis le menu ⋯ de la ligne du 12/09 : date 12/09/2026, heure 06:40, poids 85.9 prérempli, bouton « METTRE À JOUR LA SAISIE »."
+   },
+   {
+    "ecran": "Carte de confirmation de pesée + équivalences insolites",
+    "slug": "carte-de-confirmation-de-pesee-equivalences-insolites",
+    "fichier": "/Users/beauty/Desktop/GLOW/GIT-APP-V2/docs/captures/poids/carte-de-confirmation-de-pesee-equivalences-insolites.png",
+    "ce_quon_voit": "Après la mise à jour de la saisie du 12/09 : « Votre saisie « 85,9 kg » a bien été mise à jour. », bloc « DERNIÈRE PERTE ENREGISTRÉE -0.2 kg un disque vinyle 33T » avec son dessin, bloc « DEPUIS LE DÉBUT -10.1 kg une flûte à bec et une valise cabine pleine », bouton OK, puis le journal dessous."
+   },
+   {
+    "ecran": "Avis de refus « poids de départ »",
+    "slug": "avis-de-refus-poids-de-depart",
+    "fichier": "/Users/beauty/Desktop/GLOW/GIT-APP-V2/docs/captures/poids/avis-de-refus-poids-de-depart.png",
+    "ce_quon_voit": "Dans le formulaire « MODIFIER LA SAISIE » du poids de départ (96 kg, mensurations 101/91/106), la date a été passée à 30/05/2026 puis validée : l'encadré bleu avec croix « Le poids de départ est le poids le plus ancien connu. Il ne peut pas être ultérieur à un autre poids connu. » apparaît au-dessus du bouton."
+   },
+   {
+    "ecran": "Avis de refus « poids de départ »",
+    "slug": "avis-de-refus-poids-de-depart-ligne-du-journal",
+    "fichier": "/Users/beauty/Desktop/GLOW/GIT-APP-V2/docs/captures/poids/avis-de-refus-poids-de-depart-ligne-du-journal.png",
+    "ce_quon_voit": "Le même avis sous la ligne « 96 kg · Départ · 14/05/2026 · 06:00 » du journal (période Depuis le début) après avoir tapé 30/05/2026 dans la date en place et validé par Entrée : la date est restée au 14/05 et l'encadré de refus s'affiche sous la ligne."
+   },
+   {
+    "ecran": "Barre d'outils de l'historique (curseur Journal / Calendrier + « + ajouter »)",
+    "slug": "barre-d-outils-de-l-historique-curseur-journal-calendrier-aj",
+    "fichier": "/Users/beauty/Desktop/GLOW/GIT-APP-V2/docs/captures/poids/barre-d-outils-de-l-historique-curseur-journal-calendrier-aj.png",
+    "ce_quon_voit": "En tête de la page Balance : le curseur segmenté à deux carreaux (calendrier actif, journal) à gauche et le bouton « + AJOUTER » à droite, au-dessus du calendrier de septembre 2026."
+   },
+   {
+    "ecran": "Journal des pesées",
+    "slug": "journal-des-pesees",
+    "fichier": "/Users/beauty/Desktop/GLOW/GIT-APP-V2/docs/captures/poids/journal-des-pesees.png",
+    "ce_quon_voit": "Le bloc « JOURNAL (6) » sur la période par défaut (du 14/08/2026 à aujourd'hui) : bornes soulignées, icône de sélection de période, poubelle, et les trois premières lignes 85.9 / 86.1 / 86.2 kg avec date, heure et menu ⋯ dans la zone défilante."
+   },
+   {
+    "ecran": "Journal des pesées",
+    "slug": "journal-des-pesees-depuis-le-debut",
+    "fichier": "/Users/beauty/Desktop/GLOW/GIT-APP-V2/docs/captures/poids/journal-des-pesees-depuis-le-debut.png",
+    "ce_quon_voit": "Le journal après choix de la période « Depuis le début » : « JOURNAL (23) », bornes « du début à aujourd'hui », les lignes récentes visibles en tête de la zone défilante."
+   },
+   {
+    "ecran": "Ligne de journal éditable",
+    "slug": "ligne-de-journal-editable",
+    "fichier": "/Users/beauty/Desktop/GLOW/GIT-APP-V2/docs/captures/poids/ligne-de-journal-editable.png",
+    "ce_quon_voit": "Une ligne du journal (85.9 kg · 12/09/2026 · 06:40) avec son menu ⋯ déplié : « Modifier » (crayon) et « Supprimer » (corbeille)."
+   },
+   {
+    "ecran": "Calendrier des poids",
+    "slug": "calendrier-des-poids",
+    "fichier": "/Users/beauty/Desktop/GLOW/GIT-APP-V2/docs/captures/poids/calendrier-des-poids.png",
+    "ce_quon_voit": "La grille de SEPTEMBRE 2026 avec l'unité (kg) sous le mois, chevrons de navigation, une tuile par jour avec le poids (1 → 86.4, 3 → 86.1, 6 → 86.2, 8 → 86.1, 12 → 85.9 surligné) et un tiret pour les jours sans pesée."
+   },
+   {
+    "ecran": "Calendrier des poids",
+    "slug": "calendrier-des-poids-bulle",
+    "fichier": "/Users/beauty/Desktop/GLOW/GIT-APP-V2/docs/captures/poids/calendrier-des-poids-bulle.png",
+    "ce_quon_voit": "La bulle du 12 septembre ouverte sous la tuile : POIDS 85.9 kg, DATE 12/09/2026, HEURE 06:40, boutons MODIFIER et SUPPRIMER, croix de fermeture."
+   },
+   {
+    "ecran": "Calendrier des poids",
+    "slug": "calendrier-des-poids-bulle-depart",
+    "fichier": "/Users/beauty/Desktop/GLOW/GIT-APP-V2/docs/captures/poids/calendrier-des-poids-bulle-depart.png",
+    "ce_quon_voit": "MAI 2026 (chevron précédent grisé, premier mois) et la bulle du 14 mai : mention « POIDS DE DÉPART », POIDS 96 kg, DATE 14/05/2026, HEURE 06:00, seul le bouton MODIFIER (pas de Supprimer)."
+   },
+   {
+    "ecran": "Histogramme « Cadence » (perte par semaine)",
+    "slug": "histogramme-cadence-perte-par-semaine",
+    "fichier": "/Users/beauty/Desktop/GLOW/GIT-APP-V2/docs/captures/poids/histogramme-cadence-perte-par-semaine.png",
+    "ce_quon_voit": "Le bloc CADENCE du 14/08/2026 à aujourd'hui : bilan « -2.1 kg / -2.4 % entre le 14/08 et aujourd'hui », « Perte moyenne par semaine : -0.4 kg », histogramme PERTE PAR SEMAINE (barres bleues 14/08 → 11/09, dernière en pointillé à 0), axe en kg, légende Perte / Prise ; le bloc Courbe de poids commence dessous."
+   },
+   {
+    "ecran": "Histogramme « Cadence » (perte par semaine)",
+    "slug": "histogramme-cadence-perte-par-semaine-depuis-le-debut",
+    "fichier": "/Users/beauty/Desktop/GLOW/GIT-APP-V2/docs/captures/poids/histogramme-cadence-perte-par-semaine-depuis-le-debut.png",
+    "ce_quon_voit": "Le même bloc sur « du début à aujourd'hui » : « -10.1 kg / -10.5 % depuis le début et aujourd'hui », « Perte moyenne par semaine : -0.6 kg », 18 barres hebdomadaires du 21/05 au 10/09 dont une barre magenta de prise (début juillet)."
+   },
+   {
+    "ecran": "Graphe « Courbe de poids »",
+    "slug": "graphe-courbe-de-poids",
+    "fichier": "/Users/beauty/Desktop/GLOW/GIT-APP-V2/docs/captures/poids/graphe-courbe-de-poids.png",
+    "ce_quon_voit": "Le bloc COURBE DE POIDS du 14/08/2026 à aujourd'hui : axe Y 85 à 89 kg, axe X 13/08 → 12/09 en cinq graduations, courbe lissée avec fondu et ronds « Jour de saisie », légende POIDS (KG) / JOUR DE SAISIE ; le « + » flottant en bas à gauche."
+   },
+   {
+    "ecran": "Graphe « Courbe de poids »",
+    "slug": "graphe-courbe-de-poids-depuis-le-debut",
+    "fichier": "/Users/beauty/Desktop/GLOW/GIT-APP-V2/docs/captures/poids/graphe-courbe-de-poids-depuis-le-debut.png",
+    "ce_quon_voit": "La courbe sur « du début à aujourd'hui » : de 96 kg le 12/05 à 85.9 kg le 12/09, axe Y 85 à 97.5 kg par pas de 2.5, dix ronds de saisie répartis, avec le bloc Cadence « depuis le début » au-dessus."
+   },
+   {
+    "ecran": "Surimpression « Balance » (bloc Suivi du poids, variante surimpression)",
+    "slug": "surimpression-balance-bloc-suivi-du-poids-variante-surimpres",
+    "fichier": "/Users/beauty/Desktop/GLOW/GIT-APP-V2/docs/captures/poids/surimpression-balance-bloc-suivi-du-poids-variante-surimpres.png",
+    "ce_quon_voit": "La couche vitrée « BALANCE » ouverte depuis la tuile kg/semaine de la home sections : « 18 SEMAINES (121 jours) », pastille « -0.6 kg / semaine », arc Départ → Objectif « −24 kg / −25 % », rangée DÉPART 96 kg / ACTUEL 85.9 kg / OBJECTIF 72 kg, IMC 34 / 30.4 / 25.5, pastille « IMC : −3.6 », arc parcouru « −10.1 kg / −10.5 % », arc pointillé « −13.9 kg / −14.5 % », lien « Voir la page »."
+   },
+   {
+    "ecran": "Carré poids de la home standard (« Semaine n° N »)",
+    "slug": "carre-poids-de-la-home-standard-semaine-n-n",
+    "fichier": "/Users/beauty/Desktop/GLOW/GIT-APP-V2/docs/captures/poids/carre-poids-de-la-home-standard-semaine-n-n.png",
+    "ce_quon_voit": "Sur la home standard, le carré « SEMAINE N° 18 (121 jours) · ≈ -0.6 kg / semaine » : arc fléché « −24 kg / −25 % », DÉPART 96 kg, ACTUEL 85.9 kg, OBJECTIF 72 kg, « -10.5 % poids de départ », ligne « IMC : ••.• » masquée avec l'œil « Afficher » ; le carré traitement et Mes pas dessous."
+   },
+   {
+    "ecran": "Carré poids de la home standard (« Semaine n° N »)",
+    "slug": "carre-poids-de-la-home-standard-semaine-n-n-imc-affiche",
+    "fichier": "/Users/beauty/Desktop/GLOW/GIT-APP-V2/docs/captures/poids/carre-poids-de-la-home-standard-semaine-n-n-imc-affiche.png",
+    "ce_quon_voit": "Le même carré après clic sur l'œil : la ligne révèle « IMC : 30.4 Obésité I » (non cliquable : même palier qu'au départ) et l'œil barré pour masquer."
+   },
+   {
+    "ecran": "Tuiles d'équivalence insolite de la home standard (« Depuis le début », « dernière perte enregistrée »)",
+    "slug": "tuiles-d-equivalence-insolite-de-la-home-standard-depuis-le",
+    "fichier": "/Users/beauty/Desktop/GLOW/GIT-APP-V2/docs/captures/poids/tuiles-d-equivalence-insolite-de-la-home-standard-depuis-le.png",
+    "ce_quon_voit": "La tuile « DEPUIS LE DÉBUT » de la home standard : dessin flûte + valise, « -10.1 kg », « une flûte à bec et une valise cabine pleine », sous le défilé des dernières entrées et au-dessus du carré poids (la tuile « DERNIÈRE PERTE ENREGISTRÉE -0.2 kg un disque vinyle 33T » est visible sur la capture du bloc Salut)."
+   },
+   {
+    "ecran": "Rangée « Progrès » / « Évolution » de la home sections",
+    "slug": "rangee-progres-evolution-de-la-home-sections",
+    "fichier": "/Users/beauty/Desktop/GLOW/GIT-APP-V2/docs/captures/poids/rangee-progres-evolution-de-la-home-sections.png",
+    "ce_quon_voit": "La section PROGRÈS de la home sections avec ses quatre mini-tuiles : « ≈ −0.6 kg /semaine » (balance), « -3.6 points d'IMC » (jauge), « -10.1 kg en 17 semaines » avec flûte et valise, « -0.2 kg en 4 jours » avec le vinyle ; la section CÔTE À CÔTE suit."
+   },
+   {
+    "ecran": "Sous-section « début | aujourd'hui » — poids (home sections)",
+    "slug": "sous-section-debut-aujourd-hui-poids-home-sections",
+    "fichier": "/Users/beauty/Desktop/GLOW/GIT-APP-V2/docs/captures/poids/sous-section-debut-aujourd-hui-poids-home-sections.png",
+    "ce_quon_voit": "Dans CÔTE À CÔTE (DÉBUT | AUJOURD'HUI) de la home sections, la paire poids : « 96 kg » à gauche, picto balance au centre, « 85.9 kg » à droite, pied « Ajouter une entrée » et « Voir la page Balance », entre la paire injections et la paire repas."
+   },
+   {
+    "ecran": "Bloc « Salut » — objectif de poids et barre de progression",
+    "slug": "bloc-salut-objectif-de-poids-et-barre-de-progression",
+    "fichier": "/Users/beauty/Desktop/GLOW/GIT-APP-V2/docs/captures/poids/bloc-salut-objectif-de-poids-et-barre-de-progression.png",
+    "ce_quon_voit": "En tête de la home standard : « Salut Camille », cible « -13.9 kg » (reste à perdre), « 42% » posé au-dessus du point d'arrêt de la barre de progression, « Cure : Ozempic • Rappels : Non », badge Argent ; dessous la tuile « DERNIÈRE PERTE ENREGISTRÉE -0.2 kg un disque vinyle 33T », Aujourd'hui, le défilé et « DEPUIS LE DÉBUT »."
+   },
+   {
+    "ecran": "Bloc « Salut » — objectif de poids et barre de progression",
+    "slug": "bloc-salut-objectif-de-poids-et-barre-de-progression-home-sections",
+    "fichier": "/Users/beauty/Desktop/GLOW/GIT-APP-V2/docs/captures/poids/bloc-salut-objectif-de-poids-et-barre-de-progression-home-sections.png",
+    "ce_quon_voit": "Le même bloc Salut (« -13.9 kg », 42 %, barre) en tête de la home sections, suivi d'AJOUT RAPIDE, EN DIRECT, DYNAMIQUE et du début de PROGRÈS."
+   },
+   {
+    "ecran": "Surimpression « Où en est l'IMC »",
+    "slug": "surimpression-ou-en-est-l-imc",
+    "fichier": "/Users/beauty/Desktop/GLOW/GIT-APP-V2/docs/captures/poids/surimpression-ou-en-est-l-imc.png",
+    "ce_quon_voit": "La couche vitrée « OÙ EN EST L'IMC » : échelle en six bandes colorées graduée 18.5 / 25 / 30 / 35 / 40 avec les mots surpoids, obésité I, obésité II, repère plein « aujourd'hui 30.4 », repère creux « au départ 34 », lien « Voir la page » (aucun cap franchi : les deux repères sont dans la même bande)."
+   },
+   {
+    "ecran": "Bloc « Nouveau palier IMC atteint » / « Vigilance IMC »",
+    "slug": "bloc-nouveau-palier-imc-atteint-vigilance-imc",
+    "fichier": "/Users/beauty/Desktop/GLOW/GIT-APP-V2/docs/captures/poids/bloc-nouveau-palier-imc-atteint-vigilance-imc.png",
+    "ce_quon_voit": "Le bloc de fête déclenché automatiquement (session jetable : la pesée du 12/09 modifiée à 84.2 kg, IMC 29.8) : pastille « NOUVEAU PALIER IMC ATTEINT ! », « Félicitations ! », « Obésité modérée (Classe I) » barré → « Surpoids », NOUVEAU POIDS 84.2 kg, NOUVEL IMC 29.8, « Vous venez d'entrer dans la tranche Surpoids. Chaque effort compte ! », bouton « VOIR MON ÉVOLUTION ET MES GRAPHIQUES » ; la carte de confirmation « 84,2 kg » suit."
+   },
+   {
+    "ecran": "Tiroir « Journal » — pesées",
+    "slug": "tiroir-journal-pesees",
+    "fichier": "/Users/beauty/Desktop/GLOW/GIT-APP-V2/docs/captures/poids/tiroir-journal-pesees.png",
+    "ce_quon_voit": "En menu simplifié (Accueil · Journal · + · Tendances · Menu), le tiroir Journal ouvert sur la case « Balance » : la liste complète des pesées triées par date décroissante (85.9 kg 12/09/2026 06:40 … 92 kg 01/07/2026), menu ⋯ par ligne, lien « Ouvrir la page Balance »."
+   },
+   {
+    "ecran": "Tiroir « Tendances » — carte « Balance » et son graphe en surimpression",
+    "slug": "tiroir-tendances-carte-balance-et-son-graphe-en-surimpressio",
+    "fichier": "/Users/beauty/Desktop/GLOW/GIT-APP-V2/docs/captures/poids/tiroir-tendances-carte-balance-et-son-graphe-en-surimpressio.png",
+    "ce_quon_voit": "Le tiroir « TENDANCE DES 15 DERNIERS JOURS » du menu simplifié : la carte « Balance » (2e, à droite d'Actif sanguin) avec sa silhouette de poids descendante, parmi Calories, Activité physique, Temps pour soi, Sommeil, Pas, Effets secondaires."
+   },
+   {
+    "ecran": "Tiroir « Tendances » — carte « Balance » et son graphe en surimpression",
+    "slug": "tiroir-tendances-carte-balance-et-son-graphe-en-surimpressio-graphe",
+    "fichier": "/Users/beauty/Desktop/GLOW/GIT-APP-V2/docs/captures/poids/tiroir-tendances-carte-balance-et-son-graphe-en-surimpressio-graphe.png",
+    "ce_quon_voit": "Après clic sur la carte Balance : la surimpression « BALANCE » avec « du 14/08/2026 à aujourd'hui », « Courbe de poids » (85 à 89 kg, 13/08 → 12/09, ronds de saisie), légende et lien « Voir la page », par-dessus le tiroir."
+   },
+   {
+    "ecran": "Défilé des dernières entrées (entrée « Pesée »)",
+    "slug": "defile-des-dernieres-entrees-entree-pesee",
+    "fichier": "/Users/beauty/Desktop/GLOW/GIT-APP-V2/docs/captures/poids/defile-des-dernieres-entrees-entree-pesee.png",
+    "ce_quon_voit": "Le défilé horizontal de la home standard sous le bloc AUJOURD'HUI : le carré « 12/09 · Pesée · 06:40 · 85.9 kg » (picto balance) entre Petit-déjeuner et Dîner."
+   },
+   {
+    "ecran": "Page « Mon profil » — Taille, Poids de départ, Objectif final",
+    "slug": "page-mon-profil-taille-poids-de-depart-objectif-final",
+    "fichier": "/Users/beauty/Desktop/GLOW/GIT-APP-V2/docs/captures/poids/page-mon-profil-taille-poids-de-depart-objectif-final.png",
+    "ce_quon_voit": "La page MON PROFIL (ouverte par l'avatar « Configuration ») : cases Prénom Camille, Médicament Ozempic, ÂGE 48 ans, TAILLE 168 cm, POIDS DE DÉPART 96 kg, OBJECTIF FINAL 72 kg, bouton « … », puis Mon avatar et Le miroir."
+   },
+   {
+    "ecran": "Page « Mon profil » — Taille, Poids de départ, Objectif final",
+    "slug": "page-mon-profil-taille-poids-de-depart-objectif-final-formulaire",
+    "fichier": "/Users/beauty/Desktop/GLOW/GIT-APP-V2/docs/captures/poids/page-mon-profil-taille-poids-de-depart-objectif-final-formulaire.png",
+    "ce_quon_voit": "Le formulaire « MODIFIER MON PROFIL » ouvert par « … » : Prénom, Médicament (Ozempic (Sémaglutide)), ÂGE 48, TAILLE (CM) 168, POIDS DE DÉPART (KG) 96, OBJECTIF FINAL (KG) 72, bouton VALIDER."
+   }
+  ],
+  "non_capturables": [
+   {
+    "ecran": "Menu « + » — carte d'identité",
+    "pourquoi": "Inatteignable depuis l'interface de la V1 mixte : PlusMenu n'est monté que pour activeTab === 'plus' (App.tsx), et aucun bouton, onglet ni tiroir ne navigue vers 'plus' (aucun handleNavigate('plus') / setActiveTab('plus') dans src/versions/mixte, hors le retour d'une sous-page vers previousTab || 'plus') ; le menu standard n'a pas d'entrée « + » et le « + » du menu simplifié ouvre le tiroir d'ajout, pas cette carte."
+   },
+   {
+    "ecran": "Rapport médical (PDF) — poids et mensurations",
+    "pourquoi": "Domaine voisin (rapport médical / export PDF) : le document se génère hors écran, il n'appartient pas au domaine poids."
+   },
+   {
+    "ecran": "Questionnaire d'accueil (simulation) — poids initial, poids actuel, poids visé",
+    "pourquoi": "Accessible uniquement depuis la page d'administration (exclue), en simulation qui n'écrit rien dans la sauvegarde réelle."
+   }
+  ]
+ },
+ {
+  "domaine": "alimentation",
+  "captures": [
+   {
+    "ecran": "Page « Menus » (repas et en-cas)",
+    "slug": "page-menus-repas-et-en-cas",
+    "fichier": "/Users/beauty/Desktop/GLOW/GIT-APP-V2/docs/captures/alimentation/page-menus-repas-et-en-cas.png",
+    "ce_quon_voit": "Haut de la page « Menus » en vue calendrier (par défaut) : boutons « Mes aliments » / « Mes recettes », curseur Calendrier/Journal et « + ajouter », calendrier de septembre 2026 avec le total kcal sous chaque jour (12/09 = 450) et le début du graphe « Moyenne / j »."
+   },
+   {
+    "ecran": "Page « Menus » (repas et en-cas)",
+    "slug": "page-menus-repas-et-en-cas-journal",
+    "fichier": "/Users/beauty/Desktop/GLOW/GIT-APP-V2/docs/captures/alimentation/page-menus-repas-et-en-cas-journal.png",
+    "ce_quon_voit": "La même page, curseur sur Journal : carte « Journal (301) » du 14/08/2026 à aujourd'hui, journées groupées (Aujourd'hui 450 kcal, Hier 751, Jeudi 10 septembre 1117, Mercredi 9 septembre 957) avec leur barre de macronutriments et la pagination 1 … 8."
+   },
+   {
+    "ecran": "Formulaire repas / en-cas (ajout et modification)",
+    "slug": "formulaire-repas-en-cas-ajout-et-modification",
+    "fichier": "/Users/beauty/Desktop/GLOW/GIT-APP-V2/docs/captures/alimentation/formulaire-repas-en-cas-ajout-et-modification.png",
+    "ce_quon_voit": "Formulaire « Nouveau » ouvert par « + ajouter » avec ses valeurs par défaut : bascule Repas/En-cas, 12/09/2026 à 23:20, une ligne Nom / Qté 100 g, curseurs faim avant 2 et après 0, interrupteur Favori, bouton Valider, mention Ciqual ; la page derrière est vitrée."
+   },
+   {
+    "ecran": "Liste de suggestions d'aliments",
+    "slug": "liste-de-suggestions-d-aliments",
+    "fichier": "/Users/beauty/Desktop/GLOW/GIT-APP-V2/docs/captures/alimentation/liste-de-suggestions-d-aliments.png",
+    "ce_quon_voit": "Après la saisie de « pom » dans le champ Nom, le panneau d'autocomplétion : Pomme crue 51 kcal, Pomme – sèche 247 kcal, Pomme bouillie 54 kcal, Pomelo rose cru…, chacun avec Prot/Gluc/Lip/Fib pour 100 g."
+   },
+   {
+    "ecran": "Journal des repas",
+    "slug": "journal-des-repas",
+    "fichier": "/Users/beauty/Desktop/GLOW/GIT-APP-V2/docs/captures/alimentation/journal-des-repas.png",
+    "ce_quon_voit": "La carte « Journal (301) » avec sa période, la corbeille « tout supprimer », quatre journées repliées (kcal du jour et barre Prot/Gluc/Lip/Fibr) et la pagination Précédent 1 2 … 8 Suivant."
+   },
+   {
+    "ecran": "Journal des repas",
+    "slug": "journal-des-repas-journee-depliee",
+    "fichier": "/Users/beauty/Desktop/GLOW/GIT-APP-V2/docs/captures/alimentation/journal-des-repas-journee-depliee.png",
+    "ce_quon_voit": "La journée « Hier (Vendredi 11 septembre 2026) » dépliée : 16:20 En-cas « Banane crue » 210 kcal faim 1/5 -> 0/5, 19:45 Repas « Kebab baguette crudités, Chips… » 541 kcal, chacun avec sa barre de macronutriments et son menu « … »."
+   },
+   {
+    "ecran": "Journal des repas",
+    "slug": "journal-des-repas-menu-options",
+    "fichier": "/Users/beauty/Desktop/GLOW/GIT-APP-V2/docs/captures/alimentation/journal-des-repas-menu-options.png",
+    "ce_quon_voit": "Le menu « … » d'un repas du journal ouvert : Ajouter aux favoris, Voir les détails nutritionnels, Ajouter un élément, Supprimer."
+   },
+   {
+    "ecran": "Calendrier des repas",
+    "slug": "calendrier-des-repas",
+    "fichier": "/Users/beauty/Desktop/GLOW/GIT-APP-V2/docs/captures/alimentation/calendrier-des-repas.png",
+    "ce_quon_voit": "Le calendrier de septembre 2026 (flèches mois précédent/suivant) avec le total kcal sous chaque jour renseigné, du 31/08 (1711) au 12/09 (450, jour courant surligné), et « – » sur les jours à venir."
+   },
+   {
+    "ecran": "Calendrier des repas",
+    "slug": "calendrier-des-repas-bulle",
+    "fichier": "/Users/beauty/Desktop/GLOW/GIT-APP-V2/docs/captures/alimentation/calendrier-des-repas-bulle.png",
+    "ce_quon_voit": "La bulle du 1er septembre : Total 1262 kcal, Prot 15 % Gluc 47 % Lip 36 % Fib 2 %, « 2 repas · 1 snack », liens « Voir les menus de la journée » et « + Ajouter un enregistrement »."
+   },
+   {
+    "ecran": "Calendrier des repas",
+    "slug": "calendrier-des-repas-menus-du-jour",
+    "fichier": "/Users/beauty/Desktop/GLOW/GIT-APP-V2/docs/captures/alimentation/calendrier-des-repas-menus-du-jour.png",
+    "ce_quon_voit": "Le bloc « Menus du 01/09/2026 (3) » ouvert sous le calendrier : Mardi 1 septembre 2026 1262 kcal, puis 07:30 Repas « Croissant, Biscuit sec nature » 425 kcal, 17:20 En-cas « Beignet ou donut sucré, Cacahu… » 237 kcal, 19:20 Repas « Tofu nature, Pâtes sèches cuites… » 600 kcal, chacun avec sa faim avant/après."
+   },
+   {
+    "ecran": "Bloc « Ajouter aux favoris » (depuis le journal)",
+    "slug": "bloc-ajouter-aux-favoris-depuis-le-journal",
+    "fichier": "/Users/beauty/Desktop/GLOW/GIT-APP-V2/docs/captures/alimentation/bloc-ajouter-aux-favoris-depuis-le-journal.png",
+    "ce_quon_voit": "Le bloc « Ajouter aux favoris » en tête de page, titre du menu prérempli « Banane crue », boutons Annuler / Enregistrer, le journal (journée d'hier dépliée) dessous."
+   },
+   {
+    "ecran": "Bloc « Ajouter aux favoris » (depuis le journal)",
+    "slug": "bloc-ajouter-aux-favoris-depuis-le-journal-confirmation",
+    "fichier": "/Users/beauty/Desktop/GLOW/GIT-APP-V2/docs/captures/alimentation/bloc-ajouter-aux-favoris-depuis-le-journal-confirmation.png",
+    "ce_quon_voit": "Après Enregistrer : la carte « Menu ajouté aux favoris ! Retrouvez-le dans vos menus favoris. » avec son bouton OK, le bouton « Mes favoris » apparu dans l'en-tête, et l'étoile devant « Banane crue » dans le journal."
+   },
+   {
+    "ecran": "Bloc « Mes menus favoris »",
+    "slug": "bloc-mes-menus-favoris",
+    "fichier": "/Users/beauty/Desktop/GLOW/GIT-APP-V2/docs/captures/alimentation/bloc-mes-menus-favoris.png",
+    "ce_quon_voit": "Le bloc « Mes menus favoris » : boutons Ajouter et Tout effacer, champ « Rechercher un favori… », l'entrée « Banane crue EN-CAS (210 kcal) — 240g Banane crue » avec son menu « … » ; la page derrière est vitrée."
+   },
+   {
+    "ecran": "Bloc « Mes menus favoris »",
+    "slug": "bloc-mes-menus-favoris-menu-options",
+    "fichier": "/Users/beauty/Desktop/GLOW/GIT-APP-V2/docs/captures/alimentation/bloc-mes-menus-favoris-menu-options.png",
+    "ce_quon_voit": "Le menu « … » d'un favori ouvert : Ajouter rapide, Utiliser comme base, Modifier, Supprimer."
+   },
+   {
+    "ecran": "Bloc d'ajout rapide d'un favori au journal",
+    "slug": "bloc-d-ajout-rapide-d-un-favori-au-journal",
+    "fichier": "/Users/beauty/Desktop/GLOW/GIT-APP-V2/docs/captures/alimentation/bloc-d-ajout-rapide-d-un-favori-au-journal.png",
+    "ce_quon_voit": "Le bloc d'ajout rapide (En-cas « Banane crue », date 12/09/2026, heure 23:15, curseurs faim avant/après, bouton Valider) rendu au-dessus de la carte « Mes menus favoris » ; tel que la V1 l'affiche, il est vitré (flou et 35 % d'opacité) par la règle `main *:has(~ .glow-form-open)` de la carte des favoris, seule la carte de base reste nette."
+   },
+   {
+    "ecran": "Bloc « Mes aliments / boissons » et « Mes recettes »",
+    "slug": "bloc-mes-aliments-boissons-et-mes-recettes",
+    "fichier": "/Users/beauty/Desktop/GLOW/GIT-APP-V2/docs/captures/alimentation/bloc-mes-aliments-boissons-et-mes-recettes.png",
+    "ce_quon_voit": "Le bloc « Mes aliments / boissons » en mode aliments : boutons « + Ajout manuel » et « Code-barres », champ « Rechercher un aliment enregistré… », et l'état vide « Aucun aliment personnalisé enregistré pour le moment » (la graine n'en contient aucun)."
+   },
+   {
+    "ecran": "Bloc « Mes aliments / boissons » et « Mes recettes »",
+    "slug": "bloc-mes-aliments-boissons-et-mes-recettes-avec-aliment",
+    "fichier": "/Users/beauty/Desktop/GLOW/GIT-APP-V2/docs/captures/alimentation/bloc-mes-aliments-boissons-et-mes-recettes-avec-aliment.png",
+    "ce_quon_voit": "Le même bloc après l'enregistrement du produit trouvé par code-barres : la ligne « Nutella (pour 100g) » avec le pictogramme code-barres, 539 kcal, Prot 6 g, Gluc 58 g, Lip 31 g, Fib 0 g, et son menu « … »."
+   },
+   {
+    "ecran": "Bloc « Mes aliments / boissons » et « Mes recettes »",
+    "slug": "bloc-mes-aliments-boissons-et-mes-recettes-recettes",
+    "fichier": "/Users/beauty/Desktop/GLOW/GIT-APP-V2/docs/captures/alimentation/bloc-mes-aliments-boissons-et-mes-recettes-recettes.png",
+    "ce_quon_voit": "Le bloc en mode « Mes recettes » : bouton « Recette », champ « Rechercher une recette… » et l'état vide « Aucune recette enregistrée pour le moment. Cliquez sur \"Recette\" ci-dessus pour en créer une. »"
+   },
+   {
+    "ecran": "Formulaire d'aliment personnalisé (page pleine ou bloc « Ajout manuel »)",
+    "slug": "formulaire-d-aliment-personnalise-page-pleine-ou-bloc-ajout",
+    "fichier": "/Users/beauty/Desktop/GLOW/GIT-APP-V2/docs/captures/alimentation/formulaire-d-aliment-personnalise-page-pleine-ou-bloc-ajout.png",
+    "ce_quon_voit": "Le bloc « Ajout manuel — Aliment solide ou liquide (valeurs pour 100g / 100ml) » avec ses valeurs par défaut : nom vide, bascule solide/liquide, Calories, Protéines, Glucides, Lipides, Fibres à 0, bouton Enregistrer, flèche retour à la liste."
+   },
+   {
+    "ecran": "Formulaire d'aliment personnalisé (page pleine ou bloc « Ajout manuel »)",
+    "slug": "formulaire-d-aliment-personnalise-page-pleine-ou-bloc-ajout-page-pleine",
+    "fichier": "/Users/beauty/Desktop/GLOW/GIT-APP-V2/docs/captures/alimentation/formulaire-d-aliment-personnalise-page-pleine-ou-bloc-ajout-page-pleine.png",
+    "ce_quon_voit": "La page pleine « + Aliment » ouverte depuis « Ajouter cet aliment » d'une ligne de repas sans résultat : le nom saisi « zzzz » repris, le bouton scanner « OU », les cinq champs Kcal/Prot/Gluc/Lip/Fib à 0, la bascule Solide/Liquide et le bouton Ajouter."
+   },
+   {
+    "ecran": "Bloc « Ajout par code-barres »",
+    "slug": "bloc-ajout-par-code-barres",
+    "fichier": "/Users/beauty/Desktop/GLOW/GIT-APP-V2/docs/captures/alimentation/bloc-ajout-par-code-barres.png",
+    "ce_quon_voit": "Le bloc « Ajout par code-barres » (champ « Numéro de code-barres (EAN) », bouton « Rechercher le produit », mention Open Food Facts) rendu au-dessus de la carte « Mes aliments / boissons » ; tel que la V1 l'affiche, il est vitré par la règle `glow-form-open` de la carte de base, qui seule reste nette."
+   },
+   {
+    "ecran": "Figure du code-barres",
+    "slug": "figure-du-code-barres",
+    "fichier": "/Users/beauty/Desktop/GLOW/GIT-APP-V2/docs/captures/alimentation/figure-du-code-barres.png",
+    "ce_quon_voit": "Après la recherche du 3017620422003 sur Open Food Facts : le code EAN-13 dessiné en SVG avec son numéro au-dessus du formulaire d'aliment prérempli « Nutella », solide, « Valeurs préremplies via code-barres », 539 kcal, Protéines 6, Glucides 58, Lipides 31, Fibres 0, bouton Enregistrer."
+   },
+   {
+    "ecran": "Formulaire de recette",
+    "slug": "formulaire-de-recette",
+    "fichier": "/Users/beauty/Desktop/GLOW/GIT-APP-V2/docs/captures/alimentation/formulaire-de-recette.png",
+    "ce_quon_voit": "Le formulaire « Ajouter à partir d'une recette » avec ses valeurs par défaut : nom du plat/dessert vide, une ligne ingrédient à 100 g, bouton « + », encadré « Total recette — poids total 0 g, valeurs pour 100 g : 0 kcal, Prot 0 g, Gluc 0 g, Lip 0 g, Fib 0 g », bouton Enregistrer."
+   },
+   {
+    "ecran": "Bloc graphique « Moyenne / j » (apports par jour)",
+    "slug": "bloc-graphique-moyenne-j-apports-par-jour",
+    "fichier": "/Users/beauty/Desktop/GLOW/GIT-APP-V2/docs/captures/alimentation/bloc-graphique-moyenne-j-apports-par-jour.png",
+    "ce_quon_voit": "Le bloc « Moyenne / j » du 14/08/2026 à aujourd'hui : barres quotidiennes empilées Prot/Gluc/Lip/Fibr en grammes (échelle droite 0-530 g), courbe des kcal (échelle gauche 0-2300 kcal), légende, et la ligne « Moyenne » Kcal 1227, Prot 65 g, Gluc 145 g, Lip 38 g, Fibr 22 g."
+   },
+   {
+    "ecran": "Bloc graphique « Appétit » (faim par créneau horaire)",
+    "slug": "bloc-graphique-appetit-faim-par-creneau-horaire",
+    "fichier": "/Users/beauty/Desktop/GLOW/GIT-APP-V2/docs/captures/alimentation/bloc-graphique-appetit-faim-par-creneau-horaire.png",
+    "ce_quon_voit": "Le bloc « Appétit » du 14/08/2026 à aujourd'hui : courbes « Faim avant repas », « Faim après repas » (échelle 1-5) et « Kcal (moy. / prise) » (échelle 0-800) sur les huit créneaux de trois heures, renseignées de 6-9h à 18-21h."
+   },
+   {
+    "ecran": "Bloc « Repas vs en-cas »",
+    "slug": "bloc-repas-vs-en-cas",
+    "fichier": "/Users/beauty/Desktop/GLOW/GIT-APP-V2/docs/captures/alimentation/bloc-repas-vs-en-cas.png",
+    "ce_quon_voit": "Le bloc « Repas vs en-cas » du 14/08/2026 à aujourd'hui : barre « Repas · ≈ 567 kcal » (Prot 22 %, Gluc 47 %, Lip 27 %, Fibr 4 %) et barre « En-cas · ≈ 201 kcal » (11 %, 53 %, 33 %, 3 %), avec le bloc « Appétit » juste au-dessus."
+   },
+   {
+    "ecran": "Bloc « Composition moy. / h » (tableau ou barres)",
+    "slug": "bloc-composition-moy-h-tableau-ou-barres",
+    "fichier": "/Users/beauty/Desktop/GLOW/GIT-APP-V2/docs/captures/alimentation/bloc-composition-moy-h-tableau-ou-barres.png",
+    "ce_quon_voit": "Le bloc « Composition moy. / h » du 06/09/2026 à aujourd'hui en version tableau : une ligne par créneau avec Prot/Gluc/Lip/Fibr/Total/Kcal (6-9h 24 % 49 % 18 % 10 % 100 % ≈ 427 ; 12-15h ≈ 632 ; 15-18h ≈ 204 ; 18-21h ≈ 553, « — » ailleurs), les parts fortes surlignées et la note explicative."
+   },
+   {
+    "ecran": "Bloc « Composition moy. / h » (tableau ou barres)",
+    "slug": "bloc-composition-moy-h-tableau-ou-barres-barres",
+    "fichier": "/Users/beauty/Desktop/GLOW/GIT-APP-V2/docs/captures/alimentation/bloc-composition-moy-h-tableau-ou-barres-barres.png",
+    "ce_quon_voit": "Le même bloc en version barres (bouton « Version barres de composition ») : une barre à quatre parts par créneau renseigné avec sa pastille « ≈ N kcal », « aucune prise » pour 0-3h, 3-6h, 9-12h et 21-24h."
+   },
+   {
+    "ecran": "Bloc « Répartition » (tableau ou barres)",
+    "slug": "bloc-repartition-tableau-ou-barres",
+    "fichier": "/Users/beauty/Desktop/GLOW/GIT-APP-V2/docs/captures/alimentation/bloc-repartition-tableau-ou-barres.png",
+    "ce_quon_voit": "Le bloc « Répartition » du 06/09/2026 à aujourd'hui en version tableau : phrases « Créneaux hauts en kcal : 6-9h et 12-15h » (glucides, lipides), puis le tableau par créneau Prot/Gluc/Lip/Fibr/Kcal dont chaque colonne totalise 100 % (6-9h 41 % 29 % 43 % 44 % 36 %)."
+   },
+   {
+    "ecran": "Bloc « Répartition » (tableau ou barres)",
+    "slug": "bloc-repartition-tableau-ou-barres-barres",
+    "fichier": "/Users/beauty/Desktop/GLOW/GIT-APP-V2/docs/captures/alimentation/bloc-repartition-tableau-ou-barres-barres.png",
+    "ce_quon_voit": "Le même bloc en version barres (bouton « Version barres de répartition par créneau ») : une barre par apport (Prot., Gluc., Lip., Fibr., Kcal) découpée par créneau 6-9h / 12-15h / 15-18h / 18-21h avec les pourcentages, et la note « Un créneau qui ne figure pas sur une barre n'a rien apporté »."
+   },
+   {
+    "ecran": "Carré « Aujourd'hui » de l'accueil standard",
+    "slug": "carre-aujourd-hui-de-l-accueil-standard",
+    "fichier": "/Users/beauty/Desktop/GLOW/GIT-APP-V2/docs/captures/alimentation/carre-aujourd-hui-de-l-accueil-standard.png",
+    "ce_quon_voit": "Sur l'accueil standard, le carré « Aujourd'hui — En direct » : Kcal 450, Prot. 9 g, Gluc. 61 g, Lip. 17 g, Fibr. 5 g, barres d'objectif Prot. 7 % (cible 129 g) et Fib. 21 % (cible 25 g), avec dessous le défilé des dernières entrées (Petit-déjeuner 07:50 450 kcal · 3→2, Pesée, Dîner…)."
+   },
+   {
+    "ecran": "Tuiles repas de l'accueil « MaisonSections »",
+    "slug": "tuiles-repas-de-l-accueil-maisonsections",
+    "fichier": "/Users/beauty/Desktop/GLOW/GIT-APP-V2/docs/captures/alimentation/tuiles-repas-de-l-accueil-maisonsections.png",
+    "ce_quon_voit": "L'accueil « sections » (glow_home_mixte = sections) : la rangée « Ajout rapide », la section « En direct » avec 450 kcal, Prot. 7 % / 129 g, Fibr. 21 % / 25 g, le bouton « + Ajouter » (pomme), la flèche ↓ des repas dans « Dynamique sur les 7 derniers jours », puis « Progrès » et le début de « Côte à côte »."
+   },
+   {
+    "ecran": "Tuiles repas de l'accueil « MaisonSections »",
+    "slug": "tuiles-repas-de-l-accueil-maisonsections-comparee",
+    "fichier": "/Users/beauty/Desktop/GLOW/GIT-APP-V2/docs/captures/alimentation/tuiles-repas-de-l-accueil-maisonsections-comparee.png",
+    "ce_quon_voit": "La zone comparée « Depuis le début / 7 derniers jours (moyenne / jour) » : 1462 kcal, protéine 78 g, fibre 26 g face à 868 kcal, 44 g, 15 g, avec les liens « Ajouter une entrée » et « Voir la page Repas », entre les tuiles balance et pas."
+   },
+   {
+    "ecran": "Couche vitrée « Menus » de l'accueil",
+    "slug": "couche-vitree-menus-de-l-accueil",
+    "fichier": "/Users/beauty/Desktop/GLOW/GIT-APP-V2/docs/captures/alimentation/couche-vitree-menus-de-l-accueil.png",
+    "ce_quon_voit": "La couche « Menus » ouverte depuis le bloc kcal de l'accueil sections : « Aujourd'hui » avec 07:50 · Repas · 450 kcal (Prot 8 %, Gluc 55 %, Lip 35 %, Fibr 2 %) et son « … », « Ajouter un autre repas », puis la moyenne du 06/09/2026 à aujourd'hui ≈ 425 kcal (18/50/29/3 %) « sur 10 repas et 4 en-cas », lien « Voir la page »."
+   },
+   {
+    "ecran": "Couche vitrée « Menus » de l'accueil",
+    "slug": "couche-vitree-menus-de-l-accueil-menu-options",
+    "fichier": "/Users/beauty/Desktop/GLOW/GIT-APP-V2/docs/captures/alimentation/couche-vitree-menus-de-l-accueil-menu-options.png",
+    "ce_quon_voit": "Dans la couche, le menu « Options du repas de 07:50 » ouvert : Modifier, Supprimer."
+   },
+   {
+    "ecran": "Couche vitrée « Menus » de l'accueil",
+    "slug": "couche-vitree-menus-de-l-accueil-modifier",
+    "fichier": "/Users/beauty/Desktop/GLOW/GIT-APP-V2/docs/captures/alimentation/couche-vitree-menus-de-l-accueil-modifier.png",
+    "ce_quon_voit": "Le formulaire de modification dans la couche (variante surimpression) : bandeau « Modifier » Repas/En-cas, 12/09/2026 07:50, encart « Mode modification activé », les trois aliments Flocons d'avoine cuits 235 g, Glace ou sorbet 115 g, Thé infusé non sucré 295 ml avec leurs valeurs, total 450 kcal, faim 3 → 2, Favori, bouton « Mettre à jour le repas »."
+   },
+   {
+    "ecran": "Couche vitrée « Menus » de l'accueil",
+    "slug": "couche-vitree-menus-de-l-accueil-saisie",
+    "fichier": "/Users/beauty/Desktop/GLOW/GIT-APP-V2/docs/captures/alimentation/couche-vitree-menus-de-l-accueil-saisie.png",
+    "ce_quon_voit": "La couche ouverte en saisie par « Ajouter un repas ou un en-cas » : formulaire « Nouveau » Repas/En-cas, 12/09/2026 23:15, ligne Nom / Qté 100 g, curseurs faim 2 et 0, Favori, Valider, lien « Voir la page »."
+   },
+   {
+    "ecran": "Couche vitrée « Menus » de l'accueil",
+    "slug": "couche-vitree-menus-de-l-accueil-moyenne",
+    "fichier": "/Users/beauty/Desktop/GLOW/GIT-APP-V2/docs/captures/alimentation/couche-vitree-menus-de-l-accueil-moyenne.png",
+    "ce_quon_voit": "La couche ouverte depuis la tuile « depuis le début » : « Depuis le début » ≈ 588 kcal (Prot 21 %, Gluc 46 %, Lip 29 %, Fibr 4 %) « sur 261 repas et 40 en-cas entre le 14/05/2026 et aujourd'hui », puis la moyenne comparée du 06/09/2026 à aujourd'hui ≈ 425 kcal."
+   },
+   {
+    "ecran": "Curseur de faim",
+    "slug": "curseur-de-faim",
+    "fichier": "/Users/beauty/Desktop/GLOW/GIT-APP-V2/docs/captures/alimentation/curseur-de-faim.png",
+    "ce_quon_voit": "Dans le formulaire de repas, les deux curseurs gradués 0 à 5 « Faim avant le repas » (poignée sur 2) et « Faim après le repas » (poignée sur 0), sous la ligne Nom / Qté et au-dessus de l'interrupteur Favori."
+   }
+  ],
+  "non_capturables": [
+   {
+    "ecran": "Histogramme « Composition moyenne / h » (non monté)",
+    "pourquoi": "Le composant TimeOfDayChart n'est plus rendu par MealTracker dans la version Mixte (remplacé par le tableau « Composition moy. / h ») : aucun chemin d'accès à l'écran, rien ne s'affiche."
+   }
+  ]
+ },
+ {
+  "domaine": "effets-secondaires",
+  "captures": [
+   {
+    "ecran": "Page « Effets secondaires » (tracker)",
+    "slug": "page-effets-secondaires-tracker",
+    "fichier": "/Users/beauty/Desktop/GLOW/GIT-APP-V2/docs/captures/effets-secondaires/page-effets-secondaires-tracker.png",
+    "ce_quon_voit": "La page à l'arrivée : bande de titre « Effets secondaires », ligne d'outils (calendrier actif, « + ajouter »), calendrier de septembre 2026 sans entrée (tirets, le 12 surligné), puis le bloc « Impact » du début à aujourd'hui."
+   },
+   {
+    "ecran": "Formulaire « Nouveau ressenti » / « Modifier le ressenti »",
+    "slug": "formulaire-nouveau-ressenti-modifier-le-ressenti",
+    "fichier": "/Users/beauty/Desktop/GLOW/GIT-APP-V2/docs/captures/effets-secondaires/formulaire-nouveau-ressenti-modifier-le-ressenti.png",
+    "ce_quon_voit": "Carte « Nouveau ressenti » avec ses valeurs par défaut : date 12/09/2026 et heure courante, sélecteur sur « Ballonnements », curseur d'intensité à « 0 — Imperceptible », lien « + Notes », bouton « Valider », le reste de la page flouté derrière."
+   },
+   {
+    "ecran": "Formulaire « Nouveau ressenti » / « Modifier le ressenti »",
+    "slug": "formulaire-nouveau-ressenti-modifier-le-ressenti-modifier",
+    "fichier": "/Users/beauty/Desktop/GLOW/GIT-APP-V2/docs/captures/effets-secondaires/formulaire-nouveau-ressenti-modifier-le-ressenti-modifier.png",
+    "ce_quon_voit": "Le même formulaire en édition (« Modifier le ressenti ») ouvert depuis le menu d'une ligne du journal : 10/08/2026 11:50, « Ballonnements », curseur à « 4 — Fort », bouton « Mettre à jour le ressenti »."
+   },
+   {
+    "ecran": "Panneau « Effets secondaires disponibles » (Ajouter / Gérer)",
+    "slug": "panneau-effets-secondaires-disponibles-ajouter-gerer",
+    "fichier": "/Users/beauty/Desktop/GLOW/GIT-APP-V2/docs/captures/effets-secondaires/panneau-effets-secondaires-disponibles-ajouter-gerer.png",
+    "ce_quon_voit": "Panneau en fenêtre par-dessus le formulaire : champ « Rechercher un effet... », « Tout cocher | Tout décocher », grille à deux colonnes de cases (Ballonnements et Constipation cochées) et bouton « Enregistrer la sélection »."
+   },
+   {
+    "ecran": "Ligne d'outils de l'historique (Calendrier / Journal + ajouter)",
+    "slug": "ligne-doutils-de-lhistorique-calendrier-journal-ajouter",
+    "fichier": "/Users/beauty/Desktop/GLOW/GIT-APP-V2/docs/captures/effets-secondaires/ligne-doutils-de-lhistorique-calendrier-journal-ajouter.png",
+    "ce_quon_voit": "En haut de la page, le curseur segmenté à deux carreaux (calendrier mis en avant, journal en retrait) et le bouton « + ajouter » à droite, au-dessus du calendrier ; même image que la page tracker (copie aussi sous ligne-d-outils-de-l-historique-calendrier-journal-ajouter.png, selon le traitement de l'apostrophe)."
+   },
+   {
+    "ecran": "Vue Journal des effets secondaires",
+    "slug": "vue-journal-des-effets-secondaires",
+    "fichier": "/Users/beauty/Desktop/GLOW/GIT-APP-V2/docs/captures/effets-secondaires/vue-journal-des-effets-secondaires.png",
+    "ce_quon_voit": "Bloc « Journal (10) » en période « du début à aujourd'hui » avec l'icône de période et la corbeille, liste défilante des lignes du plus récent au plus ancien (4/5 Ballonnements 10/08/2026 11:50, 4/5 Reflux gastro-œso… 09/08/2026, 4/5 Disparition totale d… 06/08/2026), le graphique Impact dessous."
+   },
+   {
+    "ecran": "Ligne du journal (JournalEntryCard)",
+    "slug": "ligne-du-journal-journalentrycard",
+    "fichier": "/Users/beauty/Desktop/GLOW/GIT-APP-V2/docs/captures/effets-secondaires/ligne-du-journal-journalentrycard.png",
+    "ce_quon_voit": "Une ligne du journal (intensité « 4/5 », type « Ballonnements », date 10/08/2026, heure 11:50, trois points) avec son menu « Modifier / Supprimer » déplié sous les trois points."
+   },
+   {
+    "ecran": "Bloc de confirmation « Supprimer tout ? »",
+    "slug": "bloc-de-confirmation-supprimer-tout",
+    "fichier": "/Users/beauty/Desktop/GLOW/GIT-APP-V2/docs/captures/effets-secondaires/bloc-de-confirmation-supprimer-tout.png",
+    "ce_quon_voit": "Dans le bloc Journal, la confirmation « Supprimer tout ? » avec le message « Voulez-vous supprimer définitivement tout le journal des effets secondaires ? Cette action est irréversible. », les boutons « Annuler » et « Supprimer » et la croix."
+   },
+   {
+    "ecran": "Vue Calendrier des effets secondaires",
+    "slug": "vue-calendrier-des-effets-secondaires",
+    "fichier": "/Users/beauty/Desktop/GLOW/GIT-APP-V2/docs/captures/effets-secondaires/vue-calendrier-des-effets-secondaires.png",
+    "ce_quon_voit": "Calendrier « Août 2026 » (chevrons de mois), initiales L à D, tuiles avec la note moyenne du jour « 4/5 » les 6, 9 et 10 août et un tiret sur les autres jours du mois."
+   },
+   {
+    "ecran": "Bulle d'un jour du calendrier",
+    "slug": "bulle-dun-jour-du-calendrier",
+    "fichier": "/Users/beauty/Desktop/GLOW/GIT-APP-V2/docs/captures/effets-secondaires/bulle-dun-jour-du-calendrier.png",
+    "ce_quon_voit": "Tuile du 6 août encadrée et sa bulle : Effet « Disparition totale de l'ap… », Intensité 4/5, Date 06/08/2026, Heure 15:20, boutons « Modifier » / « Supprimer » et lien « + Ajouter un enregistrement » (copie aussi sous bulle-d-un-jour-du-calendrier.png)."
+   },
+   {
+    "ecran": "Bulle d'un jour du calendrier",
+    "slug": "bulle-dun-jour-du-calendrier-voir-plus",
+    "fichier": "/Users/beauty/Desktop/GLOW/GIT-APP-V2/docs/captures/effets-secondaires/bulle-dun-jour-du-calendrier-voir-plus.png",
+    "ce_quon_voit": "La bulle du 6 août quand le jour compte trois effets : deux lignes (Nausées 2/5 09:10, Disparition totale de l'ap… 4/5 15:20), le lien « Voir plus (3 effets) » et « Ajouter un enregistrement » ; la tuile affiche « 3/5 » — graine complétée pour cette capture de deux ressentis fictifs le 06/08 (Nausées 2, Maux de tête 3), le générateur n'ayant jamais plus d'un effet par jour."
+   },
+   {
+    "ecran": "Bloc de détail du jour « Effets du JJ/MM/AAAA (n) »",
+    "slug": "bloc-de-detail-du-jour-effets-du-jj-mm-aaaa-n",
+    "fichier": "/Users/beauty/Desktop/GLOW/GIT-APP-V2/docs/captures/effets-secondaires/bloc-de-detail-du-jour-effets-du-jj-mm-aaaa-n.png",
+    "ce_quon_voit": "Carte « Effets du 06/08/2026 (3) » sous le calendrier, avec la croix, listant les trois lignes du jour (Nausées 2/5 09:10, Disparition totale de l'appétit 4/5 15:20, Maux de tête 3/5 21:30) chacune avec « Modifier » / « Supprimer » — même graine complétée que la bulle « Voir plus »."
+   },
+   {
+    "ecran": "Graphique « Impact » (tendance de tolérance)",
+    "slug": "graphique-impact-tendance-de-tolerance",
+    "fichier": "/Users/beauty/Desktop/GLOW/GIT-APP-V2/docs/captures/effets-secondaires/graphique-impact-tendance-de-tolerance.png",
+    "ce_quon_voit": "Bloc « Impact » du début à aujourd'hui : sous-titre « Impact global des effets secondaires », aire du score en points (axe 0 à 8 pts, dates 14/05 à 10/09), pastilles vertes les jours d'injection, légende « Score d'impact (Nombre × Intensité) » et « Injection GLP-1 »."
+   },
+   {
+    "ecran": "Graphique « Impact » (tendance de tolérance)",
+    "slug": "graphique-impact-tendance-de-tolerance-infobulle",
+    "fichier": "/Users/beauty/Desktop/GLOW/GIT-APP-V2/docs/captures/effets-secondaires/graphique-impact-tendance-de-tolerance-infobulle.png",
+    "ce_quon_voit": "Le même graphique avec l'infobulle ouverte au clic sur le point du 6 août : « Jeudi 6 Août 2026 », « Score d'Impact 4 pts », « Intensité moyenne : 4/5 », « Nombre d'effets : 1 » (la partie injection 1.7 mg Bras Droit est dans la bulle mais sort du cadre visible), ligne pointillée verticale et croix."
+   },
+   {
+    "ecran": "Avis « Limite atteinte »",
+    "slug": "avis-limite-atteinte",
+    "fichier": "/Users/beauty/Desktop/GLOW/GIT-APP-V2/docs/captures/effets-secondaires/avis-limite-atteinte.png",
+    "ce_quon_voit": "En tête de la page, le bloc « Limite atteinte » avec « Limite atteinte pour aujourd'hui : cette saisie remplace la dernière. » et son bouton « OK », suivi du bandeau « L'effet secondaire a bien été ajouté à votre journal. » et du calendrier (12 : 1.8/5) — graine complétée de 15 ressentis fictifs datés du 12/09 puis un 16e validé par le formulaire."
+   },
+   {
+    "ecran": "Page vitrée du module éteint",
+    "slug": "page-vitree-du-module-eteint",
+    "fichier": "/Users/beauty/Desktop/GLOW/GIT-APP-V2/docs/captures/effets-secondaires/page-vitree-du-module-eteint.png",
+    "ce_quon_voit": "La page Effets secondaires entièrement floutée sous une vitre, avec le seul texte lisible « Activez le module Effets Secondaires pour pouvoir suivre l'évolution de vos effets secondaires. », atteinte par le tiroir Journal en menu simplifié après extinction du module."
+   },
+   {
+    "ecran": "Carte module « Effets secondaires » (page Modules)",
+    "slug": "carte-module-effets-secondaires-page-modules",
+    "fichier": "/Users/beauty/Desktop/GLOW/GIT-APP-V2/docs/captures/effets-secondaires/carte-module-effets-secondaires-page-modules.png",
+    "ce_quon_voit": "Page « Modules » (« Activez ici les modules que vous souhaitez utiliser. ») avec la carte « Effets secondaires » en deuxième position, pastille « Activé » et bascule allumée, entre Injections et Repas et en-cas."
+   },
+   {
+    "ecran": "Carte module « Effets secondaires » (page Modules)",
+    "slug": "carte-module-effets-secondaires-page-modules-desactive",
+    "fichier": "/Users/beauty/Desktop/GLOW/GIT-APP-V2/docs/captures/effets-secondaires/carte-module-effets-secondaires-page-modules-desactive.png",
+    "ce_quon_voit": "La même carte après bascule : « Désactivé » grisé, interrupteur éteint et la case « Masquer dans l'application. » apparue sous le nom (menu simplifié visible en bas)."
+   },
+   {
+    "ecran": "Tuile « ressentis du jour » de la rangée « En direct » (home Sections/Blocs)",
+    "slug": "tuile-ressentis-du-jour-de-la-rangee-en-direct-home-sections",
+    "fichier": "/Users/beauty/Desktop/GLOW/GIT-APP-V2/docs/captures/effets-secondaires/tuile-ressentis-du-jour-de-la-rangee-en-direct-home-sections.png",
+    "ce_quon_voit": "Home Sections avec le menu simplifié : dans la rangée « En direct », la tuile de droite montre un visage souriant monochrome et « pas ou peu d'effet secondaire aujourd'hui », à côté des pas et du niveau sanguin."
+   },
+   {
+    "ecran": "Badge « ressentis du jour » du carré traitement (home standard)",
+    "slug": "badge-ressentis-du-jour-du-carre-traitement-home-standard",
+    "fichier": "/Users/beauty/Desktop/GLOW/GIT-APP-V2/docs/captures/effets-secondaires/badge-ressentis-du-jour-du-carre-traitement-home-standard.png",
+    "ce_quon_voit": "Home standard, carré traitement « Semaine n° 18 (121 jours) » : sous la dose actuelle 1.7 mg, le visage souriant vert et la légende « pas ou très peu d'effet secondaire aujourd'hui », puis « Ozempic · 17 injections · 16.95mg cumulé »."
+   },
+   {
+    "ecran": "Surimpression vitrée « Effets secondaires » — matrice matin / après-midi / soir",
+    "slug": "surimpression-vitree-effets-secondaires-matrice-matin-apres-",
+    "fichier": "/Users/beauty/Desktop/GLOW/GIT-APP-V2/docs/captures/effets-secondaires/surimpression-vitree-effets-secondaires-matrice-matin-apres-.png",
+    "ce_quon_voit": "Surimpression « Effets secondaires » sur la home floutée : « Ballonnements · du 04/08 au 10/08 », rang « 1/9 » avec chevrons, grille matin / après-midi / soir sur sept dates avec une seule case rouge (matin du 10/08), légende rien / légère / modérée / marquée, note « 1 déclaration de Ballonnements sur cette semaine… C'est la dernière semaine où un effet a été déclaré. » et lien « Voir la page »."
+   },
+   {
+    "ecran": "Carte « Effets secondaires » du tiroir « Tendance des 15 derniers jours »",
+    "slug": "carte-effets-secondaires-du-tiroir-tendance-des-15-derniers-",
+    "fichier": "/Users/beauty/Desktop/GLOW/GIT-APP-V2/docs/captures/effets-secondaires/carte-effets-secondaires-du-tiroir-tendance-des-15-derniers-.png",
+    "ce_quon_voit": "Tiroir « Tendance des 15 derniers jours » avec ses huit cartes ; la dernière, « Effets secondaires », montre un seul visage souriant et « Pas ou peu d'effet secondaire » à la place d'une courbe."
+   },
+   {
+    "ecran": "Carte « Effets secondaires » du tiroir « Journal »",
+    "slug": "carte-effets-secondaires-du-tiroir-journal",
+    "fichier": "/Users/beauty/Desktop/GLOW/GIT-APP-V2/docs/captures/effets-secondaires/carte-effets-secondaires-du-tiroir-journal.png",
+    "ce_quon_voit": "Tiroir « Journal » à huit cases ; la case « Effets secondaires » liste les trois dernières entrées « 10/08 · Ballonnements », « 09/08 · Reflux gastro-œs… », « 06/08 · Disparition totale … », sans heure ni sévérité."
+   },
+   {
+    "ecran": "Carte « Effets secondaires » du tiroir « Journal »",
+    "slug": "carte-effets-secondaires-du-tiroir-journal-surimpression",
+    "fichier": "/Users/beauty/Desktop/GLOW/GIT-APP-V2/docs/captures/effets-secondaires/carte-effets-secondaires-du-tiroir-journal-surimpression.png",
+    "ce_quon_voit": "La surimpression ouverte par la case : carte « Effets secondaires » avec les dix lignes du journal (intensité, type, date, heure, trois points) du 10/08/2026 au 17/05/2026 et le lien « Ouvrir la page Effets secondaires »."
+   },
+   {
+    "ecran": "Carré « effet » du défilé récent de la home standard",
+    "slug": "carre-effet-du-defile-recent-de-la-home-standard",
+    "fichier": "/Users/beauty/Desktop/GLOW/GIT-APP-V2/docs/captures/effets-secondaires/carre-effet-du-defile-recent-de-la-home-standard.png",
+    "ce_quon_voit": "Home standard, défilé des 7 derniers jours entre « Aujourd'hui » et « Depuis le début » : le carré « 10/09 · Nausées · 08:30 · 2/5 » avec le picto du visage, entre Ozempic et Petit-déjeuner — graine complétée d'un ressenti fictif le 10/09, le dernier du générateur datant du 10/08 (hors fenêtre)."
+   }
+  ],
+  "non_capturables": [
+   {
+    "ecran": "Export du rapport médical — case « Les effets secondaires ressentis » et sections PDF",
+    "pourquoi": "Domaine voisin : la page d'export et le PDF du rapport médical relèvent de l'inventaire « Métabolisme, rapport médical (export PDF), badges, Mon Ciel, équivalences insolites et partage » (inventaires[7])."
+   },
+   {
+    "ecran": "Maquette de partage « Un effet secondaire » (« Mon ressenti »)",
+    "pourquoi": "Domaine voisin et exclusion « Cartes » : les maquettes de partage sont l'écran « Cartes de partage (15 maquettes) » de l'inventaire 7 (partage), hors du domaine effets-secondaires."
+   }
+  ]
+ },
+ {
+  "domaine": "activite",
+  "captures": [
+   {
+    "ecran": "Page « Pas » (StepsTracker)",
+    "slug": "page-pas-stepstracker",
+    "fichier": "/Users/beauty/Desktop/GLOW/GIT-APP-V2/docs/captures/activite/page-pas-stepstracker.png",
+    "ce_quon_voit": "Haut de la page « Marche » : les deux cartes de tête (Aujourd'hui 6 940 / 8 000 pas, 87 %, 346 kcal ; Statistiques/j 8 649 pas, 457 kcal, 94 %), le curseur calendrier/journal et le calendrier de septembre 2026 avec les pas de chaque jour (11.3k, 11.2k…)."
+   },
+   {
+    "ecran": "Carte « Aujourd'hui » (StepsHeroCards, carte gauche)",
+    "slug": "carte-aujourdhui-stepsherocards-carte-gauche",
+    "fichier": "/Users/beauty/Desktop/GLOW/GIT-APP-V2/docs/captures/activite/carte-aujourdhui-stepsherocards-carte-gauche.png",
+    "ce_quon_voit": "En tête de la page Pas, la carte gauche « Aujourd'hui » : 346 kcal, 6 940 pas / 8 000, barre Objectif 87 %, puis 5.3 km · 1h13 · 4.2 km/h (même vue que la page)."
+   },
+   {
+    "ecran": "Carte « Statistiques/j » (CarteStatistiquesPas) et face « Bravo ! »",
+    "slug": "carte-statistiques-j-cartestatistiquespas-et-face-bravo",
+    "fichier": "/Users/beauty/Desktop/GLOW/GIT-APP-V2/docs/captures/activite/carte-statistiques-j-cartestatistiquespas-et-face-bravo.png",
+    "ce_quon_voit": "Face avant de la carte droite « Statistiques/j » : 457 kcal, 8 649 pas, barre Moyenne 94 %, 6.6 km · 1h31 · 4.2 km/h et l'indicateur ↔ de retournement (copie sous le nom carte-statistiquesj-cartestatistiquespas-et-face-bravo.png)."
+   },
+   {
+    "ecran": "Carte « Statistiques/j » (CarteStatistiquesPas) et face « Bravo ! »",
+    "slug": "carte-statistiques-j-cartestatistiquespas-et-face-bravo-bravo",
+    "fichier": "/Users/beauty/Desktop/GLOW/GIT-APP-V2/docs/captures/activite/carte-statistiques-j-cartestatistiquespas-et-face-bravo-bravo.png",
+    "ce_quon_voit": "La même carte retournée : la face « Bravo ! » sur fond dégradé teal-émeraude avec son message d'encouragement (copie sous le nom carte-statistiquesj-…-bravo-bravo.png)."
+   },
+   {
+    "ecran": "Calendrier des pas (StepsCalendar) et sa bulle",
+    "slug": "calendrier-des-pas-stepscalendar-et-sa-bulle",
+    "fichier": "/Users/beauty/Desktop/GLOW/GIT-APP-V2/docs/captures/activite/calendrier-des-pas-stepscalendar-et-sa-bulle.png",
+    "ce_quon_voit": "Le calendrier « Septembre 2026 » de la page Pas, chaque jour renseigné portant son total abrégé (11.3k, 6.1k, 6.9k pour le 12 en surbrillance), jours futurs à « – »."
+   },
+   {
+    "ecran": "Calendrier des pas (StepsCalendar) et sa bulle",
+    "slug": "calendrier-des-pas-stepscalendar-et-sa-bulle-bulle",
+    "fichier": "/Users/beauty/Desktop/GLOW/GIT-APP-V2/docs/captures/activite/calendrier-des-pas-stepscalendar-et-sa-bulle-bulle.png",
+    "ce_quon_voit": "La bulle ouverte sur un jour du calendrier des pas (1er septembre) : le détail du relevé du jour (pas, kcal, km, durée) avec sa croix de fermeture."
+   },
+   {
+    "ecran": "Journal des pas (StepsJournal + StepsJournalRow)",
+    "slug": "journal-des-pas-stepsjournal-stepsjournalrow",
+    "fichier": "/Users/beauty/Desktop/GLOW/GIT-APP-V2/docs/captures/activite/journal-des-pas-stepsjournal-stepsjournalrow.png",
+    "ce_quon_voit": "Vue journal de la page Pas : bandeau « JOURNAL (…) du 14/08/2026 à aujourd'hui » avec la corbeille, puis les lignes datées (nombre de pas, barre d'objectif et pourcentage, kcal, date, menu …)."
+   },
+   {
+    "ecran": "Journal des pas (StepsJournal + StepsJournalRow)",
+    "slug": "journal-des-pas-stepsjournal-stepsjournalrow-tout-supprimer",
+    "fichier": "/Users/beauty/Desktop/GLOW/GIT-APP-V2/docs/captures/activite/journal-des-pas-stepsjournal-stepsjournalrow-tout-supprimer.png",
+    "ce_quon_voit": "Le journal des pas après clic sur « Tout supprimer » : la confirmation en place dans le bloc (question et boutons), annulée ensuite."
+   },
+   {
+    "ecran": "Bloc « Depuis le … » (CumulativeStepsStats)",
+    "slug": "bloc-depuis-le-cumulativestepsstats",
+    "fichier": "/Users/beauty/Desktop/GLOW/GIT-APP-V2/docs/captures/activite/bloc-depuis-le-cumulativestepsstats.png",
+    "ce_quon_voit": "Sous le calendrier, le bandeau « DEPUIS LE 14/05/2026 : 838 950 pas » et ses trois valeurs 637.6 km · 147h11 · 4.3 km/h, suivi du graphe des pas."
+   },
+   {
+    "ecran": "Bloc « Depuis le … » (CumulativeStepsStats)",
+    "slug": "bloc-depuis-le-cumulativestepsstats-date-de-depart",
+    "fichier": "/Users/beauty/Desktop/GLOW/GIT-APP-V2/docs/captures/activite/bloc-depuis-le-cumulativestepsstats-date-de-depart.png",
+    "ce_quon_voit": "Le même bloc après clic sur la date soulignée : le champ date « 14/05/2026 » ouvert en édition dans le bandeau pour changer le départ du cumul."
+   },
+   {
+    "ecran": "Graphe « Suivi de votre nombre de pas par jour » (StepsTrendChart)",
+    "slug": "graphe-suivi-de-votre-nombre-de-pas-par-jour-stepstrendchart",
+    "fichier": "/Users/beauty/Desktop/GLOW/GIT-APP-V2/docs/captures/activite/graphe-suivi-de-votre-nombre-de-pas-par-jour-stepstrendchart.png",
+    "ce_quon_voit": "Le graphe en barres « Suivi de votre nombre de pas par jour » du 14/08/2026 à aujourd'hui, échelle 0-14 000, ligne pointillée « Seuil objectif (8 000) » et légende « Pas mesurés »."
+   },
+   {
+    "ecran": "Couche vitrée « Pas » (SurimpressionPas)",
+    "slug": "couche-vitree-pas-surimpressionpas",
+    "fichier": "/Users/beauty/Desktop/GLOW/GIT-APP-V2/docs/captures/activite/couche-vitree-pas-surimpressionpas.png",
+    "ce_quon_voit": "La couche vitrée « PAS » ouverte depuis la tuile En direct de la home sections : carte Aujourd'hui pleine largeur (6 940 / 8 000, 87 %), bloc « DEPUIS LE 14/05/2026 : 838 950 » avec la carte Statistiques/j imbriquée (8 649, 94 %) et le lien « Voir la page »."
+   },
+   {
+    "ecran": "Tuiles home du domaine Pas",
+    "slug": "tuiles-home-du-domaine-pas",
+    "fichier": "/Users/beauty/Desktop/GLOW/GIT-APP-V2/docs/captures/activite/tuiles-home-du-domaine-pas.png",
+    "ce_quon_voit": "Home sections (menu simplifié) : la tuile En direct « 6 940 » pas du jour et, dans « Dynamique sur les 7 derniers jours », la tuile de sens des pas (flèche ↑) à côté de celles des repas et du sport."
+   },
+   {
+    "ecran": "Tuiles home du domaine Pas",
+    "slug": "tuiles-home-du-domaine-pas-cote-a-cote",
+    "fichier": "/Users/beauty/Desktop/GLOW/GIT-APP-V2/docs/captures/activite/tuiles-home-du-domaine-pas-cote-a-cote.png",
+    "ce_quon_voit": "Section « Côte à côte » de la home sections : les deux tuiles Pas « 8 649 » (depuis le début) et « 8 633 » (7 derniers jours) autour du médaillon empreintes, avec le lien « Voir la page Pas »."
+   },
+   {
+    "ecran": "Page vitrée d'un module éteint",
+    "slug": "page-vitree-dun-module-eteint",
+    "fichier": "/Users/beauty/Desktop/GLOW/GIT-APP-V2/docs/captures/activite/page-vitree-dun-module-eteint.png",
+    "ce_quon_voit": "Avec le module Sommeil éteint dans le profil, la case Sommeil du tiroir Journal mène à la page Sommeil entièrement vitrée (calendrier et graphe floutés) portant le texte « Activez le module Sommeil pour pouvoir suivre l'évolution de votre sommeil. »"
+   },
+   {
+    "ecran": "Page « Activité physique » (SportTracker)",
+    "slug": "page-activite-physique-sporttracker",
+    "fichier": "/Users/beauty/Desktop/GLOW/GIT-APP-V2/docs/captures/activite/page-activite-physique-sporttracker.png",
+    "ce_quon_voit": "Haut de la page Activité physique : curseur calendrier/journal, bouton « + Ajouter », calendrier « Septembre 2026 (minutes) » avec 1h00 le 1er, puis le bloc « Suivi du 14/08/2026 à aujourd'hui » et son graphe."
+   },
+   {
+    "ecran": "Formulaire « Nouvelle activité physique » / « Modifier l'activité physique » (SportForm)",
+    "slug": "formulaire-nouvelle-activite-physique-modifier-lactivite-phy",
+    "fichier": "/Users/beauty/Desktop/GLOW/GIT-APP-V2/docs/captures/activite/formulaire-nouvelle-activite-physique-modifier-lactivite-phy.png",
+    "ce_quon_voit": "Le formulaire « Nouvelle activité physique » ouvert avec ses valeurs par défaut : date 12/09/2026, heure 23:20, activité Marche, 30 minutes, champ distance (km) « ou » effort Doux/Modéré/Intensif, + Notes, bouton Valider, page floutée derrière."
+   },
+   {
+    "ecran": "Formulaire « Nouvelle activité physique » / « Modifier l'activité physique » (SportForm)",
+    "slug": "formulaire-nouvelle-activite-physique-modifier-lactivite-phy-modifier",
+    "fichier": "/Users/beauty/Desktop/GLOW/GIT-APP-V2/docs/captures/activite/formulaire-nouvelle-activite-physique-modifier-lactivite-phy-modifier.png",
+    "ce_quon_voit": "La variante « Modifier l'activité physique » ouverte depuis « Modifier » de la bulle du calendrier : 02/08/2026 18:20, Fitness / Cardio, 45 minutes, effort Modéré, bouton « Mettre à jour l'activité »."
+   },
+   {
+    "ecran": "Panneau « Activités physiques disponibles » (ManageSportsBlock)",
+    "slug": "panneau-activites-physiques-disponibles-managesportsblock",
+    "fichier": "/Users/beauty/Desktop/GLOW/GIT-APP-V2/docs/captures/activite/panneau-activites-physiques-disponibles-managesportsblock.png",
+    "ce_quon_voit": "Le panneau « Activités physiques disponibles » ouvert via l'option Ajouter/Gérer du sélecteur : champ de recherche, liens Tout cocher / Tout décocher, liste à cases (Aqua-gym, Badminton, Course à pied cochée, Fitness / Cardio cochée…) et bouton « Enregistrer la sélection »."
+   },
+   {
+    "ecran": "Journal d'activité physique et sa ligne (JournalEntryCard sport)",
+    "slug": "journal-dactivite-physique-et-sa-ligne-journalentrycard-spor",
+    "fichier": "/Users/beauty/Desktop/GLOW/GIT-APP-V2/docs/captures/activite/journal-dactivite-physique-et-sa-ligne-journalentrycard-spor.png",
+    "ce_quon_voit": "Vue journal de la page sport : « JOURNAL (5) du 14/08/2026 à aujourd'hui » et ses lignes (60 min modérée · Vélo · −518 kcal · 01/09/2026 17:30, Randonnée, Danse, Natation…) avec le menu … de chaque ligne."
+   },
+   {
+    "ecran": "Calendrier de l'activité (SportCalendar) et bulle DaySportLines",
+    "slug": "calendrier-de-lactivite-sportcalendar-et-bulle-daysportlines",
+    "fichier": "/Users/beauty/Desktop/GLOW/GIT-APP-V2/docs/captures/activite/calendrier-de-lactivite-sportcalendar-et-bulle-daysportlines.png",
+    "ce_quon_voit": "Le calendrier de l'activité sur « Août 2026 (minutes) » (mois précédent) : les jours de séance portent leurs minutes (45, 40, 55, 50, 1h00…), les autres « – »."
+   },
+   {
+    "ecran": "Calendrier de l'activité (SportCalendar) et bulle DaySportLines",
+    "slug": "calendrier-de-lactivite-sportcalendar-et-bulle-daysportlines-bulle",
+    "fichier": "/Users/beauty/Desktop/GLOW/GIT-APP-V2/docs/captures/activite/calendrier-de-lactivite-sportcalendar-et-bulle-daysportlines-bulle.png",
+    "ce_quon_voit": "La bulle DaySportLines ouverte sur le 2 août : Activité Fitness / Cardio, Durée 45 min, Intensité modérée, Calories −375 kcal, Date 02/08/2026, Heure 18:20, actions Modifier / Supprimer et « + Ajouter un enregistrement »."
+   },
+   {
+    "ecran": "Graphe « Suivi » de l'activité (SportChart)",
+    "slug": "graphe-suivi-de-lactivite-sportchart",
+    "fichier": "/Users/beauty/Desktop/GLOW/GIT-APP-V2/docs/captures/activite/graphe-suivi-de-lactivite-sportchart.png",
+    "ce_quon_voit": "Le bloc « SUIVI du 14/08/2026 à aujourd'hui » : « Total calories dépensées : ~2 320 kcal », barres kcal (0-800) et score d'activité (0-10) par séance, légende « Score Activité quotidienne de 0 à 10… », « *Valeurs estimées »."
+   },
+   {
+    "ecran": "Bloc « De quoi c'est fait » (BlocDeQuoiCestFait)",
+    "slug": "bloc-de-quoi-cest-fait-blocdequoicestfait",
+    "fichier": "/Users/beauty/Desktop/GLOW/GIT-APP-V2/docs/captures/activite/bloc-de-quoi-cest-fait-blocdequoicestfait.png",
+    "ce_quon_voit": "Le bas de la page sport : « 7 derniers jours — Aucune activité physique enregistrée ces 7 derniers jours. », puis « Depuis le début » avec les barres par activité (Danse 2 172 kcal 5h15 · 6 séances, Vélo, Marche nordique, Fitness / Cardio, 2 autres), Total 29 séances · 23h45, Par semaine 1.7 séance / 1h25 : 757 kcal."
+   },
+   {
+    "ecran": "Couche vitrée « Activité physique » (SurimpressionSport)",
+    "slug": "couche-vitree-activite-physique-surimpressionsport-lecture",
+    "fichier": "/Users/beauty/Desktop/GLOW/GIT-APP-V2/docs/captures/activite/couche-vitree-activite-physique-surimpressionsport-lecture.png",
+    "ce_quon_voit": "La couche « ACTIVITÉ PHYSIQUE » en mode lecture (tuiles Côte à côte de la home sections) : le bloc De quoi c'est fait (7 derniers jours vide, Depuis le début par activité, Total, Par semaine) et le lien « Voir la page »."
+   },
+   {
+    "ecran": "Couche vitrée « Activité physique » (SurimpressionSport)",
+    "slug": "couche-vitree-activite-physique-surimpressionsport-saisie",
+    "fichier": "/Users/beauty/Desktop/GLOW/GIT-APP-V2/docs/captures/activite/couche-vitree-activite-physique-surimpressionsport-saisie.png",
+    "ce_quon_voit": "La même couche en mode saisie, ouverte par le bouton « Ajouter » (haltère) de la section Dynamique : le formulaire sport (12/09/2026 23:20, Marche, 30 minutes, distance ou effort, Notes, Valider) et « Voir la page »."
+   },
+   {
+    "ecran": "Tuiles home du domaine Activité physique",
+    "slug": "tuiles-home-du-domaine-activite-physique",
+    "fichier": "/Users/beauty/Desktop/GLOW/GIT-APP-V2/docs/captures/activite/tuiles-home-du-domaine-activite-physique.png",
+    "ce_quon_voit": "Home sections : la tuile de sens de l'activité physique (haltère, flèche ↓) dans « Dynamique sur les 7 derniers jours » et, sous le verdict « légère baisse attendue », le bouton « + Ajouter » (haltère) qui ouvre la saisie d'une séance."
+   },
+   {
+    "ecran": "Tuiles home du domaine Activité physique",
+    "slug": "tuiles-home-du-domaine-activite-physique-cote-a-cote",
+    "fichier": "/Users/beauty/Desktop/GLOW/GIT-APP-V2/docs/captures/activite/tuiles-home-du-domaine-activite-physique-cote-a-cote.png",
+    "ce_quon_voit": "Section « Côte à côte » (moyenne / semaine) : les quatre tuiles sport « 85 min · 1.7 séance » (depuis le début) et « 0 min · 0 séance » (7 derniers jours) autour du médaillon haltère, liens « Ajouter une entrée » et « Voir la page Activité physique »."
+   },
+   {
+    "ecran": "Page « Sommeil » (SleepTracker)",
+    "slug": "page-sommeil-sleeptracker",
+    "fichier": "/Users/beauty/Desktop/GLOW/GIT-APP-V2/docs/captures/activite/page-sommeil-sleeptracker.png",
+    "ce_quon_voit": "La page Sommeil : curseur calendrier/journal, « + Ajouter », calendrier « Septembre 2026 » avec la durée de chaque nuit (7h15, 8h40, 9h10…), puis le bloc « Durée et qualité » et son graphe."
+   },
+   {
+    "ecran": "Formulaire « Nouveau sommeil » / « Modifier le sommeil » (SleepForm)",
+    "slug": "formulaire-nouveau-sommeil-modifier-le-sommeil-sleepform",
+    "fichier": "/Users/beauty/Desktop/GLOW/GIT-APP-V2/docs/captures/activite/formulaire-nouveau-sommeil-modifier-le-sommeil-sleepform.png",
+    "ce_quon_voit": "Le formulaire « Nouveau sommeil » par défaut : segment Nuit/Sieste, Endormissement 11/09/2026 23:00, Réveil 12/09/2026 07:00, « Durée : 8 h », curseur Qualité du sommeil sur « 3 — Correcte », + Notes, Valider."
+   },
+   {
+    "ecran": "Formulaire « Nouveau sommeil » / « Modifier le sommeil » (SleepForm)",
+    "slug": "formulaire-nouveau-sommeil-modifier-le-sommeil-sleepform-modifier",
+    "fichier": "/Users/beauty/Desktop/GLOW/GIT-APP-V2/docs/captures/activite/formulaire-nouveau-sommeil-modifier-le-sommeil-sleepform-modifier.png",
+    "ce_quon_voit": "La variante « Modifier le sommeil » (depuis la bulle du 2 septembre) : Nuit, 01/09/2026 23:00 → 02/09/2026 06:15, Durée 7 h 15, qualité « 4 — Bonne », bouton « Mettre à jour le sommeil »."
+   },
+   {
+    "ecran": "Journal du sommeil et sa ligne (JournalEntryCard sleep)",
+    "slug": "journal-du-sommeil-et-sa-ligne-journalentrycard-sleep",
+    "fichier": "/Users/beauty/Desktop/GLOW/GIT-APP-V2/docs/captures/activite/journal-du-sommeil-et-sa-ligne-journalentrycard-sleep.png",
+    "ce_quon_voit": "Vue journal de la page Sommeil : « JOURNAL (21) du 14/08/2026 à aujourd'hui », lignes « 9 h 10 · Nuit · 10/09 22:20 → 07:30 · 4/5 · 11/09/2026 · … », puis le bloc Durée et qualité."
+   },
+   {
+    "ecran": "Calendrier du sommeil (SleepCalendar) et bulle DaySleepLines",
+    "slug": "calendrier-du-sommeil-sleepcalendar-et-bulle-daysleeplines",
+    "fichier": "/Users/beauty/Desktop/GLOW/GIT-APP-V2/docs/captures/activite/calendrier-du-sommeil-sleepcalendar-et-bulle-daysleeplines.png",
+    "ce_quon_voit": "Le calendrier du sommeil « Septembre 2026 », chaque jour de réveil portant la durée de la nuit (7h15 le 2, 8h40 le 3 … 9h10 le 11), le 12 en surbrillance sans donnée."
+   },
+   {
+    "ecran": "Calendrier du sommeil (SleepCalendar) et bulle DaySleepLines",
+    "slug": "calendrier-du-sommeil-sleepcalendar-et-bulle-daysleeplines-bulle",
+    "fichier": "/Users/beauty/Desktop/GLOW/GIT-APP-V2/docs/captures/activite/calendrier-du-sommeil-sleepcalendar-et-bulle-daysleeplines-bulle.png",
+    "ce_quon_voit": "La bulle DaySleepLines sur le 2 septembre : « Nuit du 01 au 02/09 de 7h15 », Endormissement 23:00, Réveil le 02/09/2026 à 06:15, Qualité 4/5, Kcal le 02/09 1375 kcal, Modifier / Supprimer, « + Ajouter un enregistrement »."
+   },
+   {
+    "ecran": "Graphe « Durée et qualité » (SleepChart)",
+    "slug": "graphe-duree-et-qualite-sleepchart",
+    "fichier": "/Users/beauty/Desktop/GLOW/GIT-APP-V2/docs/captures/activite/graphe-duree-et-qualite-sleepchart.png",
+    "ce_quon_voit": "Le bloc « DURÉE ET QUALITÉ du 14/08/2026 à aujourd'hui » : « ≈ 8h13 /j de sommeil », barres Durée (h, 0-12) et courbe rose Qualité (0-5), note « Un point par jour : la durée cumule la nuit et les siestes… »."
+   },
+   {
+    "ecran": "Couche vitrée « Sommeil » — frise des sept dernières nuits (SurimpressionNuits)",
+    "slug": "couche-vitree-sommeil-frise-des-sept-dernieres-nuits-surimpr",
+    "fichier": "/Users/beauty/Desktop/GLOW/GIT-APP-V2/docs/captures/activite/couche-vitree-sommeil-frise-des-sept-dernieres-nuits-surimpr.png",
+    "ce_quon_voit": "La couche « SOMMEIL » ouverte depuis les tuiles Côte à côte : frise sam.→dim. … ven.→sam. avec, par nuit, la barre bleue « 7 dernières nuits » et la barre verte « Depuis le début » sur l'axe 22h-08h, colonnes qual. et durée (4 / 8h45, 3,2 / 8h15…), liens « Ajouter une entrée » et « Voir la page »."
+   },
+   {
+    "ecran": "Tuiles home du domaine Sommeil",
+    "slug": "tuiles-home-du-domaine-sommeil",
+    "fichier": "/Users/beauty/Desktop/GLOW/GIT-APP-V2/docs/captures/activite/tuiles-home-du-domaine-sommeil.png",
+    "ce_quon_voit": "Section « Côte à côte » de la home sections : les tuiles sommeil « 8h04 · qualité : 3.1/5 » (depuis le début) et « 8h05 · qualité : 3.6/5 » (7 derniers jours) autour du médaillon lampe, liens « Ajouter une entrée » et « Voir la page Sommeil »."
+   },
+   {
+    "ecran": "Page « Un temps pour soi » (MeTimeTracker)",
+    "slug": "page-un-temps-pour-soi-metimetracker",
+    "fichier": "/Users/beauty/Desktop/GLOW/GIT-APP-V2/docs/captures/activite/page-un-temps-pour-soi-metimetracker.png",
+    "ce_quon_voit": "La page « Un temps pour soi » : curseur, « + Ajouter », calendrier « Septembre 2026 » (1h00 le 31/08, 2h00 le 2, 45min le 10), bloc « Suivi » avec « Total : 8h de temps pour soi sur 7 jours » et son graphe, début du bloc « 7 derniers jours »."
+   },
+   {
+    "ecran": "Formulaire « Nouveau moment pour soi » / « Modifier le moment pour soi » (MeTimeForm)",
+    "slug": "formulaire-nouveau-moment-pour-soi-modifier-le-moment-pour-s",
+    "fichier": "/Users/beauty/Desktop/GLOW/GIT-APP-V2/docs/captures/activite/formulaire-nouveau-moment-pour-soi-modifier-le-moment-pour-s.png",
+    "ce_quon_voit": "Le formulaire « Nouveau moment pour soi » par défaut : 12/09/2026, 23:20, activité Spa, 30 minutes, + Notes, bouton Valider, page floutée derrière."
+   },
+   {
+    "ecran": "Formulaire « Nouveau moment pour soi » / « Modifier le moment pour soi » (MeTimeForm)",
+    "slug": "formulaire-nouveau-moment-pour-soi-modifier-le-moment-pour-s-modifier",
+    "fichier": "/Users/beauty/Desktop/GLOW/GIT-APP-V2/docs/captures/activite/formulaire-nouveau-moment-pour-soi-modifier-le-moment-pour-s-modifier.png",
+    "ce_quon_voit": "La variante « Modifier le moment pour soi » (depuis la bulle du 31 août) : 31/08/2026 16:15, Manucure, 60 minutes, bouton « Mettre à jour le moment »."
+   },
+   {
+    "ecran": "Panneau « Moments pour soi disponibles » (ManageMeTimeBlock)",
+    "slug": "panneau-moments-pour-soi-disponibles-managemetimeblock",
+    "fichier": "/Users/beauty/Desktop/GLOW/GIT-APP-V2/docs/captures/activite/panneau-moments-pour-soi-disponibles-managemetimeblock.png",
+    "ce_quon_voit": "Le panneau « Moments pour soi disponibles » (option Ajouter/Gérer) : recherche, Tout cocher / Tout décocher, cases Beauté des pieds, Manucure, Regarder du sport entre amis, Sortie cinéma, Spa, Jeu de société, Partie de cartes, Soin du visage, Sortie théâtre, bouton « Enregistrer la sélection »."
+   },
+   {
+    "ecran": "Journal « Un temps pour soi » et sa ligne (JournalEntryCard me-time)",
+    "slug": "journal-un-temps-pour-soi-et-sa-ligne-journalentrycard-me-ti",
+    "fichier": "/Users/beauty/Desktop/GLOW/GIT-APP-V2/docs/captures/activite/journal-un-temps-pour-soi-et-sa-ligne-journalentrycard-me-ti.png",
+    "ce_quon_voit": "Vue journal de la page : « JOURNAL (7) du 14/08/2026 à aujourd'hui », lignes « 45 min · Sortie théâtre · 10/09/2026 · 15:50 · … », 120 min Sortie théâtre, 60 min Manucure, 40 min Soin du visage (copie sous le nom journal-un-temps-pour-soi-et-sa-ligne-journalentrycard-metim.png)."
+   },
+   {
+    "ecran": "Calendrier « Un temps pour soi » (MeTimeCalendar) et bulle DayMeTimeLines",
+    "slug": "calendrier-un-temps-pour-soi-metimecalendar-et-bulle-daymeti",
+    "fichier": "/Users/beauty/Desktop/GLOW/GIT-APP-V2/docs/captures/activite/calendrier-un-temps-pour-soi-metimecalendar-et-bulle-daymeti.png",
+    "ce_quon_voit": "Le calendrier « Septembre 2026 » du temps pour soi : 1h00 le 31/08, 2h00 le 2, 45min le 10, le 12 en surbrillance."
+   },
+   {
+    "ecran": "Calendrier « Un temps pour soi » (MeTimeCalendar) et bulle DayMeTimeLines",
+    "slug": "calendrier-un-temps-pour-soi-metimecalendar-et-bulle-daymeti-bulle",
+    "fichier": "/Users/beauty/Desktop/GLOW/GIT-APP-V2/docs/captures/activite/calendrier-un-temps-pour-soi-metimecalendar-et-bulle-daymeti-bulle.png",
+    "ce_quon_voit": "La bulle DayMeTimeLines sur le 31 août : Activité Manucure, Durée 60 min, Date 31/08/2026, Heure 16:15, Modifier / Supprimer, « + Ajouter un enregistrement »."
+   },
+   {
+    "ecran": "Graphe « Suivi » du temps pour soi (MeTimeChart)",
+    "slug": "graphe-suivi-du-temps-pour-soi-metimechart",
+    "fichier": "/Users/beauty/Desktop/GLOW/GIT-APP-V2/docs/captures/activite/graphe-suivi-du-temps-pour-soi-metimechart.png",
+    "ce_quon_voit": "Le bloc « SUIVI du 14/08/2026 à aujourd'hui » : « Total : 8h de temps pour soi sur 7 jours », barres du score quotidien (0-10) par jour, légende « Score quotidien de 0 à 10 (où 10 vaut pour 1h de temps pour soi ou plus) »."
+   },
+   {
+    "ecran": "Bloc « Mes moments » (BlocMesMoments)",
+    "slug": "bloc-mes-moments-blocmesmoments",
+    "fichier": "/Users/beauty/Desktop/GLOW/GIT-APP-V2/docs/captures/activite/bloc-mes-moments-blocmesmoments.png",
+    "ce_quon_voit": "Le bas de la page temps pour soi : « 7 derniers jours — Sortie théâtre 1 fois » puis « Depuis le début » avec les barres Soin du visage 7 fois, Spa 6, Beauté des pieds 5, Manucure 5, Sortie cinéma 5, Sortie théâtre 5."
+   },
+   {
+    "ecran": "Bloc « Mes moments » (BlocMesMoments)",
+    "slug": "bloc-mes-moments-blocmesmoments-couche",
+    "fichier": "/Users/beauty/Desktop/GLOW/GIT-APP-V2/docs/captures/activite/bloc-mes-moments-blocmesmoments-couche.png",
+    "ce_quon_voit": "Le même bloc monté dans la couche vitrée « UN TEMPS POUR SOI » ouverte depuis les tuiles Côte à côte de la home sections, avec le lien « Voir la page »."
+   },
+   {
+    "ecran": "Tuiles home du domaine Temps pour soi",
+    "slug": "tuiles-home-du-domaine-temps-pour-soi",
+    "fichier": "/Users/beauty/Desktop/GLOW/GIT-APP-V2/docs/captures/activite/tuiles-home-du-domaine-temps-pour-soi.png",
+    "ce_quon_voit": "Section « Côte à côte » de la home sections : les tuiles « 1.9 moment » (par semaine depuis le début) et « 1 moment » (7 derniers jours) autour du médaillon « me », liens « Ajouter une entrée » et « Voir la page Un temps pour soi »."
+   },
+   {
+    "ecran": "Tiroir Journal — lignes des quatre journaux",
+    "slug": "tiroir-journal-lignes-des-quatre-journaux",
+    "fichier": "/Users/beauty/Desktop/GLOW/GIT-APP-V2/docs/captures/activite/tiroir-journal-lignes-des-quatre-journaux.png",
+    "ce_quon_voit": "Le tiroir « JOURNAL » (menu simplifié) monté du bas : huit cases dont Activité physique (01/09 · 1h00 · Vélo…), Sommeil (nuit du 10 au 11/09 : 9h10…), Un temps pour soi (10/09 · Sortie théâtre…) et Pas (12/09 · 6 940 pas…)."
+   },
+   {
+    "ecran": "Tiroir Journal — lignes des quatre journaux",
+    "slug": "tiroir-journal-lignes-des-quatre-journaux-pas",
+    "fichier": "/Users/beauty/Desktop/GLOW/GIT-APP-V2/docs/captures/activite/tiroir-journal-lignes-des-quatre-journaux-pas.png",
+    "ce_quon_voit": "La case « Pas » du tiroir ouverte par-dessus : les lignes StepsJournalRow (6 940 pas, barre 87 %, −346 kcal (en cours), 12/09/2026 … 9 080 pas 30/08/2026) et le lien « Ouvrir la page Pas »."
+   },
+   {
+    "ecran": "Tiroir Journal — lignes des quatre journaux",
+    "slug": "tiroir-journal-lignes-des-quatre-journaux-activite-physique",
+    "fichier": "/Users/beauty/Desktop/GLOW/GIT-APP-V2/docs/captures/activite/tiroir-journal-lignes-des-quatre-journaux-activite-physique.png",
+    "ce_quon_voit": "La case « Activité physique » ouverte : les lignes sport (60 min modérée · Vélo · −518 kcal · 01/09/2026 17:30 … Danse 31/07/2026) et « Ouvrir la page Activité physique »."
+   },
+   {
+    "ecran": "Tiroir Journal — lignes des quatre journaux",
+    "slug": "tiroir-journal-lignes-des-quatre-journaux-sommeil",
+    "fichier": "/Users/beauty/Desktop/GLOW/GIT-APP-V2/docs/captures/activite/tiroir-journal-lignes-des-quatre-journaux-sommeil.png",
+    "ce_quon_voit": "La case « Sommeil » ouverte : les lignes de nuit (9 h 10 · Nuit · 10/09 22:20 → 07:30 · 4/5 · 11/09/2026 …) et « Ouvrir la page Sommeil »."
+   },
+   {
+    "ecran": "Tiroir Journal — lignes des quatre journaux",
+    "slug": "tiroir-journal-lignes-des-quatre-journaux-temps-pour-soi",
+    "fichier": "/Users/beauty/Desktop/GLOW/GIT-APP-V2/docs/captures/activite/tiroir-journal-lignes-des-quatre-journaux-temps-pour-soi.png",
+    "ce_quon_voit": "La case « Un temps pour soi » ouverte : les lignes (45 min · Sortie théâtre · 10/09/2026 · 15:50 … Sortie théâtre 29/07/2026) et « Ouvrir la page Un temps pour soi »."
+   },
+   {
+    "ecran": "Tiroir Tendances — cartes Activité physique, Temps pour soi, Sommeil, Pas et graphe en surimpression",
+    "slug": "tiroir-tendances-cartes-activite-physique-temps-pour-soi-som",
+    "fichier": "/Users/beauty/Desktop/GLOW/GIT-APP-V2/docs/captures/activite/tiroir-tendances-cartes-activite-physique-temps-pour-soi-som.png",
+    "ce_quon_voit": "Le tiroir « TENDANCE DES 15 DERNIERS JOURS » : huit cartes à mini-courbe dont Activité physique, Temps pour soi, Sommeil et Pas, chacune avec son chevron vers le graphe."
+   },
+   {
+    "ecran": "Tiroir Tendances — cartes Activité physique, Temps pour soi, Sommeil, Pas et graphe en surimpression",
+    "slug": "tiroir-tendances-cartes-activite-physique-temps-pour-soi-som-valeurs",
+    "fichier": "/Users/beauty/Desktop/GLOW/GIT-APP-V2/docs/captures/activite/tiroir-tendances-cartes-activite-physique-temps-pour-soi-som-valeurs.png",
+    "ce_quon_voit": "Les quatre cartes du domaine retournées par « Voir les valeurs » : « 1h00 −37 kcal/j » (sport), « total : 3h45 » (temps pour soi), « 5h37 /j » (sommeil), « 8.3 Kpas/j −447 kcal/j » (pas)."
+   },
+   {
+    "ecran": "Tiroir Tendances — cartes Activité physique, Temps pour soi, Sommeil, Pas et graphe en surimpression",
+    "slug": "tiroir-tendances-cartes-activite-physique-temps-pour-soi-som-graphe-activite-physique",
+    "fichier": "/Users/beauty/Desktop/GLOW/GIT-APP-V2/docs/captures/activite/tiroir-tendances-cartes-activite-physique-temps-pour-soi-som-graphe-activite-physique.png",
+    "ce_quon_voit": "Le graphe SportChart en surimpression du tiroir (carte Activité physique) : période du 14/08/2026 à aujourd'hui, « Total calories dépensées : ~2 320 kcal », barres kcal et score, « Voir la page »."
+   },
+   {
+    "ecran": "Tiroir Tendances — cartes Activité physique, Temps pour soi, Sommeil, Pas et graphe en surimpression",
+    "slug": "tiroir-tendances-cartes-activite-physique-temps-pour-soi-som-graphe-temps-pour-soi",
+    "fichier": "/Users/beauty/Desktop/GLOW/GIT-APP-V2/docs/captures/activite/tiroir-tendances-cartes-activite-physique-temps-pour-soi-som-graphe-temps-pour-soi.png",
+    "ce_quon_voit": "Le graphe MeTimeChart en surimpression (carte Temps pour soi) : « Total : 8h de temps pour soi sur 7 jours », barres du score quotidien, « Voir la page »."
+   },
+   {
+    "ecran": "Tiroir Tendances — cartes Activité physique, Temps pour soi, Sommeil, Pas et graphe en surimpression",
+    "slug": "tiroir-tendances-cartes-activite-physique-temps-pour-soi-som-graphe-sommeil",
+    "fichier": "/Users/beauty/Desktop/GLOW/GIT-APP-V2/docs/captures/activite/tiroir-tendances-cartes-activite-physique-temps-pour-soi-som-graphe-sommeil.png",
+    "ce_quon_voit": "Le graphe SleepChart en surimpression (carte Sommeil) : « Durée et qualité ≈ 8h13 /j de sommeil », barres Durée et courbe Qualité, note explicative, « Voir la page »."
+   },
+   {
+    "ecran": "Tiroir Tendances — cartes Activité physique, Temps pour soi, Sommeil, Pas et graphe en surimpression",
+    "slug": "tiroir-tendances-cartes-activite-physique-temps-pour-soi-som-graphe-pas",
+    "fichier": "/Users/beauty/Desktop/GLOW/GIT-APP-V2/docs/captures/activite/tiroir-tendances-cartes-activite-physique-temps-pour-soi-som-graphe-pas.png",
+    "ce_quon_voit": "Le graphe StepsTrendChart en surimpression (carte Pas) : « Suivi de votre nombre de pas par jour », barres 0-14 000, seuil objectif 8 000, « Voir la page »."
+   }
+  ],
+  "non_capturables": [
+   {
+    "ecran": "Graphes croisés sommeil × nutrition (SleepNutritionChart) — mis de côté",
+    "pourquoi": "Non atteignable : le composant est désactivé dans SleepTracker (aucun montage dans la V1 servie), rien ne s'affiche à l'écran."
+   }
+  ]
+ },
+ {
+  "domaine": "accueil",
+  "captures": [
+   {
+    "ecran": "Home standard « Maison » (page)",
+    "slug": "home-standard-maison-page",
+    "fichier": "/Users/beauty/Desktop/GLOW/GIT-APP-V2/docs/captures/accueil/home-standard-maison-page.png",
+    "ce_quon_voit": "Haut de la home standard : bloc Salut Camille (-13.9 kg, 42 %, Cure Ozempic, badge Argent), tuile « Dernière perte enregistrée » -0.2 kg (disque vinyle 33T), bloc « Aujourd'hui » 450 kcal avec barres protéines/fibres, défilé des journaux, tuile « Depuis le début » -10.1 kg (flûte à bec et valise cabine)."
+   },
+   {
+    "ecran": "Home standard « Maison » (page)",
+    "slug": "home-standard-maison-page-bas",
+    "fichier": "/Users/beauty/Desktop/GLOW/GIT-APP-V2/docs/captures/accueil/home-standard-maison-page-bas.png",
+    "ce_quon_voit": "Bas de la home standard : fin du carré poids (IMC masqué ••.•), carré traitement semaine n° 18, bloc « Mes pas » 6 940 / 8 000, bloc « Dynamique sur les 7 derniers jours » (légère baisse attendue) et l'avertissement médical avec le bouton « Info Santé & Confidentialité »."
+   },
+   {
+    "ecran": "Bloc « Salut » (partagé par les trois homes)",
+    "slug": "bloc-salut-partage-par-les-trois-homes",
+    "fichier": "/Users/beauty/Desktop/GLOW/GIT-APP-V2/docs/captures/accueil/bloc-salut-partage-par-les-trois-homes.png",
+    "ce_quon_voit": "Le bloc Salut en tête de la home standard : avatar, « Salut Camille », objectif restant -13.9 kg, barre de progression 42 %, ligne « Cure : Ozempic • Rappels : Non » et le badge Argent à droite."
+   },
+   {
+    "ecran": "Carré poids / Évolution (home standard)",
+    "slug": "carre-poids-evolution-home-standard",
+    "fichier": "/Users/beauty/Desktop/GLOW/GIT-APP-V2/docs/captures/accueil/carre-poids-evolution-home-standard.png",
+    "ce_quon_voit": "Le carré poids en haut du cadre : « Semaine n° 18 (121 jours) ≈ -0.6 kg / semaine », arc départ→objectif -24 kg / -25 %, trois poids 96 / 85.9 / 72 kg, -10.5 % du poids de départ, ligne IMC masquée avec l'œil « Afficher »."
+   },
+   {
+    "ecran": "Carré poids / Évolution (home standard)",
+    "slug": "carre-poids-evolution-home-standard-imc",
+    "fichier": "/Users/beauty/Desktop/GLOW/GIT-APP-V2/docs/captures/accueil/carre-poids-evolution-home-standard-imc.png",
+    "ce_quon_voit": "Le même carré poids après le clic sur « Afficher » : la ligne IMC révèle « 30.4 Obésité I » (non cliquable car la catégorie n'a pas changé), l'œil devient « Masquer l'IMC »."
+   },
+   {
+    "ecran": "Carré traitement (home standard)",
+    "slug": "carre-traitement-home-standard",
+    "fichier": "/Users/beauty/Desktop/GLOW/GIT-APP-V2/docs/captures/accueil/carre-traitement-home-standard.png",
+    "ce_quon_voit": "Le carré traitement : « Semaine n° 18 (121 jours) · Dernière il y a 2 jours », doses initial 0.25 mg / actuel 1.7 mg / actif 3.5 mg, smiley « pas ou très peu d'effet secondaire aujourd'hui », pied « Ozempic · 17 injections · 16.95 mg cumulé »."
+   },
+   {
+    "ecran": "Bloc « Mes pas » (home standard)",
+    "slug": "bloc-mes-pas-home-standard",
+    "fichier": "/Users/beauty/Desktop/GLOW/GIT-APP-V2/docs/captures/accueil/bloc-mes-pas-home-standard.png",
+    "ce_quon_voit": "La carte « Mes pas » : 6 940 pas / 8 000, 346 kcal, barre objectif 87 %, puis 5.3 km · 1h13 · 4.2 km/h."
+   },
+   {
+    "ecran": "Défilé des dernières entrées de journaux",
+    "slug": "defile-des-dernieres-entrees-de-journaux",
+    "fichier": "/Users/beauty/Desktop/GLOW/GIT-APP-V2/docs/captures/accueil/defile-des-dernieres-entrees-de-journaux.png",
+    "ce_quon_voit": "La bande horizontale de carrés sous le bloc Aujourd'hui : 12/09 Petit-déjeuner 450 kcal · 3→2, 12/09 Pesée 85.9 kg, 11/09 Dîner 541 kcal, 11/09 En-cas 210 kcal, 10→11/9 Nuit 4/5 (coupée au bord droit, la bande défile)."
+   },
+   {
+    "ecran": "Section « Dynamique » — bloc du verdict (partagé)",
+    "slug": "section-dynamique-bloc-du-verdict-partage",
+    "fichier": "/Users/beauty/Desktop/GLOW/GIT-APP-V2/docs/captures/accueil/section-dynamique-bloc-du-verdict-partage.png",
+    "ce_quon_voit": "Sur la home standard, le bloc « Dynamique sur les 7 derniers jours » dévoilé : « Dynamique générale : légère baisse attendue sur la balance. Voir le calcul »."
+   },
+   {
+    "ecran": "Section « Dynamique » — bloc du verdict (partagé)",
+    "slug": "section-dynamique-bloc-du-verdict-partage-verrouille",
+    "fichier": "/Users/beauty/Desktop/GLOW/GIT-APP-V2/docs/captures/accueil/section-dynamique-bloc-du-verdict-partage-verrouille.png",
+    "ce_quon_voit": "Le même bloc à l'état verrouillé (première ouverture datée de 3 jours, glp1_first_open_date = 2026-09-09) : bandeau « Dynamique », contenu dépoli, message « Utilisez GLOW pendant 7 jours pour débloquer la dynamique générale de votre métabolisme »."
+   },
+   {
+    "ecran": "Fête « Dynamique débloquée »",
+    "slug": "fete-dynamique-debloquee",
+    "fichier": "/Users/beauty/Desktop/GLOW/GIT-APP-V2/docs/captures/accueil/fete-dynamique-debloquee.png",
+    "ce_quon_voit": "La home vitrée par la couche de fête (graine sans glp1_dynamique_celebrated) : carte « Dynamique débloquée » avec croix, texte « Sept jours de suivi, et la dynamique générale de votre métabolisme se dévoile : elle vous attend en haut de l'accueil. », confettis en bas."
+   },
+   {
+    "ecran": "Home sections / blocs (page)",
+    "slug": "home-sections-blocs-page",
+    "fichier": "/Users/beauty/Desktop/GLOW/GIT-APP-V2/docs/captures/accueil/home-sections-blocs-page.png",
+    "ce_quon_voit": "Haut de la home sections (template « sections », carrés à nu) : Salut, rangée « Ajout rapide » de sept boutons +, « En direct » (450 kcal, prot. 7 %, fibr. 21 %, 6 940 pas, 3.5 mg, smiley), « Dynamique sur les 7 derniers jours » avec les trois flèches, « Progrès » (≈ -0.6 kg/semaine, -3.6 points d'IMC, -10.1 kg, -0.2 kg)."
+   },
+   {
+    "ecran": "Home sections / blocs (page)",
+    "slug": "home-sections-blocs-page-sections",
+    "fichier": "/Users/beauty/Desktop/GLOW/GIT-APP-V2/docs/captures/accueil/home-sections-blocs-page-sections.png",
+    "ce_quon_voit": "Identique à home-sections-blocs-page : le haut de la home sections (Salut, Ajout rapide, En direct, Dynamique, Progrès)."
+   },
+   {
+    "ecran": "Home sections / blocs (page)",
+    "slug": "home-sections-blocs-page-sections-milieu",
+    "fichier": "/Users/beauty/Desktop/GLOW/GIT-APP-V2/docs/captures/accueil/home-sections-blocs-page-sections-milieu.png",
+    "ce_quon_voit": "Milieu de la home sections : la zone « Côte à côte » — début | aujourd'hui (0.25 mg → 1.7 mg Ozempic, 96 kg → 85.9 kg) puis « Depuis le début | 7 derniers jours » (1462 kcal vs 868 kcal, 8 649 vs 8 633 pas, 8h04 vs 8h05 de sommeil, 85 min vs 0 min de sport)."
+   },
+   {
+    "ecran": "Home sections / blocs (page)",
+    "slug": "home-sections-blocs-page-sections-bas",
+    "fichier": "/Users/beauty/Desktop/GLOW/GIT-APP-V2/docs/captures/accueil/home-sections-blocs-page-sections-bas.png",
+    "ce_quon_voit": "Bas de la home sections : fin du Côte à côte (pas, sommeil, activité physique 1.7 séance vs 0, temps pour soi 1.9 vs 1 moment) avec les liens « Ajouter une entrée / Voir la page », puis l'avertissement médical et le bouton « Info Santé & Confidentialité »."
+   },
+   {
+    "ecran": "Home sections / blocs (page)",
+    "slug": "home-sections-blocs-page-blocs",
+    "fichier": "/Users/beauty/Desktop/GLOW/GIT-APP-V2/docs/captures/accueil/home-sections-blocs-page-blocs.png",
+    "ce_quon_voit": "Haut de la home blocs (mêmes sections en cartes blanches arrondies) : Salut, Ajout rapide, En direct en six cartes, Dynamique avec trois cartes de sens et la carte du verdict, Progrès en quatre cartes."
+   },
+   {
+    "ecran": "Home sections / blocs (page)",
+    "slug": "home-sections-blocs-page-blocs-milieu",
+    "fichier": "/Users/beauty/Desktop/GLOW/GIT-APP-V2/docs/captures/accueil/home-sections-blocs-page-blocs-milieu.png",
+    "ce_quon_voit": "Milieu de la home blocs : le Côte à côte en cartes — début | aujourd'hui (doses, poids) et Depuis le début | 7 derniers jours (kcal, protéines/fibres, pas, sommeil, qualité), chaque domaine avec son médaillon central."
+   },
+   {
+    "ecran": "Home sections / blocs (page)",
+    "slug": "home-sections-blocs-page-blocs-bas",
+    "fichier": "/Users/beauty/Desktop/GLOW/GIT-APP-V2/docs/captures/accueil/home-sections-blocs-page-blocs-bas.png",
+    "ce_quon_voit": "Bas de la home blocs : cartes pas, sommeil, activité physique (85 min · 1.7 séance vs 0), temps pour soi (1.9 vs 1 moment), puis l'avertissement médical et « Info Santé & Confidentialité »."
+   },
+   {
+    "ecran": "Section « Ajout rapide » (home sections)",
+    "slug": "section-ajout-rapide-home-sections",
+    "fichier": "/Users/beauty/Desktop/GLOW/GIT-APP-V2/docs/captures/accueil/section-ajout-rapide-home-sections.png",
+    "ce_quon_voit": "La rangée « Ajout rapide » en haut du cadre : sept boutons blancs marqués + (injection, pesée, effet secondaire, activité physique, repas, sommeil, temps pour soi), suivie d'En direct, Dynamique et Progrès."
+   },
+   {
+    "ecran": "Section « En direct » (home sections)",
+    "slug": "section-en-direct-home-sections",
+    "fichier": "/Users/beauty/Desktop/GLOW/GIT-APP-V2/docs/captures/accueil/section-en-direct-home-sections.png",
+    "ce_quon_voit": "La section « En direct » en haut du cadre : bande 450 kcal | prot. 7 % (objectif 129 g) | fibr. 21 % (25 g), puis tuiles 6 940 pas, 3.5 mg niveau sanguin actif, smiley « pas ou peu d'effet secondaire aujourd'hui », bouton « + Ajouter » repas."
+   },
+   {
+    "ecran": "Section « Dynamique » — rangée des trois sens (home sections)",
+    "slug": "section-dynamique-rangee-des-trois-sens-home-sections",
+    "fichier": "/Users/beauty/Desktop/GLOW/GIT-APP-V2/docs/captures/accueil/section-dynamique-rangee-des-trois-sens-home-sections.png",
+    "ce_quon_voit": "La section Dynamique dévoilée en haut du cadre : trois tuiles repas ↓, activité physique ↓, pas ↑, le bloc du verdict « légère baisse attendue sur la balance. Voir le calcul » et le bouton « + Ajouter » séance ; Progrès et Côte à côte suivent."
+   },
+   {
+    "ecran": "Section « Dynamique » — rangée des trois sens (home sections)",
+    "slug": "section-dynamique-rangee-des-trois-sens-home-sections-verrouille",
+    "fichier": "/Users/beauty/Desktop/GLOW/GIT-APP-V2/docs/captures/accueil/section-dynamique-rangee-des-trois-sens-home-sections-verrouille.png",
+    "ce_quon_voit": "La section « Dynamique » verrouillée, reléguée en dernière section de la home sections : rangée des sens floutée, message centré « Utilisez GLOW pendant 7 jours pour débloquer la dynamique générale de votre métabolisme », bouton « + Ajouter » séance dessous."
+   },
+   {
+    "ecran": "Section « Progrès » / « Évolution » (home sections)",
+    "slug": "section-progres-evolution-home-sections",
+    "fichier": "/Users/beauty/Desktop/GLOW/GIT-APP-V2/docs/captures/accueil/section-progres-evolution-home-sections.png",
+    "ce_quon_voit": "La rangée « Progrès » en haut du cadre : quatre mini-tuiles ≈ -0.6 kg/semaine (balance), -3.6 points d'IMC (jauge), -10.1 kg avec flûte à bec et valise « en 17 semaines », -0.2 kg avec disque vinyle « en 4 jours » ; le Côte à côte suit."
+   },
+   {
+    "ecran": "Surimpression d'une équivalence insolite (home sections)",
+    "slug": "surimpression-dune-equivalence-insolite-home-sections",
+    "fichier": "/Users/beauty/Desktop/GLOW/GIT-APP-V2/docs/captures/accueil/surimpression-dune-equivalence-insolite-home-sections.png",
+    "ce_quon_voit": "Après le clic sur la tuile -10.1 kg : la page vitrée, bloc « Depuis le début · -10.1 kg · soit l'équivalent de » avec la flûte à bec et la valise cabine en grand, légende « une flûte à bec et une valise cabine pleine », croix de fermeture."
+   },
+   {
+    "ecran": "Surimpression d'une équivalence insolite (home sections)",
+    "slug": "surimpression-dune-equivalence-insolite-home-sections-derniere-perte",
+    "fichier": "/Users/beauty/Desktop/GLOW/GIT-APP-V2/docs/captures/accueil/surimpression-dune-equivalence-insolite-home-sections-derniere-perte.png",
+    "ce_quon_voit": "Après le clic sur la tuile -0.2 kg : bloc « Dernière perte enregistrée · -0.2 kg · soit l'équivalent de » avec le disque vinyle 33T en grand et la légende « un disque vinyle 33T »."
+   },
+   {
+    "ecran": "Section « Côte à côte » (home sections)",
+    "slug": "section-cote-a-cote-home-sections",
+    "fichier": "/Users/beauty/Desktop/GLOW/GIT-APP-V2/docs/captures/accueil/section-cote-a-cote-home-sections.png",
+    "ce_quon_voit": "Le titre « Côte à côte » en haut du cadre, la sous-section début | aujourd'hui (0.25 mg → 1.7 mg Ozempic avec médaillon seringue, 96 kg → 85.9 kg avec médaillon balance), leurs liens « Ajouter une entrée / Voir la page », puis « Depuis le début | 7 derniers jours (moyenne / jour) » : 1462 vs 868 kcal, protéines et fibres, pas, sommeil."
+   },
+   {
+    "ecran": "Section « Côte à côte » (home sections)",
+    "slug": "section-cote-a-cote-home-sections-suite",
+    "fichier": "/Users/beauty/Desktop/GLOW/GIT-APP-V2/docs/captures/accueil/section-cote-a-cote-home-sections-suite.png",
+    "ce_quon_voit": "La suite du Côte à côte : « Depuis le début | 7 derniers jours » — repas (1462 / 868 kcal, protéine 78 g / 44 g, fibre 26 g / 15 g), pas 8 649 / 8 633, sommeil 8h04 / 8h05 qualité 3.1 / 3.6, (moyenne / semaine) sport 85 min · 1.7 séance / 0, temps pour soi 1.9 / 1 moment, chacun avec ses liens de pied."
+   },
+   {
+    "ecran": "Couches vitrées de la home sections (SurimpressionVitree)",
+    "slug": "couches-vitrees-de-la-home-sections-surimpressionvitree",
+    "fichier": "/Users/beauty/Desktop/GLOW/GIT-APP-V2/docs/captures/accueil/couches-vitrees-de-la-home-sections-surimpressionvitree.png",
+    "ce_quon_voit": "Exemplaire de la couche vitrée (copie de la couche « Pas ») : bandeau titre avec picto et croix, contenu monté depuis la page, lien « Voir la page », le reste de la home flouté."
+   },
+   {
+    "ecran": "Couches vitrées de la home sections (SurimpressionVitree)",
+    "slug": "couches-vitrees-de-la-home-sections-surimpressionvitree-pas",
+    "fichier": "/Users/beauty/Desktop/GLOW/GIT-APP-V2/docs/captures/accueil/couches-vitrees-de-la-home-sections-surimpressionvitree-pas.png",
+    "ce_quon_voit": "Couche « Pas » (tuile 6 940 d'En direct) : carte Aujourd'hui 6 940 / 8 000, 87 %, 5.3 km · 1h13 · 4.2 km/h ; carte « Depuis le 14/05/2026 : 838 950 pas », 637.6 km, 147h11, statistiques/j 8 649 pas, moyenne 94 % ; « Voir la page »."
+   },
+   {
+    "ecran": "Couches vitrées de la home sections (SurimpressionVitree)",
+    "slug": "couches-vitrees-de-la-home-sections-surimpressionvitree-niveau-sanguin",
+    "fichier": "/Users/beauty/Desktop/GLOW/GIT-APP-V2/docs/captures/accueil/couches-vitrees-de-la-home-sections-surimpressionvitree-niveau-sanguin.png",
+    "ce_quon_voit": "Couche « Niveau sanguin actif » (tuile 3.5 mg) : période du 14/08/2026 à aujourd'hui, Ozempic, « En direct : 3.501 mg · dernier pic il y a 20 h », courbe pharmacocinétique en dents de scie avec les points d'injection, légende, note d'estimation, deux accordéons d'information, « Voir la page »."
+   },
+   {
+    "ecran": "Couches vitrées de la home sections (SurimpressionVitree)",
+    "slug": "couches-vitrees-de-la-home-sections-surimpressionvitree-effets-secondaires",
+    "fichier": "/Users/beauty/Desktop/GLOW/GIT-APP-V2/docs/captures/accueil/couches-vitrees-de-la-home-sections-surimpressionvitree-effets-secondaires.png",
+    "ce_quon_voit": "Couche « Effets secondaires » (tuile smiley d'En direct) : la matrice « Ballonnements · du 04/08 au 10/08 » 1/9, trois lignes matin / après-midi / soir sur sept jours, une case rouge « marquée » le 10/08 matin, légende rien/légère/modérée/marquée, phrase d'explication, « Voir la page »."
+   },
+   {
+    "ecran": "Couches vitrées de la home sections (SurimpressionVitree)",
+    "slug": "couches-vitrees-de-la-home-sections-surimpressionvitree-repas",
+    "fichier": "/Users/beauty/Desktop/GLOW/GIT-APP-V2/docs/captures/accueil/couches-vitrees-de-la-home-sections-surimpressionvitree-repas.png",
+    "ce_quon_voit": "Couche « Menus » (bloc kcal d'En direct) : « Aujourd'hui » 07:50 · Repas · 450 kcal avec barre prot./gluc./lip./fibr. 8/55/35/2 %, lien « Ajouter un autre repas », puis la moyenne du 06/09/2026 à aujourd'hui ≈ 425 kcal sur 10 repas et 4 en-cas, « Voir la page »."
+   },
+   {
+    "ecran": "Couches vitrées de la home sections (SurimpressionVitree)",
+    "slug": "couches-vitrees-de-la-home-sections-surimpressionvitree-repas-formulaire",
+    "fichier": "/Users/beauty/Desktop/GLOW/GIT-APP-V2/docs/captures/accueil/couches-vitrees-de-la-home-sections-surimpressionvitree-repas-formulaire.png",
+    "ce_quon_voit": "La couche Menus après « Ajouter un autre repas » : formulaire « Nouveau » avec bascule Repas / En-cas, date 12/09/2026 et heure 23:30, ligne Nom vide + Qté 100 g, bouton +, curseurs faim avant (2) / après (0), interrupteur Favori, bouton Valider, mention Ciqual, « Voir la page »."
+   },
+   {
+    "ecran": "Couches vitrées de la home sections (SurimpressionVitree)",
+    "slug": "couches-vitrees-de-la-home-sections-surimpressionvitree-repas-moyenne",
+    "fichier": "/Users/beauty/Desktop/GLOW/GIT-APP-V2/docs/captures/accueil/couches-vitrees-de-la-home-sections-surimpressionvitree-repas-moyenne.png",
+    "ce_quon_voit": "Couche « Menus » ouverte depuis la tuile 1462 kcal du Côte à côte : « Depuis le début » ≈ 588 kcal (21/46/29/4 %) « Moyenne sur 261 repas et 40 en-cas entre le 14/05/2026 et aujourd'hui », puis la moyenne du 06/09/2026 à aujourd'hui ≈ 425 kcal."
+   },
+   {
+    "ecran": "Couches vitrées de la home sections (SurimpressionVitree)",
+    "slug": "couches-vitrees-de-la-home-sections-surimpressionvitree-balance",
+    "fichier": "/Users/beauty/Desktop/GLOW/GIT-APP-V2/docs/captures/accueil/couches-vitrees-de-la-home-sections-surimpressionvitree-balance.png",
+    "ce_quon_voit": "Couche « Balance » (tuile ≈ -0.6 kg/semaine) : « 18 semaines (121 jours) », -0.6 kg / semaine, schéma départ 96 kg IMC 34 → actuel 85.9 kg IMC 30.4 → objectif 72 kg IMC 25.5 avec -24 kg / -25 %, IMC -3.6, -10.1 kg / -10.5 %, -13.9 kg / -14.5 % restants, « Voir la page »."
+   },
+   {
+    "ecran": "Couches vitrées de la home sections (SurimpressionVitree)",
+    "slug": "couches-vitrees-de-la-home-sections-surimpressionvitree-imc",
+    "fichier": "/Users/beauty/Desktop/GLOW/GIT-APP-V2/docs/captures/accueil/couches-vitrees-de-la-home-sections-surimpressionvitree-imc.png",
+    "ce_quon_voit": "Couche « Où en est l'IMC » (tuile -3.6 points d'IMC) : échelle colorée 18.5 / 25 / 30 / 35 / 40 avec surpoids, obésité I, obésité II, point plein « aujourd'hui 30.4 » et point creux « au départ 34 », « Voir la page »."
+   },
+   {
+    "ecran": "Couches vitrées de la home sections (SurimpressionVitree)",
+    "slug": "couches-vitrees-de-la-home-sections-surimpressionvitree-doses",
+    "fichier": "/Users/beauty/Desktop/GLOW/GIT-APP-V2/docs/captures/accueil/couches-vitrees-de-la-home-sections-surimpressionvitree-doses.png",
+    "ce_quon_voit": "Couche « Paliers de dose » (tuile 0.25 mg du Côte à côte) : « Parcours de doses · Ozempic », frise 14/05 début à 0.25 mg · 4 semaines · 3 injections · ≈ -0.5 kg/semaine, 11/06 0.5 mg, 09/07 1 mg, 06/08 1.7 mg en cours depuis 5 semaines · 6 injections ; le premier palier est mis en avant."
+   },
+   {
+    "ecran": "Couches vitrées de la home sections (SurimpressionVitree)",
+    "slug": "couches-vitrees-de-la-home-sections-surimpressionvitree-doses-actuel",
+    "fichier": "/Users/beauty/Desktop/GLOW/GIT-APP-V2/docs/captures/accueil/couches-vitrees-de-la-home-sections-surimpressionvitree-doses-actuel.png",
+    "ce_quon_voit": "La même couche « Paliers de dose » ouverte depuis la tuile 1.7 mg : c'est le dernier palier (06/08, 1.7 mg en cours) qui est mis en avant."
+   },
+   {
+    "ecran": "Couches vitrées de la home sections (SurimpressionVitree)",
+    "slug": "couches-vitrees-de-la-home-sections-surimpressionvitree-sport",
+    "fichier": "/Users/beauty/Desktop/GLOW/GIT-APP-V2/docs/captures/accueil/couches-vitrees-de-la-home-sections-surimpressionvitree-sport.png",
+    "ce_quon_voit": "Couche « Activité physique » (tuile 85 min) : « 7 derniers jours — Aucune activité physique enregistrée », puis « Depuis le début » par discipline (Danse 2 172 kcal 5h15 · 6 séances, Vélo, Marche nordique, Fitness / Cardio, 2 autres), total 29 séances · 23h45, par semaine 1.7 séance / 1h25 : 757 kcal."
+   },
+   {
+    "ecran": "Couches vitrées de la home sections (SurimpressionVitree)",
+    "slug": "couches-vitrees-de-la-home-sections-surimpressionvitree-sport-ajouter",
+    "fichier": "/Users/beauty/Desktop/GLOW/GIT-APP-V2/docs/captures/accueil/couches-vitrees-de-la-home-sections-surimpressionvitree-sport-ajouter.png",
+    "ce_quon_voit": "Couche « Activité physique » ouverte par le bouton « + Ajouter » de la section Dynamique : formulaire avec ses valeurs par défaut — 12/09/2026, 23:20, Marche, 30 minutes, distance vide (km) ou effort Doux / Modéré / Intensif, « + Notes », bouton Valider, « Voir la page »."
+   },
+   {
+    "ecran": "Couches vitrées de la home sections (SurimpressionVitree)",
+    "slug": "couches-vitrees-de-la-home-sections-surimpressionvitree-sommeil",
+    "fichier": "/Users/beauty/Desktop/GLOW/GIT-APP-V2/docs/captures/accueil/couches-vitrees-de-la-home-sections-surimpressionvitree-sommeil.png",
+    "ce_quon_voit": "Couche « Sommeil » (tuile 8h04) : graphique des sept dernières nuits (barres bleues) contre la moyenne depuis le début (barres vertes), axe 22h→08h, colonnes qual. et durée par nuit (sam.→dim. jusqu'à ven.→sam.), liens « Ajouter une entrée » et « Voir la page »."
+   },
+   {
+    "ecran": "Couches vitrées de la home sections (SurimpressionVitree)",
+    "slug": "couches-vitrees-de-la-home-sections-surimpressionvitree-temps-pour-soi",
+    "fichier": "/Users/beauty/Desktop/GLOW/GIT-APP-V2/docs/captures/accueil/couches-vitrees-de-la-home-sections-surimpressionvitree-temps-pour-soi.png",
+    "ce_quon_voit": "Couche « Un temps pour soi » (tuile 1.9 moment) : « 7 derniers jours » Sortie théâtre 1 fois ; « Depuis le début » Soin du visage 7, Spa 6, Beauté des pieds 5, Manucure 5, Sortie cinéma 5, Sortie théâtre 5 fois, en barres ; « Voir la page »."
+   },
+   {
+    "ecran": "Pied de page médical (les deux homes)",
+    "slug": "pied-de-page-medical-les-deux-homes",
+    "fichier": "/Users/beauty/Desktop/GLOW/GIT-APP-V2/docs/captures/accueil/pied-de-page-medical-les-deux-homes.png",
+    "ce_quon_voit": "Le bas de la home standard : sous le bloc Dynamique, le texte « Avertissement médical & Confidentialité : Cet outil est un carnet de bord personnel… Vos données de santé restent sur votre appareil » et le bouton « Info Santé & Confidentialité »."
+   },
+   {
+    "ecran": "Tiroir « Journal »",
+    "slug": "tiroir-journal",
+    "fichier": "/Users/beauty/Desktop/GLOW/GIT-APP-V2/docs/captures/accueil/tiroir-journal.png",
+    "ce_quon_voit": "En menu simplifié, le tiroir « Journal » venu de la gauche : huit cases sur deux colonnes (Injections, Balance, Effets secondaires, Activité physique, Menus, Sommeil, Un temps pour soi, Pas), chacune avec ses trois dernières entrées datées (ex. Balance 12/09 · 85.9 kg), barre Accueil / Journal / + / Tendances / Menu."
+   },
+   {
+    "ecran": "Surimpression du journal d'une page (tiroir Journal)",
+    "slug": "surimpression-du-journal-dune-page-tiroir-journal",
+    "fichier": "/Users/beauty/Desktop/GLOW/GIT-APP-V2/docs/captures/accueil/surimpression-du-journal-dune-page-tiroir-journal.png",
+    "ce_quon_voit": "Après le clic sur la case Balance : la surimpression « Balance » plein cadre listant toutes les pesées (85.9 kg 12/09/2026 06:40, 86.1 kg 08/09, 86.2 kg 06/09 … 92 kg 01/07/2026) avec leurs points de suspension, croix et lien « Ouvrir la page Balance »."
+   },
+   {
+    "ecran": "Tiroir « Tendance des 15 derniers jours »",
+    "slug": "tiroir-tendance-des-15-derniers-jours",
+    "fichier": "/Users/beauty/Desktop/GLOW/GIT-APP-V2/docs/captures/accueil/tiroir-tendance-des-15-derniers-jours.png",
+    "ce_quon_voit": "Le tiroir « Tendance des 15 derniers jours » : huit cartes sur deux colonnes avec courbes sans échelle (Actif sanguin, Balance, Calories, Activité physique, Temps pour soi, Sommeil, Pas) et la carte Effets secondaires avec un visage « Pas ou peu d'effet secondaire »."
+   },
+   {
+    "ecran": "Tiroir « Tendance des 15 derniers jours »",
+    "slug": "tiroir-tendance-des-15-derniers-jours-valeurs",
+    "fichier": "/Users/beauty/Desktop/GLOW/GIT-APP-V2/docs/captures/accueil/tiroir-tendance-des-15-derniers-jours-valeurs.png",
+    "ce_quon_voit": "Le même tiroir après « Voir les valeurs » sur la première carte : son titre est remplacé par la valeur « 3.58 mg · En direct » avec le chevron inversé, les autres cartes gardent leur titre."
+   },
+   {
+    "ecran": "Surimpression du graphe principal (tiroir Tendance)",
+    "slug": "surimpression-du-graphe-principal-tiroir-tendance",
+    "fichier": "/Users/beauty/Desktop/GLOW/GIT-APP-V2/docs/captures/accueil/surimpression-du-graphe-principal-tiroir-tendance.png",
+    "ce_quon_voit": "Après le clic sur la carte Balance : bloc « Balance » par-dessus le tiroir vitré, période du 14/08/2026 à aujourd'hui, « Courbe de poids » de 88 à 85.9 kg avec les jours de saisie en points, légende Poids (kg) / Jour de saisie, lien « Voir la page »."
+   },
+   {
+    "ecran": "Matrice des effets secondaires par moment de la journée",
+    "slug": "matrice-des-effets-secondaires-par-moment-de-la-journee",
+    "fichier": "/Users/beauty/Desktop/GLOW/GIT-APP-V2/docs/captures/accueil/matrice-des-effets-secondaires-par-moment-de-la-journee.png",
+    "ce_quon_voit": "Depuis la carte Effets secondaires du tiroir Tendance : le bloc « Effets secondaires » avec la matrice « Ballonnements · du 04/08 au 10/08 » 1/9 (flèches effet précédent/suivant), 3 moments × 7 jours, une case rouge le 10/08 matin, légende des crans et la phrase « 1 déclaration de Ballonnements sur cette semaine… C'est la dernière semaine où un effet a été déclaré »."
+   },
+   {
+    "ecran": "Tiroir « Dynamique » (calcul de la projection)",
+    "slug": "tiroir-dynamique-calcul-de-la-projection",
+    "fichier": "/Users/beauty/Desktop/GLOW/GIT-APP-V2/docs/captures/accueil/tiroir-dynamique-calcul-de-la-projection.png",
+    "ce_quon_voit": "Après « Voir le calcul » : le tiroir « Dynamique » venu du haut — bases (métabolisme au repos ≈ 1 510 kcal/jour, poids actuel 85.9 kg), 7 derniers jours (métabolisme ≈ 10 570 kcal, repas 5 947 kcal, pas -3 017 kcal, activité physique -0 kcal), la soustraction = différentiel -7 640 kcal, et la projection « devrait se matérialiser par une légère baisse sur la balance »."
+   },
+   {
+    "ecran": "Mini-tuile (composant de la famille « Progrès » / « Côte à côte »)",
+    "slug": "mini-tuile-composant-de-la-famille-progres-cote-a-cote",
+    "fichier": "/Users/beauty/Desktop/GLOW/GIT-APP-V2/docs/captures/accueil/mini-tuile-composant-de-la-famille-progres-cote-a-cote.png",
+    "ce_quon_voit": "Les mini-tuiles telles que montées par la home sections : la rangée Progrès (valeur + unité + libellé + picto ou objets insolites, colonne de période « en 17 semaines » / « en 4 jours ») et, dessous, celles du Côte à côte (0.25 mg Ozempic | 1.7 mg Ozempic, 96 kg | 85.9 kg, 1462 kcal | 868 kcal avec seconde mesure protéine/fibre)."
+   },
+   {
+    "ecran": "Section verrouillée (composant)",
+    "slug": "section-verrouillee-composant",
+    "fichier": "/Users/beauty/Desktop/GLOW/GIT-APP-V2/docs/captures/accueil/section-verrouillee-composant.png",
+    "ce_quon_voit": "Le composant en situation (première ouverture datée de 3 jours) : sur la home sections, la section « Dynamique » en fin de page, rangée des sens et bloc du verdict floutés (bdg-secret), avec le message centré « Utilisez GLOW pendant 7 jours pour débloquer la dynamique générale de votre métabolisme »."
+   }
+  ],
+  "non_capturables": [
+   {
+    "ecran": "Bloc palier d'IMC franchi",
+    "pourquoi": "Avec les données de Camille, l'IMC passe de 34,0 à 30,4 : les deux valeurs sont dans la même catégorie (Obésité I), donc `currentTier.index < startTier.index` est faux, la phrase d'IMC révélée n'est pas un bouton (pas de title « Cliquez pour voir votre palier d'IMC ! ») et le bloc BmiMilestoneBlock ne s'ouvre jamais. Il faudrait inventer une pesée franchissant 30 pour le voir."
+   },
+   {
+    "ecran": "Widget de félicitation",
+    "pourquoi": "Aucun déclenchement réel n'existe dans l'application : il ne s'ouvre que depuis la page d'essai « Félicitations », qui relève de l'administration (domaine exclu)."
+   },
+   {
+    "ecran": "Page d'essai « Félicitations »",
+    "pourquoi": "Page d'administration (AdminSettings), domaine exclu de la capture."
+   },
+   {
+    "ecran": "Bloc calendrier (coquille commune)",
+    "pourquoi": "Domaine voisin : la coquille CalendarBlock est montée par les pages de journaux (injections, poids, sommeil, sport, moments…), jamais par la home ; ses captures reviennent aux domaines de ces pages."
+   }
+  ]
+ },
+ {
+  "domaine": "onboarding-v2",
+  "captures": [
+   {
+    "ecran": "Étape « theme » (thème ciel)",
+    "slug": "etape-theme-ciel",
+    "fichier": "/Users/beauty/Desktop/GLOW/GIT-APP-V2/docs/captures/onboarding-v2/etape-theme-ciel.png",
+    "ce_quon_voit": "Entête marque G·LOW sans décompte, titre « Choisissez », deux cadres de thème côte à côte (bleu clair à gauche, entouré d'un liseré bleu = choisi ; bleu nuit à droite), fond dégradé bleu, un seul bouton « Suivant » pleine largeur en bas (pas de « Précédent »)."
+   },
+   {
+    "ecran": "Étape « theme » (thème ciel-fonce)",
+    "slug": "etape-theme-ciel-fonce",
+    "fichier": "/Users/beauty/Desktop/GLOW/GIT-APP-V2/docs/captures/onboarding-v2/etape-theme-ciel-fonce.png",
+    "ce_quon_voit": "Même écran avec le cadre de droite (bleu nuit) choisi : toute la page passe en fond bleu nuit, le cadre de gauche reste bleu clair ; « Suivant » seul en bas."
+   },
+   {
+    "ecran": "Étape « langue-unites » (thème ciel)",
+    "slug": "etape-langue-unites-ciel",
+    "fichier": "/Users/beauty/Desktop/GLOW/GIT-APP-V2/docs/captures/onboarding-v2/etape-langue-unites-ciel.png",
+    "ce_quon_voit": "Titre « Langue et unités », groupe LANGUE (Français choisi, English), groupe UNITÉS (cm · kg choisi, inch · pound), boutons « Précédent » et « Suivant » en bas ; pas de décompte."
+   },
+   {
+    "ecran": "Étape « langue-unites » (thème ciel-fonce)",
+    "slug": "etape-langue-unites-ciel-fonce",
+    "fichier": "/Users/beauty/Desktop/GLOW/GIT-APP-V2/docs/captures/onboarding-v2/etape-langue-unites-ciel-fonce.png",
+    "ce_quon_voit": "Même écran en fond bleu nuit, Français et cm · kg choisis."
+   },
+   {
+    "ecran": "Étape « objectif » (thème ciel)",
+    "slug": "etape-objectif-ciel",
+    "fichier": "/Users/beauty/Desktop/GLOW/GIT-APP-V2/docs/captures/onboarding-v2/etape-objectif-ciel.png",
+    "ce_quon_voit": "Titre « Vous souhaitez… », deux réponses pleine largeur empilées : « Perdre du poids » (choisi d'avance) et « Stabiliser mon poids » ; Précédent / Suivant."
+   },
+   {
+    "ecran": "Étape « objectif » (thème ciel-fonce)",
+    "slug": "etape-objectif-ciel-fonce",
+    "fichier": "/Users/beauty/Desktop/GLOW/GIT-APP-V2/docs/captures/onboarding-v2/etape-objectif-ciel-fonce.png",
+    "ce_quon_voit": "Même écran en fond bleu nuit, « Perdre du poids » choisi."
+   },
+   {
+    "ecran": "Étape « poids » (thème ciel)",
+    "slug": "etape-poids-ciel",
+    "fichier": "/Users/beauty/Desktop/GLOW/GIT-APP-V2/docs/captures/onboarding-v2/etape-poids-ciel.png",
+    "ce_quon_voit": "Titre « Quel est votre poids actuel ? », le sélecteur fermé affichant « 95,0 » avec un chevron, l'unité « kg » hors du champ à droite ; Précédent / Suivant."
+   },
+   {
+    "ecran": "Étape « poids », sélecteur de poids ouvert (thème ciel)",
+    "slug": "etape-poids-selecteur-ouvert-ciel",
+    "fichier": "/Users/beauty/Desktop/GLOW/GIT-APP-V2/docs/captures/onboarding-v2/etape-poids-selecteur-ouvert-ciel.png",
+    "ce_quon_voit": "Le champ « 95,0 » entouré de bleu (ouvert) et, dessous, le panneau à deux roues : kilos (93, 94, 95 mis en avant, 96, 97…) et centaines de grammes (0 mis en avant, 100, 200… 500), sur un panneau bleu nuit arrondi."
+   },
+   {
+    "ecran": "Étape « poids » (thème ciel-fonce)",
+    "slug": "etape-poids-ciel-fonce",
+    "fichier": "/Users/beauty/Desktop/GLOW/GIT-APP-V2/docs/captures/onboarding-v2/etape-poids-ciel-fonce.png",
+    "ce_quon_voit": "Même écran du poids actuel en fond bleu nuit, sélecteur fermé sur 95,0 kg."
+   },
+   {
+    "ecran": "Étape « poids », sélecteur de poids ouvert (thème ciel-fonce)",
+    "slug": "etape-poids-selecteur-ouvert-ciel-fonce",
+    "fichier": "/Users/beauty/Desktop/GLOW/GIT-APP-V2/docs/captures/onboarding-v2/etape-poids-selecteur-ouvert-ciel-fonce.png",
+    "ce_quon_voit": "Même panneau à deux roues (95 et 0 mis en avant) sur le thème bleu nuit."
+   },
+   {
+    "ecran": "Étape « poids-cible » (thème ciel)",
+    "slug": "etape-poids-cible-ciel",
+    "fichier": "/Users/beauty/Desktop/GLOW/GIT-APP-V2/docs/captures/onboarding-v2/etape-poids-cible-ciel.png",
+    "ce_quon_voit": "Titre « Quel poids visez-vous ? », même sélecteur fermé sur « 95,0 » kg (valeur par défaut, indépendante du poids actuel) ; Précédent / Suivant."
+   },
+   {
+    "ecran": "Étape « poids-cible » (thème ciel-fonce)",
+    "slug": "etape-poids-cible-ciel-fonce",
+    "fichier": "/Users/beauty/Desktop/GLOW/GIT-APP-V2/docs/captures/onboarding-v2/etape-poids-cible-ciel-fonce.png",
+    "ce_quon_voit": "Même écran du poids visé en fond bleu nuit."
+   },
+   {
+    "ecran": "Étape « traitement » (thème ciel)",
+    "slug": "etape-traitement-ciel",
+    "fichier": "/Users/beauty/Desktop/GLOW/GIT-APP-V2/docs/captures/onboarding-v2/etape-traitement-ciel.png",
+    "ce_quon_voit": "Premier écran avec le décompte : neuf billes à droite de la marque (5 pleines, 4 pâles). Titre sur deux lignes « Avez-vous commencé votre traitement GLP-1 ? », deux réponses côte à côte « Oui » (choisi d'avance) et « Non » ; Précédent / Suivant."
+   },
+   {
+    "ecran": "Étape « traitement » (thème ciel-fonce)",
+    "slug": "etape-traitement-ciel-fonce",
+    "fichier": "/Users/beauty/Desktop/GLOW/GIT-APP-V2/docs/captures/onboarding-v2/etape-traitement-ciel-fonce.png",
+    "ce_quon_voit": "Même écran en fond bleu nuit, « Oui » choisi, décompte 5/9."
+   },
+   {
+    "ecran": "Étape « quel-traitement », sans forme choisie (thème ciel)",
+    "slug": "etape-quel-traitement-ciel",
+    "fichier": "/Users/beauty/Desktop/GLOW/GIT-APP-V2/docs/captures/onboarding-v2/etape-quel-traitement-ciel.png",
+    "ce_quon_voit": "Pas de titre : l'intitulé de groupe FORME et deux réponses côte à côte « Injection » / « Comprimé », aucune choisie ; la liste des traitements n'apparaît pas encore ; décompte 6/9 ; le bouton « Suivant » est éteint (grisé) puisque rien n'est choisi."
+   },
+   {
+    "ecran": "Étape « quel-traitement », forme injection choisie (thème ciel)",
+    "slug": "etape-quel-traitement-injection-ciel",
+    "fichier": "/Users/beauty/Desktop/GLOW/GIT-APP-V2/docs/captures/onboarding-v2/etape-quel-traitement-injection-ciel.png",
+    "ce_quon_voit": "« Injection » entouré de bleu (choisi) et, dessous, l'intitulé TRAITEMENT avec la grille à deux par ligne : Ozempic, Wegovy, Mounjaro, Zepbound, Saxenda, Victoza, Trulicity, Rétatrutide, puis « Autre » pleine largeur ; aucune spécialité choisie, « Suivant » encore éteint."
+   },
+   {
+    "ecran": "Étape « quel-traitement », sans forme choisie (thème ciel-fonce)",
+    "slug": "etape-quel-traitement-ciel-fonce",
+    "fichier": "/Users/beauty/Desktop/GLOW/GIT-APP-V2/docs/captures/onboarding-v2/etape-quel-traitement-ciel-fonce.png",
+    "ce_quon_voit": "Même écran FORME (Injection / Comprimé, rien de choisi) en fond bleu nuit, « Suivant » éteint."
+   },
+   {
+    "ecran": "Étape « quel-traitement », forme injection choisie (thème ciel-fonce)",
+    "slug": "etape-quel-traitement-injection-ciel-fonce",
+    "fichier": "/Users/beauty/Desktop/GLOW/GIT-APP-V2/docs/captures/onboarding-v2/etape-quel-traitement-injection-ciel-fonce.png",
+    "ce_quon_voit": "Même grille des neuf spécialités injectables sous « Injection » choisi, en fond bleu nuit, « Suivant » éteint."
+   },
+   {
+    "ecran": "Étape « avatar », haut de l'écran (thème ciel)",
+    "slug": "etape-avatar-ciel",
+    "fichier": "/Users/beauty/Desktop/GLOW/GIT-APP-V2/docs/captures/onboarding-v2/etape-avatar-ciel.png",
+    "ce_quon_voit": "Décompte 7/9. Le portrait de l'avatar (visage souriant, cheveux bouclés bruns, haut violet) fixé sous l'entête, puis le titre « Composez votre avatar » et le début des réglages qui défilent : GENRE (Femme / Homme / Neutre choisi), PEAU (six pastilles, la deuxième choisie), COIFFURE (Courts, Longs, Bouclés choisi, Frange — coupé par le bas) ; Précédent / Suivant."
+   },
+   {
+    "ecran": "Étape « avatar », bas de l'écran défilé (thème ciel)",
+    "slug": "etape-avatar-bas-ciel",
+    "fichier": "/Users/beauty/Desktop/GLOW/GIT-APP-V2/docs/captures/onboarding-v2/etape-avatar-bas-ciel.png",
+    "ce_quon_voit": "Même portrait resté fixe pendant que la zone a défilé tout en bas : fin du groupe VISAGE (Ovale choisi, Rond, Carré, Cœur), EXPRESSION (Joyeuse choisie, Déterminée, Fière, Calme), LUNETTES (Oui / Non choisi) ; Précédent / Suivant."
+   },
+   {
+    "ecran": "Étape « avatar », haut de l'écran (thème ciel-fonce)",
+    "slug": "etape-avatar-ciel-fonce",
+    "fichier": "/Users/beauty/Desktop/GLOW/GIT-APP-V2/docs/captures/onboarding-v2/etape-avatar-ciel-fonce.png",
+    "ce_quon_voit": "Même haut de l'écran de l'avatar (portrait, genre, peau, coiffure) en fond bleu nuit."
+   },
+   {
+    "ecran": "Étape « avatar », bas de l'écran défilé (thème ciel-fonce)",
+    "slug": "etape-avatar-bas-ciel-fonce",
+    "fichier": "/Users/beauty/Desktop/GLOW/GIT-APP-V2/docs/captures/onboarding-v2/etape-avatar-bas-ciel-fonce.png",
+    "ce_quon_voit": "Même bas de l'écran de l'avatar (visage, expression, lunettes) en fond bleu nuit, portrait toujours fixe."
+   },
+   {
+    "ecran": "Étape « profil » (thème ciel)",
+    "slug": "etape-profil-ciel",
+    "fichier": "/Users/beauty/Desktop/GLOW/GIT-APP-V2/docs/captures/onboarding-v2/etape-profil-ciel.png",
+    "ce_quon_voit": "Décompte 8/9 (une seule bille pâle). Titre « Dernière étape », deux sélecteurs sur une ligne ANNÉE DE NAISSANCE « 1980 » et TAILLE « 165 » cm, puis trois champs vides PRÉNOM, ADRESSE E-MAIL, MOT DE PASSE avec l'aide « Huit caractères au moins. » ; en bas « Précédent » et le bouton d'entrée qui ne porte que le mot-symbole G·LOW à la place de « Suivant ». L'écran tient sans défiler."
+   },
+   {
+    "ecran": "Étape « profil » (thème ciel-fonce)",
+    "slug": "etape-profil-ciel-fonce",
+    "fichier": "/Users/beauty/Desktop/GLOW/GIT-APP-V2/docs/captures/onboarding-v2/etape-profil-ciel-fonce.png",
+    "ce_quon_voit": "Même dernière étape en fond bleu nuit : 1980, 165 cm, trois champs vides, bouton G·LOW."
+   }
+  ],
+  "non_capturables": []
+ }
+]

@@ -1,0 +1,340 @@
+{
+ "inventions": [
+  {
+   "categorie": "navigation",
+   "fonctionnalite": "Mon Profil",
+   "texte": "Un bouton de retour vers l'onglet quitté.",
+   "origine": "App.tsx retient previousTab et passe onBack à ProfileSettings, qui ne le rend pas ; j'aurais voulu écrire qu'un retour existe. Le chapitre dit seulement qu'aucun bouton ne s'en sert."
+  },
+  {
+   "categorie": "compte",
+   "fonctionnalite": "Supprimer le compte et les données",
+   "texte": "La suppression du compte efface aussi les documents en base (feedbacks/{uid}, surveys/{uid}) et les courriers en attente.",
+   "origine": "DeleteAccountBlock ne supprime que le compte Firebase et le stockage local ; rien ne dit si l'effacement en base est voulu, oublié ou délégué au serveur."
+  },
+  {
+   "categorie": "avis",
+   "fonctionnalite": "Supprimer un message de l'historique des retours",
+   "texte": "La corbeille retire aussi le document en base.",
+   "origine": "handleDeleteFeedback ne filtre que le stockage local ; le chapitre l'écrit tel quel, mais l'intention n'est consignée nulle part."
+  },
+  {
+   "categorie": "V2",
+   "fonctionnalite": "Avis, sondage, compte, information médicale",
+   "texte": "Ce que la V2 garde de l'envoi en base, des courriers, de la connexion Firebase, de la suppression de compte et de la page légale.",
+   "origine": "GUIDELINES § 1 : socle sans Firebase, ajouts au fur et à mesure ; § 4 ne tranche rien sur ces fonctions. Le chapitre ne les marque donc ni V2 ni non implémenté."
+  },
+  {
+   "categorie": "avatar",
+   "fonctionnalite": "Importer une photo d'avatar",
+   "texte": "Le stockage du navigateur plafonne autour de 5 Mo pour toute l'application, d'où le plafond de 300 Ko.",
+   "origine": "Commentaire d'avatarPhoto.ts, non vérifié ; j'ai gardé les seuils sans leur justification."
+  },
+  {
+   "categorie": "légal",
+   "fonctionnalite": "Accepter / consulter l'avertissement médical",
+   "texte": "Une nouvelle version du texte redemande l'acceptation.",
+   "origine": "La clé de stockage finit par _v1, ce qui suggère un versionnage ; rien ne l'implémente."
+  },
+  {
+   "categorie": "sondage",
+   "fonctionnalite": "Répondre au sondage / modifier ses réponses",
+   "texte": "Retirer la proposition « Suivi hydratation » du sondage.",
+   "origine": "GUIDELINES § 4 écarte le suivi hydrique de la V2 ; c'est une amélioration, pas un fait — le chapitre signale seulement la contradiction."
+  },
+  {
+   "categorie": "avis",
+   "fonctionnalite": "Plafonner les envois quotidiens et alerter",
+   "texte": "Une file locale qui rejouerait l'alerte plafond à la prochaine connexion.",
+   "origine": "Arbitrage listé dans l'inventaire : possibilité non écrite. Le chapitre dit que l'alerte hors connexion est perdue."
+  },
+  {
+   "categorie": "profil",
+   "fonctionnalite": "Modifier le profil",
+   "texte": "Un réglage des unités (métrique / impérial) sur la page profil.",
+   "origine": "UserProfile.measurementSystem existe sans interface ; la V2 le choisit à l'onboarding seulement."
+  },
+  {
+   "categorie": "profil",
+   "fonctionnalite": "Choisir le médicament prescrit",
+   "texte": "La V2 a décidé de supprimer la certification d'essai clinique du rétatrutide.",
+   "origine": "Le catalogue V2 n'a pas ce champ et l'onboarding ne la demande pas ; aucune décision ne l'écrit — le chapitre dit seulement ce que la V2 porte."
+  },
+  {
+   "categorie": "exemples",
+   "fonctionnalite": "Camille",
+   "texte": "Objectif final 80 kg ; dernière pesée 91,4 kg le 12 septembre 2026 ; dernière injection 1 mg ; e-mail camille@example.com ; formulaire ouvert depuis la Balance ; deux messages dans l'historique.",
+   "origine": "Valeurs choisies pour les exemples, hors des chiffres imposés (née en 1978, 168 cm, 96 kg en mai 2026, Ozempic 0,25 mg en semaine 1) ; à aligner avec les autres chapitres."
+  }
+ ],
+ "glossaire": [
+  {
+   "terme": "Pesée de départ",
+   "definition": "La pesée du journal marquée isStartingWeight ; son poids est le poids de départ, unique, plus jamais un champ du profil."
+  },
+  {
+   "terme": "Objectif final",
+   "definition": "Le poids visé en kg, champ du profil, arrondi à 0,1 kg à l'enregistrement."
+  },
+  {
+   "terme": "Médicament prescrit",
+   "definition": "Le traitement choisi dans le catalogue et enregistré par identifiant ; « aucun » s'affiche « Pas de traitement »."
+  },
+  {
+   "terme": "Édition en place",
+   "definition": "Cliquer une valeur du récapitulatif la remplace par un champ, enregistré quand il perd le focus ou sur Entrée."
+  },
+  {
+   "terme": "Refus",
+   "definition": "Message qui dit ce qu'une saisie doit être ; la valeur refusée n'est jamais enregistrée."
+  },
+  {
+   "terme": "Avatar",
+   "definition": "Le visage de l'utilisatrice, composé d'un genre, d'une peau et de cheveux : un émoji en V1, un dessin en V2 ; enregistré dans le profil."
+  },
+  {
+   "terme": "Photo d'avatar",
+   "definition": "Image recadrée au carré et réduite à 256 px, enregistrée dans le profil comme adresse data:image/ (V1 seulement)."
+  },
+  {
+   "terme": "Plafond quotidien",
+   "definition": "Dix envois par jour local pour les avis et le sondage ; l'envoi de trop est refusé, jamais écrasé."
+  },
+  {
+   "terme": "Journal des envois",
+   "definition": "Les instants d'envoi du sondage, gardés deux jours, qui servent à compter le plafond."
+  },
+  {
+   "terme": "Page d'origine",
+   "definition": "L'onglet quitté pour ouvrir un formulaire, lu à l'ouverture et joint au courrier."
+  },
+  {
+   "terme": "Contexte d'envoi",
+   "definition": "Réglages d'affichage et état du navigateur joints à un envoi ; aucune donnée de santé."
+  },
+  {
+   "terme": "Courrier",
+   "definition": "Document déposé dans la collection mail et expédié par une extension vers la boîte de l'équipe, réponse vers l'auteure."
+  },
+  {
+   "terme": "Attestation médicale",
+   "definition": "La case du premier lancement dont l'acceptation est un drapeau du stockage local ; sans lui, la page légale s'impose."
+  },
+  {
+   "terme": "Stockage local",
+   "definition": "Le localStorage du navigateur : profil et journaux sous une seule clé, avis, sondage et drapeaux à côté ; vidé par la suppression du compte."
+  },
+  {
+   "terme": "Mot-symbole",
+   "definition": "Le dessin « GLP1LOW » qui remplace le nom écrit dans les textes."
+  }
+ ],
+ "index": [
+  {
+   "terme": "Configuration & Plus",
+   "ancre": "profil-configuration-plus"
+  },
+  {
+   "terme": "Perte de poids (aperçu)",
+   "ancre": "profil-configuration-plus"
+  },
+  {
+   "terme": "GLP1LOW et vous",
+   "ancre": "profil-configuration-plus"
+  },
+  {
+   "terme": "Mon Profil",
+   "ancre": "profil-mon-profil"
+  },
+  {
+   "terme": "Édition en place",
+   "ancre": "profil-mon-profil"
+  },
+  {
+   "terme": "Poids de départ",
+   "ancre": "profil-mon-profil"
+  },
+  {
+   "terme": "Objectif final",
+   "ancre": "profil-mon-profil"
+  },
+  {
+   "terme": "Médicament prescrit",
+   "ancre": "profil-mon-profil"
+  },
+  {
+   "terme": "Certification d'essai clinique",
+   "ancre": "profil-mon-profil"
+  },
+  {
+   "terme": "Profil d'usine (Chloé)",
+   "ancre": "profil-mon-profil"
+  },
+  {
+   "terme": "Année de naissance (V2)",
+   "ancre": "profil-mon-profil"
+  },
+  {
+   "terme": "Bornes (âge, taille, poids)",
+   "ancre": "profil-mon-profil"
+  },
+  {
+   "terme": "Modifier mon profil",
+   "ancre": "profil-modifier-mon-profil"
+  },
+  {
+   "terme": "Refus empilés",
+   "ancre": "profil-modifier-mon-profil"
+  },
+  {
+   "terme": "Mon Avatar",
+   "ancre": "profil-mon-avatar"
+  },
+  {
+   "terme": "Genre",
+   "ancre": "profil-mon-avatar"
+  },
+  {
+   "terme": "Composer l'avatar",
+   "ancre": "profil-composer-l-avatar"
+  },
+  {
+   "terme": "Aléatoire",
+   "ancre": "profil-composer-l-avatar"
+  },
+  {
+   "terme": "Émoji (avatar)",
+   "ancre": "profil-composer-l-avatar"
+  },
+  {
+   "terme": "Utiliser ma photo",
+   "ancre": "profil-utiliser-ma-photo"
+  },
+  {
+   "terme": "HEIC",
+   "ancre": "profil-utiliser-ma-photo"
+  },
+  {
+   "terme": "Le Miroir de GLP1LOW",
+   "ancre": "profil-miroir-et-remerciement"
+  },
+  {
+   "terme": "Mes préférences de compte",
+   "ancre": "profil-miroir-et-remerciement"
+  },
+  {
+   "terme": "Bouton avatar (header)",
+   "ancre": "profil-bouton-avatar-du-header"
+  },
+  {
+   "terme": "Mon compte",
+   "ancre": "profil-mon-compte"
+  },
+  {
+   "terme": "Abonnement",
+   "ancre": "profil-mon-compte"
+  },
+  {
+   "terme": "Mot de passe (V2)",
+   "ancre": "profil-mon-compte"
+  },
+  {
+   "terme": "Supprimer mon compte",
+   "ancre": "profil-supprimer-mon-compte"
+  },
+  {
+   "terme": "Se reconnecter",
+   "ancre": "profil-supprimer-mon-compte"
+  },
+  {
+   "terme": "Avis et Feedback",
+   "ancre": "profil-avis-et-feedback"
+  },
+  {
+   "terme": "Ressenti global",
+   "ancre": "profil-avis-et-feedback"
+  },
+  {
+   "terme": "Consentement de recontact",
+   "ancre": "profil-avis-et-feedback"
+  },
+  {
+   "terme": "Plafond quotidien",
+   "ancre": "profil-avis-et-feedback"
+  },
+  {
+   "terme": "Alerte plafond",
+   "ancre": "profil-avis-et-feedback"
+  },
+  {
+   "terme": "Page d'origine",
+   "ancre": "profil-avis-et-feedback"
+  },
+  {
+   "terme": "Contexte d'envoi",
+   "ancre": "profil-avis-et-feedback"
+  },
+  {
+   "terme": "Courrier",
+   "ancre": "profil-avis-et-feedback"
+  },
+  {
+   "terme": "Vos messages récents",
+   "ancre": "profil-messages-recents"
+  },
+  {
+   "terme": "Sondage",
+   "ancre": "profil-sondage"
+  },
+  {
+   "terme": "Propositions du sondage",
+   "ancre": "profil-sondage"
+  },
+  {
+   "terme": "ALERTE sondage",
+   "ancre": "profil-sondage"
+  },
+  {
+   "terme": "Modifier mes réponses",
+   "ancre": "profil-sondage-remerciement"
+  },
+  {
+   "terme": "FAQ",
+   "ancre": "profil-faq"
+  },
+  {
+   "terme": "Information Médicale",
+   "ancre": "profil-information-medicale"
+  },
+  {
+   "terme": "Avertissement Médical",
+   "ancre": "profil-information-medicale"
+  },
+  {
+   "terme": "Attestation",
+   "ancre": "profil-information-medicale"
+  },
+  {
+   "terme": "Info Santé & Confidentialité",
+   "ancre": "profil-information-medicale"
+  }
+ ],
+ "ecrans_illustres": [
+  "profil-compte/page-configuration-plus-plusmenu",
+  "profil-compte/page-mon-profil-bloc-recapitulatif",
+  "profil-compte/formulaire-modifier-mon-profil",
+  "profil-compte/bloc-mon-avatar",
+  "profil-compte/createur-d-avatar-onglet-composer-l-avatar",
+  "profil-compte/createur-d-avatar-onglet-utiliser-ma-photo",
+  "profil-compte/bloc-le-miroir-de-glp1low-et-message-de-remerciement",
+  "profil-compte/bouton-avatar-du-header",
+  "profil-compte/page-mon-compte",
+  "profil-compte/bloc-supprimer-mon-compte",
+  "profil-compte/page-avis-et-feedback-formulaire",
+  "profil-compte/page-avis-et-feedback-vos-messages-recents-n",
+  "profil-compte/page-sondage-formulaire",
+  "profil-compte/page-sondage-ecran-de-remerciement",
+  "profil-compte/page-faq",
+  "profil-compte/page-information-medicale-avertissement-medical"
+ ]
+}

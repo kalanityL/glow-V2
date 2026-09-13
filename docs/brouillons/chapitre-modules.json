@@ -1,0 +1,128 @@
+{
+ "inventions": [
+  {
+   "categorie": "Notifications",
+   "fonctionnalite": "Rappel d'injections",
+   "texte": "Le rappel sonnerait le jour et à l'heure choisis, ou tous les N jours à partir de la date de départ.",
+   "origine": "Le récapitulatif dit « seront planifiés automatiquement » ; aucun planificateur, aucune Notification API, aucun consommateur de reminderEnabled hors l'affichage « Rappels : … » de l'accueil (grep sur src, hors thèmes)."
+  },
+  {
+   "categorie": "Notifications",
+   "fonctionnalite": "Rappel de rendez-vous médical",
+   "texte": "L'application calculerait l'instant du rappel : date et heure du rendez-vous moins le délai choisi (1 heure à 1 semaine).",
+   "origine": "Le champ « Combien de temps avant notifier ? » le suggère ; rien dans le code ne lit medicalReminderNotifyBefore ni ne soustrait quoi que ce soit."
+  },
+  {
+   "categorie": "Notifications",
+   "fonctionnalite": "Récapitulatifs des deux cartes",
+   "texte": "Dans un fuseau à l'ouest de Greenwich, la date du récapitulatif reculerait d'un jour (« 02/05/2026 » pour une date de départ du 03/05/2026).",
+   "origine": "Les deux phrases construisent new Date('AAAA-MM-JJ'), lu en UTC, puis toLocaleDateString('fr-FR') en heure locale ; comportement non observé, signalé en doute par l'inventaire."
+  },
+  {
+   "categorie": "Modules",
+   "fonctionnalite": "Masquage complet",
+   "texte": "Sur l'accueil, les tuiles et couches vitrées d'un module masqué disparaîtraient aussi.",
+   "origine": "La demande du 2026-08-27 dit que les blocs « n'apparaitront plus du tout » dans « menus tiroirs et pages » ; vérifié pour le menu du bas, les trois tiroirs et la page Badges seulement — l'accueil relève du chapitre Accueil."
+  },
+  {
+   "categorie": "Modules",
+   "fonctionnalite": "Activation automatique par la navigation",
+   "texte": "Les tuiles de l'accueil qui mènent aux repas, aux pas ou à l'activité physique allumeraient le module au passage.",
+   "origine": "HomeTemplate reçoit handleNavigate et handleQuickAddNavigate, qui allument ces trois modules ; je n'ai pas vérifié quelles tuiles de l'accueil visent ces pages ni si elles passent par ces deux fonctions."
+  },
+  {
+   "categorie": "Notifications",
+   "fonctionnalite": "Carte Injections",
+   "texte": "Pour un traitement en comprimé, la carte s'appellerait « Comprimé », comme la carte du module sur la page Modules.",
+   "origine": "Amélioration venue du contraste entre la page Modules (treatmentSectionLabel) et la page Notifications (libellé « Injections » écrit en dur, ligne 524 de NotificationsSettings.tsx)."
+  }
+ ],
+ "glossaire": [
+  {
+   "terme": "Module",
+   "definition": "L'un des sept suivis activables : traitement (Injections ou Comprimé), effets secondaires, repas et en-cas, nombre de pas, activité physique, un temps pour soi, sommeil ; la pesée n'en est pas un."
+  },
+  {
+   "terme": "Module éteint",
+   "definition": "Module désactivé : retiré du menu du bas, grisé dans les tiroirs, sa page est vitrée ; ses données sont conservées."
+  },
+  {
+   "terme": "Module masqué",
+   "definition": "Module éteint dont la case « Masquer dans l'application. » est cochée : il disparaît des tiroirs et son badge « à activer » quitte la page Badges."
+  },
+  {
+   "terme": "Page vitrée",
+   "definition": "Page d'un module éteint, couverte du verre des tiroirs et ne laissant lire que la phrase « Activez le module … », qui mène à la carte du module."
+  },
+  {
+   "terme": "Rappel hebdomadaire",
+   "definition": "Rappel d'injections à jour fixe (Lundi à Dimanche) et heure fixe."
+  },
+  {
+   "terme": "Rappel personnalisé",
+   "definition": "Rappel d'injections tous les N jours (1 à 30) à partir d'une date, à heure fixe."
+  },
+  {
+   "terme": "Délai de notification",
+   "definition": "Avance du rappel de rendez-vous médical : 1 heure, 2 heures, 1 jour, 2 jours, 3 jours ou 1 semaine avant."
+  },
+  {
+   "terme": "Minutes rondes",
+   "definition": "Les seules minutes qu'une heure enregistrée peut porter : 00, 10, 15, 20, 30, 40, 45, 50."
+  }
+ ],
+ "index": [
+  {
+   "terme": "Modules (page)",
+   "ancre": "modules-page-modules"
+  },
+  {
+   "terme": "Activation d'un module",
+   "ancre": "modules-page-modules"
+  },
+  {
+   "terme": "Défauts des modules",
+   "ancre": "modules-page-modules"
+  },
+  {
+   "terme": "Masquer dans l'application",
+   "ancre": "modules-page-modules"
+  },
+  {
+   "terme": "Activation automatique par la navigation",
+   "ancre": "modules-page-modules"
+  },
+  {
+   "terme": "Page vitrée",
+   "ancre": "modules-page-vitree"
+  },
+  {
+   "terme": "Module éteint",
+   "ancre": "modules-page-vitree"
+  },
+  {
+   "terme": "Notifications (page)",
+   "ancre": "modules-page-notifications"
+  },
+  {
+   "terme": "Rappel d'injections",
+   "ancre": "modules-page-notifications"
+  },
+  {
+   "terme": "Rappel de rendez-vous médical",
+   "ancre": "modules-page-notifications"
+  },
+  {
+   "terme": "Minutes rondes",
+   "ancre": "modules-page-notifications"
+  },
+  {
+   "terme": "Rappels : Dim / 7j / Non (accueil)",
+   "ancre": "modules-page-notifications"
+  }
+ ],
+ "ecrans_illustres": [
+  "profil-compte/page-modules",
+  "profil-compte/page-notifications"
+ ]
+}

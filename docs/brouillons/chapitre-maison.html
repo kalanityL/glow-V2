@@ -1,0 +1,265 @@
+<section id="maison">
+  <h2>4. La Maison <a class="retour" href="#sommaire">↑ sommaire</a></h2>
+  <p>La Maison est l'onglet « Accueil » de la version Mixte : une page qui résume la cure de la personne (poids, traitement, repas du jour, pas, ressenti) et ouvre chaque journal d'un clic. Trois templates d'accueil existent — <em>standard</em>, <em>sections</em> et <em>blocs</em> — et la personne peut en changer (réglage hors de ce chapitre) ; sans choix enregistré, c'est le template standard, décrit en premier ici. <span class="marque v2">V2</span> La V2 n'a pas encore de page d'accueil ; ses règles absolues — aucune fenêtre par-dessus l'écran, aucun voile, sortie par bouton et jamais par minuterie — s'appliqueront aux couches et tiroirs décrits ici.</p>
+
+  <h3 id="maison-home-standard-maison-page">Home standard (page)</h3>
+  <figure class="telephone" data-capture="accueil/home-standard-maison-page"><figcaption>La home de Camille le 12 septembre 2026 : bloc Salut (objectif −13.4 kg, barre à 36 %), tuile « dernière perte enregistrée » −0.5 kg, bloc « Aujourd'hui », défilé des journaux, tuile « Depuis le début » −7.6 kg, carré poids, carré traitement Ozempic, bloc Mes pas, section Dynamique, avertissement médical.</figcaption></figure>
+  <p>Les blocs s'empilent sur toute la largeur, dans cet ordre : Salut ; « dernière perte enregistrée » ; « Aujourd'hui » (si le module repas est allumé) ; le défilé des journaux ; « Depuis le début » ; le carré poids ; le bloc palier d'IMC (s'il est ouvert) ; le carré traitement (si le module traitement est allumé) ; « Mes pas » (sauf module des pas éteint) ; la section Dynamique ; le pied de page médical. Quand la dernière perte et la perte totale sont égales au dixième près, seule « Depuis le début » paraît, à la place de la première.</p>
+  <p>Une tuile de perte porte son libellé en bandeau, la perte en kg, un dessin d'objets du quotidien et la phrase d'équivalence insolite (chapitre Métabolisme et badges). Elle ne réagit pas au clic. Elle n'est montrée que si la perte est strictement positive, qu'une pesée existe au-delà du départ et que l'IMC actuel est d'au moins 19. Des boutons « + » de coin (pesée, injection, repas) existent mais sont désactivés par défaut.</p>
+  <details><summary>Les règles derrière les chiffres</summary>
+    <ul>
+      <li>Poids de départ, poids actuel (pesée la plus récente par date et heure), perte totale et dernière perte. <a href="spec-technique.html#maison-vue-des-poids-weightoverview">→ technique</a></li>
+      <li>Conditions d'affichage des deux tuiles de perte et fusion quand elles sont égales. <a href="spec-technique.html#maison-affichage-des-tuiles-de-perte">→ technique</a></li>
+      <li>Signe d'une variation : « +x » au-dessus de zéro, « -x » sinon (zéro s'écrit « -0 »). <a href="spec-technique.html#maison-signe-d-une-variation-de-poids-signedkg">→ technique</a></li>
+      <li>Une décimale au plus, sans « .0 ». <a href="spec-technique.html#maison-format1dec">→ technique</a> <span class="marque v2">V2</span> La V2 affiche la virgule décimale en français.</li>
+      <li>Template retenu : la valeur enregistrée si elle est connue, sinon standard. <a href="spec-technique.html#maison-choix-de-la-home-homechoice">→ technique</a></li>
+      <li>Un module absent du profil vaut allumé pour le traitement et les effets, éteint pour le sommeil et le temps pour soi. <a href="spec-technique.html#maison-etat-d-un-module-ismoduleon-ismodulehidden">→ technique</a></li>
+    </ul>
+  </details>
+  <div class="exemple"><p>Camille pèse 88.4 kg le 12 septembre après 88.9 kg le 5 : la tuile « dernière perte enregistrée » affiche « -0.5 kg », la tuile « Depuis le début » « -7.6 kg » (96 − 88.4). Si sa seule pesée après le départ était celle du 12 septembre, les deux pertes vaudraient 7.6 kg et seule « Depuis le début » serait montrée.</p></div>
+
+  <h3 id="maison-bloc-salut-partage-par-les-trois-homes">Bloc « Salut »</h3>
+  <figure class="telephone" data-capture="accueil/bloc-salut-partage-par-les-trois-homes"><figcaption>« Salut Camille », objectif « -13.4 kg », « 36% » posé au-dessus de la barre, ligne « Cure : Ozempic • Rappels : Lun », badge « ? » à droite.</figcaption></figure>
+  <p>Tête des trois homes. À gauche l'avatar ; à sa droite « Salut {prénom} » et le picto trois étoiles, puis l'objectif : ce qui reste à perdre (poids actuel − poids cible), « 0 kg » une fois la cible atteinte. En dessous, sur toute la largeur, la barre d'avancement vers la cible avec son pourcentage posé à l'abscisse où la barre s'arrête, puis la ligne « Cure : {traitement} • Rappels : {jour, ou « nj », ou Non} » — absente si le module traitement est éteint, rappels masqués sans traitement. Au bord droit, les badges débloqués (deux par ligne, quatre au plus), ou un badge « ? » tant qu'aucun n'est gagné (masquable depuis la page des badges).</p>
+  <p>Gestes : l'avatar, la salutation et tout le fond du bloc mènent au profil ; l'objectif s'édite sur place (champ « Cible : », enregistré si le nombre est positif) ; « Cure : » ouvre la liste des traitements et enregistre le choix, cliquer à côté referme sans changer ; les badges mènent à la page des badges. Sur la home sections, la barre et son pourcentage ouvrent en outre le suivi du poids en couche vitrée.</p>
+  <details><summary>Les règles derrière les chiffres</summary>
+    <ul>
+      <li>Reste à perdre = actuel − cible, au dixième ; « 0 kg » si négatif ou nul. <a href="spec-technique.html#maison-reste-a-perdre-bloc-salut">→ technique</a></li>
+      <li>Avancement = (départ − actuel) / (départ − cible), borné 0–100 ; cible au-dessus du départ : 100 si atteinte, 0 sinon. <a href="spec-technique.html#maison-avancement-vers-la-cible-goalprogresspercent">→ technique</a></li>
+      <li>Ligne « Rappels » : jour de semaine, ou intervalle « nj » en rappel personnalisé, ou « Non ». <a href="spec-technique.html#maison-ligne-rappels-du-bloc-salut">→ technique</a></li>
+      <li>Badges montrés : catégorie activée et palier atteint ; badge « ? » argent sinon. <a href="spec-technique.html#maison-badges-du-bloc-salut">→ technique</a></li>
+    </ul>
+  </details>
+  <div class="exemple"><p>Camille : 96 kg de départ, 88.4 kg aujourd'hui, cible 75 kg. Reste à perdre 13.4 kg ; avancement (96 − 88.4) / (96 − 75) = 36 %. Rappel hebdomadaire le lundi : « Rappels : Lun ».</p></div>
+
+  <h3 id="maison-carre-poids-evolution-home-standard">Carré poids (Évolution)</h3>
+  <figure class="telephone" data-capture="accueil/carre-poids-evolution-home-standard"><figcaption>Bandeau « Semaine n° 19 (131 jours) ≈ -0.4 kg / semaine », arc « −21 kg / −21.9 % » du départ vers l'objectif, « Départ 96 kg · Actuel 88.4 kg · Objectif 75 kg », « IMC : ••.• » masqué, pied « -7.9% poids de départ ».</figcaption></figure>
+  <p>Le bandeau compte la semaine de cure depuis la pesée de départ et, dès sept jours de recul, la perte moyenne par semaine. Un arc fléché relie Départ à Objectif, étiqueté de l'écart à parcourir en kg et en % du départ. Trois poids : Départ, Actuel (mis en avant), Objectif. La ligne IMC est masquée (« ••.• ») et se révèle par l'œil « Afficher » : « {IMC} {catégorie} ». Le pied donne la variation en % du poids de départ. Départ, Actuel et pied mènent à la page pesée ; Objectif au profil ; l'IMC révélé, quand la catégorie actuelle est meilleure que celle du départ, ouvre le bloc palier d'IMC.</p>
+  <details><summary>Les règles derrière les chiffres</summary>
+    <ul>
+      <li>Semaine n° = jours écoulés ÷ 7 + 1, jours comptés de minuit à minuit local depuis la pesée de départ. <a href="spec-technique.html#maison-semaine-de-cure-cureweek-weekssincedate">→ technique</a></li>
+      <li>« 1 jour » minimum, jamais « 0 jour ». <a href="spec-technique.html#maison-compte-de-jours-daycountlabel">→ technique</a></li>
+      <li>kg / semaine = (actuel − départ) × 7 / jours, affiché dès 7 jours. <a href="spec-technique.html#maison-perte-moyenne-par-semaine-weeklyrate">→ technique</a></li>
+      <li>Arc : objectif − départ, et ce même écart en % du départ ; rien sans départ ou sans objectif. <a href="spec-technique.html#maison-arc-depart-objectif">→ technique</a></li>
+      <li>Variation en % du départ, « + » devant si positive. <a href="spec-technique.html#maison-variation-en-du-poids-de-depart-pctofstart">→ technique</a></li>
+      <li>IMC = kg / m², au dixième ; 0 sans taille. <a href="spec-technique.html#maison-imc-bmiof">→ technique</a></li>
+      <li>Catégories : insuffisance pondérale, corpulence normale, surpoids, obésité I, II, III. <a href="spec-technique.html#maison-categorie-d-imc-bmicategorylabel">→ technique</a></li>
+      <li>Palier franchi = index du palier actuel inférieur à celui du départ. <a href="spec-technique.html#maison-paliers-d-imc-indexes-getbmitierinfo">→ technique</a></li>
+    </ul>
+  </details>
+  <div class="exemple"><p>Camille, partie le 4 mai 2026 : 131 jours le 12 septembre, semaine n° 19 ; (88.4 − 96) × 7 / 131 = −0.4 kg / semaine ; arc « −21 kg / −21.9 % » ; −7.9 % du poids de départ ; IMC 88.4 / 1.68² = 31.3, « Obésité I » — même palier qu'au départ (34), donc pas de bloc palier.</p></div>
+
+  <h3 id="maison-bloc-palier-d-imc-franchi">Bloc palier d'IMC franchi</h3>
+  <figure class="telephone" data-capture="accueil/bloc-palier-d-imc-franchi"><figcaption>Sous le carré poids, le bloc annonce le passage d'« Obésité I » à « Surpoids », l'IMC atteint et la date du franchissement.</figcaption></figure>
+  <p>Bloc pleine largeur ouvert sous le carré poids par le clic sur l'IMC révélé, seulement quand un palier a été franchi vers le bas. Il montre le palier de départ, le palier actuel, l'IMC et le poids actuels, et la phrase « Vous avez franchi le cap vers {catégorie} le JJ/MM/AAAA ». Une croix le referme ; « Voir les stats » mène à la page pesée.</p>
+  <details><summary>Les règles derrière les chiffres</summary>
+    <ul>
+      <li>Date du franchissement : première pesée, par date croissante, dont le palier est au plus celui d'aujourd'hui. <a href="spec-technique.html#maison-date-du-franchissement-d-un-palier-bmitransitiondate">→ technique</a></li>
+    </ul>
+  </details>
+
+  <h3 id="maison-carre-traitement-home-standard">Carré traitement</h3>
+  <figure class="telephone" data-capture="accueil/carre-traitement-home-standard"><figcaption>« Semaine n° 19 (131 jours) — Dernière [seringue] il y a 5 jours », « Initial 0.25 mg · Actuel 1 mg · Actif … mg », pied « Ozempic · 19 injections · 14mg cumulé », smiley neutre « quelques effets secondaires aujourd'hui ».</figcaption></figure>
+  <p>Présent si le module traitement est allumé. Le bandeau compte la semaine depuis la première prise du traitement en cours et l'ancienneté de la dernière (« aujourd'hui » ou « il y a n jour(s) »). Trois doses : Initial (première prise de la série), Actuel (dernière), Actif (concentration encore active). Le pied récapitule « {traitement} · n injection(s)|comprimé(s) · x mg cumulé ». Un smiley et sa phrase disent le ressenti du jour d'après les effets secondaires déclarés, si ce module est allumé. Tant qu'aucune prise n'est enregistrée : « Semaine n° 0 — traitement non commencé » et une invite, tout le carré ouvrant le formulaire d'ajout. Sinon, bandeau, Initial, Actuel et pied mènent au journal des prises ; Actif à la courbe du niveau sanguin ; le smiley aux effets secondaires.</p>
+  <details><summary>Les règles derrière les chiffres</summary>
+    <ul>
+      <li>Série en cours : en remontant l'historique, les prises du traitement courant jusqu'au premier changement de traitement. <a href="spec-technique.html#maison-serie-du-traitement-en-cours-coupure-au-changement-currenttr">→ technique</a></li>
+      <li>Une prise datée du futur n'est ni comptée ni « actuelle ». <a href="spec-technique.html#maison-serie-du-traitement-currenttreatmentseries-le-futur-s-ecarte">→ technique</a> <a href="spec-technique.html#maison-hasoccurred">→ technique</a></li>
+      <li>Jours depuis la dernière prise, par différence de dates. <a href="spec-technique.html#maison-jours-depuis-la-derniere-prise-carre-traitement">→ technique</a></li>
+      <li>Concentration active : cumul pharmacocinétique des prises des 60 derniers jours, par molécule. <a href="spec-technique.html#maison-concentration-active-activeglpconcentration">→ technique</a></li>
+      <li>Humeur du jour : somme des sévérités (0 serein ; > 8 ou une sévérité ≥ 4 difficile ; modéré entre les deux). <a href="spec-technique.html#maison-humeur-du-jour-sideeffectsmood">→ technique</a></li>
+      <li>Phrases sous le smiley. <a href="spec-technique.html#maison-phrases-sous-le-smiley-moodcaption-moodcaptioncarre">→ technique</a></li>
+    </ul>
+  </details>
+  <div class="exemple"><p>Camille s'injecte chaque lundi depuis le 4 mai : 4 × 0.25 mg, 4 × 0.5 mg puis 11 × 1 mg — 19 injections, 14 mg cumulés, dernière le 7 septembre, « il y a 5 jours ». Une nausée de sévérité 2 déclarée aujourd'hui : smiley neutre, « quelques effets secondaires aujourd'hui ».</p></div>
+
+  <h3 id="maison-bloc-mes-pas-home-standard">Bloc « Mes pas »</h3>
+  <figure class="telephone" data-capture="accueil/bloc-mes-pas-home-standard"><figcaption>« Mes pas » avec les kcal du jour, « 6 240 [empreintes] / 8 000 », « Objectif 78 % » et sa barre, « 4.7 km · durée · 4.2 km/h ».</figcaption></figure>
+  <p>Carte des pas du jour : le total sur l'objectif (8 000 pas), le pourcentage atteint et sa barre, la distance, la durée de marche estimée et la vitesse de référence, les kcal dépensées en bandeau. Toute la carte mène à la page des pas. Absente si le module des pas est éteint.</p>
+  <details><summary>Les règles derrière les chiffres</summary>
+    <ul>
+      <li>% = min(100, pas / 8 000) ; km = pas × 0,00076 ; durée à 4,2 km/h ; kcal selon le poids du jour. <a href="spec-technique.html#maison-bloc-mes-pas">→ technique</a></li>
+    </ul>
+  </details>
+
+  <h3 id="maison-defile-des-dernieres-entrees-de-journaux">Défilé des dernières entrées</h3>
+  <figure class="telephone" data-capture="accueil/defile-des-dernieres-entrees-de-journaux"><figcaption>Bande de carrés : « 12/09 · pesée · 88.4 kg », « 12/09 · déjeuner · 620 kcal », « 11→12/9 · sommeil · 4/5 », « 07/09 · injection · 1 mg »…</figcaption></figure>
+  <p>Bande horizontale entre « Aujourd'hui » et « Depuis le début » : un carré par entrée des sept derniers jours, tous journaux mélangés sauf les pas, du plus récent au plus ancien. Chaque carré porte la date (une nuit s'écrit « 25→26/8 »), le picto de la nature (repas, en-cas, injection, comprimé, pesée, temps pour soi, sommeil, sport, effet), un libellé, l'heure et la durée, et la valeur : kcal, kg, mg, effort, sévérité ou qualité « n/5 », faim « avant→après ». Un carré mène au journal d'origine. Rien n'est affiché sans entrée.</p>
+  <details><summary>Les règles derrière les chiffres</summary>
+    <ul>
+      <li>Fenêtre : d'aujourd'hui − 6 jours à aujourd'hui, futur écarté, 40 entrées au plus. <a href="spec-technique.html#maison-defile-des-journaux-recentjournalentries">→ technique</a></li>
+      <li>Nature d'une entrée (en-cas, comprimé ou injection, escaliers en étages, nuit datée du réveil). <a href="spec-technique.html#maison-nature-d-une-entree-du-defile">→ technique</a></li>
+      <li>Formats de la ligne de valeur et de durée. <a href="spec-technique.html#maison-formats-de-ligne-du-defile-lignevaleur-ligneduree">→ technique</a></li>
+    </ul>
+  </details>
+
+  <h3 id="maison-section-dynamique-bloc-du-verdict-partage">Section « Dynamique » — le verdict</h3>
+  <figure class="telephone" data-capture="accueil/section-dynamique-bloc-du-verdict-partage"><figcaption>Bandeau « Dynamique sur les 7 derniers jours », picto molécule, « Dynamique générale : [légère baisse] attendue sur la balance. Voir le calcul ».</figcaption></figure>
+  <p>Dernier bloc de la home standard <span class="marque">arbitrage non validé</span>. Il annonce, en une phrase, ce que la balance devrait faire au vu des sept derniers jours : la tendance (« à peu près stable », « légère hausse », « légère baisse », « hausse relativement marquée », « baisse relativement marquée ») porte une pastille. Le bloc entier ouvre le tiroir Dynamique. Tant que l'application n'a pas sept jours d'usage, le bandeau reste « Dynamique » <span class="marque">arbitrage non validé</span>, le contenu est dépoli, inerte, et porte le message « Utilisez GLP1low pendant 7 jours pour débloquer la dynamique générale de votre métabolisme. »</p>
+  <details><summary>Les règles derrière les chiffres</summary>
+    <ul>
+      <li>Bilan : repas ingérés − (métabolisme au repos × 7 j + pas + activité physique), saisies futures écartées ; 8 000 kcal = 1 kg. <a href="spec-technique.html#maison-divination-bilan-des-7-derniers-jours">→ technique</a></li>
+      <li>Verdict : |écart| ≤ 300 g stable ; &lt; 1 000 g légère hausse/baisse ; sinon marquée. <a href="spec-technique.html#maison-verdict-de-divination-getdivinationverdict">→ technique</a> <span class="marque">arbitrage non validé</span> (bande 700 g – 1 kg lue comme « légère »)</li>
+      <li>Les cinq phrases de la home et du tiroir. <a href="spec-technique.html#maison-phrases-de-la-dynamique">→ technique</a></li>
+      <li>Déblocage à 7 jours révolus depuis la première ouverture — ou depuis la donnée la plus ancienne des journaux pour une cure déjà en cours. <a href="spec-technique.html#maison-deblocage-de-la-section-dynamique">→ technique</a></li>
+      <li>Le bloc n'ouvre le calcul que dévoilé. <a href="spec-technique.html#maison-cliquabilite-du-bloc-dynamique">→ technique</a></li>
+      <li>Place : dernier bloc en standard ; deuxième section (après En direct) dévoilée et dernière verrouillée en sections. <a href="spec-technique.html#maison-place-de-la-section-dynamique">→ technique</a></li>
+    </ul>
+  </details>
+  <div class="exemple"><p>Camille sur sept jours : 9 800 kcal ingérées, métabolisme ≈ 10 731 kcal, pas −1 450 kcal, activité physique −600 kcal → différentiel −2 981 kcal, soit −373 g : « légère baisse attendue sur la balance ».</p></div>
+
+  <h3 id="maison-fete-dynamique-debloquee">Fête « Dynamique débloquée »</h3>
+  <figure class="telephone" data-capture="accueil/fete-dynamique-debloquee"><figcaption>Page vitrée, carte « Dynamique débloquée » avec le picto molécule et son message, confettis par-dessus.</figcaption></figure>
+  <p>À la première ouverture de la home où la section est dévoilée, une couche vitrée avec confettis titre « Dynamique débloquée » et dit : « Sept jours de suivi, et la dynamique générale de votre métabolisme se dévoile : elle vous attend en haut de l'accueil. » — alors que sur la home standard la section est en bas. Croix, clic à côté ou geste de la barre la ferment ; la marque est posée à la fermeture, et elle ne revient plus. Une personne dont les journaux ont déjà sept jours la voit dès la première ouverture.</p>
+
+  <h3 id="maison-tiroir-dynamique-calcul-de-la-projection">Tiroir « Dynamique »</h3>
+  <figure class="telephone" data-capture="accueil/tiroir-dynamique-calcul-de-la-projection"><figcaption>Tiroir venu du haut : « Métabolisme au repos ≈ 1 533 kcal / jour », « Poids actuel 88.4 kg », les quatre cases des 7 derniers jours, la soustraction posée « = différentiel −2 981 kcal », la balance inclinée et la phrase de projection.</figcaption></figure>
+  <p>Ouvert depuis le bloc du verdict (ou une tuile de sens, home sections), dans les deux menus. Quatre sections : le métabolisme au repos par jour et le poids actuel ; « 7 derniers jours » — métabolisme × 7, repas / en-cas, pas effectués (−), activité physique (−) ; « Calcul sur les 7 derniers jours » — la soustraction posée jusqu'au différentiel ; « Projection » — une balance à plateaux inclinée selon le verdict et la phrase « Un différentiel de [−2 981 kcal] sur une semaine devrait se matérialiser par une légère baisse sur la balance. » Un clic à côté le referme.</p>
+  <details><summary>Les règles derrière les chiffres</summary>
+    <ul>
+      <li>Métabolisme par jour = total 7 j ÷ 7 arrondi ; inclinaison 0°, ±9°, ±17°. <a href="spec-technique.html#maison-tiroir-dynamique-valeurs-derivees">→ technique</a></li>
+    </ul>
+  </details>
+
+  <h3 id="maison-pied-de-page-medical-les-deux-homes">Pied de page médical</h3>
+  <figure class="telephone" data-capture="accueil/pied-de-page-medical-les-deux-homes"><figcaption>Sous un filet, l'avertissement médical et de confidentialité.</figcaption></figure>
+  <p>Dernier élément des homes, sans action : « Avertissement médical &amp; Confidentialité : Cet outil est un carnet de bord personnel. Il permet à l'utilisateur d'organiser ses données et les met en page. Il ne remplace en aucun cas un avis médical et ne constitue aucune incitation à l'auto-médication. Vos données de santé restent sur votre appareil : elles ne sont envoyées à aucun serveur. »</p>
+
+  <h3 id="maison-home-sections-blocs-page">Templates sections et blocs</h3>
+  <figure class="telephone" data-capture="accueil/home-sections-blocs-page"><figcaption>La même cure de Camille en sections titrées : Salut, Ajout rapide, En direct, Dynamique, Progrès, Côte à côte.</figcaption></figure>
+  <p>Le template sections pose les mêmes données en carrés nus titrés par un séparateur hors bloc ; blocs est le même template habillé en cartes. Ordre : Salut ; « Ajout rapide » (absente en menu simplifié) ; « En direct » ; « Dynamique » si dévoilée <span class="marque">arbitrage non validé</span> ; « Progrès » ou « Évolution » ; « Côte à côte » ; « Dynamique » si verrouillée ; pied de page médical. Les sections ouvrent des couches vitrées plutôt que des pages.</p>
+
+  <h3 id="maison-section-ajout-rapide-home-sections">Section « Ajout rapide »</h3>
+  <figure class="telephone" data-capture="accueil/section-ajout-rapide-home-sections"><figcaption>Une rangée de boutons « + » : injection, pesée, effet secondaire, activité physique, temps pour soi, sommeil, repas.</figcaption></figure>
+  <p>Un bouton par page à formulaire d'ajout dont le module est allumé, dans l'ordre du menu du bas ; le picto du traitement est une seringue ou un comprimé selon la forme. Chaque bouton ouvre la page avec son formulaire déplié. Quand la rangée sort de l'écran, un « + » flottant prend le relais en bas de page.</p>
+  <details><summary>Les règles derrière les chiffres</summary>
+    <ul>
+      <li>Boutons = onglets du menu du bas ∩ pages à formulaire. <a href="spec-technique.html#maison-rangee-ajout-rapide">→ technique</a></li>
+    </ul>
+  </details>
+
+  <h3 id="maison-section-en-direct-home-sections">Section « En direct »</h3>
+  <figure class="telephone" data-capture="accueil/section-en-direct-home-sections"><figcaption>Bande « 1 120 kcal » avec les barres Prot. 62 % et Fibr. 48 %, puis trois tuiles : « 6 240 » pas, niveau sanguin actif en mg, visage neutre « quelques effets secondaires », et le bouton « + Ajouter » repas.</figcaption></figure>
+  <p>L'instant présent. La bande kcal du jour (si le module repas est allumé) : les calories, ou « Enregistrer votre 1er repas aujourd'hui » à zéro, et deux barres Prot. et Fibr. avec leur pourcentage réel, l'objectif en grammes et un trophée à 100 %. Puis les tuiles pas, niveau sanguin actif (« voir détail » si plusieurs molécules sont actives) et effets secondaires (visage et phrase). Sans module des pas, la bande kcal devient un pavé à droite des deux tuiles ; repas et pas coupés à la fois, les tuiles prennent toute la largeur <span class="marque">arbitrage non validé</span>. La bande kcal ouvre la couche « Menus » (formulaire à zéro, récapitulatif sinon), le bouton « + Ajouter » directement en saisie ; la tuile pas la couche « Pas » ; le niveau sanguin la couche « Niveau sanguin actif » (ou la page injection sans prise) ; les effets la matrice des effets (ou la page sans déclaration).</p>
+  <details><summary>Les règles derrière les chiffres</summary>
+    <ul>
+      <li>Objectifs du jour : 1 400 kcal, protéines = poids × 1,5 g, fibres 25 g, sauf valeurs du profil. <a href="spec-technique.html#maison-objectifs-nutritionnels-du-jour-dailynutritiongoals">→ technique</a></li>
+      <li>Totaux du jour = somme des repas datés du jour. <a href="spec-technique.html#maison-totaux-nutritionnels-du-jour-nutritiontotalson">→ technique</a></li>
+      <li>Pourcentage réel (peut dépasser 100) et largeur de barre bornée. <a href="spec-technique.html#maison-pourcentage-d-une-barre-d-objectif-blockcal">→ technique</a></li>
+      <li>Garde-fous : couche sanguine seulement avec un traitement et une prise ; matrice seulement avec une déclaration. <a href="spec-technique.html#maison-garde-fous-d-ouverture-des-couches-en-direct">→ technique</a></li>
+      <li>Entrée dans la couche Menus selon la tuile cliquée. <a href="spec-technique.html#maison-ouverture-de-la-couche-menus-selon-l-entree">→ technique</a></li>
+    </ul>
+  </details>
+  <div class="exemple"><p>Camille à 88.4 kg : objectif protéines 133 g ; 82 g mangés → « 62% », « [cible] 133g ». 12 g de fibres sur 25 → 48 %.</p></div>
+
+  <h3 id="maison-section-dynamique-rangee-des-trois-sens-home-sections">Section « Dynamique » — les trois sens</h3>
+  <figure class="telephone" data-capture="accueil/section-dynamique-rangee-des-trois-sens-home-sections"><figcaption>Trois tuiles — pomme, haltère, empreintes — chacune avec une flèche (baisse, stable, hausse), puis le bloc du verdict et le bouton « + Ajouter » séance.</figcaption></figure>
+  <p>Au-dessus du bloc du verdict, trois tuiles disent par une flèche le sens des sept derniers jours par rapport aux sept précédents : repas, activité physique, pas (tuile absente si le module est éteint). L'infobulle écrit « En hausse | En baisse | Stable sur les 7 derniers jours … ». Une tuile ouvre le tiroir Dynamique ; le bouton « + Ajouter » ouvre la couche « Activité physique » en saisie. Verrouillée, la rangée est dépolie sans message.</p>
+  <details><summary>Les règles derrière les chiffres</summary>
+    <ul>
+      <li>Sens = comparaison des deux moitiés de 14 jours, seuil 5 % ; stable par défaut. <a href="spec-technique.html#maison-sens-des-tuiles-dynamique">→ technique</a> <a href="spec-technique.html#maison-sens-d-une-periode-periodshift">→ technique</a></li>
+    </ul>
+  </details>
+
+  <h3 id="maison-section-progres-evolution-home-sections">Section « Progrès » / « Évolution »</h3>
+  <figure class="telephone" data-capture="accueil/section-progres-evolution-home-sections"><figcaption>Quatre mini-tuiles : « ≈ -0.4 kg/semaine », « -2.7 points d'IMC », « -7.6 kg en 19 semaines » avec son dessin, « -0.5 kg en 1 semaine ».</figcaption></figure>
+  <p>Titrée « Évolution » quand le poids actuel vaut ou dépasse celui du départ, « Progrès » sinon. De deux à quatre mini-tuiles, par rang : la perte moyenne par semaine (dès 7 jours de cure), les points d'IMC gagnés ou perdus, la perte totale et la dernière perte avec leur dessin insolite et leur durée (« en n semaines » ou « en n jours »). La tuile kg/semaine ouvre la couche « Balance », la tuile IMC la couche « Où en est l'IMC », une tuile de perte son équivalence en surimpression.</p>
+  <details><summary>Les règles derrière les chiffres</summary>
+    <ul>
+      <li>Composition, rangs et plafond de quatre. <a href="spec-technique.html#maison-rangee-progres-composition-et-plafond">→ technique</a></li>
+      <li>Points d'IMC = (actuel − départ) / m², au dixième. <a href="spec-technique.html#maison-points-d-imc-gagnes-perdus-bmipointschange">→ technique</a></li>
+      <li>Durée d'une perte : jours entre les deux pesées, en jours sous 7, en semaines arrondies sinon. <a href="spec-technique.html#maison-duree-d-une-perte-lossspanlabel-lossspandates">→ technique</a></li>
+      <li>Dessin d'équivalence : l'assignation faite par la pesée, sinon un recalcul. <a href="spec-technique.html#maison-repli-du-dessin-d-equivalence-insolite">→ technique</a></li>
+    </ul>
+  </details>
+  <div class="exemple"><p>Camille : (88.4 − 96) / 1.68² = −2.7 points d'IMC ; perte totale 7.6 kg en 131 jours → « en 19 semaines » ; dernière perte 0.5 kg entre le 5 et le 12 septembre → « en 1 semaine ».</p></div>
+
+  <h3 id="maison-surimpression-d-une-equivalence-insolite-home-sections">Équivalence insolite en surimpression</h3>
+  <figure class="telephone" data-capture="accueil/surimpression-d-une-equivalence-insolite-home-sections"><figcaption>Page vitrée, bloc « Depuis le début » : « -7.6 kg », « soit l'équivalent de », le dessin en grand et sa phrase.</figcaption></figure>
+  <p>Le bloc d'équivalence en entier, le reste de la page vitré : libellé <span class="marque">arbitrage non validé</span>, perte, « soit l'équivalent de », dessin et phrase. L'état ouvert de chaque tuile est mémorisé ; les deux peuvent l'être, la perte totale est alors montrée. La croix ferme cette équivalence ; la vitre ou le geste de barre ferment les deux.</p>
+
+  <h3 id="maison-section-cote-a-cote-home-sections">Section « Côte à côte »</h3>
+  <figure class="telephone" data-capture="accueil/section-cote-a-cote-home-sections"><figcaption>Deux colonnes : « début | aujourd'hui » (Ozempic 0.25 mg | 1 mg ; 96 kg | 88.4 kg), puis « Depuis le début | 7 derniers jours » par domaine avec « (moyenne / jour) » pour repas, pas, sommeil et « (moyenne / semaine) » pour activité physique et temps pour soi.</figcaption></figure>
+  <p>Deux colonnes comparées. D'abord « début | aujourd'hui » : la dose initiale et actuelle avec le nom du traitement, le poids de départ et actuel. Puis « Depuis le début | 7 derniers jours », par domaine autour d'un médaillon : repas (kcal, protéines et fibres par jour), pas (par jour), sommeil (durée et qualité par jour), activité physique (minutes et séances par semaine), temps pour soi (moments par semaine). Un côté sans valeur reste vide ; le pluriel des unités commence à 2 <span class="marque">arbitrage non validé</span> ; le domaine repas reste visible module éteint <span class="marque">arbitrage non validé</span>. Chaque domaine finit par « Ajouter une entrée » (sauf les pas) et « Voir la page … ». Les valeurs ouvrent la couche du domaine (« Paliers de dose », « Menus » en vue moyenne sur la fenêtre de la colonne, « Pas », « Sommeil », « Activité physique », « Un temps pour soi ») ; le poids mène à la page pesée ; le médaillon à la page si le module est allumé. La section n'est montrée que si une valeur existe.</p>
+  <details><summary>Les règles derrière les chiffres</summary>
+    <ul>
+      <li>Colonne « 7 derniers jours » : d'aujourd'hui − 6 à aujourd'hui pour pas, sommeil, sport, temps pour soi. <a href="spec-technique.html#maison-fenetre-7-derniers-jours-des-bilans">→ technique</a></li>
+      <li>Repas sur 7 jours révolus, jour courant écarté, par journée renseignée. <a href="spec-technique.html#maison-moyennes-repas-sur-7-jours-revolus-mealcaloriesdailyaveragel">→ technique</a></li>
+      <li>Repas depuis le début, par journée renseignée. <a href="spec-technique.html#maison-moyennes-du-journal-des-repas-sur-la-cure-mealdailyaverages">→ technique</a></li>
+      <li>Pas : moyenne des journées à plus de 0 pas. <a href="spec-technique.html#maison-moyenne-de-pas-par-jour-stepsdailyaverage">→ technique</a></li>
+      <li>Sommeil moyen par journée dormie ; qualité pondérée par la durée. <a href="spec-technique.html#maison-sommeil-moyen-et-qualite-ponderee">→ technique</a></li>
+      <li>Sport par semaine depuis la première séance, rien sous 7 jours. <a href="spec-technique.html#maison-moyennes-hebdomadaires-du-sport-sportweeklyaverages">→ technique</a></li>
+      <li>Temps pour soi par semaine depuis la première entrée, rien sous 7 jours. <a href="spec-technique.html#maison-moyenne-hebdomadaire-depuis-la-premiere-entree-metimeweeklya">→ technique</a></li>
+      <li>Infobulles protéines/fibres en % de l'objectif du jour. <a href="spec-technique.html#maison-de-la-recommandation-infobulles-cote-a-cote">→ technique</a></li>
+      <li>Pluriel à partir de 2. <a href="spec-technique.html#maison-pluriel-des-unites-cote-a-cote">→ technique</a></li>
+      <li>Gardes d'affichage de la section. <a href="spec-technique.html#maison-gardes-de-la-section-cote-a-cote">→ technique</a></li>
+      <li>Médaillon à deux formes, cas aujourd'hui inatteignable. <a href="spec-technique.html#maison-medaillon-du-traitement-formes-melangees">→ technique</a> <span class="marque">arbitrage non validé</span></li>
+    </ul>
+  </details>
+  <div class="exemple"><p>Camille, activité physique : 2 séances de 45 min par semaine depuis mai → « 90 min · 2 séances » à gauche ; une seule séance cette semaine → « 45 min · 1 séance » à droite.</p></div>
+
+  <h3 id="maison-couches-vitrees-de-la-home-sections-surimpressionvitree">Couches vitrées</h3>
+  <figure class="telephone" data-capture="accueil/couches-vitrees-de-la-home-sections-surimpressionvitree"><figcaption>La couche « Balance » par-dessus la home vitrée : bandeau avec picto, le bloc de suivi du poids, la croix, le lien « Voir la page ».</figcaption></figure>
+  <p>Une seule couche à la fois, par-dessus la page floutée sans teinte, bornée au cadre du téléphone : une carte unique avec bandeau titré, croix, contenu et lien de pied ; la carte défile en son sein si elle est trop haute. Dix couches : « Pas » (le jour et le cumul), « Niveau sanguin actif » (le graphe), « Menus » (formulaire ou récapitulatif du jour, moyenne comparée), « Effets secondaires » (la matrice), « Balance » (le bloc de suivi du poids), « Où en est l'IMC » (échelle 16–42, départ et aujourd'hui), « Paliers de dose » (la frise), « Activité physique » (bloc « De quoi c'est fait » ou formulaire), « Un temps pour soi », « Sommeil » (7 dernières nuits). Elles se ferment par la croix, un clic sur la vitre ou le geste de la barre ; « Voir la page » referme puis navigue. Un repas s'enregistre, se modifie ou se supprime depuis « Menus » ; une séance s'enregistre depuis « Activité physique » ; créer un aliment absent referme la couche et ouvre le formulaire de la page, la saisie en cours est perdue.</p>
+
+  <h3 id="maison-tiroir-journal">Tiroir « Journal »</h3>
+  <figure class="telephone" data-capture="accueil/tiroir-journal"><figcaption>Huit cases, deux par ligne : Balance « 12/09 · 88.4 kg / 05/09 · 88.9 kg / 29/08 · 89.3 kg », Traitement « 07/09 · 1 mg · Ozempic · AG »…, modules éteints grisés en fin.</figcaption></figure>
+  <p>Ouvert par le bouton « Journal » de la barre du bas, en menu simplifié. Une case par journal — traitement, balance, effets, activité physique, repas, sommeil, temps pour soi, pas — modules allumés d'abord, éteints grisés ensuite, masqués absents. Chaque case liste les trois dernières entrées, toutes dates confondues, futur compris ; « Rien d'enregistré » sinon. Une case allumée ouvre le journal entier de la page en surimpression ; une case éteinte mène à la page vitrée du module.</p>
+  <details><summary>Les règles derrière les chiffres</summary>
+    <ul>
+      <li>Trois entrées par onglet après tri date puis heure décroissantes ; une journée à 0 pas reste montrée. <a href="spec-technique.html#maison-tiroir-journal-recententriesbytab-recentstepentries">→ technique</a></li>
+      <li>Forme de chaque ligne (nuit « du 25 au 26/08 », initiales de site « AG », durée « 1h05 »). <a href="spec-technique.html#maison-forme-des-lignes-du-tiroir-journal-formedeligne">→ technique</a> <span class="marque">arbitrage non validé</span> (initiales coupées quand la ligne est trop longue)</li>
+      <li>Ordre et présence des cases. <a href="spec-technique.html#maison-ordre-et-presence-des-cases-des-tiroirs">→ technique</a></li>
+    </ul>
+  </details>
+
+  <h3 id="maison-surimpression-du-journal-d-une-page-tiroir-journal">Journal d'une page en surimpression</h3>
+  <figure class="telephone" data-capture="accueil/surimpression-du-journal-d-une-page-tiroir-journal"><figcaption>Le journal Balance entier de Camille, lignes modifiables sur place, lien « Ouvrir la page Balance ».</figcaption></figure>
+  <p>Le journal complet de la page, avec ses lignes, sans filtre de période ni pagination. Balance : une pesée se modifie et se supprime sur place, et une pesée enregistrée déclenche la carte de confirmation de la page pesée. Autres journaux : Modifier, Supprimer et Gérer renvoient à la page. Repas : journées et repas se plient et se déplient, la suppression d'un aliment est inerte <span class="marque">arbitrage non validé</span>. « Ouvrir la page {nom} », la croix ou la vitre ferment.</p>
+
+  <h3 id="maison-tiroir-tendance-des-15-derniers-jours">Tiroir « Tendance des 15 derniers jours »</h3>
+  <figure class="telephone" data-capture="accueil/tiroir-tendance-des-15-derniers-jours"><figcaption>Huit cartes : Actif sanguin, Balance, Calories, Activité physique, Temps pour soi, Sommeil, Pas, Effets secondaires ; la Balance retournée montre « 89.6 → 88.4 kg ».</figcaption></figure>
+  <p>Ouvert par le bouton « Tendances » de la barre, en menu simplifié ; il sort du bas, pleine largeur, sans texte <span class="marque">arbitrage non validé</span>. Le titre dit une quinzaine, la donnée court sur quatorze jours. Chaque carte porte un picto, un titre et une courbe lissée sans échelle ; le chevron ou le titre bascule vers les valeurs, et la bascule est mémorisée : Actif sanguin « x mg » en direct, Balance « début → fin kg », Calories « kcal/j », Activité « durée −kcal/j », Temps pour soi « total », Sommeil « durée /j », Pas « x Kpas/j −kcal/j ». Sans forme : « Pas encore de données » ou « Pas encore de tendance » avec un lien de saisie. Effets secondaires : un visage avant → un visage après, ou un sourire « Pas ou peu d'effet secondaire ». Une carte ouvre le graphe principal en surimpression ; une carte éteinte écrit « Activez le module … », et ce message mène à la page Modules.</p>
+  <details><summary>Les règles derrière les chiffres</summary>
+    <ul>
+      <li>Séries sur 14 jours : poids reporté, concentration à midi, sommes journalières. <a href="spec-technique.html#maison-series-de-tendance-trend-days-14">→ technique</a></li>
+      <li>Forme dessinée dès deux valeurs distinctes. <a href="spec-technique.html#maison-forme-a-dessiner-hasshape">→ technique</a></li>
+      <li>Valeurs des cartes (dernière, première, moyenne informée, total, kcal/j). <a href="spec-technique.html#maison-valeurs-des-cartes-de-tendance">→ technique</a></li>
+      <li>Visages des effets : humeur de chaque moitié de sept jours. <a href="spec-technique.html#maison-evolution-des-effets-secondaires-sideeffectshift">→ technique</a></li>
+      <li>Échelle et lissage de la courbe. <a href="spec-technique.html#maison-echelle-de-la-sparkline">→ technique</a></li>
+      <li>Cartes sans forme. <a href="spec-technique.html#maison-cartes-du-tiroir-tendance-sans-forme">→ technique</a></li>
+    </ul>
+  </details>
+
+  <h3 id="maison-surimpression-du-graphe-principal-tiroir-tendance">Graphe principal en surimpression</h3>
+  <figure class="telephone" data-capture="accueil/surimpression-du-graphe-principal-tiroir-tendance"><figcaption>Par-dessus le tiroir : bandeau « Balance », sélecteur de période, la courbe poids et traitement, lien « Voir la page ».</figcaption></figure>
+  <p>Le graphe de la page du domaine, dans un bloc unique : niveau sanguin, poids et traitement (dès deux pesées), apports (calories d'abord), activité physique, temps pour soi, sommeil, pas, ou la matrice des effets. La période se change ici et reste partagée avec la page. Croix, vitre, ou « Voir la page » ancrée sur le graphe.</p>
+  <details><summary>Les règles derrière les chiffres</summary>
+    <ul>
+      <li>Fenêtres 7/14/30/90 jours inclusives, « Depuis le début », bornes « du … au … ». <a href="spec-technique.html#maison-fenetre-temporelle-getcutoffdatestr-filterbytimewindow">→ technique</a></li>
+      <li>Période par défaut 30 jours, mémorisée par bloc. <a href="spec-technique.html#maison-options-et-defaut-de-periode">→ technique</a></li>
+    </ul>
+  </details>
+
+  <h3 id="maison-matrice-des-effets-secondaires-par-moment-de-la-journee">Matrice des effets par moment</h3>
+  <figure class="telephone" data-capture="accueil/matrice-des-effets-secondaires-par-moment-de-la-journee"><figcaption>« Nausée · du 06/09 au 12/09 », sept colonnes de dates, lignes matin / après-midi / soir, cases légère ou modérée, légende des quatre crans.</figcaption></figure>
+  <p>Un effet à la fois, sur les sept jours qui finissent à sa dernière déclaration : trois lignes (matin, après-midi, soir), une case par jour au cran le plus fort (rien, légère, modérée, marquée), et une note qui compte les déclarations. Des chevrons passent à l'effet précédent ou suivant. « Aucun effet secondaire déclaré. » si le journal est vide.</p>
+  <details><summary>Les règles derrière les chiffres</summary>
+    <ul>
+      <li>Moments par heure de saisie, crans par sévérité, ordre des effets. <a href="spec-technique.html#maison-matrice-des-effets-par-moment">→ technique</a></li>
+    </ul>
+  </details>
+
+  <h3 id="maison-widget-de-felicitation">Widget de félicitation</h3>
+  <figure class="telephone" data-capture="accueil/widget-de-felicitation"><figcaption>Page vitrée, carte « 30 % de l'objectif » — « Encore 0,6 kg de moins, 6,3 kg depuis le début. Le cap est bon. » — étoiles animées sur quatre plans, boutons « Rejouer l'animation » et « Fermer ».</figcaption></figure>
+  <p>Couche vitrée pleine page portant un titre, un corps et une scène de particules choisie par type de félicitation (douze types : badge débloqué ou monté de niveau, palier d'IMC, premier jour, dernière perte, première semaine, premier mois, première année, mois et année additionnels, multiples de 50 jours, autre). Les messages sont des propositions <span class="marque">arbitrage non validé</span>. Rien ne se ferme seul ; « Rejouer l'animation » resème la scène ; en mouvement réduit, l'animation ne part qu'au bouton « Voir l'animation ». <span class="marque non">non implémenté</span> Aucun déclenchement n'existe : les règles dictées (journées renseignées, jalons de jours, mois, années, pourcentages de l'objectif) sont consignées et non codées ; le widget n'est ouvert que depuis une page d'essai, avec des contenus simulés.</p>
+  <details><summary>Les règles derrière les chiffres</summary>
+    <ul>
+      <li>Type → scène. <a href="spec-technique.html#maison-mapping-type-de-felicitation-scene-scene-par-type">→ technique</a></li>
+      <li>Messages, nombres à la française. <a href="spec-technique.html#maison-messages-de-felicitation">→ technique</a></li>
+      <li>Même graine, même scène. <a href="spec-technique.html#maison-semis-reproductible-creerrng">→ technique</a></li>
+      <li>Durée d'une scène, pour le bouton Rejouer seulement. <a href="spec-technique.html#maison-duree-d-une-scene-dureescene">→ technique</a></li>
+      <li>Mouvement réduit, carte et vitrage sombres. <a href="spec-technique.html#maison-widget-de-felicitation-mouvement-reduit-et-surfaces-sombres">→ technique</a></li>
+    </ul>
+  </details>
+</section>

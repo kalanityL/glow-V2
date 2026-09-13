@@ -1,0 +1,179 @@
+<section id="effets">
+  <h2>7. Les effets secondaires <a class="retour" href="#sommaire">↑ sommaire</a></h2>
+  <p>Un effet secondaire est un ressenti déclaré par la personne sous traitement : un effet nommé, une intensité de 0 à 5, une date, une heure, une note facultative. Le domaine sert à celle qui suit sa cure et, par le rapport PDF, à son médecin. Il permet de saisir, de relire par journal ou par calendrier, de mesurer l'impact quotidien et de lire l'humeur du jour sur la home.</p>
+
+  <h3 id="effets-page-effets-secondaires-tracker">Page « Effets secondaires »</h3>
+  <figure class="telephone" data-capture="effets-secondaires/page-effets-secondaires-tracker"><figcaption>La page de Camille le 12/09/2026 : bandeau « L'effet secondaire a bien été ajouté à votre journal. », ligne d'outils Calendrier / Journal, calendrier de septembre avec « 2.3/5 » le 5, « 2.5/5 » le 10 et « 2/5 » le 12, graphique « Impact » en bas.</figcaption></figure>
+  <p>La page empile le bandeau de confirmation ou le formulaire, le panneau de gestion des effets (fermé), la ligne d'outils — deux carreaux Calendrier / Journal et « + ajouter » —, la vue d'historique choisie, puis le graphique « Impact ». Le calendrier est la vue par défaut ; le choix est mémorisé sur l'appareil. On y arrive par l'entrée « Effets secondaires » du menu du bas, le bloc « Ajout rapide » du menu, les tiroirs « + » (formulaire déplié) et « Journal », la tuile « ressentis du jour » de la home. Le titre de page, le « + » flottant et « + ajouter » ouvrent le formulaire ; le grand bouton « Ajouter » existe dans le code mais est masqué. Le bandeau de confirmation se ferme à la croix ou s'efface seul une fois lu et sorti de l'écran par un défilement. Module éteint (page Modules, carte « Effets secondaires », Activé / Désactivé) : l'entrée quitte le menu du bas et l'ajout rapide, la page se vitre avec « Activez le module Effets Secondaires pour pouvoir suivre l'évolution de vos effets secondaires. » ; la case « Masquer dans l'application. » retire en plus le module des tiroirs. Sans valeur dans le profil, le module est allumé. La V2 ne reprend pas les saisies rapides comme modèle et son onboarding ne touche pas ce domaine <span class="marque v2">V2</span>.</p>
+  <details><summary>Les règles derrière les chiffres</summary>
+    <ul>
+      <li>La vue d'historique vaut « journal » seulement si la valeur mémorisée l'est, sinon calendrier. <a href="spec-technique.html#effets-vue-d-historique-par-defaut">→ technique</a></li>
+      <li>Le « + » flottant s'arme quand la ligne d'outils sort de l'écran ; seuls ses incréments ouvrent le formulaire. <a href="spec-technique.html#effets-ouverture-par-le-flottant-et-le-titre">→ technique</a></li>
+      <li>Le bandeau s'efface après 800 ms cumulées de lisibilité, un défilement au geste et une sortie complète de l'écran. <a href="spec-technique.html#effets-effacement-du-bandeau-de-confirmation">→ technique</a></li>
+      <li>Module absent du profil = allumé ; masquage possible seulement éteint ; rallumer démasque. <a href="spec-technique.html#effets-etat-du-module-effets-secondaires">→ technique</a></li>
+      <li>Au chargement, l'ancien champ description est fusionné dans la note, les lignes supprimées et de démonstration sont retirées. <a href="spec-technique.html#effets-migration-description-notes">→ technique</a></li>
+    </ul>
+  </details>
+
+  <h3 id="effets-formulaire-nouveau-ressenti-modifier-le-ressenti">Formulaire « Nouveau ressenti »</h3>
+  <figure class="telephone" data-capture="effets-secondaires/formulaire-nouveau-ressenti-modifier-le-ressenti"><figcaption>Camille le 12/09/2026 à 08:37 : date 12/09/2026, heure 08:30, effet « Nausées », curseur sur « 2 — Modéré », note repliée, bouton « Valider ».</figcaption></figure>
+  <p>Titre « Nouveau ressenti » ou « Modifier le ressenti ». Date JJ/MM/AAAA et heure HH:MM, éditables au clic (calendrier et horloge maison, minutes rondes). Sélecteur d'effet : libellé court fermé, libellés entiers dans la liste, effets actifs plus l'effet courant s'il a été désactivé, option « Ajouter / Gérer ». Curseur d'intensité gradué de 0 à 5 avec le mot de la valeur courante : « 0 — Imperceptible », « 1 — Léger », « 2 — Modéré », « 3 — Marqué », « 4 — Fort », « 5 — Élevé ». Note repliée, placeholder « Commentaires sur l'effet ressenti... », 280 caractères au plus. Bouton « Valider » ou « Mettre à jour le ressenti ». Un appui hors de la carte ferme sans enregistrer. Un jour reçoit 15 ressentis au plus : le seizième remplace la dernière ligne du jour et l'avis « Limite atteinte — Limite atteinte pour aujourd'hui : cette saisie remplace la dernière. » s'affiche en haut de page.</p>
+  <details><summary>Les règles derrière les chiffres</summary>
+    <ul>
+      <li>Intensité de 0 à 5, six mots ; 0 à l'ouverture. <a href="spec-technique.html#effets-echelle-et-defaut-d-intensite-du-formulaire">→ technique</a></li>
+      <li>À l'ouverture : premier effet actif (sinon « Nausées »), date et heure de l'instant ; un jour du calendrier force sa date. <a href="spec-technique.html#effets-valeurs-par-defaut-du-formulaire">→ technique</a></li>
+      <li>Minutes rondes 0, 10, 15, 20, 30, 40, 45, 50 : l'heure est arrondie vers le bas à la saisie et à l'enregistrement. <a href="spec-technique.html#effets-heure-arrondie-vers-le-bas-aux-minutes-rondes">→ technique</a></li>
+      <li>Rien n'est enregistré sans effet, sans date ou sans heure ; la validation remonte en haut de page. <a href="spec-technique.html#effets-validation-a-la-soumission-du-formulaire">→ technique</a></li>
+      <li>Une note faite d'espaces vaut absence ; sinon le texte est conservé tel quel. <a href="spec-technique.html#effets-note-espaces-absence-texte-conserve-tel-quel">→ technique</a></li>
+      <li>Plafond de 15 lignes par jour ; au-delà, la dernière ligne du jour est écrasée, son identifiant conservé. <a href="spec-technique.html#effets-plafond-quotidien-de-15-ressentis">→ technique</a></li>
+      <li>La modification fusionne les champs sur la ligne ; la suppression la retire franchement. <a href="spec-technique.html#effets-modification-par-fusion-suppression-franche">→ technique</a></li>
+      <li>Fermé, le sélecteur retire la parenthèse finale du libellé ; le préfixe non alphabétique d'un type est nettoyé. <a href="spec-technique.html#effets-libelle-court-et-nettoyage-du-type">→ technique</a></li>
+      <li>Un appui hors de la carte ferme le formulaire, sauf sur les calendriers, horloges et listes. <a href="spec-technique.html#effets-fermeture-du-formulaire-au-clic-a-cote">→ technique</a></li>
+    </ul>
+  </details>
+  <div class="exemple"><p>Camille ouvre le formulaire le 12/09/2026 à 08:37. Il propose 12/09/2026, 08:30, « Ballonnements » (premier effet actif dans l'ordre alphabétique) et « 0 — Imperceptible ». Elle choisit « Nausées », pousse le curseur à « 2 — Modéré » et valide : la ligne 12/09/2026 08:30, Nausées, 2, sans note, rejoint le journal.</p></div>
+
+  <h3 id="effets-panneau-effets-secondaires-disponibles-ajouter-gerer">Panneau « Effets secondaires disponibles »</h3>
+  <figure class="telephone" data-capture="effets-secondaires/panneau-effets-secondaires-disponibles-ajouter-gerer"><figcaption>Le panneau avec la recherche « ver » : « Vertiges » et « Vomissements » restent, « Vertiges » coché, bouton « Enregistrer la sélection ».</figcaption></figure>
+  <p>Fenêtre en surimpression : champ « Rechercher un effet... », commandes « Tout cocher » | « Tout décocher », grille de 36 effets en cases à cocher, « Aucun effet trouvé » si la recherche ne rend rien, bouton « Enregistrer la sélection ». On l'ouvre par « Ajouter / Gérer » depuis le formulaire, une ligne du journal ou une ligne de bulle. À l'ouverture, les cases reflètent les effets actifs et la recherche est vide. Enregistrer sans case cochée affiche « Au moins un effet secondaire doit être sélectionné ». Sans sélection mémorisée, 12 effets sont actifs : Nausées, Diarrhée, Constipation, Vomissements, Douleurs abdominales, Fatigue, Vertiges, Maux de tête, Reflux gastro-œsophagien, Ballonnements, Disparition totale de l'appétit, Rots au soufre.</p>
+  <details><summary>Les règles derrière les chiffres</summary>
+    <ul>
+      <li>36 libellés triés en français ; la sélection mémorisée ne garde que les libellés encore connus ; vide, elle vaut les 12 par défaut. <a href="spec-technique.html#effets-liste-exhaustive-et-effets-actifs-par-defaut">→ technique</a></li>
+      <li>Recherche par inclusion, insensible à la casse ; tout cocher / décocher n'agit que sur les effets visibles ; la sélection vide est refusée. <a href="spec-technique.html#effets-gestion-des-effets-actifs">→ technique</a></li>
+      <li>« Tout cocher » n'est souligné que s'il reste une case visible décochée ; « Tout décocher » que s'il en reste une cochée. <a href="spec-technique.html#effets-soulignement-de-tout-cocher-tout-decocher">→ technique</a></li>
+      <li>Un sélecteur montre les effets actifs plus l'effet sélectionné s'il en a été retiré ; « Ajouter / Gérer » ouvre le panneau sans changer la sélection. <a href="spec-technique.html#effets-options-affichees-dans-un-selecteur-d-effet">→ technique</a></li>
+      <li>La sélection, la vue d'historique et les deux périodes sont mémorisées sur l'appareil. <a href="spec-technique.html#effets-stockage-local">→ technique</a></li>
+    </ul>
+  </details>
+
+  <h3 id="effets-vue-journal-des-effets-secondaires">Vue Journal</h3>
+  <figure class="telephone" data-capture="effets-secondaires/vue-journal-des-effets-secondaires"><figcaption>« Journal (6) », « du 14/08/2026 à aujourd'hui », « 30 derniers jours » ; première ligne « 2/5  Nausées  12/09/2026  08:30 ».</figcaption></figure>
+  <p>Bandeau « Journal (n) », n étant le nombre de lignes dans la période ; bornes « du … au … » éditables en place ; sélecteur 7, 14, 30 ou 90 derniers jours, Depuis le début, Choisir (30 jours par défaut) ; corbeille « Tout supprimer ». Lignes du plus récent au plus ancien dans une liste défilante de 160 px : intensité « s/5 », effet, date JJ/MM/AAAA, heure (« 12:00 » si absente), note en italique. Chaque champ s'édite au clic ; le menu à trois points propose « Modifier » (formulaire) et « Supprimer » (retrait immédiat, sans confirmation). L'intensité éditée en place ne propose que 1/5 à 5/5 : l'échelle 0–5 décidée pour le formulaire n'y est pas appliquée et un ressenti à 0 s'y lit « 0/5 » sans pouvoir y être remis à 0 <span class="marque non">non implémenté</span>. « Tout supprimer » ouvre « Supprimer tout ? — Voulez-vous supprimer définitivement tout le journal des effets secondaires ? Cette action est irréversible. ». Journal entièrement vide : « Aucun effet secondaire enregistré. Vos ressentis s'afficheront ici. » ; période sans ligne sur un journal non vide : liste vide sans message.</p>
+  <details><summary>Les règles derrière les chiffres</summary>
+    <ul>
+      <li>Tri par date puis heure décroissantes (heure absente comptée 12:00), puis filtre par période. <a href="spec-technique.html#effets-ordre-du-journal">→ technique</a></li>
+      <li>« n derniers jours » = aujourd'hui et les n − 1 jours précédents ; en mode Choisir, une borne vide est illimitée de son côté. <a href="spec-technique.html#effets-fenetre-temporelle-inclusive">→ technique</a></li>
+      <li>Période mémorisée par bloc, 30 jours par défaut ; éditer une borne bascule en Choisir avec ces bornes. <a href="spec-technique.html#effets-memoire-et-defaut-des-periodes">→ technique</a></li>
+      <li>La borne de début vaut la coupure, ou la plus ancienne entrée écrite « début » ; la fin vaut « aujourd'hui ». <a href="spec-technique.html#effets-bornes-affichees-du-au">→ technique</a></li>
+      <li>Le compteur compte les lignes filtrées ; le texte vide ne paraît que si tout le journal est vide. <a href="spec-technique.html#effets-compteur-et-etat-vide-du-journal">→ technique</a></li>
+      <li>La corbeille paraît si le journal n'est pas vide et que le profil n'interdit pas les suppressions totales. <a href="spec-technique.html#effets-bouton-tout-supprimer">→ technique</a></li>
+      <li>L'édition en place n'enregistre qu'une intensité entière de 1 à 5, une date et un effet non vides, et seulement si un champ a changé. <a href="spec-technique.html#effets-edition-en-place-dans-le-journal-severite-1-a-5">→ technique</a></li>
+    </ul>
+  </details>
+  <div class="exemple"><p>Le 12/09/2026, « 30 derniers jours » affiche « du 14/08/2026 à aujourd'hui » et « Journal (6) » : 2/5 Nausées 12/09/2026 08:30 ; 2/5 Fatigue 10/09/2026 15:00 ; 3/5 Nausées 10/09/2026 09:30 ; puis Fatigue 2/5, Vertiges 1/5 et Nausées 4/5 du 05/09/2026.</p></div>
+
+  <h3 id="effets-vue-calendrier-des-effets-secondaires">Vue Calendrier</h3>
+  <figure class="telephone" data-capture="effets-secondaires/vue-calendrier-des-effets-secondaires"><figcaption>« SEPTEMBRE 2026 » : « 2.3/5 » sous le 5, « 2.5/5 » sous le 10, « 2/5 » sous le 12 (jour courant, fond propre), un tiret sous les autres jours du mois.</figcaption></figure>
+  <p>Bandeau au mois et à l'année, chevrons voilés aux bornes (du mois de la première entrée au mois courant), glissé horizontal d'au moins 48 px pour changer de mois. Semaines du lundi au dimanche, initiales L M M J V S D. Une tuile à donnée porte la note moyenne du jour : moyenne des intensités, une décimale au plus, point décimal, suffixe « /5 » ; un jour du mois sans entrée porte un tiret ; le jour courant a son fond. Clic sur un jour à donnée : la bulle ; clic sur un jour vide, voisin compris : le formulaire à cette date, heure courante. Journal vide : « Cliquez sur la date choisie pour saisir votre premier effet secondaire ». Le mot de palier (léger, modéré, sévère) ne s'affiche plus dans la tuile ; il sert au rapport PDF.</p>
+  <details><summary>Les règles derrière les chiffres</summary>
+    <ul>
+      <li>Les effets sont rangés par date, chaque jour trié par heure croissante. <a href="spec-technique.html#effets-rangement-des-effets-par-jour">→ technique</a></li>
+      <li>Moyenne arithmétique des intensités, arrondie à une décimale, zéros de queue retirés, « /5 ». <a href="spec-technique.html#effets-note-moyenne-de-la-tuile-du-calendrier">→ technique</a></li>
+      <li>Nombres à l'écran : point décimal, zéros de queue retirés, milliers séparés d'une insécable. <a href="spec-technique.html#effets-formatage-des-nombres-a-l-ecran">→ technique</a></li>
+      <li>Mois initial = courant ; navigation bornée ; glissé retenu si |dx| ≥ 48 px et plus horizontal que vertical ; bulle fermée au clic ailleurs ; défilement si elle passe sous le menu. <a href="spec-technique.html#effets-coquille-calendarblock-bornes-gestes-titres">→ technique</a></li>
+      <li>Grille de semaines complètes lundi → dimanche, jours voisins marqués hors mois. <a href="spec-technique.html#effets-grille-de-mois">→ technique</a></li>
+    </ul>
+  </details>
+  <div class="exemple"><p>Le 05/09, Camille a déclaré 4, 1 et 2 : (4 + 1 + 2) / 3 = 2,33, tuile « 2.3/5 ». Le 10/09, 3 et 2 : « 2.5/5 ». Le 12/09, 2 : « 2/5 ».</p></div>
+
+  <h3 id="effets-bulle-d-un-jour-du-calendrier">Bulle d'un jour</h3>
+  <figure class="telephone" data-capture="effets-secondaires/bulle-d-un-jour-du-calendrier"><figcaption>Bulle du 05/09/2026 : « Nausées · 4/5 · 05/09/2026 · 08:00 », « Vertiges · 1/5 · 05/09/2026 · 11:30 », lien « Voir plus (3 effets) », « Ajouter un enregistrement ».</figcaption></figure>
+  <p>Ancrée à la tuile, la bulle liste au plus deux effets du jour, par heure croissante : « Effet », « Intensité » « n/5 », « Date », « Heure », chacun éditable en place (intensité de 0/5 à 5/5 ; l'effet propose les effets actifs et « Ajouter / Gérer »), puis « Modifier » et « Supprimer ». Au-delà de deux effets, « Voir plus (n effets) » ferme la bulle, ouvre le bloc de détail et y fait défiler. « Ajouter un enregistrement » ouvre le formulaire à cette date. Supprimer le dernier effet du jour ferme la bulle. La note ne s'y lit pas ; « Modifier » ouvre le formulaire où elle s'édite.</p>
+  <details><summary>Les règles derrière les chiffres</summary>
+    <ul>
+      <li>Deux effets au plus ; « Voir plus » si le jour en compte davantage ; le bloc de détail ne se rend que si le jour a encore des effets. <a href="spec-technique.html#effets-bulle-du-calendrier-deux-effets-voir-plus-ajout">→ technique</a></li>
+      <li>L'édition en place accepte 0 à 5, exige date et effet, n'enregistre que si un champ change et conserve la note. <a href="spec-technique.html#effets-edition-en-place-dans-le-calendrier-severite-0-a-5-note-pres">→ technique</a></li>
+    </ul>
+  </details>
+
+  <h3 id="effets-bloc-de-detail-du-jour-effets-du-jj-mm-aaaa-n">Bloc de détail du jour</h3>
+  <figure class="telephone" data-capture="effets-secondaires/bloc-de-detail-du-jour-effets-du-jj-mm-aaaa-n"><figcaption>Carte « EFFETS DU 05/09/2026 (3) » sous le calendrier : Nausées 4/5 08:00, Vertiges 1/5 11:30, Fatigue 2/5 19:00, chacun avec Modifier et Supprimer.</figcaption></figure>
+  <p>Carte sous le calendrier, bandeau « Effets du JJ/MM/AAAA (n) » et croix de fermeture ; toutes les lignes du jour, avec les mêmes gestes que la bulle. Le bloc disparaît de lui-même si le jour se vide.</p>
+
+  <h3 id="effets-graphique-impact-tendance-de-tolerance">Graphique « Impact »</h3>
+  <figure class="telephone" data-capture="effets-secondaires/graphique-impact-tendance-de-tolerance"><figcaption>Bloc « IMPACT », « du 14/08/2026 à aujourd'hui », aire avec 7 pts le 05/09, 5 pts le 10/09, 2 pts le 12/09, infobulle ouverte sur le 05/09 : « Score d'Impact 7 pts », « Intensité moyenne : 2.3/5 », « Nombre d'effets : 3 ».</figcaption></figure>
+  <p>Bandeau « Impact », bornes « du … au … » (repli de début = plus ancienne entrée parmi effets et prises), sélecteur de période à mémoire propre, 30 jours par défaut. Sous-titre « Impact global des effets secondaires ». Axe X en « JJ/MM », axe Y en « n pts », entiers. L'aire trace le score d'impact du jour : la somme des intensités. Seuls les jours portant un effet ou une prise sont des points ; une pastille marque un jour d'injection ou de prise. Clic sur un point : infobulle avec la date en toutes lettres, « Score d'Impact n pts », « Intensité moyenne : x/5 » et « Nombre d'effets : n » (ou « Aucun effet secondaire enregistré »), puis, s'il y a prise, « Injection » ou « Comprimé », la dose en mg, le site ou « Prise orale ». La croix ferme l'infobulle jusqu'au prochain clic sur le graphe. Légende : « Score d'Impact (Nombre × Intensité) » et « Injection GLP-1 » ou « Prise de comprimé ». Période sans donnée : graphe vide, sans message.</p>
+  <details><summary>Les règles derrière les chiffres</summary>
+    <ul>
+      <li>Par jour : score = somme des intensités, nombre d'effets, moyenne à une décimale ; prise du jour = la plus forte dose ; dates triées puis filtrées par la période. <a href="spec-technique.html#effets-points-du-graphique-d-impact">→ technique</a></li>
+      <li>Axe Y entier de 0 à automatique ; pastille (rayon 3,5) seulement sur un jour de prise ; infobulle au clic. <a href="spec-technique.html#effets-axes-et-pastilles-du-graphique">→ technique</a></li>
+      <li>La croix ferme l'infobulle ; seul un clic sur le graphe la rouvre, pas le déplacement du curseur. <a href="spec-technique.html#effets-fermeture-de-l-infobulle">→ technique</a></li>
+      <li>Période mémorisée à part du journal ; éditer une borne bascule en Choisir. <a href="spec-technique.html#effets-memoire-et-defaut-des-periodes">→ technique</a></li>
+    </ul>
+  </details>
+  <div class="exemple"><p>05/09 : 4 + 1 + 2 = 7 pts, intensité moyenne 2.3/5, 3 effets. 10/09 : 5 pts. 12/09 : 2 pts. Un jour d'injection sans effet déclaré est un point à 0 pt qui porte la pastille.</p></div>
+
+  <h3 id="effets-tuile-ressentis-du-jour-de-la-rangee-en-direct-home-sections">Humeur du jour, home Sections / Blocs</h3>
+  <figure class="telephone" data-capture="effets-secondaires/tuile-ressentis-du-jour-de-la-rangee-en-direct-home-sections"><figcaption>Rangée « En direct » de Camille le 12/09 : visage neutre et « quelques effets secondaires ».</figcaption></figure>
+  <p>Tuile de la rangée « En direct » : un visage (sourire, neutre, triste, même encre) et une phrase : « pas ou peu d'effet secondaire aujourd'hui », « quelques effets secondaires », « effets secondaires désagréables ». L'humeur se calcule sur les seuls effets du jour : somme des intensités 0 → serein ; somme supérieure à 8 ou une intensité de 4 ou plus → difficile ; sinon modéré. Clic : la matrice en surimpression si le module est allumé et le journal non vide, sinon la page.</p>
+  <details><summary>Les règles derrière les chiffres</summary>
+    <ul>
+      <li>Serein, modéré, difficile selon la somme des intensités du jour et la présence d'une intensité ≥ 4. <a href="spec-technique.html#effets-humeur-du-jour-home">→ technique</a></li>
+      <li>La surimpression ne s'ouvre que module allumé et journal non vide ; sinon navigation vers la page. <a href="spec-technique.html#effets-ouverture-de-la-surimpression-depuis-la-tuile-home">→ technique</a></li>
+    </ul>
+  </details>
+  <div class="exemple"><p>12/09 : Nausées à 2, somme 2 → modéré, visage neutre. 05/09 : 4, 1 et 2 → difficile, une intensité atteint 4. Un jour sans déclaration → serein.</p></div>
+
+  <h3 id="effets-badge-ressentis-du-jour-du-carre-traitement-home-standard">Humeur du jour, home standard</h3>
+  <figure class="telephone" data-capture="effets-secondaires/badge-ressentis-du-jour-du-carre-traitement-home-standard"><figcaption>Sous le carré traitement de Camille : visage ambre et « quelques effets secondaires aujourd'hui ».</figcaption></figure>
+  <p>Sous le carré traitement, si une semaine de traitement est en cours et le module allumé : visage coloré (vert, ambre, rose) et légende « pas ou très peu d'effet secondaire aujourd'hui », « quelques effets secondaires aujourd'hui », « beaucoup d'effets secondaires aujourd'hui ». Même règle d'humeur ; clic : la page.</p>
+
+  <h3 id="effets-surimpression-vitree-effets-secondaires-matrice-matin-apres">Matrice matin / après-midi / soir</h3>
+  <figure class="telephone" data-capture="effets-secondaires/surimpression-vitree-effets-secondaires-matrice-matin-apres"><figcaption>« NAUSÉES · DU 06/09 AU 12/09 », rang « 1/3 », case matin du 10/09 « modérée », case matin du 12/09 « légère », note « 2 déclarations de Nausées sur cette semaine… ».</figcaption></figure>
+  <p>Couche vitrée ouverte depuis la tuile de la home ou la carte du tiroir Tendance, un effet à la fois : ligne de titre « effet · du JJ/MM au JJ/MM », rang « i/n » et chevrons s'il y a plusieurs effets ; colonnes = sept dates « JJ/MM » ; lignes « matin » (avant 12 h), « après-midi » (12 h à 18 h), « soir » (18 h et après), d'après l'heure de saisie ; chaque case prend le cran le plus fort du moment : rien, légère (1–2), modérée (3), marquée (4–5). Légende des quatre crans. Note « n déclaration(s) de effet sur cette semaine, rangée(s) par moment de la journée. C'est la dernière semaine où un effet a été déclaré. » Les effets sont ordonnés par date de dernière déclaration, puis nombre de déclarations, puis nom ; la semaine montrée est celle qui se termine à la dernière déclaration de l'effet courant. Journal vide : « Aucun effet secondaire déclaré. ». Lien « Voir la page ». Les moments tirés de l'heure, le repli de l'échelle 0–5 sur trois crans et le choix de la semaine sont des adaptations d'une maquette qui ne les tranchait pas <span class="marque">arbitrage non validé</span>.</p>
+  <details><summary>Les règles derrière les chiffres</summary>
+    <ul>
+      <li>Moments sur l'heure entière : [0, 12), [12, 18), [18, 24) ; cran 0 si ≤ 0, 1 si ≤ 2, 2 si 3, 3 sinon ; la case garde le maximum. <a href="spec-technique.html#effets-matrice-par-moment-de-la-journee-moments-et-crans">→ technique</a></li>
+      <li>Ordre : dernière date décroissante, nombre décroissant, nom ; semaine = sept jours finissant à la dernière date de l'effet courant. <a href="spec-technique.html#effets-matrice-ordre-des-effets-et-semaine-montree">→ technique</a></li>
+    </ul>
+  </details>
+  <div class="exemple"><p>Nausées, dernière déclaration le 12/09 : semaine du 06/09 au 12/09 ; 10/09 09:30 intensité 3 → matin « modérée » ; 12/09 08:30 intensité 2 → matin « légère » ; le 05/09 est hors semaine. Rang « 1/3 », puis Fatigue (10/09), puis Vertiges (05/09).</p></div>
+
+  <h3 id="effets-carte-effets-secondaires-du-tiroir-tendance-des-15-derniers">Carte du tiroir « Tendance »</h3>
+  <figure class="telephone" data-capture="effets-secondaires/carte-effets-secondaires-du-tiroir-tendance-des-15-derniers"><figcaption>Carte « Effets secondaires » du tiroir de Camille le 12/09 : visage triste, flèche, visage neutre.</figcaption></figure>
+  <p>Huitième carte du tiroir « Tendance des 15 derniers jours » ; la fenêtre calculée compte 14 jours, aujourd'hui compris. Aucun effet dans la fenêtre : sourire et « Pas ou peu d'effet secondaire ». Sinon, chaque moitié de sept jours reçoit un ton par la règle de l'humeur du jour appliquée à sa journée moyenne (somme des intensités divisée par 7), un effet à 4 ou plus forçant « difficile » : deux visages et une flèche si les tons diffèrent, un seul sinon. La moyenne plutôt que la somme est un choix pris sans décision <span class="marque">arbitrage non validé</span>. Clic : la matrice.</p>
+  <details><summary>Les règles derrière les chiffres</summary>
+    <ul>
+      <li>Fenêtre de 14 jours, moitiés de 7 ; ton de chaque moitié = humeur de sa journée moyenne, plus un effet à 4 s'il en existe un. <a href="spec-technique.html#effets-evolution-des-effets-sur-la-quinzaine">→ technique</a></li>
+      <li>Rien → sourire légendé ; tons différents → avant, flèche, après ; sinon le visage de la seconde moitié. <a href="spec-technique.html#effets-affichage-de-la-carte-tendance">→ technique</a></li>
+    </ul>
+  </details>
+  <div class="exemple"><p>Le 12/09, fenêtre du 30/08 au 12/09. Première moitié (30/08–05/09) : Nausées à 4 le 05/09 → difficile. Seconde (06/09–12/09) : 3 + 2 + 2 = 7, soit 1 par jour → modéré. La carte montre triste → neutre.</p></div>
+
+  <h3 id="effets-carte-effets-secondaires-du-tiroir-journal">Carte du tiroir « Journal »</h3>
+  <figure class="telephone" data-capture="effets-secondaires/carte-effets-secondaires-du-tiroir-journal"><figcaption>Carte « Effets secondaires » : « 12/09 · Nausées », « 10/09 · Fatigue », « 10/09 · Nausées ».</figcaption></figure>
+  <p>Les trois entrées les plus récentes par date puis heure, futur compris, sous la forme « JJ/MM » et nom de l'effet, sans heure ni intensité ; carte grisée si le module est éteint. Clic : le journal complet en surimpression, avec les lignes de la page ; Modifier, Supprimer et « Ajouter / Gérer » y renvoient vers la page.</p>
+  <details><summary>Les règles derrière les chiffres</summary>
+    <ul>
+      <li>Tiroir : trois premières entrées par onglet, sans fenêtre ; défilé de la home : sept jours jusqu'à aujourd'hui, futur exclu. <a href="spec-technique.html#effets-entrees-recentes-et-tiroir-journal">→ technique</a></li>
+    </ul>
+  </details>
+
+  <h3 id="effets-carre-effet-du-defile-recent-de-la-home-standard">Carré du défilé récent, home standard</h3>
+  <figure class="telephone" data-capture="effets-secondaires/carre-effet-du-defile-recent-de-la-home-standard"><figcaption>Trois carrés de Camille : « 12/09 Nausées 2/5 », « 10/09 Fatigue 2/5 », « 10/09 Nausées 3/5 ».</figcaption></figure>
+  <p>Un carré par ressenti des sept derniers jours, futur exclu : date, picto pansement, effet sur deux lignes au plus, « s/5 ». Clic : la page.</p>
+
+  <h3 id="effets-export-du-rapport-medical-case-les-effets-secondaires-ressen">Rapport médical PDF</h3>
+  <figure class="telephone" data-capture="effets-secondaires/export-du-rapport-medical-case-les-effets-secondaires-ressen"><figcaption>Section « III Tolérance » du rapport de Camille : « 6 déclarations sur 3 types d'effet… », jauges Nausées 3/5 (3×  •  max 4/5), Fatigue 2/5, Vertiges 1/5.</figcaption></figure>
+  <p>Case « Les effets secondaires ressentis », cochée par défaut, proposée si le module est allumé et qu'un effet tombe dans la période du rapport. Synthèse : « n effets déclarés », « Effets légers », « Effets modérés », « Effets sévères », chaque effet classé seul : intensité 0 ou 1 léger, 2 ou 3 modéré, 4 ou 5 sévère. La tuile « Effets légers » remplace un « modérés » écrit deux fois dans la demande, et le mot « sévère » est gardé là où la demande disait « intenses » <span class="marque">arbitrage non validé</span>. Section « III Tolérance » : « n déclarations sur t types d'effet, intensité déclarée de 1 (léger) à 5 (sévère). », puis, par effet et par nombre décroissant, une jauge sur 5, la moyenne « x/5 » et « n×  •  max m/5 » ; sans donnée, « Aucun effet secondaire déclaré sur cette période. ». Annexe C « Effets secondaires déclarés » : calendrier mensuel dont la case d'un jour porte le mot du pire effet, accordé au nombre d'effets (« léger », « modérés », « sévères »). Détails des journées : rubrique « Effets secondaires », lignes heure · « s/5 » · effet, note en dessous.</p>
+  <details><summary>Les règles derrière les chiffres</summary>
+    <ul>
+      <li>Inclusion si module allumé et effets dans la période ; chaque jour porteur d'un effet compte comme journée documentée. <a href="spec-technique.html#effets-pdf-inclusion-et-synthese">→ technique</a></li>
+      <li>Par type nettoyé : moyenne, nombre, maximum ; tri par nombre décroissant ; jauge remplie à moyenne / 5. <a href="spec-technique.html#effets-pdf-section-iii-tolerance">→ technique</a></li>
+      <li>Annexe C : mot du palier du jour ; détail des journées par heure. <a href="spec-technique.html#effets-pdf-annexe-c-et-detail-des-journees">→ technique</a></li>
+      <li>Palier d'un jour : maximum des intensités, sévère si &gt; 3, modéré si &gt; 1, sinon léger. <a href="spec-technique.html#effets-palier-de-severite-d-un-jour">→ technique</a></li>
+      <li>Le mot du palier prend un « s » dès deux effets dans le jour. <a href="spec-technique.html#effets-mot-de-severite-accorde-en-nombre">→ technique</a></li>
+      <li>Les trois tuiles comptent les effets un par un, chacun dans son palier. <a href="spec-technique.html#effets-decompte-des-paliers-par-effet">→ technique</a></li>
+    </ul>
+  </details>
+  <div class="exemple"><p>Rapport de Camille sur 30 jours au 12/09 : « 6 effets déclarés », légers 1, modérés 4, sévères 1. Tolérance : Nausées 3/5 « 3×  •  max 4/5 », Fatigue 2/5 « 2×  •  max 2/5 », Vertiges 1/5 « 1×  •  max 1/5 ». Annexe C : 05/09 « sévères », 10/09 « modérés », 12/09 « modéré ».</p></div>
+
+  <h3 id="effets-maquette-de-partage-un-effet-secondaire-mon-ressenti">Partage « Mon ressenti »</h3>
+  <figure class="telephone" data-capture="effets-secondaires/maquette-de-partage-un-effet-secondaire-mon-ressenti"><figcaption>Carte « Mon ressenti » du 12/09/2026 08:30 : « Nausées », « 2 / 5 », « Modéré », deux pastilles pleines sur cinq.</figcaption></figure>
+  <p>Entrée « Un effet secondaire » de la page de partage : date et heure du dernier ressenti (le plus récent par date puis heure), effet, « n / 5 », mot d'intensité (Imperceptible à Élevé), cinq pastilles remplies jusqu'à l'intensité, note si présente. Journal vide : l'exemple Nausées à 2 des échantillons de partage. Les mots d'intensité sont recopiés du formulaire plutôt que partagés <span class="marque">arbitrage non validé</span>.</p>
+  <details><summary>Les règles derrière les chiffres</summary>
+    <ul>
+      <li>Dernier ressenti = première ligne après tri date puis heure décroissantes ; sinon l'échantillon. <a href="spec-technique.html#effets-partage-dernier-ressenti">→ technique</a></li>
+    </ul>
+  </details>
+</section>

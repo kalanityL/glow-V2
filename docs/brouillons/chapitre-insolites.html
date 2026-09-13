@@ -1,0 +1,78 @@
+<section id="insolites">
+  <h2>16. Les équivalences insolites <a class="retour" href="#sommaire">↑ sommaire</a></h2>
+  <p>Chaque perte de poids est traduite en un ou deux objets de même masse, dessinés et nommés : « -7.4 kg, une manette de console rétro et une boule de bowling ». La traduction est fixée à chaque pesée, identique sur tous les écrans, et paraît sur la home, dans la confirmation de pesée et, sur demande, dans le rapport PDF.</p>
+
+  <h3 id="insolites-le-catalogue-et-le-calcul">Le catalogue et le calcul</h3>
+  <p>Le catalogue compte 222 objets, de 1 g (un trombone à papier) à 200 kg (un piano droit) : 71 objets courants et 151 objets « insolites ». Pour un poids, l'application retient l'objet seul ou la paire d'objets (le même deux fois compris) dont la masse s'en approche le plus ; un insolite de 1 kg ou plus n'apparaît qu'avec un insolite de moins de 1 kg. Une équivalence est tenue pour vraie à 200 g près, écart absolu quel que soit le poids. Un poids nul ou négatif ne donne rien : ni dessin, ni phrase.</p>
+  <p>Sur la home et dans la confirmation de pesée, le choix se fait parmi les seules équivalences vraies, avec deux règles : « Depuis le début » choisit d'abord et « dernière perte enregistrée » évite ses objets ; à chaque choix, l'objet le moins souvent assigné gagne (turn-over), puis le plus juste, puis le premier du catalogue. Si aucune équivalence vraie ne respecte l'exclusion, la plus juste est gardée, répétition comprise. Le PDF et la page Objets Insolites emploient le calcul nu : la plus juste, sans exclusion ni turn-over.</p>
+  <p>L'assignation — les objets des deux blocs — est rattachée à la pesée la plus récente du journal (par date et heure) et aux deux pertes arrondies au dixième ; elle est conservée sur l'appareil et relue telle quelle par tous les écrans tant que rien de cela ne change. Une nouvelle pesée réassigne, même à poids égal, et compte +1 pour chaque objet retenu ; corriger ou supprimer une pesée passée réassigne sans compter. Une assignation vide alors que la perte est positive est recalculée. <span class="marque">arbitrage non validé</span> Le calcul suit le journal des pesées, pas l'écran ouvert : la home n'a pas besoin d'être visitée.</p>
+  <details><summary>Les règles derrière les chiffres</summary>
+    <ul>
+      <li>Objet seul ou paire la plus juste ; au plus 2 insolites, dont un de moins de 1 kg dès qu'il y en a ; rien pour un poids nul ou négatif. <a href="spec-technique.html#insolites-combinaison-ludique-la-plus-juste">→ technique</a></li>
+      <li>Avec options : parmi les combinaisons vraies à 200 g près, écarter celles qui contiennent un objet exclu, puis usage cumulé minimal, écart minimal, rang du catalogue ; aucune vraie sans objet exclu → la plus juste. <a href="spec-technique.html#insolites-exclusion-et-turn-over-blocs-de-la-home">→ technique</a></li>
+      <li>Signature « id|date|heure » de la pesée la plus récente ; assignation gardée si signature et pertes au dixième sont inchangées ; compteurs +1 par objet au seul changement de signature ; clé glow_ludic_usage. <a href="spec-technique.html#insolites-assignation-des-objets-a-la-pesee">→ technique</a></li>
+      <li>Perte totale = poids de départ − pesée la plus récente ; dernière perte = avant-dernière − dernière (0 sous deux pesées). <a href="spec-technique.html#insolites-pertes-de-l-assignation">→ technique</a></li>
+    </ul>
+  </details>
+  <div class="exemple"><p>Camille, partie de 96,0 kg le 4 mai 2026, pèse 89,2 kg le 5 septembre et 88,6 kg le 12 septembre : 7,4 kg depuis le début, 0,6 kg depuis la pesée précédente. Compteurs vides, « Depuis le début » reçoit une manette de console rétro (0,4 kg) et une boule de bowling (7,0 kg) ; la dernière perte, qui doit les éviter, reçoit une bougie parfumée en pot (0,6 kg). Les trois objets passent à 1. Le 19 septembre, elle pèse encore 88,6 kg : la dernière perte est nulle, son bloc disparaît ; la perte totale est réassignée et, à justesse égale, va à des objets jamais vus, un globe terrestre (0,9 kg) et une paire de skis avec fixations (6,5 kg).</p></div>
+
+  <h3 id="insolites-bloc-equivalence-insolite-dessin-phrase">Le dessin et la phrase</h3>
+  <figure class="telephone" data-capture="metabolisme-rapport-badges/bloc-equivalence-insolite-dessin-phrase"><figcaption>Le bloc de Camille au 12 septembre 2026 : la manette de console rétro et la boule de bowling dessinées côte à côte, et la phrase « une manette de console rétro et une boule de bowling ».</figcaption></figure>
+  <p>Le bloc est le même partout : un dessin par objet retenu, deux au plus (68 dessins dédiés, l'émoji de l'objet pour les autres), et la phrase — article et nom pour un exemplaire (« une boule de bowling »), nombre et pluriel au-delà (« 2 balles de jonglage »), reliés par « et ». Dessin et phrase lisent la même liste d'objets. Liste vide : rien ne s'affiche.</p>
+  <details><summary>Les règles derrière les chiffres</summary>
+    <ul>
+      <li>Compte plafonné à 2 par objet, 2 dessins au plus ; clé de dessin inconnue redérivée du nom, sinon émoji ; liste vide → rien. <a href="spec-technique.html#insolites-dessin-de-la-composition">→ technique</a></li>
+      <li>Dessin détecté par sous-chaîne du nom (68 clés), sinon « emoji ». <a href="spec-technique.html#insolites-cle-d-illustration">→ technique</a></li>
+      <li>Un exemplaire : préfixe + nom sans article ; plusieurs : « N pluriel » ; jonction par « , » et « et ». <a href="spec-technique.html#insolites-texte-d-une-equivalence">→ technique</a></li>
+    </ul>
+  </details>
+
+  <h3 id="insolites-carte-de-confirmation-de-pesee-equivalences-insolites">La confirmation de pesée</h3>
+  <figure class="telephone" data-capture="poids/carte-de-confirmation-de-pesee-equivalences-insolites"><figcaption>Camille vient d'enregistrer 88,6 kg le 12 septembre 2026 : « Votre nouvelle saisie « 88,6 kg » a bien été ajoutée à votre journal. », puis « dernière perte enregistrée » -0.6 kg avec la bougie parfumée en pot, et « Depuis le début » -7.4 kg avec la manette et la boule de bowling.</figcaption></figure>
+  <p>Après un ajout ou une correction de pesée, la carte remplace le formulaire de la page Balance, ou flotte par-dessus le tiroir Journal si la correction vient de là. Elle porte le message de confirmation puis, si la pesée est la plus récente du journal, n'est pas le poids de départ, marque une perte depuis le début et laisse l'IMC à 19 ou plus, les deux blocs : « dernière perte enregistrée » (contre la pesée qui précède, si elle existe et si c'est une perte) et « Depuis le début ». Deux pertes égales au dixième : seul « Depuis le début » reste. Les objets sont ceux de l'assignation ; si la perte affichée ne correspond pas à celle de l'assignation, ils sont recalculés. OK ou la croix ferment ; par-dessus le tiroir, un clic sur le voile aussi.</p>
+  <details><summary>Les règles derrière les chiffres</summary>
+    <ul>
+      <li>IMC = poids / taille² (22 sans taille) ; blocs si IMC ≥ 19, perte depuis le début > 0, pesée la plus récente, pas le départ ; bloc dernière perte si pesée précédente, perte > 0 et différente au dixième ; objets de l'assignation si la perte au dixième correspond, sinon recalculés. <a href="spec-technique.html#insolites-conditions-d-affichage-de-la-carte-de-confirmation">→ technique</a></li>
+    </ul>
+  </details>
+  <div class="exemple"><p>Le 11 mai 2026, deuxième pesée de Camille : 95,2 kg. Les deux pertes valent 0,8 kg : la carte ne montre que « Depuis le début » -0.8 kg.</p></div>
+
+  <h3 id="insolites-tuiles-d-equivalence-insolite-de-la-home-standard-depuis-le">Les tuiles de la home standard</h3>
+  <figure class="telephone" data-capture="poids/tuiles-d-equivalence-insolite-de-la-home-standard-depuis-le"><figcaption>La home standard de Camille le 12 septembre 2026 : sous le bloc Salut, « dernière perte enregistrée » -0.6 kg et la bougie parfumée en pot ; plus bas, « Depuis le début » -7.4 kg, la manette et la boule de bowling.</figcaption></figure>
+  <p>Deux tuiles en pleine largeur : le libellé en bandeau, la valeur « -x kg », le dessin à gauche, la phrase à droite. La dernière perte s'affiche si elle est positive, la perte totale si elle est positive ; les deux se taisent si l'IMC est sous 19, si le journal n'a que le poids de départ ou si le poids actuel n'est pas sous le poids de départ. Pertes égales au dixième : « Depuis le début » seule, à la place de la dernière perte. Les tuiles ne réagissent pas au clic.</p>
+
+  <h3 id="insolites-rangee-progres-evolution-de-la-home-sections">La rangée Progrès de la home sections</h3>
+  <figure class="telephone" data-capture="poids/rangee-progres-evolution-de-la-home-sections"><figcaption>La rangée Progrès de Camille le 12 septembre 2026 : après la moyenne par semaine et les points d'IMC, -7.4 kg « en 19 semaines » avec la manette et la boule en petit, puis -0.6 kg « en 1 semaine » avec la bougie.</figcaption></figure>
+  <p>Sur la home sections, chaque perte est une mini-tuile : la valeur, le dessin en petit, la durée en italique — « en N semaines » à partir de 7 jours, « en N jours » en dessous, rien sous un jour — et pas de libellé visible (l'infobulle le garde). Mêmes conditions d'affichage que la home standard, sauf que deux pertes égales gardent leurs deux tuiles. La durée de la perte totale court de la pesée de départ à la dernière ; celle de la dernière perte, de l'avant-dernière à la dernière. Si l'assignation arrive vide pour une perte positive, la tuile recalcule ses objets sur-le-champ. Toucher une tuile ouvre l'équivalence en entier.</p>
+  <details><summary>Les règles derrière les chiffres</summary>
+    <ul>
+      <li>Repli : objets recalculés si la liste assignée est vide et la perte positive, la dernière perte excluant ceux de la perte totale. <a href="spec-technique.html#insolites-repli-du-dessin-d-equivalence-insolite">→ technique</a></li>
+    </ul>
+  </details>
+
+  <h3 id="insolites-surimpression-d-une-equivalence-insolite-home-sections">L'équivalence en entier</h3>
+  <figure class="telephone" data-capture="accueil/surimpression-d-une-equivalence-insolite-home-sections"><figcaption>Camille a touché la tuile -7.4 kg : « Depuis le début », -7.4 kg, « soit l'équivalent de », la manette et la boule de bowling en grand, puis « une manette de console rétro et une boule de bowling » ; le reste de la home est vitré.</figcaption></figure>
+  <p>Le bloc reprend le libellé, la valeur, « soit l'équivalent de », le dessin en grand et la phrase, par-dessus la page vitrée. L'état ouvert de chaque équivalence est mémorisé d'une visite à l'autre ; si les deux sont ouvertes, la perte totale est montrée. La croix referme celle-ci, un clic sur la vitre referme les deux.</p>
+
+  <h3 id="insolites-pdf-ii-poids-et-doses">Dans le rapport PDF</h3>
+  <figure class="telephone" data-capture="metabolisme-rapport-badges/pdf-ii-poids-et-doses"><figcaption>Section II du rapport de Camille sur 30 jours : « Première pesée de la période : 90.1 kg le 14/08/2026. Dernière : 88.6 kg le 12/09/2026. Variation : −1.5 kg sur 5 pesées. » puis, en italique, « Soit l'équivalent de : un dictionnaire encyclopédique. »</figcaption></figure>
+  <p>Dans l'export sur mesure, la case « Les équivalences insolites » est cochée par défaut et son état mémorisé ; l'export rapide ne l'emporte jamais. Cochée, et si la variation de la période (dernière pesée moins première) est une perte, la section II ajoute sous le paragraphe des pesées « Soit l'équivalent de : … ». C'est le calcul nu sur cette variation : ni assignation, ni turn-over, ni exclusion — l'objet peut différer de celui de la home.</p>
+  <details><summary>Les règles derrière les chiffres</summary>
+    <ul>
+      <li>Si insolites inclus et variation &lt; 0 : « Soit l'équivalent de : {équivalence(−variation)}. » <a href="spec-technique.html#insolites-equivalence-insolite-dans-le-pdf">→ technique</a></li>
+      <li>La case n'a pas de masque de données : cochée = incluse ; l'export rapide l'exclut toujours. <a href="spec-technique.html#insolites-bascules-proposees-masque-des-donnees-disponibles">→ technique</a></li>
+      <li>Cochée par défaut, mémorisée sous glow_report_include_v2. <a href="spec-technique.html#insolites-defauts-et-memorisation-des-choix-du-sur-mesure">→ technique</a></li>
+    </ul>
+  </details>
+
+  <h3 id="insolites-page-objets-insolites-revue-du-catalogue">La page Objets Insolites</h3>
+  <figure class="telephone" data-capture="metabolisme-rapport-badges/page-objets-insolites-revue-du-catalogue"><figcaption>La page Objets Insolites : « 151 objets insolites classés par poids », le champ de recherche, le bouton « Copier la revue », puis les premières lignes — flûte à bec 100 g, figurine Funko Pop 100 g, porte-clés lumineux 100 g — avec dessin, catégorie « Très petit poids » et boutons OK / Attente / PAS OK.</figcaption></figure>
+  <p>La page liste les 151 insolites du catalogue par poids croissant : dessin, nom sans article, poids (« 400 g » sous 1 kg, kilos arrondis à l'entier au-delà : 3,6 kg s'écrit « 4 kg »), catégorie « Très petit poids » (moins de 1 kg), « Poids moyen » (moins de 10 kg) ou « Poids lourd ». On y cherche par nom, pluriel ou poids (« 2kg », « 500g ») ; on renomme, change le poids en grammes (1 g à 1 000 000 g), supprime et restaure, marque OK / Attente / PAS OK (61 objets en Attente par défaut, les autres OK ; recliquer revient au défaut) et copie la revue dans le presse-papier. Ces retouches ne changent que l'affichage de cette page, sur cet appareil : le catalogue et les équivalences ne les voient pas. Aucun écran utilisateur de la Mixte ne mène à cette page.</p>
+  <details><summary>Les règles derrière les chiffres</summary>
+    <ul>
+      <li>Tri par poids croissant ; suppressions, renommages, poids et revue mémorisés sous trois clés, indexés sur le nom d'origine ; poids saisi en grammes entier, converti en kg ; catégories à 1 et 10 kg ; message de copie 2 s. <a href="spec-technique.html#insolites-page-objets-insolites-liste-et-revue">→ technique</a></li>
+    </ul>
+  </details>
+
+  <p>La V2 n'a rien décidé sur ce domaine : ce chapitre décrit la V1 seule.</p>
+</section>

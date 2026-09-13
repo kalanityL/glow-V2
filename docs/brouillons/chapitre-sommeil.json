@@ -1,0 +1,273 @@
+{
+ "inventions": [
+  {
+   "categorie": "Code mis de côté",
+   "fonctionnalite": "Graphes croisés sommeil × nutrition",
+   "texte": "Trois graphes « Éveil et nutrition », « Nuit précédente et nutrition », « Qualité de la nuit et nutrition » : courbe de sommeil à gauche, kcal du jour à droite, « Rien à croiser sur cette période. », accordéon d'analyse par corrélation de Pearson (moins de 7 paires : trop peu ; |r| < 0,3 : aucun lien ; ≥ 0,5 : net ; sinon modéré ; réserve « pas une cause à effet » ; « L'échantillon reste modeste » sous 14 paires). Le temps d'éveil d'une journée (du réveil de la nuit datée J à l'endormissement de la nuit datée J+1, siestes déduites, absent si une borne manque, journée en cours retirée) n'existe que pour eux. Rien de cela n'est visible.",
+   "origine": "Code complet dans SleepNutritionChart.tsx, sleep.utils.ts (awakeMinutesOn, dropCurrentDay) et shared/analysis/analysis.ts ; non monté : `false && croiseAlimentation` dans SleepTracker.tsx (2026-08-22 : « tout les graphs sauf le premier graph »). Les définitions du temps d'éveil sont un arbitrage de Claude du 2026-08-18."
+  },
+  {
+   "categorie": "Code mis de côté",
+   "fonctionnalite": "Analyse sans IA du graphe Durée et qualité",
+   "texte": "Accordéon « Analyse » sous le graphe : textes d'attente sous trois journées dormies, puis moyenne, min–max, régularité (écart-type < 45 min « régulières », < 90 min « assez régulières », sinon « varient sensiblement »), qualité moyenne des journées notées, tendance dès 7 journées (écart des moyennes des deux moitiés ≥ 30 min), « restent indicatifs » en deçà. Les seuils 45/90/30 min et 7 journées sont des choix de Claude non validés.",
+   "origine": "sleepAnalysis.ts, calculé à chaque rendu de SleepChart.tsx mais affiché sous `false &&` (2026-08-22 : « supprimer les analyses de la page sommeil »)."
+  },
+  {
+   "categorie": "Code mis de côté",
+   "fonctionnalite": "Menu des raccourcis de graphes",
+   "texte": "Bandeau collant de boutons « Durée et qualité », « Éveil et nutrition », « Nuit précédente et nutrition », « Qualité de la nuit et nutrition » (les trois derniers seulement si le module repas est allumé), chacun défilant vers son bloc.",
+   "origine": "GRAPH_SHORTCUTS dans SleepTracker.tsx, sous `false &&` depuis qu'un seul graphe reste."
+  },
+  {
+   "categorie": "Code mis de côté",
+   "fonctionnalite": "Grand bouton « Ajouter » de la page",
+   "texte": "Bouton « Ajouter » centré en tête de page, sous le bandeau de confirmation.",
+   "origine": "SleepTracker.tsx, sous `false &&` (2026-08-22 : l'ajout passe par « + ajouter », le calendrier et le « + » flottant)."
+  },
+  {
+   "categorie": "Non fondé (code non lu)",
+   "fonctionnalite": "Accès par le menu bas",
+   "texte": "J'aurais écrit que la page Sommeil s'atteint par une icône lampe de chevet du menu bas dès que le module est allumé : bottomMenuTabs filtre les onglets par isModuleOn et PAGE_ICONS.sleep vaut BedsideLampIcon, mais le rendu du menu bas n'a pas été lu. Le chapitre ne cite que les chemins vérifiés.",
+   "origine": "src/versions/mixte/app/navigation.ts et App.tsx parcourus par grep seulement."
+  },
+  {
+   "categorie": "Non fondé (code non lu)",
+   "fonctionnalite": "Réglage du module sur la page Modules",
+   "texte": "Le libellé et le fonctionnement de l'interrupteur « module-sleep-tracking » ; seuls la cible, le nom « Sommeil » et le texte de la vitre sont lus dans App.tsx.",
+   "origine": "Page Modules hors des chemins lus (doutes de l'inventaire)."
+  },
+  {
+   "categorie": "Non fondé (code non lu)",
+   "fonctionnalite": "Sélecteur d'heure du formulaire",
+   "texte": "Si TimeSelect ne propose que des minutes rondes, l'arrondi à l'enregistrement ne change jamais rien ; s'il accepte 06:47, la ligne s'écrit 06:45 sans prévenir. Le composant n'a pas été lu ; le chapitre n'énonce que la règle d'enregistrement.",
+   "origine": "src/shared/ui TimeSelect non lu ; snapSleepTimes dans sleep.utils.ts."
+  },
+  {
+   "categorie": "Non fondé (code non lu)",
+   "fonctionnalite": "Affichage du refus du plafond quotidien",
+   "texte": "Le message « Limite atteinte pour cette journée : 15 saisies de sommeil au maximum. Rien n'a été enregistré. » est posé par setLimitNotice au niveau de l'application ; où et comment il s'affiche n'a pas été lu, le chapitre ne dit pas qu'il s'empile avec les refus du formulaire.",
+   "origine": "useAppData.ts handleAddSleep ; rendu de limitNotice dans App.tsx non lu."
+  },
+  {
+   "categorie": "Hors chapitre",
+   "fonctionnalite": "Durée moyenne d'une nuit (nuits seules)",
+   "texte": "nightMinutesDailyAverage et sa jumelle à 7 jours existent (nuits seules, nuits de zéro minute écartées du numérateur et du dénominateur — arbitrage de Claude du 2026-08-23) mais aucune surface de ce chapitre ne les affiche ; elles servent au rapport PDF.",
+   "origine": "sleep.utils.ts ; consommateur MedicalReportExport (chapitre rapport) non lu ici."
+  },
+  {
+   "categorie": "Écart constaté, non corrigé",
+   "fonctionnalite": "Carte Sommeil du tiroir Tendances",
+   "texte": "J'aurais voulu écrire « moyenne par journée renseignée » comme sur la home et le graphe ; le code divise par les 14 jours de la fenêtre, zéros compris. Le chapitre décrit ce que fait le code.",
+   "origine": "trends.ts : sleepTrend met 0 les jours sans entrée, informedTrendMean n'écarte que les null ; doute consigné dans l'inventaire."
+  },
+  {
+   "categorie": "Écart constaté, non corrigé",
+   "fonctionnalite": "Moyenne « ≈ … /j » du graphe sur plus de 60 jours",
+   "texte": "Au-delà de 60 jours (Depuis le début, ou Choisir large), le graphe ne trace qu'un jour sur n, mais la moyenne divise le total de toutes les entrées de la période par les seuls jours tracés à durée > 0 : elle grandit avec la période. Le chapitre n'énonce que la règle brute.",
+   "origine": "computeSleepDays (maxPoints 60, step) dans sleep.utils.ts ; daysWithSleep et totalMinutes dans SleepChart.tsx / useSleepChart.ts."
+  },
+  {
+   "categorie": "Écart avec la commande",
+   "fonctionnalite": "Échelle de qualité « 1–5 »",
+   "texte": "La consigne du chapitre parle d'une qualité 1–5 ; le code compte six crans de 0 (« Très mauvaise ») à 5 (« Excellente »), le curseur part de 0 et le journal écrit « 0/5 ». Le chapitre suit le code.",
+   "origine": "SLEEP_QUALITY_LABELS dans sleep.constants.ts ; SleepForm min=0, max=5."
+  }
+ ],
+ "glossaire": [
+  {
+   "terme": "Nuit / Sieste",
+   "definition": "Les deux natures d'une entrée ; seule la nuit alimente la frise des sept dernières nuits et le mot d'après-saisie."
+  },
+  {
+   "terme": "Endormissement",
+   "definition": "Premier bord d'une entrée : date et heure écrites, jamais déduites."
+  },
+  {
+   "terme": "Réveil",
+   "definition": "Second bord d'une entrée ; sa date et son heure datent la ligne."
+  },
+  {
+   "terme": "Date d'une entrée",
+   "definition": "Le jour du réveil : la nuit du 10 au 11/09 appartient au 11 (arbitrage non validé)."
+  },
+  {
+   "terme": "Durée déduite",
+   "definition": "Réveil moins endormissement sur deux instants complets ; jamais saisie ni stockée ; zéro si le réveil ne suit pas l'endormissement."
+  },
+  {
+   "terme": "Qualité",
+   "definition": "Note de 0 « Très mauvaise » à 5 « Excellente », six crans ; 3 « Correcte » par défaut."
+  },
+  {
+   "terme": "Qualité pondérée",
+   "definition": "Moyenne des qualités pondérée par les durées, au dixième ; les entrées de durée nulle n'y entrent pas."
+  },
+  {
+   "terme": "Journée renseignée",
+   "definition": "Date de réveil portant au moins une entrée ; le dénominateur des moyennes de la home et du graphe."
+  },
+  {
+   "terme": "Plage",
+   "definition": "L'intervalle endormissement → réveil d'une entrée ; deux plages ne se recouvrent jamais."
+  },
+  {
+   "terme": "Bout-à-bout",
+   "definition": "Réveil d'une entrée égal à l'endormissement d'une autre : permis, ce n'est pas un recouvrement."
+  },
+  {
+   "terme": "Plafond quotidien",
+   "definition": "Quinze entrées au plus par jour de réveil ; la suivante est refusée, rien n'est écrasé."
+  },
+  {
+   "terme": "Deux bords",
+   "definition": "Nommage d'une entrée qui enjambe deux jours par ses deux dates : « nuit du 10 au 11/09 », « 25→26/8 » en compact."
+  },
+  {
+   "terme": "Soirée",
+   "definition": "Le soir auquel la frise rattache une nuit : celui de l'endormissement, ou la veille si l'endormissement tombe avant midi."
+  },
+  {
+   "terme": "Moyenne circulaire",
+   "definition": "Moyenne d'heures calculée sur le cadran de 24 h, qui ne casse pas à minuit (23 h 50 et 00 h 10 donnent minuit)."
+  },
+  {
+   "terme": "Couche vitrée",
+   "definition": "Panneau ouvert par-dessus l'accueil ; ici la frise des sept dernières nuits, titrée « Sommeil »."
+  },
+  {
+   "terme": "Côte à côte",
+   "definition": "Section de l'accueil qui compare, par rangée, la valeur depuis le début et celle des 7 derniers jours."
+  },
+  {
+   "terme": "Mot d'après-saisie",
+   "definition": "Seconde phrase du bandeau de confirmation après une nuit dont le réveil est daté du jour même."
+  },
+  {
+   "terme": "Palier de teinte",
+   "definition": "L'une des cinq teintes d'une barre du graphe, relative à la plus longue journée affichée."
+  }
+ ],
+ "index": [
+  {
+   "terme": "Module Sommeil (activation, vitre)",
+   "ancre": "sommeil-page-sommeil"
+  },
+  {
+   "terme": "Bandeau de confirmation",
+   "ancre": "sommeil-page-sommeil"
+  },
+  {
+   "terme": "« + » flottant",
+   "ancre": "sommeil-page-sommeil"
+  },
+  {
+   "terme": "Tout supprimer (sommeil)",
+   "ancre": "sommeil-page-sommeil"
+  },
+  {
+   "terme": "Nuit",
+   "ancre": "sommeil-formulaire-nouveau-sommeil"
+  },
+  {
+   "terme": "Sieste",
+   "ancre": "sommeil-formulaire-nouveau-sommeil"
+  },
+  {
+   "terme": "Endormissement / Réveil",
+   "ancre": "sommeil-formulaire-nouveau-sommeil"
+  },
+  {
+   "terme": "Durée déduite",
+   "ancre": "sommeil-formulaire-nouveau-sommeil"
+  },
+  {
+   "terme": "Qualité du sommeil (0–5)",
+   "ancre": "sommeil-formulaire-nouveau-sommeil"
+  },
+  {
+   "terme": "Confirmation d'une durée > 12 h",
+   "ancre": "sommeil-formulaire-nouveau-sommeil"
+  },
+  {
+   "terme": "Recouvrement de plages (refus)",
+   "ancre": "sommeil-formulaire-nouveau-sommeil"
+  },
+  {
+   "terme": "Plafond quotidien (15)",
+   "ancre": "sommeil-formulaire-nouveau-sommeil"
+  },
+  {
+   "terme": "Arrondi des heures",
+   "ancre": "sommeil-formulaire-nouveau-sommeil"
+  },
+  {
+   "terme": "Journal du sommeil",
+   "ancre": "sommeil-journal-du-sommeil"
+  },
+  {
+   "terme": "Deux bords (nuit du 10 au 11/09)",
+   "ancre": "sommeil-journal-du-sommeil"
+  },
+  {
+   "terme": "Tiroir Journal (sommeil)",
+   "ancre": "sommeil-journal-du-sommeil"
+  },
+  {
+   "terme": "Calendrier du sommeil",
+   "ancre": "sommeil-calendrier-du-sommeil"
+  },
+  {
+   "terme": "Bulle du calendrier (Kcal le …)",
+   "ancre": "sommeil-calendrier-du-sommeil"
+  },
+  {
+   "terme": "Graphe Durée et qualité",
+   "ancre": "sommeil-graphe-duree-et-qualite"
+  },
+  {
+   "terme": "Qualité pondérée",
+   "ancre": "sommeil-graphe-duree-et-qualite"
+  },
+  {
+   "terme": "Palier de teinte",
+   "ancre": "sommeil-graphe-duree-et-qualite"
+  },
+  {
+   "terme": "Mot d'après-saisie",
+   "ancre": "sommeil-mot-d-apres-saisie"
+  },
+  {
+   "terme": "Frise des sept dernières nuits",
+   "ancre": "sommeil-couche-sommeil-sept-dernieres-nuits"
+  },
+  {
+   "terme": "Soirée (rattachement d'une nuit)",
+   "ancre": "sommeil-couche-sommeil-sept-dernieres-nuits"
+  },
+  {
+   "terme": "Moyenne circulaire",
+   "ancre": "sommeil-couche-sommeil-sept-dernieres-nuits"
+  },
+  {
+   "terme": "Tuiles Côte à côte (sommeil)",
+   "ancre": "sommeil-tuiles-de-l-accueil"
+  },
+  {
+   "terme": "Tiroir Tendances (sommeil)",
+   "ancre": "sommeil-tuiles-de-l-accueil"
+  },
+  {
+   "terme": "Journée renseignée",
+   "ancre": "sommeil-tuiles-de-l-accueil"
+  }
+ ],
+ "ecrans_illustres": [
+  "activite/page-sommeil-sleeptracker",
+  "activite/formulaire-nouveau-sommeil-modifier-le-sommeil-sleepform",
+  "activite/journal-du-sommeil-et-sa-ligne-journalentrycard-sleep",
+  "activite/calendrier-du-sommeil-sleepcalendar-et-bulle-daysleeplines",
+  "activite/graphe-duree-et-qualite-sleepchart",
+  "activite/couche-vitree-sommeil-frise-des-sept-dernieres-nuits-surimpr",
+  "activite/tuiles-home-du-domaine-sommeil"
+ ]
+}

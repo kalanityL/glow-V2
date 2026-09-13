@@ -1,0 +1,273 @@
+{
+ "inventions": [
+  {
+   "categorie": "exemple",
+   "fonctionnalite": "Calories d'une séance",
+   "texte": "Le poids de Camille au 12/09/2026 (90 kg) est posé pour rendre l'arithmétique lisible ; il n'est fixé nulle part. Le chapitre Poids fait foi sur sa trajectoire, et le rédacteur doit y aligner ce chiffre.",
+   "origine": "Les calories dépendent du poids à la date de la séance (getWeightAtDate) ; aucune valeur commune aux chapitres n'était donnée."
+  },
+  {
+   "categorie": "cohérence",
+   "fonctionnalite": "Tuile « 7 derniers jours » (home) et tiroir Tendances",
+   "texte": "J'aurais voulu écrire qu'un étage vaut 0,5 minute partout. Le code additionne les durées brutes dans sportMinutesLast7Days et sportTrend : les étages de Montée escaliers y comptent comme des minutes, contrairement au calendrier, aux moyennes hebdomadaires et à « De quoi c'est fait ». Le chapitre dit le fait ; l'harmonisation est une suggestion.",
+   "origine": "Doute 6 de l'inventaire, confirmé à la lecture de homeOverview.ts et trends.ts."
+  },
+  {
+   "categorie": "amélioration",
+   "fonctionnalite": "Partage d'une séance",
+   "texte": "L'envie d'écrire « un bouton Partager sur chaque séance ». buildSportShareConfig et useShareSport ne sont montés que dans les versions Initiale, Cartes et les thèmes de la Mixte, tous hors périmètre ; la Mixte de base n'a aucun bouton.",
+   "origine": "Fonctionnalité 12 de l'inventaire ; grep sur src confirmant l'absence d'import dans src/versions/mixte hors thèmes."
+  },
+  {
+   "categorie": "règle supposée",
+   "fonctionnalite": "Score d'activité",
+   "texte": "Présenter le seuil de 78 minutes pondérées comme une décision de l'utilisatrice. La légende du graphe dit « 10 vaut pour 1h d'activité physique intensive », ce qui donne 60 × 1,3 = 78, mais aucun commentaire lu ne cite une dictée fixant ce seuil.",
+   "origine": "Doute 12 de l'inventaire ; sportScore.ts documente la formule, pas l'origine du seuil."
+  },
+  {
+   "categorie": "comportement supposé",
+   "fonctionnalite": "Plafond quotidien",
+   "texte": "Décrire où et comment le message « Limite atteinte pour aujourd'hui : cette saisie remplace la dernière. » s'affiche (bandeau, durée, fermeture). Seul son montage dans App.tsx (limitNotice, ligne 2041) a été repéré, pas lu.",
+   "origine": "useAppData.ts pose le texte ; le composant qui l'affiche n'a pas été lu."
+  },
+  {
+   "categorie": "règle supposée",
+   "fonctionnalite": "Édition en place du journal et de la bulle",
+   "texte": "Affirmer que le refus d'une saisie en place affiche mot pour mot le message de la règle (« Une durée entre 1 et 480 minutes est attendue. ») et remet la valeur enregistrée. NumberField et useInlineEditableLog n'ont pas été lus ; seul numberRules.ts (pur) l'a été.",
+   "origine": "Doute 11 de l'inventaire."
+  },
+  {
+   "categorie": "amélioration",
+   "fonctionnalite": "Bandeau de confirmation",
+   "texte": "Écrire que la page et la couche partagent le même composant de confirmation. MessageActiviteEnregistree est écrit pour être adopté par la page, mais SportTracker garde son bandeau propre (effacement à la sortie d'écran) : point laissé ouvert dans le code.",
+   "origine": "Arbitrage 6 de l'inventaire (MessageActiviteEnregistree.tsx)."
+  },
+  {
+   "categorie": "règle plausible",
+   "fonctionnalite": "Encouragement après une activité",
+   "texte": "Faire dire aux félicitations une régularité (« trois jours d'affilée », « aujourd'hui »). Le code précise qu'aucune notion de série n'existe dans features/sport et que les phrases l'évitent à dessein.",
+   "origine": "Commentaire de sportEncouragements.ts."
+  },
+  {
+   "categorie": "comportement supposé",
+   "fonctionnalite": "Navigation vers la page",
+   "texte": "Dire que l'onglet « Activité physique » est dans le menu du bas. Le libellé existe dans App.tsx (sports : « Activité physique ») mais le montage du menu n'a pas été lu ; le chemin certain est handleNavigate('sports') depuis la home, les tiroirs et l'ajout rapide.",
+   "origine": "Doute 9 de l'inventaire."
+  },
+  {
+   "categorie": "règle supposée",
+   "fonctionnalite": "Graphe « Suivi »",
+   "texte": "Détailler le pas d'échantillonnage au-delà de 60 jours (« un jour sur deux à 90 jours »). Le code calcule pas = floor((jours + 1) / 60) ; 90 jours donnent un pas de 1, donc tous les jours ; le seuil de 60 points n'est documenté par aucune décision.",
+   "origine": "computeSportChartData dans sport.utils.ts ; doute 12 de l'inventaire."
+  }
+ ],
+ "glossaire": [
+  {
+   "terme": "Séance",
+   "definition": "Une ligne du journal d'activité physique : activité, date, heure, durée, effort ou distance, notes."
+  },
+  {
+   "terme": "Activité",
+   "definition": "Entrée du catalogue de 54 activités physiques, identifiée par son nom et porteuse d'un MET."
+  },
+  {
+   "terme": "Activités actives",
+   "definition": "Sous-ensemble du catalogue proposé dans les sélecteurs, choisi dans le panneau « Ajouter/Gérer » ; sept par défaut."
+  },
+  {
+   "terme": "MET",
+   "definition": "Équivalent métabolique : coût énergétique d'une activité en multiples du repos, base du calcul des calories."
+  },
+  {
+   "terme": "Effort (intensité)",
+   "definition": "Ressenti coché doux / modéré / intensif, enregistré douce / modérée / intensive ; multiplicateur 0,8 / 1 / 1,3."
+  },
+  {
+   "terme": "Distance",
+   "definition": "Longueur parcourue, facultative, sur huit activités ; stockée en mètres, saisie en km ou en m ; remplace l'effort dans tous les calculs."
+  },
+  {
+   "terme": "Allure",
+   "definition": "Distance divisée par la durée, en km/h ; donne le MET par la courbe de l'activité."
+  },
+  {
+   "terme": "Étage",
+   "definition": "Unité de « durée » de Montée escaliers ; vaut 0,5 minute dans les cumuls qui convertissent."
+  },
+  {
+   "terme": "Minutes pondérées",
+   "definition": "Minutes d'une séance multipliées par son facteur d'effort ; unité du score d'activité."
+  },
+  {
+   "terme": "Score d'activité",
+   "definition": "Mesure quotidienne de 0 à 10 ; 10 à partir de 78 minutes pondérées, soit une heure intensive."
+  },
+  {
+   "terme": "Calories d'une séance",
+   "definition": "Estimation en kcal au poids du jour de la séance ; jamais stockée, recalculée à chaque affichage."
+  },
+  {
+   "terme": "Plafond quotidien",
+   "definition": "Quinze séances par jour ; la suivante remplace la dernière du jour, avec un message."
+  },
+  {
+   "terme": "Couche vitrée",
+   "definition": "Surimpression posée sur la home, en lecture (« De quoi c'est fait ») ou en saisie (formulaire), sans quitter la page."
+  },
+  {
+   "terme": "Encouragement",
+   "definition": "Félicitation tirée parmi huit phrases après un ajout, jamais après une correction."
+  },
+  {
+   "terme": "Période",
+   "definition": "Filtre commun des journaux et graphes : 7, 14, 30, 90 derniers jours, Depuis le début, Choisir ; 30 jours par défaut."
+  },
+  {
+   "terme": "Module",
+   "definition": "Drapeau du profil qui monte ou vitre la page ; allumé automatiquement quand on navigue vers elle."
+  },
+  {
+   "terme": "De quoi c'est fait",
+   "definition": "Répartition de l'activité par activité, sur les 7 derniers jours puis depuis le début."
+  }
+ ],
+ "index": [
+  {
+   "terme": "Activité physique (page)",
+   "ancre": "activite-page-activite-physique"
+  },
+  {
+   "terme": "Module (activation automatique)",
+   "ancre": "activite-page-activite-physique"
+  },
+  {
+   "terme": "« + » flottant",
+   "ancre": "activite-page-activite-physique"
+  },
+  {
+   "terme": "Formulaire d'activité",
+   "ancre": "activite-formulaire"
+  },
+  {
+   "terme": "Distance",
+   "ancre": "activite-formulaire"
+  },
+  {
+   "terme": "Effort / intensité",
+   "ancre": "activite-formulaire"
+  },
+  {
+   "terme": "Étage",
+   "ancre": "activite-formulaire"
+  },
+  {
+   "terme": "Plafond quotidien",
+   "ancre": "activite-formulaire"
+  },
+  {
+   "terme": "Encouragement",
+   "ancre": "activite-formulaire"
+  },
+  {
+   "terme": "Refus de saisie",
+   "ancre": "activite-formulaire"
+  },
+  {
+   "terme": "Catalogue des activités",
+   "ancre": "activite-panneau-activites-physiques-disponibles"
+  },
+  {
+   "terme": "Activités actives",
+   "ancre": "activite-panneau-activites-physiques-disponibles"
+  },
+  {
+   "terme": "Ajouter/Gérer",
+   "ancre": "activite-panneau-activites-physiques-disponibles"
+  },
+  {
+   "terme": "Journal d'activité",
+   "ancre": "activite-journal"
+  },
+  {
+   "terme": "Période (sélecteur)",
+   "ancre": "activite-journal"
+  },
+  {
+   "terme": "Tout supprimer",
+   "ancre": "activite-journal"
+  },
+  {
+   "terme": "Calendrier de l'activité",
+   "ancre": "activite-calendrier"
+  },
+  {
+   "terme": "Graphe Suivi",
+   "ancre": "activite-graphe-suivi"
+  },
+  {
+   "terme": "Calories d'une séance",
+   "ancre": "activite-graphe-suivi"
+  },
+  {
+   "terme": "MET",
+   "ancre": "activite-graphe-suivi"
+  },
+  {
+   "terme": "Allure",
+   "ancre": "activite-graphe-suivi"
+  },
+  {
+   "terme": "Score d'activité",
+   "ancre": "activite-graphe-suivi"
+  },
+  {
+   "terme": "Minutes pondérées",
+   "ancre": "activite-graphe-suivi"
+  },
+  {
+   "terme": "De quoi c'est fait",
+   "ancre": "activite-bloc-de-quoi-c-est-fait"
+  },
+  {
+   "terme": "Couche vitrée",
+   "ancre": "activite-couche-vitree-activite-physique"
+  },
+  {
+   "terme": "Tuiles home (Dynamique, Côte à côte)",
+   "ancre": "activite-tuiles-home"
+  },
+  {
+   "terme": "Sens hausse / baisse / stable",
+   "ancre": "activite-tuiles-home"
+  },
+  {
+   "terme": "Moyennes par semaine",
+   "ancre": "activite-tuiles-home"
+  },
+  {
+   "terme": "Tiroir Journal",
+   "ancre": "activite-tiroir-journal"
+  },
+  {
+   "terme": "Tiroir Tendances",
+   "ancre": "activite-tiroir-tendances"
+  },
+  {
+   "terme": "Partage d'une séance",
+   "ancre": "activite"
+  }
+ ],
+ "ecrans_illustres": [
+  "activite/page-activite-physique-sporttracker",
+  "activite/formulaire-nouvelle-activite-physique-modifier-l-activite-ph",
+  "activite/panneau-activites-physiques-disponibles-managesportsblock",
+  "activite/journal-d-activite-physique-et-sa-ligne-journalentrycard-spo",
+  "activite/calendrier-de-l-activite-sportcalendar-et-bulle-daysportline",
+  "activite/graphe-suivi-de-l-activite-sportchart",
+  "activite/bloc-de-quoi-c-est-fait-blocdequoicestfait",
+  "activite/couche-vitree-activite-physique-surimpressionsport",
+  "activite/tuiles-home-du-domaine-activite-physique",
+  "activite/tiroir-journal-lignes-des-quatre-journaux",
+  "activite/tiroir-tendances-cartes-activite-physique-temps-pour-soi-som"
+ ]
+}

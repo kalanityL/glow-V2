@@ -1,0 +1,288 @@
+{
+ "inventions": [
+  {
+   "categorie": "comportement supposé",
+   "fonctionnalite": "PDF — encart d'identité",
+   "texte": "Avec un profil sans poids visé (V2 : objectif « Stabiliser mon poids »), l'encart imprimerait vraisemblablement « undefined kg » en Objectif et « NaN kg » en Reste à l'objectif, le code écrivant `${profile.targetWeight} kg` sans garde.",
+   "origine": "La V2 ne demande le poids visé que si l'objectif est « Perdre » (GUIDELINES § 4) ; le comportement du PDF V1 sur un champ absent n'a pas été exécuté ni lu dans un test."
+  },
+  {
+   "categorie": "comportement supposé",
+   "fonctionnalite": "PDF — encart d'identité",
+   "texte": "En V2, la valeur imprimée sous « Genre » serait celle de l'avatar (masculin/féminin) ; le libellé « Non précisé » ne pourrait plus apparaître.",
+   "origine": "La V2 supprime la question du genre à part et le porte sur l'avatar ; aucune liaison avatar → profile.gender n'a été lue."
+  },
+  {
+   "categorie": "règle plausible",
+   "fonctionnalite": "PDF — I. Synthèse",
+   "texte": "La valeur « ≈ 0.4 % » de l'exemple de Camille (Perdus / sem.) est illustrative : elle dépend de l'interpolation de computeWeeklyLoss et du découpage en 5 semaines d'une période de 30 jours, non recalculés à la main.",
+   "origine": "L'inventaire signale computeWeeklyLoss comme lu partiellement ; le chiffre exact n'a pas été vérifié par exécution."
+  },
+  {
+   "categorie": "règle plausible",
+   "fonctionnalite": "Bloc « Rapport médical » — période",
+   "texte": "« Depuis le début » devrait aussi remonter jusqu'à la plus ancienne nuit ou au plus ancien temps pour soi ; le scan de la plus ancienne entrée ignore ces deux journaux, ce qui pourrait tronquer le début effectif si un sommeil précède toute autre donnée.",
+   "origine": "Constat de code (oldestEntryDate ne scanne pas sleepLogs ni meTimeLogs) ; le chapitre décrit le fait, l'idée de correction est une supposition."
+  },
+  {
+   "categorie": "amélioration",
+   "fonctionnalite": "Génération et téléchargement du PDF",
+   "texte": "Sur mobile, proposer le partage natif du fichier (feuille de partage) plutôt qu'un seul téléchargement via doc.save.",
+   "origine": "Envie venue de la conversion React Native mentionnée dans les commentaires ; rien dans le code ne le prévoit."
+  },
+  {
+   "categorie": "amélioration",
+   "fonctionnalite": "PDF — bandeau",
+   "texte": "Retirer la mention « thème : … » du bandeau avant toute remise à un médecin.",
+   "origine": "Le code la marque provisoire et explique comment la retirer ; la décision de la retirer n'est pas prise."
+  },
+  {
+   "categorie": "comportement supposé",
+   "fonctionnalite": "Panneau d'attente",
+   "texte": "La capture d'écran du panneau d'attente suppose de figer une animation CSS de quelques secondes ; l'état montré dépendra du moment de la prise de vue.",
+   "origine": "Le panneau n'existe que pendant la génération ; sa capture n'a pas été tentée."
+  }
+ ],
+ "glossaire": [
+  {
+   "terme": "Période",
+   "definition": "Fenêtre de dates qui commande tout le rapport : 7, 14, 30 ou 90 derniers jours, Depuis le début, ou bornes choisies."
+  },
+  {
+   "terme": "Bornes effectives",
+   "definition": "Les deux dates réellement appliquées : date de coupure ou borne saisie au début, borne saisie ou aujourd'hui à la fin."
+  },
+  {
+   "terme": "Section (du rapport)",
+   "definition": "Un des huit journaux cochables de l'export sur mesure ; le journal des injections est inclus d'office."
+  },
+  {
+   "terme": "Masque des données disponibles",
+   "definition": "Règle qui n'imprime une section cochée que si son module est actif et si la période contient des données."
+  },
+  {
+   "terme": "Tirage",
+   "definition": "Palette du document : noir et blanc, couleurs du thème (défaut) ou neutre ; choix non mémorisé."
+  },
+  {
+   "terme": "Palette dérivée",
+   "definition": "Palette calculée au clic à partir des jetons CSS du thème courant, encres assombries et surfaces éclaircies pour le papier."
+  },
+  {
+   "terme": "Cartouche",
+   "definition": "Mini-tuile du PDF : une valeur en gros, son « ≈ » et son unité en petit, une légende dessous ; cinq au plus par rangée."
+  },
+  {
+   "terme": "Jour couvert",
+   "definition": "Chaque jour entre les bornes de la période, bornes comprises."
+  },
+  {
+   "terme": "Journée documentée",
+   "definition": "Date distincte portant au moins une entrée dans un journal emporté (relevé de pas à 0 exclu)."
+  },
+  {
+   "terme": "Poids de repère (actuel)",
+   "definition": "Pesée la plus récente de tout l'historique, hors période ; sert à l'IMC, à la variation totale et au reste à l'objectif."
+  },
+  {
+   "terme": "Pesée de départ",
+   "definition": "Pesée marquée comme départ de la cure ; donne le poids et la date « Depuis le … »."
+  },
+  {
+   "terme": "Palier de dose",
+   "definition": "Tracé en pointillé du graphique poids / doses : la dose d'une prise est tenue jusqu'à la prise suivante."
+  },
+  {
+   "terme": "Palier de sévérité",
+   "definition": "Léger (1), modéré (2–3), sévère (4–5) ; compté par effet dans la synthèse, par pire effet du jour dans l'annexe C."
+  },
+  {
+   "terme": "Annexe",
+   "definition": "Détail d'un journal en fin de document : grilles mensuelles (A, C, D, E, F, G) ou tableau (B avec mensurations, pas)."
+  },
+  {
+   "terme": "Grille fusionnée",
+   "definition": "Carte réunissant deux ou trois mois voisins qui partagent une semaine, cette semaine n'étant imprimée qu'une fois."
+  },
+  {
+   "terme": "Carnet (Détails des journées)",
+   "definition": "Dernier chapitre : chaque journée documentée, dans l'ordre, avec toutes ses lignes de journal."
+  },
+  {
+   "terme": "Équivalence insolite",
+   "definition": "Phrase « Soit l'équivalent de : … » traduisant la perte de période en objets du quotidien, si la section est cochée."
+  },
+  {
+   "terme": "Fiche d'échec",
+   "definition": "Enregistrement d'un export tombé : erreur, étape, période, cases, volumes (comptes seulement), tirage, temps écoulé ; écrite en base et signalée par courrier."
+  },
+  {
+   "terme": "Étape d'export",
+   "definition": "Moment où un échec survient : préparation, palette, construction, enregistrement."
+  },
+  {
+   "terme": "Journée en cours figée",
+   "definition": "Compte de pas d'aujourd'hui relevé une fois à l'arrivée sur la page et réutilisé tel quel dans le carreau des pas."
+  }
+ ],
+ "index": [
+  {
+   "terme": "Rapport médical",
+   "ancre": "rapport"
+  },
+  {
+   "terme": "Page Export",
+   "ancre": "rapport-bloc-rapport-medical"
+  },
+  {
+   "terme": "Période du rapport",
+   "ancre": "rapport-bloc-rapport-medical"
+  },
+  {
+   "terme": "Bornes « du … au … »",
+   "ancre": "rapport-bloc-rapport-medical"
+  },
+  {
+   "terme": "Export détaillé sur mesure",
+   "ancre": "rapport-export-detaille-sur-mesure"
+  },
+  {
+   "terme": "Sections du rapport",
+   "ancre": "rapport-export-detaille-sur-mesure"
+  },
+  {
+   "terme": "Impression en noir et blanc",
+   "ancre": "rapport-export-detaille-sur-mesure"
+  },
+  {
+   "terme": "Impression aux couleurs du thème",
+   "ancre": "rapport-export-detaille-sur-mesure"
+  },
+  {
+   "terme": "Tirage",
+   "ancre": "rapport-export-detaille-sur-mesure"
+  },
+  {
+   "terme": "Télécharger le rapport",
+   "ancre": "rapport-export-detaille-sur-mesure"
+  },
+  {
+   "terme": "Échec d'export",
+   "ancre": "rapport-export-detaille-sur-mesure"
+  },
+  {
+   "terme": "Fiche d'échec",
+   "ancre": "rapport-export-detaille-sur-mesure"
+  },
+  {
+   "terme": "Nom du fichier PDF",
+   "ancre": "rapport-export-detaille-sur-mesure"
+  },
+  {
+   "terme": "Panneau d'attente",
+   "ancre": "rapport-panneau-d-attente"
+  },
+  {
+   "terme": "Sommaire qui se coche",
+   "ancre": "rapport-panneau-d-attente"
+  },
+  {
+   "terme": "Sur cette période",
+   "ancre": "rapport-sur-cette-periode"
+  },
+  {
+   "terme": "Journées documentées",
+   "ancre": "rapport-sur-cette-periode"
+  },
+  {
+   "terme": "Pas figés (journée en cours)",
+   "ancre": "rapport-sur-cette-periode"
+  },
+  {
+   "terme": "Bandeau du PDF",
+   "ancre": "rapport-pdf-bandeau-et-identite"
+  },
+  {
+   "terme": "Encart d'identité",
+   "ancre": "rapport-pdf-bandeau-et-identite"
+  },
+  {
+   "terme": "IMC (PDF)",
+   "ancre": "rapport-pdf-bandeau-et-identite"
+  },
+  {
+   "terme": "Pied de page du PDF",
+   "ancre": "rapport-pdf-bandeau-et-identite"
+  },
+  {
+   "terme": "Synthèse (PDF)",
+   "ancre": "rapport-pdf-i-synthese"
+  },
+  {
+   "terme": "Cartouches",
+   "ancre": "rapport-pdf-i-synthese"
+  },
+  {
+   "terme": "Perdus par semaine",
+   "ancre": "rapport-pdf-i-synthese"
+  },
+  {
+   "terme": "Entre 2 injections",
+   "ancre": "rapport-pdf-i-synthese"
+  },
+  {
+   "terme": "Graphique poids / doses",
+   "ancre": "rapport-pdf-ii-poids-et-doses"
+  },
+  {
+   "terme": "Équivalence insolite (PDF)",
+   "ancre": "rapport-pdf-ii-poids-et-doses"
+  },
+  {
+   "terme": "Tolérance (PDF)",
+   "ancre": "rapport-pdf-iii-tolerance"
+  },
+  {
+   "terme": "Jauges d'intensité",
+   "ancre": "rapport-pdf-iii-tolerance"
+  },
+  {
+   "terme": "Activité et nutrition (PDF)",
+   "ancre": "rapport-pdf-iv-activite-et-nutrition"
+  },
+  {
+   "terme": "Sommeil et temps pour soi (PDF)",
+   "ancre": "rapport-pdf-v-sommeil-et-temps-pour-soi"
+  },
+  {
+   "terme": "Graphique sommeil / qualité",
+   "ancre": "rapport-pdf-v-sommeil-et-temps-pour-soi"
+  },
+  {
+   "terme": "Annexes A à G",
+   "ancre": "rapport-pdf-annexes-a-a-g"
+  },
+  {
+   "terme": "Grilles mensuelles fusionnées",
+   "ancre": "rapport-pdf-annexes-a-a-g"
+  },
+  {
+   "terme": "Tableau des pesées et mensurations",
+   "ancre": "rapport-pdf-annexes-a-a-g"
+  },
+  {
+   "terme": "Détails des journées",
+   "ancre": "rapport-pdf-details-des-journees"
+  },
+  {
+   "terme": "Nuit du … au …",
+   "ancre": "rapport-pdf-details-des-journees"
+  }
+ ],
+ "ecrans_illustres": [
+  "metabolisme-rapport-badges/rapport-medical-bloc-rapport-medical-selecteur-de-periode",
+  "metabolisme-rapport-badges/rapport-medical-sous-bloc-export-detaille-sur-mesure",
+  "metabolisme-rapport-badges/rapport-medical-panneau-d-attente-le-sommaire-qui-se-coche",
+  "metabolisme-rapport-badges/rapport-medical-bloc-sur-cette-periode"
+ ]
+}

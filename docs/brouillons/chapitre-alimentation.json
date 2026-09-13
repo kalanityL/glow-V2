@@ -1,0 +1,318 @@
+{
+ "inventions": [
+  {
+   "categorie": "Graphiques",
+   "fonctionnalite": "Analyses textuelles sous les graphiques",
+   "texte": "Une lecture en toutes lettres sous chaque bloc : « vos kcal sont très régulières », écart net entre faim avant et après, créneau dominant, composition qui change selon l'heure.",
+   "origine": "Le moteur chartAnalysis.ts (analyzeNutrition, analyzeHunger, analyzeTimeSlotShare, analyzeTimeSlotComposition) existe avec ses seuils, mais aucun écran de la page Menus ne le monte ; je n'ai pu décrire aucune phrase affichée."
+  },
+  {
+   "categorie": "Saisie",
+   "fonctionnalite": "Quantité en portions usuelles",
+   "texte": "Saisir « une cuillère à soupe », « un verre », « une tranche » et laisser l'application convertir en g ou ml.",
+   "origine": "La table src/data/portionsUsuelles.ts existe mais n'est importée par aucun écran ; seule la saisie en g / ml est câblée."
+  },
+  {
+   "categorie": "Unités",
+   "fonctionnalite": "Affichage impérial",
+   "texte": "Une personne en système impérial verrait ses quantités en oz et fl oz.",
+   "origine": "food.units.ts porte les conversions, mais tous les appels lus passent sans système, donc métrique ; aucun réglage vu dans le périmètre."
+  },
+  {
+   "categorie": "Formulaire repas",
+   "fonctionnalite": "Refus d'une prise datée du futur",
+   "texte": "Une prise datée après aujourd'hui serait refusée.",
+   "origine": "Règle plausible, aucun garde-fou trouvé dans useMealForm ni useAppData ; hasOccurred existe dans date.local sans appel vu pour les repas."
+  },
+  {
+   "categorie": "Formulaire repas",
+   "fonctionnalite": "Plafond de lignes d'aliments par prise",
+   "texte": "Un repas ne pourrait pas dépasser un certain nombre de lignes.",
+   "origine": "Tous les autres plafonds sont posés (30 prises/jour, 50 favoris, 50 aliments, 20 recettes) ; aucun plafond par composition n'existe dans le code."
+  },
+  {
+   "categorie": "Suggestions",
+   "fonctionnalite": "Marque visuelle des aliments personnels dans la liste",
+   "texte": "Les aliments créés par l'utilisatrice porteraient une icône dans les suggestions.",
+   "origine": "Seul le score +2000 les place en tête ; FoodSuggestionList ne montre que la coche de sélection et le badge /100g ou /100ml."
+  },
+  {
+   "categorie": "Objectifs",
+   "fonctionnalite": "Palier kcal",
+   "texte": "Une félicitation quand les kcal du jour atteignent l'objectif de 1400.",
+   "origine": "L'objectif kcal existe (dailyNutritionGoals), mais paliersNutritifs.ts ne connaît que protéines et fibres ; tentation de symétrie."
+  },
+  {
+   "categorie": "Calendrier",
+   "fonctionnalite": "Intensité de couleur par kcal",
+   "texte": "Une tuile de jour plus foncée quand le total kcal est plus élevé.",
+   "origine": "Attente d'un calendrier de suivi ; MealCalendar n'affiche que le nombre entier, sans nuance."
+  },
+  {
+   "categorie": "Code-barres",
+   "fonctionnalite": "Journalisation anonyme des échecs de scan",
+   "texte": "Chaque échec de lecture serait journalisé anonymement.",
+   "origine": "Consigne V2 pour la conversion native (GUIDELINES § 1), aucun code correspondant dans la V1 ni la V2."
+  },
+  {
+   "categorie": "Onboarding",
+   "fonctionnalite": "Premier repas en fin d'onboarding",
+   "texte": "L'onboarding se terminerait par la saisie d'un premier repas et une félicitation.",
+   "origine": "Principe consigné dans GUIDELINES V2 § 4 ; la V2 n'a pas encore d'accueil ni de saisie de repas, la V1 ne le fait pas."
+  },
+  {
+   "categorie": "Suggestions",
+   "fonctionnalite": "Cohérence du compteur de sélection",
+   "texte": "La coche « N fois sélectionné » reflète exactement les validations de l'aliment.",
+   "origine": "Doute de l'inventaire : la liste lit le compteur par libellé officiel alors que l'incrément passe par le nom court affiché ; non vérifié à l'exécution, donc non affirmé."
+  }
+ ],
+ "glossaire": [
+  {
+   "terme": "Prise",
+   "definition": "Un repas ou un en-cas enregistré à une date et une heure, avec sa composition et sa faim."
+  },
+  {
+   "terme": "Repas / En-cas",
+   "definition": "Les deux seules familles affichées ; est un en-cas toute prise de type snack ou inconnu, tout le reste est un repas."
+  },
+  {
+   "terme": "Ciqual",
+   "definition": "Table de composition nutritionnelle des aliments de l'Anses (3 479 entrées), base de la recherche d'aliments."
+  },
+  {
+   "terme": "Nom court",
+   "definition": "Nom d'affichage d'une entrée Ciqual, préféré au libellé officiel quand il existe."
+  },
+  {
+   "terme": "Aliment personnalisé",
+   "definition": "Aliment ou boisson créé par l'utilisatrice, avec ses cinq valeurs pour 100 g ou 100 ml."
+  },
+  {
+   "terme": "Recette",
+   "definition": "Aliment personnalisé calculé depuis des ingrédients, valeurs ramenées à 100 g et arrondies."
+  },
+  {
+   "terme": "Menu favori",
+   "definition": "Composition nommée (aliments et type) réutilisable comme base de saisie ou ajoutée au journal d'un geste."
+  },
+  {
+   "terme": "Faim avant / après",
+   "definition": "Deux notes entières de 0 (Pas faim) à 5 (Faim de loup) portées par chaque prise."
+  },
+  {
+   "terme": "Créneau horaire",
+   "definition": "Tranche de trois heures, huit par jour de 0-3h à 21-24h, sur laquelle les graphiques regroupent les prises."
+  },
+  {
+   "terme": "Part calorique",
+   "definition": "Part d'un nutriment dans l'énergie : 4 kcal/g pour protéines et glucides, 9 pour les lipides, 2 pour les fibres."
+  },
+  {
+   "terme": "Part de masse",
+   "definition": "Part d'un nutriment dans la masse totale des quatre macronutriments, en grammes."
+  },
+  {
+   "terme": "Journée renseignée",
+   "definition": "Jour portant au moins une prise ; seul dénominateur des moyennes par jour."
+  },
+  {
+   "terme": "Objectif du jour",
+   "definition": "Cible kcal, protéines et fibres du profil ou ses défauts : 1400 kcal, poids actuel × 1,5 g, 25 g."
+  },
+  {
+   "terme": "Palier",
+   "definition": "Franchissement de la recommandation protéines ou fibres dans la journée, fêté une fois par jour et par nutriment."
+  },
+  {
+   "terme": "Couche vitrée",
+   "definition": "Panneau posé sur l'accueil qui récapitule la journée, compare à une moyenne et permet de saisir sans quitter la page."
+  },
+  {
+   "terme": "Fenêtre de période",
+   "definition": "7, 14, 30 ou 90 derniers jours, Depuis le début ou Choisir ; chaque bloc retient la sienne."
+  },
+  {
+   "terme": "Open Food Facts",
+   "definition": "Base ouverte de produits alimentaires interrogée par numéro de code-barres."
+  },
+  {
+   "terme": "EAN",
+   "definition": "Numéro de code-barres à 13 ou 8 chiffres (12 pour UPC-A), vérifié par sa clé de contrôle."
+  },
+  {
+   "terme": "Heure arrondie",
+   "definition": "Heure ramenée à la minute ronde inférieure parmi 0, 10, 15, 20, 30, 40, 45, 50."
+  },
+  {
+   "terme": "Journal / Calendrier",
+   "definition": "Les deux vues de l'historique des prises, jamais affichées ensemble ; calendrier par défaut."
+  }
+ ],
+ "index": [
+  {
+   "terme": "Menus (page)",
+   "ancre": "alimentation-page-menus-repas-et-en-cas"
+  },
+  {
+   "terme": "Formulaire de repas",
+   "ancre": "alimentation-formulaire-repas-en-cas-ajout-et-modification"
+  },
+  {
+   "terme": "Faim avant / après",
+   "ancre": "alimentation-formulaire-repas-en-cas-ajout-et-modification"
+  },
+  {
+   "terme": "Heure arrondie",
+   "ancre": "alimentation-formulaire-repas-en-cas-ajout-et-modification"
+  },
+  {
+   "terme": "Plafond de 30 prises par jour",
+   "ancre": "alimentation-formulaire-repas-en-cas-ajout-et-modification"
+  },
+  {
+   "terme": "Suggestions d'aliments",
+   "ancre": "alimentation-liste-de-suggestions-d-aliments"
+  },
+  {
+   "terme": "Ciqual",
+   "ancre": "alimentation-liste-de-suggestions-d-aliments"
+  },
+  {
+   "terme": "Compteur de sélection",
+   "ancre": "alimentation-liste-de-suggestions-d-aliments"
+  },
+  {
+   "terme": "Journal des repas",
+   "ancre": "alimentation-journal-des-repas"
+  },
+  {
+   "terme": "Éditions en place",
+   "ancre": "alimentation-journal-des-repas"
+  },
+  {
+   "terme": "Calendrier des repas",
+   "ancre": "alimentation-calendrier-des-repas"
+  },
+  {
+   "terme": "Parts caloriques",
+   "ancre": "alimentation-calendrier-des-repas"
+  },
+  {
+   "terme": "Menus favoris",
+   "ancre": "alimentation-bloc-mes-menus-favoris"
+  },
+  {
+   "terme": "Ajout rapide d'un favori",
+   "ancre": "alimentation-bloc-mes-menus-favoris"
+  },
+  {
+   "terme": "Aliments personnalisés",
+   "ancre": "alimentation-bloc-mes-aliments-boissons-et-mes-recettes"
+  },
+  {
+   "terme": "Formulaire d'aliment",
+   "ancre": "alimentation-formulaire-d-aliment-personnalise-page-pleine-ou-bloc-ajout-"
+  },
+  {
+   "terme": "Unités g / ml",
+   "ancre": "alimentation-formulaire-d-aliment-personnalise-page-pleine-ou-bloc-ajout-"
+  },
+  {
+   "terme": "Code-barres",
+   "ancre": "alimentation-bloc-ajout-par-code-barres"
+  },
+  {
+   "terme": "Open Food Facts",
+   "ancre": "alimentation-bloc-ajout-par-code-barres"
+  },
+  {
+   "terme": "Recettes",
+   "ancre": "alimentation-formulaire-de-recette"
+  },
+  {
+   "terme": "Moyenne / j (graphique)",
+   "ancre": "alimentation-bloc-graphique-moyenne-j-apports-par-jour"
+  },
+  {
+   "terme": "Fenêtre de période",
+   "ancre": "alimentation-bloc-graphique-moyenne-j-apports-par-jour"
+  },
+  {
+   "terme": "Diaporama Tendances",
+   "ancre": "alimentation-bloc-graphique-moyenne-j-apports-par-jour"
+  },
+  {
+   "terme": "Appétit (graphique)",
+   "ancre": "alimentation-bloc-graphique-appetit-faim-par-creneau-horaire"
+  },
+  {
+   "terme": "Créneau horaire",
+   "ancre": "alimentation-bloc-graphique-appetit-faim-par-creneau-horaire"
+  },
+  {
+   "terme": "Repas vs en-cas",
+   "ancre": "alimentation-bloc-repas-vs-en-cas"
+  },
+  {
+   "terme": "Composition par créneau",
+   "ancre": "alimentation-bloc-composition-moy-h-tableau-ou-barres"
+  },
+  {
+   "terme": "Part de masse",
+   "ancre": "alimentation-bloc-composition-moy-h-tableau-ou-barres"
+  },
+  {
+   "terme": "Répartition par créneau",
+   "ancre": "alimentation-bloc-repartition-tableau-ou-barres"
+  },
+  {
+   "terme": "Créneaux hauts",
+   "ancre": "alimentation-bloc-repartition-tableau-ou-barres"
+  },
+  {
+   "terme": "Objectifs du jour",
+   "ancre": "alimentation-carre-aujourd-hui-de-l-accueil-standard"
+  },
+  {
+   "terme": "Moyennes depuis le début / 7 jours",
+   "ancre": "alimentation-tuiles-repas-de-l-accueil-maisonsections"
+  },
+  {
+   "terme": "Tendance des kcal",
+   "ancre": "alimentation-tuiles-repas-de-l-accueil-maisonsections"
+  },
+  {
+   "terme": "Couche vitrée Menus",
+   "ancre": "alimentation-couche-vitree-menus-de-l-accueil"
+  },
+  {
+   "terme": "Paliers protéines et fibres",
+   "ancre": "alimentation-couche-vitree-menus-de-l-accueil"
+  },
+  {
+   "terme": "Fibres",
+   "ancre": "alimentation"
+  }
+ ],
+ "ecrans_illustres": [
+  "alimentation/page-menus-repas-et-en-cas",
+  "alimentation/formulaire-repas-en-cas-ajout-et-modification",
+  "alimentation/liste-de-suggestions-d-aliments",
+  "alimentation/journal-des-repas",
+  "alimentation/calendrier-des-repas",
+  "alimentation/bloc-mes-menus-favoris",
+  "alimentation/bloc-mes-aliments-boissons-et-mes-recettes",
+  "alimentation/formulaire-d-aliment-personnalise-page-pleine-ou-bloc-ajout-",
+  "alimentation/bloc-ajout-par-code-barres",
+  "alimentation/formulaire-de-recette",
+  "alimentation/bloc-graphique-moyenne-j-apports-par-jour",
+  "alimentation/bloc-graphique-appetit-faim-par-creneau-horaire",
+  "alimentation/bloc-repas-vs-en-cas",
+  "alimentation/bloc-composition-moy-h-tableau-ou-barres",
+  "alimentation/bloc-repartition-tableau-ou-barres",
+  "alimentation/carre-aujourd-hui-de-l-accueil-standard",
+  "alimentation/tuiles-repas-de-l-accueil-maisonsections",
+  "alimentation/couche-vitree-menus-de-l-accueil"
+ ]
+}

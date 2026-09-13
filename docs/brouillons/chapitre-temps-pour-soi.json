@@ -1,0 +1,176 @@
+{
+ "inventions": [
+  {
+   "categorie": "Formulaire",
+   "fonctionnalite": "Durée « Autre »",
+   "texte": "J'aurais écrit que le champ « Autre » avance par pas de 5 minutes (RULE_DURATION porte step: 5), mais je n'ai pas lu NumberField : je ne sais pas si ce pas se voit à l'écran ou s'il sert seulement de règle interne.",
+   "origine": "src/versions/mixte/app/form.rules.ts déclare step: 5 ; l'inventaire le reprend (« pas 5 ») sans dire son effet."
+  },
+  {
+   "categorie": "Formulaire",
+   "fonctionnalite": "Date d'un moment",
+   "texte": "J'aurais aimé dire qu'un moment ne peut pas être daté dans le futur ; aucun code ne le refuse — la date est libre.",
+   "origine": "Attente naturelle d'un journal ; rien dans useMeTimeForm, MeTimeForm ni logbook.ts."
+  },
+  {
+   "categorie": "Formulaire",
+   "fonctionnalite": "Notes",
+   "texte": "Aucune longueur maximale des notes n'est visible dans le code lu ; je n'ai rien pu affirmer.",
+   "origine": "NotesField (shared/ui) non lu."
+  },
+  {
+   "categorie": "Navigation",
+   "fonctionnalite": "Activation du module",
+   "texte": "La page des modules (cible module-metime-tracking) qui allume le temps pour soi n'a pas été lue : je ne décris pas le geste d'activation, seulement le fait que la navigation ne l'allume pas.",
+   "origine": "Doute noté dans l'inventaire ; hors chemins cités."
+  },
+  {
+   "categorie": "Navigation",
+   "fonctionnalite": "Menu bas et tiroir « + »",
+   "texte": "Je dis que l'onglet paraît au menu bas quand le module est allumé et que l'ajout rapide existe (« Ajouter un temps pour soi ») en me fondant sur navigation.ts et App.tsx ; le composant du menu et le tiroir « + » du menu simplifié n'ont pas été lus.",
+   "origine": "src/versions/mixte/app/navigation.ts (BOTTOM_MENU_ORDER, ADD_DRAWER_ORDER) ; doute de l'inventaire."
+  },
+  {
+   "categorie": "Graphe « Suivi »",
+   "fonctionnalite": "Échantillonnage des longues périodes",
+   "texte": "Amélioration qui m'est venue : quand le graphe ne trace qu'un jour sur deux ou trois, les minutes des jours sautés disparaissent au lieu d'être regroupées ; une somme par pas rendrait le total et les barres cohérents. Non demandé, non implémenté.",
+   "origine": "computeMeTimeChartData (step > 1 filtre log.date === dateStr du seul jour tracé)."
+  },
+  {
+   "categorie": "Tiroir Journal",
+   "fonctionnalite": "Édition en place",
+   "texte": "Dans le tiroir Journal, la ligne du temps pour soi ne reçoit pas onUpdateMeTime : l'édition en place y semble inactive. Je ne l'ai pas affirmé dans le chapitre faute d'avoir lu useInlineEditableLog et le comportement sans callback.",
+   "origine": "JournalDrawer.tsx, case 'metime' : seuls onDeleteMeTime, onStartEdit, onOpenManageModal sont passés (versLaPage)."
+  },
+  {
+   "categorie": "Accueil",
+   "fonctionnalite": "Minutes des 7 derniers jours",
+   "texte": "La fonction meTimeMinutesLast7Days existe sans appelant (arbitrage de Claude, gardée « le temps que le sujet se pose ») ; rien à l'écran, donc rien dans le chapitre.",
+   "origine": "src/features/home/homeOverview.ts ; arbitrages_de_claude de l'inventaire."
+  }
+ ],
+ "glossaire": [
+  {
+   "terme": "Moment pour soi",
+   "definition": "Une entrée du journal « Un temps pour soi » : une activité, une durée en minutes, une date, une heure et des notes facultatives."
+  },
+  {
+   "terme": "Activité (temps pour soi)",
+   "definition": "L'une des neuf entrées du catalogue (Spa, Manucure, Sortie cinéma…) ; aucune valeur énergétique ne lui est attachée."
+  },
+  {
+   "terme": "Activités actives",
+   "definition": "Le sous-ensemble du catalogue proposé dans les sélecteurs, réglé par le panneau « Ajouter/Gérer » et conservé sur l'appareil."
+  },
+  {
+   "terme": "Score quotidien",
+   "definition": "Les minutes de temps pour soi d'une journée rapportées à une heure, de 0 à 10 : 60 minutes ou plus valent 10."
+  },
+  {
+   "terme": "Période",
+   "definition": "Fenêtre d'un journal ou d'un graphe : 7, 14, 30, 90 derniers jours, Depuis le début ou Choisir ; 30 jours par défaut, mémorisée bloc par bloc."
+  },
+  {
+   "terme": "Bornes « du … au … »",
+   "definition": "Les deux dates de la période, écrites dans le bandeau et éditables ; les modifier bascule en « Choisir »."
+  },
+  {
+   "terme": "Minute ronde",
+   "definition": "Minute autorisée pour une heure enregistrée : 0, 10, 15, 20, 30, 40, 45 ou 50 ; l'heure saisie est arrondie vers le bas."
+  },
+  {
+   "terme": "Plafond quotidien",
+   "definition": "Quinze moments par jour ; la saisie suivante remplace la dernière ligne du jour, avec l'avis « Limite atteinte »."
+  },
+  {
+   "terme": "Couche vitrée",
+   "definition": "Bloc ouvert par-dessus la home, le reste flouté ; celle du temps pour soi montre le bloc des moments."
+  },
+  {
+   "terme": "Module",
+   "definition": "Drapeau du profil qui allume ou éteint le domaine ; éteint, sa page s'affiche vitrée et ses tuiles disparaissent."
+  }
+ ],
+ "index": [
+  {
+   "terme": "Un temps pour soi (page)",
+   "ancre": "temps-pour-soi-page-un-temps-pour-soi-metimetracker"
+  },
+  {
+   "terme": "Moment pour soi",
+   "ancre": "temps-pour-soi-formulaire-nouveau-moment-pour-soi-modifier-le-moment-pour-s"
+  },
+  {
+   "terme": "Durée d'un moment",
+   "ancre": "temps-pour-soi-formulaire-nouveau-moment-pour-soi-modifier-le-moment-pour-s"
+  },
+  {
+   "terme": "Heure arrondie (minute ronde)",
+   "ancre": "temps-pour-soi-formulaire-nouveau-moment-pour-soi-modifier-le-moment-pour-s"
+  },
+  {
+   "terme": "Plafond quotidien (15 moments)",
+   "ancre": "temps-pour-soi-page-un-temps-pour-soi-metimetracker"
+  },
+  {
+   "terme": "Catalogue des activités",
+   "ancre": "temps-pour-soi-panneau-moments-pour-soi-disponibles-managemetimeblock"
+  },
+  {
+   "terme": "Ajouter/Gérer (temps pour soi)",
+   "ancre": "temps-pour-soi-panneau-moments-pour-soi-disponibles-managemetimeblock"
+  },
+  {
+   "terme": "Journal des moments",
+   "ancre": "temps-pour-soi-journal-un-temps-pour-soi-et-sa-ligne-journalentrycard-me-ti"
+  },
+  {
+   "terme": "Tout supprimer (moments)",
+   "ancre": "temps-pour-soi-journal-un-temps-pour-soi-et-sa-ligne-journalentrycard-me-ti"
+  },
+  {
+   "terme": "Calendrier des moments",
+   "ancre": "temps-pour-soi-calendrier-un-temps-pour-soi-metimecalendar-et-bulle-daymeti"
+  },
+  {
+   "terme": "Score quotidien (temps pour soi)",
+   "ancre": "temps-pour-soi-graphe-suivi-du-temps-pour-soi-metimechart"
+  },
+  {
+   "terme": "Suivi (graphe du temps pour soi)",
+   "ancre": "temps-pour-soi-graphe-suivi-du-temps-pour-soi-metimechart"
+  },
+  {
+   "terme": "Mes moments (bloc)",
+   "ancre": "temps-pour-soi-bloc-mes-moments-blocmesmoments"
+  },
+  {
+   "terme": "Couche vitrée « Un temps pour soi »",
+   "ancre": "temps-pour-soi-tuiles-home-du-domaine-temps-pour-soi"
+  },
+  {
+   "terme": "Moments par semaine",
+   "ancre": "temps-pour-soi-tuiles-home-du-domaine-temps-pour-soi"
+  },
+  {
+   "terme": "Tendances (carte Temps pour soi)",
+   "ancre": "temps-pour-soi-tiroirs-journal-et-tendances"
+  },
+  {
+   "terme": "Tiroir Journal (temps pour soi)",
+   "ancre": "temps-pour-soi-tiroirs-journal-et-tendances"
+  }
+ ],
+ "ecrans_illustres": [
+  "activite/page-un-temps-pour-soi-metimetracker",
+  "activite/formulaire-nouveau-moment-pour-soi-modifier-le-moment-pour-s",
+  "activite/panneau-moments-pour-soi-disponibles-managemetimeblock",
+  "activite/journal-un-temps-pour-soi-et-sa-ligne-journalentrycard-me-ti",
+  "activite/calendrier-un-temps-pour-soi-metimecalendar-et-bulle-daymeti",
+  "activite/graphe-suivi-du-temps-pour-soi-metimechart",
+  "activite/bloc-mes-moments-blocmesmoments",
+  "activite/tuiles-home-du-domaine-temps-pour-soi",
+  "activite/tiroir-journal-lignes-des-quatre-journaux",
+  "activite/tiroir-tendances-cartes-activite-physique-temps-pour-soi-som"
+ ]
+}

@@ -1,0 +1,233 @@
+{
+ "inventions": [
+  {
+   "categorie": "principe",
+   "fonctionnalite": "Unités canoniques (V2)",
+   "texte": "La V2 enregistrera le poids en kilogrammes quelle que soit l'unité de saisie.",
+   "origine": "unites.ts l'annonce (« on stockera toujours en unités métriques ») et reponses.ts renvoie la conversion « là où on les enregistrera » ; aucune fonction kg↔lb n'existe et rien n'enregistre. Seule la taille est convertie (tailleEnCm)."
+  },
+  {
+   "categorie": "principe",
+   "fonctionnalite": "Supprimer supprime",
+   "texte": "Les journaux du sommeil et du temps pour soi ne sont pas purgés parce qu'ils sont nés après la suppression logique.",
+   "origine": "purgeDeleted.ts traverse sept journaux et laisse meTimeLogs et sleepLogs sans dire pourquoi ; le doute est dans l'inventaire, non tranché dans le code."
+  },
+  {
+   "categorie": "principe",
+   "fonctionnalite": "Dates locales",
+   "texte": "Le libellé relatif d'une date (« lundi 3 août ») recule d'un jour dans les fuseaux à l'ouest de Greenwich.",
+   "origine": "date.relative.ts fait new Date(dateStr) ; la conséquence est décrite dans les commentaires de date.local.ts pour ce motif, mais je ne l'ai pas observée à l'écran."
+  },
+  {
+   "categorie": "contrainte",
+   "fonctionnalite": "Stockage des données de santé",
+   "texte": "Les données de santé sont chiffrées sur l'appareil.",
+   "origine": "GUIDELINES §1 le prescrit pour le jour de la conversion native ; en V1 la sauvegarde est un JSON en clair dans localStorage, en V2 rien n'est stocké."
+  },
+  {
+   "categorie": "non-but",
+   "fonctionnalite": "Posologie",
+   "texte": "Le produit n'annonce jamais qu'une prise est en retard.",
+   "origine": "App.tsx (V1) calcule getNextInjectionMessage (« En retard de Nj », dernière prise + 7 jours) ; l'inventaire n'a trouvé aucun rendu de ce message et le tient pour du code mort. Je ne peux affirmer ni qu'il s'affiche ni qu'il ne s'affiche pas."
+  },
+  {
+   "categorie": "objet",
+   "fonctionnalite": "Une seule personne par installation",
+   "texte": "Deux comptes ouverts sur le même navigateur partagent la même sauvegarde.",
+   "origine": "Déduit de la clé unique glp1_app_companion_data, qui ne porte pas l'identifiant du compte ; comportement non vérifié."
+  },
+  {
+   "categorie": "questionnaire",
+   "fonctionnalite": "Questionnaire d'accueil V1",
+   "texte": "Le questionnaire V1 écrira un jour le profil, les journaux et les modules.",
+   "origine": "SPEC-FONCTIONNELLE §11 le liste comme point ouvert ; le code calcule ce qu'il allumerait (onboarding.outcome.ts) sans rien écrire. La V2 a repris l'onboarding de zéro."
+  },
+  {
+   "categorie": "non-but",
+   "fonctionnalite": "Réseau social",
+   "texte": "La page « Configuration & Plus » est inatteignable en usage normal.",
+   "origine": "L'inventaire n'a trouvé aucune entrée de menu vers l'onglet « plus » ; je n'ai pas relu App.tsx en entier et j'ai écrit « qu'aucune entrée de menu relevée n'atteint »."
+  }
+ ],
+ "glossaire": [
+  {
+   "terme": "Cure",
+   "definition": "La période de traitement GLP-1 suivie par le carnet, comptée depuis la pesée de départ."
+  },
+  {
+   "terme": "Prise",
+   "definition": "Une injection ou un comprimé enregistré : date, heure, dose en milligrammes, site, traitement."
+  },
+  {
+   "terme": "Pesée de départ",
+   "definition": "La pesée de référence, reconnue à son drapeau isStartingWeight et jamais à sa valeur ; elle ne se supprime pas."
+  },
+  {
+   "terme": "Catalogue des traitements",
+   "definition": "La liste livrée avec le produit dans laquelle le traitement se choisit ; chaque forme (injection, comprimé) finit par « Autre »."
+  },
+  {
+   "terme": "Unité canonique",
+   "definition": "L'unité dans laquelle une grandeur est stockée (kg, cm, g ou ml, mg, min, m, années) ; la conversion n'existe qu'à la saisie et à l'affichage."
+  },
+  {
+   "terme": "Date locale",
+   "definition": "Un jour AAAA-MM-JJ ou une heure HH:MM lus sur l'horloge de l'appareil, sans fuseau : l'heure murale vécue."
+  },
+  {
+   "terme": "Minute ronde",
+   "definition": "L'une des minutes 0, 10, 15, 20, 30, 40, 45, 50 ; toute heure enregistrée y est ramenée vers le bas."
+  },
+  {
+   "terme": "Sauvegarde",
+   "definition": "L'ensemble des données de suivi, un seul JSON dans le stockage local de l'appareil sous une clé unique."
+  },
+  {
+   "terme": "Module",
+   "definition": "Un domaine de suivi qui s'active ou se désactive (repas, pas, sport, temps pour soi, sommeil, traitement, effets secondaires)."
+  },
+  {
+   "terme": "Restitution",
+   "definition": "Toute lecture des données saisies : total, moyenne, courbe, échéance, document PDF. Jamais une recommandation."
+  },
+  {
+   "terme": "Document médical",
+   "definition": "Le PDF produit sur une période choisie, à remettre à un professionnel de santé ; il porte la mention qu'il ne constitue pas un avis médical."
+  },
+  {
+   "terme": "Onboarding",
+   "definition": "Le parcours de premier lancement ; simulation qui n'écrit rien en V1, seul contenu de la V2 à ce jour."
+  },
+  {
+   "terme": "V1",
+   "definition": "L'application web du dépôt REPO-GIT-LOCAL, dont ce document relève le comportement."
+  },
+  {
+   "terme": "V2",
+   "definition": "L'application repartie de zéro le 6 septembre 2026 dans le dépôt GIT-APP-V2 ; quand elle a décidé autrement, elle prime."
+  },
+  {
+   "terme": "Branche",
+   "definition": "Une question du parcours qui n'apparaît que si une réponse explicite l'ouvre ; une question passée ne décide rien."
+  }
+ ],
+ "index": [
+  {
+   "terme": "Objet du produit",
+   "ancre": "produit-objet-et-posture"
+  },
+  {
+   "terme": "Avertissement médical",
+   "ancre": "produit-objet-et-posture"
+  },
+  {
+   "terme": "Catalogue des traitements",
+   "ancre": "produit-objet-et-posture"
+  },
+  {
+   "terme": "Compte (Firebase, Google)",
+   "ancre": "produit-objet-et-posture"
+  },
+  {
+   "terme": "Une seule personne par installation",
+   "ancre": "produit-objet-et-posture"
+  },
+  {
+   "terme": "Rien de dérivable n'est stocké",
+   "ancre": "produit-les-principes"
+  },
+  {
+   "terme": "Référence par identifiant",
+   "ancre": "produit-les-principes"
+  },
+  {
+   "terme": "Unités canoniques",
+   "ancre": "produit-les-principes"
+  },
+  {
+   "terme": "Système métrique / impérial",
+   "ancre": "produit-les-principes"
+  },
+  {
+   "terme": "Dates locales",
+   "ancre": "produit-les-principes"
+  },
+  {
+   "terme": "Minutes rondes",
+   "ancre": "produit-les-principes"
+  },
+  {
+   "terme": "Supprimer supprime",
+   "ancre": "produit-les-principes"
+  },
+  {
+   "terme": "Valeur absente (se tait)",
+   "ancre": "produit-les-principes"
+  },
+  {
+   "terme": "Branche fermée sur un silence",
+   "ancre": "produit-les-principes"
+  },
+  {
+   "terme": "Cache nutritionnel des repas",
+   "ancre": "produit-les-principes"
+  },
+  {
+   "terme": "Stockage local",
+   "ancre": "produit-contraintes"
+  },
+  {
+   "terme": "Flux sortants (PDF, avis, Open Food Facts, Google)",
+   "ancre": "produit-contraintes"
+  },
+  {
+   "terme": "Sauvegarde illisible",
+   "ancre": "produit-contraintes"
+  },
+  {
+   "terme": "Bornes de saisie",
+   "ancre": "produit-contraintes"
+  },
+  {
+   "terme": "Saisie impossible",
+   "ancre": "produit-contraintes"
+  },
+  {
+   "terme": "Non-buts",
+   "ancre": "produit-non-buts"
+  },
+  {
+   "terme": "Objectifs quotidiens par défaut",
+   "ancre": "produit-non-buts"
+  },
+  {
+   "terme": "Suivi hydrique (supprimé)",
+   "ancre": "produit-non-buts"
+  },
+  {
+   "terme": "Objectifs de poids à paliers (supprimés)",
+   "ancre": "produit-non-buts"
+  },
+  {
+   "terme": "V2",
+   "ancre": "produit-la-v2"
+  },
+  {
+   "terme": "React Native",
+   "ancre": "produit-la-v2"
+  },
+  {
+   "terme": "Multilingue",
+   "ancre": "produit-la-v2"
+  },
+  {
+   "terme": "Administration (hors périmètre)",
+   "ancre": "produit-hors-perimetre"
+  },
+  {
+   "terme": "Thèmes (hors périmètre)",
+   "ancre": "produit-hors-perimetre"
+  }
+ ],
+ "ecrans_illustres": []
+}

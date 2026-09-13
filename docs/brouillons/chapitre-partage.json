@@ -1,0 +1,180 @@
+{
+ "inventions": [
+  {
+   "categorie": "Cartes de partage",
+   "fonctionnalite": "Fabrication de l'image et partage des cartes",
+   "texte": "Chaque carte produirait une image, comme la carte du badge, et partirait par la feuille de partage du système depuis un bouton Partager sur la page de la donnée (pesée, injection, repas…).",
+   "origine": "Les en-têtes du code annoncent que « la fabrication de l'image viendra quand l'apparence sera validée » ; rien ne l'écrit, et aucun bouton Partager n'existe dans la Mixte hors des badges."
+  },
+  {
+   "categorie": "Cartes de partage",
+   "fonctionnalite": "Choix de l'entrée à partager",
+   "texte": "La personne choisirait l'entrée à partager (une pesée passée, un repas précis) plutôt que la dernière.",
+   "origine": "Chaque carte ne lit que la dernière entrée par date et heure ; aucun mécanisme de choix n'est écrit."
+  },
+  {
+   "categorie": "Cartes de partage",
+   "fonctionnalite": "Mention « exemple » sur une carte remplie par l'exemple figé",
+   "texte": "Une carte remplie par l'exemple figé porterait une mention, pour ne pas être partagée comme une vraie donnée.",
+   "origine": "Le code refuse explicitement cette mention (« la maquette ne dit rien ») ; le partage réel n'existant pas, le risque n'a pas été tranché."
+  },
+  {
+   "categorie": "Cartes de partage",
+   "fonctionnalite": "Graphe partagé au choix",
+   "texte": "Le graphe partagé pourrait être n'importe quel graphe de l'application (poids, pas, effets).",
+   "origine": "Seul le graphe du sommeil est maquetté, parce que son analyse se branche sur les mêmes points que le tracé ; l'extension aux autres graphes n'est pas écrite."
+  },
+  {
+   "categorie": "Carte d'injection",
+   "fonctionnalite": "Dose à deux décimales",
+   "texte": "La dose s'écrirait avec deux décimales quand elle en a (« 0.25 mg »).",
+   "origine": "dec1 arrondit à une décimale et écrit « 0.3 » pour 0,25 mg ; un affichage à deux décimales serait une amélioration, pas le code."
+  },
+  {
+   "categorie": "QR code",
+   "fonctionnalite": "QR code réel vers les magasins d'applications",
+   "texte": "Le QR encoderait l'adresse d'une page qui redirige vers l'App Store ou le Play Store.",
+   "origine": "La demande du 2026-08-19 cite « un qrcode vers l'app sur les stores » ; ni l'adresse ni l'encodeur n'existent."
+  },
+  {
+   "categorie": "Partage d'un badge",
+   "fonctionnalite": "Lien dans le presse-papier",
+   "texte": "Le repli presse-papier copierait aussi l'adresse de la page, comme la notice l'annonce.",
+   "origine": "La notice dit « Lien et texte de partage copiés » alors que seul le texte est écrit dans le presse-papier ; corriger l'un ou l'autre est une décision à prendre."
+  },
+  {
+   "categorie": "Partage d'un badge",
+   "fonctionnalite": "Partage unifié sur la couche de plateforme",
+   "texte": "Le partage de badge passerait par shared/platform/share (shareNative) comme le prévoit la règle « aucune API web hors de shared/platform ».",
+   "origine": "Le code le note comme à faire « à la conversion » native ; l'auteur du code a choisi de ne pas l'aligner maintenant parce que le contrat diffère (URL jointe au fichier, retrait des fichiers refusés)."
+  },
+  {
+   "categorie": "Partage",
+   "fonctionnalite": "Position de la V2 sur le partage",
+   "texte": "La V2 reprendrait le partage de badge et les cartes tels quels.",
+   "origine": "GUIDELINES.md § 4 et src/screens/onboarding de la V2 ne mentionnent pas le partage ; rien ne permet de l'affirmer ni de l'infirmer."
+  }
+ ],
+ "glossaire": [
+  {
+   "terme": "Carte de partage",
+   "definition": "Image verticale (proportion 4/5) qui résume une donnée du carnet avec le prénom, l'avatar et le pied GLP1LOW, destinée à sortir de l'application."
+  },
+  {
+   "terme": "Maquette",
+   "definition": "Rendu à l'écran de ce qu'une carte de partage montrera, sans image produite ni partage possible."
+  },
+  {
+   "terme": "Feuille de partage",
+   "definition": "Panneau du système (navigator.share) qui propose les applications de destination d'un texte, d'un lien ou d'un fichier."
+  },
+  {
+   "terme": "Repli presse-papier",
+   "definition": "Quand le système n'a pas de feuille de partage, le texte est copié dans le presse-papier à la place."
+  },
+  {
+   "terme": "Tampon",
+   "definition": "Date et heure de l'entrée partagée, écrites « JJ/MM/AAAA · HH:MM » à droite du titre de la carte."
+  },
+  {
+   "terme": "Exemple figé",
+   "definition": "Données d'exemple datées du 18/08/2026 qu'une carte affiche quand le journal concerné est vide."
+  },
+  {
+   "terme": "Palier",
+   "definition": "Niveau atteint par un badge : éveil, bronze, argent ou or."
+  },
+  {
+   "terme": "Équivalence insolite",
+   "definition": "Perte de poids traduite en objets du quotidien, avec leur dessin et la phrase « soit l'équivalent de … »."
+  },
+  {
+   "terme": "Niveau sanguin actif",
+   "definition": "Quantité de molécule estimée présente dans le corps, en mg, calculée à partir des prises ; la carte d'injection le trace sur 14 jours."
+  },
+  {
+   "terme": "QR code",
+   "definition": "Motif carré lisible par l'appareil photo ; sur les cartes, un faux motif fixe qui ne se scanne pas."
+  }
+ ],
+ "index": [
+  {
+   "terme": "Partager un badge",
+   "ancre": "partage-partager-un-badge"
+  },
+  {
+   "terme": "navigator.share",
+   "ancre": "partage-partager-un-badge"
+  },
+  {
+   "terme": "Presse-papier",
+   "ancre": "partage-partager-un-badge"
+  },
+  {
+   "terme": "Image JPEG du badge",
+   "ancre": "partage-partager-un-badge"
+  },
+  {
+   "terme": "Cartes de partage",
+   "ancre": "partage-les-cartes-de-partage"
+  },
+  {
+   "terme": "Maquettes de partage",
+   "ancre": "partage-les-cartes-de-partage"
+  },
+  {
+   "terme": "Cadre commun (prénom, avatar, pied)",
+   "ancre": "partage-les-cartes-de-partage"
+  },
+  {
+   "terme": "Exemple figé",
+   "ancre": "partage-les-cartes-de-partage"
+  },
+  {
+   "terme": "Tampon",
+   "ancre": "partage-les-cartes-de-partage"
+  },
+  {
+   "terme": "Carte Pesée",
+   "ancre": "partage-les-cartes-de-partage"
+  },
+  {
+   "terme": "Carte Recette",
+   "ancre": "partage-les-cartes-de-partage"
+  },
+  {
+   "terme": "Carte Équivalence",
+   "ancre": "partage-les-cartes-de-partage"
+  },
+  {
+   "terme": "Carte Graphe du sommeil",
+   "ancre": "partage-les-cartes-de-partage"
+  },
+  {
+   "terme": "Carte Injection / prise",
+   "ancre": "partage-la-carte-d-une-injection-ou-d-une-prise"
+  },
+  {
+   "terme": "Niveau sanguin sur 14 jours",
+   "ancre": "partage-la-carte-d-une-injection-ou-d-une-prise"
+  },
+  {
+   "terme": "Carte Ressenti",
+   "ancre": "partage-la-carte-d-un-ressenti"
+  },
+  {
+   "terme": "Mots d'intensité",
+   "ancre": "partage-la-carte-d-un-ressenti"
+  },
+  {
+   "terme": "QR code (faux)",
+   "ancre": "partage-le-faux-qr-code"
+  }
+ ],
+ "ecrans_illustres": [
+  "metabolisme-rapport-badges/page-badges",
+  "metabolisme-rapport-badges/cartes-de-partage-15-maquettes",
+  "traitement/carte-de-partage-une-injection-prise-de-comprime-domaine-voi",
+  "effets-secondaires/maquette-de-partage-un-effet-secondaire-mon-ressenti"
+ ]
+}

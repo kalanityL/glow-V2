@@ -1,0 +1,62 @@
+<section id="badges">
+  <h2>14. Les badges <a class="retour" href="#sommaire">↑ sommaire</a></h2>
+  <p>Quatre badges récompensent la régularité : Kangourou Musclé (activité physique), Lapin des Fibres et Requin protéiné (repas), Hérisson Marcheur (pas). Chacun se tient à l'un de cinq paliers — aucun, éveil, bronze, argent, or — recalculés à chaque changement des données sur une fenêtre glissante de 7 ou 10 jours. Un palier qui monte est fêté ; la page Badges les liste avec leurs règles et permet de partager un badge gagné.</p>
+
+  <h3 id="badges-les-quatre-badges-et-leurs-paliers">Les quatre badges et leurs paliers</h3>
+  <table>
+    <thead><tr><th>Badge</th><th>Module requis</th><th>Journée réussie</th><th>Éveil</th><th>Bronze</th><th>Argent</th><th>Or</th></tr></thead>
+    <tbody>
+      <tr><td>Hérisson Marcheur</td><td>Nombre de Pas</td><td>≥ 8 000 pas</td><td>1 journée réussie, aujourd'hui ou hier</td><td>3 journées sur 7</td><td>4 sur 7</td><td>5 sur 7</td></tr>
+      <tr><td>Lapin des Fibres</td><td>Repas et En-cas</td><td>≥ 25 g de fibres</td><td>idem</td><td>4 sur 7</td><td>5 sur 7</td><td>7 sur 7</td></tr>
+      <tr><td>Requin protéiné</td><td>Repas et En-cas</td><td>protéines ≥ poids actuel × 1,5 g</td><td>idem</td><td>4 sur 7</td><td>5 sur 7</td><td>7 sur 7</td></tr>
+      <tr><td>Kangourou Musclé</td><td>Activité Physique</td><td>—</td><td>une séance enregistrée aujourd'hui ou hier</td><td>120 min d'équivalent modéré sur 10 j</td><td>180 min d'équivalent intensif sur 10 j</td><td>180 min d'équivalent intensif sur 7 j</td></tr>
+    </tbody>
+  </table>
+  <p>Le palier retenu est le plus haut atteint. La fenêtre de 7 jours est la journée en cours et les six précédentes (10 : les neuf précédentes). Seules les entrées déjà survenues comptent : un repas ou une séance saisis à une heure à venir attendent leur heure ; les pas, sans heure, comptent dès leur saisie. Pour le Requin protéiné, le poids actuel est la dernière pesée de l'historique, à défaut le poids de départ, à défaut 70 kg. Pour le Kangourou Musclé, une minute intensive vaut 1 min d'équivalent intensif, modérée 0,67, douce 0,33 ; en équivalent modéré, 1,5 / 1 / 0,5. Son éveil s'obtient par une séance enregistrée, quelles que soient sa durée et son intensité. <span class="marque">arbitrage non validé</span></p>
+  <p>Les badges pas et activité physique sont actifs tant que leur module n'est pas désactivé ; les deux badges des repas exigent le module Repas et En-cas activé. Un badge de module inactif n'est pas évalué.</p>
+  <div class="exemple"><p>Camille pèse 89,4 kg à sa dernière pesée : son objectif de protéines est de 134 g par jour (arrondi de 89,4 × 1,5). Sur les sept derniers jours, elle ne l'a atteint que le 8 septembre, ni aujourd'hui ni hier : « 1/7j à ≥ 134g de protéines », aucun palier, le Requin protéiné reste à débloquer. Si elle activait le module Activité Physique, trois séances sur dix jours — 45 min douce, 60 min modérée, 30 min intensive — feraient 22,5 + 60 + 45 = 127,5 min d'équivalent modéré : Kangourou Musclé bronze.</p></div>
+
+  <h3 id="badges-page-badges">Page Badges</h3>
+  <figure class="telephone" data-capture="metabolisme-rapport-badges/page-badges"><figcaption>Camille a deux badges débloqués — Hérisson Marcheur BRONZE « 3/7j à ≥ 8 000 pas », Lapin des Fibres ÉVEIL « 1/7j à ≥ 25g de fibres » —, le curseur « Afficher le badge mystère » sur Oui, le Requin protéiné à débloquer et le Kangourou Musclé à activer, son module Activité Physique étant éteint.</figcaption></figure>
+  <p>Trois sections, chacune absente si vide : « Badges Débloqués (N) » (module actif, palier au moins éveil) — dessin, titre, pastille du palier, progression ; « Badges à débloquer (N) » (module actif, aucun palier) — dessin flouté sous cadenas, titre voilé, pastille « À débloquer » ; « Badges à activer (N) » (module inactif et non masqué) — dessin voilé, pastille « Inactif », phrase « Activez le module {catégorie} dans vos préférences pour jouer à débloquer le badge ». Le clic sur le dessin d'un badge gagné ouvre le badge en grand avec le bouton Partager ; le clic sur sa pastille, ou sur une carte à débloquer, ouvre les règles des quatre paliers (le Requin protéiné y affiche le chiffre réel : « 134g protéines atteint 4 fois /7j »). Un seul bloc de règles et un seul badge en grand ouverts à la fois. Le clic sur une carte à activer ouvre la page Modules et défile jusqu'au module concerné. Entre débloqués et à débloquer, la carte « Afficher le badge mystère » (Oui par défaut) règle le badge « ? » du bloc Salut. On y arrive par Paramètres → Préférences → Badges, ou par le pavé de badges du bloc Salut.</p>
+  <details><summary>Les règles derrière les chiffres</summary>
+    <ul>
+      <li>Cinq paliers ordonnés aucun, éveil, bronze, argent, or ; libellés Aucun / Éveil / Bronze / Argent / Or. <a href="spec-technique.html#badges-ordre-des-paliers-de-badge">→ technique</a></li>
+      <li>Fenêtre de N jours = aujourd'hui et les N−1 jours précédents ; éveil = aujourd'hui ou hier ; seules les entrées déjà survenues comptent. <a href="spec-technique.html#badges-fenetres-et-donnees-comptees-par-les-badges">→ technique</a></li>
+      <li>Kangourou Musclé : équivalents intensif (1 / 0,67 / 0,33) et modéré (1,5 / 1 / 0,5) ; or 180 min intensif sur 7 j, argent 180 sur 10 j, bronze 120 modéré sur 10 j, éveil une séance. <a href="spec-technique.html#badges-badge-kangourou-muscle-activite-physique">→ technique</a></li>
+      <li>Lapin des Fibres : journée réussie à 25 g ; or 7, argent 5, bronze 4 sur 7 j. <a href="spec-technique.html#badges-badge-lapin-des-fibres">→ technique</a></li>
+      <li>Requin protéiné : objectif = arrondi(poids actuel × 1,5) g ; or 7, argent 5, bronze 4 sur 7 j. <a href="spec-technique.html#badges-badge-requin-proteine">→ technique</a></li>
+      <li>Hérisson Marcheur : journée réussie à 8 000 pas ; or 5, argent 4, bronze 3 sur 7 j. <a href="spec-technique.html#badges-badge-herisson-marcheur">→ technique</a></li>
+      <li>Débloqués = module actif et palier ≠ aucun ; à débloquer = module actif et palier aucun ; à activer = module inactif et non masqué ; une section vide ne s'affiche pas. <a href="spec-technique.html#badges-sections-de-la-page-badges">→ technique</a></li>
+      <li>Badge mystère affiché tant que le profil ne dit pas le contraire ; le curseur écrit le profil. <a href="spec-technique.html#badges-badge-mystere">→ technique</a></li>
+      <li>Dessins en 28, 36, 56, 80 ou 112 px ; palier aucun désaturé à 65 %. <a href="spec-technique.html#badges-tailles-des-dessins-de-badge">→ technique</a></li>
+    </ul>
+  </details>
+
+  <h3 id="badges-bloc-de-celebration-d-un-badge-debloque">Célébration d'un palier</h3>
+  <figure class="telephone" data-capture="metabolisme-rapport-badges/bloc-de-celebration-d-un-badge-debloque"><figcaption>Camille saisit 8 400 pas, quatrième journée réussie de la semaine : « NIVEAU ARGENT DÉBLOQUÉ ! », Hérisson Marcheur, « 4/7j à ≥ 8 000 pas », « Objectif : débloquer le niveau or ».</figcaption></figure>
+  <p>Quand un palier monte, un bloc de félicitations s'ouvre en tête de la page où l'on se trouve, sans rien bloquer : pastille du niveau (éveil, bronze, argent ou or), dessin du badge en grand, titre, « Félicitations ! Votre récent ajout a validé un nouveau palier ! », progression, objectif suivant. Plusieurs paliers montés d'un coup s'enchaînent (« Badge 1 sur 2 », bouton « Badge suivant ») ; le dernier se ferme par « Fermer » ou la croix. Le bouton Partager lance le partage du badge.</p>
+  <details><summary>Les règles derrière les chiffres</summary>
+    <ul>
+      <li>Le dernier palier observé de chaque badge est mémorisé sur l'appareil ; une montée par rapport à ce palier se fête, éveil compris, dans la session ou au retour. Un badge jamais observé (première ouverture, historique importé, module allumé pour la première fois) est retenu sans fête. Un palier qui baisse est retenu sans fête ; le remonter se fête. Un module éteint garde son palier connu : rallumé au même palier, pas de seconde fête. <a href="spec-technique.html#badges-celebration-d-un-badge">→ technique</a></li>
+    </ul>
+  </details>
+  <div class="exemple"><p>Camille désactive le module Nombre de Pas alors que son Hérisson est argent, puis le réactive une semaine plus tard : ses pas ont continué d'être enregistrés, le badge est toujours argent, rien n'est fêté. S'il était passé or entre-temps, une seule fête s'ouvre.</p></div>
+
+  <h3 id="badges-pave-de-badges-badge-mystere-du-bloc-salut">Pavé de badges du bloc Salut</h3>
+  <figure class="telephone" data-capture="metabolisme-rapport-badges/pave-de-badges-badge-mystere-du-bloc-salut"><figcaption>Au bord droit du bloc Salut de l'accueil, les deux badges de Camille — Hérisson Marcheur argent, Lapin des Fibres éveil — sur une ligne.</figcaption></figure>
+  <p>Les badges débloqués s'affichent en dessin seul, deux par ligne, quatre au plus ; le clic mène à la page Badges. Sans aucun badge débloqué, un badge « ? » (cocarde argent, point d'interrogation) tient la place et mène à la même page ; il disparaît si le curseur « Afficher le badge mystère » est sur Non. Les badges gagnés ne se masquent pas.</p>
+  <details><summary>Les règles derrière les chiffres</summary>
+    <ul>
+      <li>Le « ? » ne s'affiche que si aucun badge n'est débloqué et que le profil ne le masque pas ; absent = affiché. <a href="spec-technique.html#badges-badge-mystere">→ technique</a></li>
+    </ul>
+  </details>
+
+  <h3 id="badges-partage-d-un-badge">Partage d'un badge</h3>
+  <p>Depuis le badge en grand ou la célébration, Partager envoie le texte « J'ai débloqué le badge "Hérisson Marcheur" Niveau ARGENT sur G(lp1)LOW », l'adresse de la page et une carte JPEG 600 × 600 (niveau, dessin, titre, règle du palier, marque GLP1LOW) à la feuille de partage du téléphone. Sans partage natif, le texte est copié dans le presse-papier et la page Badges l'annonce : « Lien et texte de partage copiés dans le presse-papier. » ; le bloc de célébration ne l'annonce pas. Détail des cartes au <a href="#partage">chapitre 20</a>.</p>
+  <details><summary>Les règles derrière les chiffres</summary>
+    <ul>
+      <li>Texte, titre « Badge {titre} - GLP1LOW », carte rendue en 2×, JPEG qualité 0,95, fichier joint si la plateforme l'accepte, repli presse-papier. <a href="spec-technique.html#badges-partage-d-un-badge">→ technique</a></li>
+    </ul>
+  </details>
+</section>

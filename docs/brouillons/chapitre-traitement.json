@@ -1,0 +1,508 @@
+{
+ "inventions": [
+  {
+   "categorie": "comportement supposé",
+   "fonctionnalite": "Configurer les rappels d'injection",
+   "texte": "L'application envoie une notification au jour et à l'heure réglés, ou tous les N jours à partir de la date choisie.",
+   "origine": "La carte Notifications l'annonce (« seront planifiés automatiquement ») ; aucun code de planification ni d'envoi n'existe dans src (recherche sur Notification, serviceWorker, LocalNotifications, PushNotifications). Le chapitre le marque « non implémenté »."
+  },
+  {
+   "categorie": "règle plausible",
+   "fonctionnalite": "Modifier une prise",
+   "texte": "La modification par le formulaire conserve le traitement d'origine de la ligne.",
+   "origine": "Le bloc « Traitement mis à jour » promet que les prises gardent leur traitement, mais useInjectionForm.handleSubmit réécrit brand avec le traitement du profil du moment, alors que l'édition en place (journal, bulle) le conserve. L'écart n'est pas documenté ; le chapitre décrit le code."
+  },
+  {
+   "categorie": "amélioration",
+   "fonctionnalite": "Modifier une prise",
+   "texte": "Le mode d'ouverture (palier ou « Autre dose ») se décide sur les paliers de la fiche du traitement, pas sur la liste générique 0,25 / 0,5 / 1 / 1,7 / 2,4.",
+   "origine": "startEdit lit DEFAULT_DOSE_PRESETS : une prise Mounjaro 5 mg s'ouvre en saisie libre bien que 5 soit un palier Mounjaro. Intention non établie."
+  },
+  {
+   "categorie": "amélioration",
+   "fonctionnalite": "Saisir une prise (injection ou comprimé)",
+   "texte": "Annuler le formulaire ramène la dose au premier palier du traitement et la zone à la suggestion, pas à 0,25 mg et abdomen gauche.",
+   "origine": "cancelEdit fixe 0.25 et abdomen_gauche quel que soit le traitement ; l'ouverture suivante corrige la zone mais pas la dose si elle n'est pas dans les paliers. Comportement observé, intention non établie."
+  },
+  {
+   "categorie": "amélioration",
+   "fonctionnalite": "Proposer la zone d'injection",
+   "texte": "La zone proposée se calcule à la date et à l'heure saisies dans le formulaire : une prise ajoutée au 12 août se juge parmi ses voisines du 12 août.",
+   "origine": "suggestInjectionSite accepte un instant `at`, mais InjectionsTracker l'appelle à maintenant (arbitrage consigné dans le code, marqué dans le chapitre)."
+  },
+  {
+   "categorie": "amélioration",
+   "fonctionnalite": "Résumer le traitement en cours sur la home",
+   "texte": "Le clic sur « Actif » du carré et sur la tuile « En direct » sans surimpression fait défiler la page Injections jusqu'au graphe.",
+   "origine": "La cible 'plot' met autoOpenPkPlot à vrai, que BloodLevelPlot ne lit pas ; seul handleGraphNavigate (tiroir Tendances) fait défiler jusqu'à blood-level-plot-section."
+  },
+  {
+   "categorie": "règle plausible",
+   "fonctionnalite": "Saisir une prise (injection ou comprimé)",
+   "texte": "La troisième prise d'un même jour est refusée plutôt que d'écraser la dernière.",
+   "origine": "Le sommeil et les repas refusent (règle du 2026-08-17 citée dans useAppData : « RIEN AU MONDE ne devrait détruire la donnée ») ; les injections écrasent encore via addLogWithinDailyCap(cap 2)."
+  },
+  {
+   "categorie": "fonctionnalité supposée",
+   "fonctionnalite": "Résumer le traitement en cours sur la home",
+   "texte": "Une tuile « Prochaine injection : Aujourd'hui / Demain / Dans N jours / En retard de N j ».",
+   "origine": "App.tsx calcule nextDoseMessage (dernière prise passée + 7 jours) et lastDose, sans aucun affichage : code mort. Non rapporté comme écran."
+  },
+  {
+   "categorie": "fonctionnalité supposée",
+   "fonctionnalite": "Proposer la zone d'injection",
+   "texte": "Une cartographie corporelle des zones et une zone « recommandée » (jamais utilisée, sinon la plus ancienne).",
+   "origine": "getRecommendedSite, computeSiteStats.stats, BODY_MAP_SITES et showMap existent sans affichage en Mixte ; la cartographie a été retirée le 2026-08-09. Cités seulement dans le bloc repliable comme « calculés, plus affichés »."
+  },
+  {
+   "categorie": "règle plausible",
+   "fonctionnalite": "Valider la dose",
+   "texte": "Une dose au-delà de la « Dose max » de la fiche déclenche un avertissement.",
+   "origine": "Le suffixe « (Dose max) » le suggère ; seule RULE_DOSE (0,001–1 000 000 mg) refuse. Le chapitre dit que le suffixe informe."
+  },
+  {
+   "categorie": "amélioration",
+   "fonctionnalite": "Résumer le traitement en cours sur la home",
+   "texte": "Le carré traitement de la home standard écarte les prises futures comme le fait la série de la home sections.",
+   "origine": "Maison.tsx lit currentTreatmentInjections sans filtre hasOccurred ; MaisonSections lit currentTreatmentSeries (filtrée). Doute de l'inventaire ; la V2 ne tranche pas."
+  },
+  {
+   "categorie": "règle V2 supposée",
+   "fonctionnalite": "Certifier un essai clinique",
+   "texte": "La certification d'essai clinique est aussi demandée dans l'onboarding V2 pour le rétatrutide.",
+   "origine": "Le catalogue V2 (src/domaine/traitements.ts) n'a pas de drapeau requiresTrialCertification et l'écran « Quel traitement » valide le rétatrutide comme les autres. Le chapitre décrit la V2 telle quelle."
+  },
+  {
+   "categorie": "détail non vérifié",
+   "fonctionnalite": "Modifier une prise",
+   "texte": "Les gestes exacts de validation en place (Entrée, sortie de champ, Échap) dans la ligne du journal et la bulle du calendrier.",
+   "origine": "Composants partagés (useInlineEditableLog, InlineEditableDate/Time/Note, NumberField) lus par extraits dans l'inventaire ; le chapitre dit « s'édite en place » sans nommer le geste."
+  },
+  {
+   "categorie": "détail non vérifié",
+   "fonctionnalite": "Filtrer le journal par période",
+   "texte": "Le format exact des bornes « du … au … » (JJ/MM/AAAA ou JJ/MM) dans le bandeau du journal et du graphe.",
+   "origine": "InlineCustomDateRange et PeriodBounds non lus ; les légendes de capture évitent d'écrire ces bornes."
+  }
+ ],
+ "glossaire": [
+  {
+   "terme": "Prise",
+   "definition": "Une injection ou un comprimé enregistré au journal : identifiant, date, heure, dose en mg, zone, notes, identifiant du traitement."
+  },
+  {
+   "terme": "Traitement (fiche)",
+   "definition": "Entrée du catalogue, référencée par un identifiant stable ; porte nom, forme, molécule, paliers, demi-vies, biodisponibilité relative et rythme usuel."
+  },
+  {
+   "terme": "Forme",
+   "definition": "Injection ou oral (comprimé) ; commande les mots, l'icône, la zone et la fenêtre du pic."
+  },
+  {
+   "terme": "Molécule",
+   "definition": "Principe actif de la fiche (sémaglutide, tirzépatide, liraglutide, dulaglutide, rétatrutide, orforglipron) ; clé de cumul du niveau sanguin. Les fiches « Autre traitement » n'en ont pas."
+  },
+  {
+   "terme": "Pas de traitement",
+   "definition": "État « aucun », valeur par défaut du profil ; ce n'est pas une fiche du catalogue."
+  },
+  {
+   "terme": "Certification d'essai clinique",
+   "definition": "Case à cocher et bouton Valider exigés pour choisir le rétatrutide."
+  },
+  {
+   "terme": "Palier de dose",
+   "definition": "Dose usuelle proposée par la fiche (« Initiation », « Dose max ») ; dans l'escalier, suite de prises consécutives de même dose."
+  },
+  {
+   "terme": "Zone d'injection",
+   "definition": "L'une des six zones corporelles (abdomen, cuisse, bras ; gauche ou droit) ; « Prise Orale » pour un comprimé."
+  },
+  {
+   "terme": "Zone proposée",
+   "definition": "Zone tirée au sort hors de celles des prises voisines d'avant et d'après."
+  },
+  {
+   "terme": "Minutes rondes",
+   "definition": "0, 10, 15, 20, 30, 40, 45, 50 ; toute heure enregistrée y est ramenée vers le bas."
+  },
+  {
+   "terme": "Plafond quotidien",
+   "definition": "Deux prises par jour ; la troisième remplace la dernière du jour, avec un avis."
+  },
+  {
+   "terme": "Niveau sanguin actif",
+   "definition": "Concentration estimée en mg, somme des courbes de chaque prise d'une molécule à l'instant présent ; « En direct » sur le graphe."
+  },
+  {
+   "terme": "Modèle de Bateman",
+   "definition": "Courbe d'une dose à un compartiment : montée par absorption, descente par élimination ; le pic vaut la dose × biodisponibilité à tMax."
+  },
+  {
+   "terme": "Demi-vie",
+   "definition": "Temps pour éliminer la moitié de ce qui circule (168 h pour Ozempic, 13 h pour Saxenda, 36 h pour Foundayo)."
+  },
+  {
+   "terme": "tMax",
+   "definition": "Délai entre une prise isolée et son pic (≈ 57 h pour Ozempic, ≈ 1 h pour Rybelsus)."
+  },
+  {
+   "terme": "Biodisponibilité relative (doseScale)",
+   "definition": "Part de la dose qui compte sur la courbe ; 1 pour une injection, 0,008 pour le sémaglutide oral."
+  },
+  {
+   "terme": "Pic",
+   "definition": "Sommet de la courbe cumulée des prises faites ; annoncé « pic en cours », « prochain pic dans … », « dernier pic il y a … »."
+  },
+  {
+   "terme": "État d'équilibre",
+   "definition": "Niveau autour duquel la courbe ondule après quatre à cinq demi-vies à rythme constant (~4 semaines pour Ozempic)."
+  },
+  {
+   "terme": "Résiduel",
+   "definition": "Molécule encore active d'un traitement qui n'est plus celui du profil ; son graphe suit celui du traitement en cours."
+  },
+  {
+   "terme": "Série du traitement en cours",
+   "definition": "Prises du traitement du profil depuis le dernier changement de traitement ; sur la home sections, prises faites seulement."
+  },
+  {
+   "terme": "Coupure au changement de traitement",
+   "definition": "Revenir à un traitement déjà pris ne rouvre pas son ancien épisode ; les lignes passées gardent leur identifiant."
+  },
+  {
+   "terme": "Semaine de cure (traitement)",
+   "definition": "Jours écoulés depuis la première prise de la série ÷ 7, plus un."
+  },
+  {
+   "terme": "Fenêtre (période)",
+   "definition": "7, 14, 30, 90 derniers jours, depuis le début, ou bornes choisies ; mémorisée par journal et par molécule."
+  },
+  {
+   "terme": "Escalier des doses",
+   "definition": "Frise des paliers de la série en cours : date, dose, durée, nombre de prises, variation de poids hebdomadaire."
+  },
+  {
+   "terme": "Module Traitement",
+   "definition": "Interrupteur du suivi ; éteint, l'onglet, la ligne « Cure », le carré et l'entrée « + » disparaissent."
+  },
+  {
+   "terme": "Rappel d'injection",
+   "definition": "Réglage hebdomadaire (jour, heure) ou tous les N jours (date de départ, heure), enregistré au profil ; aucun envoi."
+  },
+  {
+   "terme": "Ajout rapide",
+   "definition": "Ouverture de la page avec le formulaire déjà ouvert : menu « + », carré non commencé, « Ajouter une entrée », « + » flottant."
+  },
+  {
+   "terme": "Surimpression",
+   "definition": "Couche vitrée par-dessus la home : « Niveau sanguin actif », « L'escalier des doses »."
+  }
+ ],
+ "index": [
+  {
+   "terme": "Page Injections / Comprimés",
+   "ancre": "#traitement-page-injections-comprimes"
+  },
+  {
+   "terme": "Menu « + » (entrée traitement)",
+   "ancre": "#traitement-page-injections-comprimes"
+  },
+  {
+   "terme": "Cible « plot »",
+   "ancre": "#traitement-page-injections-comprimes"
+  },
+  {
+   "terme": "Bloc de suivi des prises",
+   "ancre": "#traitement-bloc-de-suivi-des-prises"
+  },
+  {
+   "terme": "Journal des prises",
+   "ancre": "#traitement-bloc-de-suivi-des-prises"
+  },
+  {
+   "terme": "Période (7, 14, 30, 90 jours, Choisir)",
+   "ancre": "#traitement-bloc-de-suivi-des-prises"
+  },
+  {
+   "terme": "Bascule Journal / Calendrier",
+   "ancre": "#traitement-bloc-de-suivi-des-prises"
+  },
+  {
+   "terme": "« + » flottant",
+   "ancre": "#traitement-bloc-de-suivi-des-prises"
+  },
+  {
+   "terme": "Tout supprimer",
+   "ancre": "#traitement-bloc-de-suivi-des-prises"
+  },
+  {
+   "terme": "Bandeau de confirmation",
+   "ancre": "#traitement-bloc-de-suivi-des-prises"
+  },
+  {
+   "terme": "Changement de traitement",
+   "ancre": "#traitement-bloc-indiquer-un-changement-de-traitement"
+  },
+  {
+   "terme": "Traitement mis à jour",
+   "ancre": "#traitement-bloc-indiquer-un-changement-de-traitement"
+  },
+  {
+   "terme": "Sélecteur de traitement",
+   "ancre": "#traitement-selecteur-de-traitement"
+  },
+  {
+   "terme": "Catalogue des traitements",
+   "ancre": "#traitement-selecteur-de-traitement"
+  },
+  {
+   "terme": "Pas de traitement",
+   "ancre": "#traitement-selecteur-de-traitement"
+  },
+  {
+   "terme": "Rétatrutide (certification)",
+   "ancre": "#traitement-selecteur-de-traitement"
+  },
+  {
+   "terme": "Migration des libellés",
+   "ancre": "#traitement-selecteur-de-traitement"
+  },
+  {
+   "terme": "Onboarding V2 (traitement)",
+   "ancre": "#traitement-selecteur-de-traitement"
+  },
+  {
+   "terme": "Formulaire de prise",
+   "ancre": "#traitement-formulaire-de-prise"
+  },
+  {
+   "terme": "Zone d'injection",
+   "ancre": "#traitement-formulaire-de-prise"
+  },
+  {
+   "terme": "Zone proposée",
+   "ancre": "#traitement-formulaire-de-prise"
+  },
+  {
+   "terme": "Avertissement même zone",
+   "ancre": "#traitement-formulaire-de-prise"
+  },
+  {
+   "terme": "Minutes rondes",
+   "ancre": "#traitement-formulaire-de-prise"
+  },
+  {
+   "terme": "Règle de dose",
+   "ancre": "#traitement-formulaire-de-prise"
+  },
+  {
+   "terme": "Plafond quotidien",
+   "ancre": "#traitement-formulaire-de-prise"
+  },
+  {
+   "terme": "Limite atteinte",
+   "ancre": "#traitement-formulaire-de-prise"
+  },
+  {
+   "terme": "Prise future",
+   "ancre": "#traitement-formulaire-de-prise"
+  },
+  {
+   "terme": "Sélecteur de dose",
+   "ancre": "#traitement-selecteur-de-dose"
+  },
+  {
+   "terme": "Paliers (Initiation, Dose max)",
+   "ancre": "#traitement-selecteur-de-dose"
+  },
+  {
+   "terme": "Autre dose",
+   "ancre": "#traitement-selecteur-de-dose"
+  },
+  {
+   "terme": "Ligne du journal",
+   "ancre": "#traitement-ligne-du-journal"
+  },
+  {
+   "terme": "Édition en place",
+   "ancre": "#traitement-ligne-du-journal"
+  },
+  {
+   "terme": "Supprimer une prise",
+   "ancre": "#traitement-ligne-du-journal"
+  },
+  {
+   "terme": "Calendrier des prises",
+   "ancre": "#traitement-calendrier-des-prises"
+  },
+  {
+   "terme": "Bulle du calendrier",
+   "ancre": "#traitement-calendrier-des-prises"
+  },
+  {
+   "terme": "Dose arrondie (tuile)",
+   "ancre": "#traitement-calendrier-des-prises"
+  },
+  {
+   "terme": "Niveau sanguin actif",
+   "ancre": "#traitement-niveau-sanguin-actif"
+  },
+  {
+   "terme": "Molécule active",
+   "ancre": "#traitement-niveau-sanguin-actif"
+  },
+  {
+   "terme": "Actif résiduel",
+   "ancre": "#traitement-niveau-sanguin-actif"
+  },
+  {
+   "terme": "Simulateur Pharmacocinétique",
+   "ancre": "#traitement-niveau-sanguin-actif"
+  },
+  {
+   "terme": "Graphe Niveau Sanguin Actif",
+   "ancre": "#traitement-graphe-niveau-sanguin-actif"
+  },
+  {
+   "terme": "En direct (mg)",
+   "ancre": "#traitement-graphe-niveau-sanguin-actif"
+  },
+  {
+   "terme": "Pic (phrase du pic)",
+   "ancre": "#traitement-graphe-niveau-sanguin-actif"
+  },
+  {
+   "terme": "Bateman",
+   "ancre": "#traitement-graphe-niveau-sanguin-actif"
+  },
+  {
+   "terme": "Biodisponibilité relative (doseScale)",
+   "ancre": "#traitement-graphe-niveau-sanguin-actif"
+  },
+  {
+   "terme": "Étiquette de dose",
+   "ancre": "#traitement-graphe-niveau-sanguin-actif"
+  },
+  {
+   "terme": "Infobulle",
+   "ancre": "#traitement-graphe-niveau-sanguin-actif"
+  },
+  {
+   "terme": "Évolution du niveau sanguin",
+   "ancre": "#traitement-accordeon-evolution-du-niveau-sanguin"
+  },
+  {
+   "terme": "Demi-vie",
+   "ancre": "#traitement-accordeon-evolution-du-niveau-sanguin"
+  },
+  {
+   "terme": "Creux à l'équilibre",
+   "ancre": "#traitement-accordeon-evolution-du-niveau-sanguin"
+  },
+  {
+   "terme": "Comprendre vos sensations physiologiques",
+   "ancre": "#traitement-accordeon-comprendre-vos-sensations-physiologiques"
+  },
+  {
+   "terme": "État d'équilibre",
+   "ancre": "#traitement-accordeon-comprendre-vos-sensations-physiologiques"
+  },
+  {
+   "terme": "Tuile En direct",
+   "ancre": "#traitement-tuile-en-direct-du-niveau-sanguin"
+  },
+  {
+   "terme": "Voir détail",
+   "ancre": "#traitement-tuile-en-direct-du-niveau-sanguin"
+  },
+  {
+   "terme": "Carré traitement",
+   "ancre": "#traitement-carre-traitement"
+  },
+  {
+   "terme": "Semaine de cure",
+   "ancre": "#traitement-carre-traitement"
+  },
+  {
+   "terme": "Initial / Actuel / Actif",
+   "ancre": "#traitement-carre-traitement"
+  },
+  {
+   "terme": "Série du traitement en cours",
+   "ancre": "#traitement-carre-traitement"
+  },
+  {
+   "terme": "Coupure au changement de traitement",
+   "ancre": "#traitement-carre-traitement"
+  },
+  {
+   "terme": "mg cumulé",
+   "ancre": "#traitement-carre-traitement"
+  },
+  {
+   "terme": "Côte à côte",
+   "ancre": "#traitement-cote-a-cote"
+  },
+  {
+   "terme": "Escalier des doses",
+   "ancre": "#traitement-escalier-des-doses"
+  },
+  {
+   "terme": "Palier (durée, prises, kg / semaine)",
+   "ancre": "#traitement-escalier-des-doses"
+  },
+  {
+   "terme": "Ligne Cure",
+   "ancre": "#traitement-ligne-cure-du-bloc-salut"
+  },
+  {
+   "terme": "Médicament prescrit",
+   "ancre": "#traitement-ligne-cure-du-bloc-salut"
+  },
+  {
+   "terme": "Module Traitement",
+   "ancre": "#traitement-module-et-rappels"
+  },
+  {
+   "terme": "Rappels d'injection",
+   "ancre": "#traitement-module-et-rappels"
+  },
+  {
+   "terme": "Tiroir Journal (initiales de zone)",
+   "ancre": "#traitement-ailleurs"
+  },
+  {
+   "terme": "Fréquence des prises",
+   "ancre": "#traitement-ailleurs"
+  },
+  {
+   "terme": "Rapport PDF (traitement)",
+   "ancre": "#traitement-ailleurs"
+  },
+  {
+   "terme": "Partage d'une injection",
+   "ancre": "#traitement-ailleurs"
+  }
+ ],
+ "ecrans_illustres": [
+  "traitement/page-injections-comprimes",
+  "traitement/bloc-de-suivi-des-prises-injectiontracker",
+  "traitement/bloc-indiquer-un-changement-de-traitement-changetreatmentblo",
+  "traitement/selecteur-de-traitement-treatmentselect",
+  "traitement/formulaire-nouvelle-injection-nouvelle-prise-de-comprime-mod",
+  "traitement/selecteur-de-dose-doseselector",
+  "traitement/ligne-du-journal-journalentrycard",
+  "traitement/calendrier-des-prises-injectioncalendar-sur-calendarblock",
+  "traitement/niveau-sanguin-actif-bloodlevelplot",
+  "traitement/graphe-niveau-sanguin-actif-moleculeconcentrationchart",
+  "traitement/accordeon-evolution-du-niveau-sanguin",
+  "traitement/accordeon-comprendre-vos-sensations-physiologiques",
+  "traitement/tuile-en-direct-du-niveau-sanguin-home-sections",
+  "traitement/carre-traitement-home-sections-et-home-standard",
+  "traitement/cote-a-cote-mini-tuiles-debut-actuel-du-dosage",
+  "traitement/surimpression-l-escalier-des-doses-surimpressiondoses",
+  "traitement/ligne-cure-du-bloc-salut",
+  "traitement/module-injections-comprime-et-rappels-notificationssettings"
+ ]
+}

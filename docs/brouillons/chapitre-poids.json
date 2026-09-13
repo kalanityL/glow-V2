@@ -1,0 +1,325 @@
+{
+ "inventions": [
+  {
+   "categorie": "Onboarding V2",
+   "fonctionnalite": "Tenir le poids de départ",
+   "texte": "Le poids actuel saisi à l'onboarding V2 devient la pesée de départ du journal.",
+   "origine": "keepStartingOnOldest fait de la première pesée d'un historique vide le départ, mais rien n'enregistre les réponses de l'onboarding (GUIDELINES § 5) : le lien n'est écrit nulle part."
+  },
+  {
+   "categorie": "Poids visé",
+   "fonctionnalite": "Fixer le poids visé",
+   "texte": "Un poids visé supérieur au poids actuel ou au poids de départ est refusé.",
+   "origine": "Les arcs et la barre affichent ce cas avec un « + » ou 0 % ; aucun refus n'existe, et la V2 dit seulement que les deux valeurs ne sont jamais liées."
+  },
+  {
+   "categorie": "Poids de départ",
+   "fonctionnalite": "Tenir le poids de départ",
+   "texte": "Demander la date de la première pesée à l'onboarding.",
+   "origine": "La V1 simulait cette question (OnboardingPage) ; la V2 ne la pose pas ; la date par défaut (la veille) reste un arbitrage non validé."
+  },
+  {
+   "categorie": "Mensurations",
+   "fonctionnalite": "Saisir des mensurations",
+   "texte": "Une courbe des tours de poitrine, taille et hanches sous la courbe de poids.",
+   "origine": "useWeightTreatmentChart porte ces trois mesures dans ses points à midi, mais aucun rendu lu ne les affiche."
+  },
+  {
+   "categorie": "Unités",
+   "fonctionnalite": "Consulter le journal des pesées",
+   "texte": "Affichage des pesées en livres quand le système impérial est choisi.",
+   "origine": "UserProfile.measurementSystem existe sans interface en V1 ; la V2 fixe la règle (stockage métrique, affichage selon le système) mais n'a pas d'écran de pesée."
+  },
+  {
+   "categorie": "IMC",
+   "fonctionnalite": "Calculer et afficher l'IMC",
+   "texte": "Une seule table de libellés de catégories d'IMC.",
+   "origine": "Deux jeux coexistent : bmiCategoryLabel (« Obésité I ») sur la ligne IMC du carré, getBmiTierInfo (« Obésité modérée (Classe I) ») dans le bloc palier ; l'unifier serait une amélioration."
+  },
+  {
+   "categorie": "Confirmation",
+   "fonctionnalite": "Confirmer et fêter une pesée",
+   "texte": "Le poids de la carte de confirmation écrit avec un point comme le reste du site.",
+   "origine": "La carte écrit « 84,5 kg » (toFixed(1).replace('.', ',')) alors que format1Dec écrit un point partout ailleurs ; constaté dans l'inventaire, non tranché."
+  },
+  {
+   "categorie": "Menu +",
+   "fonctionnalite": "Suivre la progression vers l'objectif",
+   "texte": "La perte du menu « + » calculée sur la pesée la plus récente par date.",
+   "origine": "PlusMenu prend weightHistory[length − 1] ; l'ordre stocké cesse de suivre les dates après une modification (updateWeighIn ne retrie pas). Le chapitre décrit le comportement réel."
+  },
+  {
+   "categorie": "Rappels",
+   "fonctionnalite": "Enregistrer une pesée",
+   "texte": "Un rappel de pesée hebdomadaire.",
+   "origine": "Aucun rappel de pesée n'existe ; seuls les rappels d'injection et de rendez-vous se configurent."
+  },
+  {
+   "categorie": "Courbe de poids",
+   "fonctionnalite": "Visualiser la courbe de poids",
+   "texte": "Le message de données insuffisantes sans la mention du « tramage de dose de GLP-1 ».",
+   "origine": "Le texte cite encore le GLP-1 alors que MONTRER_GLP1 = false ; le chapitre le signale comme un fait, la correction serait une décision."
+  },
+  {
+   "categorie": "Surimpression IMC",
+   "fonctionnalite": "Calculer et afficher l'IMC",
+   "texte": "Nommer les bandes insuffisance pondérale, corpulence normale et obésité III sur l'échelle.",
+   "origine": "Trois bandes sur six sont sans mot depuis le retrait de la ligne de classe ; l'arbitrage est consigné dans SurimpressionImc, pas décidé."
+  }
+ ],
+ "glossaire": [
+  {
+   "terme": "Pesée",
+   "definition": "Une ligne du journal : date AAAA-MM-JJ, heure HH:MM aux minutes rondes, poids en kg à une décimale, neuf mensurations facultatives en cm."
+  },
+  {
+   "terme": "Poids de départ",
+   "definition": "La pesée qui porte le drapeau isStartingWeight ; toujours la plus ancienne du journal ; ne se supprime pas."
+  },
+  {
+   "terme": "Poids visé (objectif)",
+   "definition": "profile.targetWeight, en kg, arrondi au dixième ; référence de la barre de progression et des arcs."
+  },
+  {
+   "terme": "Mensurations",
+   "definition": "Neuf tours en cm attachés à une pesée : poitrine, taille, hanches, bras, sous-poitrine, fesses, cuisses, genoux, mollets."
+  },
+  {
+   "terme": "Journal",
+   "definition": "La liste des pesées de la période choisie, la plus récente en tête, chaque ligne éditable en place."
+  },
+  {
+   "terme": "Calendrier",
+   "definition": "La grille mensuelle des pesées, une tuile par jour, ajout sur jour vide seulement."
+  },
+  {
+   "terme": "Cadence",
+   "definition": "L'histogramme de la perte par semaine avec son bilan de période (total, % du poids de début, moyenne par semaine)."
+  },
+  {
+   "terme": "Courbe de poids",
+   "definition": "La courbe lissée des pesées sur une fenêtre, prolongée à plat jusqu'à aujourd'hui."
+  },
+  {
+   "terme": "Période",
+   "definition": "Fenêtre 7, 14, 30 ou 90 derniers jours, Depuis le début, ou bornes choisies ; mémorisée par bloc ; défaut 30 jours."
+  },
+  {
+   "terme": "Minutes rondes",
+   "definition": "0, 10, 15, 20, 30, 40, 45, 50 : toute heure enregistrée est ramenée à la plus grande minute ronde inférieure ou égale."
+  },
+  {
+   "terme": "Une pesée par jour",
+   "definition": "Règle du journal : un ajout sur un jour pris remplace la ligne du jour ; pour les calculs, la dernière pesée du jour fait foi."
+  },
+  {
+   "terme": "IMC",
+   "definition": "Poids en kg divisé par la taille en mètres au carré, arrondi au dixième ; 0 sans taille."
+  },
+  {
+   "terme": "Palier d'IMC",
+   "definition": "L'une des six classes : insuffisance pondérale (< 18,5), corpulence normale, surpoids (≥ 25), obésité I (≥ 30), II (≥ 35), III (≥ 40)."
+  },
+  {
+   "terme": "Cap franchi",
+   "definition": "Un seuil d'IMC (18,5 · 25 · 30 · 35 · 40) traversé entre l'IMC du départ et celui d'aujourd'hui."
+  },
+  {
+   "terme": "Points d'IMC",
+   "definition": "(actuel − départ) / taille², arrondi sur la différence ; négatif quand le poids descend."
+  },
+  {
+   "terme": "Semaine de cure",
+   "definition": "Rang de la semaine depuis la date de la pesée de départ : jours écoulés ÷ 7 + 1."
+  },
+  {
+   "terme": "Perte totale / dernière perte",
+   "definition": "Départ − actuel ; avant-dernière pesée − dernière pesée, par dates."
+  },
+  {
+   "terme": "Équivalence insolite",
+   "definition": "Une perte traduite en objets du quotidien, avec dessin et texte (chapitre 16)."
+  },
+  {
+   "terme": "Surimpression",
+   "definition": "Couche vitrée ouverte par-dessus la home sections (Balance, Où en est l'IMC)."
+  },
+  {
+   "terme": "Home standard / home sections",
+   "definition": "Les deux gabarits d'accueil ; le carré poids vit sur la première, la rangée Progrès et les surimpressions sur la seconde."
+  },
+  {
+   "terme": "Tiroirs Journal et Tendances",
+   "definition": "Les panneaux du menu simplifié : le premier liste les pesées, le second montre la tendance sur 14 jours."
+  }
+ ],
+ "index": [
+  {
+   "terme": "Page Balance",
+   "ancre": "poids-page-balance-onglet-history"
+  },
+  {
+   "terme": "Formulaire de pesée",
+   "ancre": "poids-formulaire-nouvelle-saisie-modifier-la-saisie"
+  },
+  {
+   "terme": "Mensurations",
+   "ancre": "poids-formulaire-nouvelle-saisie-modifier-la-saisie"
+  },
+  {
+   "terme": "Une pesée par jour",
+   "ancre": "poids-formulaire-nouvelle-saisie-modifier-la-saisie"
+  },
+  {
+   "terme": "Minutes rondes",
+   "ancre": "poids-formulaire-nouvelle-saisie-modifier-la-saisie"
+  },
+  {
+   "terme": "Bornes de saisie du poids",
+   "ancre": "poids-formulaire-nouvelle-saisie-modifier-la-saisie"
+  },
+  {
+   "terme": "Confirmation de pesée",
+   "ancre": "poids-carte-de-confirmation-de-pesee-equivalences-insolites"
+  },
+  {
+   "terme": "Équivalences insolites",
+   "ancre": "poids-carte-de-confirmation-de-pesee-equivalences-insolites"
+  },
+  {
+   "terme": "Journal des pesées",
+   "ancre": "poids-journal-des-pesees"
+  },
+  {
+   "terme": "Poids de départ",
+   "ancre": "poids-journal-des-pesees"
+  },
+  {
+   "terme": "Tout supprimer (pesées)",
+   "ancre": "poids-journal-des-pesees"
+  },
+  {
+   "terme": "Calendrier des poids",
+   "ancre": "poids-calendrier-des-poids"
+  },
+  {
+   "terme": "Cadence",
+   "ancre": "poids-histogramme-cadence-perte-par-semaine"
+  },
+  {
+   "terme": "Perte par semaine",
+   "ancre": "poids-histogramme-cadence-perte-par-semaine"
+  },
+  {
+   "terme": "Courbe de poids",
+   "ancre": "poids-graphe-courbe-de-poids"
+  },
+  {
+   "terme": "Période",
+   "ancre": "poids-page-balance-onglet-history"
+  },
+  {
+   "terme": "Surimpression Balance",
+   "ancre": "poids-surimpression-balance-bloc-suivi-du-poids-variante-surimpres"
+  },
+  {
+   "terme": "Semaine de cure",
+   "ancre": "poids-surimpression-balance-bloc-suivi-du-poids-variante-surimpres"
+  },
+  {
+   "terme": "Arcs Départ / Actuel / Objectif",
+   "ancre": "poids-surimpression-balance-bloc-suivi-du-poids-variante-surimpres"
+  },
+  {
+   "terme": "Reprise de poids",
+   "ancre": "poids-surimpression-balance-bloc-suivi-du-poids-variante-surimpres"
+  },
+  {
+   "terme": "Carré poids (home standard)",
+   "ancre": "poids-carre-poids-de-la-home-standard-semaine-n-n"
+  },
+  {
+   "terme": "IMC",
+   "ancre": "poids-carre-poids-de-la-home-standard-semaine-n-n"
+  },
+  {
+   "terme": "Rangée Progrès",
+   "ancre": "poids-rangee-progres-evolution-de-la-home-sections"
+  },
+  {
+   "terme": "Points d'IMC",
+   "ancre": "poids-rangee-progres-evolution-de-la-home-sections"
+  },
+  {
+   "terme": "Début | aujourd'hui",
+   "ancre": "poids-sous-section-debut-aujourd-hui-poids-home-sections"
+  },
+  {
+   "terme": "Poids visé",
+   "ancre": "poids-bloc-salut-objectif-de-poids-et-barre-de-progression"
+  },
+  {
+   "terme": "Progression vers l'objectif",
+   "ancre": "poids-bloc-salut-objectif-de-poids-et-barre-de-progression"
+  },
+  {
+   "terme": "Objectif perdre / stabiliser (V2)",
+   "ancre": "poids-bloc-salut-objectif-de-poids-et-barre-de-progression"
+  },
+  {
+   "terme": "Échelle d'IMC",
+   "ancre": "poids-surimpression-ou-en-est-l-imc"
+  },
+  {
+   "terme": "Cap franchi",
+   "ancre": "poids-surimpression-ou-en-est-l-imc"
+  },
+  {
+   "terme": "Palier d'IMC",
+   "ancre": "poids-bloc-nouveau-palier-imc-atteint-vigilance-imc"
+  },
+  {
+   "terme": "Vigilance IMC",
+   "ancre": "poids-bloc-nouveau-palier-imc-atteint-vigilance-imc"
+  },
+  {
+   "terme": "Tiroir Journal",
+   "ancre": "poids-tiroir-journal-pesees"
+  },
+  {
+   "terme": "Tiroir Tendances",
+   "ancre": "poids-tiroir-tendances-carte-balance-et-son-graphe-en-surimpressio"
+  },
+  {
+   "terme": "Profil : poids de départ et objectif",
+   "ancre": "poids-page-mon-profil-taille-poids-de-depart-objectif-final"
+  },
+  {
+   "terme": "Onboarding V2 : poids actuel et poids visé",
+   "ancre": "poids-page-mon-profil-taille-poids-de-depart-objectif-final"
+  },
+  {
+   "terme": "Poids actif à une date",
+   "ancre": "poids-page-mon-profil-taille-poids-de-depart-objectif-final"
+  }
+ ],
+ "ecrans_illustres": [
+  "poids/page-balance-onglet-history",
+  "poids/formulaire-nouvelle-saisie-modifier-la-saisie",
+  "poids/carte-de-confirmation-de-pesee-equivalences-insolites",
+  "poids/journal-des-pesees",
+  "poids/calendrier-des-poids",
+  "poids/histogramme-cadence-perte-par-semaine",
+  "poids/graphe-courbe-de-poids",
+  "poids/surimpression-balance-bloc-suivi-du-poids-variante-surimpres",
+  "poids/carre-poids-de-la-home-standard-semaine-n-n",
+  "poids/rangee-progres-evolution-de-la-home-sections",
+  "poids/sous-section-debut-aujourd-hui-poids-home-sections",
+  "poids/bloc-salut-objectif-de-poids-et-barre-de-progression",
+  "poids/surimpression-ou-en-est-l-imc",
+  "poids/bloc-nouveau-palier-imc-atteint-vigilance-imc",
+  "poids/tiroir-journal-pesees",
+  "poids/tiroir-tendances-carte-balance-et-son-graphe-en-surimpressio",
+  "poids/page-mon-profil-taille-poids-de-depart-objectif-final"
+ ]
+}

@@ -1,0 +1,184 @@
+<section id="profil">
+  <h2>19. Profil, avatar, compte, avis, sondage, FAQ, légal <a class="retour" href="#sommaire">↑ sommaire</a></h2>
+  <p>Ce domaine réunit ce que l'utilisatrice règle sur elle-même — profil, avatar, compte — et ce qu'elle échange avec l'équipe : avis, sondage, FAQ, information médicale. Tout part de l'onglet « Configuration &amp; Plus » du menu du bas ou de la section « GLP1LOW et vous » du panneau « + ». Le profil reste sur l'appareil ; seuls les avis et le sondage partent en base, sans aucune donnée de santé.</p>
+
+  <h3 id="profil-configuration-plus">Configuration &amp; Plus</h3>
+  <figure class="telephone" data-capture="profil-compte/page-configuration-plus-plusmenu"><figcaption>L'aperçu de Camille : avatar, « Camille », étiquette « Ozempic », « -4.6 kg », « 1 mg », puis les entrées et la notice.</figcaption></figure>
+  <p>Onglet « plus » du menu du bas. Une carte d'aperçu : avatar (44 px), prénom, nom court du traitement, perte de poids « -X.X kg » (poids de départ moins dernière pesée, une décimale, point décimal tel que le code l'écrit), dose en mg de la dernière injection passée, bouton « Mon profil ». Historique vide : « -0 kg » ; aucune injection : « N/A ». La V2 tait une valeur absente. <span class="marque v2">V2</span> Dessous, les entrées Modules, Notifications, Avis &amp; Feedbacks, Sondage, Sécurité, Avertissements &amp; Confidentialité (ouvre la page légale) et Social (ouvre <code>/social/carte.html</code> dans un nouvel onglet). En pied : « © 2026 HOPTID-GLP1LOW — Conçu pour votre confort. » et « Ce service sauvegarde vos données localement sur votre téléphone. Il ne remplace pas une ordonnance médicale. » Mon compte, Avis et Feedback, Sondage et FAQ s'atteignent aussi par la section « GLP1LOW et vous » du panneau « + ».</p>
+  <details><summary>Les règles derrière les chiffres</summary>
+    <ul>
+      <li>Perte = poids de la pesée marquée départ (0 si absente) moins la dernière entrée de l'historique ; dernière injection = la plus récente passée, sinon la plus récente de toutes. <a href="spec-technique.html#profil-apercu-profil-du-plusmenu">→ technique</a></li>
+      <li>Le poids de départ affiché vient de la pesée marquée départ, sinon 95 kg semés à l'installation. <a href="spec-technique.html#profil-poids-de-depart-affiche">→ technique</a></li>
+      <li>Titres de page : « Configuration &amp; Plus », « Mon Profil », « Mon compte », « Avis et Feedback », « Sondage », « FAQ ». <a href="spec-technique.html#profil-navigation-vers-mon-profil">→ technique</a></li>
+    </ul>
+  </details>
+  <div class="exemple"><p>Camille est partie de 96 kg ; sa dernière pesée est 91,4 kg : la carte écrit « -4.6 kg ». Sa dernière injection d'Ozempic est à 1 mg : « 1 mg ».</p></div>
+
+  <h3 id="profil-mon-profil">Mon Profil — récapitulatif</h3>
+  <figure class="telephone" data-capture="profil-compte/page-mon-profil-bloc-recapitulatif"><figcaption>Le récapitulatif de Camille : Camille, Ozempic, 48 ans, 168 cm, 96 kg de départ, objectif final 80 kg.</figcaption></figure>
+  <p>Onglet « settings », titre « Mon Profil » ; on y arrive par le bouton « Mon profil » de Configuration &amp; Plus ou par l'avatar du header. Six cases : Prénom ou Pseudo (placeholder « Ex: Sophie »), Médicament prescrit, Âge (ans), Taille (cm), Poids de départ (kg), Objectif final (kg). Cliquer une valeur ouvre un champ à sa place ; il s'enregistre quand il perd le focus ou sur Entrée. Une saisie refusée n'est pas enregistrée : la case revient à la valeur enregistrée et un message dit ce qui est attendu, effacé dès que la frappe redevient acceptable. Le médicament se choisit dans le catalogue (Stylos Injectables, Comprimés Oraux, puis « Pas de traitement ») ; cliquer une option enregistre ; le rétatrutide exige de cocher une certification d'essai clinique avant Valider. Le poids de départ n'est pas un champ du profil : c'est la pesée marquée départ, que la case modifie ou crée. Le bouton « … » ouvre le formulaire complet. La page ne rend aucun bouton de retour : on la quitte par le menu du bas, où l'onglet surligné est « plus ». En bas, le lien « Mes préférences de compte » mène à Mon compte.</p>
+  <p>La V2 recueille ces valeurs à l'onboarding, par roues bornées et sans saisie libre : l'année de naissance (défaut 1980) remplace l'âge ; taille défaut 165 cm ; bornes 1 à 130 ans rapportés à l'année en cours, 50 à 300 cm, 1 à 999 kg ou 1 à 2 000 lb selon le système d'unités choisi, le stockage restant métrique. Son catalogue ne porte que le nom et la forme du traitement, chaque forme finissant par « Autre », et ne demande aucune certification. <span class="marque v2">V2</span></p>
+  <details><summary>Les règles derrière les chiffres</summary>
+    <ul>
+      <li>Prénom : tout sauf le vide, espaces retirés ; refus « Un prénom ou un pseudo est attendu. » <a href="spec-technique.html#profil-nom-ou-pseudo">→ technique</a></li>
+      <li>Âge : entier arrondi entre 1 et 130 ; refus « Un âge entre 1 et 130 ans est attendu. » <a href="spec-technique.html#profil-age">→ technique</a></li>
+      <li>Taille : entier arrondi entre 50 et 300 cm ; refus « Une taille entre 50 et 300 cm est attendue. » <a href="spec-technique.html#profil-taille">→ technique</a></li>
+      <li>Poids de départ et objectif : une décimale, entre 0,1 et 1000 kg ; refus « Un poids entre 0,1 et 1000 kg est attendu. » <a href="spec-technique.html#profil-poids-depart-et-objectif">→ technique</a></li>
+      <li>Nettoyage d'un décimal : virgule en point, un seul point, une décimale tronquée. <a href="spec-technique.html#profil-nettoyage-decimal">→ technique</a></li>
+      <li>Une case chiffrée est jugée au blur ou sur Entrée ; refusée, elle revient à la dernière valeur valable traversée. <a href="spec-technique.html#profil-moment-du-jugement-et-retour-arriere-numberfield">→ technique</a></li>
+      <li>Flèches haut/bas : pas de 1 (âge, taille) ou 0,1 (poids), borné. <a href="spec-technique.html#profil-fleches-clavier-sur-un-champ-numerique">→ technique</a></li>
+      <li>Une case n'enregistre que si la valeur retenue diffère de la valeur enregistrée. <a href="spec-technique.html#profil-edition-en-place-d-une-case-du-profil">→ technique</a></li>
+      <li>Poids de départ : la pesée marquée départ change de poids seulement ; absente, elle est créée à la veille (de la plus ancienne pesée, sinon d'aujourd'hui), 08:00. <span class="marque">arbitrage non validé</span> <a href="spec-technique.html#profil-poids-de-depart-depuis-le-profil">→ technique</a></li>
+      <li>Enregistrement : objectif arrondi à 0,1 kg ; heures de rappel ramenées aux minutes rondes. <a href="spec-technique.html#profil-enregistrement-du-profil">→ technique</a></li>
+      <li>Le profil enregistre l'identifiant du traitement, jamais son nom ; identifiant inconnu = « Pas de traitement ». <a href="spec-technique.html#profil-traitement-par-identifiant">→ technique</a></li>
+      <li>Sélecteur : choisir referme et enregistre ; Échap ou clic à côté referment sans changer. <a href="spec-technique.html#profil-selecteur-de-traitement">→ technique</a></li>
+      <li>Profil d'usine avant tout réglage : « Chloé », femme, 42 ans, 168 cm, objectif 72,0 kg, « Pas de traitement », poids de départ semé 95 kg. <a href="spec-technique.html#profil-profil-d-usine">→ technique</a></li>
+      <li>Persistance JSON dans le stockage local du navigateur, sous une seule clé avec les journaux. <a href="spec-technique.html#profil-stockage-local">→ technique</a></li>
+    </ul>
+  </details>
+  <div class="exemple"><p>Camille tape « 47,6 » dans Âge : la case enregistre 48. Elle tape « 0 » dans Taille : « Une taille entre 50 et 300 cm est attendue. », la case revient à 168. Elle corrige son poids de départ en 96,3 : seule la pesée de mai 2026 change de poids, sa date reste.</p></div>
+
+  <h3 id="profil-modifier-mon-profil">Modifier mon profil</h3>
+  <figure class="telephone" data-capture="profil-compte/formulaire-modifier-mon-profil"><figcaption>Le formulaire de Camille ouvert par « … » : six champs pré-remplis, un seul bouton Valider.</figcaption></figure>
+  <p>Le formulaire remplace la carte récapitulative ; le curseur se pose sur le prénom. Mêmes six champs, l'unité dans l'intitulé (« Âge (ans) »). Un seul bouton, « Valider » ; la croix du bandeau ou un appui hors de la carte referment sans rien enregistrer. Valider juge les cinq règles d'un coup : un seul refus empêche tout enregistrement ; les refus s'empilent avant le bouton, dédoublonnés ; retoucher un champ efface son refus, qui revient au prochain clic s'il tient toujours. <span class="marque">arbitrage non validé</span> Valide, le formulaire enregistre nom, âge, taille, objectif et médicament, puis le poids de départ à part, et se referme. La V2 fait l'inverse : la règle se dit avant la faute, sous le champ, en temps réel, jamais après un clic sur Valider ; ses roues rendent tout refus inatteignable. <span class="marque v2">V2</span></p>
+  <details><summary>Les règles derrière les chiffres</summary>
+    <ul>
+      <li>Au clic, les cinq valeurs sont nettoyées ; une seule nulle pose ses refus et rien n'est enregistré. <a href="spec-technique.html#profil-validation-du-formulaire-complet">→ technique</a></li>
+      <li>Les champs chiffrés gardent la saisie fautive sans message jusqu'au clic. <a href="spec-technique.html#profil-moment-du-jugement-et-retour-arriere-numberfield">→ technique</a></li>
+      <li>Appui hors de la carte : fermeture sans enregistrement. <a href="spec-technique.html#profil-fermeture-d-un-formulaire-par-appui-a-cote">→ technique</a></li>
+      <li>Nettoyage générique et validation à la sortie d'un champ chiffré. <a href="spec-technique.html#profil-nettoyage-numerique-generique">→ technique</a> <a href="spec-technique.html#profil-validation-numerique-a-la-sortie">→ technique</a></li>
+      <li>Message d'une règle sans texte propre : « Une valeur entre {min} et {max}{unité} est attendue. » <a href="spec-technique.html#profil-message-par-defaut-d-une-regle">→ technique</a></li>
+    </ul>
+  </details>
+  <div class="exemple"><p>Camille vide le prénom et met 0 aux deux poids, puis Valider : deux lignes seulement, « Un prénom ou un pseudo est attendu. » et « Un poids entre 0,1 et 1000 kg est attendu. » — la phrase des deux poids ne s'écrit qu'une fois.</p></div>
+
+  <h3 id="profil-mon-avatar">Mon Avatar</h3>
+  <figure class="telephone" data-capture="profil-compte/bloc-mon-avatar"><figcaption>La vignette de Camille (64 px), « Avatar personnalisé », « Genre : Femme ».</figcaption></figure>
+  <p>Deuxième bloc de Mon Profil : vignette, « Avatar personnalisé », « Genre : Femme | Homme | Neutre ». Cliquer la vignette ou « … » ouvre le créateur dans la page ; « Fermer » et « Valider les modifications » le referment, chaque retouche étant déjà enregistrée. Le genre du profil est celui de l'avatar : c'est le seul endroit où il se choisit, et il sert au métabolisme de base et au rapport médical. La V2 garde ce principe : le genre fait partie de l'avatar et n'est plus une question à part. <span class="marque v2">V2</span></p>
+  <details><summary>Les règles derrière les chiffres</summary>
+    <ul>
+      <li>Chaque retouche enregistre le profil avec gender = genre de l'avatar. <a href="spec-technique.html#profil-genre-du-profil-genre-de-l-avatar">→ technique</a></li>
+    </ul>
+  </details>
+
+  <h3 id="profil-composer-l-avatar">Créateur d'avatar — Composer l'avatar</h3>
+  <figure class="telephone" data-capture="profil-compte/createur-d-avatar-onglet-composer-l-avatar"><figcaption>Camille compose : aperçu 140 px, Femme, peau Beige, coupe Classique, cheveux Châtain.</figcaption></figure>
+  <p>Aperçu (140 px) et bouton « Aléatoire », puis quatre réglages : Profil de Silhouette (Femme, Homme, Neutre), Couleur de Peau (Clair, Beige, Doré, Café, Scolat, Ébène), Coupe de Cheveux (Classique, Bouclé, Chauve), Couleur des Cheveux (Blond, Brun, Châtain, Noir, Roux, Gris Polaire ; masquée si chauve). Chaque retouche enregistre et efface la photo. Changer de genre remet la coupe : longue pour femme, bouclée pour neutre, courte pour homme. L'avatar est un émoji composé du genre, du teint et de la chevelure quand l'émoji la connaît (chauve, bouclé, roux, gris, blond) ; forme du visage, yeux, lunettes et expression restent enregistrés sans changer le dessin, et l'expression vaut toujours « happy ». La V2 reprend le créateur dessiné, pas l'émoji : huit réglages visibles sur le dessin — genre, peau, coiffure (courts, longs, bouclés, frange, en brosse, sans cheveux), cheveux, yeux, visage, expression, lunettes —, le genre se voyant sur le vêtement et la coiffure ; pas de tirage au hasard. Avatar de départ V2 : neutre, ovale, peau Beige, yeux bleus, bouclé, brun, sans lunettes, joyeuse. <span class="marque v2">V2</span></p>
+  <details><summary>Les règles derrière les chiffres</summary>
+    <ul>
+      <li>Genre → coupe par défaut et photo effacée. <a href="spec-technique.html#profil-changement-de-genre-de-l-avatar">→ technique</a></li>
+      <li>Aléatoire tire forme, coupe (six valeurs), peau, yeux, cheveux, lunettes (30 %) ; expression « happy » ; photo effacée. <a href="spec-technique.html#profil-avatar-aleatoire">→ technique</a></li>
+      <li>Rien n'écrit une autre expression que « happy » ni ne l'affiche. <a href="spec-technique.html#profil-expression-toujours-happy">→ technique</a></li>
+      <li>Coupes court, frange, brosse déjà enregistrées se lisent comme Classique. <a href="spec-technique.html#profil-coupes-proposees">→ technique</a></li>
+      <li>Glyphe : personne selon le genre + modificateur de teint + chevelure liée ; blond a son propre émoji. <a href="spec-technique.html#profil-composition-du-glyphe-emoji">→ technique</a></li>
+    </ul>
+  </details>
+
+  <h3 id="profil-utiliser-ma-photo">Créateur d'avatar — Utiliser ma photo</h3>
+  <figure class="telephone" data-capture="profil-compte/createur-d-avatar-onglet-utiliser-ma-photo"><figcaption>L'onglet photo : « Parcourir mes fichiers », puis « Photo de visage activée avec succès ! ».</figcaption></figure>
+  <p>Un fichier JPEG, PNG, WebP, GIF ou AVIF de 12 Mo au plus est décodé sur l'appareil, recadré au carré centré, réduit à 256 px sans jamais être agrandi, réencodé en JPEG sous 300 Ko et enregistré dans le profil ; il ne quitte pas l'appareil. Le bouton dit « Préparation… » pendant le décodage. Quatre refus : format (le HEIC est nommé), poids (« Cette photo pèse 18,4 Mo, au-delà des 12 Mo acceptés. Choisissez une photo plus légère. »), fichier illisible, photo encore trop lourde après réduction. Toute retouche de l'onglet Composer efface la photo ; une photo qui ne s'ouvre plus rend l'avatar dessiné. La V2 n'a pas de photo. <span class="marque v2">V2</span></p>
+  <details><summary>Les règles derrière les chiffres</summary>
+    <ul>
+      <li>Seule une adresse <code>data:image/</code> est affichable ; l'échec est retenu par adresse. <a href="spec-technique.html#profil-photo-utilisable">→ technique</a></li>
+      <li>Format jugé avant le poids ; 12 × 1024 × 1024 octets exactement accepté. <a href="spec-technique.html#profil-refus-d-une-photo-avant-lecture">→ technique</a></li>
+      <li>Octets écrits en Mo à une décimale au-delà de 1 Mo, sinon en Ko (1 Ko minimum). <a href="spec-technique.html#profil-ecriture-des-octets">→ technique</a></li>
+      <li>Carré = plus petit côté, centré ; cible = min(256, côté). <a href="spec-technique.html#profil-recadrage-carre">→ technique</a></li>
+      <li>Qualités JPEG 0,82 puis 0,7 puis 0,55 ; la première sous 300 Ko est gardée. <a href="spec-technique.html#profil-reencodage-et-plafond-enregistre">→ technique</a></li>
+      <li>Poids d'une data URL calculé sur sa charge base64. <a href="spec-technique.html#profil-poids-d-une-data-url">→ technique</a></li>
+      <li>Le champ fichier est vidé après chaque tentative pour que le même fichier se rechoisisse. <a href="spec-technique.html#profil-champ-fichier-vide">→ technique</a></li>
+    </ul>
+  </details>
+
+  <h3 id="profil-miroir-et-remerciement">Le Miroir de GLP1LOW et remerciement</h3>
+  <figure class="telephone" data-capture="profil-compte/bloc-le-miroir-de-glp1low-et-message-de-remerciement"><figcaption>Le miroir « You Are Beautiful » et le remerciement, sous l'avatar de Camille.</figcaption></figure>
+  <p>Deux blocs fixes au bas de Mon Profil : le titre « Le Miroir de GLP1LOW » avec un miroir dessiné portant « You Are Beautiful », puis « Thank you for trusting GLP1LOW — Together we all can make it happen ». Aucune action. Le dernier bloc de la page est le lien « Mes préférences de compte ».</p>
+
+  <h3 id="profil-bouton-avatar-du-header">Bouton avatar du header</h3>
+  <figure class="telephone" data-capture="profil-compte/bouton-avatar-du-header"><figcaption>L'avatar de Camille en haut à droite de l'accueil (32 px).</figcaption></figure>
+  <p>Sur toutes les pages sauf Mon Profil, l'avatar (32 px sur l'accueil, 25 px ailleurs, infobulle « Configuration ») ouvre Mon Profil. L'onglet quitté est retenu, mais aucun bouton de Mon Profil ne s'en sert.</p>
+  <details><summary>Les règles derrière les chiffres</summary>
+    <ul>
+      <li>Aller vers « settings » retient l'onglet courant ; « settings » surligne « plus ». <a href="spec-technique.html#profil-navigation-vers-mon-profil">→ technique</a></li>
+    </ul>
+  </details>
+
+  <h3 id="profil-mon-compte">Mon compte</h3>
+  <figure class="telephone" data-capture="profil-compte/page-mon-compte"><figcaption>La page Mon compte de Camille : abonnement, paiement et factures annoncés vides, puis le bloc de suppression.</figcaption></figure>
+  <p>Onglet « compte », titre « Mon compte » ; on y arrive par l'entrée « Mon compte » de « GLP1LOW et vous » ou par le lien du bas de Mon Profil. Trois sections statiques : « Mon abonnement » (« GLP1LOW ne propose aucun abonnement pour l'instant. »), « Moyens de paiement » (« Aucun moyen de paiement n'est enregistré. »), « Factures et reçus » (« Il n'y a aucune facture : rien ne vous a été facturé. », avec renvoi vers l'export du rapport médical). Aucune action propre ; le bloc de suppression ferme la page. La V2 ouvre le compte à la dernière étape de l'onboarding : e-mail et mot de passe, huit signes au moins, seule contrainte ; vide ne bloque pas. <span class="marque v2">V2</span></p>
+
+  <h3 id="profil-supprimer-mon-compte">Supprimer mon compte</h3>
+  <figure class="telephone" data-capture="profil-compte/bloc-supprimer-mon-compte"><figcaption>La mise en garde ouverte : trois puces, « Supprimer définitivement », « Annuler ».</figcaption></figure>
+  <p>Trois états dans la page, jamais de fenêtre. Au repos : « Vous pouvez fermer votre compte et effacer tout ce que l'application a enregistré sur cet appareil. » et le bouton « Supprimer mon compte et mes données ». Mise en garde : « Prenez un instant avant de confirmer. », trois puces (le compte n'existera plus ; tout le suivi sera effacé — balance, menus, injections ou comprimés, effets secondaires, activité physique, sommeil, un temps pour soi, pas, favoris, recettes, aliments, badges, profil et réglages ; rien n'est gardé en réserve), le conseil de faire une pause ou d'exporter le rapport médical d'abord, puis « Supprimer définitivement », « Annuler » et une croix. Travail : le bouton devient « Suppression… ». Le compte est supprimé d'abord ; alors seulement tout le stockage local est vidé et l'application rechargée sur sa page de connexion. Un échec affiche son message, revient à la mise en garde et n'efface rien ; une session trop ancienne ajoute « Se reconnecter », qui déconnecte et recharge sans toucher aux données.</p>
+  <details><summary>Les règles derrière les chiffres</summary>
+    <ul>
+      <li>Ordre : compte Firebase si configuré, puis effacement, puis rechargement ; toute erreur arrête avant l'effacement. <a href="spec-technique.html#profil-ordre-de-la-suppression-de-compte">→ technique</a></li>
+      <li>Messages d'échec, tous porteurs de « n'a été effacé » ; défaut « La suppression a échoué. Rien n'a été effacé — réessayez. » <a href="spec-technique.html#profil-messages-d-echec-de-suppression">→ technique</a></li>
+      <li>Sans personne de connectée, la suppression échoue avec son propre message. <a href="spec-technique.html#profil-suppression-du-compte-firebase">→ technique</a></li>
+      <li>Sans configuration Firebase, il n'y a pas de compte : seules les données sont effacées. <a href="spec-technique.html#profil-verrou-actif">→ technique</a></li>
+      <li>L'effacement vide tout le stockage local, session comprise. <a href="spec-technique.html#profil-stockage-local">→ technique</a></li>
+    </ul>
+  </details>
+  <div class="exemple"><p>Camille confirme avec une session que Firebase juge trop ancienne : « Par sécurité, cette suppression demande une connexion récente. Reconnectez-vous, puis recommencez — rien n'a été effacé. » et le bouton « Se reconnecter ». Ses journaux sont intacts.</p></div>
+
+  <h3 id="profil-avis-et-feedback">Avis et Feedback — formulaire</h3>
+  <figure class="telephone" data-capture="profil-compte/page-avis-et-feedback-formulaire"><figcaption>Camille envoie une idée : ressenti Content, type Idée, catégorie « Suivi de Poids &amp; Courbes », message, consentement coché.</figcaption></figure>
+  <p>Onglet « feedback », titre « Avis et Feedback ». Ressenti global : Content (défaut), Neutre, Pas content. Type : Avis (défaut), Idée, Bug ; pour Idée ou Bug, une catégorie facultative (« Catégorie de l'idée » / « Section concernée par le bug ») parmi Interface &amp; Ergonomie, Suivi des Injections &amp; Dosage, Repas et en-cas, Suivi de Poids &amp; Courbes, Rappels &amp; Notifications, Export PDF &amp; Rapports Médicaux, Autre section. Une zone de message dont le libellé et le placeholder suivent le type. Une case « J'accepte d'être contactée pour recevoir une réponse, le cas échéant. », décochée par défaut et jamais obligatoire. Le bouton « Envoyer mon message » (« Envoyez votre idée » pour une idée) reste toujours cliquable : c'est le clic qui dit pourquoi ça ne part pas. Message vide : refus selon le type. Dix envois déjà faits ce jour : « Limite atteinte : pas plus de 10 envois par jour. L'envoi reprend demain. » Sinon le message est enregistré sur l'appareil, en tête de l'historique ; bannière « Votre message a bien été envoyé. » pendant 4 s ; zone vidée, case décochée. Ensuite, sans attendre et sans jamais montrer d'erreur : un document en base sous le compte et un courrier vers la boîte de l'équipe, réponse adressée à l'e-mail de l'auteure, avec un contexte d'affichage (page d'origine, version, thème, cadre, langue, fuseau) et aucune donnée de santé. Sans compte ou sans configuration, rien ne part. Un refus du plafond déclenche un courrier d'alerte, une seule fois par compte et par jour ; hors connexion, cette alerte est perdue. <span class="marque">arbitrage non validé</span></p>
+  <details><summary>Les règles derrière les chiffres</summary>
+    <ul>
+      <li>Refus du vide : « Décrivez votre idée… », « Décrivez le problème… », « Écrivez votre message avant de l'envoyer. » ; effacé à la frappe. <a href="spec-technique.html#profil-refus-d-un-message-vide">→ technique</a></li>
+      <li>Plafond : 10 envois par jour local, comptés sur les messages réellement enregistrés ; un message sans instant ne compte pas. <a href="spec-technique.html#profil-plafond-quotidien-des-envois">→ technique</a></li>
+      <li>Message : id = instant, catégorie gardée seulement pour Idée ou Bug, texte trimé, date libellée fr-FR. <a href="spec-technique.html#profil-composition-d-un-message-de-retour">→ technique</a></li>
+      <li>La base vient après le local, jamais attendue, jamais en échec visible. <a href="spec-technique.html#profil-envoi-en-base-apres-le-local">→ technique</a></li>
+      <li>Document <code>feedbacks/{uid}/messages</code> : type, ressenti, catégorie, message, consentement, rang du jour, contexte. <a href="spec-technique.html#profil-document-de-retour-en-base">→ technique</a></li>
+      <li>Courrier déposé dans la collection <code>mail</code>, réponse vers l'e-mail de l'auteure. <a href="spec-technique.html#profil-courrier-boite-et-reponse">→ technique</a></li>
+      <li>Alerte plafond marquée « uid:jour » avant l'envoi ; jamais deux le même jour. <a href="spec-technique.html#profil-alerte-plafond-une-par-compte-et-par-jour">→ technique</a></li>
+      <li>Sujets : « [GLP1LOW] Avis|Idée|Bug — e-mail — date », « [GLP1LOW] ALERTE plafond — 10 envois atteints — e-mail ». <a href="spec-technique.html#profil-sujets-des-courriers">→ technique</a></li>
+      <li>Lignes du courrier : date locale et fuseau, page d'origine, version, thème, cadre, langue, ressenti, catégorie, consentement. <a href="spec-technique.html#profil-lignes-de-contexte-d-un-courrier">→ technique</a></li>
+      <li>Contexte : réglages d'affichage et état du navigateur seulement. <a href="spec-technique.html#profil-contexte-d-envoi">→ technique</a></li>
+      <li>Page d'origine = l'onglet quitté pour ouvrir le formulaire, lue à l'ouverture. <a href="spec-technique.html#profil-page-d-origine">→ technique</a> <a href="spec-technique.html#profil-libelles-de-page">→ technique</a></li>
+    </ul>
+  </details>
+  <div class="exemple"><p>Camille vient de la Balance et envoie une idée le 12 septembre 2026 à 10:42. Sujet du courrier : « [GLP1LOW] Idée — camille@example.com — 12 septembre 2026 à 10:42:07 » ; ligne « Page d'origine : Balance ». Le 11e envoi du jour est refusé et un seul courrier d'alerte part.</p></div>
+
+  <h3 id="profil-messages-recents">Avis et Feedback — Vos messages récents</h3>
+  <figure class="telephone" data-capture="profil-compte/page-avis-et-feedback-vos-messages-recents-n"><figcaption>« Vos messages récents (2) » de Camille : une idée puis un avis, du plus récent au plus ancien.</figcaption></figure>
+  <p>Sous le formulaire, seulement s'il existe des messages : « Vos messages récents (N) », liste défilante du plus récent au plus ancien. Chaque message porte une étiquette — « Avis : Content », « Avis : Neutre », « Avis : Pas content », « Idée : catégorie » ou « Bug : catégorie », la catégorie omise si absente et écrite par sa valeur enregistrée (« Poids &amp; Graphiques ») et non par le libellé du menu (« Suivi de Poids &amp; Courbes ») —, sa date (« 12 sept. 2026, 10:42 ») et son texte, retours à la ligne conservés. La corbeille retire le message de l'appareil et rend sa place au plafond du jour ; le document en base et le courrier déjà partis ne sont pas touchés.</p>
+
+  <h3 id="profil-sondage">Sondage — formulaire</h3>
+  <figure class="telephone" data-capture="profil-compte/page-sondage-formulaire"><figcaption>Camille note les sept propositions ; « Version imprimable en format livre » à « 5 — Indispensable ! ».</figcaption></figure>
+  <p>Onglet « sondage », titre « Sondage ». « Nous construisons l'avenir de votre application ensemble », puis « Que souhaiteriez-vous voir ajouté à votre application ? » et la consigne « Évaluez chaque proposition de 0 à 5 et validez toutes vos réponses en bas de page. » Sept propositions — Album photos silhouette, Album photos repas et en-cas, Porte-monnaie traitement, Journal de bord émotionnel, Suivi hydratation, Rendre public votre journal GLP1LOW, Version imprimable en format livre —, chacune avec sa description, un curseur de 0 à 5 par pas de 1, les bornes « 0 » et « 5 », et une pastille « N — libellé » : 0 Pas intéressé, 1 Peu d'intérêt, 2 Pourquoi pas, 3 Intéressé, 4 Très utile, 5 Indispensable !. Tout est à 0 par défaut. Une zone « Autres suggestions ». Le bouton dit « Valider mes réponses », ou « Mettre à jour mes réponses » quand une réponse existe déjà. Au clic, le plafond de 10 envois par jour s'applique comme aux avis ; sinon la réponse unique est réécrite sur l'appareil et l'écran de remerciement s'affiche. Ensuite, sans attendre : un seul document en base par compte, fusionné, avec un compteur de mises à jour tenu côté serveur, et un courrier « Sondage » ; au passage à 11 envois, un courrier « ALERTE sondage » part une seule fois. La V2 écarte le suivi hydrique. <span class="marque v2">V2</span></p>
+  <details><summary>Les règles derrière les chiffres</summary>
+    <ul>
+      <li>Sept notes entières 0–5, 0 par défaut ; clé absente d'une réponse enregistrée = 0. <a href="spec-technique.html#profil-sondage-notes-et-defauts">→ technique</a></li>
+      <li>Lecture de la clé v2, sinon de l'ancienne clé (jamais réécrite) ; l'une ou l'autre vaut « déjà répondu ». <a href="spec-technique.html#profil-sondage-stockage-local-et-repli">→ technique</a></li>
+      <li>Journal des envois limité aux deux derniers jours ; il porte le plafond. <a href="spec-technique.html#profil-sondage-journal-des-envois">→ technique</a></li>
+      <li>Plafond et alerte identiques à ceux des avis. <a href="spec-technique.html#profil-plafond-quotidien-des-envois">→ technique</a></li>
+      <li>Document <code>surveys/{uid}</code> : notes, suggestion, updateCount +1 en transaction, premier et dernier envoi ; drapeau d'alerte posé au franchissement de 10. <a href="spec-technique.html#profil-sondage-en-base-un-document-fusionne">→ technique</a></li>
+      <li>Sujets : « [GLP1LOW] Sondage — e-mail — date », « [GLP1LOW] ALERTE sondage — N mises à jour — e-mail ». <a href="spec-technique.html#profil-sujets-des-courriers">→ technique</a></li>
+    </ul>
+  </details>
+  <div class="exemple"><p>Camille met Journal de bord émotionnel à « 4 — Très utile » et Version imprimable à « 5 — Indispensable ! », laisse le reste à 0, valide. Elle revient le lendemain, « Modifier mes réponses », monte l'album silhouette à 3 : le document en base passe à updateCount 2, le courrier dit « Mises à jour : 2ᵉ envoi de cette réponse ».</p></div>
+
+  <h3 id="profil-sondage-remerciement">Sondage — remerciement</h3>
+  <figure class="telephone" data-capture="profil-compte/page-sondage-ecran-de-remerciement"><figcaption>« Merci pour votre participation ! » après la validation de Camille.</figcaption></figure>
+  <p>Dès qu'une réponse est enregistrée — à l'arrivée sur la page ou après une validation —, le formulaire est remplacé par « Merci pour votre participation ! » et « Nous lisons chaque retour et adapterons les développements de l'application en fonction de vos réponses. » Le bouton « Modifier mes réponses » rouvre le formulaire pré-rempli.</p>
+
+  <h3 id="profil-faq">FAQ</h3>
+  <figure class="telephone" data-capture="profil-compte/page-faq"><figcaption>La FAQ, la question sur les journaux ouverte.</figcaption></figure>
+  <p>Onglet « faq », titre « FAQ ». « Les réponses aux questions les plus courantes sur GLP1LOW. » puis six questions repliées : le calcul du niveau sanguin actif ; où sont stockées les données ; modifier ou supprimer une entrée de journal ; activer le suivi des repas, des pas ou de l'activité physique ; à quoi servent les badges ; partager une idée ou signaler un problème. Cliquer une question ouvre sa réponse et referme l'autre ; recliquer la referme. Le contenu est un premier jet. <span class="marque">arbitrage non validé</span></p>
+  <details><summary>Les règles derrière les chiffres</summary>
+    <ul>
+      <li>Une seule réponse ouverte à la fois ; tout refermé à l'arrivée. <a href="spec-technique.html#profil-faq-ouverture-exclusive">→ technique</a></li>
+    </ul>
+  </details>
+
+  <h3 id="profil-information-medicale">Information médicale</h3>
+  <figure class="telephone" data-capture="profil-compte/page-information-medicale-avertissement-medical"><figcaption>Le premier lancement de Camille : onglet Cadre, attestation à cocher, « J'accepte et j'accède ».</figcaption></figure>
+  <p>Une page, pas une fenêtre : elle remplace le contenu courant. Au premier lancement, tant que l'acceptation n'est pas enregistrée, elle est la seule chose affichée, sous le titre « Information Médicale », sans croix ; le bouton « J'accepte et j'accède » reste désactivé tant que la case « J'atteste avoir lu que cette application est un outil de suivi personnel, qu'elle ne remplace pas un médecin et qu'elle ne fournit aucun conseil médical. » n'est pas cochée. Ensuite, sous le titre « Avertissement Médical », elle s'ouvre depuis l'entrée de Configuration &amp; Plus, le bouton « Info Santé &amp; Confidentialité » au pied de chaque page ou l'accueil, et se ferme par « Fermer » ou la croix. Sous-titre « Vie privée, sécurité &amp; cadre clinique » et trois onglets. Cadre (défaut) : « Carnet personnel - Aucun conseil ni prescription », 1. Suivi personnel uniquement, 2. Pas d'auto-médication, 3. Conduite en cas d'urgence (15 ou 112). Vie Privée : « Données 100% locales &amp; souveraines », stockage local — hébergement Google (Firebase), seul l'e-mail connu —, zéro revente ni traçage — tiers Google pour la connexion et Open Food Facts pour le scan, seul le code envoyé —, droit d'effacement. Sécurité : « Vos données restent sur votre appareil », stockage sur l'appareil, chiffrement en transit (HTTPS), carte « Minimisation des Données » (Symptômes &amp; Effets → Local ; Traitements &amp; Doses → Local). Pied en consultation : « Données 100 % locales » et « Fermer ».</p>
+  <details><summary>Les règles derrière les chiffres</summary>
+    <ul>
+      <li>Drapeau d'acceptation dans le stockage local ; absent, la page s'impose au démarrage ; accepter l'écrit et rend la main. <a href="spec-technique.html#profil-acceptation-legale">→ technique</a></li>
+      <li>Premier lancement : pas de croix, bouton lié à la case ; ensuite « Fermer » et croix. <a href="spec-technique.html#profil-premier-lancement-legal">→ technique</a></li>
+    </ul>
+  </details>
+</section>

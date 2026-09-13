@@ -1,0 +1,145 @@
+{
+ "inventions": [
+  {
+   "categorie": "Navigation",
+   "fonctionnalite": "Calculer et consulter le bilan métabolique des 7 derniers jours",
+   "texte": "Écrire par quelle entrée de menu la page s'ouvre.",
+   "origine": "Aucun menu ni lien de la Mixte ne mène à l'onglet metabolism : la table partagée allTabs porte une entrée « Métabolisme », mais ni BOTTOM_MENU_ORDER ni le menu Paramètres ne la reprennent, et aucun setActiveTab('metabolism') n'existe hors du montage dans App.tsx. J'aurais voulu décrire un chemin d'accès."
+  },
+  {
+   "categorie": "Profil (V2)",
+   "fonctionnalite": "Calculer et consulter le bilan métabolique des 7 derniers jours",
+   "texte": "Dériver l'âge de l'année de naissance pour la formule de Mifflin-St Jeor.",
+   "origine": "La V2 recueille anneeNaissance (reponses.ts) ; la formule V1 lit profile.age en années. Aucun code ne fait la conversion."
+  },
+  {
+   "categorie": "Unités (V2)",
+   "fonctionnalite": "Calculer et consulter le bilan métabolique des 7 derniers jours",
+   "texte": "Afficher le bilan en livres et pouces quand la V2 est réglée en anglais.",
+   "origine": "GUIDELINES § 4 : « English » bascule sur inch · pound ; la page V1 n'écrit que kg et cm."
+  },
+  {
+   "categorie": "Fenêtre",
+   "fonctionnalite": "Calculer et consulter le bilan métabolique des 7 derniers jours",
+   "texte": "Exclure du bilan les repas et séances saisis à une heure encore à venir.",
+   "origine": "La projection de l'accueil (divination.ts) filtre par hasOccurred avant d'appeler computeMetabolismSummary ; la page ne le fait pas. Tentation d'aligner les deux."
+  },
+  {
+   "categorie": "Tendance",
+   "fonctionnalite": "Calculer et consulter le bilan métabolique des 7 derniers jours",
+   "texte": "Justifier les seuils 4 000 / 8 000 / 14 000 kcal par une équivalence en kilos (0,5 / 1 / 1,75 kg à 8 000 kcal par kilo).",
+   "origine": "getEnergyTrend ne documente pas ses seuils ; l'équivalence 8 000 kcal = 1 kg n'est écrite que pour la projection de l'accueil (KCAL_PER_KILO)."
+  },
+  {
+   "categorie": "Affichage",
+   "fonctionnalite": "Calculer et consulter le bilan métabolique des 7 derniers jours",
+   "texte": "Écrire « estimées à partir de la composition des repas » à la place d'« estimées par IA ».",
+   "origine": "Le bloc « Dépenses & Apports Actifs » annonce des calories « estimées par IA » ; computeIngestedCalories somme le champ calories des SavedMealLog, recalculé depuis leurs aliments à chaque écriture. Aucune estimation par IA n'existe dans ce calcul."
+  },
+  {
+   "categorie": "Données manquantes",
+   "fonctionnalite": "Calculer et consulter le bilan métabolique des 7 derniers jours",
+   "texte": "Signaler les journées sans repas saisi, comptées 0 kcal ingérée, qui creusent la balance.",
+   "origine": "Une journée sans saisie vaut 0 kcal ingérée et aucun signal n'existe à l'écran. Supposition d'un comportement souhaitable."
+  },
+  {
+   "categorie": "Pas simulés",
+   "fonctionnalite": "Calculer et consulter le bilan métabolique des 7 derniers jours",
+   "texte": "Dire si les relevés de pas marqués isSimulated comptent dans le bilan.",
+   "origine": "StepLog porte un champ isSimulated ; computeMetabolismSummary somme tous les relevés de la date sans le lire. Je ne sais pas ce que ce champ signifie pour ce domaine."
+  },
+  {
+   "categorie": "Formats",
+   "fonctionnalite": "Calculer et consulter le bilan métabolique des 7 derniers jours",
+   "texte": "Homogénéiser l'écriture des milliers entre les blocs de synthèse et le tableau journalier.",
+   "origine": "Les totaux passent par formatNumber (espace insécable) ; MetabolismDailyTable et la ligne « MB (N) + Activités (N) » écrivent les nombres bruts. Tentation de décrire un format unique."
+  }
+ ],
+ "glossaire": [
+  {
+   "terme": "Métabolisme de base (MB)",
+   "definition": "Énergie dépensée au repos sur une journée, en kcal, calculée chaque jour par la formule de Mifflin-St Jeor avec le poids du jour."
+  },
+  {
+   "terme": "Mifflin-St Jeor",
+   "definition": "Formule 10 × poids (kg) + 6,25 × taille (cm) − 5 × âge, + 5 pour un homme, − 161 pour une femme, moyenne des deux pour le genre neutre."
+  },
+  {
+   "terme": "Calories ingérées",
+   "definition": "Somme des calories des repas et en-cas datés d'une journée."
+  },
+  {
+   "terme": "Dépense active",
+   "definition": "Calories des pas et des séances d'activité physique d'une journée."
+  },
+  {
+   "terme": "MET",
+   "definition": "Multiple de la dépense au repos attribué à un sport ou à une allure ; MET × poids (kg) × heures donne des kcal."
+  },
+  {
+   "terme": "Balance énergétique",
+   "definition": "Calories ingérées moins calories dépensées (MB + dépense active), négative en déficit, positive en surplus."
+  },
+  {
+   "terme": "Tendance",
+   "definition": "Libellé déduit de la balance des 7 jours, de « Stable » à « Perte de poids marquée » ou « Prise de poids marquée »."
+  },
+  {
+   "terme": "Poids à une date",
+   "definition": "Dernière pesée datée au plus tard ce jour, ou un poids de repli (départ, visé, première pesée, 80 kg)."
+  },
+  {
+   "terme": "Fenêtre de 7 jours",
+   "definition": "Les 7 dates locales d'aujourd'hui − 6 à aujourd'hui."
+  }
+ ],
+ "index": [
+  {
+   "terme": "Bilan métabolique",
+   "ancre": "metabolisme-bilan-metabolique-page-metabolisme"
+  },
+  {
+   "terme": "Métabolisme de base (MB)",
+   "ancre": "metabolisme-bilan-metabolique-page-metabolisme"
+  },
+  {
+   "terme": "Mifflin-St Jeor",
+   "ancre": "metabolisme-bilan-metabolique-page-metabolisme"
+  },
+  {
+   "terme": "Balance énergétique",
+   "ancre": "metabolisme-bilan-metabolique-page-metabolisme"
+  },
+  {
+   "terme": "Tendance (balance)",
+   "ancre": "metabolisme-bilan-metabolique-page-metabolisme"
+  },
+  {
+   "terme": "Calories ingérées",
+   "ancre": "metabolisme-bilan-metabolique-page-metabolisme"
+  },
+  {
+   "terme": "Calories des pas",
+   "ancre": "metabolisme-bilan-metabolique-page-metabolisme"
+  },
+  {
+   "terme": "Calories d'une séance",
+   "ancre": "metabolisme-bilan-metabolique-page-metabolisme"
+  },
+  {
+   "terme": "Détail journalier",
+   "ancre": "metabolisme-bilan-metabolique-page-metabolisme"
+  },
+  {
+   "terme": "Poids moyen (7 j)",
+   "ancre": "metabolisme-bilan-metabolique-page-metabolisme"
+  },
+  {
+   "terme": "MET",
+   "ancre": "metabolisme-bilan-metabolique-page-metabolisme"
+  }
+ ],
+ "ecrans_illustres": [
+  "metabolisme-rapport-badges/bilan-metabolique-page-metabolisme"
+ ]
+}

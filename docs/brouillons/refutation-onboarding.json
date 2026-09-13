@@ -1,0 +1,141 @@
+{
+ "id": "onboarding",
+ "refutations": [
+  {
+   "phrase": "« Quel est votre poids actuel ? » ; le champ ouvert sur ses deux roues : Camille vient de poser 96 aux kilos et va toucher 0 à la centaine de grammes.",
+   "probleme": "La capture référencée (onboarding-v2/etape-poids-ciel) montre le champ FERMÉ sur 95,0 kg : aucune roue ouverte, pas de 96. La capture avec les roues ouvertes existe sous un autre nom et montre 95 et 0 retenus, pas 96.",
+   "preuve": "docs/captures/onboarding-v2/etape-poids-ciel.png (champ fermé « 95,0 » kg) ; docs/captures/onboarding-v2/etape-poids-selecteur-ouvert-ciel.png (roues ouvertes, 95 et 0 surlignés).",
+   "gravite": "faux"
+  },
+  {
+   "phrase": "« Quel poids visez-vous ? » ; Camille a posé 78,0 kg ; le champ s'était ouvert sur 95,0, pas sur ses 96 kg.",
+   "probleme": "La capture montre 95,0 kg, pas 78,0. La légende décrit un scénario que l'image ne montre pas.",
+   "preuve": "docs/captures/onboarding-v2/etape-poids-cible-ciel.png : champ « 95,0 » kg, Suivant allumé.",
+   "gravite": "faux"
+  },
+  {
+   "phrase": "Sans titre : « Forme » Injection · Comprimé, puis « Traitement » à deux par ligne ; Camille a choisi Injection puis Ozempic, et « Suivant » vient de s'allumer.",
+   "probleme": "La capture référencée ne montre aucune forme choisie, aucune liste « Traitement », et « Suivant » éteint. Même la variante « injection » montre Injection retenu, aucune spécialité et Suivant toujours éteint. Aucune capture ne montre Ozempic choisi ni Suivant allumé.",
+   "preuve": "docs/captures/onboarding-v2/etape-quel-traitement-ciel.png (Forme seule, rien retenu, Suivant grisé) ; docs/captures/onboarding-v2/etape-quel-traitement-injection-ciel.png (Injection retenu, grille sans choix, Suivant grisé).",
+   "gravite": "faux"
+  },
+  {
+   "phrase": "« Composez votre avatar » : le portrait figé sous l'entête, les réglages qui défilent dessous ; Camille a choisi Femme, cheveux longs châtains, yeux noisette, expression déterminée.",
+   "probleme": "La capture montre l'avatar de départ : Neutre retenu, cheveux bouclés bruns, yeux bleus, sourire (joyeuse), vêtement violet, peau beige — exactement AVATAR_INITIAL.",
+   "preuve": "docs/captures/onboarding-v2/etape-avatar-ciel.png ; src/domaine/avatar.ts l.76-85 (AVATAR_INITIAL : neutre, ovale, COULEURS_PEAU[1], COULEURS_YEUX[0], boucle, COULEURS_CHEVEUX[1], joyeuse).",
+   "gravite": "faux"
+  },
+  {
+   "phrase": "« Dernière étape » : 1978 et 168 cm côte à côte, « Camille », son adresse, un mot de passe de neuf signes ; le bouton du bas ne porte que le mot-symbole.",
+   "probleme": "La capture montre 1980 et 165 cm et trois champs vides : ni prénom, ni adresse, ni mot de passe. Seule la fin de la légende (le bouton au mot-symbole) est vraie.",
+   "preuve": "docs/captures/onboarding-v2/etape-profil-ciel.png (1980, 165 cm, Prénom / Adresse e-mail / Mot de passe vides, « Huit caractères au moins. » en gris).",
+   "gravite": "faux"
+  },
+  {
+   "phrase": "Le créateur d'avatar de la V1, sans photo ni tirage au hasard.",
+   "probleme": "Dans la V1 du périmètre (Mixte), l'avatar est un ÉMOJI depuis le 2026-08-09 (AvatarSVG rend avatarEmoji dans un <svg><text>), l'expression vaut toujours « happy » et ne se choisit plus (demande du 2026-08-15 : « ne pas le dire, ne pas pouvoir le changer »), et forme du visage, yeux, lunettes ne changent plus le dessin. Le visage SVG à expression et lunettes que la V2 reprend vient de versions/cartes/components/AvatarCreator.tsx — la version Cartes, hors périmètre. Le réglage « Expression (Joyeuse, Déterminée, Fière, Calme) » réintroduit donc ce que l'utilisatrice avait fait retirer, sans marque d'arbitrage.",
+   "preuve": "REPO-GIT-LOCAL src/versions/mixte/components/AvatarCreator.tsx l.120-131 (« Le visage est un émoji depuis le 2026-08-09 … L'expression … vaut toujours HAPPY depuis le 2026-08-15 ») et l.159 ; GIT-APP-V2 src/domaine/avatar.ts l.4-5 (« viennent de versions/cartes/components/AvatarCreator.tsx de l'ancien dépôt ») ; commit a833080.",
+   "gravite": "hors-perimetre"
+  },
+  {
+   "phrase": "Un mot de passe vide laisse passer.",
+   "probleme": "Présenté comme une règle acquise (et repris dans « Règle du mot de passe : … vide ne bloque pas ») alors que c'est un choix de Claude à arbitrer : le code lui-même dit « forcer la main ici serait un choix qu'elle n'a pas fait » et TODO-CLAUDE.md le liste sous « À arbitrer (décisions à toi) ». La marque « arbitrage non validé », que le document s'impose, manque.",
+   "preuve": "src/screens/onboarding/parcours.ts l.100-103 ; TODO-CLAUDE.md l.19-21 (« Un mot de passe vide laisse entrer … Choisi le 2026-09-08 parce que rien n'était obligatoire jusque-là ; à renverser d'un mot »).",
+   "gravite": "non-fonde"
+  },
+  {
+   "phrase": "→ technique",
+   "probleme": "Les vingt renvois pointent vers spec-technique.html, qui n'existe pas dans docs/ : tous les liens « → technique » du chapitre sont morts aujourd'hui.",
+   "preuve": "ls docs/ → captures/, index.html, spec-fonctionnelle.html, style.css ; « ls: docs/spec-technique.html: No such file or directory ».",
+   "gravite": "non-fonde"
+  },
+  {
+   "phrase": "Deux thèmes : Ciel (jour) et Ciel foncé (nuit).",
+   "probleme": "« jour » et « nuit » ne viennent de nulle part : les noms sont « Ciel » / « Ciel foncé » (« Sky » / « Dark sky ») et rien dans le code ne lie un thème à l'heure.",
+   "preuve": "src/i18n/textes.ts l.183-186 et l.315-318 ; src/themes/themes.ts l.20 (THEMES = ['ciel', 'ciel-fonce']).",
+   "gravite": "imprecis"
+  },
+  {
+   "phrase": "Toucher un cadre change aussitôt l'entête, le titre, les cadres et le bouton.",
+   "probleme": "Les cadres ne changent pas : chacun porte sa propre classe de thème et garde son fond (la phrase suivante le dit elle-même). Seul le liseré de sélection passe de l'un à l'autre.",
+   "preuve": "src/screens/onboarding/EtapeTheme.tsx l.32 (`carte-theme ${classeDuTheme(id)}` sur chaque cadre) ; src/themes/page.css l.236-257 (background: var(--fond) du cadre, .carte-theme--choisi = box-shadow accent).",
+   "gravite": "imprecis"
+  },
+  {
+   "phrase": "Le kilo ne referme pas le panneau ; la centaine le referme et vaut confirmation ; un clic à côté ou Échap referment aussi.",
+   "probleme": "Le kilo est lui aussi écrit aussitôt (poser() au clic) : rien n'attend de « confirmation », la centaine referme seulement. Dire que la centaine « vaut confirmation » laisse croire que le kilo seul ne serait pas retenu.",
+   "preuve": "src/screens/onboarding/SelecteurPoids.tsx l.111 (onClick={() => poser(valeurEntiere, dixieme)}) et l.131-134 (poser puis setOuvert(false)).",
+   "gravite": "imprecis"
+  },
+  {
+   "phrase": "Catalogue des traitements : treize spécialités, neuf injections et quatre comprimés, chaque forme finissant par Autre",
+   "probleme": "Treize ENTRÉES, pas treize spécialités : Wegovy figure deux fois (wegovy-injection, wegovy-oral) et « Autre » deux fois ; dix spécialités réelles.",
+   "preuve": "src/domaine/traitements.ts l.27-41.",
+   "gravite": "imprecis"
+  },
+  {
+   "phrase": "Décompte des écrans : une bille par étape visible, allumée pour chaque étape passée, sans aucun texte",
+   "probleme": "Sans texte VISIBLE seulement : le décompte porte role=\"progressbar\", un nom lu « Avancement du questionnaire » et la valeur courante (aria-valuenow / aria-valuemax). Le chapitre précise ailleurs ce qui est « dit aux lecteurs d'écran » (cadres, pastilles, bouton) ; ici il l'omet.",
+   "preuve": "src/screens/onboarding/Progression.tsx l.29-36 ; src/i18n/textes.ts l.241 (progression: 'Avancement du questionnaire').",
+   "gravite": "imprecis"
+  },
+  {
+   "phrase": "Le questionnaire de la V1 (<code>src/features/onboarding</code>, 24 étapes) est remplacé ; il n'écrivait ni profil, ni journaux, ni modules.",
+   "probleme": "La page vit dans src/versions/mixte/components/onboarding/OnboardingPage.tsx (features/onboarding n'a que modèle, étapes, contenu, outcome) ; elle n'était ouvrable que depuis l'espace Admin (hors périmètre) ; et elle écrivait bien deux choses : le thème choisi (selectTheme, réellement appliqué à l'application) et son propre état sous la clé glow_onboarding_sim_mixte.",
+   "preuve": "REPO-GIT-LOCAL src/versions/mixte/components/onboarding/OnboardingPage.tsx l.34-73 (« LA SEULE EXCEPTION : LE THÈME … Choisir un thème ici change donc le thème de l'application, vraiment » ; SIM_STORAGE_KEY) ; inventaire : « Onglet « onboarding » ouvert depuis l'espace Admin ».",
+   "gravite": "imprecis"
+  },
+  {
+   "phrase": "Chaque page a trois zones : l'entête (logo, mot-symbole et, à partir de « Avez-vous commencé votre traitement GLP-1 ? », les billes du décompte), la zone du milieu, seule à défiler, et la rangée des boutons au bas de l'écran.",
+   "probleme": "L'écran de l'avatar en a une quatrième, figée : le portrait, posé entre l'entête et la zone qui défile.",
+   "preuve": "src/screens/Onboarding.tsx l.76-84 (portrait rendu hors de .page__defilant) ; src/themes/page.css l.176-181.",
+   "gravite": "imprecis"
+  },
+  {
+   "phrase": "Deux questions, chacune sur une ligne. Français et cm · kg sont retenus d'avance.",
+   "probleme": "Le titre de l'écran, « Langue et unités », n'est jamais donné alors que chaque autre h3 cite le sien ; et ce titre est un choix de Claude non arbitré (TODO-CLAUDE : « sont de moi »), sans marque.",
+   "preuve": "src/i18n/textes.ts l.209-211 ; docs/captures/onboarding-v2/etape-langue-unites-ciel.png (titre « Langue et unités ») ; TODO-CLAUDE.md l.22-23.",
+   "gravite": "imprecis"
+  },
+  {
+   "phrase": "Thème appliqué à la page : le thème retenu pose sa classe sur la page de l'onboarding ; le contour du téléphone et sa barre du bas ne le suivent pas.",
+   "probleme": "Mécanique de thème (classe CSS, couleurs du cadre en dur) : de la présentation et du technique, pas un chiffre de l'écran, et le chapitre exclut les thèmes. L'étape du thème elle-même est légitime (c'est un écran de l'onboarding) ; ce détail ne l'est pas.",
+   "preuve": "src/index.css l.45-94 (#0f172a en dur sur .phone-frame et .phone-bar) ; src/screens/Onboarding.tsx l.53.",
+   "gravite": "hors-perimetre"
+  },
+  {
+   "phrase": "Il s'adresse à la personne qui installe l'application.",
+   "probleme": "Ne dit rien : un onboarding s'adresse par définition à qui installe.",
+   "preuve": "—",
+   "gravite": "style"
+  },
+  {
+   "phrase": "Ce qui bloque Suivant : forme et spécialité exigées ici, et nulle part ailleurs sauf le mot de passe.",
+   "probleme": "Redite de la puce « Ce qui bloque Suivant » de la section « Le parcours », vers la même ancre.",
+   "preuve": "Ancre #onboarding-ce-qui-bloque-suivant utilisée deux fois dans le chapitre.",
+   "gravite": "style"
+  },
+  {
+   "phrase": "Poids actuel et poids visé jamais liés : deux réponses distinctes, mêmes bornes, même défaut, aucune mémorisation de l'une vers l'autre.",
+   "probleme": "Redite du paragraphe qui précède immédiatement (« Sa valeur est indépendante : même défaut de 95,0, aucune copie du poids actuel, aucune borne tirée de lui »).",
+   "preuve": "—",
+   "gravite": "style"
+  },
+  {
+   "phrase": "Camille pèse 96 kg : roue de gauche sur 96, roue de droite sur 0. Le champ affiche 96,0 kg ; la réponse gardée est « 96.0 ».",
+   "probleme": "« Le champ affiche 96,0 kg » contredit « l'unité est écrite hors du champ » trois lignes plus haut : le champ affiche 96,0 ; « kg » est à côté.",
+   "preuve": "src/screens/onboarding/SelecteurPoids.tsx l.95-96 (« L'unité reste DEHORS du champ »).",
+   "gravite": "style"
+  }
+ ],
+ "manques": [
+  "Le « Questionnaire d'accueil (simulation) » de l'inventaire n'a pas de h3 : ses 24 étapes (bienvenue « Votre compte est créé. », depuis-quand, poids de départ, activité, séances, cahier alimentaire, suivis nutrition/pas/sport, détente, temps pour soi, genre, prénom, taille, âge), le compteur « Question N sur M », la home d'arrivée (« Bonjour {prénom} », « Rien à afficher pour le moment. ») — et surtout sa raison d'être : les réponses devaient allumer les modules Repas, Pas, Activité physique, Un temps pour soi et précocher les activités de détente (REPO-GIT-LOCAL src/features/onboarding/onboarding.outcome.ts). Le chapitre ne dit nulle part si la V2 y renonce ou le remet à plus tard.",
+  "L'avertissement médical obligatoire au premier lancement (LegalPrivacyPage : case « J'atteste avoir lu … », bouton « J'accepte et j'accède », clé hasAcceptedMedicalDisclaimer_v1) fait partie de « l'arrivée » en V1 ; le chapitre ne le situe pas par rapport à l'onboarding (avant, après, supprimé ?).",
+  "La connexion V1 (AuthGate, LoginPage : « pas d'inscription libre », comptes créés par l'administratrice) : la « Dernière étape » recueille e-mail et mot de passe, mais rien ne dit ce que devient la page de connexion ni si l'onboarding crée le compte — un renvoi au chapitre 2 au minimum.",
+  "La version anglaise des écrans : navigateur en anglais, tout l'onboarding s'affiche en anglais (« Choose », « Language and units », « Lose weight », « Last step », « Enter the GLP1LOW galaxy », séparateur décimal « . » — src/i18n/textes.ts l.291-422) ; le chapitre ne le dit pas et ne donne que « virgule en français ».",
+  "L'asymétrie des réponses cachées : « Stabiliser » cache le poids visé sans l'effacer (la valeur choisie réapparaît si l'on revient à « Perdre », useParcours.ts ne touche pas poidsCible), alors que « Non » efface forme et spécialité.",
+  "Les limites connues des roues, absentes du chapitre : pas de parcours aux flèches du clavier, panneau toujours ouvert vers le bas (TODO-CLAUDE.md l.38-41).",
+  "Deux titres d'écran sont des choix de Claude non arbitrés (« Langue et unités », « Composez votre avatar » — TODO-CLAUDE.md l.22-23) et le chapitre les cite sans marque « arbitrage non validé »."
+ ],
+ "verdict_global": "Le corps du chapitre tient contre le code de la V2 (étapes, blocages, billes, défauts, bornes, catalogue, avatar, mot de passe : tout se retrouve dans parcours.ts, useParcours.ts, les composants et le domaine, tests verts), mais cinq légendes de figures sur dix racontent un scénario « Camille » que les captures référencées ne montrent pas — elles montrent toutes l'état de départ — et tous les renvois « → technique » visent un fichier qui n'existe pas. Trois points de fond restent à corriger : l'avatar est repris de la version Cartes (hors périmètre) et réintroduit le choix d'expression que l'utilisatrice avait fait retirer de la Mixte, le mot de passe vide qui laisse passer est un arbitrage de Claude non marqué comme tel, et le chapitre ne dit rien du rôle que la V1 donnait à l'onboarding (allumer les modules) ni de l'avertissement médical et de la connexion qui encadraient « l'arrivée »."
+}

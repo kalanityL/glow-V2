@@ -1,0 +1,134 @@
+{
+ "id": "compte",
+ "refutations": [
+  {
+   "phrase": "par l'entrée Sécurité de « Configuration & Plus » ou depuis l'accueil",
+   "probleme": "« depuis l'accueil » est faux : les deux boutons de la Maison ont été retirés le 2026-08-26 ; `onOpenLegalModal` est reçu par Maison mais jamais appelé, la home n'écrit qu'un paragraphe d'avertissement. Et l'entrée du PlusMenu ne s'appelle pas « Sécurité » mais « Sécurité, Avertissements & Confidentialité » ; surtout, aucune entrée de menu ne mène à l'onglet 'plus' (seul le `onBack` d'AdminSettings y retombe), donc cette porte n'existe pas en pratique. La seule porte réelle est le bouton du pied de page.",
+   "preuve": "REPO-GIT-LOCAL src/versions/mixte/components/Maison.tsx:167,219 (prop reçue), :1149-1153 « LES DEUX BOUTONS SONT PARTIS … Une seule porte suffit : celle du pied de page » ; PlusMenu.tsx:83-84 label 'Sécurité, Avertissements & Confidentialité' ; grep `'plus'` dans src/versions/mixte → App.tsx:1310,1315 (surbrillance), :2226 (rendu), :2301 `onBack={() => setActiveTab(previousTab || 'plus')}` seulement ; quickMenuSections App.tsx:1449-1508 sans 'plus' ni 'legal'.",
+   "gravite": "faux"
+  },
+  {
+   "phrase": "Au premier lancement, cette page occupe seule l'écran sous le titre « Information Médicale », sans croix.",
+   "probleme": "Elle ne remplace que le contenu du `main` : l'entête (logo, étoiles, avatar) et le menu du bas restent affichés et cliquables au premier lancement. Même imprécision dans le détail « la page est seule à l'écran ».",
+   "preuve": "App.tsx:2056-2064 rendu dans `main` ; App.tsx:1829 `<header>` conditionné seulement par `!isMonCiel` ; App.tsx:2609 et :2681 `<nav>` sans condition sur `isFirstLaunchLegal`.",
+   "gravite": "imprecis"
+  },
+  {
+   "phrase": "clearAll vide tout le stockage local, session Firebase et acceptation médicale comprises.",
+   "probleme": "Repris d'un commentaire de storage.ts, contredit par le SDK : `clearAll` = `localStorage.clear()`, or Firebase Auth 12 persiste la session d'abord dans IndexedDB, que `localStorage.clear()` ne touche pas. La session disparaît parce que `deleteUser` appelle lui-même `signOut()` — c'est d'ailleurs ce que dit auth.ts. Même erreur dans « puis tout le stockage local effacé, session comprise ».",
+   "preuve": "storage.ts:94-100 (`localStorage.clear()`), :89-90 (le commentaire fautif) ; node_modules/@firebase/auth/dist/browser-cjs/index-D1eM-zGc.js:11238-11242 `persistence: [indexedDBLocalPersistence, browserLocalPersistence, browserSessionPersistence]` ; :1845-1854 `UserImpl.delete()` → `return this.auth.signOut()` ; auth.ts:94-95 « La déconnexion est faite par le SDK dans la foulée ».",
+   "gravite": "non-fonde"
+  },
+  {
+   "phrase": "puis rechargement sur la page de connexion",
+   "probleme": "`reloadApp` est un simple `window.location.reload()` ; la page de connexion n'apparaît que parce que le compte a été déconnecté par `deleteUser` et que Firebase est configuré. Sur un poste sans configuration (cas prévu par le bloc lui-même), l'application se rouvre directement, sans page de connexion.",
+   "preuve": "appUrl.ts:26-28 ; DeleteAccountBlock.tsx:124-126 `if (isAuthConfigured) await deleteCurrentUser();` ; AuthGate.tsx:16-17 laisse passer sans configuration.",
+   "gravite": "imprecis"
+  },
+  {
+   "phrase": "la chaîne brute est recopiée telle quelle sous glp1_app_companion_data__secours, seulement si cette clé est vide",
+   "probleme": "La condition est « clé absente » (`=== null`), pas « vide » : une clé présente mais vide empêche la mise à l'abri.",
+   "preuve": "useAppData.ts:139 `if (getString(rescueKeyFor(STORAGE_KEY)) === null)`.",
+   "gravite": "imprecis"
+  },
+  {
+   "phrase": "l'application repart du profil d'usine et de journaux vides",
+   "probleme": "En cas de lecture ratée, le même état initial est rendu, avec une pesée de départ semée à 95 kg (veille, 08:00) : le journal des pesées n'est pas vide. L'exemple (« ses 96 kg de départ … n'apparaissent plus ») oublie que 95 kg s'affichent à leur place.",
+   "preuve": "useAppData.ts:131-158 : le `catch` tombe sur `return { profile: INITIAL_PROFILE, weightHistory: setStartingWeight([], INITIAL_STARTING_WEIGHT), … }` ; startingWeighIn.ts:158-165.",
+   "gravite": "imprecis"
+  },
+  {
+   "phrase": "n'écrit plus rien de la session",
+   "probleme": "Seule l'écriture de la clé principale est gelée ; toutes les autres clés continuent d'être écrites pendant la session (acceptation médicale, menu, thème, flips des tendances, date de première ouverture…). Même imprécision dans le détail « plus aucune écriture ».",
+   "preuve": "`mayPersist` n'a qu'un appelant : useAppData.ts:170-173 (`setItem(STORAGE_KEY, appData)`) ; App.tsx:806 `setString(MEDICAL_DISCLAIMER_STORAGE_KEY, 'true')` sans garde ; ~36 autres clés `glp1_*`/`glow_*` écrites sans garde (grep).",
+   "gravite": "imprecis"
+  },
+  {
+   "phrase": "Toute la sauvegarde est un seul JSON sous la clé glp1_app_companion_data, réécrit à chaque changement.",
+   "probleme": "Le suivi (AppData) est un seul JSON, mais l'état de l'application tient dans une quarantaine de clés (thème, menu, sports/effets actifs, vues d'historique, feedbacks et sondage locaux, acceptation médicale, paliers de badges…) ; le chapitre le reconnaît lui-même pour l'acceptation. « Toute la sauvegarde » est donc trop large.",
+   "preuve": "storage.ts:82-87 « les clés sont éparpillées dans une vingtaine de fichiers » ; grep `'(glp1|glow)_…'` → 37 clés distinctes (glow_theme_mixte, glow_menu_mixte, glp1_active_sports, glp1_user_feedbacks, glp1_user_survey_v2, glp1_first_open_date…).",
+   "gravite": "imprecis"
+  },
+  {
+   "phrase": "Aucune base distante ne reçoit le suivi.",
+   "probleme": "Vrai pour les journaux de santé, mais le chapitre tait qu'une base distante (Firestore) existe et reçoit, sous l'identifiant et l'e-mail du compte : les feedbacks, le sondage, une boîte de courrier, et un journal des échecs d'export du rapport écrit automatiquement dans un `catch` (état du navigateur, comptes) — ce dernier n'est pas « un geste explicite », contrairement à l'introduction.",
+   "preuve": "firestore.ts:37 `isDatabaseConfigured = isAuthConfigured` ; remoteSubmit.ts:127 (mail), :160 (`surveys/${author.id}`), :238 (`feedbacks/${author.id}/messages`), :347 (`reportErrors/<uid>/failures`, dans `recordReportExportFailure`).",
+   "gravite": "imprecis"
+  },
+  {
+   "phrase": "Des copies de secours horodatées existent (clé glp1_app_companion_data__secours-AAAA-MM-JJ-HHMMSS, index trié, copie vérifiée par relecture, restauration qui met d'abord l'état courant à l'abri) ; seule la page d'administration les liste et les restaure, hors périmètre.",
+   "probleme": "Mécanisme exclusivement administratif (Générer des données), décrit en détail puis déclaré hors périmètre ; le détail « Copies horodatées en heure locale, suffixe si la clé est prise, jamais recouvertes » en remet une couche. À réduire à une phrase ou à sortir.",
+   "preuve": "Seul appelant : src/versions/mixte/components/DataGeneratorPage.tsx:57,218,254,266,282 (listBackups, writeWithBackup, restoreBackup) ; dataBackup.ts:1-13 « la page « Générer des données » ».",
+   "gravite": "hors-perimetre"
+  },
+  {
+   "phrase": "La V2 n'a pas de Firebase ni de page de connexion : le compte se crée sur le dernier écran de l'onboarding (voir Dans la V2), ce qui contredit « pas d'inscription libre ».",
+   "probleme": "Rien ne se crée : l'écran collecte une adresse et un mot de passe dans un `useState`, le bouton final est sans effet (le rang est borné), aucun réseau, aucune persistance. Aucune décision « inscription libre » n'existe dans le code ni les notes V2 ; la « contradiction » est une inférence. Le marqueur V2 (« existe dans la V2 » selon §0) est posé sur ce qui n'y existe pas.",
+   "preuve": "GIT-APP-V2 src/app/useParcours.ts:31 (`useState(REPONSES_INITIALES)`), :108 `avancer: () => setRang(Math.min(rangBorne + 1, visibles.length - 1))` ; package.json dependencies : react, react-dom seulement ; grep « inscription » dans GUIDELINES/TODO/SUIVI-PUSHS/src → rien ; docs/spec-fonctionnelle.html:59 légende du marqueur.",
+   "gravite": "non-fonde"
+  },
+  {
+   "phrase": "Le compte s'ouvre sur le dernier écran de l'onboarding, avec l'année de naissance, la taille et le prénom : une adresse e-mail et un mot de passe.",
+   "probleme": "« s'ouvre » suggère une action ; le bouton « Entre dans la galaxie GLP1LOW » ne fait rien sur la dernière étape. Les cinq champs sont exacts, la règle des huit signes et l'accent aussi.",
+   "preuve": "src/screens/Onboarding.tsx:176-186 (`onClick={avancer}`), useParcours.ts:108 ; EtapeProfil.tsx:72-149 ; compte.ts:11-16 ; page.css:445-448 `.regle--manquee { color: var(--accent) }`.",
+   "gravite": "imprecis"
+  },
+  {
+   "phrase": "un écran uni avec un point animé (aria-label « Chargement »)",
+   "probleme": "Le fond n'est pas uni : c'est le dégradé bleu-vert de la page de connexion. La légende de figure (« fond uni ») répète l'erreur.",
+   "preuve": "AuthGate.tsx:25 `bg-gradient-to-tr from-sky-400 via-teal-500 to-emerald-400`.",
+   "gravite": "imprecis"
+  },
+  {
+   "phrase": "compte désactivé, trop de tentatives, réseau coupé, fenêtre Google refermée ou bloquée, domaine non autorisé ont chacun leur phrase",
+   "probleme": "La liste omet l'adresse e-mail mal formée (`auth/invalid-email`), qui a sa propre phrase « L'adresse e-mail n'est pas valide. » — et « identifiant invalide » (invalid-credential) est ambigu à côté.",
+   "preuve": "auth.errors.ts:10-11.",
+   "gravite": "imprecis"
+  },
+  {
+   "phrase": "« Factures et reçus » (« Il n'y a aucune facture : rien ne vous a été facturé. », avec renvoi vers l'export du rapport médical)",
+   "probleme": "Le « renvoi » est une phrase (« il est dans la section Export du menu »), pas un lien ; « sans action » et « renvoi » se contredisent à la lecture.",
+   "preuve": "AccountSettings.tsx:105-109.",
+   "gravite": "imprecis"
+  },
+  {
+   "phrase": "<figure class=\"telephone\" data-capture=\"profil-compte/bloc-supprimer-mon-compte\"><figcaption>La mise en garde ouverte sous le bouton",
+   "probleme": "La capture nommée montre l'état au repos ; l'état décrit par la légende a sa propre capture, `bloc-supprimer-mon-compte-confirmation`.",
+   "preuve": "docs/captures/profil-compte/ : bloc-supprimer-mon-compte.png et bloc-supprimer-mon-compte-confirmation.png.",
+   "gravite": "imprecis"
+  },
+  {
+   "phrase": "<a href=\"spec-technique.html#compte-connexion-champs-requis\">→ technique</a>",
+   "probleme": "Les 22 liens « → technique » du chapitre visent un fichier qui n'existe pas dans docs/ ; aucune des ancres (compte-…) n'existe nulle part. Tant que la spec technique n'est pas écrite, les blocs « Les règles derrière les chiffres » ne renvoient à rien.",
+   "preuve": "`ls GIT-APP-V2/docs` → captures, index.html, spec-fonctionnelle.html, style.css ; `ls docs/spec-technique.html` → No such file.",
+   "gravite": "non-fonde"
+  },
+  {
+   "phrase": "Les règles derrière les chiffres",
+   "probleme": "Libellé de gabarit posé sur des blocs qui ne contiennent aucun chiffre (messages de connexion, trois états de session, ordre de suppression).",
+   "preuve": "Les cinq `<details>` du chapitre.",
+   "gravite": "style"
+  },
+  {
+   "phrase": "La session est gardée sans limite de durée sur l'appareil.",
+   "probleme": "Redite : la même chose est dite dans la page de connexion (« ne revient qu'après une déconnexion explicite »), ici, puis dans le détail (« la session persiste jusqu'à déconnexion explicite »).",
+   "preuve": "Trois occurrences dans le texte du chapitre.",
+   "gravite": "style"
+  },
+  {
+   "phrase": "Ce chapitre couvre la connexion, l'avertissement médical, la sauvegarde et ses garde-fous, la suppression du compte.",
+   "probleme": "Annonce de plan qui répète la liste des h3 ; n'apporte rien.",
+   "preuve": "Paragraphe d'introduction.",
+   "gravite": "style"
+  }
+ ],
+ "manques": [
+  "Captures absentes pour trois figures du chapitre : profil-compte/page-de-connexion, profil-compte/ecran-d-attente-de-session et transversal/bloc-limite-atteinte-sauvegarde-illisible n'existent pas dans docs/captures (§0 : « Aucune maquette n'est inventée ») ; et la section « Dans la V2 » n'a pas de figure alors que docs/captures/onboarding-v2/etape-profil-ciel.png existe (§0 : capture de la V2 « quand l'écran y existe déjà »).",
+  "Ce qui quitte l'appareil malgré tout : Firestore (feedbacks, sondage, courrier, journal des échecs d'export — remoteSubmit.ts:127,160,238,347) et le fait que ces envois sont signés de l'identifiant et de l'e-mail du compte ; aucune phrase ni h3, alors que « Données sur l'appareil » affirme « Aucune base distante ».",
+  "Les autres clés du stockage local (thème, menu, sports/effets actifs, vues d'historique, feedbacks et sondage locaux, paliers de badges, date de première ouverture… ~36 clés) : ce que clearAll efface au-delà du JSON, ce qui survit à une session « Limite atteinte », ce que le rechargement retrouve — rien n'est dit.",
+  "Le profil d'usine que voit une installation neuve (prénom « Chloé », 42 ans, 168 cm, objectif 72 kg, tous modules éteints, traitement par défaut, date cible 2026-11-15 — useAppData.ts:54-78) n'est pas décrit ; le renvoi « → technique » est mort.",
+  "L'aiguillage des versions (VersionRouter/VersionPicker, inventaire 8) : le chapitre n'indique jamais comment la Mixte s'ouvre (#/mixte) ni ce qui précède la page de connexion ; à placer ici ou dans le chapitre transversal, mais nulle part pour l'instant.",
+  "Le message « Renseignez l’e-mail et le mot de passe. » ne concerne que le bouton « Se connecter » ; le chemin Google (aucun champ requis, fenêtre surgissante, message si la fenêtre est fermée) n'a pas de description propre."
+ ],
+ "verdict_global": "Le chapitre est globalement fidèle au code sur les libellés, les états et les messages (connexion, avertissement, Mon compte, suppression), mais il porte une erreur franche (l'accès à l'avertissement « depuis l'accueil » n'existe plus, et l'entrée de « Configuration & Plus » n'est jointe par aucun menu), deux affirmations reprises de commentaires plutôt que du comportement réel (la session Firebase « effacée » par clearAll, le « compte qui se crée » dans une V2 où rien n'est créé), et plusieurs approximations sur la sauvegarde (journaux « vides » avec 95 kg semés, « plus rien n'est écrit » alors que seule la clé principale est gelée, « toute la sauvegarde » alors qu'une quarantaine de clés coexistent). Il faut aussi trancher le sort des 22 liens vers une spec technique inexistante, des trois captures manquantes et du paragraphe d'administration déclaré hors périmètre mais détaillé."
+}
