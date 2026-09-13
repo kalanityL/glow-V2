@@ -27,8 +27,8 @@
   {
    "categorie": "cadrage",
    "fonctionnalite": "Les non-buts",
-   "texte": "Ils se fondent sur des ABSENCES de code, jamais sur une ligne. Vérifié : aucun appel réseau hors authentification, envoi d'avis et fiches d'échec ; aucune donnée d'un tiers dans le modèle ; aucun conseil engendré.",
-   "origine": "SPEC-FONCTIONNELLE.md § 10 et GUIDELINES.md § 1 les énoncent ; src/shared/platform/ ne contient que auth, storage, clipboard, download, share, id, image."
+   "texte": "Ils se fondaient sur des ABSENCES de code ; trois ne tenaient pas et ont été corrigés (diagnostic, posologie, capteur/import), les autres sont conservés avec la réserve qui les entame.",
+   "origine": "Réfutations vérifiées : src/utils/bmiHelpers.ts:9-16 (six catégories cliniques nommées) ; src/shared/medication/treatment.catalog.ts:31-32, 58, 76-77 et src/features/injections/useInjectionForm.ts:37 (paliers de dose et présélection) ; src/shared/food/food.barcode.ts:44, 289 (requête Open Food Facts). SPEC-FONCTIONNELLE.md § 10 et GUIDELINES.md § 1 énoncent les non-buts d'origine."
   },
   {
    "categorie": "règle d'affichage",
@@ -45,14 +45,14 @@
   {
    "categorie": "règle d'affichage",
    "fonctionnalite": "Préférences de présentation stockées dans le profil",
-   "texte": "Mode daltonien, masquage du badge mystère, masquage complet d'un module éteint, ancien mode lecture facile : elles vivent dans le profil mais ne changent aucune valeur.",
-   "origine": "types.ts UserProfile (colorblindModeEnabled, mysteryBadgeHidden, *ModuleHidden, easyReadingMode) ; navigation.ts isModuleHidden."
+   "texte": "Mode daltonien, masquage du badge mystère, masquage complet d'un module éteint, ancien mode lecture facile : elles vivent dans le profil mais ne changent aucune valeur. Le chapitre ne garde du masquage que ses faits de données (sept drapeaux, ne valant que module éteint, effacés au rallumage) et dit en une ligne que son effet ne porte que sur la restitution.",
+   "origine": "types.ts UserProfile (colorblindModeEnabled, mysteryBadgeHidden, *ModuleHidden lignes 213-227, easyReadingMode) ; src/versions/mixte/app/navigation.ts:157-176 isModuleHidden."
   },
   {
    "categorie": "dette",
    "fonctionnalite": "Système de mesure de la V1",
    "texte": "Le champ measurementSystem est déclaré et jamais écrit ni lu.",
-   "origine": "grep « measurementSystem » sur src/ de la V1 : une seule occurrence, sa déclaration dans types.ts ligne 253."
+   "origine": "grep « measurementSystem » sur src/ de la V1 : une seule occurrence, sa déclaration dans types.ts ligne 253. Le type MeasurementSystem sert ailleurs comme paramètre par défaut (shared/food/food.units.ts), jamais lu depuis le profil."
   },
   {
    "categorie": "dette",
@@ -75,283 +75,255 @@
   {
    "categorie": "hors périmètre",
    "fonctionnalite": "Administration et thèmes",
-   "texte": "Le compte d'administration en dur, les thèmes et les trois mises en page d'accueil sont écartés du chapitre.",
-   "origine": "Consigne du brief ; src/versions/mixte/App.tsx (ADMIN_PAGES_AVAILABLE, onglet admin), src/versions/mixte/homes/homeChoice.ts."
+   "texte": "Les thèmes et les trois mises en page d'accueil sont écartés du chapitre. Le compte d'administration, lui, y entre par une phrase : il est la précondition de deux capacités destructrices, et le taire aurait laissé croire qu'elles sont ouvertes à tous.",
+   "origine": "Consigne du brief ; src/versions/mixte/App.tsx:489-497 (ADMIN_EMAIL, isAdminUser), :1477, :2296 ; src/features/data-generator/resetJournals.ts ; src/versions/mixte/homes/homeChoice.ts."
+  },
+  {
+   "categorie": "règle d'affichage",
+   "fonctionnalite": "« Trois décimales » pour une dose",
+   "texte": "Le chapitre précédent la rangeait dans « précision à l'écriture » : faux, rien n'arrondit une dose avant de l'enregistrer. C'est une règle de saisie de la seule V1 Mixte, déplacée dans la table des bornes.",
+   "origine": "src/versions/mixte/app/form.rules.ts:146-158 (RULE_DOSE { min: 0.001, max: 1000000, decimals: 3 }) ; chemin d'écriture src/features/injections/useInjectionForm.ts:179-193 puis src/app/useAppData.ts:255-262, qui n'arrondit que l'heure (snapLogTime, src/shared/model/logbook.ts:30-33). Seuls roundWeight (weight.utils.ts:27) et snapToRoundedMinutes (date.local.ts:78) normalisent à l'écriture."
+  },
+  {
+   "categorie": "correction",
+   "fonctionnalite": "« Une moyenne hebdomadaire n'existe pas avant sept jours de recul »",
+   "texte": "Phrase retirée : elle décrivait une règle qui n'existe pas. La moyenne à sept jours se calcule sur les journées renseignées de la fenêtre et rend une valeur dès qu'une seule journée en porte.",
+   "origine": "src/features/steps/steps.utils.ts:292-300 (stepsDailyAverage, null seulement si aucune journée) et :312-319 (stepsDailyAverageLast7Days, qui ne fait que filtrer la fenêtre)."
+  },
+  {
+   "categorie": "correction",
+   "fonctionnalite": "« Deux dérivations seulement vont plus loin que le relevé brut »",
+   "texte": "Comptage faux : elles sont au moins six. Le chapitre les énumère (corpulence, concentration de molécule, corrélation, métabolisme de base, balance énergétique nommée, dépenses estimées).",
+   "origine": "src/utils/bmiHelpers.ts:9-16 ; src/shared/analysis/analysis.ts:90-143 ; src/features/metabolism/metabolism.utils.ts:82-88 et :106+ ; src/features/steps/steps.utils.ts:60 ; src/shared/body-metrics/sportCalories.ts."
+  },
+  {
+   "categorie": "correction",
+   "fonctionnalite": "Le compte des flux",
+   "texte": "Les deux comptages étaient faux : quatre flux déclenchés par la personne (document, image d'une distinction, image d'une séance, image d'une série temporelle), quatre collections distantes (sondage, avis, échecs de production, file de courriels) et un flux entrant (code-barres).",
+   "origine": "src/features/feedback/remoteSubmit.ts:16-30 et :95 ; firestore.rules:35, 45, 74, 100 ; src/features/sport/useShareSport.ts:15-20 ; src/versions/mixte/components/share/ShareChart.tsx ; src/utils/badgeShare.ts ; src/shared/food/food.barcode.ts:289."
+  },
+  {
+   "categorie": "correction",
+   "fonctionnalite": "« L'identifiant est unique »",
+   "texte": "Énoncé retiré comme invariant : rien ne le tient. Sept journaux fabriquent « préfixe-instant » et aucun contrôle d'unicité n'existe à l'écriture ; seuls les repas emploient un identifiant universel ordonné.",
+   "origine": "src/app/useAppData.ts:233, 258, 282, 306, 333, 358, 401 ; src/shared/platform/id.ts:34-37, qui documente lui-même la collision du motif remplacé."
+  },
+  {
+   "categorie": "correction",
+   "fonctionnalite": "« Seules les métadonnées de création et de modification sont des instants absolus »",
+   "texte": "Phrase remplacée : aucune ligne de journal ne porte createdAt ni updatedAt ; ces deux propriétés n'existent que sur les entités hors sauvegarde. Sept journaux, en revanche, enfouissent un instant absolu dans l'identifiant.",
+   "origine": "types.ts : WeightLog (17-49), InjectionLog (86-104), SavedMealLog (259-287), StepLog (290-300), SportLog (302-330), MeTimeLog (339-347), SleepLog (377-403), SideEffectLog (432-446) sans horodatage ; Recipe (506-507), CustomFood (533-534), SideEffectType (549-550), SportType (558-559) avec."
+  },
+  {
+   "categorie": "correction",
+   "fonctionnalite": "« Le document ne porte que les domaines activés »",
+   "texte": "Faux pour le traitement : sa section ne consulte aucun drapeau et figure toujours. La case des objets de comparaison n'est masquée par aucun drapeau non plus. Le chapitre le dit désormais domaine par domaine.",
+   "origine": "src/versions/mixte/components/MedicalReportExport.tsx:1428-1440 (six drapeaux, aucun pour le traitement), :1560-1563 (injections poussées sans condition), :1674-1687 (insolites: selection.insolites, « dont la case survit à un profil qui ne l'allume jamais »)."
+  },
+  {
+   "categorie": "correction",
+   "fonctionnalite": "Le garde-fou de la sauvegarde illisible",
+   "texte": "« Plus aucune écriture n'a lieu pendant la session » était trop large : le garde-fou ne couvre que la clé de la sauvegarde. Le chapitre le restreint et nomme ce qui continue d'être écrit.",
+   "origine": "src/app/useAppData.ts:170-173 (un seul setItem, une seule clé) ; écritures non gardées : src/versions/mixte/App.tsx:754, src/versions/mixte/components/MealTracker.tsx:435 et 636, src/versions/mixte/components/MedicalReportExport.tsx:702."
+  },
+  {
+   "categorie": "vocabulaire",
+   "fonctionnalite": "« Distinction » pour « badge »",
+   "texte": "Le mot « badge » est banni de ce document parce qu'il nomme une page de la V1. « Distinction » désigne la même dérivation : quatre évaluations, cinq paliers, chacune conditionnée à l'activation de son domaine.",
+   "origine": "src/utils/badgeSystem.ts:26 (BADGE_TIERS_ASC), :403-456 (athlete, lapin, kangourou, herisson, chacun avec categoryEnabled)."
   },
   {
    "categorie": "cadrage",
-   "fonctionnalite": "Une quatrième capacité : importer",
-   "texte": "Le chapitre affirmait « aucune quatrième capacité n'existe : rien n'importe de données extérieures ». Faux, et corrigé : une fiche Open Food Facts entre dans le référentiel des aliments par code-barres, et une photographie de l'appareil est réencodée puis enregistrée dans le profil. L'entrée « Les trois capacités » ci-dessus reste celle du rédacteur ; son constat de fond (le découpage n'a pas de frontière dans le code) tient toujours.",
-   "origine": "REPO-GIT-LOCAL/src/shared/food/food.barcode.ts:1-2 et :289 (fetch OPEN_FOOD_FACTS_URL) ; src/features/custom-food/barcode.utils.ts:54 draftFromProduct ; src/shared/avatarPhoto.ts (décodage, recadrage 256 px, réencodage JPEG dans le profil)."
-  },
-  {
-   "categorie": "retiré",
-   "fonctionnalite": "« Deux dérivations vont plus loin que le relevé brut, et sont les seules à le faire »",
-   "texte": "Le compte était faux et la clause d'exclusivité inventée. Elles sont cinq, désormais nommées dans le chapitre.",
-   "origine": "REPO-GIT-LOCAL/src/features/divination/divination.ts:31 KCAL_PER_KILO = 8000 et :39-45 DivinationVerdict ; src/features/metabolism/metabolism.utils.ts:106-124 getEnergyTrend ; src/features/meal-charts/chartAnalysis.ts:19-30 ; src/utils/bmiHelpers.ts:8-16 ; le catalogue des demi-vies (treatment.catalog.ts:44-56)."
-  },
-  {
-   "categorie": "retiré",
-   "fonctionnalite": "« Rien ne le lit pour en tirer une information, à une exception près »",
-   "texte": "Trois lectures tirent une information de l'identifiant, pas une. Le chapitre les nomme toutes les trois.",
-   "origine": "REPO-GIT-LOCAL/src/shared/model/appData.ts:28-30 SEED_ID_PREFIXES et :213-221 sommeDesLettres ; src/shared/model/startingWeighIn.ts:13 et :104 (id en dur)."
-  },
-  {
-   "categorie": "retiré",
-   "fonctionnalite": "« plus aucune écriture n'a lieu pendant la session »",
-   "texte": "La garde du chargement raté ne protège que la clé de la sauvegarde ; référentiels et marques d'état continuent d'être écrits. Phrase remplacée par sa portée exacte.",
-   "origine": "REPO-GIT-LOCAL/src/app/useAppData.ts:170-173 (la garde n'enveloppe que setItem(STORAGE_KEY, appData)) ; src/shared/model/loadGuard.ts:45-52 ; src/shared/platform/storage.ts:30-36 ne consulte rien."
-  },
-  {
-   "categorie": "retiré",
-   "fonctionnalite": "« Toute ligne porte un identifiant unique »",
-   "texte": "L'unicité n'est garantie que pour les repas. Les sept autres journaux composent leur identifiant d'un préfixe et de Date.now().",
-   "origine": "REPO-GIT-LOCAL/src/app/useAppData.ts:233, :258, :282, :306, :333, :358, :401 ; contre src/shared/platform/id.ts:34-37 (UUIDv7 pour les repas, « contrairement au motif meal-${Date.now()} qu'il remplace »)."
-  },
-  {
-   "categorie": "retiré",
-   "fonctionnalite": "« Une moyenne hebdomadaire n'existe pas avant sept jours de recul » énoncé comme invariant",
-   "texte": "Vrai d'un calcul, faux d'un autre : perWeekKg ne prend aucune borne. La règle est réécrite avec sa portée.",
-   "origine": "REPO-GIT-LOCAL/src/features/weight/weight.utils.ts:277-283 (MIN_DAYS_FOR_WEEKLY_RATE = 7) et :310-313 contre :271 perWeekKg, sans garde, et :299-301."
-  },
-  {
-   "categorie": "retiré",
-   "fonctionnalite": "« journées » présentée comme un membre vivant de la sauvegarde",
-   "texte": "La collection est morte : aucun geste ne l'alimente. Elle reste dans la table, marquée comme telle, parce que le document la porte toujours.",
-   "origine": "REPO-GIT-LOCAL/src/app/useAppData.ts:153 dailyLogs: [] ; src/features/data-generator/resetJournals.ts:31 ; src/features/data-generator/dataGenerator.ts:735 ; aucun handleAdd de journée dans les 33 gestes de useAppData.ts:198-510."
-  },
-  {
-   "categorie": "règle d'affichage",
-   "fonctionnalite": "Les trois décimales de la dose",
-   "texte": "Elles n'existent qu'au tracé de la concentration, pas à l'écriture. Retirées du tableau des unités.",
-   "origine": "REPO-GIT-LOCAL/src/versions/mixte/features/blood-level/MoleculeConcentrationChart.tsx:63 concentration.toFixed(3) ; à l'écriture, useInjectionForm.ts:179 parseFloat nu."
-  },
-  {
-   "categorie": "règle d'affichage",
-   "fonctionnalite": "L'apparence choisie au recueil initial de la V2",
-   "texte": "La V2 recueille un identifiant d'apparence au même titre que la langue, et le stocke dans ses réponses. Il ne décide d'aucune valeur du modèle : hors de ce document. La langue, elle, y reste, parce qu'elle commande le système d'unités.",
-   "origine": "GIT-APP-V2/src/screens/onboarding/reponses.ts:69-72 (theme, langue) ; src/app/useParcours.ts:53-58 (choisirLangue repose systeme)."
-  },
-  {
-   "categorie": "vocabulaire",
-   "fonctionnalite": "« Distinction »",
-   "texte": "Terme forgé pour ce document, à la place du mot du code, qui est un nom d'écran de la V1. Il désigne un palier évalué (aucun, éveil, bronze, argent, or), non stocké.",
-   "origine": "REPO-GIT-LOCAL/src/utils/badgeSystem.ts:26 BADGE_TIERS_ASC ; src/utils/badgeCelebration.ts:174 (seul le dernier palier connu est mémorisé, hors sauvegarde)."
-  },
-  {
-   "categorie": "vocabulaire",
-   "fonctionnalite": "« Référentiel » et « Catalogue »",
-   "texte": "Deux termes forgés pour ce document : le code n'a pas de nom commun pour les listes que la personne compose sous leurs propres clés, ni pour les tables livrées avec le produit.",
-   "origine": "REPO-GIT-LOCAL/src/data/mealConstants.ts:161-174 (fullCiqualDb livré, USER_CUSTOM_FOODS_STORAGE_KEY, FAVORITE_MEALS_STORAGE_KEY) ; sport.constants.ts:8 ; sideEffects.constants.ts:5 ; meTime.constants.ts:30 ; shared/medication/treatment.catalog.ts."
+   "fonctionnalite": "Le nombre de documents hors sauvegarde",
+   "texte": "Le chapitre dit « une vingtaine » sans en dresser la liste exhaustive : les clés sont éparpillées et le dépôt lui-même refuse de les énumérer à la main. Les entités de domaine sont nommées, pas les clés techniques.",
+   "origine": "src/shared/platform/storage.ts:82-87 (« les clés sont éparpillées dans une vingtaine de fichiers ») ; clés vérifiées : glp1_user_custom_foods, glp1_favorite_meals, glp1_active_side_effects, glp1_active_sports, glp1_active_me_time, glp1_user_survey_v2, glp1_user_feedbacks, glow_ludic_usage, glow_home_equivalences, glow_report_include_v2."
   },
   {
    "categorie": "dette",
-   "fonctionnalite": "silhouetteType",
-   "texte": "Le profil porte une silhouette, distincte du genre et de l'avatar qui en porte un troisième. Elle n'entre dans aucun calcul du chapitre ; elle est signalée comme redondance, pas décrite.",
-   "origine": "REPO-GIT-LOCAL/src/types.ts:112 silhouetteType et :2 AvatarConfig.gender ; src/features/data-generator/dataGenerator.ts:690 SILHOUETTE_BY_GENDER."
+   "fonctionnalite": "Le journal des journées",
+   "texte": "Présenté comme un journal, mais aucun geste n'en crée de ligne : la collection ne peut être non vide que sur une sauvegarde ancienne ou un jeu de démonstration. Le chapitre le signale en cas limite plutôt que de le retirer, parce que le document de synthèse la lit.",
+   "origine": "src/app/useAppData.ts:198-510 (aucun handler dailyLogs) ; écritures : useAppData.ts:153, resetJournals.ts:31, dataGenerator.ts:735 ; lecture : MedicalReportExport.tsx:1386."
   },
   {
-   "categorie": "dette",
-   "fonctionnalite": "Le « nouveau modèle de données » non adopté",
-   "texte": "SideEffectType, SportType et Recipe sont déclarés sous un en-tête de migration et branchés nulle part ; c'est ce qui laisse les lignes d'effets, de séances et de moments référencer par libellé.",
-   "origine": "REPO-GIT-LOCAL/src/types.ts:448-452, :502-507, :546-560 ; sideEffects.constants.ts:8-21 (des libellés stockés sous glp1_active_side_effects) ; appData.ts:133-141 (« le nom d'un sport EST sa clé »)."
-  },
-  {
-   "categorie": "hors périmètre",
-   "fonctionnalite": "L'accès aux outils d'administration",
-   "texte": "« Vider tous les journaux » n'existe que par ces outils, ouverts par une constante que le projet prévoit de refermer. La précondition est dite, l'écran ne l'est pas.",
-   "origine": "REPO-GIT-LOCAL/src/features/data-generator/resetJournals.ts (seul appelant : versions/mixte/components/DataGeneratorPage.tsx:268) ; versions/mixte/app/adminAccess.ts:14-19 ADMIN_PAGES_AVAILABLE = true."
+   "categorie": "arbitrage",
+   "fonctionnalite": "Intensité d'un ressenti : 0 à 5, non 1 à 5",
+   "texte": "Le type porte le commentaire « 1 to 5 », mais l'échelle nommée compte six crans et la valeur de départ est 0. Le chapitre retient ce que le code écrit, pas ce que le commentaire annonce.",
+   "origine": "src/types.ts:437 (commentaire « 1 to 5 ») contre src/versions/mixte/features/side-effects/SideEffectForm.tsx:47-54 (six libellés) et :220-222 (min 0, max longueur-1) ; src/features/side-effects/useSideEffectForm.ts:31 (DEFAULT_SEVERITY = 0)."
   }
  ],
  "glossaire": [
   {
    "terme": "Sauvegarde",
-   "definition": "Le document unique qui porte le profil et les neuf collections, sous une clé de stockage unique. Ne porte pas les référentiels."
+   "definition": "Le document principal du stockage local : un profil et neuf collections, sous une clé unique. Ce n'est pas la totalité des données de la personne."
+  },
+  {
+   "terme": "Stockage local",
+   "definition": "L'ensemble des documents conservés sur l'appareil : la sauvegarde et la vingtaine d'autres clés qui portent les aliments personnalisés, les favoris, les listes suivies, les compteurs et les réglages."
   },
   {
    "terme": "Profil",
-   "definition": "L'unique enregistrement décrivant la personne, son corps, son traitement suivi, ses objectifs, ses drapeaux d'activation et ses rappels."
+   "definition": "L'unique enregistrement décrivant la personne : identité, corps, traitement suivi, objectifs, domaines activés, rappels, réglages enregistrés."
   },
   {
    "terme": "Journal",
-   "definition": "Une collection de lignes datées d'un même domaine."
+   "definition": "Une collection de lignes datées d'un même domaine de relevé."
   },
   {
    "terme": "Ligne",
-   "definition": "Un fait relevé : identifiant, date locale, souvent une heure locale, et les données propres à son domaine. Ne porte ni instant de création ni instant de modification."
-  },
-  {
-   "terme": "Référentiel",
-   "definition": "Une liste composée par la personne, hors de la sauvegarde et sous sa propre clé, à laquelle des lignes renvoient : aliments personnalisés, repas favoris, types d'effets actifs, activités physiques actives, moments pour soi actifs."
-  },
-  {
-   "terme": "Catalogue",
-   "definition": "Une liste livrée avec le produit et non modifiable : la table des aliments de référence, le catalogue des traitements."
+   "definition": "Un fait relevé : un identifiant, une date locale, souvent une heure locale, et les données propres à son domaine."
   },
   {
    "terme": "Domaine de relevé",
-   "definition": "L'un des huit sujets suivis. Sept portent un drapeau d'activation ; le poids n'en a pas."
+   "definition": "L'un des huit sujets suivis : poids, traitement, effets secondaires, alimentation, pas, activité physique, temps pour soi, sommeil. Sept portent un drapeau d'activation, et un second drapeau qui ne vaut que domaine inactif."
   },
   {
    "terme": "Prise",
-   "definition": "Une administration du traitement, injection ou comprimé. Jamais « injection » seul : la forme dépend du traitement."
+   "definition": "Une administration du traitement, injection ou comprimé selon la forme du traitement."
   },
   {
    "terme": "Pesée",
-   "definition": "Une ligne du journal du poids, mensurations comprises."
+   "definition": "Une ligne du journal du poids : un poids en kilogrammes et jusqu'à neuf mensurations en centimètres."
   },
   {
    "terme": "Pesée de départ",
-   "definition": "La pesée la plus ancienne, seule à porter le drapeau de départ, référence de la perte totale. Le drapeau se replace à chaque écriture."
+   "definition": "La plus ancienne pesée du journal, porteuse du drapeau de départ, référence de la perte totale. Le drapeau est réécrit sur tout le journal à chaque écriture."
   },
   {
    "terme": "Traitement",
-   "definition": "Une entrée du catalogue des traitements, jamais une chaîne libre. En V1 : identifiant, nom court, libellé complet, forme, molécule, paliers de dose, demi-vie d'élimination, demi-vie d'absorption, part de la dose portée au sang, rythme de prise usuel, exigence éventuelle d'une certification d'essai clinique. En V2 : identifiant, nom, forme."
+   "definition": "Une entrée du catalogue livré avec le produit, jamais une chaîne libre. La V1 lui donne huit à onze propriétés, dont la molécule, les paliers de dose et deux demi-vies ; la V2 trois : identifiant, nom, forme."
   },
   {
    "terme": "Molécule",
-   "definition": "Le principe actif d'un traitement, nul pour les entrées génériques. L'axe des cumuls, pas le nom commercial ni la forme."
+   "definition": "Le principe actif d'un traitement, et la clé de cumul : la molécule quand elle est connue, l'identifiant du traitement sinon. Une entrée générique n'a pas de molécule et ne s'additionne à rien."
+  },
+  {
+   "terme": "Fiche d'aliment",
+   "definition": "Une entrée de la base livrée (3 479 fiches) ou de la base personnelle : un nom et des valeurs pour 100 g ou 100 ml. Une quantité de repas la référence par identifiant et par sa provenance."
   },
   {
    "terme": "Cure",
-   "definition": "Le suivi d'une personne sous traitement, de la pesée de départ à aujourd'hui — jamais jusqu'au dernier relevé. Sa durée est le dénominateur de la variation hebdomadaire."
+   "definition": "Le suivi d'une personne sous traitement, du premier relevé au dernier."
   },
   {
    "terme": "Série en cours",
-   "definition": "Les prises du traitement porté par le profil, depuis le dernier changement de traitement, celles datées dans le futur exclues. Revenir à un traitement déjà pris ouvre une nouvelle série."
+   "definition": "Les prises du traitement porté par le profil depuis le dernier changement, celles datées dans le futur exclues. Revenir à un traitement déjà pris ouvre une nouvelle série."
+  },
+  {
+   "terme": "Distinction",
+   "definition": "L'une des quatre évaluations dérivées des journaux — activité physique, alimentation (deux), pas — rendant l'un des cinq paliers : aucun, éveil, bronze, argent, or. Une distinction n'est évaluée que si son domaine est actif."
   },
   {
    "terme": "Fenêtre",
    "definition": "Un intervalle de dates sur lequel une dérivation est calculée."
   },
   {
-   "terme": "Distinction",
-   "definition": "Un palier — aucun, éveil, bronze, argent, or — évalué à partir d'un journal sur une fenêtre récente. Ne se stocke pas ; seul le dernier palier connu est mémorisé hors de la sauvegarde."
+   "terme": "Plafond quotidien",
+   "definition": "Le nombre maximal de lignes qu'une date accepte dans un journal. Selon le journal, il refuse l'enregistrement ou fusionne la charge dans la dernière ligne du jour."
   },
   {
-   "terme": "Plafond quotidien de lignes",
-   "definition": "Le nombre maximal de lignes qu'une date accepte dans un journal donné. Distinct des plafonds quotidiens de création du référentiel des aliments (50 et 20) et de celui des envois techniques (10)."
+   "terme": "Survenu",
+   "definition": "Une ligne a eu lieu si sa date est passée, ou si elle est celle du jour et que son heure est atteinte ; une ligne sans heure est survenue dès le début de sa journée. Les dérivations ne comptent que ce qui est survenu."
+  },
+  {
+   "terme": "Minute ronde",
+   "definition": "L'une des huit minutes retenues — 0, 10, 15, 20, 30, 40, 45, 50. Toute heure enregistrée y est ramenée par arrondi inférieur."
   }
  ],
  "index": [
-  {
-   "terme": "Sauvegarde",
-   "ancre": "domaine-ce-qui-est-modelise"
-  },
-  {
-   "terme": "Profil",
-   "ancre": "domaine-ce-qui-est-modelise"
-  },
-  {
-   "terme": "Collections facultatives",
-   "ancre": "domaine-ce-qui-est-modelise"
-  },
-  {
-   "terme": "Journal des journées",
-   "ancre": "domaine-ce-qui-est-modelise"
-  },
-  {
-   "terme": "Enregistrer",
-   "ancre": "domaine-les-capacites"
-  },
-  {
-   "terme": "Dériver",
-   "ancre": "domaine-les-capacites"
-  },
-  {
-   "terme": "Importer",
-   "ancre": "domaine-les-capacites"
-  },
-  {
-   "terme": "Rendre transmissible",
-   "ancre": "domaine-les-capacites"
-  },
-  {
-   "terme": "Pesée semée à l'installation",
-   "ancre": "domaine-les-capacites"
-  },
-  {
-   "terme": "Jeu de données de démonstration",
-   "ancre": "domaine-les-capacites"
-  },
   {
    "terme": "Acteur unique",
    "ancre": "domaine-l-acteur-unique"
   },
   {
-   "terme": "Compte",
+   "terme": "Administrateur (rôle)",
    "ancre": "domaine-l-acteur-unique"
   },
   {
-   "terme": "Mot de passe",
-   "ancre": "domaine-l-acteur-unique"
+   "terme": "Aliment personnalisé",
+   "ancre": "domaine-hors-sauvegarde"
   },
   {
-   "terme": "Genre",
-   "ancre": "domaine-l-acteur-unique"
+   "terme": "Année de naissance",
+   "ancre": "domaine-bornes-de-saisie"
   },
   {
-   "terme": "Avatar",
-   "ancre": "domaine-l-acteur-unique"
+   "terme": "Bornes de saisie",
+   "ancre": "domaine-bornes-de-saisie"
   },
   {
-   "terme": "Stockage local",
-   "ancre": "domaine-la-portee"
-  },
-  {
-   "terme": "Clé de secours",
-   "ancre": "domaine-la-portee"
-  },
-  {
-   "terme": "Flux sortants",
-   "ancre": "domaine-la-portee"
-  },
-  {
-   "terme": "Code-barres",
-   "ancre": "domaine-la-portee"
-  },
-  {
-   "terme": "Photographie d'avatar",
-   "ancre": "domaine-la-portee"
-  },
-  {
-   "terme": "Non-buts",
-   "ancre": "domaine-les-non-buts"
+   "terme": "Capacités (les trois)",
+   "ancre": "domaine-les-trois-capacites"
   },
   {
    "terme": "Catégorie de corpulence",
    "ancre": "domaine-les-non-buts"
   },
   {
-   "terme": "Paliers de dose",
+   "terme": "Code-barres",
+   "ancre": "domaine-la-portee"
+  },
+  {
+   "terme": "Compte",
+   "ancre": "domaine-l-acteur-unique"
+  },
+  {
+   "terme": "Corrélation",
    "ancre": "domaine-les-non-buts"
   },
   {
-   "terme": "Projection de poids",
-   "ancre": "domaine-les-non-buts"
+   "terme": "Distinction",
+   "ancre": "domaine-le-vocabulaire"
   },
   {
-   "terme": "Tendance énergétique",
-   "ancre": "domaine-les-non-buts"
-  },
-  {
-   "terme": "Domaine de relevé",
+   "terme": "Domaines de relevé",
    "ancre": "domaine-les-domaines-de-releve"
   },
   {
-   "terme": "Drapeau d'activation",
-   "ancre": "domaine-les-domaines-de-releve"
+   "terme": "Dose",
+   "ancre": "domaine-bornes-de-saisie"
   },
   {
-   "terme": "Plafond quotidien de lignes",
-   "ancre": "domaine-les-domaines-de-releve"
+   "terme": "Effacement",
+   "ancre": "domaine-la-remise-a-zero"
   },
   {
-   "terme": "Zone d'administration",
-   "ancre": "domaine-les-domaines-de-releve"
+   "terme": "Fenêtre",
+   "ancre": "domaine-le-vocabulaire"
   },
   {
-   "terme": "Recouvrement de sommeils",
+   "terme": "Fiche d'aliment",
+   "ancre": "domaine-hors-sauvegarde"
+  },
+  {
+   "terme": "Filtrage du futur",
+   "ancre": "domaine-la-ligne-de-releve"
+  },
+  {
+   "terme": "Flux entrants et sortants",
+   "ancre": "domaine-la-portee"
+  },
+  {
+   "terme": "Genre",
+   "ancre": "domaine-l-acteur-unique"
+  },
+  {
+   "terme": "Heure (minute ronde)",
+   "ancre": "domaine-la-ligne-de-releve"
+  },
+  {
+   "terme": "Identifiant de ligne",
+   "ancre": "domaine-la-ligne-de-releve"
+  },
+  {
+   "terme": "Invariants",
+   "ancre": "domaine-les-invariants"
+  },
+  {
+   "terme": "Journal",
+   "ancre": "domaine-ce-qui-est-modelise"
+  },
+  {
+   "terme": "Journées (journal des)",
    "ancre": "domaine-les-domaines-de-releve"
   },
   {
@@ -359,115 +331,83 @@
    "ancre": "domaine-la-ligne-de-releve"
   },
   {
-   "terme": "Identifiant",
-   "ancre": "domaine-la-ligne-de-releve"
+   "terme": "Masquage d'un domaine",
+   "ancre": "domaine-les-domaines-de-releve"
   },
   {
-   "terme": "Minutes rondes",
-   "ancre": "domaine-la-ligne-de-releve"
-  },
-  {
-   "terme": "Référentiel",
-   "ancre": "domaine-les-referentiels"
-  },
-  {
-   "terme": "Aliment personnalisé",
-   "ancre": "domaine-les-referentiels"
-  },
-  {
-   "terme": "Repas favori",
-   "ancre": "domaine-les-referentiels"
-  },
-  {
-   "terme": "Recette",
-   "ancre": "domaine-les-referentiels"
-  },
-  {
-   "terme": "Catalogue",
-   "ancre": "domaine-les-referentiels"
-  },
-  {
-   "terme": "Unité canonique",
-   "ancre": "domaine-unites-et-precision"
-  },
-  {
-   "terme": "Système de mesure",
-   "ancre": "domaine-unites-et-precision"
-  },
-  {
-   "terme": "Pouce",
-   "ancre": "domaine-unites-et-precision"
-  },
-  {
-   "terme": "Bornes",
-   "ancre": "domaine-unites-et-precision"
-  },
-  {
-   "terme": "Année de naissance",
-   "ancre": "domaine-unites-et-precision"
-  },
-  {
-   "terme": "Invariants",
-   "ancre": "domaine-les-invariants"
-  },
-  {
-   "terme": "Rien de dérivable n'est stocké",
-   "ancre": "domaine-les-invariants"
-  },
-  {
-   "terme": "Référence par identifiant",
-   "ancre": "domaine-les-invariants"
-  },
-  {
-   "terme": "Dates locales",
-   "ancre": "domaine-les-invariants"
-  },
-  {
-   "terme": "Valeur absente",
-   "ancre": "domaine-les-invariants"
-  },
-  {
-   "terme": "Migration",
-   "ancre": "domaine-les-invariants"
-  },
-  {
-   "terme": "Vider un journal",
-   "ancre": "domaine-ce-qui-peut-effacer"
-  },
-  {
-   "terme": "Vider tous les journaux",
-   "ancre": "domaine-ce-qui-peut-effacer"
-  },
-  {
-   "terme": "Supprimer le compte",
-   "ancre": "domaine-ce-qui-peut-effacer"
-  },
-  {
-   "terme": "Pesée de départ",
-   "ancre": "domaine-ce-qui-peut-effacer"
-  },
-  {
-   "terme": "Vocabulaire",
-   "ancre": "domaine-le-vocabulaire"
-  },
-  {
-   "terme": "Cure",
-   "ancre": "domaine-le-vocabulaire"
-  },
-  {
-   "terme": "Série en cours",
-   "ancre": "domaine-le-vocabulaire"
+   "terme": "Métabolisme de base",
+   "ancre": "domaine-les-non-buts"
   },
   {
    "terme": "Molécule",
    "ancre": "domaine-le-vocabulaire"
   },
   {
-   "terme": "Distinction",
+   "terme": "Non-buts",
+   "ancre": "domaine-les-non-buts"
+  },
+  {
+   "terme": "Objectifs quotidiens",
+   "ancre": "domaine-bornes-de-saisie"
+  },
+  {
+   "terme": "Ordre des lignes",
+   "ancre": "domaine-la-ligne-de-releve"
+  },
+  {
+   "terme": "Pesée de départ",
+   "ancre": "domaine-les-invariants"
+  },
+  {
+   "terme": "Plafond quotidien",
+   "ancre": "domaine-les-domaines-de-releve"
+  },
+  {
+   "terme": "Portée",
+   "ancre": "domaine-la-portee"
+  },
+  {
+   "terme": "Prise",
    "ancre": "domaine-le-vocabulaire"
   },
   {
-   "terme": "Fenêtre",
+   "terme": "Profil",
+   "ancre": "domaine-ce-qui-est-modelise"
+  },
+  {
+   "terme": "Sauvegarde",
+   "ancre": "domaine-ce-qui-est-modelise"
+  },
+  {
+   "terme": "Sauvegarde illisible",
+   "ancre": "domaine-la-portee"
+  },
+  {
+   "terme": "Série en cours",
+   "ancre": "domaine-le-vocabulaire"
+  },
+  {
+   "terme": "Sommeil (non-chevauchement)",
+   "ancre": "domaine-les-invariants"
+  },
+  {
+   "terme": "Stockage local",
+   "ancre": "domaine-hors-sauvegarde"
+  },
+  {
+   "terme": "Système de mesure",
+   "ancre": "domaine-unites-et-precision"
+  },
+  {
+   "terme": "Traitement (catalogue)",
+   "ancre": "domaine-le-vocabulaire"
+  },
+  {
+   "terme": "Unités canoniques",
+   "ancre": "domaine-unites-et-precision"
+  },
+  {
+   "terme": "Vocabulaire",
    "ancre": "domaine-le-vocabulaire"
   }
  ]

@@ -55,337 +55,337 @@
    "origine": "V1, src/features/steps/steps.constants.ts (DEFAULT_DAILY_GOAL_STEPS)"
   },
   {
-   "categorie": "phrase-retiree",
-   "fonctionnalite": "Refus d'une valeur de poids hors bornes",
-   "texte": "La phrase « le message “poids incorrect” de la V1 est devenu inatteignable » est retirée : ce message n'existe pas. Aucune chaîne du dépôt V1 ne contient « poids incorrect » ; le seul « incorrect » du code est celui de l'authentification, et la doctrine des contraintes numériques interdit explicitement les mots « erreur » et « invalide ». La formulation réelle est composée à partir des bornes (« Un poids entre 0,1 et 1000 kg est attendu. »), et c'est une phrase d'interface qui n'a de toute façon pas sa place ici. Le chapitre ne garde que le fait de données : la valeur enregistrée reste en place.",
-   "origine": "Invention du rédacteur ; réfutation juste. V1, src/versions/mixte/app/form.rules.ts:66 et src/shared/ui/numberRules.ts:90-94"
+   "categorie": "affirmation-retiree",
+   "fonctionnalite": "Arrondi du poids d'un objet de comparaison",
+   "texte": "La règle « arrondi(kg × 1000) ÷ 1000 à l'écriture » n'existe nulle part et a été retirée. Ce qui est écrit est grammes ÷ 1000 à partir d'un entier de grammes (la règle de ce champ ne déclare aucune décimale) : il n'y a rien à arrondir. Le seul Math.round(poids × 1000) du fichier est une expression de restitution, hors périmètre. La ligne « kilogramme → gramme, × 1000, arrondi au gramme » du tableau des conversions a été remplacée par la conversion réelle, gramme → kilogramme, sans arrondi.",
+   "origine": "Réfutation vérifiée : V1, src/versions/mixte/components/InsolitesPage.tsx:129,144-146,321-325 et app/form.rules.ts:198-203"
   },
   {
-   "categorie": "regle-de-rendu-ecartee",
-   "fonctionnalite": "Poids d'un objet de comparaison",
-   "texte": "Le chapitre affirmait un arrondi d'écriture « arrondi(kg × 1000) ÷ 1000 ». À l'écriture il n'y a aucun arrondi : la valeur posée est grammes ÷ 1000, division nue d'un entier déjà contraint. Le Math.round(poids × 1000) est sur le chemin de LECTURE, pour repasser des kilogrammes du catalogue aux grammes exprimés — un arrondi de rendu, écarté ici. Le tableau des arrondis a été corrigé.",
-   "origine": "Réfutation juste. V1, src/versions/mixte/components/InsolitesPage.tsx:322 (écriture), :90, :129, :294 (lectures)"
+   "categorie": "affirmation-retiree",
+   "fonctionnalite": "Message de refus d'un poids en V1",
+   "texte": "La phrase « le message “poids incorrect” de la V1 est devenu inatteignable » a été retirée : ce texte n'existe nulle part dans le dépôt V1, et la doctrine du fichier de règles interdit précisément cette formulation (« LE MESSAGE DIT CE QUI EST ATTENDU, jamais “erreur” ni “invalide” » ; le texte réel est « Un poids entre 0,1 et 1000 kg est attendu. »). C'était en outre un mot d'interface. Le fait restant, exprimé en termes de données, est le passage du régime de refus au régime de restriction du domaine.",
+   "origine": "Réfutation vérifiée : V1, grep « poids incorrect » sans résultat ; form.rules.ts:24-27,66"
   },
   {
-   "categorie": "phrase-retiree",
-   "fonctionnalite": "Instant de suppression",
-   "texte": "La ligne « Instant technique (création, modification, suppression) » est ramenée à création et modification : le modèle a explicitement retiré deletedAt (« Supprimer supprime : la ligne quitte la sauvegarde »), les interfaces ne portent plus que createdAt/updatedAt, et une brique de purge irréversible efface le champ des sauvegardes héritées. Le fait de la suppression du champ est désormais énoncé dans le chapitre.",
-   "origine": "Réfutation juste. V1, src/types.ts:468-471 et src/shared/model/purgeDeleted.ts:35-38"
-  },
-  {
-   "categorie": "phrase-retiree",
-   "fonctionnalite": "Arrondi au pas décimal",
-   "texte": "La phrase « Toute opération à pas décimal est suivie d'un arrondi au pas » est retirée : elle n'est vraie que du déplacement d'une valeur d'un cran (stepNumber), qui n'est pas le chemin ordinaire d'écriture. Le chemin ordinaire tronque (cleanNumericInput puis sanitizeNumber, sans aucun Math.round). C'est cette phrase qui rendait plausible l'exemple faux 95,65 → 95,7.",
-   "origine": "Réfutation juste. V1, src/shared/ui/numberRules.ts:179-181 (stepNumber) contre :139-151 (sanitizeNumber)"
-  },
-  {
-   "categorie": "regle-de-rendu-ecartee",
-   "fonctionnalite": "Durée de sommeil exprimée en heures",
-   "texte": "Les minutes d'un sommeil sont converties en heures au dixième (Math.round(minutes / 60 * 10) / 10). Le code la nomme lui-même « la conversion d'AFFICHAGE du domaine » : aucune donnée n'est écrite en heures, la durée n'étant même pas conservée. Elle n'entre donc ni au tableau des conversions ni à celui des arrondis.",
-   "origine": "V1, src/features/sleep/sleep.utils.ts:489 et src/versions/mixte/features/report/reportWellbeing.ts:40"
+   "categorie": "affirmation-corrigee",
+   "fonctionnalite": "Arrondi d'écriture d'une pesée",
+   "texte": "L'exemple « 95,65 kg enregistrée à 95,7 » était arithmétiquement faux : le nettoyage TRONQUE à une décimale (slice, pas d'arrondi) avant tout enregistrement, donc la valeur retenue est 95,6. L'exemple a été corrigé et le chapitre dit désormais que l'arrondi d'écriture ne mord que sur une valeur qui n'a pas traversé ce nettoyage — valeur engendrée, importée ou calculée.",
+   "origine": "Réfutation vérifiée : V1, src/shared/ui/numberRules.ts:127-129 et src/features/weight/weight.utils.ts:27-29"
   },
   {
    "categorie": "incoherence-relevee",
-   "fonctionnalite": "Système d'unités de la V1",
-   "texte": "Le système d'unités de la V1 n'agit sur aucune grandeur : profile.measurementSystem n'est lu par aucune ligne du dépôt, formatItemsAsText et getUnitLabel prennent 'metric' par défaut et tous leurs appelants l'omettent (le seul explicite passe le littéral 'metric'), toBaseQuantity et fromLargeUnit sont exportés sans aucun consommateur. Les trois lignes de conversion alimentaire sont marquées « non implémenté » dans le chapitre plutôt que présentées comme un comportement.",
-   "origine": "Réfutation juste. V1, src/types.ts:253, src/shared/food/food.units.ts, food.format.ts:21, medicalReportPdf.ts:2997-2998"
+   "fonctionnalite": "Échelle de sévérité d'un effet indésirable",
+   "texte": "Le chapitre annonçait 1 à 5 en recopiant un commentaire de type périmé (« severity: number; // 1 to 5 »). L'échelle réelle va de 0 à 5 et compte six échelons nommés (imperceptible, léger, modéré, marqué, fort, élevé) : corrigé, et l'écart entre le code et son commentaire est signalé dans le chapitre.",
+   "origine": "Réfutation vérifiée : V1, SideEffectForm.tsx:47-54,221-223,229 contre types.ts:437"
+  },
+  {
+   "categorie": "code-mort",
+   "fonctionnalite": "Système d'unités en V1",
+   "texte": "Le système d'unités n'agit sur RIEN en V1 : la préférence du profil n'a aucun lecteur, toBaseQuantity et fromLargeUnit n'ont aucun appelant, les deux appels de toDisplayQuantity hors de la brique passent 'metric' en dur et tous les appels d'étiquette omettent l'argument. Les trois lignes de conversion correspondantes portent désormais la marque « non implémenté ».",
+   "origine": "Réfutation vérifiée : V1, types.ts:253 seul porteur de measurementSystem ; food.units.ts ; medicalReportPdf.ts:2997,3368 ; food.format.ts:20"
   },
   {
    "categorie": "incoherence-relevee",
-   "fonctionnalite": "Sévérité d'un effet indésirable",
-   "texte": "Le chapitre annonçait 1 à 5, copié du type SeverityLevel du modèle cible, que rien n'applique. L'échelle vivante va de 0 à 5, six échelons nommés (« Imperceptible » … « Élevé »), bornes tirées de la longueur de la liste. Le chapitre donne désormais 0 à 5 et signale le type mort.",
-   "origine": "Réfutation juste. V1, src/versions/mixte/features/side-effects/SideEffectForm.tsx:40-54 et :220-229, contre src/types.ts:478"
+   "fonctionnalite": "Stockage métrique du poids en V2",
+   "texte": "L'invariant « une valeur est conservée en unité métrique » est écrit deux fois dans la V2 (en-tête de src/domaine/unites.ts, et GUIDELINES § « Données, unités, nombres, dates ») mais n'est pas tenu pour le poids : il n'existe ni POIDS_EN_KG ni constante de conversion, la valeur retenue est le nombre choisi dans l'unité du système, et le plafond employé est celui de cette unité. Le chapitre énonce désormais la règle, dit qu'elle est tenue pour la taille et pas pour le poids, et marque l'écart « non implémenté ».",
+   "origine": "Réfutation vérifiée : V2, unites.ts:1-20,58-61 ; mesures.ts:22-25 ; SelecteurPoids.tsx:65,74-77 ; GUIDELINES.md:282-293"
   },
   {
-   "categorie": "arbitrage-non-valide",
-   "fonctionnalite": "Ensemble des poids atteignables en V2",
-   "texte": "« L'ensemble des valeurs atteignables est exactement l'intervalle » n'est vrai que pour la taille et l'année de naissance. Pour le poids, l'ensemble est le réseau discret {1,0 ; 1,1 ; … ; 999,9}, dont le maximum dépasse le plafond déclaré de 999 ; et le plancher de 1 n'est déclaré nulle part — il tombe de la construction de la liste (rang + 1), aucun POIDS_MIN n'existe. Corrigé dans le chapitre et marqué.",
-   "origine": "Réfutation juste. V2, src/screens/onboarding/SelecteurPoids.tsx:27 et :77 ; src/domaine/mesures.ts:22-25"
+   "categorie": "incoherence-relevee",
+   "fonctionnalite": "Valeurs dérivées conservées dans un repas",
+   "texte": "« Rien de dérivable n'est conservé » est démenti par cinq champs — énergie, protéines, glucides, lipides, fibres — recalculés et réécrits à chaque enregistrement d'un repas, et lus tels quels par le total d'énergie ingérée. Le modèle les nomme « cache transitoire » et les destine à disparaître ; ils n'ont pas disparu. Le chapitre l'énonce désormais au présent, sur les cinq champs, avec sa conséquence : corriger une fiche d'aliment ne corrige pas les repas déjà enregistrés.",
+   "origine": "Réfutation vérifiée : V1, types.ts:258-279 et features/metabolism/metabolism.utils.ts:96-102"
   },
   {
-   "categorie": "migration-non-prevue",
-   "fonctionnalite": "Invariant « le format enregistré ne change pas sans migration »",
-   "texte": "Cet invariant est énoncé dans les GUIDELINES de la V2 et repris au chapitre, mais aucun code ne le porte : ni migration, ni vérification à la lecture, ni garde. Il est marqué « non implémenté » dans le chapitre plutôt que présenté comme une garantie.",
-   "origine": "V2, GUIDELINES.md § « Données, unités, nombres, dates » ; aucun fichier de migration dans GIT-APP-V2/src"
+   "categorie": "incoherence-relevee",
+   "fonctionnalite": "Plancher de poids en V2",
+   "texte": "Le domaine V2 ne déclare aucun POIDS_MIN : mesures.ts n'expose que POIDS_MAX. Le plancher de 1 vient de l'ensemble des valeurs admissibles construit ailleurs, et il est consigné dans le registre des décisions (« poids 1–999 kg / 1–2000 lb »). Le chapitre garde donc le 1 mais dit qu'il ne vit pas dans le modèle.",
+   "origine": "Réfutation vérifiée : V2, mesures.ts:22-25 ; SelecteurPoids.tsx:77 ; GUIDELINES.md:290-292"
+  },
+  {
+   "categorie": "incoherence-relevee",
+   "fonctionnalite": "Aller-retour des bornes de taille en pouces",
+   "texte": "Le plancher ne fait pas l'aller-retour : tailleEnCm(20,'in') = arrondi(50,8) = 51, si bien qu'en impérial la plus petite taille atteignable vaut 51 cm et que 50 cm est inatteignable ; le plafond, lui, se referme exactement (118 in = 300 cm). La phrase « la règle reste la fourchette en centimètres » a été corrigée en conséquence.",
+   "origine": "Réfutation vérifiée : V2, unites.ts:75-77 ; mesures.ts:54-57 ; EtapeProfil.tsx:62,95-96"
+  },
+  {
+   "categorie": "incoherence-relevee",
+   "fonctionnalite": "Replis de calcul",
+   "texte": "Quatre replis substituent un chiffre inventé à une donnée absente — âge 42, taille 170 cm, genre femme, poids 80 kg — et un cinquième ramène une heure absente à midi. Ils contredisent la règle « une valeur absente se tait » : le métabolisme d'un profil incomplet est celui d'une personne fictive, sans que rien ne le signale. Ajoutés au chapitre dans une section propre, marqués « arbitrage non validé ».",
+   "origine": "Réfutation vérifiée : V1, metabolism.utils.ts:150-152 ; bodyMetrics.utils.ts:11-19 ; bloodLevel.utils.ts:96,126"
+  },
+  {
+   "categorie": "manque",
+   "fonctionnalite": "Écriture persistante en V2",
+   "texte": "Le chapitre annonçait la conversion du texte « 95.0 » en nombre « à l'enregistrement » alors qu'aucun enregistrement n'existe : ni stockage local, ni base, ni échange distant dans tout GIT-APP-V2/src. La phrase est conservée mais marquée « non implémenté ».",
+   "origine": "Réfutation vérifiée : V2, grep localStorage / fetch dans src sans résultat ; reponses.ts:14-21"
   },
   {
    "categorie": "hors-perimetre",
-   "fonctionnalite": "Longueur de nom en lettres",
-   "texte": "RULE_NAME_LENGTH (0 à 200 lettres, vide admis) ne contraint qu'un filtre des outils internes de revue Ciqual, à la lisière de l'administration. La ligne est donnée au tableau des bornes pour que le catalogue soit complet, avec la mention de son périmètre.",
-   "origine": "V1, src/versions/mixte/app/form.rules.ts:210-216"
+   "fonctionnalite": "Bornes de longueur de texte",
+   "texte": "Deux longueurs de texte sont bornées — le libellé d'un produit venu d'un code-barres, tronqué franchement à 120 caractères, et la longueur d'un nom filtré par un outil interne de revue, 0 à 200 lettres — et ne sont pas des grandeurs mesurées. Le chapitre les cite pour dire où passe la frontière, sans les traiter.",
+   "origine": "V1, src/shared/food/food.barcode.ts:149 et src/versions/mixte/app/form.rules.ts:210-216"
   },
   {
-   "categorie": "incoherence-relevee",
-   "fonctionnalite": "Type du poids en V2",
-   "texte": "Le poids de la V2 n'est pas un nombre mais une chaîne (« 95.0 »), dans l'unité que le système désigne, et aucune conversion livre ↔ kilogramme n'existe. Le tableau des unités porte désormais deux lignes distinctes, V1 (nombre, kilogramme) et V2 (chaîne, unité du système), et une section entière expose le trou.",
-   "origine": "Réfutation juste. V2, src/screens/onboarding/reponses.ts:14-21, :34-35, :57-59, :84-85 ; EtapePoids.tsx:35 ; SelecteurPoids.tsx:74-75"
+   "categorie": "regle-de-rendu-ecartee",
+   "fonctionnalite": "Quantification des minutes rondes à la source",
+   "texte": "L'ensemble des huit minutes rondes est exporté pour servir de domaine à toute heure choisie ; ce que dit le code, c'est que les sélecteurs natifs du navigateur ne savent pas engendrer un ensemble irrégulier, pas qu'aucun mécanisme ne le sait. Le chapitre énonce désormais la règle des deux côtés — domaine de la valeur et quantification à l'écriture — sans nommer le mécanisme d'interface.",
+   "origine": "Réfutation vérifiée : V1, src/shared/date/date.local.ts:36-41,68-72"
   }
  ],
  "glossaire": [
   {
    "terme": "Unité de conservation",
-   "definition": "L'unité dans laquelle une grandeur est effectivement gardée, sans étiquette portée par la valeur. Métrique par doctrine ; tenue pour la taille, pas pour le poids de la V2."
+   "definition": "L'unique unité dans laquelle une grandeur est gardée. Le nombre conservé ne porte pas son étiquette : celle-ci se recalcule à la lecture depuis une propriété de la donnée (la nature solide ou liquide d'un aliment) ou depuis la préférence du compte."
   },
   {
    "terme": "Système d'unités",
-   "definition": "Préférence du compte, metrique ou imperial, qui détermine l'unité dans laquelle une valeur est exprimée vers l'extérieur et interprétée quand elle arrive. Défaut metrique ; la langue choisie repose le système sans l'imposer."
+   "definition": "Préférence du compte à deux valeurs, metrique et imperial. Il détermine l'unité dans laquelle une valeur est exprimée vers l'extérieur et interprétée quand elle arrive. Défaut metrique ; la langue choisie repose le système sans l'imposer."
   },
   {
-   "terme": "Troncature",
-   "definition": "Coupe des décimales au-delà du nombre autorisé, sans arrondi et sans refus de la valeur. C'est le mécanisme qui impose réellement la granularité d'une valeur fournie."
+   "terme": "Granularité",
+   "definition": "Le pas de quantification d'une grandeur : le plus petit écart que deux valeurs conservées peuvent avoir. Dixième de kilogramme pour un poids, millième de milligramme pour une dose, un mètre pour une distance."
   },
   {
    "terme": "Arrondi d'écriture",
-   "definition": "Arrondi appliqué une fois, au moment d'enregistrer ; il change la valeur conservée. Le poids au dixième de kilogramme en V1 en est le cas type."
+   "definition": "Arrondi appliqué une fois, au moment d'enregistrer, qui change la valeur conservée. À distinguer de la troncature du nettoyage, qui agit plus tôt et coupe les décimales excédentaires au lieu d'arrondir."
   },
   {
    "terme": "Arrondi de calcul",
-   "definition": "Arrondi appliqué dans une grandeur dérivée ; il détermine la valeur du résultat sans rien écrire."
+   "definition": "Arrondi appliqué dans une grandeur dérivée, qui détermine la valeur du résultat sans jamais toucher une valeur conservée."
   },
   {
-   "terme": "Pas",
-   "definition": "Le déplacement d'un cran d'une grandeur, déclaré à côté de ses bornes. À défaut, un cran de la dernière décimale autorisée."
+   "terme": "Arrondi de restitution",
+   "definition": "Arrondi qui n'existe que le temps d'exprimer un nombre vers l'extérieur et ne modifie aucune donnée. Hors du périmètre de ce chapitre."
   },
   {
-   "terme": "Borne",
-   "definition": "Fourchette admise d'une grandeur, minimum inclus et maximum inclus, le maximum étant facultatif. Elle n'écarte que l'absurde et ne juge jamais un corps."
+   "terme": "Nettoyage",
+   "definition": "Traitement appliqué à chaque instant de la composition d'une valeur : virgule convertie en point, caractères non numériques retirés, un seul point conservé, décimales tronquées au nombre autorisé, signe négatif retiré. Il ne borne pas."
   },
   {
-   "terme": "Minute ronde",
-   "definition": "Une des huit valeurs 0, 10, 15, 20, 30, 40, 45, 50 ; toute heure conservée y est ramenée vers le bas."
+   "terme": "Régime de borne",
+   "definition": "Manière dont une borne agit. Trois existent : le refus (valeur non retenue, valeur antérieure conservée), la restriction du domaine (l'ensemble des valeurs admissibles est exactement l'intervalle), l'écartement (la valeur hors bornes devient une absence de valeur)."
   },
   {
-   "terme": "Heure murale locale",
-   "definition": "Chaîne HH:MM lue sur les composantes locales de l'horloge, sans fuseau ni suffixe universel."
+   "terme": "Valeur par défaut",
+   "definition": "Valeur posée d'avance, qui devient une valeur enregistrée si rien ne la remplace. Indiscernable, une fois enregistrée, d'une valeur choisie."
   },
   {
-   "terme": "Instant technique",
-   "definition": "Nombre de millisecondes depuis l'époque Unix, porté par createdAt et updatedAt. Il n'existe pas d'instant de suppression."
-  },
-  {
-   "terme": "Échelle sans unité",
-   "definition": "Grandeur qui est une position ordonnée et non une mesure : faim, qualité d'un sommeil, sévérité d'un effet indésirable, score d'activité, intensité d'une séance."
+   "terme": "Repli",
+   "definition": "Valeur substituée dans un calcul à une donnée absente. Jamais enregistrée, mais déterminante pour le résultat — âge 42, taille 170 cm, genre femme, poids 80 kg, heure 12:00."
   },
   {
    "terme": "Grandeur dérivée",
-   "definition": "Valeur jamais conservée, recalculée à chaque lecture depuis ses sources, de sorte que corriger une source corrige tout l'historique."
+   "definition": "Grandeur recalculée à chaque lecture depuis d'autres valeurs, de sorte que corriger une source corrige tout l'historique. Seule exception subsistante : les cinq valeurs nutritionnelles d'un repas, conservées."
+  },
+  {
+   "terme": "Minute ronde",
+   "definition": "L'une des huit minutes que peut porter une heure conservée : 0, 10, 15, 20, 30, 40, 45, 50. Toute heure y est ramenée vers le bas au moment d'écrire."
+  },
+  {
+   "terme": "Échelle sans unité",
+   "definition": "Grandeur qui est une position et non une mesure : faim, qualité d'un sommeil, sévérité d'un effet indésirable, intensité d'une séance. Conservée en entier, définie par son intervalle et l'ordre de ses échelons."
   },
   {
    "terme": "MET",
-   "definition": "Équivalent métabolique : une kilocalorie par kilogramme de masse corporelle et par heure. Rend homogène MET × kg × heures, en kilocalories."
+   "definition": "Coût métabolique d'une activité, multiple du métabolisme de repos. 3,5 pour la marche ordinaire ; les valeurs viennent d'un catalogue d'activités et, pour les séances à distance, d'une table d'ancrages allure → MET."
   },
   {
-   "terme": "Allure",
-   "definition": "Vitesse d'une séance en kilomètres par heure, mètres ÷ 1000 ÷ heures. Quand elle existe, elle remplace l'intensité ressentie dans le calcul de l'énergie."
-  },
-  {
-   "terme": "Facteur d'intensité",
-   "definition": "Multiplicateur d'une séance : 0,8 douce, 1,0 modérée, 1,3 intensive. Le facteur tiré de l'allure est ramené à la même plage."
-  },
-  {
-   "terme": "Minutes pondérées",
-   "definition": "Durée d'une séance multipliée par son facteur d'intensité, un étage valant une demi-minute d'équivalent. 78 valent le score d'activité plein."
-  },
-  {
-   "terme": "Métabolisme de base",
-   "definition": "Dépense au repos d'une journée, en kilocalories, calculée depuis le poids, la taille, l'âge et le genre. Accumulé sans arrondi sur plusieurs jours."
+   "terme": "Ancrage d'allure",
+   "definition": "Point (allure en km/h, coût en MET) d'une table par activité. Entre deux ancrages, le coût est interpolé linéairement ; au-delà des extrémités, il est bloqué à la valeur de l'ancrage extrême."
   },
   {
    "terme": "Points d'IMC",
-   "definition": "Écart d'IMC entre le poids actuel et le poids de départ, arrondi sur l'écart et non sur les deux IMC. Négatif quand le poids baisse."
-  },
-  {
-   "terme": "Foulée",
-   "definition": "Distance d'un pas. Deux modèles coexistent : 0,00076 km fixe pour la distance de marche, taille × 0,414 ÷ 100000 km pour l'énergie."
+   "definition": "Écart d'IMC entre le poids courant et le poids de départ, arrondi une seule fois au dixième sur l'écart. Signe de la variation : négatif quand du poids est perdu. Absence de valeur si la taille est inconnue."
   },
   {
    "terme": "Poids net comestible",
-   "definition": "Valeur d'une unité usuelle une fois retirée la partie non consommée (coquille, peau, noyau) ; jamais un poids brut."
+   "definition": "Convention de la table d'équivalences : chaque valeur est le poids de la partie consommable, jamais le poids brut — un œuf moyen vaut 50 g et non 58."
   },
   {
-   "terme": "Réseau discret",
-   "definition": "Ensemble fini des valeurs qu'une grandeur peut prendre quand elle se pose par choix. Pour le poids en V2 : {1,0 ; 1,1 ; … ; 999,9}."
+   "terme": "Biodisponibilité relative",
+   "definition": "Part de la dose prise qui compte sur la courbe de concentration, portée par la fiche de chaque forme de traitement. La concentration est ensuite normalisée pour que son maximum vaille la dose ainsi mise à l'échelle."
   }
  ],
  "index": [
   {
-   "terme": "Unités canoniques",
+   "terme": "unité de conservation",
    "ancre": "grandeurs-les-unites-canoniques"
   },
   {
-   "terme": "Système d'unités",
+   "terme": "système d'unités",
    "ancre": "grandeurs-les-unites-canoniques"
   },
   {
-   "terme": "Kilogramme",
+   "terme": "étiquette d'unité",
    "ancre": "grandeurs-les-unites-canoniques"
   },
   {
-   "terme": "Centimètre",
+   "terme": "kilogramme",
    "ancre": "grandeurs-les-unites-canoniques"
   },
   {
-   "terme": "Kilocalorie",
+   "terme": "livre",
    "ancre": "grandeurs-les-unites-canoniques"
   },
   {
-   "terme": "Milligramme",
+   "terme": "centimètre",
    "ancre": "grandeurs-les-unites-canoniques"
   },
   {
-   "terme": "Étage",
+   "terme": "kilocalorie",
    "ancre": "grandeurs-les-unites-canoniques"
   },
   {
-   "terme": "Objectifs quotidiens",
+   "terme": "milligramme",
    "ancre": "grandeurs-les-unites-canoniques"
   },
   {
-   "terme": "Instant technique",
+   "terme": "étage",
    "ancre": "grandeurs-les-unites-canoniques"
   },
   {
-   "terme": "Instant de suppression",
+   "terme": "granularité",
    "ancre": "grandeurs-les-unites-canoniques"
   },
   {
-   "terme": "Code-barres",
+   "terme": "objectif quotidien",
    "ancre": "grandeurs-les-unites-canoniques"
   },
   {
-   "terme": "Poids en livres",
-   "ancre": "grandeurs-le-poids-echappe-a-la-doctrine"
+   "terme": "kilojoule (absent)",
+   "ancre": "grandeurs-les-unites-canoniques"
   },
   {
-   "terme": "Facteur livre-kilogramme",
-   "ancre": "grandeurs-le-poids-echappe-a-la-doctrine"
+   "terme": "pouce",
+   "ancre": "grandeurs-les-conversions-et-leurs-facteurs"
   },
   {
-   "terme": "Valeurs de départ",
-   "ancre": "grandeurs-les-valeurs-de-depart"
+   "terme": "once avoirdupois",
+   "ancre": "grandeurs-les-conversions-et-leurs-facteurs"
   },
   {
-   "terme": "Poids visé",
-   "ancre": "grandeurs-les-valeurs-de-depart"
+   "terme": "once liquide",
+   "ancre": "grandeurs-les-conversions-et-leurs-facteurs"
   },
   {
-   "terme": "Taille par défaut",
-   "ancre": "grandeurs-les-valeurs-de-depart"
+   "terme": "facteur de conversion",
+   "ancre": "grandeurs-les-conversions-et-leurs-facteurs"
   },
   {
-   "terme": "Année de naissance",
-   "ancre": "grandeurs-les-valeurs-de-depart"
+   "terme": "8 000 kcal par kilogramme",
+   "ancre": "grandeurs-les-conversions-et-leurs-facteurs"
   },
   {
-   "terme": "Conversions",
-   "ancre": "grandeurs-les-conversions"
+   "terme": "table d'équivalences des portions",
+   "ancre": "grandeurs-les-conversions-et-leurs-facteurs"
   },
   {
-   "terme": "Pouce",
-   "ancre": "grandeurs-les-conversions"
+   "terme": "poids net comestible",
+   "ancre": "grandeurs-les-conversions-et-leurs-facteurs"
   },
   {
-   "terme": "Once avoirdupois",
-   "ancre": "grandeurs-les-conversions"
-  },
-  {
-   "terme": "Once liquide",
-   "ancre": "grandeurs-les-conversions"
-  },
-  {
-   "terme": "Table d'équivalences des unités usuelles",
-   "ancre": "grandeurs-les-conversions"
-  },
-  {
-   "terme": "Poids net comestible",
-   "ancre": "grandeurs-les-conversions"
-  },
-  {
-   "terme": "Bornes",
+   "terme": "borne",
    "ancre": "grandeurs-les-bornes"
   },
   {
-   "terme": "Pas d'une grandeur",
+   "terme": "régime de borne",
    "ancre": "grandeurs-les-bornes"
   },
   {
-   "terme": "Décimales autorisées",
+   "terme": "écartement d'une valeur",
    "ancre": "grandeurs-les-bornes"
   },
   {
-   "terme": "Vide admis",
+   "terme": "plafond de poids",
    "ancre": "grandeurs-les-bornes"
   },
   {
-   "terme": "Réseau discret",
+   "terme": "année de naissance",
    "ancre": "grandeurs-les-bornes"
   },
   {
-   "terme": "Valeur non finie",
+   "terme": "bornes d'un code-barres",
    "ancre": "grandeurs-les-bornes"
   },
   {
-   "terme": "Troncature",
-   "ancre": "grandeurs-les-arrondis-de-calcul"
+   "terme": "longueur de texte bornée",
+   "ancre": "grandeurs-les-bornes"
   },
   {
-   "terme": "Arrondi d'écriture",
-   "ancre": "grandeurs-les-arrondis-de-calcul"
+   "terme": "arrondi d'écriture",
+   "ancre": "grandeurs-les-arrondis"
   },
   {
-   "terme": "Arrondi de calcul",
-   "ancre": "grandeurs-les-arrondis-de-calcul"
+   "terme": "arrondi de calcul",
+   "ancre": "grandeurs-les-arrondis"
   },
   {
-   "terme": "Foulée",
-   "ancre": "grandeurs-les-arrondis-de-calcul"
+   "terme": "arrondi de restitution",
+   "ancre": "grandeurs-les-arrondis"
   },
   {
-   "terme": "Séparateur décimal",
-   "ancre": "grandeurs-l-ecriture-d-un-nombre"
+   "terme": "atteinte d'un objectif",
+   "ancre": "grandeurs-les-arrondis"
   },
   {
-   "terme": "Nettoyage d'un nombre",
-   "ancre": "grandeurs-l-ecriture-d-un-nombre"
+   "terme": "poids moyen sur sept jours",
+   "ancre": "grandeurs-les-arrondis"
   },
   {
-   "terme": "Signe négatif",
-   "ancre": "grandeurs-l-ecriture-d-un-nombre"
+   "terme": "foulée",
+   "ancre": "grandeurs-les-arrondis"
   },
   {
-   "terme": "Valeur absente",
-   "ancre": "grandeurs-l-ecriture-d-un-nombre"
+   "terme": "séparateur décimal",
+   "ancre": "grandeurs-l-ecriture-d-un-nombre-au-stockage"
   },
   {
-   "terme": "Échelles sans unité",
+   "terme": "nettoyage d'une valeur",
+   "ancre": "grandeurs-l-ecriture-d-un-nombre-au-stockage"
+  },
+  {
+   "terme": "troncature des décimales",
+   "ancre": "grandeurs-l-ecriture-d-un-nombre-au-stockage"
+  },
+  {
+   "terme": "valeur absente",
+   "ancre": "grandeurs-l-ecriture-d-un-nombre-au-stockage"
+  },
+  {
+   "terme": "échelle sans unité",
    "ancre": "grandeurs-les-echelles-sans-unite"
   },
   {
-   "terme": "Faim",
+   "terme": "faim",
    "ancre": "grandeurs-les-echelles-sans-unite"
   },
   {
-   "terme": "Qualité d'un sommeil",
+   "terme": "qualité d'un sommeil",
    "ancre": "grandeurs-les-echelles-sans-unite"
   },
   {
-   "terme": "Sévérité d'un effet indésirable",
+   "terme": "sévérité d'un effet indésirable",
    "ancre": "grandeurs-les-echelles-sans-unite"
   },
   {
-   "terme": "Score d'activité",
+   "terme": "intensité d'une séance",
    "ancre": "grandeurs-les-echelles-sans-unite"
   },
   {
-   "terme": "Minutes pondérées",
-   "ancre": "grandeurs-les-echelles-sans-unite"
+   "terme": "valeur par défaut",
+   "ancre": "grandeurs-les-valeurs-par-defaut-et-les-replis"
   },
   {
-   "terme": "Intensité d'une séance",
-   "ancre": "grandeurs-les-echelles-sans-unite"
+   "terme": "repli de calcul",
+   "ancre": "grandeurs-les-valeurs-par-defaut-et-les-replis"
   },
   {
-   "terme": "Grandeurs dérivées",
+   "terme": "objectif de pas",
+   "ancre": "grandeurs-les-valeurs-par-defaut-et-les-replis"
+  },
+  {
+   "terme": "grandeur dérivée",
    "ancre": "grandeurs-les-grandeurs-derivees"
   },
   {
@@ -393,11 +393,11 @@
    "ancre": "grandeurs-les-grandeurs-derivees"
   },
   {
-   "terme": "Points d'IMC",
+   "terme": "points d'IMC",
    "ancre": "grandeurs-les-grandeurs-derivees"
   },
   {
-   "terme": "Métabolisme de base",
+   "terme": "métabolisme de base",
    "ancre": "grandeurs-les-grandeurs-derivees"
   },
   {
@@ -405,31 +405,43 @@
    "ancre": "grandeurs-les-grandeurs-derivees"
   },
   {
-   "terme": "Allure",
+   "terme": "allure",
    "ancre": "grandeurs-les-grandeurs-derivees"
   },
   {
-   "terme": "Pourcentage d'atteinte",
+   "terme": "ancrage d'allure",
    "ancre": "grandeurs-les-grandeurs-derivees"
   },
   {
-   "terme": "Concentration sanguine",
+   "terme": "concentration sanguine",
    "ancre": "grandeurs-les-grandeurs-derivees"
   },
   {
-   "terme": "Durée",
+   "terme": "biodisponibilité relative",
+   "ancre": "grandeurs-les-grandeurs-derivees"
+  },
+  {
+   "terme": "cache de valeurs nutritionnelles",
+   "ancre": "grandeurs-les-grandeurs-derivees"
+  },
+  {
+   "terme": "minute ronde",
    "ancre": "grandeurs-le-temps-comme-grandeur"
   },
   {
-   "terme": "Heure murale locale",
+   "terme": "heure murale locale",
    "ancre": "grandeurs-le-temps-comme-grandeur"
   },
   {
-   "terme": "Minute ronde",
+   "terme": "instant technique",
    "ancre": "grandeurs-le-temps-comme-grandeur"
   },
   {
-   "terme": "Fuseau horaire",
+   "terme": "jour d'endormissement",
+   "ancre": "grandeurs-le-temps-comme-grandeur"
+  },
+  {
+   "terme": "fuseau et langue",
    "ancre": "grandeurs-le-temps-comme-grandeur"
   }
  ]

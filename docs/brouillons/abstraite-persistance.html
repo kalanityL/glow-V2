@@ -1,30 +1,31 @@
 <section id="persistance">
   <h2>8. Persistance, effacement, portabilité <a class="retour" href="#sommaire">↑ sommaire</a></h2>
-  <p>Tout ce que le produit retient tient sur l'appareil, dans un magasin de paires clé-valeur, et n'en sort que par un geste explicite. Ce chapitre dit ce qui est conservé, sous quelle forme, ce qui arrive quand la lecture ou l'écriture échoue, ce que l'effacement emporte et dans quel ordre, et ce qui franchit ou ne franchit jamais la limite de l'appareil.</p>
+  <p>Tout ce que le produit retient tient sur l'appareil, dans un magasin de paires clé-valeur, et n'en sort que par un geste explicite ou par une recherche de code-barres. Ce chapitre dit ce qui est conservé, sous quelle forme, ce qui arrive quand la lecture ou l'écriture échoue, ce que l'effacement emporte et dans quel ordre, et ce qui franchit ou ne franchit jamais la limite de l'appareil.</p>
 
   <h3 id="persistance-le-document-unique">Le document unique</h3>
   <p>Le profil et les journaux forment un seul document, sérialisé en JSON, conservé sous une seule clé : <code>glp1_app_companion_data</code>. Il n'a ni numéro de schéma, ni horodatage, ni signature : les conversions de chargement se reconnaissent à la forme des données, pas à une version déclarée. Il est conservé en clair.</p>
   <table>
     <thead><tr><th>Propriété</th><th>Type</th><th>Cardinalité</th><th>Contenu</th></tr></thead>
     <tbody>
-      <tr><td><code>profile</code></td><td>objet</td><td>1, obligatoire</td><td>identité, corps, cible, avatar, rappels, drapeaux des sept suivis activables, traitement en cours (identifiant du catalogue)</td></tr>
-      <tr><td><code>weightHistory</code></td><td>liste</td><td>0..n, obligatoire</td><td>pesées, dont au plus une porte le drapeau de pesée de départ</td></tr>
+      <tr><td><code>profile</code></td><td>objet</td><td>1, obligatoire</td><td>identité (prénom, genre, âge en années, taille en centimètres), silhouette, poids cible, avatar, rappels, drapeaux des sept suivis activables, traitement en cours (identifiant du catalogue), date d'échéance, objectifs quotidiens (calories, protéines, fibres) — et onze drapeaux qui ne portent pas sur les données : <code>deleteAllButtonsEnabled</code> conditionne l'accès au vidage d'un journal, les dix autres (<code>homeCornerButtonsEnabled</code>, <code>colorblindModeEnabled</code>, <code>mysteryBadgeHidden</code>, sept <code>*ModuleHidden</code>) ne règlent que ce qui est montré du carnet</td></tr>
+      <tr><td><code>weightHistory</code></td><td>liste</td><td>0..n, obligatoire</td><td>pesées ; chacune porte le drapeau de pesée de départ, dont l'unicité n'est pas structurellement imposée (voir plus bas)</td></tr>
       <tr><td><code>dailyLogs</code></td><td>liste</td><td>0..n, obligatoire</td><td>journal quotidien hérité</td></tr>
       <tr><td><code>injectionHistory</code></td><td>liste</td><td>0..n, obligatoire</td><td>prises : dose, traitement, zone</td></tr>
-      <tr><td><code>savedMeals</code></td><td>liste</td><td>0..n, facultative</td><td>repas et en-cas, leur composition et leurs valeurs nutritionnelles</td></tr>
+      <tr><td><code>savedMeals</code></td><td>liste</td><td>0..n, facultative</td><td>repas et en-cas : type, libellé du type, composition, valeurs nutritionnelles, deux niveaux de faim</td></tr>
       <tr><td><code>sideEffectHistory</code></td><td>liste</td><td>0..n, facultative</td><td>effets ressentis : type, intensité 1–5, note libre</td></tr>
       <tr><td><code>stepLogs</code></td><td>liste</td><td>0..n, facultative</td><td>pas comptés par jour</td></tr>
-      <tr><td><code>sportLogs</code></td><td>liste</td><td>0..n, facultative</td><td>séances : sport, durée, calories</td></tr>
-      <tr><td><code>meTimeLogs</code></td><td>liste</td><td>0..n, facultative</td><td>moments pour soi</td></tr>
+      <tr><td><code>sportLogs</code></td><td>liste</td><td>0..n, facultative</td><td>séances : sport (son nom, qui lui sert de clé), intensité parmi trois, durée en minutes, distance facultative <strong>en mètres</strong>, note libre. <strong>Aucune calorie n'est conservée</strong> : la dépense se recalcule à chaque lecture depuis le MET du catalogue, retrouvé par le nom du sport</td></tr>
+      <tr><td><code>meTimeLogs</code></td><td>liste</td><td>0..n, facultative</td><td>moments pour soi : activité (son nom), durée en minutes, note libre</td></tr>
       <tr><td><code>sleepLogs</code></td><td>liste</td><td>0..n, facultative</td><td>nuits et siestes</td></tr>
     </tbody>
   </table>
-  <p>« Facultative » se lit à la lettre : la propriété peut être absente du document, et l'absence ne vaut pas liste vide pour qui la relit — toute lecture retombe sur une liste vide elle-même. Rien de dérivable n'y est conservé, à une exception assumée : un repas garde les valeurs nutritionnelles calculées à son enregistrement (calories, protéines, glucides, lipides, fibres), recalculées à chaque modification.</p>
-  <p>Ce document ne contient pas : la base des aliments et recettes personnalisés, les repas mis en favori, les compteurs de sélection d'aliments, les listes de sports, d'effets et de moments suivis, les paliers déjà franchis, les compteurs d'objets ludiques, les retours et les réponses au questionnaire, l'acceptation du cadre médical, ni aucune préférence de restitution. Chacun de ces ensembles a sa propre clé.</p>
+  <p>« Facultative » ne vaut qu'une fois. Sur une installation neuve, sept propriétés seulement sont écrites — ni <code>sportLogs</code>, ni <code>meTimeLogs</code>, ni <code>sleepLogs</code>. Dès le premier chargement réussi d'un document existant, les neuf journaux sont matérialisés en listes vides par la conversion qui retire les lignes de démonstration, puis réécrits ainsi : l'absence ne survit pas à une ouverture. Toute lecture retombe de toute façon sur une liste vide.</p>
+  <p>Rien de dérivable n'y est conservé, à deux exceptions près, toutes deux dans le repas : ses valeurs nutritionnelles (calories, protéines, glucides, lipides, fibres), recalculées depuis sa composition à chaque écriture, et le <strong>libellé de son type</strong> à côté de son type — un nom déduit d'un identifiant, écrit à chaque enregistrement par la fonction pure qui le calcule. Cette seconde exception contredit deux règles à la fois : ne rien conserver de dérivable, et référencer par identifiant plutôt que par nom. <span class="marque">arbitrage non validé</span></p>
+  <p>Ce document ne contient pas : la base des aliments et recettes personnalisés, les repas mis de côté, les compteurs de sélection d'aliments, les listes de sports, d'effets et de moments suivis, les paliers déjà franchis, les compteurs d'objets ludiques, les retours et les réponses au questionnaire, l'acceptation du cadre médical, ni les choix de présentation indépendants du compte. Chacun de ces ensembles a sa propre clé. En revanche il porte, dans le profil, les onze drapeaux ci-dessus : le partage est explicite dans le code — ce qui règle l'affichage <em>des données</em> suit le profil, ce qui relève de la présentation seule reste sur l'appareil.</p>
 
   <h3 id="persistance-ce-qui-vit-hors-du-document">Ce qui vit hors du document</h3>
   <table>
-    <thead><tr><th>Clé</th><th>Forme</th><th>Contenu</th></tr></thead>
+    <thead><tr><th>Clé</th><th>Voie</th><th>Contenu</th></tr></thead>
     <tbody>
       <tr><td><code>glp1_user_custom_foods</code></td><td>JSON, liste</td><td>aliments et recettes créés ; seul ensemble portant un lien référentiel (une recette vers ses ingrédients)</td></tr>
       <tr><td><code>glp1_favorite_meals</code></td><td>JSON, liste</td><td>compositions mises de côté pour être rejouées</td></tr>
@@ -33,32 +34,36 @@
       <tr><td><code>glp1_badge_tiers_connus</code></td><td>JSON, dictionnaire</td><td>dernier palier observé par distinction, pour ne fêter qu'une fois</td></tr>
       <tr><td><code>glp1_paliers_nutritifs_fetes</code></td><td>JSON</td><td>paliers nutritionnels déjà salués</td></tr>
       <tr><td><code>glow_ludic_usage</code></td><td>JSON, objet</td><td>compteurs par objet et assignation courante (signature de la pesée, deux pertes en kilos, deux décompositions)</td></tr>
+      <tr><td><code>glow_onboarding_sim_mixte</code></td><td>JSON, objet</td><td><strong>les réponses du questionnaire d'accueil</strong> — prénom, genre, poids de départ et sa date, poids actuel, cible, taille, âge, activité, séances, cahier alimentaire, suivis souhaités —, l'étape en cours et l'achèvement. Données personnelles conservées hors du document unique et <strong>jamais versées au profil</strong> : rien de ce qui y est répondu n'atteint le carnet</td></tr>
       <tr><td><code>glp1_first_open_date</code></td><td>chaîne <code>AAAA-MM-JJ</code></td><td>premier jour d'usage, posé une fois</td></tr>
       <tr><td><code>glp1_dynamique_celebrated</code></td><td>chaîne <code>'true'</code></td><td>déblocage déjà salué</td></tr>
       <tr><td><code>glp1_notified_bmi_tier_index</code></td><td>chaîne d'un entier</td><td>dernier palier d'IMC signalé ; absent vaut 99</td></tr>
       <tr><td><code>hasAcceptedMedicalDisclaimer_v1</code></td><td>chaîne <code>'true'</code></td><td>acceptation du cadre médical</td></tr>
-      <tr><td><code>glp1_meal_edit_notice_dismissed</code></td><td>chaîne <code>'true'</code></td><td>avertissement de modification écarté</td></tr>
-      <tr><td><code>steps_custom_start_date</code></td><td>chaîne</td><td>origine choisie pour le cumul des pas</td></tr>
-      <tr><td><code>glow_report_include_v2</code></td><td>JSON, objet</td><td>les huit sections retenues pour le prochain bilan ; paramètre de ce qui sortira de l'appareil</td></tr>
+      <tr><td><code>glp1_meal_edit_notice_dismissed</code></td><td>chaîne <code>'true'</code></td><td>la mise en garde sur la modification d'un repas a été refusée pour de bon</td></tr>
+      <tr><td><code>steps_custom_start_date</code></td><td><strong>JSON</strong>, chaîne</td><td>origine choisie pour le cumul des pas ; passe par la voie JSON, le magasin contient donc les guillemets</td></tr>
+      <tr><td><code>glow_report_include_v2</code></td><td>JSON, objet</td><td>les huit ensembles de données retenus pour le prochain bilan ; paramètre de ce qui sortira de l'appareil. Le suffixe de version est délibéré : la clé antérieure n'est ni lue ni effacée</td></tr>
       <tr><td><code>glp1_user_feedbacks</code></td><td>JSON, liste</td><td>retours écrits : type, ressenti, catégorie, message, instant d'envoi, consentement de recontact</td></tr>
       <tr><td><code>glp1_user_survey_v2</code></td><td>JSON, objet</td><td>sept notes 0–5, suggestion libre, journal des envois (instants en millisecondes, deux jours gardés)</td></tr>
       <tr><td><code>glp1_user_survey</code></td><td>JSON, objet</td><td>format antérieur du questionnaire : lu en repli, jamais réécrit</td></tr>
       <tr><td><code>glp1_send_cap_alert</code></td><td>chaîne <code>identifiant:AAAA-MM-JJ</code></td><td>jour où l'alerte de plafond d'envoi est déjà partie</td></tr>
-      <tr><td>clés de restitution (<code>glp1_period_…</code>, <code>glp1_view_…</code>, <code>glp1_*_history_view</code>, <code>glow_theme_…</code>, <code>glow_home_…</code>, <code>glow_menu_…</code>, <code>glow_trend_flips</code>, <code>glow_home_equivalences</code>)</td><td>JSON ou chaîne nue</td><td>préférences de restitution ; aucune n'a d'effet sur les données. Hors périmètre de ce document</td></tr>
+      <tr><td>clés de présentation : <code>glp1_period_…</code> (dont <code>glp1_period_blood_level_by_brand</code>, une entrée par molécule), <code>glp1_view_…</code>, <code>glp1_*_history_view</code>, une douzaine de clés <code>glow_…</code></td><td>JSON ou chaîne nue</td><td>périodes retenues, modes de lecture, parure, disposition, bascules de tendance. Aucune n'a d'effet sur les données. Hors périmètre de ce document, citées ici parce que l'effacement total les emporte</td></tr>
       <tr><td><code>glp1_meals_cleared</code>, <code>glp1_last_celebrated_weight</code>, <code>glp1_last_celebrated_weight_id</code></td><td>chaînes nues</td><td>héritées : plus jamais écrites, jamais lues, conservées seulement pour être emportées par l'effacement total</td></tr>
       <tr><td><code>&lt;clé&gt;__secours</code>, <code>&lt;clé&gt;__secours-&lt;horodatage&gt;</code>, <code>&lt;clé&gt;__secours-index</code></td><td>chaînes brutes et JSON</td><td>copies de secours du document unique et leur inventaire</td></tr>
     </tbody>
   </table>
-  <p>Deux conventions d'accès coexistent et ne sont pas interchangeables : une valeur écrite en JSON se relit en JSON, une chaîne nue se relit telle quelle. Faire passer un drapeau <code>'true'</code> par la voie JSON le réécrirait <code>"true"</code> et rendrait illisible ce qui est déjà conservé sur les appareils. Le choix de la voie est donc fixé par clé, et ne se change pas.</p>
+  <p>Deux conventions d'accès coexistent et ne sont pas interchangeables : une valeur écrite en JSON se relit en JSON, une chaîne nue se relit telle quelle. Faire passer un drapeau <code>'true'</code> par la voie JSON le réécrirait <code>"true"</code> et rendrait illisible ce qui est déjà conservé sur les appareils. Le choix de la voie est fixé par clé, et ne se change pas.</p>
+  <p>Un troisième magasin existe, à durée de session : trois clés d'outillage réservé (<code>glow_ciqual_admin_summary</code>, <code>…_return_tab</code>, <code>…_page_state</code>) y traversent un redémarrage. Elles n'appartiennent pas au carnet, et l'effacement total ne les touche pas.</p>
 
   <h3 id="persistance-quand-l-ecriture-a-lieu">Quand l'écriture a lieu</h3>
   <p>Le document unique est réécrit intégralement à chaque changement de son contenu, y compris au tout premier instant qui suit un chargement réussi. Il n'y a ni écriture différée, ni écriture partielle, ni journal d'opérations : la dernière écriture gagne, et une écriture porte tout le document. Les ensembles hors du document suivent la même règle, chacun pour sa clé.</p>
-  <p>L'écriture peut échouer sans que rien ne le signale : magasin indisponible, place épuisée. La couche d'accès avale l'erreur — une lecture ratée rend « absent », une écriture ratée ne rend rien. Une seule capacité corrige ce silence, en relisant ce qu'elle vient d'écrire et en comparant à l'octet près.</p>
+  <p>L'écriture peut échouer sans que rien ne le signale : magasin indisponible, place épuisée. La couche d'accès avale l'erreur — une lecture ratée rend « absent », une écriture ratée ne rend rien. Trois capacités seulement corrigent ce silence, en relisant ce qu'elles viennent d'écrire et en comparant caractère pour caractère : la mise à l'abri, l'écriture sous protection, la remise d'une copie. Toutes trois sont réservées à un outillage hors périmètre ; les écritures ordinaires ne relisent jamais.</p>
+  <p>Un geste qui touche à la fois le document et une clé secondaire les écrit séparément : il n'y a aucune atomicité entre clés, et un demi-état est possible — le document réécrit sans la clé secondaire, ou l'inverse. Rien ne le détecte, rien ne le rattrape. <span class="marque">arbitrage non validé</span></p>
   <details><summary>Cas limites</summary>
     <ul>
       <li>Magasin indisponible : chaque lecture rend « absent », donc les valeurs par défaut ; le produit fonctionne, sans rien conserver.</li>
       <li>Une valeur illisible sous une clé secondaire vaut valeur par défaut, sans trace ni copie de secours ; seul le document unique bénéficie du garde-fou.</li>
       <li>Deux exécutions simultanées du produit sur le même appareil écrivent la même clé sans arbitrage : la dernière écrase.</li>
+      <li>La comparaison de relecture porte sur des caractères, pas sur des octets ; la taille inscrite à l'inventaire des copies est elle aussi un nombre de caractères.</li>
     </ul>
   </details>
 
@@ -67,20 +72,21 @@
   <table>
     <thead><tr><th>#</th><th>Conversion</th><th>Effet</th></tr></thead>
     <tbody>
-      <tr><td>1</td><td>Retrait des ensembles supprimés</td><td>le suivi hydrique et les objectifs de poids à paliers quittent le document, ainsi que trois drapeaux du profil qui leur appartenaient</td></tr>
-      <tr><td>2</td><td>Complétion du profil</td><td>le profil lu recouvre le profil d'usine, propriété par propriété ; l'avatar est fusionné de la même façon</td></tr>
+      <tr><td>1</td><td>Retrait des ensembles supprimés</td><td>le suivi hydrique et les objectifs de poids à paliers quittent le document, ainsi que trois propriétés du profil qui leur appartenaient : deux drapeaux (<code>hydrationTrackingEnabled</code>, <code>weightGoalsEnabled</code>) et une quantité (<code>dailyWaterGoalMl</code>, un objectif en millilitres)</td></tr>
+      <tr><td>2</td><td>Complétion du profil</td><td>le profil lu recouvre le profil d'usine, propriété par propriété ; l'avatar est fusionné de la même façon ; <code>stepLogs</code> est matérialisé en liste vide s'il manque</td></tr>
       <tr><td>3</td><td>Écart des repas d'avant la bascule</td><td>un repas est retenu si et seulement s'il porte une liste de composants ; le critère est l'absence de la liste, jamais une liste vide</td></tr>
-      <tr><td>4</td><td>Retrait des lignes de démonstration</td><td>neuf journaux traversés ; une ligne part si son identifiant commence par l'un des cinq préfixes de démonstration</td></tr>
-      <tr><td>5</td><td>Passage des traitements aux identifiants</td><td>le profil et chaque prise portaient un libellé, ils portent un identifiant du catalogue ; un profil sans correspondance retombe sur « aucun traitement » ; une prise sans traitement en reste dépourvue, ce qui signifie « celui du profil »</td></tr>
+      <tr><td>4</td><td>Retrait des lignes de démonstration</td><td>neuf journaux traversés et tous reconstruits, donc matérialisés ; une ligne part si son identifiant commence par l'un des cinq préfixes de démonstration</td></tr>
+      <tr><td>5</td><td>Passage des traitements aux identifiants</td><td>le profil et chaque prise portaient un libellé, ils portent un identifiant du catalogue. Un libellé connu se convertit ; un libellé qui évoque l'absence de traitement donne <code>aucun</code> ; <strong>un libellé inconnu rejoint <code>autre-comprime</code> ou <code>autre-injection</code></strong> selon ce que son nom laisse deviner, et le nom saisi est perdu. Seule une valeur absente reste absente : au profil elle devient <code>aucun</code>, à une prise elle signifie « celui du profil »</td></tr>
       <tr><td>6</td><td>Purge des lignes marquées supprimées</td><td>sept journaux traversés ; les lignes marquées quittent le document et la marque est retirée des autres. Irréversible : les lignes marquées étaient déjà inaccessibles</td></tr>
       <tr><td>7</td><td>Fusion des deux textes libres d'un effet</td><td>l'ancien texte se replie dans la note ; la note l'emporte quand les deux existent ; un texte vide vaut absence de note</td></tr>
-      <tr><td>8</td><td>Fusion de deux noms de sport</td><td>deux libellés désignant le même sport n'en font plus qu'un ; sans quoi les séances retomberaient sur le repli du catalogue et leurs calories changeraient après coup</td></tr>
+      <tr><td>8</td><td>Fusion de deux noms de sport</td><td>deux libellés désignant le même sport n'en font plus qu'un ; sans quoi les séances retomberaient sur le repli du catalogue (4,5 MET) et leur dépense, recalculée à chaque lecture, changerait après coup</td></tr>
       <tr><td>9</td><td>Complétion des deux niveaux de faim d'un repas</td><td>une ligne qui porte déjà ses deux valeurs n'est jamais retouchée ; sinon les deux se déduisent du moment de la journée, de la taille du repas et de l'identifiant de la ligne — donc stables d'un chargement à l'autre</td></tr>
-      <tr><td>10</td><td>Assurance de la pesée de départ</td><td>le drapeau est posé sur toutes les pesées, vrai sur une seule ; si aucune ne le porte et que l'ancien profil déclarait un poids de départ, une pesée est créée à 08:00, à la date déclarée ou la veille de la plus ancienne</td></tr>
+      <tr><td>10</td><td>Assurance de la pesée de départ</td><td>le drapeau est posé sur chaque pesée ; s'il s'en trouve au moins une de marquée, la conversion s'arrête là. Sinon, et si l'ancien profil déclarait un poids de départ, une pesée est créée à 08:00, avec ce poids et <strong>les mensurations de départ de l'ancien profil</strong>, à la date déclarée, ou à défaut la veille de la plus ancienne pesée — et <strong>hier</strong> si l'historique est vide</td></tr>
     </tbody>
   </table>
-  <p>Document absent : le produit part du profil d'usine et d'une seule pesée, marquée départ, à 95,0 kg, datée de la veille à 08:00 ; les autres journaux sont vides. Cette pesée existe parce que la perte totale, les distinctions et le bilan n'auraient sinon aucune référence.</p>
-  <div class="exemple"><p>Le document de Camille a été écrit avant l'arrivée des identifiants de traitement : son profil porte le libellé « Ozempic » et douze prises aussi. Au premier chargement, tous deviennent l'identifiant <code>ozempic</code>, et le document réécrit ne contient plus un seul libellé. Le chargement suivant traverse la même conversion sans rien changer.</p></div>
+  <p><strong>L'unicité de la pesée de départ n'est pas tenue.</strong> Le drapeau la porte, aucun code ne l'impose : la conversion s'arrête dès qu'une ligne est marquée, rien ne dédoublonne, et un document peut en porter zéro ou plusieurs. La lecture prend la première marquée dans l'ordre de la liste. <span class="marque">arbitrage non validé</span></p>
+  <p>Document absent : le produit part du <strong>profil d'usine</strong> et d'une seule pesée, marquée départ, à 95,0 kg, datée de la veille à 08:00 ; les autres journaux sont vides. Le profil d'usine n'est pas un profil vide mais une personne fictive complète — un prénom, femme, 42 ans, 168 cm, cible 72,0 kg, silhouette en sablier, un avatar entier (teint, yeux verts, cheveux longs châtains), un rappel hebdomadaire le dimanche à 20:00, une échéance au 15 novembre 2026, aucun traitement, tous les suivis facultatifs éteints. La pesée semée existe parce que la perte totale, les distinctions et le bilan n'auraient sinon aucune référence.</p>
+  <div class="exemple"><p>Le document de Camille a été écrit avant l'arrivée des identifiants de traitement : son profil porte le libellé « Ozempic » et douze prises aussi. Au premier chargement, tous deviennent l'identifiant <code>ozempic</code>, et le document réécrit ne contient plus un seul libellé. Le chargement suivant traverse la même conversion sans rien changer. Si son profil avait porté un nom saisi à la main, absent du catalogue, il serait devenu <code>autre-injection</code> et le nom serait perdu.</p></div>
 
   <h3 id="persistance-quand-le-document-ne-se-lit-pas">Quand le document ne se lit pas</h3>
   <p>Une lecture ratée ne doit jamais détruire ce qu'elle n'a pas su lire. Trois effets, ensemble :</p>
@@ -88,7 +94,8 @@
   1. copie brute sous « &lt;clé&gt;__secours », UNE seule fois (si la clé est libre)
   2. aucune écriture de toute la session : mayPersist(chargementRaté) = faux
   3. l'état est déclaré : rien n'est perdu, rien ne sera enregistré</code></pre>
-  <p>Le produit fonctionne alors sur des données vides — profil d'usine et pesée de départ semée — sans jamais les conserver. La session redevient normale au redémarrage suivant, dont la lecture échouera de nouveau tant que le document reste illisible.</p>
+  <p>Le produit fonctionne alors sur des données vides — profil d'usine et pesée de départ semée — sans jamais les conserver.</p>
+  <p><strong>Rien ne répare cet état.</strong> Le document illisible n'est ni retiré, ni renommé, ni remplacé, ni marqué : chaque démarrage relit la même chaîne et échoue de la même façon. La seule issue est une intervention sur le magasin depuis l'extérieur du produit — aucune capacité offerte ne retire la clé ni ne remet la copie en place. Le message donné à la personne annonce pourtant un retour à la normale au prochain démarrage : il est faux. <span class="marque">arbitrage non validé</span></p>
   <details><summary>Cas limites</summary>
     <ul>
       <li>Un second échec ne recouvre pas le premier sauvetage : la clé de secours ne s'écrit que si elle est libre, et c'est la première copie qui porte les vraies données.</li>
@@ -96,7 +103,7 @@
       <li>Si l'écriture de la copie échoue elle aussi, la session reste en lecture seule : le refus d'écrire ne dépend pas de la réussite du sauvetage.</li>
     </ul>
   </details>
-  <div class="exemple"><p>Le document de Camille est tronqué. Au démarrage suivant, elle retrouve une pesée de départ à 95,0 kg datée de la veille — un chiffre qui ressemble à ses 96 kg de mai 2026 sans en être un. Ses données réelles sont intactes sous <code>glp1_app_companion_data__secours</code>, et rien de ce qu'elle enregistrerait pendant cette session ne serait conservé.</p></div>
+  <div class="exemple"><p>Le document de Camille est tronqué. Au démarrage suivant, elle retrouve le profil d'usine — un autre prénom, 42 ans, cible 72 kg — et une pesée de départ à 95,0 kg datée de la veille, un chiffre qui ressemble à ses 96 kg de mai 2026 sans en être un. Ses données réelles sont intactes sous <code>glp1_app_companion_data__secours</code>, rien de ce qu'elle enregistrerait ne serait conservé, et le démarrage suivant lui rendra exactement le même état.</p></div>
 
   <h3 id="persistance-les-copies-de-secours">Les copies de secours</h3>
   <p>Une capacité met le document courant à l'abri avant qu'il ne soit remplacé. La copie porte un horodatage local, à la seconde, et aucune copie n'en recouvre jamais une autre.</p>
@@ -116,18 +123,20 @@
       <li>Deux copies dans la même seconde : le suffixe numérique les sépare ; au-delà de 99, l'instant en millisecondes.</li>
       <li>Une copie référencée par l'inventaire mais absente du magasin : la remise échoue et ne touche à rien.</li>
       <li>Les copies comptent dans la place occupée : plus il y en a, plus tôt la place manque.</li>
-      <li>Ces deux capacités ne sont déclenchées que depuis l'espace d'administration, hors périmètre ; le modèle, lui, les porte.</li>
+      <li>Ces deux capacités n'ont d'appelant que dans un outillage réservé à la fabrication de données, hors périmètre ; le modèle, lui, les porte. La copie du sauvetage de lecture, elle, n'a aucun appelant de remise.</li>
     </ul>
   </details>
   <div class="exemple"><p>Le 18 août 2026 à 14 h 32 min 05 s, l'état de Camille est mis à l'abri sous <code>glp1_app_companion_data__secours-2026-08-18-143205</code>, et l'inventaire retient le motif et la taille de la copie.</p></div>
 
   <h3 id="persistance-quand-la-place-manque">Quand la place manque</h3>
-  <p>Le magasin a une capacité bornée — de l'ordre de cinq mégaoctets sur le socle actuel — et rien ne prévient de son approche. Trois ans de journaux en occupent une bonne part. La conséquence est une écriture qui échoue en silence, indistinguable d'une écriture réussie pour qui ne relit pas.</p>
-  <p>La seule parade est la relecture. Une capacité qui remplace le document ne se déclare réussie qu'après avoir relu et comparé ; à défaut, elle refuse, l'état antérieur est intact, et la personne est informée de ce qu'il faut libérer.</p>
+  <p>Le magasin a une capacité bornée — de l'ordre de cinq mégaoctets sur le socle actuel — et rien ne prévient de son approche. La conséquence est une écriture qui échoue en silence, indistinguable d'une écriture réussie pour qui ne relit pas.</p>
+  <p>Le produit ne mesure jamais la place occupée : aucun seuil, aucune alerte anticipée, aucune purge, aucune borne au nombre de copies de secours. La seule taille qu'il connaisse est celle qu'il inscrit à l'inventaire au moment d'une copie, en caractères. La seule parade est la relecture : une capacité qui remplace le document ne se déclare réussie qu'après avoir relu et comparé ; à défaut, elle refuse et l'état antérieur est intact.</p>
+  <p>Le refus demande de supprimer d'anciennes copies de secours. <strong>Aucune capacité ne le permet.</strong> La seule suppression de clé qu'offre le produit est celle des repas mis de côté ; nulle part une clé <code>__secours-…</code> n'est retirée, ni son entrée d'inventaire. Le geste demandé n'existe que hors du produit. <span class="marque non">non implémenté</span></p>
   <details><summary>Cas limites</summary>
     <ul>
       <li>Les écritures ordinaires du document unique ne relisent pas : une saisie perdue faute de place ne se signale pas. <span class="marque">arbitrage non validé</span></li>
       <li>Une copie de secours qui ne tient pas en place fait échouer le geste qu'elle protégeait, jamais l'inverse.</li>
+      <li>Chaque mise à l'abri double au moins la place occupée par le document le temps de la copie ; la saturation se rapproche donc plus vite qu'on ne l'écrit.</li>
     </ul>
   </details>
 
@@ -139,78 +148,84 @@
       <tr><td>Supprimer une ligne</td><td>un journal</td><td>tout le reste ; rien n'est récupérable</td></tr>
       <tr><td>Vider le journal des pesées</td><td>toutes les pesées</td><td><strong>la pesée de départ</strong>, épargnée : elle est la référence de la perte totale, des distinctions et du bilan</td></tr>
       <tr><td>Vider un autre journal</td><td>prises, effets, pas, séances, moments, sommeil, repas</td><td>rien de ce journal ; la liste devient vide</td></tr>
-      <tr><td>Retirer les favoris</td><td>la clé entière</td><td>—</td></tr>
+      <tr><td>Retirer les repas mis de côté</td><td>la clé entière</td><td>—</td></tr>
       <tr><td>Supprimer un aliment</td><td>la base personnalisée</td><td>refusé si une recette l'utilise comme ingrédient ; le refus nomme les recettes concernées</td></tr>
       <tr><td>Supprimer un retour</td><td>l'inventaire local des retours</td><td>l'envoi distant déjà parti, qui n'est pas repris</td></tr>
-      <tr><td>Tout effacer</td><td>l'appareil entier</td><td>rien</td></tr>
+      <tr><td>Tout effacer</td><td>le magasin persistant de l'origine, en une fois</td><td>ce qui vit ailleurs : magasin de session, base indexée, témoins de connexion</td></tr>
     </tbody>
   </table>
   <p><strong>L'ordre de l'effacement total est fixe, et il est le sujet.</strong></p>
-  <pre><code>1. si un compte distant existe → le supprimer
+  <pre><code>1. si un compte distant est configuré → le supprimer
      échec → RIEN n'est effacé, l'état antérieur est intact, la cause est dite
-2. effacer le magasin local en une fois, toutes clés confondues
+2. effacer le magasin persistant local en une fois, toutes clés confondues
 3. redémarrer le produit à zéro</code></pre>
   <p>Le compte d'abord : le service distant peut refuser (session trop ancienne, réseau coupé), et effacer avant de savoir laisserait une personne sans données mais avec un compte — un demi-état qu'aucun message ne rattrape. Sans compte distant configuré, l'étape 1 n'existe pas et le reste est identique.</p>
-  <p>L'effacement est total et non sélectif, délibérément : les clés naissent dans une vingtaine d'endroits, et une liste écrite à la main vieillirait mal — la première clé ajoutée ailleurs survivrait à l'effacement sans que rien ne le signale. Il emporte donc aussi la session d'authentification mémorisée, les copies de secours, l'acceptation du cadre médical, les préférences de restitution et les clés héritées.</p>
+  <p>L'effacement est total et non sélectif, délibérément : les clés naissent dans une vingtaine d'endroits, et une liste écrite à la main vieillirait mal — la première clé ajoutée ailleurs survivrait à l'effacement sans que rien ne le signale. Il emporte donc aussi les copies de secours, l'acceptation du cadre médical, les réponses du questionnaire d'accueil, les choix de présentation et les clés héritées.</p>
+  <p><strong>Sa portée s'arrête là.</strong> Le geste vide le magasin persistant d'une seule origine. Il ne touche ni le magasin de session, ni la base indexée, ni les témoins de connexion. Rien dans le code ne fixe où le service d'authentification range sa session mémorisée : aucune persistance n'est choisie, et le socle distant en décide seul — la version employée la range hors du magasin effacé. L'affirmation qu'une session mémorisée part avec le reste ne repose que sur un commentaire, pas sur du code. <span class="marque">arbitrage non validé</span></p>
+  <p>Ce qui est déjà parti ne part pas : les retours, les réponses au questionnaire, les fiches d'échec de bilan et les courriers déposés dans la file d'envoi restent dans la base distante, rangés sous l'identifiant du compte. La suppression du compte ne supprime que le compte d'authentification. Aucune capacité n'efface ces documents. <span class="marque non">non implémenté</span></p>
   <details><summary>Cas limites</summary>
     <ul>
       <li>Session trop ancienne : la suppression du compte est refusée ; seule une reconnexion débloque le geste, et rien n'a été effacé.</li>
       <li>Aucune session ouverte alors qu'un compte est configuré : refus, rien n'est effacé.</li>
       <li>Le redémarrage est le seul moyen sûr de ne rien laisser en mémoire vive d'un compte qui n'existe plus.</li>
-      <li>Les copies de secours partent avec le reste : après un effacement total, aucun sauvetage n'existe plus.</li>
+      <li>Les copies de secours partent avec le reste : après un effacement total, aucun sauvetage n'existe plus dans le magasin persistant.</li>
     </ul>
   </details>
-  <div class="exemple"><p>Camille efface tout. Son compte est supprimé, puis les 96 kg de mai, les prises d'Ozempic, les repas, les effets, l'année 1978 et les 168 cm quittent l'appareil en une fois, copies de secours comprises. Au redémarrage, le produit ne la connaît plus : profil d'usine, pesée de départ à 95,0 kg, cadre médical à accepter de nouveau.</p></div>
+  <div class="exemple"><p>Camille efface tout. Son compte est supprimé, puis les 96 kg de mai, les prises d'Ozempic, les repas, les effets, l'année 1978 et les 168 cm quittent le magasin persistant en une fois, copies de secours comprises. Au redémarrage, le produit ne la connaît plus — mais il ne présente pas une page blanche : il repart du profil d'usine, une autre personne, avec sa pesée de départ à 95,0 kg. Ses trois retours écrits, eux, sont toujours dans la base distante.</p></div>
 
   <h3 id="persistance-ce-qui-sort-de-l-appareil">Ce qui sort de l'appareil</h3>
-  <p>Rien ne part sans un geste explicite, et aucun geste ne synchronise : il n'existe aucune remontée du carnet, aucun rétablissement depuis un serveur, aucun partage entre appareils.</p>
+  <p>Aucun geste ne synchronise : il n'existe aucune remontée du carnet, aucun rétablissement depuis un serveur, aucun partage entre appareils. Une seule sortie n'est pas déclenchée pour elle-même : la recherche d'un code-barres.</p>
   <table>
     <thead><tr><th>Sortie</th><th>Contenu</th><th>Destination</th></tr></thead>
     <tbody>
-      <tr><td>Bilan de suivi</td><td>document paginé nommé <code>Bilan_GLP1_&lt;début&gt;_&lt;fin&gt;.pdf</code> : identité (prénom ou « Patiente non nommée »), genre, taille, IMC, cible, reste à parcourir, traitement, puis les sections retenues parmi huit, bornées à la période retenue</td><td>l'appareil lui-même : le document est produit localement et enregistré, il n'est envoyé nulle part</td></tr>
-      <tr><td>Image de progression</td><td>une image et une légende portant la valeur mise en avant (une perte en kilos, par exemple), plus l'adresse du produit</td><td>enregistrée sur l'appareil, ou remise au partage du système, ou déposée sur un service tiers dont l'adresse est ouverte avec la légende</td></tr>
-      <tr><td>Légende seule</td><td>le même texte</td><td>presse-papiers de l'appareil</td></tr>
-      <tr><td>Réponse au questionnaire</td><td>sept notes 0–5, suggestion libre, nombre de reprises, instants d'envoi ; auteur (identifiant, adresse, nom) ; contexte technique</td><td>un document par compte, fusionné à chaque envoi, dans la base distante</td></tr>
-      <tr><td>Retour écrit</td><td>type, ressenti, catégorie, message, consentement de recontact ; auteur ; contexte technique</td><td>un document par message, rangé sous l'identifiant du compte</td></tr>
-      <tr><td>Fiche d'un bilan qui a échoué</td><td>nature et pile de l'erreur, étape, bornes de la période, sections demandées et sections effectivement retenues, <strong>comptes</strong> d'entrées, options du tirage, durée écoulée</td><td>un document par échec, rangé sous l'identifiant du compte</td></tr>
-      <tr><td>Courrier d'accompagnement</td><td>reprise du contenu ci-dessus, mis en forme, échappé</td><td>une file d'envoi lue par un service tiers, vers une adresse fixe</td></tr>
-      <tr><td>Connexion</td><td>adresse et mot de passe, ou passage par un fournisseur tiers</td><td>le service d'authentification ; la session revient et est mémorisée sur l'appareil</td></tr>
+      <tr><td>Bilan de suivi</td><td>document nommé <code>Bilan_GLP1_&lt;début&gt;_&lt;fin&gt;.pdf</code> : identité (prénom ou « Patiente non nommée »), genre, taille, IMC, cible, reste à parcourir, traitement, puis les ensembles retenus parmi huit (pesées, repas, effets, pas, séances, sommeil, moments pour soi, équivalences ludiques), bornés à la période retenue</td><td>l'appareil lui-même : le document est produit localement et enregistré, il n'est envoyé nulle part</td></tr>
+      <tr><td>Image de progression</td><td>une image et le texte qui l'accompagne, portant la valeur mise en avant (une perte en kilos, par exemple), plus l'adresse du produit</td><td>enregistrée sur l'appareil, ou remise au partage du système, ou déposée sur un service tiers dont l'adresse est ouverte avec le texte</td></tr>
+      <tr><td>Texte seul</td><td>le même texte</td><td>presse-papiers de l'appareil</td></tr>
+      <tr><td><strong>Recherche d'un code-barres</strong></td><td>le code scanné ou saisi, et rien d'autre ; en-tête d'agent <code>MealTrackerApp - Web - Version 1.0</code></td><td><code>https://world.openfoodfacts.org/api/v0/product/&lt;code&gt;.json</code>, délai armé à 10 000 ms, corps compris. Interrogé <strong>en dernier recours seulement</strong> : si le code est porté par un aliment créé ou par la base embarquée, aucune requête ne part. Code inconnu du service : rien n'est prérempli. Échec : deux causes distinguées, service injoignable ou réponse mauvaise, et rien n'est enregistré ni signalé au service</td></tr>
+      <tr><td>Réponse au questionnaire</td><td>sept notes 0–5, suggestion libre, nombre de reprises, instants d'envoi ; auteur (identifiant, adresse, nom) ; contexte technique</td><td><code>surveys/&lt;identifiant du compte&gt;</code> : un document par compte, fusionné à chaque envoi</td></tr>
+      <tr><td>Retour écrit</td><td>type, ressenti, catégorie, message, consentement de recontact ; auteur ; contexte technique</td><td><code>feedbacks/&lt;identifiant&gt;/messages</code> : un document par message</td></tr>
+      <tr><td>Fiche d'un bilan qui a échoué</td><td>nature et pile de l'erreur, étape, bornes de la période, ensembles demandés et ensembles effectivement retenus, <strong>comptes</strong> d'entrées, options du tirage, durée écoulée</td><td><code>reportErrors/&lt;identifiant&gt;/failures</code> : un document par échec</td></tr>
+      <tr><td>Courrier d'accompagnement</td><td>reprise du contenu ci-dessus, mis en forme, échappé ; l'adresse de l'auteur en réponse</td><td>la collection <code>mail</code>, file lue par un service tiers d'expédition, vers une adresse fixe</td></tr>
+      <tr><td>Connexion</td><td>adresse et mot de passe, ou passage par un fournisseur tiers</td><td>le service d'authentification ; la session revient et est mémorisée sur l'appareil, à un emplacement que le produit ne choisit pas</td></tr>
     </tbody>
   </table>
-  <p>Le contexte technique joint aux trois envois ne contient que : version, provenance, préférences de restitution, dimensions, langues déclarées par le socle, instant en trois formes, fuseau et décalage, identification du socle, mode de compilation. Aucune donnée de santé.</p>
-  <p>Les envois distants sont un ajout, jamais un obstacle : l'enregistrement local a lieu le premier, et rien de ce qui suit ne peut l'empêcher ni le défaire. Aucun envoi ne peut faire échouer un geste, aucun ne se signale en cas d'échec. Sans configuration du service distant, rien n'est même tenté.</p>
+  <p>Le contexte technique joint aux trois envois ne contient que : version, provenance, choix de présentation, dimensions, langues déclarées par le socle, instant en <strong>quatre</strong> formes (millisecondes, forme universelle, forme locale lisible, jour local), fuseau et décalage en minutes, identification du socle, mode de compilation. Aucune donnée de santé.</p>
+  <p>Les envois distants sont un ajout, jamais un obstacle : l'enregistrement local a lieu le premier, et rien de ce qui suit ne peut l'empêcher ni le défaire. Aucun envoi ne peut faire échouer un geste, aucun ne se signale en cas d'échec. Sans configuration du service distant, rien n'est même tenté. La recherche de code-barres échappe à cette règle : c'est elle qui conditionne le préremplissage, et son échec se dit.</p>
   <details><summary>Cas limites</summary>
     <ul>
-      <li>Plafond de dix envois par jour local ; au-delà, refus, et une alerte part une seule fois par compte et par jour.</li>
+      <li>Plafond de dix envois par jour local ; au-delà, refus, et une alerte part une seule fois par compte et par jour. Un envoi supprimé le jour même rend sa place.</li>
       <li>Au-delà de dix reprises du questionnaire, une alerte part au franchissement, une seule fois.</li>
       <li>Un retour supprimé localement ne retire pas le document déjà envoyé.</li>
-      <li>Le partage vers un service tiers emporte la légende et l'adresse du produit, jamais un fichier.</li>
+      <li>Le partage vers un service tiers emporte le texte et l'adresse du produit, jamais un fichier.</li>
+      <li>Une fiche du service alimentaire n'est jamais crue sur parole : chaque valeur est vérifiée, convertie, bornée, et ce qui ne tient pas est écarté plutôt que rabattu sur une valeur plausible.</li>
     </ul>
   </details>
 
   <h3 id="persistance-ce-qui-n-en-sort-jamais">Ce qui n'en sort jamais</h3>
   <p>Poids et mensurations, prises et doses, repas et leur composition, effets ressentis et leurs notes, pas, séances, sommeil, moments pour soi, distinctions, avatar, identité : rien de tout cela ne quitte l'appareil, sinon dans le bilan et l'image de progression, que la personne produit et destine elle-même.</p>
-  <p>La recherche d'un aliment par son code-barres est entièrement locale : elle interroge la base embarquée et celle des aliments créés. Aucune requête ne part vers un service alimentaire, ni pour chercher, ni pour signaler un code introuvable.</p>
+  <p>La seule donnée qui parte sans geste dédié est un code-barres, et il ne dit rien de la personne : ni ce qu'elle en fait, ni la quantité, ni l'heure, ni si l'aliment finit dans un repas. Il dit qu'un produit a été scanné, à cet instant, depuis cette adresse.</p>
   <p>La fiche d'un bilan qui a échoué ne connaît du carnet que sa taille : des comptes et deux bornes de période, jamais une valeur, jamais une date d'entrée de journal. La seule chose que la taille d'un carnet dit de sa propriétaire, c'est depuis combien de temps elle s'en sert.</p>
 
   <h3 id="persistance-les-contraintes-du-portage">Les contraintes du portage</h3>
-  <p>Le magasin n'est connu que d'une couche unique : lire, écrire, retirer une clé, tout effacer. Aucune autre partie du produit ne sait comment ni où c'est conservé, ce qui fait du remplacement du magasin un changement d'un seul endroit. La même clôture vaut pour l'authentification, pour la base distante, pour le presse-papiers, pour le partage, pour l'enregistrement d'un fichier et pour la génération d'identifiants.</p>
-  <p>Les identifiants sont des UUID version 7 : 48 bits d'horodatage en tête, 74 bits d'aléatoire, ordonnables lexicographiquement à la milliseconde. Le motif antérieur, fondé sur l'instant seul, produisait deux fois la même valeur pour deux créations dans la même milliseconde. Plusieurs journaux emploient encore ce motif antérieur. <span class="marque">arbitrage non validé</span></p>
+  <p>Le magasin n'est connu que d'une couche unique, qui expose six verbes : lire en JSON, écrire en JSON, lire une chaîne nue, écrire une chaîne nue, retirer une clé, tout effacer. Lire et écrire sont deux gestes chacun, et le choix de la voie est fixé par clé. Aucune autre partie du produit ne sait comment ni où c'est conservé, ce qui fait du remplacement du magasin un changement d'un seul endroit. La même clôture vaut pour l'authentification, pour la base distante, pour le presse-papiers, pour le partage, pour l'enregistrement d'un fichier et pour la génération d'identifiants. Elle souffre une exception, dans un outillage réservé hors périmètre, qui s'adresse directement au magasin de session.</p>
+  <p>Les identifiants sont des UUID version 7 : 48 bits d'horodatage en tête, 74 bits d'aléatoire, ordonnables lexicographiquement à la milliseconde. Le motif antérieur, fondé sur l'instant seul, produisait deux fois la même valeur pour deux créations dans la même milliseconde. Seuls les repas emploient le nouveau motif ; pesées, prises, effets, pas, séances, moments et sommeil emploient encore l'ancien. <span class="marque">arbitrage non validé</span></p>
   <p><span class="marque v2">V2</span> Ce que la V2 a arrêté et qui prévaut :</p>
   <ul>
-    <li>Rien n'est encore conservé : aucune écriture n'existe, un redémarrage perd tout. Ce chapitre décrit donc l'état de la V1, sauf mention contraire.</li>
-    <li>Le stockage est toujours métrique — kilogrammes, centimètres, grammes, millilitres — et ne porte aucune étiquette d'unité ; la conversion se fait aux deux bouts. Le séparateur décimal conservé est le point.</li>
+    <li>Rien n'est encore conservé : aucune écriture n'existe, aucune couche de magasin n'existe, un redémarrage perd tout. Ce chapitre décrit donc l'état de la V1, sauf mention contraire.</li>
+    <li>Le stockage est toujours métrique — kilogrammes, centimètres, grammes, millilitres, mètres — et ne porte aucune étiquette d'unité ; la conversion se fait aux deux bouts. Le séparateur décimal conservé est le point.</li>
     <li>La taille est conservée en centimètres ; l'année de naissance remplace l'âge, qui se périme.</li>
     <li>Les dates conservées sont locales (<code>AAAA-MM-JJ</code>, <code>HH:MM</code>) ; une conversion universelle recule d'un jour en soirée.</li>
     <li>Le format déjà enregistré ne se change pas sans migration.</li>
     <li>Rien de dérivable n'est conservé ; on référence par identifiant, jamais par nom ; supprimer supprime ; une valeur absente se tait plutôt que de valoir zéro.</li>
+    <li>Aucune synchronisation multi-appareils : le carnet reste lié à un appareil.</li>
   </ul>
-  <p><span class="marque v2">V2</span> Exigences posées pour la conversion vers le socle natif, qui n'aura lieu qu'une fois : surface d'attaque minimale ; <strong>données de santé chiffrées</strong> ; secrets hors du paquet livré ; aucune permission native non justifiée ; dépendances auditées ; liens profonds validés ; revue de sécurité avant toute distribution. Aucune n'est tenue aujourd'hui : le document est conservé en clair, et la configuration du service distant vit dans le code livré — elle n'est pas un secret, la protection tenant aux règles du service et à la liste des comptes autorisés, mais l'exigence, elle, reste à satisfaire. <span class="marque non">non implémenté</span></p>
+  <p><span class="marque v2">V2</span> Exigences posées pour la conversion vers le socle natif, qui n'aura lieu qu'une fois : surface d'attaque minimale ; <strong>données de santé chiffrées</strong> ; secrets hors du paquet livré ; aucune permission native non justifiée ; dépendances auditées ; liens profonds validés ; revue de sécurité avant toute distribution. Aucune n'est tenue aujourd'hui, et aucune n'est spécifiée : le document est conservé en clair ; la configuration du service distant vit dans le code livré — elle n'est pas un secret, la protection tenant aux règles du service et à la liste des comptes autorisés, mais rien ne dit ce qui <em>est</em> un secret aujourd'hui ni ce qui devra sortir du paquet demain ; et les trois permissions qu'appelleront les capacités promises dans le même paragraphe — appareil photo pour le scan réel, notifications du téléphone, données de mouvement pour le podomètre réel — ne sont ni nommées ni justifiées une à une. <span class="marque non">non implémenté</span></p>
   <details><summary>Cas limites</summary>
     <ul>
-      <li>Le chiffrement au repos changera la forme de ce qui est conservé : il appelle une migration, donc une conversion de plus dans la chaîne de chargement.</li>
+      <li>Le chiffrement au repos changera la forme de ce qui est conservé : il appelle une migration, donc une conversion de plus dans la chaîne de chargement. Rien ne dit encore ce qui est chiffré (le seul document, toutes les clés, les copies de secours), où vit la clé, si elle survit à une réinstallation, ni ce qu'il advient des copies déjà posées en clair sur les appareils.</li>
       <li>Le magasin natif n'offre pas les mêmes garanties de capacité : la relecture de vérification reste la seule parade portable.</li>
-      <li>Aucune synchronisation multi-appareils n'est prévue ; le carnet reste lié à un appareil, et un appareil perdu est un carnet perdu.</li>
+      <li>« Tout effacer » ne recouvrira pas la même chose sur le socle natif : la portée devra être redite, magasin par magasin.</li>
+      <li>Un appareil perdu est un carnet perdu.</li>
     </ul>
   </details>
 </section>

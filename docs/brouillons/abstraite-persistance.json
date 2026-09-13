@@ -4,19 +4,37 @@
    "categorie": "Chiffrement",
    "fonctionnalite": "Données de santé chiffrées au repos",
    "texte": "Le document conservé serait chiffré, avec une clé dérivée du compte ou du séquestre de l'appareil.",
-   "origine": "Exigence écrite de la V2 (GUIDELINES.md § 1, contrainte permanente 1, consigne du 2026-08-26/27) pour le jour de la conversion native. Le code actuel n'a aucun chiffrement : `shared/platform/storage.ts` sérialise en JSON et écrit en clair."
+   "origine": "Exigence écrite de la V2 (GUIDELINES.md § 1, contrainte permanente 1, consigne du 2026-08-26/27) pour le jour de la conversion native. Le code actuel n'a aucun chiffrement : `shared/platform/storage.ts` sérialise en JSON et écrit en clair. L'exigence n'est par ailleurs spécifiée nulle part : ni le périmètre chiffré, ni l'emplacement de la clé, ni sa survie à une réinstallation, ni le sort des copies de secours déjà posées en clair."
+  },
+  {
+   "categorie": "Sécurité",
+   "fonctionnalite": "Permissions natives nommées et justifiées",
+   "texte": "Chaque permission demandée au socle natif serait nommée et justifiée une à une.",
+   "origine": "GUIDELINES.md § 1 pose « aucune permission native non justifiée » dans le paragraphe qui annonce l'appareil photo pour le scan réel, les notifications du téléphone et le podomètre réel — soit caméra, notifications et données de mouvement. Aucune liste, aucune justification n'existe : l'exigence n'est pas vérifiable."
+  },
+  {
+   "categorie": "Sécurité",
+   "fonctionnalite": "Inventaire des secrets",
+   "texte": "Ce qui est un secret aujourd'hui, et ce qui devra sortir du paquet livré demain, serait énuméré.",
+   "origine": "GUIDELINES.md § 1 pose « secrets hors du bundle ». Le seul élément examinable, `shared/platform/firebase.config.ts:4-13`, n'est pas un secret (la protection tient aux règles du service et à la liste des comptes autorisés). Aucun inventaire n'existe."
   },
   {
    "categorie": "Portabilité",
    "fonctionnalite": "Exporter et réimporter son carnet",
    "texte": "Une capacité pour emporter tout le document dans un fichier, puis le réinjecter sur un autre appareil.",
-   "origine": "Attendu naturel d'un carnet local. Rien de tel n'existe : la seule sortie est le bilan de suivi (`medicalReportPdf.ts`, document paginé, non relisible par le produit), et aucune capacité ne lit un fichier. La V2 exclut par ailleurs toute synchronisation multi-appareils."
+   "origine": "Attendu naturel d'un carnet local. Rien de tel n'existe : la seule sortie est le bilan de suivi (`medicalReportPdf.ts`), que le produit ne sait pas relire, et aucune capacité ne lit un fichier. La V2 exclut par ailleurs toute synchronisation multi-appareils."
   },
   {
    "categorie": "Copies de secours",
    "fonctionnalite": "Remettre une copie de secours",
    "texte": "La personne choisirait une copie horodatée et la remettrait en place.",
-   "origine": "`shared/model/dataBackup.ts` porte `restoreBackup` et l'inventaire des copies, mais son seul appelant est l'espace d'administration, hors périmètre. La copie du sauvetage de lecture (`<clé>__secours`) n'a, elle, aucun appelant de remise."
+   "origine": "`shared/model/dataBackup.ts` porte `restoreBackup` et l'inventaire des copies, mais son seul appelant est un outillage réservé à la fabrication de données, hors périmètre. La copie du sauvetage de lecture (`<clé>__secours`) n'a, elle, aucun appelant de remise."
+  },
+  {
+   "categorie": "Copies de secours",
+   "fonctionnalite": "Supprimer une copie de secours",
+   "texte": "La personne libérerait de la place en retirant d'anciennes copies horodatées.",
+   "origine": "Le message d'échec d'écriture le demande explicitement (`dataBackup.ts:152-154` : « Supprimez d'anciennes sauvegardes de secours ou libérez de la place »), mais aucun `removeItem` sur une clé `__secours-…` n'existe dans le dépôt : la seule suppression de clé du produit est celle des repas mis de côté (`MealTracker.tsx`). Le message promet un geste qui n'existe pas."
   },
   {
    "categorie": "Copies de secours",
@@ -31,22 +49,58 @@
    "origine": "Aucun champ de version dans `AppData` (`src/types.ts`). Les dix conversions de `useAppData.ts` sont toutes idempotentes et reconnaissent la forme des données, ce qui tient lieu de versionnement."
   },
   {
+   "categorie": "Format",
+   "fonctionnalite": "Calories d'une séance conservées",
+   "texte": "Chaque séance de sport porterait sa dépense en calories, figée à l'enregistrement.",
+   "origine": "Affirmé par le chapitre précédent, faux : `SportLog` (`src/types.ts:302-337`) porte id, date, heure, sport, intensité, durée, distance facultative et note — aucun champ `calories`. La dépense est recalculée à chaque lecture depuis le MET du catalogue, retrouvé par le NOM du sport, ce que `shared/model/appData.ts:130-140` explicite en justifiant la fusion « ping-pong / tennis de table » : sans elle « leurs calories auraient changé toutes seules, après coup ». Le chapitre est corrigé."
+  },
+  {
+   "categorie": "Format",
+   "fonctionnalite": "Unicité de la pesée de départ",
+   "texte": "Au plus une pesée porterait le drapeau de départ.",
+   "origine": "Invariant énoncé sans code qui le tienne. `shared/model/startingWeighIn.ts:102-109` pose le drapeau ligne par ligne et s'arrête dès qu'une ligne est marquée ; rien ne dédoublonne. Le fichier le reconnaît (:89-91 : « l'unicité qu'un drapeau n'impose pas structurellement — zéro ligne marquée, ou plusieurs ») et `findStartingWeighIn` (:38-40) prend la première trouvée. Le chapitre dit désormais l'état réel."
+  },
+  {
    "categorie": "Écriture",
    "fonctionnalite": "Vérification de toutes les écritures",
    "texte": "Chaque écriture du document serait relue et comparée, comme le fait la mise à l'abri.",
-   "origine": "Seules `backUpCurrentSave`, `writeWithBackup` et `restoreBackup` relisent. L'écriture ordinaire (`setItem(STORAGE_KEY, appData)` dans `useAppData.ts`) passe par une couche qui avale l'erreur en silence : une saisie perdue faute de place ne se signale pas."
+   "origine": "Seules `backUpCurrentSave` (`dataBackup.ts:148`), `writeWithBackup` (:214) et `restoreBackup` (:182) relisent — trois capacités, pas une, et la comparaison porte sur des caractères, pas sur des octets. L'écriture ordinaire (`setItem(STORAGE_KEY, appData)` dans `useAppData.ts:170-173`) passe par une couche qui avale l'erreur en silence : une saisie perdue faute de place ne se signale pas."
   },
   {
    "categorie": "Écriture",
    "fonctionnalite": "Alerte de place bientôt épuisée",
    "texte": "Un seuil préviendrait avant que le magasin ne sature.",
-   "origine": "Le quota d'environ cinq mégaoctets est cité en commentaire dans `dataBackup.ts` (« rien ne prévient ») ; l'application ne mesure jamais la place occupée et n'a aucun seuil."
+   "origine": "Le quota d'environ cinq mégaoctets est cité en commentaire dans `dataBackup.ts` (« rien ne prévient ») ; l'application ne mesure jamais la place occupée, n'a aucun seuil et ne connaît d'autre taille que celle qu'elle inscrit à l'inventaire d'une copie, en caractères."
+  },
+  {
+   "categorie": "Écriture",
+   "fonctionnalite": "Atomicité entre le document et une clé secondaire",
+   "texte": "Un geste touchant le document et une autre clé les écrirait ensemble, ou pas du tout.",
+   "origine": "Aucun code ne l'assure : chaque clé est écrite pour elle-même par `setItem`/`setString`, sans transaction ni rattrapage. Un demi-état inter-clés est donc possible, et rien ne le détecte."
+  },
+  {
+   "categorie": "Chargement",
+   "fonctionnalite": "Sortie de l'état de lecture seule",
+   "texte": "Le produit se remettrait à écrire une fois le document illisible traité.",
+   "origine": "Rien ne répare l'état : `useAppData.ts:132-142` recopie la chaîne sous la clé de secours et ne fait rien d'autre — ni `removeItem(STORAGE_KEY)`, ni réécriture, ni marque. Chaque démarrage échoue à l'identique. Le message donné à la personne (`shared/model/loadGuard.ts:38-42`) annonce pourtant un retour à la normale « une fois cet écran rechargé » : il est faux."
   },
   {
    "categorie": "Effacement",
    "fonctionnalite": "Effacement sélectif des clés",
    "texte": "L'effacement total retirerait les clés une à une, en épargnant ce qui n'appartient pas au compte.",
-   "origine": "Refusé dans `shared/platform/storage.ts` : `clearAll` efface tout le magasin, parce qu'une liste écrite à la main vieillirait mal. La seule suppression clé par clé du produit est celle des favoris de repas (`MealTracker.tsx`)."
+   "origine": "Refusé dans `shared/platform/storage.ts` : `clearAll` efface tout le magasin, parce qu'une liste écrite à la main vieillirait mal. La seule suppression clé par clé du produit est celle des repas mis de côté (`MealTracker.tsx`)."
+  },
+  {
+   "categorie": "Effacement",
+   "fonctionnalite": "Emport de la session d'authentification",
+   "texte": "L'effacement total emporterait la session mémorisée du service d'authentification.",
+   "origine": "Affirmé par le chapitre précédent sur la foi d'un commentaire (`storage.ts:85-88`), sans code qui l'appuie. `clearAll` (:94-100) n'appelle que `localStorage.clear()` ; aucun `setPersistence` n'existe dans `src` (zéro occurrence de `setPersistence`, `browserLocalPersistence`, `indexedDB`), et la version employée du SDK (`package.json:18`, `firebase ^12.17.1`) range la session hors du magasin effacé. Rien n'efface la base indexée, le magasin de session ni les témoins de connexion."
+  },
+  {
+   "categorie": "Effacement",
+   "fonctionnalite": "Effacement des données déjà parties",
+   "texte": "Supprimer son compte effacerait aussi les documents déjà envoyés dans la base distante.",
+   "origine": "`DeleteAccountBlock.tsx:124-136` n'appelle que `deleteCurrentUser()` puis `clearAll()`. Les retours (`feedbacks/{uid}/messages`), les réponses au questionnaire (`surveys/{uid}`), les fiches d'échec (`reportErrors/{uid}/failures`) et les courriers déposés dans la file `mail` restent en place, rangés sous l'identifiant d'un compte qui n'existe plus."
   },
   {
    "categorie": "Effacement",
@@ -58,13 +112,25 @@
    "categorie": "Sorties",
    "fonctionnalite": "Interrogation d'un service alimentaire",
    "texte": "Un code-barres inconnu serait cherché auprès d'Open Food Facts.",
-   "origine": "Le texte légal cite Open Food Facts comme tiers, mais `features/custom-food/barcode.utils.ts` ne lit que la base embarquée et les aliments créés ; aucun appel réseau n'existe dans le code (aucun `fetch` hors des routes de développement)."
+   "origine": "Entrée erronée du rédacteur précédent : l'appel EXISTE. `shared/food/food.barcode.ts:275-291` appelle `https://world.openfoodfacts.org/api/v0/product/<code>.json` avec l'en-tête `MealTrackerApp - Web - Version 1.0` et un délai de 10 000 ms ; `MealTracker.tsx:246` l'invoque en dernier recours, après `findUserFoodByBarcode` (:224) et `findFoodByBarcode` (:234). La sortie est désormais décrite dans le chapitre. Ce qui reste non implémenté, c'est le journal anonyme des échecs de scan promis par GUIDELINES.md § 1 pour le socle natif."
   },
   {
    "categorie": "Sorties",
    "fonctionnalite": "Envois distants anonymisés",
    "texte": "Les envois porteraient un identifiant opaque plutôt que l'identité du compte.",
-   "origine": "`remoteSubmit.ts` écrit `uid`, `email` et `displayName` sur chaque document, et le courrier d'accompagnement porte l'adresse en clair dans son sujet."
+   "origine": "`remoteSubmit.ts:96` écrit `uid`, `email` et `displayName` sur chaque document, et le courrier d'accompagnement porte l'adresse en clair en réponse."
+  },
+  {
+   "categorie": "Présentation",
+   "fonctionnalite": "Clés de présentation",
+   "texte": "Périodes retenues, mode de lecture d'un ensemble, apparence, disposition et bascules de tendance sont conservés sur l'appareil.",
+   "origine": "Règles d'affichage seules : elles ne changent aucune donnée. Citées dans le chapitre pour le seul inventaire de l'effacement, décrites nulle part ailleurs."
+  },
+  {
+   "categorie": "Présentation",
+   "fonctionnalite": "Onze drapeaux d'affichage dans le profil",
+   "texte": "Ils décident de ce qui est montré du carnet, jamais de ce qui est conservé.",
+   "origine": "Contrairement à ce qu'affirmait le chapitre précédent, ils vivent DANS le document unique : `src/types.ts:166` `deleteAllButtonsEnabled`, :168 `homeCornerButtonsEnabled`, :174 `colorblindModeEnabled`, :212 `mysteryBadgeHidden`, :219-227 les sept `*ModuleHidden`. Le commentaire :205-210 tranche le partage : ce qui règle l'affichage DES DONNÉES suit le profil, la mémoire locale n'accueille que la présentation indépendante du compte. Ils sont donc listés comme données conservées, mais leur effet est hors périmètre — sauf `deleteAllButtonsEnabled`, qui conditionne l'accès au vidage d'un journal."
   },
   {
    "categorie": "Identifiants",
@@ -73,250 +139,238 @@
    "origine": "`shared/platform/id.ts` produit des UUIDv7 et seuls les repas s'en servent ; pesées, prises, effets, pas, séances, moments et sommeil emploient encore le motif `<préfixe>-<instant en millisecondes>` (`useAppData.ts`), qui collisionne dans la même milliseconde."
   },
   {
-   "categorie": "Restitution",
-   "fonctionnalite": "Clés de présentation",
-   "texte": "Périodes retenues, mode de lecture d'un ensemble, apparence, disposition et bascules de tendance sont conservés sur l'appareil.",
-   "origine": "Règles d'affichage seules : elles ne changent aucune donnée. Citées ici pour l'inventaire de l'effacement, décrites nulle part ailleurs dans ce document."
+   "categorie": "Format",
+   "fonctionnalite": "Libellé du type de repas conservé",
+   "texte": "Un repas porterait le nom de son type à côté de son type.",
+   "origine": "Non pas une invention mais une dérivation conservée non déclarée, désormais dite dans le chapitre : `src/types.ts:263-264` porte `type` puis `typeLabel: string`, écrit à chaque enregistrement par `mealTypeLabel` (`useAppData.ts:26`). Contraire à deux règles de la V2 : ne rien conserver de dérivable, et référencer par identifiant jamais par nom."
   }
  ],
  "glossaire": [
   {
    "terme": "Document unique",
-   "definition": "Le profil et les dix journaux, sérialisés en un seul JSON sous la clé glp1_app_companion_data, réécrit intégralement à chaque changement."
+   "definition": "Le profil et les journaux réunis en un seul objet JSON, conservé sous la clé glp1_app_companion_data, réécrit intégralement à chaque changement."
   },
   {
-   "terme": "Clé de stockage",
-   "definition": "Nom sous lequel une valeur est conservée dans le magasin local. Une clé fixe aussi sa convention d'accès : JSON, ou chaîne nue, et cela ne se change pas."
+   "terme": "Magasin persistant",
+   "definition": "Le magasin de paires clé-valeur de l'appareil, qui survit à un redémarrage. Distinct du magasin de session, que l'effacement total ne touche pas."
+  },
+  {
+   "terme": "Voie JSON / voie chaîne nue",
+   "definition": "Les deux conventions d'accès au magasin. Une valeur écrite en JSON se relit en JSON, une chaîne nue telle quelle ; la voie est fixée par clé et ne se change pas sans rendre illisible ce qui est déjà conservé."
   },
   {
    "terme": "Conversion de chargement",
-   "definition": "Transformation pure appliquée au document lu, avant tout usage. Les dix conversions s'enchaînent dans un ordre fixe et sont toutes idempotentes."
+   "definition": "Fonction pure d'un document vers un document, appliquée à la lecture, idempotente : la rejouer sur un document déjà converti ne le change plus. Dix se succèdent dans un ordre fixe."
   },
   {
-   "terme": "Idempotence",
-   "definition": "Propriété d'une conversion qui, rejouée sur un document déjà converti, ne le change plus. C'est ce qui permet de les appliquer à chaque chargement."
+   "terme": "Idempotente",
+   "definition": "Se dit d'une conversion dont la seconde application ne produit plus aucun changement ; c'est ce qui tient lieu de numéro de schéma."
   },
   {
-   "terme": "Session en lecture seule",
-   "definition": "État où le chargement a échoué : plus rien n'est écrit jusqu'au redémarrage, pour ne pas remplacer par du vide des données qu'on n'a pas su lire."
-  },
-  {
-   "terme": "Copie de sauvetage",
-   "definition": "Recopie brute du document illisible sous <clé>__secours. Écrite une seule fois : un second échec ne recouvre pas le premier sauvetage."
-  },
-  {
-   "terme": "Copie de secours",
-   "definition": "Recopie horodatée du document courant, faite avant qu'il ne soit remplacé. Sa clé porte l'horodatage local à la seconde ; aucune n'en recouvre une autre."
-  },
-  {
-   "terme": "Inventaire des copies",
-   "definition": "Liste JSON des copies de secours, une entrée par copie : clé, horodatage, motif, taille en caractères, du plus récent au plus ancien. Illisible vaut vide."
-  },
-  {
-   "terme": "Écriture protégée",
-   "definition": "Mise à l'abri, puis écriture, puis relecture de vérification. Si la mise à l'abri échoue, rien n'est écrit."
-  },
-  {
-   "terme": "Relecture de vérification",
-   "definition": "Comparaison caractère pour caractère de ce qui vient d'être écrit avec l'original. Seule parade contre une écriture qui échoue en silence."
-  },
-  {
-   "terme": "Suppression franche",
-   "definition": "Une ligne supprimée quitte la liste par son identifiant. Aucune marque de suppression n'est plus écrite, et les marques héritées sont purgées au chargement."
+   "terme": "Profil d'usine",
+   "definition": "Le profil de départ posé quand aucun document n'est lisible : non pas un profil vide mais une personne fictive complète — prénom, femme, 42 ans, 168 cm, cible 72,0 kg, avatar entier, rappel dominical, aucun traitement."
   },
   {
    "terme": "Pesée de départ",
-   "definition": "La pesée qui sert de référence à la perte totale, aux distinctions et au bilan. Reconnue à son drapeau, unique, semée à 95,0 kg sur un appareil vierge, épargnée quand le journal des pesées est vidé."
+   "definition": "La pesée porteuse du drapeau de départ, référence de la perte totale, des distinctions et du bilan. Épargnée par le vidage du journal des pesées. Son unicité n'est pas imposée par le code."
+  },
+  {
+   "terme": "Lecture seule (session en)",
+   "definition": "État d'une session dont le chargement a échoué : la chaîne illisible est mise à l'abri, aucune écriture n'a lieu jusqu'à la fin de la session, et rien ne répare l'état d'un démarrage à l'autre."
+  },
+  {
+   "terme": "Clé de secours",
+   "definition": "Copie brute du document illisible, sous <clé>__secours, écrite une seule fois pour qu'un second échec ne recouvre pas le premier sauvetage. Aucune capacité ne la remet en place."
+  },
+  {
+   "terme": "Mise à l'abri",
+   "definition": "Copie du document courant sous une clé horodatée <clé>__secours-AAAA-MM-JJ-HHMMSS, inscrite à un inventaire et vérifiée par relecture. Aucune copie n'en recouvre une autre, aucune n'est effacée automatiquement."
+  },
+  {
+   "terme": "Écriture sous protection",
+   "definition": "Mettre à l'abri, écrire, relire et comparer. Si la mise à l'abri échoue, rien n'est écrit."
+  },
+  {
+   "terme": "Relecture de vérification",
+   "definition": "Seule parade au silence des écritures : relire ce qu'on vient d'écrire et comparer caractère pour caractère. Trois capacités seulement la pratiquent ; les écritures ordinaires jamais."
   },
   {
    "terme": "Effacement total",
-   "definition": "Compte distant supprimé d'abord, puis tout le magasin local en une fois, puis redémarrage. Un échec à la première étape n'efface rien."
+   "definition": "Suppression du compte distant s'il est configuré, puis vidage en une fois du magasin persistant de l'origine, puis redémarrage. Non sélectif par choix ; il ne touche ni le magasin de session, ni la base indexée, ni les témoins de connexion."
   },
   {
-   "terme": "Contexte d'envoi",
-   "definition": "Ce qui accompagne un envoi distant hors du contenu : version, provenance, préférences de restitution, dimensions, langues, instant, fuseau, socle, mode de compilation. Aucune donnée de santé."
+   "terme": "Contexte technique",
+   "definition": "Le bloc joint aux envois distants : version, provenance, choix de présentation, dimensions, langues, instant en quatre formes, fuseau et décalage, identification du socle, mode de compilation. Aucune donnée de santé."
   },
   {
-   "terme": "Fiche d'échec",
-   "definition": "Ce qui est envoyé quand la production d'un bilan échoue : erreur, étape, bornes de période, sections, comptes d'entrées, durée. Des comptes et des bornes, jamais des valeurs."
+   "terme": "Plafond d'envoi",
+   "definition": "Dix envois par jour local, comptés sur les envois réellement enregistrés ; au-delà, refus, et une alerte part une fois par compte et par jour."
+  },
+  {
+   "terme": "UUID version 7",
+   "definition": "Identifiant de 48 bits d'horodatage suivis de 74 bits d'aléatoire, ordonnable lexicographiquement à la milliseconde. Employé par les seuls repas ; les autres journaux emploient encore un motif fondé sur l'instant, qui collisionne."
   }
  ],
  "index": [
   {
    "terme": "Document unique",
-   "ancre": "#persistance-le-document-unique"
+   "ancre": "persistance-le-document-unique"
   },
   {
    "terme": "glp1_app_companion_data",
-   "ancre": "#persistance-le-document-unique"
+   "ancre": "persistance-le-document-unique"
   },
   {
-   "terme": "Propriétés facultatives",
-   "ancre": "#persistance-le-document-unique"
+   "terme": "Drapeaux d'affichage du profil",
+   "ancre": "persistance-le-document-unique"
   },
   {
-   "terme": "Cache nutritionnel d'un repas",
-   "ancre": "#persistance-le-document-unique"
+   "terme": "Libellé du type de repas",
+   "ancre": "persistance-le-document-unique"
+  },
+  {
+   "terme": "Calories d'une séance (non conservées)",
+   "ancre": "persistance-le-document-unique"
   },
   {
    "terme": "Clés hors du document",
-   "ancre": "#persistance-ce-qui-vit-hors-du-document"
+   "ancre": "persistance-ce-qui-vit-hors-du-document"
+  },
+  {
+   "terme": "glow_onboarding_sim_mixte",
+   "ancre": "persistance-ce-qui-vit-hors-du-document"
+  },
+  {
+   "terme": "Voie JSON / voie chaîne nue",
+   "ancre": "persistance-ce-qui-vit-hors-du-document"
+  },
+  {
+   "terme": "Magasin de session",
+   "ancre": "persistance-ce-qui-vit-hors-du-document"
   },
   {
    "terme": "Clés héritées",
-   "ancre": "#persistance-ce-qui-vit-hors-du-document"
+   "ancre": "persistance-ce-qui-vit-hors-du-document"
   },
   {
-   "terme": "JSON ou chaîne nue",
-   "ancre": "#persistance-ce-qui-vit-hors-du-document"
+   "terme": "Écriture intégrale",
+   "ancre": "persistance-quand-l-ecriture-a-lieu"
   },
   {
-   "terme": "Aliments et recettes personnalisés",
-   "ancre": "#persistance-ce-qui-vit-hors-du-document"
+   "terme": "Échec d'écriture silencieux",
+   "ancre": "persistance-quand-l-ecriture-a-lieu"
   },
   {
-   "terme": "Réécriture intégrale",
-   "ancre": "#persistance-quand-l-ecriture-a-lieu"
+   "terme": "Demi-état inter-clés",
+   "ancre": "persistance-quand-l-ecriture-a-lieu"
   },
   {
-   "terme": "Échec silencieux d'écriture",
-   "ancre": "#persistance-quand-l-ecriture-a-lieu"
+   "terme": "Conversions de chargement",
+   "ancre": "persistance-le-chargement-et-ses-conversions"
   },
   {
-   "terme": "Chaîne de conversions",
-   "ancre": "#persistance-le-chargement-et-ses-conversions"
+   "terme": "Passage des traitements aux identifiants",
+   "ancre": "persistance-le-chargement-et-ses-conversions"
   },
   {
-   "terme": "Idempotence",
-   "ancre": "#persistance-le-chargement-et-ses-conversions"
-  },
-  {
-   "terme": "Purge des lignes marquées",
-   "ancre": "#persistance-le-chargement-et-ses-conversions"
-  },
-  {
-   "terme": "Lignes de démonstration",
-   "ancre": "#persistance-le-chargement-et-ses-conversions"
+   "terme": "Pesée de départ",
+   "ancre": "persistance-le-chargement-et-ses-conversions"
   },
   {
    "terme": "Profil d'usine",
-   "ancre": "#persistance-le-chargement-et-ses-conversions"
+   "ancre": "persistance-le-chargement-et-ses-conversions"
   },
   {
-   "terme": "Pesée de départ semée",
-   "ancre": "#persistance-le-chargement-et-ses-conversions"
+   "terme": "Lecture seule (session en)",
+   "ancre": "persistance-quand-le-document-ne-se-lit-pas"
   },
   {
-   "terme": "Garde-fou du chargement",
-   "ancre": "#persistance-quand-le-document-ne-se-lit-pas"
+   "terme": "Clé de secours",
+   "ancre": "persistance-quand-le-document-ne-se-lit-pas"
   },
   {
-   "terme": "Copie de sauvetage",
-   "ancre": "#persistance-quand-le-document-ne-se-lit-pas"
-  },
-  {
-   "terme": "Session en lecture seule",
-   "ancre": "#persistance-quand-le-document-ne-se-lit-pas"
-  },
-  {
-   "terme": "Copies de secours horodatées",
-   "ancre": "#persistance-les-copies-de-secours"
+   "terme": "Mise à l'abri",
+   "ancre": "persistance-les-copies-de-secours"
   },
   {
    "terme": "Inventaire des copies",
-   "ancre": "#persistance-les-copies-de-secours"
+   "ancre": "persistance-les-copies-de-secours"
+  },
+  {
+   "terme": "Écriture sous protection",
+   "ancre": "persistance-les-copies-de-secours"
+  },
+  {
+   "terme": "Capacité du magasin",
+   "ancre": "persistance-quand-la-place-manque"
   },
   {
    "terme": "Relecture de vérification",
-   "ancre": "#persistance-les-copies-de-secours"
+   "ancre": "persistance-quand-la-place-manque"
   },
   {
-   "terme": "Écriture protégée",
-   "ancre": "#persistance-les-copies-de-secours"
+   "terme": "Suppression d'une ligne",
+   "ancre": "persistance-effacer"
   },
   {
-   "terme": "Remise d'une copie",
-   "ancre": "#persistance-les-copies-de-secours"
+   "terme": "Vidage d'un journal",
+   "ancre": "persistance-effacer"
   },
   {
-   "terme": "Quota du magasin",
-   "ancre": "#persistance-quand-la-place-manque"
+   "terme": "Effacement total",
+   "ancre": "persistance-effacer"
   },
   {
-   "terme": "Suppression franche",
-   "ancre": "#persistance-effacer"
+   "terme": "Suppression du compte distant",
+   "ancre": "persistance-effacer"
   },
   {
-   "terme": "Vider un journal",
-   "ancre": "#persistance-effacer"
-  },
-  {
-   "terme": "Aliment utilisé par une recette",
-   "ancre": "#persistance-effacer"
-  },
-  {
-   "terme": "Ordre de l'effacement total",
-   "ancre": "#persistance-effacer"
-  },
-  {
-   "terme": "Effacement en une fois",
-   "ancre": "#persistance-effacer"
+   "terme": "Données déjà parties",
+   "ancre": "persistance-effacer"
   },
   {
    "terme": "Bilan de suivi",
-   "ancre": "#persistance-ce-qui-sort-de-l-appareil"
+   "ancre": "persistance-ce-qui-sort-de-l-appareil"
   },
   {
    "terme": "Image de progression",
-   "ancre": "#persistance-ce-qui-sort-de-l-appareil"
+   "ancre": "persistance-ce-qui-sort-de-l-appareil"
   },
   {
-   "terme": "Contexte d'envoi",
-   "ancre": "#persistance-ce-qui-sort-de-l-appareil"
+   "terme": "Recherche d'un code-barres",
+   "ancre": "persistance-ce-qui-sort-de-l-appareil"
   },
   {
-   "terme": "Plafond d'envois quotidien",
-   "ancre": "#persistance-ce-qui-sort-de-l-appareil"
+   "terme": "Open Food Facts",
+   "ancre": "persistance-ce-qui-sort-de-l-appareil"
   },
   {
-   "terme": "Fiche d'échec",
-   "ancre": "#persistance-ce-qui-sort-de-l-appareil"
+   "terme": "Contexte technique",
+   "ancre": "persistance-ce-qui-sort-de-l-appareil"
   },
   {
-   "terme": "Code-barres, recherche locale",
-   "ancre": "#persistance-ce-qui-n-en-sort-jamais"
+   "terme": "Plafond d'envoi",
+   "ancre": "persistance-ce-qui-sort-de-l-appareil"
   },
   {
-   "terme": "Données qui ne sortent jamais",
-   "ancre": "#persistance-ce-qui-n-en-sort-jamais"
+   "terme": "Fiche d'échec de bilan",
+   "ancre": "persistance-ce-qui-n-en-sort-jamais"
   },
   {
-   "terme": "Couche unique de stockage",
-   "ancre": "#persistance-les-contraintes-du-portage"
+   "terme": "Couche d'accès au magasin",
+   "ancre": "persistance-les-contraintes-du-portage"
   },
   {
    "terme": "UUID version 7",
-   "ancre": "#persistance-les-contraintes-du-portage"
+   "ancre": "persistance-les-contraintes-du-portage"
   },
   {
-   "terme": "Chiffrement des données de santé",
-   "ancre": "#persistance-les-contraintes-du-portage"
+   "terme": "Chiffrement au repos",
+   "ancre": "persistance-les-contraintes-du-portage"
   },
   {
-   "terme": "Secrets hors du paquet livré",
-   "ancre": "#persistance-les-contraintes-du-portage"
-  },
-  {
-   "terme": "Stockage métrique",
-   "ancre": "#persistance-les-contraintes-du-portage"
-  },
-  {
-   "terme": "Migration obligatoire",
-   "ancre": "#persistance-les-contraintes-du-portage"
-  },
-  {
-   "terme": "Absence de synchronisation",
-   "ancre": "#persistance-les-contraintes-du-portage"
+   "terme": "Permissions natives",
+   "ancre": "persistance-les-contraintes-du-portage"
   }
  ]
 }

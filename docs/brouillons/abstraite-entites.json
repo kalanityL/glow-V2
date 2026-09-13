@@ -13,6 +13,12 @@
    "origine": "La V1 fait de la première pesée d'un historique vide le départ (keepStartingOnOldest), mais aucun code V2 ne relie les réponses à une table."
   },
   {
+   "categorie": "Persistance V2",
+   "fonctionnalite": "Enregistrer un poids recueilli en texte",
+   "texte": "« Recueilli en texte à point décimal, converti en nombre à l'enregistrement. » Retiré du chapitre : la conversion n'existe pas.",
+   "origine": "Réfutation juste. GIT-APP-V2/src/screens/onboarding/reponses.ts:15-21 : « Les mesures sont gardées EN TEXTE et AVEC UN POINT […] La conversion en nombre se fera là où on les enregistrera. » Aucun parseFloat ni écriture de `poids` dans src/. Le chapitre dit désormais que les deux poids restent des chaînes."
+  },
+  {
    "categorie": "Catalogue des traitements",
    "fonctionnalite": "Désigner un traitement par identifiant",
    "texte": "La correspondance entre l'identifiant V1 « orforglipron » et l'identifiant V2 « foundayo » du même comprimé.",
@@ -22,13 +28,61 @@
    "categorie": "Base alimentaire",
    "fonctionnalite": "Résoudre un aliment de référence",
    "texte": "Le nombre d'entrées de la base de référence annoncé par le code : 3 479.",
-   "origine": "Compté sur src/data/ciqual.json : 3 258 entrées, dont 2 425 avec nom court et 3 258 avec nom générique et nature liquide. Les commentaires de mealConstants.ts et food.resolve.ts annoncent 3 479 ; le chapitre retient le compte du fichier, plus les 2 entrées ajoutées à la main dans customFoods, soit 3 260 fiches résolvables."
+   "origine": "Compté sur src/data/ciqual.json : 3 258 entrées, dont 2 425 avec nom court et 3 258 avec nom générique et nature liquide. Les commentaires de mealConstants.ts et food.resolve.ts annoncent 3 479 ; le chapitre retient le compte du fichier."
+  },
+  {
+   "categorie": "Base alimentaire",
+   "fonctionnalite": "Abréger le libellé d'un aliment",
+   "texte": "« nom_court : 32 signes au plus. » Retiré comme invariant : la borne est une intention, pas une propriété des données.",
+   "origine": "Réfutation juste. Comptage sur src/data/ciqual.json : 2 425 noms courts, dont un de 34 signes (alim_code 13212, « Compote de pomme maison non sucrée »). Aucune écriture ne vérifie la longueur. La seconde moitié de la phrase, elle, tient : les 2 108 libellés de plus de 30 signes portent tous un nom court."
+  },
+  {
+   "categorie": "Pesée de départ",
+   "fonctionnalite": "Tenir un seul poids de départ",
+   "texte": "« Au plus une ligne porte isStartingWeight = true », et la réparation d'un historique qui en porterait deux.",
+   "origine": "Réfutation juste. src/features/weight/weighInWrites.ts:63-69 : `const current = entries.find(w => w.isStartingWeight); if (current && (current.id === oldest.id || current.date === oldest.date)) return entries;` — le retour anticipé précède la réécriture du drapeau sur toute la liste. Un historique à deux drapeaux dont l'un est sur la plus ancienne n'est jamais réparé, malgré le commentaire du code qui l'affirme. Le chapitre dit ce que le code fait ; réparer ce cas reste à décider."
+  },
+  {
+   "categorie": "Pesée",
+   "fonctionnalite": "Tenir une pesée par jour",
+   "texte": "« Une pesée par journée » comme propriété des données.",
+   "origine": "Réfutation juste. La règle ne vit que dans addWeighIn ; updateWeighIn (weighInWrites.ts:185-201) n'a aucun contrôle de date, et son commentaire l'assume : « c'est la LIGNE DU JOURNAL qui refuse le geste avant d'appeler (isDayTaken), pas cette fonction ». Une réimplémentation doit décider si la contrainte descend dans l'écriture."
+  },
+  {
+   "categorie": "Journal des lignes",
+   "fonctionnalite": "Modifier une ligne par fusion",
+   "texte": "L'invariant « les attributs absents de la charge sont conservés » garanti par le type LogUpdate<T>.",
+   "origine": "Réfutation juste. types.ts:410 et :417 : `NewLog<T> = Omit<T,'id'>`, `LogUpdate<T> = NewLog<T> & { id: string }` — tous les attributs exigés. La fusion vient de logbook.ts:49-52, `applyLogUpdate(logs, update: Partial<T> & { id: string })`. Le type et la fonction se contredisent ; lequel doit céder n'est tranché nulle part."
+  },
+  {
+   "categorie": "Bornes des valeurs",
+   "fonctionnalite": "Enregistrer une note, un niveau, une durée",
+   "texte": "Les fourchettes 0–6, 0–5, 1–5 et la positivité des durées, doses et pas, tenues comme des contraintes.",
+   "origine": "types.ts:109-114, :280-281, :400, :436-437 : ce sont des `number` nus. Aucune écriture ne vérifie. Les types HungerLevel et SeverityLevel, qui les diraient, ne sont utilisés nulle part."
+  },
+  {
+   "categorie": "Valeurs d'ouverture",
+   "fonctionnalite": "Proposer une valeur avant qu'on n'en choisisse une",
+   "texte": "Les valeurs proposées d'avance à une capture (qualité 3, sévérité 0 ou 2 selon le chemin, faims 2 et 0, site abdomen_gauche) — elles ne sont pas des propriétés des entités.",
+   "origine": "sleep.constants.ts:59, useSideEffectForm.ts:31, useSideEffectQuickForm.ts:12, useMealForm.ts:99-100, useInjectionQuickForm.ts:16. Deux chemins de capture d'un ressenti proposent deux valeurs différentes, ce qui montre bien qu'il s'agit d'ergonomie et non de modèle. Hors périmètre de ce document."
+  },
+  {
+   "categorie": "Cardinalités",
+   "fonctionnalite": "Composer un repas, une recette, une table",
+   "texte": "Un plafond du nombre de quantités d'aliment d'un repas, d'ingrédients d'une recette, ou de lignes d'une table.",
+   "origine": "Aucun code n'en pose. La seule limite est celle du stockage local, « ~5 Mo » d'après shared/model/dataBackup.ts:24-25, que rien ne mesure ni n'anticipe."
+  },
+  {
+   "categorie": "Copies de secours",
+   "fonctionnalite": "Conserver des copies de la sauvegarde",
+   "texte": "Une purge, une rétention ou un nombre maximal de copies.",
+   "origine": "dataBackup.ts : « Elles s'accumulent, et c'est assumé. » Rien ne les efface, alors que chacune pèse la taille du carnet entier et que le quota du stockage est atteignable."
   },
   {
    "categorie": "Marque de journée",
    "fonctionnalite": "Marquer qu'il s'est passé quelque chose un jour donné",
    "texte": "Ce qu'une réimplémentation doit faire de DailyLog.",
-   "origine": "Aucun geste ne l'écrit : seul src/features/data-generator/dataGenerator.ts en crée. Deux lectures subsistent (choix de la phrase d'accueil, comptage du document médical). Garder l'entité ou la déduire de la présence des autres lignes n'est tranché nulle part."
+   "origine": "Aucun geste ne l'écrit : seul src/features/data-generator/dataGenerator.ts en crée (id `gen-daily-<i>`, ligne 735). Deux lectures subsistent. Garder l'entité ou la déduire de la présence des autres lignes n'est tranché nulle part."
   },
   {
    "categorie": "Restitution",
@@ -39,56 +93,14 @@
   {
    "categorie": "Restitution",
    "fonctionnalite": "Régler ce que le produit montre",
-   "texte": "Sept attributs du profil ne décrivent que la restitution : quickAddEnabled, insoliteLibraryEnabled, deleteAllButtonsEnabled, homeCornerButtonsEnabled, colorblindModeEnabled, mysteryBadgeHidden, easyReadingMode. Ils sont listés parce qu'ils sont stockés, non parce qu'ils modélisent quelque chose.",
-   "origine": "src/types.ts, UserProfile. Correction de la réfutation : easyReadingMode n'est PAS inerte partout — src/versions/cartes/components/NotificationsSettings.tsx le lit (l. 25-27) et l'écrit (l. 84 en booléen, l. 184 en nombre), et deux autres points le lisent. Il reste donc un attribut qu'une saisie peut créer ou modifier dans une sauvegarde ; le chapitre ne le décrit plus comme une trace d'archive."
+   "texte": "Sept attributs du profil ne décrivent que la restitution : quickAddEnabled, insoliteLibraryEnabled, deleteAllButtonsEnabled, homeCornerButtonsEnabled, colorblindModeEnabled, mysteryBadgeHidden, easyReadingMode. Ils sont listés ici parce qu'ils sont stockés, non parce qu'ils modélisent quelque chose.",
+   "origine": "src/types.ts, UserProfile. Le dernier est inerte dans la version de référence depuis le 2026-08-27, mais DEUX AUTRES VERSIONS le lisent ET l'écrivent encore (versions/cartes/components/NotificationsSettings.tsx:84 et :184, idem versions/initiale) : le dire inerte sans réserve était faux, et le chapitre ne le dit plus."
   },
   {
    "categorie": "Restitution",
-   "fonctionnalite": "Éteindre puis cacher un suivi",
-   "texte": "Sept attributs booléens du profil ne portent que le masquage d'un ensemble de fonctions une fois son suivi éteint : foodModuleHidden, stepsModuleHidden, sportModuleHidden, meTimeModuleHidden, sleepModuleHidden, treatmentModuleHidden, sideEffectsModuleHidden. Leur règle — ils ne valent que suivi désactivé, et réactiver le suivi les remet à faux — ne change aucune donnée de suivi.",
-   "origine": "src/types.ts, UserProfile, lignes 218-227. Le chapitre les compte (sept sur les quatorze attributs de restitution) et énonce la règle sans les nommer, parce qu'ils ne modélisent rien."
-  },
-  {
-   "categorie": "Restitution",
-   "fonctionnalite": "Compter une montée d'escaliers",
-   "texte": "L'étage comme unité d'une séance : la durée d'une séance « Montée escaliers » se lit en étages et non en minutes.",
-   "origine": "src/features/home/recentJournal.ts:71-74 et 218 posent durationIsFloors sur une forme dérivée, jamais sur SportLog. La donnée conservée reste SportLog.duration, en minutes. Règle de rendu seulement."
-  },
-  {
-   "categorie": "Relevé de pas",
-   "fonctionnalite": "Totaliser les pas d'une journée",
-   "texte": "Ce que vaut une journée qui porte plusieurs relevés de pas.",
-   "origine": "Trois lectures divergent. src/features/home/homeOverview.ts:564-566 stepsOn prend la PREMIÈRE ligne de la date ; src/utils/badgeSystem.ts:353-355 et src/features/steps/steps.utils.ts:293-296 somment les lignes de la date. Le modèle n'impose ni l'une ni l'autre, et rien n'empêche deux lignes le même jour."
-  },
-  {
-   "categorie": "Envoi distant",
-   "fonctionnalite": "Envoyer un message ou une réponse au questionnaire",
-   "texte": "La forme unique d'un message envoyé et d'une réponse au questionnaire.",
-   "origine": "FeedbackItem est déclaré au moins deux fois sur la même clé glp1_user_feedbacks, avec acceptsContact dans l'une (src/versions/mixte/components/FeedbackSettings.tsx:33-53) et sans dans l'autre (src/versions/cartes/components/FeedbackSettings.tsx:24-40). Même divergence pour StoredSurvey sur glp1_user_survey_v2 : sept notes d'un côté, quatre de l'autre. Aucune déclaration ne fait autorité ; le chapitre décrit l'union et le dit."
-  },
-  {
-   "categorie": "Pesée de départ",
-   "fonctionnalite": "Réparer un historique à deux drapeaux",
-   "texte": "La garantie « au plus une ligne porte isStartingWeight = true », tenue à chaque écriture.",
-   "origine": "src/features/weight/weighInWrites.ts:63-69 : entries.find ne voit que le premier drapeau, et si celui-ci est déjà sur la plus ancienne ligne, ou porte la même date qu'elle, la fonction rend la liste inchangée. Deux drapeaux peuvent survivre indéfiniment. Le chapitre énonce l'invariant comme visé, non comme tenu."
-  },
-  {
-   "categorie": "Avatar",
-   "fonctionnalite": "Choisir une valeur de nuancier",
-   "texte": "La contrainte qui limiterait skinColor, eyeColor et hairColor aux valeurs du nuancier livré.",
-   "origine": "src/types.ts, AvatarConfig : les trois attributs sont des chaînes libres. Les nuanciers fermés (6, 5, 6 valeurs) ne vivent que dans les composants de composition (src/versions/mixte/components/AvatarCreator.tsx:23-47) ; rien ne vérifie une valeur relue depuis une sauvegarde. La V2 (src/domaine/avatar.ts) reprend les mêmes tables, également sans contrainte de type."
-  },
-  {
-   "categorie": "Quantité d'aliment",
-   "fonctionnalite": "Composer un repas",
-   "texte": "Un rôle de référence pour FoodQuantity.id.",
-   "origine": "copyItems et draftToItems (src/shared/food/food.composition.ts) le régénèrent à chaque copie ; aucun code ne le vise. Son unicité n'est vérifiée nulle part."
-  },
-  {
-   "categorie": "Silhouette",
-   "fonctionnalite": "Décrire la morphologie",
-   "texte": "Une valeur de silhouetteType choisie par la personne.",
-   "origine": "UserProfile.silhouetteType est obligatoire, mais aucun enregistrement ne le modifie : seule la valeur d'usine 'sablier' ou celle de la fabrication de données subsiste. La V2 l'a supprimé."
+   "fonctionnalite": "Retenir une préférence de consultation",
+   "texte": "Neuf clés de stockage local hors périmètre : glp1_period_blood_level_by_brand et les huit glp1_*_history_view (poids, pas, sport, sommeil, ressentis, repas, moments pour soi, traitements).",
+   "origine": "useMoleculeChartState.ts:14 et les hooks de journal. Elles retiennent une fenêtre de consultation, jamais une donnée de suivi."
   },
   {
    "categorie": "Onboarding V2",
@@ -101,129 +113,153 @@
    "fonctionnalite": "Conserver des données de santé",
    "texte": "Le chiffrement des données de santé au repos.",
    "origine": "GUIDELINES.md § « Les deux contraintes permanentes » l'annonce pour le jour de la conversion native. Rien n'est chiffré aujourd'hui : la sauvegarde est du JSON en clair sous glp1_app_companion_data."
+  },
+  {
+   "categorie": "Quantité d'aliment",
+   "fonctionnalite": "Composer un repas",
+   "texte": "Un rôle de référence pour FoodQuantity.id.",
+   "origine": "copyItems et draftToItems (src/shared/food/food.composition.ts) le régénèrent à chaque copie ; aucun code ne le vise. Son unicité n'est vérifiée nulle part."
+  },
+  {
+   "categorie": "Identité des lignes",
+   "fonctionnalite": "Poser un identifiant",
+   "texte": "L'unicité des identifiants dérivés de l'horloge (w-, inj-, se-, step-, sport-, metime-, sleep-, user-custom-, user-custom-recipe-).",
+   "origine": "Deux enregistrements dans la même milliseconde produisent la même chaîne, et rien ne le détecte. Seuls les UUID v7 (repas, quantités, menus favoris) ferment le cas. Aucune décision n'est prise sur les autres."
+  },
+  {
+   "categorie": "Silhouette",
+   "fonctionnalite": "Décrire la morphologie",
+   "texte": "Une valeur de silhouetteType choisie par la personne dans la version de référence.",
+   "origine": "UserProfile.silhouetteType est obligatoire, mais aucun écrit de src/versions/mixte ne le modifie : seule la valeur d'usine 'sablier' ou celle de la fabrication de données subsiste. La V2 l'a supprimé."
+  },
+  {
+   "categorie": "Compte et envois",
+   "fonctionnalite": "Faire partir un message vers une adresse",
+   "texte": "Ce que devient un document de la boîte d'envoi mail/{id} après expédition, et qui peut le lire.",
+   "origine": "remoteSubmit.ts:16-29 : la collection est lue par une extension tierce qui « expédie puis marque le document » ; le client ne relit jamais. Aucune rétention, aucune purge, aucune règle de lecture n'est décrite côté produit."
   }
  ],
  "glossaire": [
   {
    "terme": "Objet racine",
-   "definition": "L'unique document JSON qui porte le profil et les neuf tables de lignes datées, conservé sous la clé glp1_app_companion_data. Une personne, un appareil, une sauvegarde."
+   "definition": "L'unique document JSON conservé sous glp1_app_companion_data : un profil et neuf tables de lignes datées. Tout le reste vit sous d'autres clés."
   },
   {
-   "terme": "Ligne datée",
-   "definition": "Un enregistrement d'une des neuf tables : un identifiant, une date locale AAAA-MM-JJ et, sauf pour le relevé de pas, une heure locale HH:MM."
+   "terme": "Réserve",
+   "definition": "Une clé de stockage local hors de l'objet racine, portant une donnée qui n'est pas une ligne de suivi : base d'aliments créés, menus favoris, listes actives, états de célébration, envois."
   },
   {
-   "terme": "Minutes rondes",
-   "definition": "La contrainte appliquée à toute heure au moment de l'écriture : la minute est ramenée à la valeur inférieure parmi 0, 10, 15, 20, 30, 40, 45, 50."
+   "terme": "Ligne",
+   "definition": "Une entrée d'une des neuf tables : un identifiant, une date locale, souvent une heure, et ses attributs propres. La suppression est franche, la modification se fait par fusion."
   },
   {
-   "terme": "Unité canonique",
-   "definition": "L'unité dans laquelle une grandeur est conservée, indépendamment de celle qui sert à la saisir : kilogramme, centimètre, gramme, millilitre, milligramme, minute, mètre, kilocalorie. Aucune étiquette d'unité n'est enregistrée."
+   "terme": "Clé de tri",
+   "definition": "date + \"T\" + (time || \"12:00\"), comparée lexicographiquement. C'est l'ordre qui fait foi, jamais le rang dans la table."
   },
   {
-   "terme": "Date visée",
-   "definition": "La date que porte une ligne, par opposition au jour où elle est enregistrée. Le plafond des repas compte à la date visée, ce qui permet de rattraper plusieurs journées d'un coup."
-  },
-  {
-   "terme": "Plafond quotidien",
-   "definition": "Le nombre maximal de lignes qu'une journée peut porter pour une entité. Dépassé, il écrase la dernière ligne du jour au sens du rang dans la table, ou refuse l'écriture selon l'entité."
-  },
-  {
-   "terme": "Quota de création",
-   "definition": "Un plafond qui compte les créations d'une journée et non les lignes présentes : 50 aliments personnalisés, 20 recettes, 50 menus favoris, 10 messages envoyés. Une modification n'en consomme pas."
-  },
-  {
-   "terme": "Pesée de départ",
-   "definition": "L'unique ligne de weightHistory portant isStartingWeight à true. Elle se reconnaît à son drapeau et non à sa valeur, et survit à la suppression de tout l'historique."
-  },
-  {
-   "terme": "Mensurations",
-   "definition": "Les neuf attributs facultatifs d'une pesée, en centimètres (BodyMeasurements) : chest, waist, hips, arm, underbust, buttocks, thigh, knee, calf."
-  },
-  {
-   "terme": "Quantité d'aliment",
-   "definition": "FoodQuantity : la référence d'un aliment et sa quantité en grammes ou en millilitres. Imbriquée, sans existence propre, régénérée à chaque copie."
-  },
-  {
-   "terme": "Fiche normalisée",
-   "definition": "ResolvedFood : la forme unique sous laquelle toute consommation lit un aliment, quelle que soit la base d'origine. Une référence non résolue rend undefined."
+   "terme": "Drapeau de départ",
+   "definition": "L'attribut isStartingWeight d'une pesée. Il désigne la pesée la plus ancienne ; il n'est pas garanti unique."
   },
   {
    "terme": "Cache nutritionnel",
-   "definition": "Les cinq valeurs (calories, protein, carbs, fat, fiber) recopiées sur un repas alors qu'elles se recalculent depuis sa composition. Exception assumée à la règle du non-dérivé."
+   "definition": "Les cinq valeurs (calories, protéines, glucides, lipides, fibres) recopiées sur un repas et recalculées à chaque écriture depuis sa composition. Seule donnée dérivée stockée."
+  },
+  {
+   "terme": "Quantité d'aliment",
+   "definition": "FoodQuantity : un identifiant régénéré à chaque copie, la référence d'un aliment, la base à résoudre, et une quantité en grammes ou en millilitres."
   },
   {
    "terme": "Recette",
-   "definition": "Un aliment personnalisé qui porte sa composition dans recipeIngredients. Sans nom propre : son nom est celui de l'aliment qu'elle définit, et ses valeurs valent pour 100 g de la composition entière."
+   "definition": "Un aliment personnalisé qui porte sa composition. Son nom est celui de l'aliment ; ses valeurs sont rapportées à 100 g de la composition entière ; ses ingrédients ne peuvent pas être supprimés."
   },
   {
-   "terme": "Menu favori",
-   "definition": "FavoriteMealItem : une composition nommée et réutilisable, qui reçoit une copie de la composition d'origine et ne suit plus ses modifications."
+   "terme": "Quota de création",
+   "definition": "Un plafond compté sur les créations, non sur les lignes présentes : 50 aliments, 20 recettes, 50 menus favoris. Une modification n'en consomme pas."
+  },
+  {
+   "terme": "Plafond quotidien",
+   "definition": "Le nombre de lignes acceptées pour une journée. Au-delà, la dernière ligne du jour est réécrite — sauf pour le sommeil et les repas, où l'écriture est refusée."
+  },
+  {
+   "terme": "Catalogue livré",
+   "definition": "Une liste de référence livrée avec le produit et jamais écrite : traitements, activités, moments pour soi, effets. Les trois derniers sont référencés par leur texte."
   },
   {
    "terme": "Liste d'entrées actives",
-   "definition": "Une des trois listes de chaînes qui restreignent les valeurs qu'une nouvelle ligne peut porter, sans rien retirer aux lignes déjà enregistrées."
+   "definition": "Le sous-ensemble d'un catalogue tenu pour actif. Elle ne retire rien des lignes enregistrées."
   },
   {
-   "terme": "Clé de secours",
-   "definition": "glp1_app_companion_data__secours, sans tiret final : l'unique copie d'une sauvegarde qui n'a pas pu être lue. Écrite une seule fois, jamais recouverte."
+   "terme": "Conversion au chargement",
+   "definition": "Une des neuf transformations idempotentes appliquées à la sauvegarde à chaque lecture, pour rattraper une décision passée sans perdre de donnée."
   },
   {
    "terme": "Copie de secours",
-   "definition": "BackupEntry : une copie intégrale de la sauvegarde, prise avant tout remplacement en masse, sous glp1_app_companion_data__secours-<horodatage>. Relue et comparée avant d'être déclarée faite."
+   "definition": "Une copie intégrale de la sauvegarde, prise avant tout remplacement en masse, relue et comparée avant d'être déclarée faite. Rien ne l'efface."
+  },
+  {
+   "terme": "Sauvegarde de secours",
+   "definition": "La recopie unique d'une sauvegarde illisible, sous <clé>__secours. Distincte des copies horodatées, dont le préfixe est __secours-."
   },
   {
    "terme": "Assignation d'équivalences",
-   "definition": "LudicUsageState : les objets attribués aux deux pertes de poids, signés par l'identifiant, la date et l'heure de la pesée la plus récente et par les deux pertes au dixième. Chaque nouvelle pesée réassigne."
+   "definition": "L'état mémorisé qui fige les objets attribués entre deux pesées : une signature de pesée, deux pertes au dixième, deux listes d'objets, et des compteurs par objet."
   },
   {
-   "terme": "Équivalent métabolique",
-   "definition": "L'attribut met du catalogue des activités : un nombre sans dimension, arrondi au demi, dont dépend la dépense calculée d'une séance. Il se retrouve par le nom de l'activité."
+   "terme": "Contexte technique",
+   "definition": "Les vingt-quatre attributs joints à chaque envoi vers le compte distant. Aucune donnée de suivi n'y figure."
   },
   {
-   "terme": "UUID version 7",
-   "definition": "L'identifiant des repas, des quantités d'aliment et des menus favoris. Seule forme d'identifiant du modèle qui exclut la collision, les autres dérivant de l'horloge à la milliseconde."
-  },
-  {
-   "terme": "Marque de journée",
-   "definition": "DailyLog : une ligne réduite à un identifiant et une date, dont seule la présence est lue. Aucun enregistrement n'en crée."
-  },
-  {
-   "terme": "Suppression franche",
-   "definition": "La règle du modèle : une ligne supprimée quitte la sauvegarde, et aucun marqueur de suppression n'est conservé."
-  },
-  {
-   "terme": "Conversion de chargement",
-   "definition": "Une des neuf transformations idempotentes appliquées à la sauvegarde à sa lecture, qui rattrapent les formes anciennes sans jamais détruire une donnée saisie."
-  },
-  {
-   "terme": "Nuancier",
-   "definition": "L'ensemble fermé de valeurs hexadécimales dans lequel un attribut d'avatar prend sa valeur : 6 pour la peau, 5 pour les yeux, 6 pour les cheveux. Le type, lui, accepte toute chaîne."
+   "terme": "Déclaré sans table derrière",
+   "definition": "Un type présent dans le modèle qu'aucune donnée enregistrée n'instancie : la cible d'une migration entamée, ou un recueil qui n'écrit rien."
   }
  ],
  "index": [
   {
-   "terme": "AppData (objet racine)",
+   "terme": "AppData",
    "ancre": "entites-l-objet-racine-et-ses-tables"
   },
   {
-   "terme": "Ordre des lignes",
+   "terme": "glp1_app_companion_data",
    "ancre": "entites-l-objet-racine-et-ses-tables"
   },
   {
-   "terme": "Clés de stockage",
-   "ancre": "entites-les-reserves-hors-de-l-objet-racine"
+   "terme": "Ordre de tri des lignes",
+   "ancre": "entites-l-objet-racine-et-ses-tables"
+  },
+  {
+   "terme": "Clés de stockage local",
+   "ancre": "entites-les-reserves-hors-de-la-sauvegarde"
   },
   {
    "terme": "glow_ludic_usage",
-   "ancre": "entites-les-reserves-hors-de-l-objet-racine"
+   "ancre": "entites-les-reserves-hors-de-la-sauvegarde"
   },
   {
-   "terme": "Hors périmètre (clés)",
-   "ancre": "entites-les-reserves-hors-de-l-objet-racine"
+   "terme": "hasAcceptedMedicalDisclaimer_v1",
+   "ancre": "entites-les-reserves-hors-de-la-sauvegarde"
   },
   {
-   "terme": "Identifiants (préfixes)",
+   "terme": "Clés héritées",
+   "ancre": "entites-les-reserves-hors-de-la-sauvegarde"
+  },
+  {
+   "terme": "Identifiants (motifs)",
+   "ancre": "entites-conventions-communes-a-toutes-les-lignes"
+  },
+  {
+   "terme": "starting-weight-log",
+   "ancre": "entites-conventions-communes-a-toutes-les-lignes"
+  },
+  {
+   "terme": "NewLog",
+   "ancre": "entites-conventions-communes-a-toutes-les-lignes"
+  },
+  {
+   "terme": "LogUpdate",
+   "ancre": "entites-conventions-communes-a-toutes-les-lignes"
+  },
+  {
+   "terme": "updatedAt",
    "ancre": "entites-conventions-communes-a-toutes-les-lignes"
   },
   {
@@ -231,27 +267,15 @@
    "ancre": "entites-conventions-communes-a-toutes-les-lignes"
   },
   {
-   "terme": "Unités canoniques",
+   "terme": "Références par nom",
    "ancre": "entites-conventions-communes-a-toutes-les-lignes"
   },
   {
-   "terme": "Grandeurs sans unité",
+   "terme": "Bornes non tenues",
    "ancre": "entites-conventions-communes-a-toutes-les-lignes"
   },
   {
-   "terme": "Référence par nom (trois exceptions)",
-   "ancre": "entites-conventions-communes-a-toutes-les-lignes"
-  },
-  {
-   "terme": "Suppression franche",
-   "ancre": "entites-conventions-communes-a-toutes-les-lignes"
-  },
-  {
-   "terme": "Conversions de chargement",
-   "ancre": "entites-conventions-communes-a-toutes-les-lignes"
-  },
-  {
-   "terme": "Plafonds quotidiens",
+   "terme": "Cardinalités",
    "ancre": "entites-les-cardinalites"
   },
   {
@@ -259,7 +283,7 @@
    "ancre": "entites-les-cardinalites"
   },
   {
-   "terme": "Date visée",
+   "terme": "Quota du stockage local",
    "ancre": "entites-les-cardinalites"
   },
   {
@@ -267,15 +291,15 @@
    "ancre": "entites-le-profil"
   },
   {
-   "terme": "Interrupteurs de suivi",
+   "terme": "measurementSystem",
    "ancre": "entites-le-profil"
   },
   {
-   "terme": "Objectifs quotidiens",
+   "terme": "Drapeaux de suivi",
    "ancre": "entites-le-profil"
   },
   {
-   "terme": "Rappels",
+   "terme": "Masquage des modules",
    "ancre": "entites-le-profil"
   },
   {
@@ -283,11 +307,11 @@
    "ancre": "entites-le-profil"
   },
   {
-   "terme": "AvatarConfig",
-   "ancre": "entites-l-avatar"
+   "terme": "startingWeight (attribut retiré)",
+   "ancre": "entites-le-profil"
   },
   {
-   "terme": "Nuancier",
+   "terme": "AvatarConfig",
    "ancre": "entites-l-avatar"
   },
   {
@@ -295,7 +319,7 @@
    "ancre": "entites-la-pesee"
   },
   {
-   "terme": "Pesée de départ",
+   "terme": "isStartingWeight",
    "ancre": "entites-la-pesee"
   },
   {
@@ -311,11 +335,11 @@
    "ancre": "entites-la-prise-de-traitement"
   },
   {
-   "terme": "Treatment (catalogue)",
+   "terme": "Treatment",
    "ancre": "entites-le-catalogue-des-traitements"
   },
   {
-   "terme": "Identifiants de traitement",
+   "terme": "orforglipron",
    "ancre": "entites-le-catalogue-des-traitements"
   },
   {
@@ -324,10 +348,6 @@
   },
   {
    "terme": "FoodQuantity",
-   "ancre": "entites-le-repas"
-  },
-  {
-   "terme": "Cache nutritionnel",
    "ancre": "entites-le-repas"
   },
   {
@@ -343,24 +363,16 @@
    "ancre": "entites-l-aliment"
   },
   {
-   "terme": "Recette",
+   "terme": "user-custom-recipe",
    "ancre": "entites-l-aliment"
   },
   {
-   "terme": "Code-barres",
+   "terme": "nom_court",
    "ancre": "entites-l-aliment"
   },
   {
-   "terme": "ResolvedFood",
-   "ancre": "entites-la-fiche-normalisee-et-l-apport"
-  },
-  {
-   "terme": "Nutrition / ZERO_NUTRITION",
-   "ancre": "entites-la-fiche-normalisee-et-l-apport"
-  },
-  {
-   "terme": "Formule d'apport",
-   "ancre": "entites-la-fiche-normalisee-et-l-apport"
+   "terme": "barcode",
+   "ancre": "entites-l-aliment"
   },
   {
    "terme": "FavoriteMealItem",
@@ -368,10 +380,6 @@
   },
   {
    "terme": "SideEffectLog",
-   "ancre": "entites-le-ressenti"
-  },
-  {
-   "terme": "SideEffectOption (catalogue)",
    "ancre": "entites-le-ressenti"
   },
   {
@@ -383,19 +391,7 @@
    "ancre": "entites-la-seance-d-activite"
   },
   {
-   "terme": "SportPreset (catalogue)",
-   "ancre": "entites-la-seance-d-activite"
-  },
-  {
-   "terme": "Équivalent métabolique",
-   "ancre": "entites-la-seance-d-activite"
-  },
-  {
    "terme": "MeTimeLog",
-   "ancre": "entites-le-moment-pour-soi"
-  },
-  {
-   "terme": "MeTimePreset (catalogue)",
    "ancre": "entites-le-moment-pour-soi"
   },
   {
@@ -403,7 +399,7 @@
    "ancre": "entites-la-nuit-ou-la-sieste"
   },
   {
-   "terme": "Durée de sommeil",
+   "terme": "bedDate",
    "ancre": "entites-la-nuit-ou-la-sieste"
   },
   {
@@ -411,7 +407,19 @@
    "ancre": "entites-la-marque-de-journee"
   },
   {
-   "terme": "Listes d'entrées actives",
+   "terme": "SportPreset",
+   "ancre": "entites-les-catalogues-livres"
+  },
+  {
+   "terme": "MeTimePreset",
+   "ancre": "entites-les-catalogues-livres"
+  },
+  {
+   "terme": "SideEffectOption",
+   "ancre": "entites-les-catalogues-livres"
+  },
+  {
+   "terme": "glp1_active_sports",
    "ancre": "entites-les-listes-d-entrees-actives"
   },
   {
@@ -423,6 +431,10 @@
    "ancre": "entites-les-etats-tenus-hors-de-la-sauvegarde"
   },
   {
+   "terme": "Compteurs de sélection",
+   "ancre": "entites-les-etats-tenus-hors-de-la-sauvegarde"
+  },
+  {
    "terme": "Date de première ouverture",
    "ancre": "entites-les-etats-tenus-hors-de-la-sauvegarde"
   },
@@ -431,7 +443,7 @@
    "ancre": "entites-les-copies-de-secours"
   },
   {
-   "terme": "Clé de secours",
+   "terme": "__secours",
    "ancre": "entites-les-copies-de-secours"
   },
   {
@@ -447,19 +459,39 @@
    "ancre": "entites-le-compte-et-ce-qui-quitte-l-appareil"
   },
   {
-   "terme": "CustomFood (déclaré)",
+   "terme": "ReportExportFailure",
+   "ancre": "entites-le-compte-et-ce-qui-quitte-l-appareil"
+  },
+  {
+   "terme": "mail/{id}",
+   "ancre": "entites-le-compte-et-ce-qui-quitte-l-appareil"
+  },
+  {
+   "terme": "SubmissionContext",
+   "ancre": "entites-le-compte-et-ce-qui-quitte-l-appareil"
+  },
+  {
+   "terme": "CustomFood",
    "ancre": "entites-declares-sans-table-derriere"
   },
   {
-   "terme": "Recipe (déclaré)",
+   "terme": "Recipe",
    "ancre": "entites-declares-sans-table-derriere"
   },
   {
-   "terme": "SideEffectType, SportType (déclarés)",
+   "terme": "SideEffectType",
    "ancre": "entites-declares-sans-table-derriere"
   },
   {
-   "terme": "OnboardingAnswers, OnboardingState",
+   "terme": "SportType",
+   "ancre": "entites-declares-sans-table-derriere"
+  },
+  {
+   "terme": "HungerLevel",
+   "ancre": "entites-declares-sans-table-derriere"
+  },
+  {
+   "terme": "OnboardingAnswers",
    "ancre": "entites-declares-sans-table-derriere"
   },
   {
@@ -467,19 +499,27 @@
    "ancre": "entites-ce-que-la-v2-a-decide-autrement"
   },
   {
-   "terme": "anneeNaissance, tailleCm",
+   "terme": "anneeNaissance",
    "ancre": "entites-ce-que-la-v2-a-decide-autrement"
   },
   {
-   "terme": "Systeme, Langue (V2)",
+   "terme": "tailleCm",
+   "ancre": "entites-ce-que-la-v2-a-decide-autrement"
+  },
+  {
+   "terme": "traitementCommence",
+   "ancre": "entites-ce-que-la-v2-a-decide-autrement"
+  },
+  {
+   "terme": "foundayo",
+   "ancre": "entites-ce-que-la-v2-a-decide-autrement"
+  },
+  {
+   "terme": "Systeme (V2)",
    "ancre": "entites-ce-que-la-v2-a-decide-autrement"
   },
   {
    "terme": "Avatar (V2)",
-   "ancre": "entites-ce-que-la-v2-a-decide-autrement"
-  },
-  {
-   "terme": "Traitement (V2)",
    "ancre": "entites-ce-que-la-v2-a-decide-autrement"
   }
  ]

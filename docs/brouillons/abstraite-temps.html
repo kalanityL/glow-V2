@@ -8,65 +8,98 @@
     <thead><tr><th>Représentation</th><th>Type</th><th>Forme</th><th>Ce qu'elle porte</th></tr></thead>
     <tbody>
       <tr><td>Jour local</td><td>chaîne</td><td><code>AAAA-MM-JJ</code></td><td>La date portée par toute entrée de journal, sans exception.</td></tr>
-      <tr><td>Heure murale</td><td>chaîne</td><td><code>HH:MM</code>, 24 h, zéros de tête</td><td>L'heure d'une entrée, quand elle en porte une. Aucun fuseau, aucune seconde, aucun suffixe.</td></tr>
+      <tr><td>Heure murale</td><td>chaîne</td><td><code>HH:MM</code>, zéros de tête</td><td>L'heure d'une entrée, quand elle en porte une. Aucun fuseau, aucune seconde.</td></tr>
       <tr><td>Horodatage d'archive</td><td>chaîne</td><td><code>AAAA-MM-JJ-HHMMSS</code></td><td>Le moment local d'une copie de secours des données.</td></tr>
-      <tr><td>Instant absolu</td><td>entier</td><td>millisecondes depuis l'époque Unix</td><td>Les métadonnées de création et de dernière modification des référentiels et des collections que l'utilisatrice enrichit.</td></tr>
+      <tr><td>Instant absolu</td><td>entier</td><td>millisecondes depuis l'époque Unix</td><td>Les métadonnées de création et de modification des objets de bibliothèque, l'instant d'un envoi, et le contexte d'un envoi.</td></tr>
     </tbody>
   </table>
-  <p>L'instant absolu n'est jamais porté par une donnée de santé. Il est porté par six sortes d'objets, et par elles seules : une recette et un aliment personnalisé portent un instant de création <em>et</em> un instant de dernière modification, tous deux obligatoires ; un type d'effet secondaire et un type d'activité physique portent les deux mêmes, également obligatoires ; un menu favori et une entrée de la base d'aliments enrichie portent un instant de création <em>facultatif</em>, arrivé après coup avec un plafond de création — les objets écrits avant lui n'en ont pas, et ne comptent dans aucun quota.</p>
-  <p>Aucune pesée, aucune prise, aucun repas, aucune nuit ne porte d'instant absolu : ces entrées portent un jour local et, sauf le total de pas, une heure murale.</p>
+  <p>L'instant absolu n'est pas rare et n'est pas réservé aux aliments personnalisés. Il est porté par :</p>
+  <table>
+    <thead><tr><th>Objet</th><th>Métadonnées absolues</th><th>Obligation</th></tr></thead>
+    <tbody>
+      <tr><td>Recette</td><td><code>createdAt</code>, <code>updatedAt</code></td><td>Obligatoires.</td></tr>
+      <tr><td>Aliment personnalisé</td><td><code>createdAt</code> (<code>updatedAt</code> dans le type cible)</td><td><strong>Facultatif</strong> dans la structure que le code lit.</td></tr>
+      <tr><td>Nature d'effet indésirable</td><td><code>createdAt</code>, <code>updatedAt</code></td><td>Obligatoires.</td></tr>
+      <tr><td>Nature d'activité</td><td><code>createdAt</code>, <code>updatedAt</code></td><td>Obligatoires.</td></tr>
+      <tr><td>Menu favori</td><td><code>createdAt</code></td><td><strong>Facultatif</strong>.</td></tr>
+      <tr><td>Envoi (avis, idée, anomalie, réponse au sondage)</td><td>instant d'envoi</td><td><strong>Facultatif</strong>.</td></tr>
+      <tr><td>Contexte d'un envoi</td><td>instant en millisecondes, instant sérialisé en UTC, décalage au fuseau en minutes, nom du fuseau</td><td>Obligatoires — le seul endroit du produit qui sérialise en UTC.</td></tr>
+    </tbody>
+  </table>
+  <p><strong>Un instant absolu facultatif est un trou de datation, pas un détail.</strong> Un objet écrit avant l'arrivée de cette métadonnée n'en porte pas ; il n'appartient alors à aucun jour de création, et n'est donc compté dans le quota d'aucune journée. Aucune sauvegarde n'a été réécrite pour lui en donner un.</p>
+  <p>Aucune donnée de santé n'est datée par un instant absolu : une pesée, une prise, un repas, une nuit portent un jour local et, le plus souvent, une heure murale, jamais un horodatage universel. Les instants absolus datent la <em>bibliothèque</em> (aliments, recettes, natures, menus) et les <em>envois</em>, jamais le journal.</p>
 
   <h3 id="temps-le-jour-local">Le jour local</h3>
-  <p>Un jour local se compose des composantes locales de l'horloge de l'appareil : année, mois, quantième, chacun complété de zéros. Il n'est jamais dérivé de la moitié gauche d'un instant sérialisé en UTC.</p>
+  <p>Un jour local se compose des composantes locales de l'horloge de l'appareil : année, mois, quantième, chacun complété de zéros.</p>
   <pre><code>jourLocal(t) = t.année_locale + "-" + pad2(t.mois_local) + "-" + pad2(t.quantième_local)</code></pre>
-  <p>La conversion par UTC est proscrite parce qu'elle décale d'un jour et que le sens du décalage dépend du fuseau. Dans un fuseau positif (France en été, UTC+2), une saisie faite à 00 h 30 locale appartient encore à la veille en UTC. Dans un fuseau négatif, c'est la fin de soirée qui bascule au lendemain. Une entrée ainsi datée est rangée dans la mauvaise journée, comptée dans la mauvaise fenêtre et perdue pour la bonne.</p>
-  <p>Le format se compare directement : pour deux jours locaux, l'ordre lexicographique des chaînes est l'ordre chronologique. C'est ce que fait le filtrage des fenêtres réglables, qui ne compare que des chaînes et ne fait donc intervenir aucun fuseau. <strong>Ce n'est pas universel</strong> : plusieurs bornes et plusieurs ordres passent par des instants, et la section sur l'arithmétique des jours en donne le relevé.</p>
-
-  <h4 id="temps-la-lecture-stricte-d-un-jour">La lecture stricte d'un jour</h4>
-  <p>Une seule capacité vérifie qu'un jour local <em>existe</em>, et rend le triplet ou l'absence. C'est la seule règle de quantième du produit.</p>
-  <pre><code>lireJour("AAAA-MM-JJ") → { année, mois, quantième } | absent
-  forme ≠ AAAA-MM-JJ         → absent
-  mois &lt; 1 ou mois &gt; 12      → absent
-  quantième &lt; 1 ou quantième &gt; joursDuMois(année, mois) → absent
-joursDuMois(année, mois) = quantième local du « jour 0 » du mois suivant</code></pre>
-  <p>Ainsi <code>2026-02-30</code> et <code>1900-02-29</code> sont absents, <code>2000-02-29</code> est accepté, sans qu'aucune règle de divisibilité par 4, 100 ou 400 soit écrite : le débordement d'un mois se résout par la normalisation d'un triplet, jamais par un test. La saisie de huit chiffres se lit avec les mêmes trois refus, plus un quatrième : une année inférieure à 1000 est refusée. Partout ailleurs, une date est seulement testée sur sa <em>forme</em> — <code>^\d{4}-\d{2}-\d{2}$</code> —, jamais sur son existence.</p>
-
-  <h3 id="temps-l-heure-murale">L'heure murale et les minutes rondes</h3>
-  <p>Une heure est une chaîne <code>HH:MM</code>, zéros de tête compris, donc comparable comme chaîne à toute autre heure. Elle ne porte ni fuseau, ni secondes. <strong>Son domaine est <code>HH ∈ [00,23]</code> et <code>MM ∈ [00,59]</code></strong>, et ce domaine n'est vérifié que par les deux capacités qui lisent une heure en minutes : la conversion d'une heure en minutes depuis minuit rend « absent » dès que <code>HH &gt; 23</code> ou <code>MM &gt; 59</code>, et le placement d'une entrée dans son créneau de trois heures rend « absent » hors de <code>[0,23]</code>.</p>
-  <p>Toute heure retenue par le produit respecte les <strong>minutes rondes</strong> : <code>0, 10, 15, 20, 30, 40, 45, 50</code>. L'ensemble est irrégulier — des pas de dix, plus les deux quarts.</p>
-  <pre><code>arrondir("HH:MM") = "HH:" + max{ m ∈ {0,10,15,20,30,40,45,50} | m ≤ MM }</code></pre>
-  <p>L'arrondi est toujours vers le bas, jamais au plus proche : arrondir vers le haut produirait une heure encore à venir, qu'un calcul de « déjà survenu » refuserait de compter, et pourrait franchir minuit — donc changer de journée.</p>
-  <p><strong>L'arrondi ne contrôle que les minutes.</strong> Il refuse une chaîne qui n'a pas la forme <code>HH:MM</code>, et refuse <code>MM &gt; 59</code> : ces deux-là ressortent inchangées. Il ne regarde pas l'heure : <code>25:37</code> ressort <code>25:30</code>. Il n'y a donc pas une lecture d'« heure » mais deux — la garde de forme de l'arrondi, et la garde de domaine de la conversion en minutes. Aucune précondition d'écriture ne rattrape la première.</p>
-  <p>La règle vit au moment d'écrire, pas à la saisie, parce que l'ensemble des minutes rondes est trop irrégulier pour être proposé autrement. Elle est portée par les deux gestes génériques d'un journal — ajouter une ligne, fusionner une modification dans une ligne —, qui arrondissent le seul attribut nommé <em>heure</em> et laissent passer une ligne qui n'en a pas. Le sommeil en porte <em>deux</em> : ses gestes appellent donc leur propre arrondi, qui traite l'heure de réveil et l'heure d'endormissement, faute de quoi un endormissement à 22:37 serait écrit tel quel. Sont ainsi arrondies les heures de pesée, de prise de traitement, de repas, de séance d'activité, de moment à soi, les deux heures d'une entrée de sommeil, et les heures de rappel.</p>
-  <p>L'heure proposée par défaut à la création d'une entrée est l'heure locale courante ainsi arrondie vers le bas ; elle est donc toujours déjà passée.</p>
-  <div class="exemple"><p>Camille se pèse à 07 h 37 : la pesée est enregistrée à <code>07:30</code>. Une prise notée à 14 h 58 est enregistrée à <code>14:50</code>, jamais à 15 h 00.</p></div>
-
-  <h3 id="temps-l-instant-d-une-entree">L'instant d'une entrée, et les trois heures de repli</h3>
-  <p>Quand un calcul a besoin d'un instant — durée d'une nuit, cinétique d'une molécule, ordre de deux entrées du même jour —, il compose le jour local et l'heure murale et lit le résultat dans le fuseau de l'appareil, sans jamais mentionner de fuseau.</p>
-  <pre><code>instant(entrée) = interprétationLocale(entrée.date + "T" + (entrée.heure || "12:00") + ":00")</code></pre>
-  <p>Le repli est celui d'une valeur <em>vide ou absente</em>, et non de la seule absence : l'heure étant facultative, une chaîne vide retombe elle aussi sur le repli plutôt que de produire un instant illisible.</p>
-  <p><strong>Trois heures de repli coexistent, et le produit n'a pas tranché entre elles.</strong> Elles ne portent pas sur les mêmes calculs, et deux d'entre elles se contredisent sur le même objet.</p>
+  <p>La conversion par UTC est proscrite parce qu'elle décale d'un jour et que le sens du décalage dépend du fuseau. Dans un fuseau positif (France en été, UTC+2), une écriture faite à 00 h 30 locale appartient encore à la veille en UTC. Dans un fuseau négatif, c'est la fin de soirée qui passe au lendemain. Une entrée ainsi datée est rangée dans la mauvaise journée, comptée dans la mauvaise fenêtre et perdue pour la bonne.</p>
+  <p>La lecture symétrique est proscrite pour la même raison : convertir la chaîne <code>AAAA-MM-JJ</code> en instant l'interprète comme minuit UTC, ce qui recule d'un jour à l'ouest de Greenwich.</p>
+  <p>Le format se compare directement : pour deux jours locaux, l'ordre lexicographique des chaînes est l'ordre chronologique. Tous les filtrages, toutes les bornes et tous les tris comparent des chaînes, et ne font intervenir aucun fuseau.</p>
+  <p><strong>La règle est posée, elle n'est pas tenue partout.</strong> Quatre arithmétiques de jours coexistent, une seule conforme :</p>
   <table>
-    <thead><tr><th>Repli</th><th>Où il s'applique</th><th>Effet</th></tr></thead>
+    <thead><tr><th>Arithmétique</th><th>Méthode</th><th>Conforme</th></tr></thead>
     <tbody>
-      <tr><td><code>12:00</code></td><td>Le comparateur générique du modèle (croissant et décroissant) ; la retenue de la dernière pesée d'une journée ; toute la cinétique des molécules (instant de la prise la plus récente, fenêtre des prises actives, rotation des sites) ; l'ordre du journal des traitements.</td><td>Place l'entrée au milieu de sa journée, donc ni avant ni après les journées voisines.</td></tr>
-      <tr><td><code>00:00</code></td><td>La signature de la <em>dernière pesée</em> ; l'ordre des journaux de sommeil, d'activité physique et de moments à soi ; la coupure du traitement en cours.</td><td>Place l'entrée en tête de sa journée : elle passe avant toutes celles qui portent une heure.</td></tr>
-      <tr><td>chaîne vide</td><td>L'ordre du fil de toutes les entrées, tous journaux confondus, qui compare d'abord les dates puis les heures.</td><td>La chaîne vide est plus petite que toute heure : en ordre décroissant, l'entrée sans heure passe <em>après</em> celles de son jour qui en portent une.</td></tr>
+      <tr><td>Celle du modèle (décalage, veille, écart)</td><td>Triplet (année, mois, quantième) normalisé par une origine UTC commune.</td><td>Oui.</td></tr>
+      <tr><td>Celle du document médical exporté</td><td>Écart et décalage bâtis sur l'analyse de la chaîne, relus par composantes UTC ; la date en toutes lettres est explicitement lue en UTC.</td><td>Non — mais cohérente avec elle-même.</td></tr>
+      <tr><td>Celle du sommeil (lendemain d'une journée)</td><td>La chaîne est lue à <code>T12:00:00</code> locale, puis le quantième est incrémenté.</td><td>Non, mais le repli à midi la met hors d'atteinte du changement d'heure.</td></tr>
+      <tr><td>Le libellé relatif d'une date</td><td>La chaîne est convertie en instant — donc en minuit UTC — puis mise en forme localement.</td><td>Non : c'est exactement la conversion proscrite.</td></tr>
     </tbody>
   </table>
-  <p>La retenue de la dernière pesée d'une journée et la signature de la dernière pesée du journal portent sur la même donnée avec deux replis différents. Aucune décision ne dit lequel fait foi.</p>
-  <p>L'ordre d'un journal se lit sur la date et l'heure portées par ses lignes, jamais sur leur rang d'insertion : une ligne antidatée est écrite en fin de table et appartient pourtant au passé. La forme de la comparaison varie elle aussi : le comparateur générique compare deux clés <code>date + "T" + heure</code> comme des chaînes, les journaux de sommeil, d'activité et de moments à soi construisent deux instants et soustraient leurs millisecondes, le fil de toutes les entrées compare la date puis l'heure séparément.</p>
-  <pre><code>cléDeTri(ligne) = ligne.date + "T" + (ligne.heure || "12:00")   // comparateur générique du modèle</code></pre>
+  <p>La validation d'une borne personnalisée convertit elle aussi la chaîne en instant, mais seulement pour juger sa lisibilité : la valeur rendue reste la chaîne d'origine.</p>
+
+  <h3 id="temps-l-heure-murale-et-les-minutes-rondes">L'heure murale et les minutes rondes</h3>
+  <p>Une heure est une chaîne <code>HH:MM</code>, zéros de tête compris, donc comparable comme chaîne à toute autre heure. Elle ne porte ni fuseau, ni secondes.</p>
+  <p>Toute heure retenue par le produit respecte les <strong>minutes rondes</strong> : <code>0, 10, 15, 20, 30, 40, 45, 50</code>. L'ensemble est irrégulier — des pas de dix, plus les deux quarts.</p>
+  <pre><code>arrondir("HH:MM") = "HH:" + max{ m ∈ {0,10,15,20,30,40,45,50} | m ≤ MM }</code></pre>
+  <p>L'arrondi est toujours vers le bas, jamais au plus proche : arrondir vers le haut produirait une heure encore à venir, qu'un calcul de « déjà survenu » refuserait de compter, et pourrait franchir minuit — donc changer de journée. La règle s'applique au moment de l'écriture, à la création comme à la modification, et à toutes les heures enregistrées : pesée, prise de traitement, repas, séance d'activité, moment à soi, les <em>deux</em> heures d'une entrée de sommeil (coucher et réveil), et les heures de rappel du profil.</p>
+  <p>La valeur initiale d'une heure d'entrée est l'heure locale courante ainsi arrondie vers le bas ; elle est donc toujours déjà passée.</p>
+  <p><strong>L'arrondi n'est pas la garde de domaine de l'heure.</strong> Il exige la forme <code>HH:MM</code> et rend la chaîne inchangée si les minutes dépassent 59, mais il ne borne pas les heures : <code>99:37</code> en ressort <code>99:30</code>. Deux lectures seulement rejettent une heure hors de 0–23, et aucune n'est universelle :</p>
+  <table>
+    <thead><tr><th>Lecture</th><th>Ce qu'elle refuse</th><th>Portée</th></tr></thead>
+    <tbody>
+      <tr><td>Arrondi aux minutes rondes</td><td>Forme non <code>HH:MM</code>, minutes &gt; 59 — la chaîne ressort telle quelle.</td><td>Toute écriture d'heure.</td></tr>
+      <tr><td>Heure en minutes depuis minuit</td><td>Forme non <code>HH:MM</code>, heures &gt; 23, minutes &gt; 59 — rend « absent ».</td><td>Sommeil seulement.</td></tr>
+      <tr><td>Placement dans un créneau de trois heures</td><td>Heure non entière ou hors 0–23 — rend « absent ».</td><td>Repas et en-cas seulement.</td></tr>
+    </tbody>
+  </table>
+  <p>Il n'existe donc, hors sommeil et repas, aucune précondition d'écriture qui tienne la borne des vingt-quatre heures.</p>
+  <div class="exemple"><p>Camille se pèse à 07 h 37 : la pesée est enregistrée à <code>07:30</code>. Une prise notée à 14 h 58 est enregistrée à <code>14:50</code>, jamais à 15 h 00.</p></div>
+
+  <h3 id="temps-l-instant-d-une-entree">L'instant d'une entrée</h3>
+  <p>Quand un calcul a besoin d'un instant — cinétique d'une molécule, ordre de deux entrées du même jour, coupure des soixante jours —, il compose le jour local et l'heure murale et lit le résultat dans le fuseau de l'appareil, sans jamais mentionner de fuseau.</p>
+  <pre><code>instant(entrée) = interprétationLocale(entrée.date + "T" + (entrée.heure || "12:00") + ":00")</code></pre>
+  <p>Le repli est <em>falsy</em> et non <em>nullish</em>, et ce n'est pas indifférent : l'heure absente est en pratique la chaîne vide, qu'un repli nullish laisserait passer et qui produirait une date invalide.</p>
+  <p><strong>La durée d'une nuit ne passe pas par cette fonction.</strong> Elle additionne une origine UTC du jour et les minutes murales, et rend donc exactement la différence d'horloge murale : une nuit qui enjambe un changement d'heure vaut vingt-quatre heures si le coucher et le réveil portent la même heure, jamais vingt-trois ni vingt-cinq.</p>
+  <pre><code>instantMinutes(jour, heure) = Date.UTC(année, mois−1, quantième) / 60000 + minutesDepuisMinuit(heure)
+durée(nuit) = instantMinutes(date, time) − instantMinutes(bedDate, bedTime)
+si l'une des deux lectures est absente, ou si la différence est ≤ 0 → 0</code></pre>
+  <p>L'ordre d'un journal se lit sur la date et l'heure portées par ses lignes, jamais sur leur rang d'insertion : une ligne antidatée est écrite en fin de table et appartient pourtant au passé.</p>
+  <pre><code>cléDeTri(ligne) = ligne.date + "T" + (ligne.heure || "12:00")   // comparaison de chaînes</code></pre>
   <p>À clé égale, l'ordre de la table subsiste : à heure égale, la dernière enregistrée l'emporte.</p>
 
-  <h3 id="temps-l-instant-de-reference-est-injecte">L'instant de référence est toujours injecté</h3>
-  <p>Aucune fonction du domaine ne lit l'horloge d'elle-même : « maintenant » ou « aujourd'hui » lui est passé en paramètre, avec l'instant courant pour valeur par défaut. La règle vaut pour le calcul de « déjà survenu », les bornes des fenêtres de progression, le rang de semaine depuis une date, le bilan de dépense, la date de première ouverture, l'horodatage d'une archive, les séries journalières et la proposition d'un site de rotation.</p>
-  <p>Deux conséquences. Un calcul est reproductible : le même appel avec le même instant de référence rend toujours le même résultat, ce qui rend testables les bords — la veille d'un changement d'heure, une minute avant minuit, une année bissextile. Et un même instant de référence traverse une chaîne de calculs sans se décaler en route : la fenêtre de sept jours et la frontière du « déjà survenu » d'un même bilan sont fixées par la même valeur.</p>
+  <h3 id="temps-ce-que-vaut-une-heure-absente">Ce que vaut une heure absente</h3>
+  <p>Il n'y a pas une convention mais <strong>trois</strong>, et le calcul décide laquelle s'applique.</p>
+  <table>
+    <thead><tr><th>Valeur prise</th><th>Effet</th><th>Où</th></tr></thead>
+    <tbody>
+      <tr><td><code>12:00</code></td><td>L'entrée se range au milieu de sa journée, donc ni avant ni après les journées voisines.</td><td>Comparateurs d'ordre du modèle, retenue de la pesée du jour, instants de prise, coupure des soixante jours, rotation des zones.</td></tr>
+      <tr><td>Minuit, de fait</td><td>La journée en cours est réputée survenue en entier : une entrée du jour sans heure a déjà eu lieu.</td><td>Précondition « déjà survenu ».</td></tr>
+      <tr><td>Chaîne vide</td><td>L'entrée passe <em>après</em> celles de son jour qui portent une heure, du plus récent au plus ancien.</td><td>Sélection des entrées récentes, tous journaux confondus.</td></tr>
+    </tbody>
+  </table>
+  <p>Les trois sont dans le code livré et rien n'énonce laquelle fait foi. <span class="marque">arbitrage non validé</span></p>
 
-  <h3 id="temps-fuseau-et-langue">Fuseau et langue</h3>
-  <p>Le fuseau qui date une entrée est toujours celui de l'appareil, lu à travers les composantes locales de l'horloge. Le produit ne convertit jamais une date de santé d'un fuseau à un autre et n'en stocke aucun <em>sur une entrée</em>.</p>
-  <p>Deux exceptions, hors des données de santé. Un envoi de retour capte le fuseau nommé de l'appareil (<code>Europe/Paris</code>, ou « inconnu »), son décalage en minutes compté positivement à l'est, l'instant de l'envoi en millisecondes, ce même instant sérialisé en UTC, son écriture lisible locale et le jour local correspondant — six valeurs, jointes au message. Et la synthèse médicale exportée relit ses dates en UTC de bout en bout : elle compose l'instant à partir de la chaîne suffixée <code>Z</code> puis le remet en forme dans ce même UTC, si bien que les deux conversions s'annulent et que le jour rendu est celui qui était écrit.</p>
-  <p>La langue et le fuseau sont deux axes indépendants : changer de langue ne change pas la journée à laquelle une entrée appartient. L'indépendance est aujourd'hui une propriété par défaut plutôt qu'une règle tenue par du code : le profil de la V1 ne porte aucune langue, et toute mise en forme lisible y est figée en français. La V2 porte une langue (<code>fr</code>, <code>en</code>, valeur de départ <code>fr</code>) et ne met en forme aucune date. <span class="marque v2">V2</span></p>
+  <h3 id="temps-le-fuseau-et-la-langue">Le fuseau, et la langue</h3>
+  <p>Le fuseau retenu pour dater est toujours celui de l'appareil, lu à travers les composantes locales de l'horloge. Aucune entrée de journal ne porte de fuseau, et aucune n'est convertie.</p>
+  <p>Deux endroits sortent de cette règle, tous deux hors du journal :</p>
+  <table>
+    <thead><tr><th>Où</th><th>Ce qui est lu ou écrit</th></tr></thead>
+    <tbody>
+      <tr><td>Contexte d'un envoi</td><td>Le nom du fuseau de l'appareil, le décalage à UTC en minutes (signe retourné pour se lire « UTC+2 »), et l'instant de l'envoi sérialisé en UTC, à côté du même instant en composantes locales et du jour local.</td></tr>
+      <tr><td>Document médical exporté</td><td>Une date en toutes lettres composée à partir de la chaîne lue comme minuit UTC, puis mise en forme <em>en UTC</em> — cohérente avec elle-même, et sans effet sur les données.</td></tr>
+    </tbody>
+  </table>
+  <p>La langue et le fuseau sont posés comme deux axes indépendants, et c'est une <strong>règle</strong>, pas une propriété observable : la V1 n'a qu'une seule langue, en dur, et toutes ses mises en forme de date sont figées en français ; la V2 porte des langues mais n'a encore aucun module de dates. <span class="marque v2">V2</span></p>
   <p>Une conséquence à admettre : le jour local d'une entrée est figé à l'écriture, mais « aujourd'hui » est recalculé sur l'horloge de l'appareil à chaque lecture. Voyager change donc ce qui est « aujourd'hui », jamais ce qui a déjà été enregistré.</p>
 
   <h3 id="temps-la-journee">La journée</h3>
@@ -74,166 +107,190 @@ joursDuMois(année, mois) = quantième local du « jour 0 » du mois suivant</co
   <table>
     <thead><tr><th>Ce qui se compte par journée</th><th>Règle</th></tr></thead>
     <tbody>
-      <tr><td>Plafond quotidien d'un journal</td><td>Le décompte porte sur les lignes réellement présentes qui portent la même date. Selon le journal, le plafond refuse la saisie (sommeil : 15 par journée, rien n'est écrit) ou écrase une ligne du jour.</td></tr>
-      <tr><td>Total de pas</td><td>Une valeur par journée, sans heure. L'entrée de pas ne porte aucun attribut d'heure : l'absence n'y est pas un oubli de saisie mais une impossibilité de type. La journée entière est donc réputée survenue dès qu'elle est la journée en cours.</td></tr>
+      <tr><td>Une pesée par journée</td><td>Écrire une pesée sur une journée qui en porte déjà une <strong>fusionne</strong> : la ligne du jour est mise à jour, les valeurs que la nouvelle écriture ne mentionne pas — dont les mensurations — sont conservées. Déplacer une pesée existante sur une journée occupée ne fusionne pas : le geste est refusé en amont.</td></tr>
+      <tr><td>Total de pas</td><td><strong>Aucune unicité, aucun plafond.</strong> Une écriture empile une ligne de plus. Deux lectures divergent : l'une retient la <em>première</em> ligne trouvée pour la date — donc le rang d'insertion décide —, l'autre <em>somme</em> toutes les lignes du jour. Une entrée de pas ne porte pas d'heure.</td></tr>
       <tr><td>Dénominateur d'une moyenne journalière</td><td>Le nombre de journées effectivement renseignées dans la fenêtre, jamais la longueur de la fenêtre. Aucune journée renseignée : la moyenne est absente, pas nulle.</td></tr>
-      <tr><td>Découpage horaire des repas</td><td>Huit créneaux fixes de trois heures, <code>index = ⌊heure / 3⌋</code>. Ce découpage ne sert qu'aux repas et en-cas ; aucun autre journal n'est découpé ainsi. Une heure absente ou hors <code>[0,23]</code> est comptée à part, jamais placée au hasard.</td></tr>
+      <tr><td>Découpage en créneaux de trois heures</td><td>Huit créneaux fixes, <code>index = ⌊heure / 3⌋</code>. Ce découpage n'existe que pour les <strong>repas et en-cas</strong> ; aucun autre journal n'est découpé ainsi. Une entrée sans heure exploitable est comptée à part, jamais placée au hasard.</td></tr>
     </tbody>
   </table>
-  <p><strong>La ligne écrasée au plafond est la dernière de la table, pas la plus tardive.</strong> Le geste cherche, en remontant depuis la fin, la dernière ligne portant la date visée, et fusionne la nouvelle valeur dedans ; il ne lit aucune heure. C'est l'ordre des saisies qui décide — exactement ce que le reste du modèle refuse. Une ligne antidatée saisie en dernier est donc celle qu'on écrase. <span class="marque">arbitrage non validé</span></p>
-  <p><strong>Une nuit occupe deux journées et n'appartient qu'à une.</strong> Une entrée de sommeil porte quatre valeurs temporelles : une date et une heure d'endormissement, une date et une heure de réveil ; elle porte aussi sa nature, nuit ou sieste. La date de l'entrée est celle du <em>réveil</em> ; la date d'endormissement est écrite, jamais déduite — une sieste et une nuit ont la même structure.</p>
-  <pre><code>durée(nuit) = instant(date, heureRéveil) − instant(dateEndormissement, heureEndormissement), en minutes
-si cette différence est ≤ 0 → 0   // aucun passage de minuit n'est deviné
-recouvrement(a, b) ⇔ début(a) &lt; fin(b) et début(b) &lt; fin(a)   // bout-à-bout permis</code></pre>
-  <p>Le <strong>temps d'éveil</strong> d'une journée J se lit sur deux entrées différentes : le réveil d'une nuit datée J l'ouvre, l'endormissement d'une nuit datée J+1 le ferme, et les siestes de J s'en retranchent. Il est absent tant que l'une des deux nuits manque — un jour sans nuit ne vaut pas vingt-quatre heures d'éveil.</p>
-  <p>Sa formule n'est pas une soustraction d'instants, contrairement à celle de la durée d'une nuit : elle ne manipule que des <em>minutes depuis minuit</em>, et c'est le seul endroit du produit où un passage de minuit est <em>deviné</em>. La date d'endormissement de la nuit du lendemain n'est jamais lue.</p>
-  <pre><code>nuitsJ    = entrées de nature « nuit » datées J          ; absent si vide
-nuitsJ+1  = entrées de nature « nuit » datées J+1        ; absent si vide
-réveil    = max( minutesDepuisMinuit(heureRéveil) sur nuitsJ )          // le plus tardif ouvre
-coucher   = min( minutesDepuisMinuit(heureEndormissement) sur nuitsJ+1 ) // le plus précoce ferme
-brut      = coucher &gt; réveil ? coucher − réveil : coucher + 1440 − réveil
-éveil(J)  = brut − siestes(J)   ; absent si ce résultat n'est pas &gt; 0</code></pre>
-  <p>Plusieurs nuits pour une même journée donnent donc le temps d'éveil le plus prudent, jamais gonflé par une saisie en double. Une heure illisible y compte pour zéro minute.</p>
 
-  <h3 id="temps-arithmetique-des-jours">L'arithmétique des jours</h3>
+  <h3 id="temps-les-plafonds-quotidiens">Les plafonds quotidiens</h3>
+  <p>Dix plafonds portent sur une journée. Deux effets seulement : refuser l'écriture, ou remplacer la dernière ligne du jour. Deux façons de rattacher un objet à une journée : la date qu'il porte, ou son instant de création ramené au jour local.</p>
   <table>
-    <thead><tr><th>Capacité</th><th>Définition</th><th>Rendu</th></tr></thead>
+    <thead><tr><th>Ce qui est plafonné</th><th>Plafond</th><th>Effet au plafond</th><th>Ce qui est compté</th></tr></thead>
     <tbody>
-      <tr><td>Décaler un jour de <var>n</var></td><td>Le triplet (année, mois, quantième + <var>n</var>) est normalisé composante par composante, sur une origine UTC posée et relue en UTC des deux côtés ; <var>n</var> peut être négatif.</td><td>Un jour local. Une entrée mal formée ressort inchangée.</td></tr>
+      <tr><td>Prises de traitement</td><td>2</td><td>Remplace la dernière ligne du jour.</td><td>Lignes présentes de même date.</td></tr>
+      <tr><td>Effets indésirables déclarés</td><td>15</td><td>Remplace la dernière ligne du jour.</td><td>Lignes présentes de même date.</td></tr>
+      <tr><td>Séances d'activité</td><td>15</td><td>Remplace la dernière ligne du jour.</td><td>Lignes présentes de même date.</td></tr>
+      <tr><td>Moments à soi</td><td>15</td><td>Remplace la dernière ligne du jour.</td><td>Lignes présentes de même date.</td></tr>
+      <tr><td>Entrées de sommeil</td><td>15</td><td><strong>Refuse l'écriture.</strong></td><td>Lignes présentes de même date (réveil).</td></tr>
+      <tr><td>Repas et en-cas</td><td>30</td><td><strong>Refuse l'écriture.</strong></td><td>Lignes présentes portant la <em>date visée</em>, pas la date du jour.</td></tr>
+      <tr><td>Menus favoris créés</td><td>50</td><td><strong>Refuse l'écriture.</strong></td><td><code>createdAt</code> ramené au jour local.</td></tr>
+      <tr><td>Aliments personnalisés créés</td><td>50</td><td><strong>Refuse l'écriture.</strong></td><td><code>createdAt</code> ramené au jour local.</td></tr>
+      <tr><td>Recettes créées</td><td>20</td><td><strong>Refuse l'écriture.</strong></td><td><code>createdAt</code> ramené au jour local ; quota distinct de celui des aliments.</td></tr>
+      <tr><td>Envois</td><td>10</td><td><strong>Refuse l'écriture.</strong></td><td>Instant d'envoi ramené au jour local.</td></tr>
+      <tr><td>Pesées, relevés de pas</td><td>aucun</td><td>—</td><td>—</td></tr>
+    </tbody>
+  </table>
+  <p>Les quatre plafonds de création — menus favoris, aliments personnalisés, recettes, envois — sont la <strong>seule exception</strong> à « le décompte porte sur les lignes qui portent la même date » : ils ramènent un instant absolu à un jour local. Un objet sans instant de création échappe donc à tout quota. Dans tous les cas le décompte porte sur les objets <em>réellement présents</em> : supprimer une création du jour rend sa place. Modifier un objet existant ne consomme aucun quota.</p>
+
+  <h3 id="temps-la-nuit-et-le-temps-d-eveil">La nuit et le temps d'éveil</h3>
+  <p><strong>Une nuit occupe deux journées et n'appartient qu'à une.</strong> Une entrée de sommeil porte quatre valeurs temporelles : <code>bedDate</code> et <code>bedTime</code> (l'endormissement), <code>date</code> et <code>time</code> (le réveil). La date de l'entrée est celle du <em>réveil</em> ; la date d'endormissement est écrite, jamais déduite — une sieste et une nuit ont la même structure.</p>
+  <pre><code>si durée ≤ 0 → 0   // aucun passage de minuit n'est deviné à partir des seules heures
+recouvrement(a, b) ⇔ début(a) &lt; fin(b) et début(b) &lt; fin(a)   // bout-à-bout permis</code></pre>
+  <p>Le <strong>temps d'éveil</strong> d'une journée J se lit sur deux entrées différentes, et sur des heures murales seules :</p>
+  <pre><code>réveil   = max des heures de réveil des nuits datées J        (en minutes depuis minuit)
+coucher  = min des heures d'endormissement des nuits datées J+1
+brut     = coucher &gt; réveil ? coucher − réveil : coucher + 1440 − réveil
+éveil(J) = brut − minutes de sieste de J
+absent si aucune nuit datée J, aucune nuit datée J+1, ou éveil ≤ 0</code></pre>
+  <p>Plusieurs nuits pour une même journée : le réveil le plus tardif ouvre la journée, l'endormissement le plus précoce la ferme — le temps d'éveil le plus prudent. Il est absent tant que l'une des deux nuits manque : un jour sans nuit ne vaut pas vingt-quatre heures d'éveil.</p>
+
+  <h3 id="temps-la-semaine">La semaine</h3>
+  <p>Le mot recouvre <strong>quatre</strong> objets distincts, et aucun ne se déduit d'un autre.</p>
+  <table>
+    <thead><tr><th>Semaine</th><th>Définition</th><th>Ancrage aux jours nommés</th></tr></thead>
+    <tbody>
+      <tr><td>Rang de semaine depuis une date de départ</td><td><code>⌊joursÉcoulés / 7⌋ + 1</code>, la première portant le n° 1.</td><td>Aucun.</td></tr>
+      <tr><td>Fenêtre glissante de sept journées</td><td><code>[J−6, J]</code>, la journée en cours comprise.</td><td>Aucun.</td></tr>
+      <tr><td>Semaine civile</td><td>Sept jours commençant le <strong>lundi</strong>.</td><td>Total.</td></tr>
+      <tr><td>Jour de rappel hebdomadaire</td><td>Un entier de 0 à 6 où <strong>0 = dimanche</strong>.</td><td>Total, et sur une autre origine que la précédente.</td></tr>
+    </tbody>
+  </table>
+  <p>Les deux dernières se contredisent sur l'origine de la semaine ; rien dans le modèle ne les rapproche.</p>
+
+  <h3 id="temps-l-arithmetique-des-jours">L'arithmétique des jours</h3>
+  <table>
+    <thead><tr><th>Capacité</th><th>Définition</th><th>Résultat</th></tr></thead>
+    <tbody>
+      <tr><td>Décaler un jour de <var>n</var></td><td>Le triplet (année, mois, quantième + <var>n</var>) est normalisé composante par composante ; <var>n</var> peut être négatif.</td><td>Un jour local. Une chaîne mal formée ressort inchangée.</td></tr>
       <tr><td>Veille d'un jour</td><td>Le décalage de −1.</td><td>Un jour local.</td></tr>
-      <tr><td>Écart entre deux jours</td><td><code>(fin − début) / 86 400 000</code>, arrondi, les deux jours étant posés à la même origine composante par composante.</td><td>Un entier de jours, signé. Zéro si l'une des deux formes est illisible.</td></tr>
+      <tr><td>Écart entre deux jours</td><td><code>(fin − début) / 86 400 000</code>, arrondi, les deux jours étant pris à la même origine composante par composante.</td><td>Un entier de jours, signé. Zéro si l'une des deux formes est illisible.</td></tr>
     </tbody>
   </table>
-  <p>Ces trois opérations sont insensibles au changement d'heure : elles ne manipulent que des triplets de nombres, jamais une durée réelle. La normalisation absorbe seule les fins de mois et les années bissextiles.</p>
-  <p><strong>Reculer de <var>n</var> jours se fait de quatre façons dans le produit, et elles ne coïncident pas toujours.</strong></p>
-  <table>
-    <thead><tr><th>Méthode</th><th>Où</th><th>Sensibilité au changement d'heure</th></tr></thead>
-    <tbody>
-      <tr><td>Triplet normalisé (décalage de jour ci-dessus)</td><td>Les deux fenêtres de comparaison de la progression d'activité et de la progression alimentaire ; les quatre fenêtres semaine/mois ; la date de déverrouillage de l'ancienneté.</td><td>Aucune.</td></tr>
-      <tr><td>Décrémentation du quantième d'une date locale</td><td>La coupure des fenêtres réglables ; les sept journées du bilan de dépense ; la veille du libellé relatif.</td><td>Aucune.</td></tr>
-      <tr><td>Décrémentation du quantième, la date étant d'abord posée à midi</td><td>Le lendemain d'une journée, dans le temps d'éveil.</td><td>Aucune ; le midi met à l'abri des heures manquantes ou doublées.</td></tr>
-      <tr><td>Soustraction de <code>n × 86 400 000</code> ms à l'instant courant, puis relecture du jour local</td><td>Les cumuls à sept jours (activité, moments à soi, sommeil) ; les moyennes journalières des repas ; les séries de quatorze journées ; la fenêtre du fil de toutes les entrées.</td><td>Décale d'un jour quand un changement d'heure tombe dans l'intervalle et que l'instant courant est à moins d'une heure de minuit.</td></tr>
-    </tbody>
-  </table>
-  <p>À cela s'ajoute une arithmétique par instants : l'écart en jours depuis la dernière prise du traitement en cours se calcule en soustrayant deux chaînes <code>AAAA-MM-JJ</code> converties en instants. La conversion interprète chacune comme minuit UTC ; comme les deux subissent le même décalage, la différence reste exacte. Le procédé est néanmoins celui que la règle du produit proscrit, et il est faux dès qu'un seul des deux termes est un instant local.</p>
-  <p>Le rang d'une semaine depuis une date de départ se calcule encore autrement, sur deux minuits locaux :</p>
-  <pre><code>joursÉcoulés = arrondi((minuitLocal(aujourd'hui) − minuitLocal(départ)) / 86 400 000)
-si départ illisible → absent               // année, mois ou quantième nul ou non numérique
-si joursÉcoulés &lt; 0 → absent               // une date de départ à venir n'a pas de rang
-rangDeSemaine = ⌊joursÉcoulés / 7⌋ + 1     // la première semaine porte le n° 1</code></pre>
+  <p>Ces trois opérations sont insensibles au changement d'heure : elles ne manipulent que des triplets de nombres, jamais une durée réelle. La normalisation absorbe seule les fins de mois et les années bissextiles — aucune règle de divisibilité n'est écrite nulle part.</p>
+  <p>Le rang d'une semaine depuis une date de départ se calcule autrement, sur deux minuits locaux :</p>
+  <pre><code>si année, mois ou quantième est illisible ou nul → absent
+joursÉcoulés = arrondi((minuitLocal(aujourd'hui) − minuitLocal(départ)) / 86 400 000)
+si joursÉcoulés &lt; 0 → absent          // une date de départ à venir n'a pas de rang
+rangDeSemaine = ⌊joursÉcoulés / 7⌋ + 1  // la première semaine porte le n° 1</code></pre>
   <p>L'arrondi est là pour absorber l'heure qu'un passage à l'heure d'été ajoute ou retire au milieu de l'intervalle. Le rang de semaine de la cure se compte depuis la date de la pesée de départ ; le même calcul, appliqué à la date de la première prise du traitement en cours, donne le rang de semaine de ce traitement.</p>
   <div class="exemple"><p>Camille a sa pesée de départ au 2026-05-04. Le 2026-09-13, l'écart vaut 132 jours : elle est dans sa 19<sup>e</sup> semaine de cure.</p></div>
 
   <h3 id="temps-le-futur-et-le-deja-survenu">Le futur et le déjà survenu</h3>
   <p>Rien n'interdit de dater une entrée dans le futur : une prise peut être notée à l'avance, un repas planifié. Les calculs qui prétendent décrire l'état réel à l'instant présent écartent donc ce qui n'a pas encore eu lieu.</p>
-  <pre><code>déjàSurvenu(date, heure?, maintenant) =
-  date &lt; aujourd'hui(maintenant)        → vrai
-  date &gt; aujourd'hui(maintenant)        → faux
-  date = aujourd'hui, sans heure        → vrai      // une journée en cours compte en entier
-  date = aujourd'hui, avec heure        → heure ≤ heure locale de maintenant</code></pre>
-  <p>Cette précondition gouverne notamment le nombre de prises comptées, la dose dite « actuelle », le total administré, les bilans de dépense et l'analyse de progression. Elle n'est pas universelle : la plupart des fenêtres n'ont pas de borne haute, et une entrée datée de demain y passe.</p>
+  <pre><code>déjàSurvenu(date, heure?) =
+  date &lt; aujourd'hui        → vrai
+  date &gt; aujourd'hui        → faux
+  date = aujourd'hui, sans heure → vrai      // une journée en cours compte en entier
+  date = aujourd'hui, avec heure → heure ≤ heure locale courante</code></pre>
+  <p>Cette précondition gouverne :</p>
+  <table>
+    <thead><tr><th>Calcul</th><th>Ce qui est filtré</th></tr></thead>
+    <tbody>
+      <tr><td>Attribution des distinctions</td><td>Séances d'activité, repas (deux calculs distincts), relevés de pas. C'est le plus gros consommateur de la règle.</td></tr>
+      <tr><td>Projection de poids</td><td>Repas, séances d'activité, relevés de pas.</td></tr>
+      <tr><td>Progression d'activité et progression alimentaire</td><td>Toutes les entrées de chaque moitié, en plus des bornes de date.</td></tr>
+      <tr><td>Série du traitement en cours</td><td>Les prises, avant même la coupure au changement de traitement : nombre de prises, dose initiale, dose actuelle, total administré.</td></tr>
+      <tr><td>Intervalle moyen entre deux prises</td><td>Les prises ; l'intervalle est <code>écart / (nombre de dates distinctes − 1)</code>, absent sous deux dates.</td></tr>
+      <tr><td>Prochaine zone de rotation</td><td>Les prises postérieures à maintenant ne commandent rien.</td></tr>
+    </tbody>
+  </table>
+  <p>Elle n'est pas universelle. Le bilan de dépense énergétique et sa projection ne l'appliquent <em>pas</em> : ils parcourent sept journées et prennent tout ce qui y est daté. Les fenêtres réglables non plus.</p>
 
-  <h3 id="temps-fenetres-reglables">Les fenêtres réglables</h3>
-  <p>Six fenêtres, les mêmes partout, le choix étant une donnée retenue par usage.</p>
+  <h3 id="temps-les-fenetres-reglables">Les fenêtres réglables</h3>
+  <p>Six fenêtres, retenues par usage et mémorisées.</p>
   <table>
     <thead><tr><th>Fenêtre</th><th>Borne basse</th><th>Borne haute</th><th>Inclusivité</th></tr></thead>
     <tbody>
-      <tr><td>7 jours</td><td><code>aujourd'hui − 6 jours</code></td><td>aucune</td><td>Basse inclusive.</td></tr>
-      <tr><td>14 jours</td><td><code>aujourd'hui − 13 jours</code></td><td>aucune</td><td>Basse inclusive.</td></tr>
-      <tr><td>30 jours</td><td><code>aujourd'hui − 29 jours</code></td><td>aucune</td><td>Basse inclusive.</td></tr>
-      <tr><td>90 jours</td><td><code>aujourd'hui − 89 jours</code></td><td>aucune</td><td>Basse inclusive.</td></tr>
-      <tr><td>Tout</td><td>aucune</td><td>aucune</td><td>Tout est retenu.</td></tr>
-      <tr><td>Personnalisée</td><td>jour local donné, ou vide</td><td>jour local donné, ou vide</td><td>Les deux bornes inclusives ; une borne vide vaut « sans limite de ce côté ».</td></tr>
+      <tr><td><code>7days</code></td><td><code>aujourd'hui − 6 jours</code></td><td>aucune</td><td>Basse inclusive.</td></tr>
+      <tr><td><code>14days</code></td><td><code>aujourd'hui − 13 jours</code></td><td>aucune</td><td>Basse inclusive.</td></tr>
+      <tr><td><code>30days</code></td><td><code>aujourd'hui − 29 jours</code></td><td>aucune</td><td>Basse inclusive.</td></tr>
+      <tr><td><code>90days</code></td><td><code>aujourd'hui − 89 jours</code></td><td>aucune</td><td>Basse inclusive.</td></tr>
+      <tr><td><code>all</code></td><td>aucune</td><td>aucune</td><td>Tout est retenu.</td></tr>
+      <tr><td><code>custom</code></td><td>jour local donné, ou vide</td><td>jour local donné, ou vide</td><td>Les deux bornes inclusives ; une borne vide vaut « sans limite de ce côté ».</td></tr>
     </tbody>
   </table>
   <pre><code>coupure(n jours) = aujourd'hui − (n − 1) jours          // la journée en cours compte
 retenue(entrée)  = entrée.date ≥ coupure                 // comparaison de chaînes
-personnalisée : retenue(entrée) = (début vide ou entrée.date ≥ début) et (fin vide ou entrée.date ≤ fin)</code></pre>
-  <p>« Sept derniers jours » signifie donc aujourd'hui et les six jours précédents, soit sept journées pleines. La coupure est obtenue en décrémentant le quantième de la date locale courante : elle est insensible au changement d'heure. Ces quatre fenêtres à durée fixe ne posent aucune borne haute, et laissent passer une entrée datée du futur.</p>
-  <p>La valeur de départ d'une fenêtre est propre à chaque usage : elle vaut 30 jours sauf si l'usage en demande une autre — le relevé des créneaux horaires ouvre sur 7 jours. Une valeur relue qui ne correspond à aucune des six retombe sur la valeur de départ <em>de cet usage</em>, pas sur 30 jours. Chaque usage retient son choix séparément : changer la fenêtre d'un usage n'entraîne aucun autre. Le passage en fenêtre personnalisée et l'écriture de ses deux bornes forment une seule écriture.</p>
+custom : retenue(entrée) = (début vide ou entrée.date ≥ début) et (fin vide ou entrée.date ≤ fin)</code></pre>
+  <p>« Sept derniers jours » signifie donc aujourd'hui et les six jours précédents, soit sept journées pleines. La coupure est obtenue en décrémentant le quantième de la date locale courante : elle est insensible au changement d'heure. Aucune fenêtre réglable à durée fixe ne pose de borne haute : elle laisse passer une entrée datée du futur.</p>
+  <p><strong>Le défaut appartient à l'usage</strong>, et <code>30days</code> n'est que le défaut du défaut : chaque usage peut en demander un autre, et un usage le fait — le découpage des apports par créneau horaire ouvre sur <code>7days</code>. Chaque usage porte sa propre clé de mémorisation et vit sa vie : changer la fenêtre d'un usage n'entraîne aucun autre. Une valeur relue qui ne correspond à aucune des six retombe sur le défaut de l'usage. Le passage en fenêtre personnalisée et l'écriture de ses deux bornes forment une <em>écriture unique</em> — les enchaîner ferait repartir la seconde écriture de l'état d'avant la première.</p>
+  <p><strong>Deux règles divergentes pour une borne personnalisée illisible.</strong> Le filtrage compare les chaînes telles quelles, sans vérifier leur forme : une borne mal formée s'applique lexicalement. Le calcul de coupure, lui, convertit la borne basse en instant et rend « pas de coupure » si elle est illisible : la borne est alors ignorée. Le même intervalle ne retient donc pas les mêmes entrées selon le chemin. <span class="marque">arbitrage non validé</span></p>
   <div class="exemple"><p>Le 2026-09-13, la fenêtre « 7 derniers jours » de Camille retient toute entrée dont la date est ≥ <code>2026-09-07</code>.</p></div>
 
-  <h3 id="temps-fenetres-fixes">Les fenêtres fixes des bilans</h3>
-  <p>Certains calculs ne sont pas réglables : leur fenêtre fait partie de leur définition. Les bornes ci-dessous sont toutes inclusives, et J désigne la journée en cours.</p>
+  <h3 id="temps-les-fenetres-fixes-des-bilans">Les fenêtres fixes des bilans</h3>
+  <p>Certains calculs ne sont pas réglables : leur fenêtre fait partie de leur définition. Les bornes ci-dessous sont toutes inclusives et J désigne la journée en cours. La colonne « recul » dit comment la borne basse est obtenue, ce qui décide de sa sensibilité au changement d'heure.</p>
   <table>
-    <thead><tr><th>Bilan</th><th>Fenêtre</th><th>Borne haute</th><th>Précision</th></tr></thead>
+    <thead><tr><th>Bilan</th><th>Fenêtre</th><th>Recul</th><th>Précision</th></tr></thead>
     <tbody>
-      <tr><td>Cumuls et moyennes « sept derniers jours » : minutes d'activité, minutes de moments à soi, sommeil</td><td><code>[J−6, J]</code></td><td>aucune</td><td>Recul par millisecondes. Dénominateur d'une moyenne : les journées renseignées ; absente si aucune.</td></tr>
-      <tr><td>Moyennes journalières des repas sur sept jours (calories, protéines, fibres)</td><td><code>[J−7, J−1]</code></td><td><code>J−1</code></td><td>Sept journées <em>révolues</em> : la journée en cours est écartée, parce qu'elle est presque toujours incomplète. Dénominateur : les journées renseignées ; absente si aucune.</td></tr>
-      <tr><td>Moyennes journalières des repas depuis le début</td><td>tout l'historique</td><td>aucune</td><td>Aucune borne : le découpage est celui des journées renseignées du journal, quel que soit leur éloignement.</td></tr>
-      <tr><td>Séries journalières de quatorze journées</td><td><code>[J−13, J]</code></td><td>aucune</td><td>Une valeur par journée, de la plus ancienne à la plus récente. Recul par millisecondes.</td></tr>
-      <tr><td>Sens d'évolution d'une série journalière</td><td>première moitié contre seconde</td><td>—</td><td>Sur une série de quatorze journées, cela fait sept contre sept.</td></tr>
-      <tr><td>Progression d'activité et progression alimentaire, échelle semaine</td><td><code>[J−6, J]</code> contre <code>[J−13, J−7]</code></td><td>bornes des fenêtres</td><td>Recul par triplet. Entrées filtrées en plus par « déjà survenu ». Ni chevauchement ni trou.</td></tr>
-      <tr><td>Progression d'activité, échelle mois</td><td><code>[J−29, J]</code> contre <code>[J−59, J−30]</code></td><td>bornes des fenêtres</td><td>Les deux échelles se calculent, la meilleure l'emporte.</td></tr>
-      <tr><td>Bilan de dépense et projection</td><td><code>[J−6, J]</code></td><td>aucune</td><td>Recul par décrémentation du quantième. Entrées filtrées par « déjà survenu », l'instant de référence fixant à la fois la fenêtre et cette frontière.</td></tr>
-      <tr><td>Fil de toutes les entrées</td><td><code>[J−6, J]</code></td><td><code>J</code></td><td>Borne haute explicite : le futur est écarté. Au plus 40 entrées retenues.</td></tr>
-      <tr><td>Prises réputées actives</td><td>instants ≥ maintenant − 60 × 86 400 000 ms</td><td>aucune</td><td>Exprimée en instants. Si elle ne retient rien, l'historique entier est repris — un traitement arrêté depuis longtemps mais encore présent dans le sang ne disparaît pas.</td></tr>
-      <tr><td>Étendue d'une série poids-traitement à durée fixe</td><td><code>[midiLocal(J) − n × 86 400 000, midiLocal(J)]</code></td><td><code>midi de J</code></td><td>Deux bornes en instants, et un recul de <var>n</var> jours pleins : la fenêtre « 7 jours » y couvre huit journées, contrairement à la fenêtre réglable homonyme.</td></tr>
-      <tr><td>Étendue d'un histogramme de perte à durée fixe</td><td><code>dernierPoint − n × 86 400 000</code></td><td>aucune</td><td>La coupure se compte depuis la dernière semaine connue, pas depuis aujourd'hui.</td></tr>
+      <tr><td>Cumuls et moyennes « sept derniers jours » (minutes d'activité, séances, moments à soi, effets déclarés, pas, sommeil, qualité pondérée)</td><td><code>[J−6, J]</code></td><td>Millisecondes</td><td>Sept journées, la journée en cours comprise. Pas de borne haute.</td></tr>
+      <tr><td>Moyennes journalières des repas</td><td><code>[J−7, J−1]</code></td><td>Millisecondes</td><td>Sept journées <em>révolues</em> : la journée en cours est écartée, parce qu'elle est presque toujours incomplète. Dénominateur : les journées renseignées ; absent si aucune.</td></tr>
+      <tr><td>Séries de tendance</td><td><code>[J−13, J]</code></td><td>Millisecondes</td><td>Quatorze journées, une valeur par journée, de la plus ancienne à la plus récente.</td></tr>
+      <tr><td>Sens d'évolution d'une série de tendance</td><td>Les deux moitiés de la série</td><td>—</td><td>Le partage est <code>⌊longueur / 2⌋</code> : sur une longueur impaire, la moitié ancienne est plus courte d'un jour. Aucune parité n'est vérifiée.</td></tr>
+      <tr><td>Progression d'activité, échelle semaine</td><td><code>[J−6, J]</code> contre <code>[J−13, J−7]</code></td><td>Triplet</td><td>Bornes haute et basse ; entrées filtrées en plus par « déjà survenu ».</td></tr>
+      <tr><td>Progression d'activité, échelle mois</td><td><code>[J−29, J]</code> contre <code>[J−59, J−30]</code></td><td>Triplet</td><td>Idem. Sans jour commun entre les deux fenêtres.</td></tr>
+      <tr><td>Progression alimentaire</td><td>Les mêmes <code>[J−6, J]</code> contre <code>[J−13, J−7]</code></td><td>Triplet</td><td>Absente tant que la période récente porte moins de <strong>3</strong> repas analysables. Ne compare pas des sommes (voir plus bas).</td></tr>
+      <tr><td>Bilan de dépense énergétique et projection</td><td><code>[J−6, J]</code></td><td>Quantième</td><td>Sept journées énumérées une à une. <strong>Aucun filtre « déjà survenu ».</strong></td></tr>
+      <tr><td>Entrées récentes, tous journaux confondus</td><td><code>[J−6, J]</code></td><td>Millisecondes</td><td><strong>Borne haute explicite</strong> <code>≤ aujourd'hui</code> : une entrée de demain est écartée, une entrée d'aujourd'hui à une heure future est retenue. Au plus 40 entrées.</td></tr>
+      <tr><td>Traitements réputés actifs</td><td>instants ≥ maintenant − 60 × 86 400 000 ms</td><td>Millisecondes absolues</td><td>La seule fenêtre exprimée en instants. Si elle ne retient rien, l'historique entier est repris.</td></tr>
     </tbody>
   </table>
-  <p>La série journalière compte quatorze journées ; le nom qui la désigne dit « quinze derniers jours », par décision de l'utilisatrice du 2026-08-28 — en français, « quinze jours » veut dire deux semaines. Aucune règle de données ne dépend de ce nom, et la donnée reste sur quatorze journées.</p>
-  <p>La comparaison de deux moitiés porte sur des <em>sommes</em>. Elle ne connaît pas le nombre sept : elle coupe la série qu'on lui donne en <code>⌊longueur / 2⌋</code>, la première moitié étant ce qui précède cette coupure. Sur une longueur impaire les deux moitiés diffèrent d'une journée ; le sept contre sept ne tient qu'à la longueur de quatorze. Une journée absente y compte pour zéro : une semaine vide est une semaine sans activité, pas une mesure manquante.</p>
-  <pre><code>si longueur(série) &lt; 2 → absent
-avant = somme(première moitié) ; après = somme(seconde moitié)   // une valeur absente vaut 0
-si avant ≤ 0 ou après ≤ 0 :
-    les deux ≤ 0 → stable ; sinon après &gt; avant ? hausse : baisse
-sinon écart = (après − avant) / avant
-    |écart| &lt; 0,05 → stable ; écart &gt; 0 → hausse ; sinon baisse</code></pre>
-  <p>La branche directe couvre donc tout ce qui est négatif ou nul, pas seulement le zéro : le rapport relatif n'est calculé que sur deux moitiés strictement positives. Le seuil de stabilité vaut 5 % et se remplace par appel.</p>
-  <p>La progression alimentaire ajoute une précondition d'échantillon : elle est absente tant que la fenêtre récente porte moins de <strong>trois</strong> repas analysables. Et l'amélioration ne se déclare que si la fenêtre ancienne porte au moins un repas analysable — sinon son écart moyen vaudrait zéro par convention, et toute semaine passerait pour une régression.</p>
+  <p><strong>Trois façons de reculer de n jours coexistent</strong> — décrémenter le quantième d'une date locale, décaler un triplet, retrancher <code>n × 86 400 000</code> ms à l'instant courant puis relire la date locale — et elles ne se répartissent pas entre « réglable » et « fixe » : deux fenêtres fixes majeures reculent par quantième ou par triplet. Les deux premières sont insensibles au changement d'heure, la troisième ne l'est pas.</p>
+  <p>La fenêtre des traitements actifs est le seul endroit où les deux représentations se rencontrent : une coupure <em>absolue</em> est comparée à un instant <em>recomposé</em> d'un jour local et d'une heure murale, midi à défaut. C'est le point exact où « aucune donnée de santé n'est datée par un instant absolu » devient délicat : la donnée reste locale, la coupure ne l'est pas.</p>
+  <p>Le repli « si la fenêtre ne retient rien, tout l'historique est repris » n'existe <strong>que</strong> là. Aucune autre fenêtre ne s'élargit quand elle est vide.</p>
+  <p>La comparaison de deux moitiés d'une série de tendance porte sur des <em>sommes</em>. Le sens est « stable » tant que l'écart relatif à la moitié ancienne reste sous <strong>5 %</strong>. Quand l'une des deux moitiés vaut zéro, le rapport n'est pas calculable et la comparaison est directe : deux moitiés à zéro sont stables, passer de zéro à quelque chose est une hausse, l'inverse une baisse.</p>
+  <pre><code>écart = (somme(récente) − somme(ancienne)) / somme(ancienne)
+|écart| &lt; 0,05 → stable ; écart &gt; 0 → hausse ; sinon baisse</code></pre>
+  <p>La progression alimentaire n'obéit pas à cette règle : elle compare deux <em>moyennes</em> d'écart de composition et exige un gain d'au moins <strong>2</strong> points de la période récente sur la période ancienne ; une période ancienne sans repas analysable ne sert pas de référence du tout.</p>
 
-  <h3 id="temps-anciennete">L'ancienneté d'usage</h3>
+  <h3 id="temps-l-anciennete-d-usage">L'ancienneté d'usage</h3>
   <p>Le modèle ne porte aucune date d'installation. Une date de première ouverture est donc déterminée une fois, écrite en <code>AAAA-MM-JJ</code>, et jamais réécrite :</p>
-  <pre><code>1. la date déjà écrite, si elle existe et a la forme AAAA-MM-JJ ;
+  <pre><code>1. la date déjà écrite, si elle existe et est bien formée ;
 2. sinon, la plus ancienne date trouvée dans les neuf journaux, si elle est ≤ aujourd'hui ;
 3. sinon, aujourd'hui.</code></pre>
-  <p>Les neuf journaux sont parcourus, y compris ceux dont le suivi est éteint : une donnée datée du 15 mars prouve que le produit était là le 15 mars. Une entrée dont la date n'a pas la bonne forme est ignorée ; une date postérieure à aujourd'hui n'est pas retenue comme origine, sans quoi l'âge serait négatif. La détermination est une lecture pure ; l'écriture est un geste distinct, qui ne touche jamais une date déjà posée. Vider un journal ne rajeunit donc pas l'installation.</p>
+  <p>Tous les journaux sont parcourus, y compris ceux dont le suivi est éteint : une donnée datée du 15 mars prouve que le produit était là le 15 mars. Une entrée sans date lisible est ignorée. Comme la date est écrite dès la première détermination, ni vider un journal ni antidater une entrée après coup ne déplacent le repère.</p>
   <pre><code>âgeD'usage = max(0, écartEnJours(premièreOuverture, aujourd'hui))
 déverrouillé ⇔ âgeD'usage ≥ 7</code></pre>
-  <p>Le seuil se compte en jours entiers, sur des jours locaux : six jours et vingt-trois heures ne font pas sept jours.</p>
-  <p>La durée d'une perte de poids se dit en jours en deçà de sept jours, et au-delà en semaines arrondies à l'entier le plus proche, avec un plancher d'une semaine. Elle est <em>absente</em> dans deux cas : quand la date de début manque ou est postérieure à la date de fin, et quand l'écart est inférieur à un jour — « en 0 jour » serait un artefact.</p>
+  <p>Le seuil se compte en jours <em>calendaires</em>, sur deux jours locaux, et aucune heure n'entre dans le calcul — ni pour resserrer le seuil, ni pour l'assouplir. Une première ouverture posée le 2026-09-01 à 23 h vaut donc sept jours d'ancienneté dès le 2026-09-08 à 00 h 01, après six jours et une heure d'usage réel.</p>
+  <p>La durée d'une perte de poids s'exprime en jours en deçà de sept jours, et au-delà en semaines arrondies à l'entier le plus proche, avec un plancher d'une semaine. Elle est <strong>absente</strong> dans deux cas : quand la date de départ est postérieure à la date de référence, et quand l'écart est inférieur à un jour.</p>
 
-  <h3 id="temps-horodatages-d-archive">Les horodatages d'archive</h3>
-  <p>Une copie de secours des données porte un horodatage local <code>AAAA-MM-JJ-HHMMSS</code>, composé lui aussi des composantes locales de l'horloge, secondes comprises.</p>
-  <p>Deux copies faites dans la même seconde ne s'écrasent pas, mais le suffixe qui les sépare porte sur l'<em>emplacement</em> de la copie, pas sur son horodatage : un suffixe <code>-2</code> à <code>-99</code> est cherché, et à défaut le nombre de millisecondes depuis l'époque Unix. L'entrée d'index, elle, conserve l'horodatage nu — recomposé une seconde fois, donc identique. L'index est ordonné par comparaison de chaînes décroissante sur cet horodatage, ce que ce format rend exact sans conversion ; deux copies de la même seconde y portent la même clé de tri et ne sont départagées que par la stabilité du tri, la dernière ajoutée restant en tête. Une entrée est remplacée quand son emplacement est réutilisé, jamais quand son horodatage se répète. <span class="marque">arbitrage non validé</span></p>
+  <h3 id="temps-les-horodatages-d-archive">Les horodatages d'archive</h3>
+  <p>Une copie de secours des données porte un horodatage local <code>AAAA-MM-JJ-HHMMSS</code>, composé lui aussi des composantes locales de l'horloge, secondes comprises. Deux copies dans la même seconde ne s'écrasent jamais : un suffixe <code>-2</code> à <code>-99</code> est cherché pour la <em>clé</em>, et à défaut le nombre de millisecondes depuis l'époque Unix.</p>
+  <p>L'inventaire des copies est ordonné par comparaison décroissante des horodatages, selon la collation locale et non octet par octet. L'horodatage qu'il enregistre est l'horodatage <em>de base</em>, recalculé, et non la clé : deux copies de la même seconde, que le suffixe distingue bien dans le stockage, y portent le même horodatage et leur ordre relatif n'est pas déterminé.</p>
 
-  <h3 id="temps-donnees-temporelles-du-profil">Les données temporelles du profil</h3>
-  <p>Les valeurs ci-dessous sont enregistrées et relues. Les domaines indiqués sont ceux que le type documente ; <strong>aucun n'est vérifié</strong> — ce sont des annotations, pas des préconditions. La valeur de départ est celle qui s'applique quand la donnée est absente.</p>
+  <h3 id="temps-les-donnees-temporelles-du-profil">Les données temporelles du profil</h3>
   <table>
-    <thead><tr><th>Donnée</th><th>Type</th><th>Domaine documenté</th><th>Valeur de départ</th></tr></thead>
+    <thead><tr><th>Donnée</th><th>Type</th><th>Domaine</th></tr></thead>
     <tbody>
-      <tr><td>Forme du rappel de prise</td><td>énumération</td><td>hebdomadaire ou par intervalle</td><td>hebdomadaire</td></tr>
-      <tr><td>Jour de rappel hebdomadaire</td><td>entier</td><td>0 à 6, <code>0</code> = dimanche</td><td>0</td></tr>
-      <tr><td>Heure de rappel</td><td>chaîne <code>HH:MM</code></td><td>Minutes rondes, comme toute heure enregistrée.</td><td><code>20:00</code></td></tr>
-      <tr><td>Intervalle d'un rappel de prise</td><td>entier</td><td>Un nombre de jours (5, 7, 10…)</td><td>7</td></tr>
-      <tr><td>Date de début du rappel par intervalle</td><td><code>AAAA-MM-JJ</code></td><td>—</td><td>aujourd'hui</td></tr>
-      <tr><td>Date d'un rendez-vous médical</td><td><code>AAAA-MM-JJ</code></td><td>Facultative.</td><td>vide</td></tr>
-      <tr><td>Heure d'un rendez-vous médical</td><td>chaîne <code>HH:MM</code></td><td>Facultative.</td><td><code>10:00</code></td></tr>
-      <tr><td>Préavis d'un rappel</td><td>chaîne d'énumération</td><td>une heure, deux heures, un jour, deux jours, trois jours, sept jours — une durée relative à l'échéance</td><td>un jour</td></tr>
+      <tr><td>Jour de rappel hebdomadaire</td><td>entier</td><td>0 à 6, <code>0</code> = dimanche.</td></tr>
+      <tr><td>Heure de rappel</td><td>chaîne <code>HH:MM</code></td><td>Minutes rondes, comme toute heure enregistrée.</td></tr>
+      <tr><td>Intervalle d'un rappel de prise</td><td>entier</td><td>Un nombre de jours (5, 7, 10…), avec une date de début en <code>AAAA-MM-JJ</code>.</td></tr>
+      <tr><td>Date et heure d'un rendez-vous médical</td><td><code>AAAA-MM-JJ</code> + <code>HH:MM</code></td><td>Facultatives.</td></tr>
+      <tr><td>Préavis d'un rappel</td><td>chaîne d'énumération</td><td><code>1h</code>, <code>2h</code>, <code>1d</code>, <code>2d</code>, <code>3d</code>, <code>7d</code> — une durée relative à l'échéance.</td></tr>
+      <tr><td>Date d'échéance d'un compte à rebours</td><td><code>AAAA-MM-JJ</code></td><td>Lue composante par composante, ramenée à minuit local, jamais convertie depuis la chaîne.</td></tr>
     </tbody>
   </table>
-  <p>Les deux formes du rappel de prise s'excluent : c'est la forme retenue qui décide si le jour et l'heure hebdomadaires s'appliquent, ou l'intervalle et sa date de début.</p>
   <p>Ces valeurs sont enregistrées et relues, et rien de plus : aucune remise de rappel à l'échéance n'existe. <span class="marque non">non implémenté</span></p>
+  <p>Le temps restant jusqu'à une échéance est la seule grandeur temporelle du produit à être recalculée à intervalle régulier — chaque seconde —, et non à la demande d'un calcul.</p>
 
   <h3 id="temps-l-annee-de-naissance">L'année de naissance <span class="marque v2">V2</span></h3>
   <p>La V1 enregistre un âge en années. La V2 enregistre l'<strong>année de naissance</strong> : un âge se périme d'un anniversaire à l'autre, une année de naissance non. L'âge redevient une valeur dérivée, jamais stockée.</p>
   <pre><code>bornes(annéeCourante) = { min: annéeCourante − 130, max: annéeCourante − 1 }   // âge 1 à 130</code></pre>
-  <p>L'année courante est fournie par l'appelant, comme tout instant de référence du produit : la règle de bornes ne lit pas l'horloge, ce qui la rend testable et indépendante du moment où elle s'exécute. Valeur de départ : 1980.</p>
+  <p>L'année courante est fournie par l'appelant : la règle de bornes ne lit pas l'horloge, ce qui la rend testable et indépendante du moment où elle s'exécute. Valeur de départ : 1980.</p>
   <div class="exemple"><p>Camille est née en 1978. En 2026, les bornes acceptent 1896 à 2025 ; son âge, 48 ans, se recalcule à chaque lecture et n'est écrit nulle part.</p></div>
 
   <details><summary>Cas limites</summary>
     <p>Une chaîne de date mal formée n'est jamais devinée : le décalage la rend inchangée, l'écart entre deux jours rend zéro, la lecture stricte rend « absent ».</p>
-    <p>Une heure dont les minutes dépassent 59, ou qui n'a pas la forme <code>HH:MM</code>, traverse l'arrondi sans être modifiée ; une heure dont les <em>heures</em> dépassent 23 est arrondie comme une autre, et n'est refusée que par la conversion en minutes.</p>
-    <p>Trois heures de repli coexistent pour une entrée sans heure : midi pour le comparateur du modèle et la cinétique, minuit pour les journaux de sommeil, d'activité et de moments à soi, la chaîne vide pour le fil de toutes les entrées — où l'entrée sans heure passe après celles de son jour qui en portent une.</p>
-    <p>Une heure vide (chaîne vide) se comporte comme une heure absente : le repli s'applique à la valeur fausse, pas à la seule absence.</p>
-    <p>Un réveil antérieur ou égal à l'endormissement rend une durée de zéro : aucun passage de minuit n'est deviné dans la durée d'une nuit. Le temps d'éveil, lui, en devine un.</p>
-    <p>Le temps d'éveil est absent quand son résultat n'est pas strictement positif — siestes plus longues que le temps disponible, données incohérentes.</p>
-    <p>Une date de départ postérieure à aujourd'hui rend un rang de semaine absent, jamais un rang négatif ou nul ; une date de départ illisible aussi.</p>
-    <p>Quatre méthodes de recul coexistent ; seule celle par millisecondes se décale d'un jour quand un changement d'heure tombe dans l'intervalle et que l'instant courant est à moins d'une heure de minuit.</p>
-    <p>Les quatre fenêtres réglables à durée fixe n'ont pas de borne haute : une entrée datée du futur y est retenue, sauf si le calcul applique en plus « déjà survenu ». Trois fenêtres fixes en posent une : les moyennes de repas sur sept jours, le fil de toutes les entrées, l'étendue d'une série poids-traitement.</p>
-    <p>Une comparaison de deux moitiés sur une série de moins de deux journées est absente ; sur une série impaire, les deux moitiés n'ont pas la même longueur.</p>
-    <p>Rien ne se recalcule au passage de minuit : « aujourd'hui » est lu sur l'instant de référence à chaque calcul, pas à intervalle régulier.</p>
-    <p>Une année bissextile et une fin de mois ne sont l'objet d'aucune règle de divisibilité : la normalisation du triplet et le « jour 0 du mois suivant » les traitent seuls.</p>
+    <p>Un rang de semaine est absent aussi bien pour une date de départ à venir que pour une date illisible, ou dont l'année, le mois ou le quantième est nul ou non numérique.</p>
+    <p>Une heure dont les minutes dépassent 59, ou qui n'a pas la forme <code>HH:MM</code>, traverse l'arrondi sans être modifiée ; une heure dont les <em>heures</em> dépassent 23 est arrondie normalement et reste enregistrable, sauf en sommeil et en repas.</p>
+    <p>Une heure absente vaut midi pour l'ordre et les instants, minuit pour « déjà survenu », et la chaîne vide dans la sélection des entrées récentes — où elle passe alors <em>après</em> celles de son jour qui en portent une. Les trois règles coexistent.</p>
+    <p>Un réveil antérieur ou égal à l'endormissement rend une durée de zéro : aucun passage de minuit n'est deviné à partir des seules heures. En revanche, le temps d'éveil, lui, enjambe minuit par construction, puisqu'il ajoute 1 440 minutes quand le coucher précède le réveil.</p>
+    <p>Une nuit qui enjambe un changement d'heure garde sa durée d'horloge murale : la différence des instants réels n'est jamais calculée.</p>
+    <p>Reculer de <var>n</var> jours par quantième ou par triplet est insensible au changement d'heure ; le faire en retranchant <code>n × 86 400 000</code> ms ne l'est pas. Les deux résultats diffèrent d'un jour quand un changement d'heure tombe dans l'intervalle et que l'instant courant est à moins d'une heure de minuit.</p>
+    <p>Une fenêtre réglable à durée fixe n'a pas de borne haute : une entrée datée du futur y est retenue, sauf si le calcul applique en plus « déjà survenu ». Deux fenêtres fixes en posent une, elles : la sélection des entrées récentes et les deux moitiés de la progression d'activité.</p>
+    <p>Une entrée peut être datée avant la date de première ouverture : rien ne l'interdit. Le repère, une fois écrit, ne bouge plus, ni par antidatation ni par suppression.</p>
+    <p>« Aujourd'hui » est lu sur l'horloge à chaque calcul, jamais rafraîchi au passage de minuit. Seul le temps restant jusqu'à une échéance se recalcule à intervalle régulier.</p>
+    <p>Une année bissextile et une fin de mois ne sont l'objet d'aucune règle : la normalisation du triplet les traite seule.</p>
   </details>
 </section>

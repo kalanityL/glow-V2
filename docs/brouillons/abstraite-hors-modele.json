@@ -3,20 +3,50 @@
   {
    "categorie": "Modèle de données",
    "fonctionnalite": "Migration des noms vers des tables de référence",
-   "texte": "Convertir SideEffectLog.type, SportLog.sport et MeTimeLog.activity en typeId : créer une entrée de table par nom distinct rencontré dans l'historique — identifiant en forme de slug pour les entrées livrées, identifiant fabriqué pour celles créées par la personne —, puis réécrire chaque ligne à un chargement, comme la fusion de deux noms de sport le fait déjà pour un cas unique.",
-   "origine": "Les interfaces SideEffectType et SportType sont déclarées, la règle « on référence par identifiant, jamais par nom » est écrite, et AppData ne porte aucune des deux collections. Le chemin de conversion n'existe nulle part dans le dépôt ; la généralisation de la conversion existante est de moi seul."
+   "texte": "Convertir SideEffectLog.type, SportLog.sport et MeTimeLog.activity en typeId : créer une entrée de table par nom distinct rencontré dans l'historique — identifiant en forme de slug pour les entrées livrées, identifiant fabriqué pour celles créées par la personne —, puis réécrire chaque ligne à un chargement, comme la fusion de deux noms de sport le fait déjà pour un cas unique. Les trois listes d'entrées actives conservées hors de l'agrégat sont à convertir dans le même passage.",
+   "origine": "Les interfaces SideEffectType et SportType sont déclarées, la règle « on référence par identifiant, jamais par nom » est écrite, et AppData ne porte aucune des deux collections. Le chemin de conversion n'existe nulle part dans le dépôt ; la généralisation de la conversion existante, et l'extension aux listes d'entrées actives, sont de moi seul."
+  },
+  {
+   "categorie": "Modèle de données",
+   "fonctionnalite": "Typage du site d'une prise",
+   "texte": "Faire de InjectionLog.site une référence typée : une union fermée des sept valeurs déjà écrites en commentaire, ou une table de sites au même titre que les symptômes et les sports.",
+   "origine": "Le type dit `site: string; // 'abdomen_gauche' | … | string` (types.ts:91) et BODY_MAP_SITES porte six zones avec leur code : c'est vérifié. Aucun commentaire, aucune demande ne dit que ce champ doit être fermé ni sous quelle forme ; le rapprochement avec les deux autres noms libres est de moi seul."
   },
   {
    "categorie": "Rappels",
    "fonctionnalite": "Émission réelle des rappels",
    "texte": "Faire d'un rappel un événement plutôt qu'une préférence : matérialiser les occurrences depuis reminderDay/reminderTime ou depuis l'intervalle en jours et sa date de départ, marquer chacune faite, manquée ou reportée, et n'en émettre qu'une à la fois.",
-   "origine": "Le code conserve neuf propriétés de rappel sur le profil et n'appelle aucune interface de notification, ce qui est vérifiable. Ce qu'une occurrence porterait — identité, état, date d'émission — n'est écrit nulle part ; la forme proposée est de moi seul."
+   "origine": "Le code conserve onze propriétés de rappel sur le profil et n'appelle aucune interface de notification, ce qui est vérifiable. Ce qu'une occurrence porterait — identité, état, date d'émission — n'est écrit nulle part ; la forme proposée est de moi seul."
   },
   {
    "categorie": "Stockage",
    "fonctionnalite": "Reprise d'un carnet sur un autre appareil",
-   "texte": "Un transfert explicite de l'agrégat entier : une sortie relisible, une empreinte de version pour refuser une reprise incompatible, et un refus de reprise sur un carnet non vide — sans base distante ni synchronisation continue, que la spécification pose en non-but.",
-   "origine": "Le code n'a que deux sorties non relisibles (un document PDF, une image) et aucune capacité d'importation ; les copies de secours existantes restent dans le même stockage local. Un transfert manuel n'est ni écrit ni écarté : sa forme est de moi seul."
+   "texte": "Un transfert explicite de tout ce qui est conservé — l'agrégat ET les tables qui vivent hors de lui — : une sortie relisible, une empreinte de version pour refuser une reprise incompatible, et un refus de reprise sur un carnet non vide ; sans base distante ni synchronisation continue, que la spécification pose en non-but.",
+   "origine": "Le code n'a que deux sorties non relisibles (un document PDF, une image) et aucune capacité d'importation depuis l'extérieur de l'appareil ; les copies de secours existantes restent dans le même stockage local et ne portent que l'agrégat. Un transfert manuel n'est ni écrit ni écarté : sa forme est de moi seul."
+  },
+  {
+   "categorie": "Stockage",
+   "fonctionnalite": "Sort des tables qui vivent hors de l'agrégat",
+   "texte": "Décider si la bibliothèque des aliments créés, les menus favoris, les trois listes d'entrées actives, les compteurs de sélection et les états de célébration rejoignent l'agrégat comme collections déclarées, ou restent des tables séparées mais dotées d'un propriétaire, d'une version et d'un chemin de sauvegarde commun.",
+   "origine": "L'existence, le contenu et l'absence de métadonnées de ces clés sont vérifiés une par une dans le code. Rien nulle part ne dit laquelle des deux voies est retenue, ni pourquoi ces tables sont sorties de l'agrégat : la question et ses deux branches sont de moi seul."
+  },
+  {
+   "categorie": "Stockage",
+   "fonctionnalite": "Sort du mécanisme de sauvegarde et de restauration",
+   "texte": "Trancher si les copies de secours font partie du produit ou de l'outillage : leur nombre est non borné et rien ne les purge, elles ne portent que l'agrégat, et la restauration ramène un état complet qui contredit toute suppression demandée depuis.",
+   "origine": "backUpCurrentSave, restoreBackup et writeWithBackup sont lus ligne à ligne, leurs appels sont localisés, et le fichier assume par écrit l'accumulation des copies. Ce qu'il faudrait en faire — bornage, purge, extension aux autres tables — n'est écrit nulle part et est de moi seul."
+  },
+  {
+   "categorie": "Repas",
+   "fonctionnalite": "Intégrité des références vers les aliments",
+   "texte": "Borner le seul lien référentiel du modèle : interdire la suppression d'un aliment référencé, ou copier au repas et à la recette ce qu'il faut pour rester lisible sans lui, plutôt que de laisser une recette perdre silencieusement un ingrédient à la réouverture.",
+   "origine": "La référence morte, ses deux comportements et la perte silencieuse à la ré-écriture d'une recette sont documentés dans resolveFood et marqués « défaut connu, non traité » : c'est vérifié. Les deux remèdes proposés ne figurent nulle part et sont de moi seul."
+  },
+  {
+   "categorie": "Saisie",
+   "fonctionnalite": "Harmonisation des plafonds quotidiens",
+   "texte": "Unifier le comportement des plafonds : les journaux d'un côté écrasent la dernière ligne insérée du jour, les repas, le sommeil, la bibliothèque, les menus et les envois de l'autre refusent. La règle « rien ne détruit la donnée » plaide pour le refus partout.",
+   "origine": "Les neuf plafonds et leurs deux comportements sont relevés à la constante près. Le commentaire de mealDailyCap oppose bien le refus à l'écrasement, mais aucune décision n'a été trouvée pour étendre le refus aux quatre journaux qui écrasent encore : la conclusion est de moi seul."
   },
   {
    "categorie": "Profil",
@@ -33,8 +63,80 @@
   {
    "categorie": "Modèle de données",
    "fonctionnalite": "Sort de l'entité de journée",
-   "texte": "Retirer DailyLog, ou lui redonner un contenu : elle est requise dans l'agrégat, vidée de ses trois contenus successifs, écrite par la seule génération de démonstration, et ses deux lectures ne lui demandent qu'une date la plus ancienne que les autres journaux fournissent déjà.",
-   "origine": "Le vidage successif et les deux lectures sont documentés dans le code et vérifiés. La conclusion « on peut la retirer » n'y est écrite nulle part : c'est mon inférence, et elle suppose de vérifier qu'aucune sauvegarde existante ne porte une date plus ancienne dans cette seule collection."
+   "texte": "Retirer DailyLog, ou lui redonner un contenu : elle est requise dans l'agrégat, vidée de ses trois contenus successifs, écrite par la seule génération de démonstration, et ses cinq lectures ne lui demandent qu'une date la plus ancienne que les autres journaux fournissent déjà, ou un compte de lignes qui vaut zéro en usage réel.",
+   "origine": "Le vidage successif et les cinq lectures sont vérifiés fichier par fichier. La conclusion « on peut la retirer » n'est écrite nulle part : c'est mon inférence, et elle suppose de vérifier qu'aucune sauvegarde existante ne porte une date plus ancienne dans cette seule collection."
+  },
+  {
+   "categorie": "Retiré du chapitre (réfuté par le code)",
+   "fonctionnalite": "« L'agrégat est tout ce qui est conservé »",
+   "texte": "La version précédente ouvrait sur « une installation porte un seul agrégat, et cet agrégat est tout ce qui est conservé ». Faux : une trentaine de clés coexistent, dont plusieurs portent du contenu écrit par la personne. Remplacé par l'énumération des clés hors agrégat.",
+   "origine": "Réfutation vérifiée : useAppData.ts:80 pour STORAGE_KEY, mealConstants.ts:132 et :164-174 pour la bibliothèque et les menus, dataBackup.ts:47-53 pour les copies de secours, plus les clés d'entrées actives et de célébration relevées une par une."
+  },
+  {
+   "categorie": "Retiré du chapitre (réfuté par le code)",
+   "fonctionnalite": "« Aucune capacité n'importe de données, d'aucune forme »",
+   "texte": "Faux au sens du stockage local : restoreBackup relit une copie de secours et la réécrit par-dessus l'agrégat, writeWithBackup y écrit une charge arbitraire, et les deux sont appelées depuis l'assemblage livré. La phrase est remplacée par une borne exacte : aucune importation depuis l'extérieur de l'appareil.",
+   "origine": "Réfutation vérifiée : dataBackup.ts:173 et :196, appelées en DataGeneratorPage.tsx:254, :266 et :282."
+  },
+  {
+   "categorie": "Retiré du chapitre (réfuté par le code)",
+   "fonctionnalite": "« Aucun rappel possible d'une ligne effacée »",
+   "texte": "Faux : une copie de secours antérieure à la suppression remet en place l'état complet, et ces copies ne sont jamais purgées automatiquement. Remplacé par l'énoncé de ce que la restauration ramène, et de ce qu'elle ne ramène pas.",
+   "origine": "Réfutation vérifiée : dataBackup.ts:27-33 (« Aucune sauvegarde de secours n'est jamais écrasée, ni effacée automatiquement […] Elles s'accumulent, et c'est assumé ») et :173."
+  },
+  {
+   "categorie": "Retiré du chapitre (réfuté par le code)",
+   "fonctionnalite": "« La pesée de départ n'a aucun chemin de suppression »",
+   "texte": "Faux : handleDeleteWeight est un removeLogById nu, sans garde sur isStartingWeight. Seul removeAllWeightsButStarting épargne la ligne de départ. Le cas limite dit maintenant ce que devient l'historique après cette suppression.",
+   "origine": "Réfutation vérifiée : useAppData.ts:237-239 ; startingWeighIn.ts:160-166 ; keepStartingOnOldest (weighInWrites.ts:60) ne repose le drapeau qu'aux écritures d'ajout et de modification."
+  },
+  {
+   "categorie": "Retiré du chapitre (réfuté par le code)",
+   "fonctionnalite": "« Deux lectures de DailyLog, pour la date la plus ancienne » et « son seul effet est d'avancer la borne »",
+   "texte": "Faux sur le compte, le motif et le sens : cinq lectures, dont trois qui comptent les lignes, et une ligne plus ancienne recule la borne vers le passé au lieu de l'avancer.",
+   "origine": "Réfutation vérifiée : dynamiqueUnlock.ts:78-97 ; MedicalReportExport.tsx:1386 ; themes sideral et test :88 et :1064 ; DataGeneratorPage.tsx:165 ; types.ts:71-74."
+  },
+  {
+   "categorie": "Retiré du chapitre (réfuté par le code)",
+   "fonctionnalite": "« Deux conversions déjà passées »",
+   "texte": "Sous-compte : le chargement enchaîne sept conversions et cinq effacements de propriétés, dont au moins six irréversibles. Remplacé par une table des conversions.",
+   "origine": "Réfutation vérifiée : useAppData.ts:107-115, :126 et :130 ; appData.ts:71-74, :103, :146, :186."
+  },
+  {
+   "categorie": "Retiré du chapitre (réfuté par le code)",
+   "fonctionnalite": "« Une valeur absente se tait »",
+   "texte": "Contredit par fillMealHunger, qui fabrique et écrit hungerBefore et hungerAfter pour tout repas qui n'en porte pas les deux. Le cas limite porte désormais l'exception.",
+   "origine": "Réfutation vérifiée : appData.ts:186-201 et :204 et suivantes, appelée à chaque chargement (useAppData.ts:130)."
+  },
+  {
+   "categorie": "Retiré du chapitre (réfuté par le code)",
+   "fonctionnalite": "« Trois collections distantes » et « le seul appel sortant »",
+   "texte": "Quatre collections distantes, la quatrième étant la boîte d'envoi mail/{id} vers une adresse en dur ; et l'authentification (connexion par mot de passe, connexion Google, suppression du compte) est un appel sortant de plus. La moitié exacte — aucune donnée de santé ne part — est conservée.",
+   "origine": "Réfutation vérifiée : remoteSubmit.ts:16-29, :63, :65, :127 ; auth.ts:76, :81, :103."
+  },
+  {
+   "categorie": "Retiré du chapitre (réfuté par le code)",
+   "fonctionnalite": "Trois affirmations recopiées de commentaires sans vérification",
+   "texte": "« silhouetteType n'est jamais relu » (il l'est par deux assemblages, dans un état de session jamais reporté à l'enregistrement) ; « JournalViewMode est figé à 'vue' » (le module expose setViewMode ; c'est l'assemblage livré qui n'appelle pas le module) ; « la polarité de mysteryBadgeHidden est retournée en un seul endroit » (deux fois dans le même chemin, plus une relecture directe ailleurs). Les trois sont remplacées par le fait exact.",
+   "origine": "Réfutations vérifiées : ProfileSettings.tsx:39, :57 et :99-108 des thèmes sideral et test ; useMealJournal.ts:47 et :316, MealJournal.tsx (versions gelées) :173, :185, :197, aucun « viewMode » dans src/versions/mixte ; BadgesPage.tsx:136 et :176, SalutBlock.tsx:734."
+  },
+  {
+   "categorie": "Retiré du chapitre (réfuté par le code)",
+   "fonctionnalite": "« createdAt et updatedAt n'existent que sur quatre types »",
+   "texte": "Trompeur des deux côtés : ces quatre types ne portent aucune donnée réelle, et la donnée réellement conservée porte bien un createdAt — sur les aliments créés (CiqualFood.createdAt?) et sur les menus favoris (FavoriteMealItem.createdAt?), pour le décompte des plafonds. La formulation « rien nulle part » proposée par la réfutation est donc fausse elle aussi ; le chapitre dit maintenant les deux faits.",
+   "origine": "Vérifié : types.ts:502-560 pour les quatre types déclarés ; mealConstants.ts:5-18 (FavoriteMealItem.createdAt?) et :112-131 (CiqualFood.createdAt?) ; aucun updatedAt hors des quatre types."
+  },
+  {
+   "categorie": "Retiré du chapitre (réfuté par le code)",
+   "fonctionnalite": "Deux listes données pour exhaustives",
+   "texte": "Les plafonds quotidiens en omettaient quatre (50 aliments, 20 recettes, 50 menus favoris, 10 envois), l'écrasement visait « la ligne la plus récente » au lieu de la dernière insérée, la liste des rappels omettait reminderEnabled, et « quatre endroits dérogent » à la règle des identifiants en oubliait un cinquième, InjectionLog.site. Les quatre listes sont complétées.",
+   "origine": "Réfutations vérifiées : customFoodDailyCap.ts:21 et :24, favoriteDailyCap.ts:20, sendDailyCap.ts:26, mealDailyCap.ts:17, sleep.constants.ts:74 ; logbook.ts:54-56 et :81-86 ; types.ts:116 ; types.ts:91."
+  },
+  {
+   "categorie": "Retiré du chapitre (réfuté par le code)",
+   "fonctionnalite": "« Les mesures de la V2 sont recueillies en texte »",
+   "texte": "Généralisation fausse : seuls poids et poidsCible sont des chaînes ; tailleCm et anneeNaissance sont des nombres. Corrigé dans la liste V2.",
+   "origine": "Réfutation vérifiée : GIT-APP-V2/src/screens/onboarding/reponses.ts:41-42 et :57-58."
   },
   {
    "categorie": "Écarté du chapitre (règle de rendu)",
@@ -53,81 +155,139 @@
    "fonctionnalite": "Ordres de tri des journaux",
    "texte": "Les journaux se lisent par date et heure décroissantes, les pesées suivant un ordre à elles ; règle de rendu, écartée du chapitre.",
    "origine": "Relevé dans le code, écarté parce que l'ordre des lignes ne fait pas partie des données conservées."
+  },
+  {
+   "categorie": "Écarté du chapitre (règle de rendu)",
+   "fonctionnalite": "Clés de préférence de lecture",
+   "texte": "glp1_weight_history_view, glp1_meals_history_view et leurs six jumelles, glp1_period_blood_level_by_brand et glp1_meal_edit_notice_dismissed conservent la dernière fenêtre de lecture choisie et un avertissement déjà écarté ; nommées pour l'exhaustivité du stockage, elles ne portent aucune donnée du modèle.",
+   "origine": "Relevées par recensement des clés du stockage, écartées parce qu'elles ne conservent que des choix de présentation."
   }
  ],
  "glossaire": [
   {
-   "terme": "Agrégat de sauvegarde",
-   "definition": "L'unique objet conservé par installation : un profil et neuf collections datées, dont six facultatives. Il n'a ni identifiant, ni version, ni propriétaire."
+   "terme": "Agrégat",
+   "definition": "L'objet AppData : un profil et neuf collections, conservé sous la clé unique glp1_app_companion_data. Il est lu et réécrit en entier à chaque changement."
   },
   {
-   "terme": "Heure murale locale",
-   "definition": "Une date AAAA-MM-JJ et une heure HH:MM sans fuseau ni décalage — l'heure vécue, telle qu'elle a été notée. À distinguer d'un instant absolu, en millisecondes depuis l'époque Unix, réservé aux métadonnées d'écriture."
+   "terme": "Clé de stockage",
+   "definition": "Une entrée du stockage local de l'appareil, identifiée par un nom en clair. Une trentaine coexistent : l'agrégat, les tables qu'il référence, les états de célébration, les préférences de lecture et les copies de secours."
   },
   {
-   "terme": "Unité canonique",
-   "definition": "L'unité dans laquelle une grandeur est conservée : kilogramme, centimètre, minute, mètre, gramme ou millilitre, milligramme, année. Aucune étiquette d'unité n'est conservée à côté de la valeur."
+   "terme": "Copie de secours",
+   "definition": "Une copie intégrale de l'agrégat, écrite sous la clé <clé>__secours-<AAAA-MM-JJ-HHMMSS> et déclarée dans un index. Aucune n'est jamais recouverte ni purgée automatiquement."
   },
   {
-   "terme": "Pesée de départ",
-   "definition": "La pesée qui porte isStartingWeight à vrai — toujours la plus ancienne. Elle sert de référence à la perte totale, aux badges et au document médical, tient lieu de date de début de cure, et n'a aucun chemin de suppression."
-  },
-  {
-   "terme": "Série du traitement courant",
-   "definition": "Les prises retenues quand on remonte le journal de la plus récente à la plus ancienne et qu'on s'arrête au premier identifiant de traitement différent. Elle n'est pas conservée : elle se recalcule à chaque lecture."
+   "terme": "Conversion de chargement",
+   "definition": "Une fonction appliquée à la sauvegarde à chaque lecture, avant tout usage. Toutes sont idempotentes ; celles qui jettent ou déduisent une donnée sont irréversibles dès la première écriture qui suit."
   },
   {
    "terme": "Plafond quotidien",
-   "definition": "Le nombre maximal de lignes qu'une journée accepte dans un journal. Selon le journal, le dépassement remplace la dernière ligne du jour ou refuse la nouvelle."
+   "definition": "Le nombre maximal de lignes qu'une journée accepte pour un journal ou une table donnés. Deux comportements coexistent : remplacement de la dernière ligne insérée du jour, ou refus de la saisie."
   },
   {
-   "terme": "Métadonnées d'écriture",
-   "definition": "createdAt et updatedAt, instants absolus en millisecondes depuis l'époque Unix. Elles n'existent que sur Recipe, CustomFood, SideEffectType et SportType, et sur aucun journal."
+   "terme": "Nom libre",
+   "definition": "Une valeur de type string qui sert de référence à une entrée de catalogue, sans table ni identifiant. Renommer l'entrée oblige à réécrire l'historique ; la valeur ne se traduit pas."
   },
   {
-   "terme": "MET",
-   "definition": "Équivalent métabolique d'une activité, servant au calcul des calories dépensées. Il est relu dans un catalogue constant à partir du nom du sport, faute de table de sports."
+   "terme": "Référence morte",
+   "definition": "Un foodId qui ne correspond plus à aucun aliment, la bibliothèque des aliments créés se supprimant franchement. Cas courant et non exceptionnel, documenté comme défaut non traité."
   },
   {
-   "terme": "Non implémenté",
-   "definition": "Décision prise, ou déclaration écrite dans les types, dont le code ne porte pas la mise en œuvre — ou dont il porte tout sauf le chemin qui y mène."
+   "terme": "Métadonnée",
+   "definition": "Un instant absolu en millisecondes depuis l'époque Unix décrivant l'écriture d'une ligne. Seule createdAt existe réellement, sur les aliments créés et les menus favoris ; updatedAt n'est portée par aucune donnée conservée."
   },
   {
-   "terme": "Arbitrage non validé",
-   "definition": "Choix retenu faute d'instruction, consigné pour être discuté. Il tient jusqu'à décision contraire."
+   "terme": "Pesée de départ",
+   "definition": "La ligne du journal des pesées portant isStartingWeight: true. Elle tient lieu de début de cure et de référence de perte totale ; elle est toujours la plus ancienne, et le drapeau se repose aux écritures d'ajout et de modification."
   },
   {
-   "terme": "V2",
-   "definition": "La réécriture en cours, dans son propre dépôt. Sur un point qu'elle a tranché, elle prime sur la V1 décrite ici."
+   "terme": "Traitement « aucun »",
+   "definition": "L'entrée NO_TREATMENT du catalogue, identifiant 'aucun', retenue par défaut sur un profil neuf et pour tout identifiant inconnu. C'est une entrée du catalogue, pas une absence de valeur."
+  },
+  {
+   "terme": "Assemblage livré",
+   "definition": "Celle des trois compositions du produit qui est publiée. Les deux autres, gelées, lisent et écrivent le même agrégat et conservent des capacités que la livrée n'a plus."
+  },
+  {
+   "terme": "Heure murale locale",
+   "definition": "Une date AAAA-MM-JJ et une heure HH:MM sans décalage ni fuseau, telles qu'elles se lisent sur place au moment noté."
+  },
+  {
+   "terme": "Unité canonique",
+   "definition": "L'unité dans laquelle une valeur est conservée, indépendamment de toute présentation : kg, cm, g, ml, mg, minutes, mètres, kcal."
+  },
+  {
+   "terme": "Bibliothèque des aliments créés",
+   "definition": "La table glp1_user_custom_foods, hors agrégat : les aliments et recettes créés depuis l'application, à la forme héritée de la base de référence. Toute composition de repas la référence par identifiant."
   }
  ],
  "index": [
   {
-   "terme": "AppData",
-   "ancre": "hors-modele-la-forme-de-la-sauvegarde"
+   "terme": "AppData (agrégat)",
+   "ancre": "hors-modele-la-forme-de-l-agregat"
   },
   {
-   "terme": "Badge, absence d'entité",
+   "terme": "Collections facultatives",
+   "ancre": "hors-modele-la-forme-de-l-agregat"
+  },
+  {
+   "terme": "Installation neuve",
+   "ancre": "hors-modele-la-forme-de-l-agregat"
+  },
+  {
+   "terme": "glp1_app_companion_data",
+   "ancre": "hors-modele-ce-que-le-stockage-porte-hors-de-l-agregat"
+  },
+  {
+   "terme": "Bibliothèque des aliments créés",
+   "ancre": "hors-modele-ce-que-le-stockage-porte-hors-de-l-agregat"
+  },
+  {
+   "terme": "Menus favoris",
+   "ancre": "hors-modele-ce-que-le-stockage-porte-hors-de-l-agregat"
+  },
+  {
+   "terme": "Listes d'entrées actives",
+   "ancre": "hors-modele-ce-que-le-stockage-porte-hors-de-l-agregat"
+  },
+  {
+   "terme": "Copies de secours",
+   "ancre": "hors-modele-ce-que-le-stockage-porte-hors-de-l-agregat"
+  },
+  {
+   "terme": "Fuseau horaire",
    "ancre": "hors-modele-ce-qu-aucune-entite-ne-porte"
   },
   {
-   "terme": "BodyMeasurements",
+   "terme": "Prescription",
    "ancre": "hors-modele-ce-qu-aucune-entite-ne-porte"
   },
   {
-   "terme": "Code-barres",
-   "ancre": "hors-modele-ce-qu-aucune-capacite-n-ecrit"
-  },
-  {
-   "terme": "createdAt / updatedAt",
-   "ancre": "hors-modele-declare-sans-etre-employe"
-  },
-  {
-   "terme": "cureWeek",
+   "terme": "Épisode de traitement",
    "ancre": "hors-modele-ce-qu-aucune-entite-ne-porte"
   },
   {
-   "terme": "customPhotoUrl",
+   "terme": "Traitement « aucun »",
+   "ancre": "hors-modele-ce-qu-aucune-entite-ne-porte"
+  },
+  {
+   "terme": "Pesée de départ",
+   "ancre": "hors-modele-ce-qu-aucune-entite-ne-porte"
+  },
+  {
+   "terme": "Objectif de pas",
+   "ancre": "hors-modele-ce-qu-aucune-entite-ne-porte"
+  },
+  {
+   "terme": "Récurrence de rappel",
+   "ancre": "hors-modele-ce-qu-aucune-entite-ne-porte"
+  },
+  {
+   "terme": "SideEffectLog.severity",
+   "ancre": "hors-modele-ce-qu-aucune-entite-ne-porte"
+  },
+  {
+   "terme": "SleepLog.quality",
    "ancre": "hors-modele-ce-qu-aucune-entite-ne-porte"
   },
   {
@@ -135,79 +295,39 @@
    "ancre": "hors-modele-une-entite-que-rien-ne-cree"
   },
   {
-   "terme": "DEFAULT_DAILY_GOAL_STEPS",
-   "ancre": "hors-modele-ce-qu-aucune-entite-ne-porte"
+   "terme": "oldestDataDate",
+   "ancre": "hors-modele-une-entite-que-rien-ne-cree"
   },
   {
-   "terme": "deletedAt",
+   "terme": "Authentification",
    "ancre": "hors-modele-ce-qu-aucune-capacite-n-ecrit"
   },
   {
-   "terme": "easyReadingMode",
-   "ancre": "hors-modele-declare-sans-etre-employe"
+   "terme": "Collections distantes",
+   "ancre": "hors-modele-ce-qu-aucune-capacite-n-ecrit"
   },
   {
-   "terme": "Épisode de traitement",
-   "ancre": "hors-modele-ce-qu-aucune-entite-ne-porte"
+   "terme": "restoreBackup",
+   "ancre": "hors-modele-ce-qu-aucune-capacite-n-ecrit"
   },
   {
-   "terme": "Fuseau horaire",
-   "ancre": "hors-modele-ce-qu-aucune-entite-ne-porte"
+   "terme": "writeWithBackup",
+   "ancre": "hors-modele-ce-qu-aucune-capacite-n-ecrit"
   },
   {
-   "terme": "glp1Brand",
-   "ancre": "hors-modele-des-noms-la-ou-la-regle-veut-des-identifiants"
+   "terme": "Code-barres",
+   "ancre": "hors-modele-ce-qu-aucune-capacite-n-ecrit"
+  },
+  {
+   "terme": "Plafonds quotidiens",
+   "ancre": "hors-modele-les-plafonds-quotidiens"
+  },
+  {
+   "terme": "addLogWithinDailyCap",
+   "ancre": "hors-modele-les-plafonds-quotidiens"
   },
   {
    "terme": "HungerLevel",
-   "ancre": "hors-modele-declare-sans-etre-employe"
-  },
-  {
-   "terme": "InjectionLog.brand",
-   "ancre": "hors-modele-ce-qu-aucune-entite-ne-porte"
-  },
-  {
-   "terme": "isSimulated",
-   "ancre": "hors-modele-ce-qu-aucune-entite-ne-porte"
-  },
-  {
-   "terme": "isStartingWeight",
-   "ancre": "hors-modele-ce-qu-aucune-entite-ne-porte"
-  },
-  {
-   "terme": "JournalViewMode",
-   "ancre": "hors-modele-declare-sans-etre-employe"
-  },
-  {
-   "terme": "localDateTime",
-   "ancre": "hors-modele-ce-qui-demanderait-une-migration"
-  },
-  {
-   "terme": "measurementSystem",
-   "ancre": "hors-modele-ce-qu-aucune-capacite-n-ecrit"
-  },
-  {
-   "terme": "medicalReminderDoctor",
-   "ancre": "hors-modele-ce-qu-aucune-entite-ne-porte"
-  },
-  {
-   "terme": "MeTimeLog.activity",
-   "ancre": "hors-modele-des-noms-la-ou-la-regle-veut-des-identifiants"
-  },
-  {
-   "terme": "mysteryBadgeHidden",
-   "ancre": "hors-modele-ce-qui-demanderait-une-migration"
-  },
-  {
-   "terme": "Plafond quotidien",
-   "ancre": "hors-modele-ce-qu-aucune-capacite-n-ecrit"
-  },
-  {
-   "terme": "Rappel",
-   "ancre": "hors-modele-ce-qu-aucune-capacite-n-ecrit"
-  },
-  {
-   "terme": "Recipe et CustomFood",
    "ancre": "hors-modele-declare-sans-etre-employe"
   },
   {
@@ -215,7 +335,11 @@
    "ancre": "hors-modele-declare-sans-etre-employe"
   },
   {
-   "terme": "SideEffectType",
+   "terme": "SportLog.distance",
+   "ancre": "hors-modele-declare-sans-etre-employe"
+  },
+  {
+   "terme": "MeasurementSystem",
    "ancre": "hors-modele-declare-sans-etre-employe"
   },
   {
@@ -223,32 +347,68 @@
    "ancre": "hors-modele-declare-sans-etre-employe"
   },
   {
-   "terme": "SportLog.sport",
-   "ancre": "hors-modele-des-noms-la-ou-la-regle-veut-des-identifiants"
-  },
-  {
-   "terme": "SportType",
+   "terme": "JournalViewMode",
    "ancre": "hors-modele-declare-sans-etre-employe"
   },
   {
-   "terme": "StepLog",
-   "ancre": "hors-modele-ce-qu-aucune-entite-ne-porte"
+   "terme": "BODY_MAP_SITES",
+   "ancre": "hors-modele-declare-sans-etre-employe"
   },
   {
-   "terme": "Synchronisation",
-   "ancre": "hors-modele-ce-qu-aucune-capacite-n-ecrit"
+   "terme": "createdAt / updatedAt",
+   "ancre": "hors-modele-declare-sans-etre-employe"
   },
   {
-   "terme": "typeLabel",
+   "terme": "InjectionLog.site",
    "ancre": "hors-modele-des-noms-la-ou-la-regle-veut-des-identifiants"
   },
   {
-   "terme": "UUIDv7",
+   "terme": "SavedMealLog.typeLabel",
+   "ancre": "hors-modele-des-noms-la-ou-la-regle-veut-des-identifiants"
+  },
+  {
+   "terme": "FoodQuantity.foodId",
+   "ancre": "hors-modele-le-seul-lien-referentiel-n-est-pas-garanti"
+  },
+  {
+   "terme": "Référence morte",
+   "ancre": "hors-modele-le-seul-lien-referentiel-n-est-pas-garanti"
+  },
+  {
+   "terme": "fillMealHunger",
+   "ancre": "hors-modele-les-conversions-deja-passees"
+  },
+  {
+   "terme": "migrateTreatmentIds",
+   "ancre": "hors-modele-les-conversions-deja-passees"
+  },
+  {
+   "terme": "purgeDeleted",
+   "ancre": "hors-modele-les-conversions-deja-passees"
+  },
+  {
+   "terme": "mergeTableTennisSport",
+   "ancre": "hors-modele-les-conversions-deja-passees"
+  },
+  {
+   "terme": "SleepLog (deux dates, deux heures)",
    "ancre": "hors-modele-ce-qui-demanderait-une-migration"
   },
   {
-   "terme": "Zones corporelles",
-   "ancre": "hors-modele-declare-sans-etre-employe"
+   "terme": "mysteryBadgeHidden",
+   "ancre": "hors-modele-ce-qui-demanderait-une-migration"
+  },
+  {
+   "terme": "localDateTime",
+   "ancre": "hors-modele-ce-qui-demanderait-une-migration"
+  },
+  {
+   "terme": "V2 : tailleCm, anneeNaissance",
+   "ancre": "hors-modele-ce-que-la-v2-a-retire-ou-n-a-pas-repris"
+  },
+  {
+   "terme": "V2 : poids en texte",
+   "ancre": "hors-modele-ce-que-la-v2-a-retire-ou-n-a-pas-repris"
   }
  ]
 }

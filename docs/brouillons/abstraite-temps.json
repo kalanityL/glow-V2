@@ -3,410 +3,344 @@
   {
    "categorie": "rendu",
    "fonctionnalite": "Mises en forme lisibles d'une date, d'une heure ou d'une durée",
-   "texte": "Écarté du chapitre : JJ/MM/AAAA, JJ/MM, « 25 au 26/08 » (le mois n'est porté que par la seconde date quand elles le partagent), « Aujourd'hui » / « Hier » / « lundi 3 août », « 6h26 » / « 45min » / « 7 h 45 », « 18/08/2026 à 14 h 32 » pour un horodatage d'archive, les étiquettes de créneau « 0-3h » à « 21-24h », les noms de mois en français, la semaine commençant le lundi et la grille de six semaines de sept jours. Y sont ajoutés l'habillage d'une saisie de huit chiffres en JJ/MM/AAAA et le traitement du « / » tapé. Rien de tout cela ne change une donnée : ce sont des règles de restitution ou de saisie.",
-   "origine": "src/shared/date/date.utils.ts, date.relative.ts, date.calendar.ts (MONTH_LABELS, WEEKDAY_LABELS, monthGrid, formatTypedDate), src/shared/calendar.ts, src/shared/model/dataBackup.ts (readableStamp), src/features/meal-charts/mealCharts.utils.ts (timeSlotLabel)"
+   "texte": "Écarté du chapitre : JJ/MM/AAAA, JJ/MM, « 25 au 26/08 » (le mois n'est porté que par la seconde date quand elles le partagent), « Aujourd'hui » / « Hier » / « lundi 3 août », « 6h26 » / « 45min » / « 7 h 45 », les étiquettes de créneau « 0-3h » à « 21-24h », les noms de mois en français, la semaine commençant le lundi et la grille de six semaines de sept jours. Rien de tout cela ne change une donnée : ce sont des règles de restitution.",
+   "origine": "src/shared/date/date.utils.ts, date.relative.ts, date.calendar.ts, src/shared/calendar.ts, src/features/meal-charts/mealCharts.utils.ts"
   },
   {
    "categorie": "libellé",
    "fonctionnalite": "« 15 derniers jours » pour une fenêtre de 14 jours",
-   "texte": "Le chapitre en dit désormais une phrase, parce que c'est une règle de langue attachée à une grandeur : la série compte quatorze journées (TREND_DAYS = 14) et le nom qui la désigne dit « 15 derniers jours ». Décision de l'utilisatrice du 2026-08-28 : « en français 15 derniers jours veut dire 2 dernieres semaines » — une tournure, pas un compte. Aucune règle de données ne dépend de ce nom ; le nom lui-même reste hors périmètre.",
-   "origine": "src/versions/mixte/App.tsx (DRAWER_TITLES, ligne 342), src/features/trends/trends.ts (TREND_DAYS)"
+   "texte": "Écarté du chapitre : la fenêtre de tendance compte quatorze journées (TREND_DAYS = 14) et le nom qui la désigne dit « 15 derniers jours ». Décision de l'utilisatrice du 2026-08-28 : « en français 15 derniers jours veut dire 2 dernieres semaines » — une tournure, pas un compte, la donnée reste sur quatorze jours. Aucune règle de données ne dépend de ce nom.",
+   "origine": "src/versions/mixte/App.tsx (DRAWER_TITLES), src/features/trends/trends.ts"
   },
   {
    "categorie": "incohérence constatée",
-   "fonctionnalite": "Trois heures de repli concurrentes pour une entrée sans heure",
-   "texte": "Corrigé dans le chapitre : il n'y a pas une convention mais trois. 12:00 pour le comparateur générique du modèle, la retenue de la dernière pesée d'une journée et toute la cinétique ; 00:00 pour la signature de la dernière pesée, les ordres des journaux de sommeil, d'activité physique et de moments à soi, et la coupure du traitement en cours ; la chaîne vide pour le fil de toutes les entrées, ce qui range l'entrée sans heure après celles de son jour. Les deux premières s'appliquent au MÊME objet — la dernière pesée — avec des résultats différents. Aucun commentaire ne dit laquelle fait foi. À trancher.",
-   "origine": "src/shared/model/logOrder.ts et src/features/weight/weight.utils.ts:116 (12:00) contre src/utils/ludicUsage.ts:79-80, src/features/sleep|sport|me-time/use*Journal.ts et src/features/home/homeOverview.ts:267 (00:00) contre src/features/home/recentJournal.ts:325 (chaîne vide)"
+   "fonctionnalite": "Deux tie-breaks concurrents pour une entrée sans heure",
+   "texte": "Le comparateur du modèle donne à l'heure absente la valeur 12:00 ; la sélection des entrées récentes tous journaux confondus range au contraire l'entrée sans heure après celles de son jour qui en portent une. Les deux sont dans le code, aucun commentaire ne dit lequel fait foi. À trancher.",
+   "origine": "src/shared/model/logOrder.ts contre src/features/home/recentJournal.ts"
   },
   {
    "categorie": "incohérence constatée",
-   "fonctionnalite": "Quatre façons de reculer de n jours",
-   "texte": "Corrigé dans le chapitre, qui en tabule désormais quatre au lieu de deux : triplet normalisé par Date.UTC (progressWindows, fenetresSport, dynamiqueUnlockDate) ; décrémentation du quantième d'une date locale (getCutoffDateStr, getLast7DaysDates du bilan de dépense, formatDateRelative) ; décrémentation du quantième après avoir posé la date à midi (addDays local de sleep.utils) ; soustraction de n × 86 400 000 ms à l'instant courant puis relecture du jour local (cumuls à sept jours, moyennes de repas, trendDates, recentJournalEntries). Seule la dernière se décale d'un jour lorsqu'un changement d'heure tombe dans l'intervalle et que l'instant courant est à moins d'une heure de minuit. Déduction arithmétique, non écrite dans le code ; aucune décision ne dit laquelle est la bonne méthode.",
-   "origine": "src/shared/date/date.local.ts (addDays), src/shared/time-window/timeWindow.utils.ts, src/features/metabolism/metabolism.utils.ts:54-62, src/features/sleep/sleep.utils.ts:371-375, src/features/home/homeOverview.ts:574, src/features/trends/trends.ts:71, src/features/home/recentJournal.ts:294"
+   "fonctionnalite": "Deux façons de reculer de n jours",
+   "texte": "Les fenêtres réglables décrémentent le quantième de la date locale (insensible au changement d'heure) ; les fenêtres fixes des bilans, les séries de tendance et la fenêtre des entrées récentes retranchent n × 86 400 000 ms à l'instant courant puis relisent la date locale. Les deux résultats diffèrent d'un jour lorsqu'un changement d'heure tombe dans l'intervalle et que l'instant courant est à moins d'une heure de minuit. Déduction arithmétique, non écrite dans le code ; aucune décision ne dit laquelle est la bonne méthode.",
+   "origine": "src/shared/time-window/timeWindow.utils.ts contre src/features/home/homeOverview.ts, src/features/trends/trends.ts, src/features/home/recentJournal.ts"
   },
   {
    "categorie": "violation de la règle du projet",
-   "fonctionnalite": "Endroits qui construisent encore un instant depuis une chaîne AAAA-MM-JJ",
-   "texte": "Le chapitre ne prétend plus que l'invariant est tenu ; il le pose comme règle et nomme les manquements. Deux sont des mises en forme lisibles (libellé relatif d'une date, une restitution de journal de poids), un est un calcul : l'écart en jours depuis la dernière prise soustrait deux Date.parse de chaînes AAAA-MM-JJ. Ce dernier reste exact parce que les deux termes subissent le même décalage de minuit UTC, mais le procédé est celui que la règle proscrit et il casse dès qu'un seul des deux termes est local. À noter : la conversion relevée dans timeWindow.utils.ts:26 n'est PAS une violation — le Date construit ne sert qu'à un test de validité, et c'est la chaîne d'origine qui est rendue. Constaté, non tranché.",
-   "origine": "src/shared/date/date.relative.ts:21-22, src/versions/cartes/features/weight/WeightTracker.tsx:225, src/versions/mixte/components/Maison.tsx:318 ; contre-exemple : src/shared/time-window/timeWindow.utils.ts:26"
-  },
-  {
-   "categorie": "réfutation écartée",
-   "fonctionnalite": "Prétendue règle de divisibilité 4/100/400",
-   "texte": "La réfutation portée aux manques affirme que date.calendar.ts contient le test 4/100/400 et contredit donc la phrase « aucune règle de divisibilité n'est écrite nulle part ». Vérifié : faux. daysInMonth vaut `new Date(year, month, 0).getDate()` — le jour 0 du mois suivant —, et aucun 4, 100 ou 400 n'apparaît dans le fichier. La phrase est conservée, reformulée pour dire d'où vient réellement le règlement des années bissextiles.",
-   "origine": "src/shared/date/date.calendar.ts:78-80 (daysInMonth), vérifié par grep sur 400|100|% 4"
+   "fonctionnalite": "Deux endroits construisent encore un instant depuis une chaîne AAAA-MM-JJ",
+   "texte": "Le libellé relatif d'une date et les phrases récapitulatives des rappels appellent l'analyse d'une chaîne AAAA-MM-JJ, interprétée en UTC — ce que la règle du projet interdit. Risque de décalage d'un jour à l'ouest de Greenwich. Constaté, non tranché.",
+   "origine": "src/shared/date/date.relative.ts, src/versions/*/components/NotificationsSettings.tsx ; déjà relevé dans inventaire-v1.json (inventaires[8].doutes)"
   },
   {
    "categorie": "absence à confirmer",
    "fonctionnalite": "Remise d'un rappel à l'échéance",
-   "texte": "Les données temporelles de rappel (forme, jour, heure, intervalle, date de début, date et heure de rendez-vous, préavis) sont enregistrées et relues, mais aucune programmation ni remise à l'échéance n'existe dans le code lu : rien n'appelle l'interface de notification du navigateur. Marqué non implémenté dans le chapitre sur cette base.",
-   "origine": "src/types.ts (UserProfile:113-124), src/versions/mixte/components/NotificationsSettings.tsx, absence de tout appel à Notification dans src/"
-  },
-  {
-   "categorie": "absence de précondition",
-   "fonctionnalite": "Les domaines des données temporelles du profil ne sont vérifiés nulle part",
-   "texte": "Le chapitre le dit désormais explicitement plutôt que de présenter une colonne « Domaine » comme si elle était tenue : « 0 à 6 » pour le jour de rappel et « un nombre de jours (5, 7, 10…) » pour l'intervalle sont des commentaires de type, et aucune écriture ne les contrôle. De même, aucune précondition d'écriture ne refuse une heure dont les heures dépassent 23, contrairement à ce que le chapitre affirmait.",
-   "origine": "src/types.ts:114,118 (commentaires de type) ; src/shared/date/date.local.ts:78-85 (snapToRoundedMinutes, aucun test sur match[1])"
+   "texte": "Les données temporelles de rappel (jour, heure, intervalle, date de rendez-vous, préavis) sont enregistrées et relues, mais aucune programmation ni remise à l'échéance n'existe dans le code lu : rien n'appelle l'interface de notification du navigateur. Marqué non implémenté dans le chapitre sur cette base.",
+   "origine": "src/types.ts (UserProfile), absence de tout appel à Notification dans src/"
   },
   {
    "categorie": "V2 non encore écrite",
    "fonctionnalite": "Module de dates de la V2",
-   "texte": "La V2 n'a, à ce jour, aucun module de dates : les règles (AAAA-MM-JJ, HH:MM, jamais toISOString, fuseau et langue indépendants, minutes rondes arrondies vers le bas) y sont posées dans GUIDELINES.md, et le seul code temporel existant est celui des bornes d'année de naissance, plus un unique appel à l'horloge pour fournir l'année courante à l'appelant. Aucun toLocaleDateString ni Intl n'existe dans GIT-APP-V2/src. Le chapitre décrit donc la V1 partout où la V2 n'a pas encore tranché.",
-   "origine": "/Users/beauty/Desktop/GLOW/GIT-APP-V2/GUIDELINES.md:295-303, src/domaine/mesures.ts:42-49, src/screens/Onboarding.tsx:149, src/i18n/langues.ts"
+   "texte": "La V2 n'a, à ce jour, aucun module de dates : les règles (AAAA-MM-JJ, HH:MM, jamais toISOString, fuseau et langue indépendants, minutes rondes arrondies vers le bas) y sont posées dans GUIDELINES.md, et le seul code temporel existant est celui des bornes d'année de naissance. Le chapitre décrit donc la V1 partout où la V2 n'a pas encore tranché.",
+   "origine": "/Users/beauty/Desktop/GLOW/GIT-APP-V2/GUIDELINES.md (section « Données, unités, nombres, dates »), src/domaine/mesures.ts"
   },
   {
    "categorie": "exemple",
    "fonctionnalite": "Chiffres de l'exemple Camille",
    "texte": "Les valeurs de l'exemple (pesée de départ au 2026-05-04, lecture au 2026-09-13, 132 jours, 19e semaine, bornes 1896-2025) sont calculées avec les formules du chapitre, pas relevées dans le code ; seule la mécanique est fondée.",
-   "origine": "calcul appliqué à weeksSinceDate (src/features/home/homeOverview.ts:908-919) et bornesAnneeNaissance (V2, src/domaine/mesures.ts:47-49)"
+   "origine": "calcul appliqué à weeksSinceDate (src/features/home/homeOverview.ts) et bornesAnneeNaissance (V2, src/domaine/mesures.ts)"
+  },
+  {
+   "categorie": "affirmation retirée",
+   "fonctionnalite": "« Le bilan de dépense est filtré par déjà survenu »",
+   "texte": "Retirée du chapitre : le bilan de dépense énergétique et sa projection n'appellent aucun filtre du futur. Ils énumèrent sept dates locales et somment tout ce qui y est daté, y compris un repas ou une séance notés à l'avance dans la journée en cours. Le chapitre dit désormais l'inverse, et le nomme comme la principale exception à la règle.",
+   "origine": "src/features/metabolism/metabolism.utils.ts:54-62 et :141-196 — aucune occurrence de hasOccurred dans le fichier"
+  },
+  {
+   "categorie": "affirmation retirée",
+   "fonctionnalite": "« Le produit ne stocke aucun fuseau, n'en demande aucun, et n'en convertit aucun »",
+   "texte": "Retirée : le contexte d'un envoi lit le nom du fuseau de l'appareil, calcule son décalage à UTC en minutes et sérialise l'instant en UTC ; le document médical exporté convertit explicitement une date en UTC pour l'écrire en toutes lettres. Le chapitre énonce désormais la règle sur le seul journal, et nomme les deux exceptions.",
+   "origine": "src/features/feedback/submissionContext.ts:96, :136, :143 ; src/features/feedback/submissionMail.ts:145 ; src/versions/mixte/features/report/medicalReportPdf.ts:574-579"
+  },
+  {
+   "categorie": "affirmation retirée",
+   "fonctionnalite": "« Les seules métadonnées absolues du modèle »",
+   "texte": "Retirée : le couple createdAt/updatedAt est aussi porté par les natures d'effet indésirable et d'activité, un menu favori porte un createdAt, un envoi porte son instant, et le contexte d'un envoi porte quatre grandeurs absolues. Le chapitre en donne maintenant le relevé complet, avec l'obligation de chaque champ.",
+   "origine": "src/types.ts:505-506, :533-534, :549-550, :559-560 ; src/data/mealConstants.ts:17 et :120-129 ; src/features/feedback/submissionContext.ts:136-143"
+  },
+  {
+   "categorie": "incohérence constatée",
+   "fonctionnalite": "Trois valeurs pour une heure absente",
+   "texte": "Au-delà des deux tie-breaks déjà relevés, une troisième convention existe : « déjà survenu » traite l'heure absente comme minuit, donc comme survenue dès que la journée est la journée en cours. Midi, minuit et la chaîne vide cohabitent dans le code livré, chacune commentée comme « la convention du projet ». Aucune décision ne dit laquelle prime. À trancher.",
+   "origine": "src/shared/date/date.local.ts:105 et src/features/home/homeOverview.ts:323 (minuit) ; src/shared/model/logOrder.ts et src/features/weight/weight.utils.ts:116 (midi) ; src/features/home/recentJournal.ts:325 (chaîne vide)"
+  },
+  {
+   "categorie": "incohérence constatée",
+   "fonctionnalite": "Deux lectures du journal des pas",
+   "texte": "L'écriture d'un relevé de pas n'applique aucun plafond et ne fusionne pas la journée : elle empile. Deux lectures en tirent des résultats différents — l'une retient la première ligne trouvée pour la date, donc le rang d'insertion décide, l'autre somme toutes les lignes du jour. Ni règle ni commentaire ne dit laquelle est la bonne. À trancher.",
+   "origine": "src/app/useAppData.ts:303-312 ; src/features/steps/steps.utils.ts:185 et :241 ; src/features/metabolism/metabolism.utils.ts:168-171"
+  },
+  {
+   "categorie": "incohérence constatée",
+   "fonctionnalite": "Une troisième façon de reculer de n jours",
+   "texte": "En plus du quantième et des millisecondes, une troisième méthode existe : le décalage de triplet, employé par la progression d'activité et la progression alimentaire. Elle est insensible au changement d'heure comme la première, ce qui invalide le partage « réglable = quantième, fixe = millisecondes ». Constaté, non tranché.",
+   "origine": "src/features/home/homeProgressAnalysis.ts:46-51 et :147-148 (addDays) contre src/features/metabolism/metabolism.utils.ts:54-62 (setDate) et src/features/trends/trends.ts:68-74 (millisecondes)"
+  },
+  {
+   "categorie": "principe sans code",
+   "fonctionnalite": "Indépendance de la langue et du classement temporel",
+   "texte": "L'énoncé « la langue ne pilote aucun classement temporel » est une règle du projet, pas une propriété vérifiable : la V1 n'a qu'une langue, en dur, et toutes ses mises en forme de date sont figées en français ; la V2 porte des langues mais aucun module de dates. Le chapitre le présente désormais comme une règle, marquée V2.",
+   "origine": "src/features/feedback/submissionContext.ts:35 (APP_LANGUAGE = 'fr') ; src/shared/date/date.calendar.ts:35-54 ; src/shared/date/date.relative.ts:22 ; V2 : src/i18n/langues.ts, src/domaine/ sans module de date ; GUIDELINES.md"
+  },
+  {
+   "categorie": "rendu",
+   "fonctionnalite": "Temps restant jusqu'à une échéance, recalculé chaque seconde",
+   "texte": "La seule grandeur temporelle du produit rafraîchie à intervalle fixe l'est par un minuteur d'une seconde qui recalcule jours, heures, minutes et secondes restants depuis une date d'échéance ramenée à minuit local. La donnée enregistrée reste la seule date d'échéance ; le reste est une restitution. Une ligne du chapitre le note comme exception à « aujourd'hui est lu à chaque calcul ».",
+   "origine": "src/versions/cartes/components/MonCiel.tsx:196-231"
+  },
+  {
+   "categorie": "incohérence constatée",
+   "fonctionnalite": "Deux règles pour une borne personnalisée illisible",
+   "texte": "Le filtrage d'une fenêtre personnalisée compare les chaînes telles quelles, sans vérifier la forme d'une borne ; le calcul de coupure convertit la borne basse en instant et l'ignore si elle est illisible. Une borne mal formée est donc tantôt appliquée lexicalement, tantôt ignorée, selon le chemin. Constaté et dit dans le chapitre ; aucune décision ne tranche.",
+   "origine": "src/shared/time-window/timeWindow.utils.ts:55-63 contre :24-28"
   }
  ],
  "glossaire": [
   {
    "terme": "Jour local",
-   "definition": "Chaîne AAAA-MM-JJ composée des composantes locales de l'horloge de l'appareil (année, mois, quantième). Portée par toute entrée de journal. Se compare comme chaîne : l'ordre lexicographique est l'ordre chronologique."
+   "definition": "Chaîne AAAA-MM-JJ composée des composantes locales de l'horloge de l'appareil. Portée par toute entrée de journal. Se compare lexicalement, sans fuseau."
   },
   {
    "terme": "Heure murale",
-   "definition": "Chaîne HH:MM sur 24 heures, zéros de tête compris, sans fuseau ni secondes. Domaine documenté : HH de 00 à 23, MM de 00 à 59 ; seule la conversion en minutes depuis minuit vérifie ce domaine."
-  },
-  {
-   "terme": "Minutes rondes",
-   "definition": "L'ensemble irrégulier 0, 10, 15, 20, 30, 40, 45, 50. Toute heure enregistrée y est ramenée par arrondi vers le bas, au moment de l'écriture, pour ne jamais produire une heure encore à venir."
-  },
-  {
-   "terme": "Instant d'une entrée",
-   "definition": "Le jour local et l'heure murale d'une entrée composés puis lus dans le fuseau de l'appareil. Une heure absente ou vide est remplacée par une heure de repli, qui vaut midi, minuit ou la chaîne vide selon le calcul."
+   "definition": "Chaîne HH:MM, zéros de tête, sans fuseau ni secondes. Facultative sur une entrée. Se compare lexicalement."
   },
   {
    "terme": "Instant absolu",
-   "definition": "Entier de millisecondes depuis l'époque Unix. Réservé aux métadonnées de création et de modification des recettes, aliments personnalisés, types d'effet secondaire et types d'activité (obligatoires), et à la création d'un menu favori ou d'un aliment de la base enrichie (facultative). Aucune donnée de santé n'en porte."
-  },
-  {
-   "terme": "Lecture stricte d'un jour",
-   "definition": "La seule capacité qui vérifie qu'un jour local existe : forme AAAA-MM-JJ, mois de 1 à 12, quantième existant dans le mois. Rend le triplet ou l'absence. Les années bissextiles s'y règlent par le « jour 0 du mois suivant », sans règle de divisibilité."
-  },
-  {
-   "terme": "Journée",
-   "definition": "Un jour local, et rien d'autre. Une entrée appartient à la journée de sa date ; aucune journée décalée n'existe. C'est l'unité des plafonds quotidiens et des dénominateurs de moyenne."
-  },
-  {
-   "terme": "Nuit",
-   "definition": "Entrée de sommeil de nature « nuit », portant une date et une heure d'endormissement et une date et une heure de réveil. Elle est datée de son réveil ; sa durée est la différence des deux instants, nulle si elle n'est pas positive."
-  },
-  {
-   "terme": "Temps d'éveil",
-   "definition": "Pour une journée J : le réveil le plus tardif des nuits datées J jusqu'à l'endormissement le plus précoce des nuits datées J+1, moins les siestes de J. Calculé en minutes depuis minuit, avec un passage de minuit deviné. Absent si l'une des deux nuits manque ou si le résultat n'est pas strictement positif."
-  },
-  {
-   "terme": "Instant de référence",
-   "definition": "Le « maintenant » ou l'« aujourd'hui » passé en paramètre à toute fonction du domaine, avec l'instant courant pour valeur par défaut. Rend les calculs reproductibles et fait qu'une fenêtre et sa frontière de « déjà survenu » partagent la même valeur."
-  },
-  {
-   "terme": "Déjà survenu",
-   "definition": "Précondition qui écarte ce qui n'a pas encore eu lieu : vrai avant aujourd'hui, faux après, et le jour même vrai sans heure, sinon vrai si l'heure est atteinte."
-  },
-  {
-   "terme": "Fenêtre réglable",
-   "definition": "L'une des six fenêtres choisies par usage : 7, 14, 30, 90 jours, tout, ou personnalisée. Les quatre à durée fixe posent une borne basse inclusive à aujourd'hui − (n − 1) jours et aucune borne haute. La valeur de départ est propre à chaque usage, 30 jours par défaut."
-  },
-  {
-   "terme": "Coupure",
-   "definition": "La borne basse d'une fenêtre à durée fixe, obtenue en décrémentant le quantième de la date locale courante de n − 1. La journée en cours compte dans la fenêtre."
-  },
-  {
-   "terme": "Rang de semaine",
-   "definition": "⌊joursÉcoulés / 7⌋ + 1, joursÉcoulés étant l'écart arrondi entre deux minuits locaux. Absent si la date de départ est illisible ou postérieure. La première semaine porte le n° 1."
-  },
-  {
-   "terme": "Âge d'usage",
-   "definition": "L'écart en jours entre la date de première ouverture et aujourd'hui, jamais négatif. La date de première ouverture est déterminée une fois — valeur écrite, sinon plus ancienne donnée des neuf journaux si elle n'est pas future, sinon aujourd'hui — et jamais réécrite. Sept jours déverrouillent."
+   "definition": "Entier en millisecondes depuis l'époque Unix. Date les objets de bibliothèque (aliments, recettes, natures, menus), les envois et leur contexte ; jamais une donnée de santé."
   },
   {
    "terme": "Horodatage d'archive",
-   "definition": "Chaîne AAAA-MM-JJ-HHMMSS en composantes locales, secondes comprises, qui date une copie de secours. Se trie par comparaison de chaînes. Deux copies de la même seconde partagent cet horodatage ; seul leur emplacement les distingue."
+   "definition": "Chaîne AAAA-MM-JJ-HHMMSS composée des composantes locales, secondes comprises, qui nomme une copie de secours des données."
+  },
+  {
+   "terme": "Minutes rondes",
+   "definition": "L'ensemble irrégulier 0, 10, 15, 20, 30, 40, 45, 50. Toute heure enregistrée y est ramenée vers le bas au moment de l'écriture."
+  },
+  {
+   "terme": "Garde de domaine de l'heure",
+   "definition": "La précondition qui refuse une heure hors 0–23. Elle n'existe qu'en sommeil et en repas ; l'arrondi aux minutes rondes ne borne que les minutes."
+  },
+  {
+   "terme": "Trou de datation",
+   "definition": "L'état d'un objet dont l'instant de création facultatif est absent : il n'appartient au jour de création d'aucune journée et n'est compté dans aucun quota."
+  },
+  {
+   "terme": "Déjà survenu",
+   "definition": "Précondition qui écarte ce qui n'a pas eu lieu à l'instant présent : date antérieure à aujourd'hui, ou date du jour avec une heure ≤ l'heure courante. Une entrée du jour sans heure est réputée survenue."
+  },
+  {
+   "terme": "Journée",
+   "definition": "Un jour local, et rien d'autre. Aucune journée décalée n'existe : une entrée appartient à la journée de sa date."
+  },
+  {
+   "terme": "Plafond quotidien",
+   "definition": "Nombre maximal d'objets rattachés à une même journée. Deux effets : refuser l'écriture, ou remplacer la dernière ligne du jour. Deux rattachements : la date portée, ou l'instant de création ramené au jour local."
+  },
+  {
+   "terme": "Temps d'éveil",
+   "definition": "Pour une journée J : l'intervalle du réveil le plus tardif des nuits datées J à l'endormissement le plus précoce des nuits datées J+1, minoré des siestes de J. Absent si l'une des deux nuits manque."
+  },
+  {
+   "terme": "Semaine civile",
+   "definition": "Sept jours commençant le lundi. À distinguer du jour de rappel hebdomadaire, entier où 0 vaut dimanche."
+  },
+  {
+   "terme": "Rang de semaine",
+   "definition": "⌊joursÉcoulés / 7⌋ + 1 depuis une date de départ, la première semaine portant le n° 1. Absent pour une date illisible ou postérieure à la référence."
+  },
+  {
+   "terme": "Fenêtre réglable",
+   "definition": "L'une des six fenêtres 7days, 14days, 30days, 90days, all, custom. Retenue et mémorisée par usage, avec un défaut propre à l'usage — 30days à défaut de mieux."
+  },
+  {
+   "terme": "Coupure",
+   "definition": "Borne basse d'une fenêtre à durée fixe : aujourd'hui − (n − 1) jours, la journée en cours comptant. Inclusive, comparée comme chaîne."
+  },
+  {
+   "terme": "Fenêtre fixe",
+   "definition": "Fenêtre qui fait partie de la définition d'un calcul et n'est pas modifiable. Trois méthodes de recul coexistent : quantième, triplet, millisecondes."
+  },
+  {
+   "terme": "Date de première ouverture",
+   "definition": "Jour local déterminé une fois — la date déjà écrite, sinon la plus ancienne date des neuf journaux si elle est ≤ aujourd'hui, sinon aujourd'hui — puis jamais réécrit."
+  },
+  {
+   "terme": "Âge d'usage",
+   "definition": "Écart en jours calendaires entre la date de première ouverture et aujourd'hui, jamais négatif. Le seuil de déverrouillage est 7."
+  },
+  {
+   "terme": "Année de naissance",
+   "definition": "Grandeur enregistrée par la V2 à la place de l'âge, bornée par annéeCourante − 130 et annéeCourante − 1. L'âge en est dérivé, jamais stocké."
   }
  ],
  "index": [
   {
-   "terme": "Jour local",
-   "ancre": "temps-le-jour-local"
-  },
-  {
-   "terme": "Format AAAA-MM-JJ",
-   "ancre": "temps-le-jour-local"
-  },
-  {
-   "terme": "Conversion par UTC (proscrite)",
-   "ancre": "temps-le-jour-local"
-  },
-  {
-   "terme": "Ordre lexicographique des dates",
-   "ancre": "temps-le-jour-local"
-  },
-  {
-   "terme": "Lecture stricte d'un jour",
-   "ancre": "temps-la-lecture-stricte-d-un-jour"
-  },
-  {
-   "terme": "Quantième existant dans le mois",
-   "ancre": "temps-la-lecture-stricte-d-un-jour"
-  },
-  {
-   "terme": "Année bissextile",
-   "ancre": "temps-la-lecture-stricte-d-un-jour"
-  },
-  {
-   "terme": "Heure murale",
-   "ancre": "temps-l-heure-murale"
-  },
-  {
-   "terme": "Format HH:MM",
-   "ancre": "temps-l-heure-murale"
-  },
-  {
-   "terme": "Minutes rondes",
-   "ancre": "temps-l-heure-murale"
-  },
-  {
-   "terme": "Arrondi vers le bas",
-   "ancre": "temps-l-heure-murale"
-  },
-  {
-   "terme": "Domaine d'une heure (00-23)",
-   "ancre": "temps-l-heure-murale"
-  },
-  {
-   "terme": "Arrondi des deux heures d'une nuit",
-   "ancre": "temps-l-heure-murale"
-  },
-  {
-   "terme": "Instant d'une entrée",
-   "ancre": "temps-l-instant-d-une-entree"
-  },
-  {
-   "terme": "Heure de repli midi",
-   "ancre": "temps-l-instant-d-une-entree"
-  },
-  {
-   "terme": "Heure de repli minuit",
-   "ancre": "temps-l-instant-d-une-entree"
-  },
-  {
-   "terme": "Heure de repli chaîne vide",
-   "ancre": "temps-l-instant-d-une-entree"
-  },
-  {
-   "terme": "Clé de tri d'une ligne",
-   "ancre": "temps-l-instant-d-une-entree"
-  },
-  {
-   "terme": "Ordre des lignes d'un journal",
-   "ancre": "temps-l-instant-d-une-entree"
-  },
-  {
-   "terme": "Ligne antidatée",
-   "ancre": "temps-l-instant-d-une-entree"
-  },
-  {
-   "terme": "Instant de référence injecté",
-   "ancre": "temps-l-instant-de-reference-est-injecte"
-  },
-  {
-   "terme": "Reproductibilité d'un calcul",
-   "ancre": "temps-l-instant-de-reference-est-injecte"
-  },
-  {
-   "terme": "Fuseau de l'appareil",
-   "ancre": "temps-fuseau-et-langue"
-  },
-  {
-   "terme": "Fuseau capté par un envoi de retour",
-   "ancre": "temps-fuseau-et-langue"
-  },
-  {
-   "terme": "Langue et temps (indépendance)",
-   "ancre": "temps-fuseau-et-langue"
-  },
-  {
-   "terme": "Journée",
-   "ancre": "temps-la-journee"
-  },
-  {
-   "terme": "Plafond quotidien d'un journal",
-   "ancre": "temps-la-journee"
-  },
-  {
-   "terme": "Ligne écrasée au plafond",
-   "ancre": "temps-la-journee"
-  },
-  {
-   "terme": "Total de pas (sans heure)",
-   "ancre": "temps-la-journee"
-  },
-  {
-   "terme": "Dénominateur d'une moyenne journalière",
-   "ancre": "temps-la-journee"
-  },
-  {
-   "terme": "Créneaux de trois heures (repas)",
-   "ancre": "temps-la-journee"
-  },
-  {
-   "terme": "Nuit (deux journées)",
-   "ancre": "temps-la-journee"
-  },
-  {
-   "terme": "Durée d'une nuit",
-   "ancre": "temps-la-journee"
-  },
-  {
-   "terme": "Recouvrement de deux plages de sommeil",
-   "ancre": "temps-la-journee"
-  },
-  {
-   "terme": "Temps d'éveil",
-   "ancre": "temps-la-journee"
-  },
-  {
-   "terme": "Passage de minuit deviné",
-   "ancre": "temps-la-journee"
-  },
-  {
-   "terme": "Décaler un jour de n",
-   "ancre": "temps-arithmetique-des-jours"
-  },
-  {
-   "terme": "Veille d'un jour",
-   "ancre": "temps-arithmetique-des-jours"
-  },
-  {
-   "terme": "Écart entre deux jours",
-   "ancre": "temps-arithmetique-des-jours"
-  },
-  {
-   "terme": "Quatre méthodes de recul",
-   "ancre": "temps-arithmetique-des-jours"
-  },
-  {
-   "terme": "Changement d'heure",
-   "ancre": "temps-arithmetique-des-jours"
-  },
-  {
-   "terme": "Rang de semaine",
-   "ancre": "temps-arithmetique-des-jours"
-  },
-  {
-   "terme": "Semaine de cure",
-   "ancre": "temps-arithmetique-des-jours"
-  },
-  {
-   "terme": "Déjà survenu",
-   "ancre": "temps-le-futur-et-le-deja-survenu"
-  },
-  {
-   "terme": "Entrée datée du futur",
-   "ancre": "temps-le-futur-et-le-deja-survenu"
-  },
-  {
-   "terme": "Fenêtre réglable",
-   "ancre": "temps-fenetres-reglables"
-  },
-  {
-   "terme": "Coupure d'une fenêtre",
-   "ancre": "temps-fenetres-reglables"
-  },
-  {
-   "terme": "Fenêtre personnalisée",
-   "ancre": "temps-fenetres-reglables"
-  },
-  {
-   "terme": "Valeur de départ d'une fenêtre",
-   "ancre": "temps-fenetres-reglables"
-  },
-  {
-   "terme": "Fenêtres fixes des bilans",
-   "ancre": "temps-fenetres-fixes"
-  },
-  {
-   "terme": "Sept journées révolues",
-   "ancre": "temps-fenetres-fixes"
-  },
-  {
-   "terme": "Série journalière de quatorze journées",
-   "ancre": "temps-fenetres-fixes"
-  },
-  {
-   "terme": "Quinze derniers jours (nom)",
-   "ancre": "temps-fenetres-fixes"
-  },
-  {
-   "terme": "Comparaison de deux moitiés",
-   "ancre": "temps-fenetres-fixes"
-  },
-  {
-   "terme": "Seuil de stabilité 5 %",
-   "ancre": "temps-fenetres-fixes"
-  },
-  {
-   "terme": "Prises réputées actives (60 jours)",
-   "ancre": "temps-fenetres-fixes"
-  },
-  {
-   "terme": "Plancher de trois repas analysables",
-   "ancre": "temps-fenetres-fixes"
-  },
-  {
-   "terme": "Date de première ouverture",
-   "ancre": "temps-anciennete"
-  },
-  {
    "terme": "Âge d'usage",
-   "ancre": "temps-anciennete"
+   "ancre": "temps-l-anciennete-d-usage"
   },
   {
-   "terme": "Seuil de sept jours",
-   "ancre": "temps-anciennete"
-  },
-  {
-   "terme": "Durée d'une perte de poids",
-   "ancre": "temps-anciennete"
-  },
-  {
-   "terme": "Horodatage d'archive",
-   "ancre": "temps-horodatages-d-archive"
-  },
-  {
-   "terme": "Deux copies dans la même seconde",
-   "ancre": "temps-horodatages-d-archive"
-  },
-  {
-   "terme": "Jour de rappel hebdomadaire",
-   "ancre": "temps-donnees-temporelles-du-profil"
-  },
-  {
-   "terme": "Heure de rappel",
-   "ancre": "temps-donnees-temporelles-du-profil"
-  },
-  {
-   "terme": "Intervalle d'un rappel de prise",
-   "ancre": "temps-donnees-temporelles-du-profil"
-  },
-  {
-   "terme": "Préavis d'un rappel",
-   "ancre": "temps-donnees-temporelles-du-profil"
-  },
-  {
-   "terme": "Rendez-vous médical",
-   "ancre": "temps-donnees-temporelles-du-profil"
+   "terme": "Ancienneté d'usage",
+   "ancre": "temps-l-anciennete-d-usage"
   },
   {
    "terme": "Année de naissance",
    "ancre": "temps-l-annee-de-naissance"
   },
   {
-   "terme": "Bornes de l'âge (1 à 130)",
-   "ancre": "temps-l-annee-de-naissance"
+   "terme": "Arithmétique des jours",
+   "ancre": "temps-l-arithmetique-des-jours"
+  },
+  {
+   "terme": "Arrondi aux minutes rondes",
+   "ancre": "temps-l-heure-murale-et-les-minutes-rondes"
+  },
+  {
+   "terme": "Compte à rebours (date d'échéance)",
+   "ancre": "temps-les-donnees-temporelles-du-profil"
+  },
+  {
+   "terme": "Coupure d'une fenêtre",
+   "ancre": "temps-les-fenetres-reglables"
+  },
+  {
+   "terme": "Créneau de trois heures",
+   "ancre": "temps-la-journee"
+  },
+  {
+   "terme": "Date de première ouverture",
+   "ancre": "temps-l-anciennete-d-usage"
+  },
+  {
+   "terme": "Déjà survenu",
+   "ancre": "temps-le-futur-et-le-deja-survenu"
+  },
+  {
+   "terme": "Durée d'une nuit",
+   "ancre": "temps-l-instant-d-une-entree"
+  },
+  {
+   "terme": "Écart entre deux jours",
+   "ancre": "temps-l-arithmetique-des-jours"
+  },
+  {
+   "terme": "Fenêtre personnalisée (custom)",
+   "ancre": "temps-les-fenetres-reglables"
+  },
+  {
+   "terme": "Fenêtre réglable",
+   "ancre": "temps-les-fenetres-reglables"
+  },
+  {
+   "terme": "Fenêtres fixes des bilans",
+   "ancre": "temps-les-fenetres-fixes-des-bilans"
+  },
+  {
+   "terme": "Fuseau de l'appareil",
+   "ancre": "temps-le-fuseau-et-la-langue"
+  },
+  {
+   "terme": "Garde de domaine de l'heure",
+   "ancre": "temps-l-heure-murale-et-les-minutes-rondes"
+  },
+  {
+   "terme": "Heure absente",
+   "ancre": "temps-ce-que-vaut-une-heure-absente"
+  },
+  {
+   "terme": "Heure murale",
+   "ancre": "temps-l-heure-murale-et-les-minutes-rondes"
+  },
+  {
+   "terme": "Horodatage d'archive",
+   "ancre": "temps-les-horodatages-d-archive"
+  },
+  {
+   "terme": "Instant absolu",
+   "ancre": "temps-les-representations-du-temps"
+  },
+  {
+   "terme": "Instant d'une entrée",
+   "ancre": "temps-l-instant-d-une-entree"
+  },
+  {
+   "terme": "Jour local",
+   "ancre": "temps-le-jour-local"
+  },
+  {
+   "terme": "Journée",
+   "ancre": "temps-la-journee"
+  },
+  {
+   "terme": "Langue et temps",
+   "ancre": "temps-le-fuseau-et-la-langue"
+  },
+  {
+   "terme": "Minutes rondes",
+   "ancre": "temps-l-heure-murale-et-les-minutes-rondes"
+  },
+  {
+   "terme": "Nuit",
+   "ancre": "temps-la-nuit-et-le-temps-d-eveil"
+  },
+  {
+   "terme": "Ordre d'un journal",
+   "ancre": "temps-l-instant-d-une-entree"
+  },
+  {
+   "terme": "Pesée unique par journée",
+   "ancre": "temps-la-journee"
+  },
+  {
+   "terme": "Plafond quotidien",
+   "ancre": "temps-les-plafonds-quotidiens"
+  },
+  {
+   "terme": "Rang de semaine",
+   "ancre": "temps-l-arithmetique-des-jours"
+  },
+  {
+   "terme": "Rappel (données temporelles)",
+   "ancre": "temps-les-donnees-temporelles-du-profil"
+  },
+  {
+   "terme": "Recul de n jours",
+   "ancre": "temps-les-fenetres-fixes-des-bilans"
+  },
+  {
+   "terme": "Semaine",
+   "ancre": "temps-la-semaine"
+  },
+  {
+   "terme": "Semaine civile",
+   "ancre": "temps-la-semaine"
+  },
+  {
+   "terme": "Sens d'évolution d'une série",
+   "ancre": "temps-les-fenetres-fixes-des-bilans"
+  },
+  {
+   "terme": "Temps d'éveil",
+   "ancre": "temps-la-nuit-et-le-temps-d-eveil"
+  },
+  {
+   "terme": "Total de pas",
+   "ancre": "temps-la-journee"
+  },
+  {
+   "terme": "Traitements réputés actifs",
+   "ancre": "temps-les-fenetres-fixes-des-bilans"
+  },
+  {
+   "terme": "Trou de datation",
+   "ancre": "temps-les-representations-du-temps"
   }
  ]
 }

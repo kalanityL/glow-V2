@@ -1,94 +1,108 @@
 <section id="invariants">
   <h2>9. Les invariants <a class="retour" href="#sommaire">↑ sommaire</a></h2>
-  <p>Ce chapitre énonce dix-neuf propriétés que le modèle doit vérifier, avec l'endroit du code qui les tient, le test qui les épingle quand il existe, et la conséquence de leur chute. Elles priment sur les règles particulières des chapitres précédents : une capacité qui les contredirait n'est pas une capacité du produit.</p>
-  <p>Elles ne sont pas de même nature. Les nº 1 à 17 sont des propriétés des données, vraies après n'importe quelle écriture ; la nº 18 borne le périmètre du modèle ; la nº 19 porte sur la lecture d'une sauvegarde plus ancienne que le code qui la lit. Sept d'entre elles ne sont aujourd'hui tenues qu'en partie, et chaque écart est situé à la ligne.</p>
+  <p>Ce chapitre énonce les dix-sept propriétés que les données doivent vérifier après une écriture, et pour chacune l'endroit exact du code qui la tient : une fonction d'écriture du modèle, le code appelant en dehors du modèle, une conversion au chargement, une règle de la base distante — ou rien. Quatre d'entre elles ne sont pas tenues par le modèle, et sont énoncées ici avec cette réserve : une réimplémentation qui les croirait structurelles les perdrait.</p>
 
-  <h3 id="invariants-rien-de-derivable-n-est-stocke">1. Rien de dérivable n'est stocké</h3>
-  <p>Aucune grandeur calculable à partir d'autres attributs ne possède d'attribut à elle. La durée d'un sommeil n'existe nulle part : elle se calcule des deux instants complets par <code>sleepMinutesBetween</code> (<code>src/features/sleep/sleep.utils.ts:43</code>), seule fonction à la produire. L'apport d'une composition se recalcule par <code>computeItemsNutrition</code> (<code>src/shared/food/food.nutrition.ts:52</code>). L'IMC, la perte totale, la dépense d'une séance, le poids courant se calculent à la demande. En V2, l'âge est remplacé par l'année de naissance (<code>src/domaine/mesures.ts</code>) — un âge se périme, une année de naissance non. <span class="marque v2">V2</span></p>
-  <pre><code>duree_sommeil = instant(reveil) − instant(endormissement)   // jamais un attribut enregistré
-nutrition(composition) = Σ computeQuantityNutrition(item.qty, fiche(item.foodId))</code></pre>
-  <p><strong>Trois dérivations sont pourtant stockées :</strong></p>
+  <h3 id="invariants-ou-chaque-propriete-est-tenue">Où chaque propriété est tenue</h3>
+  <p>Une propriété tenue par une fonction d'écriture du modèle survit à n'importe quel appelant ; une propriété tenue par l'appelant disparaît avec lui, et un appelant de plus, ou une reprise de sauvegarde, la rompt sans que rien ne s'y oppose.</p>
   <table>
-    <thead><tr><th>Dérivation stockée</th><th>Où</th><th>Quand elle se rafraîchit</th></tr></thead>
+    <thead><tr><th>Propriété</th><th>Tenue par</th><th>Réserve</th></tr></thead>
     <tbody>
-      <tr><td>Les cinq valeurs nutritionnelles d'une prise alimentaire (<code>calories</code>, <code>protein</code>, <code>carbs</code>, <code>fat</code>, <code>fiber</code>)</td><td><code>SavedMealLog</code>, <code>src/types.ts</code> ; écrites par <code>src/app/useAppData.ts:445-458</code> et <code>:487-497</code></td><td>à chaque réécriture de la ligne, jamais autrement</td></tr>
-      <tr><td>Les cinq valeurs pour 100 g d'une recette, à côté de sa composition <code>recipeIngredients</code></td><td><code>UserCustomFood</code> = <code>CiqualFood</code>, <code>src/data/mealConstants.ts</code> ; écrites par <code>computeRecipeNutritionPer100</code> depuis <code>src/features/custom-food/useRecipeForm.ts:211-258</code></td><td>au ré-enregistrement de la recette seulement</td></tr>
-      <tr><td>L'âge en années</td><td><code>UserProfile.age</code>, <code>src/types.ts:109</code></td><td>jamais : il se périme tout seul</td></tr>
+      <tr><td>1. Rien de dérivable n'est stocké</td><td>modèle</td><td>une exception : les cinq attributs nutritionnels d'une prise alimentaire</td></tr>
+      <tr><td>2. Référence par identifiant</td><td>modèle</td><td>trois journaux référencent encore par nom</td></tr>
+      <tr><td>3. Supprimer supprime</td><td>modèle + conversion au chargement</td><td>—</td></tr>
+      <tr><td>4. Une valeur absente se tait</td><td>fonctions de lecture</td><td>trois définitions distinctes du dénominateur</td></tr>
+      <tr><td>5. Aucune branche ne se ferme sur un silence</td><td>modèle (V1) ; partiellement (V2)</td><td>l'effacement des réponses d'une étape sautée n'existe pas en V2</td></tr>
+      <tr><td>6. Unités canoniques</td><td>convention</td><td>aucune fonction ne la vérifie</td></tr>
+      <tr><td>7. Dates locales</td><td>modèle</td><td>cinq lectures en temps universel subsistent</td></tr>
+      <tr><td>8. L'ordre est celui des dates</td><td>fonctions de tri, à la lecture</td><td>au moins trois lectures prennent encore le dernier rang</td></tr>
+      <tr><td>9. Minutes rondes</td><td>modèle, en huit endroits d'écriture</td><td>une écriture hors de ces huit y échapperait</td></tr>
+      <tr><td>10. Une seule pesée par jour</td><td>modèle à l'ajout ; appelant à la modification</td><td>la modification ne l'applique pas</td></tr>
+      <tr><td>11. Le départ est la pesée la plus ancienne</td><td>modèle sur deux chemins d'écriture sur cinq</td><td>l'unicité du drapeau n'est garantie par aucune écriture</td></tr>
+      <tr><td>12. Deux sommeils ne se recouvrent pas</td><td>appelant, et seulement si la plage a changé</td><td>ce n'est pas un invariant des données</td></tr>
+      <tr><td>13. Les fibres ne manquent nulle part</td><td>types et fonctions de calcul</td><td>glucides et lipides manquent aux totaux du jour</td></tr>
+      <tr><td>14. Une seule personne par installation</td><td>stockage local unique + règles de la base</td><td>changer de compte n'efface pas l'historique local</td></tr>
+      <tr><td>15. Le format ne change pas sans conversion</td><td>conversion au chargement</td><td>—</td></tr>
+      <tr><td>16. Forme d'une date et d'une heure</td><td>rien</td><td>aucune écriture ne la vérifie</td></tr>
+      <tr><td>17. Bornes d'une valeur</td><td>modèle (V2) ; rien (V1)</td><td>les échelles graduées ne sont pas typées</td></tr>
     </tbody>
   </table>
-  <p>Seule la première est inscrite au « reste à faire » de <code>CONVENTIONS.md</code> ; les deux autres ne le sont pas. <span class="marque">arbitrage non validé</span> La conséquence porte : corriger la fiche d'un aliment ne corrige que ce qui se recalcule à la demande. Une recette qui le cite garde ses propres valeurs, et le code le dit — le commentaire de <code>recipesUsingFood</code> (<code>src/features/custom-food/customFood.utils.ts:119-135</code>) constate que <code>computeItemsNutrition</code> « abaisserait ses valeurs au ré-enregistrement, sans rien dire ».</p>
-  <p><strong>S'il tombe :</strong> deux valeurs existent pour une même grandeur et divergent à la première correction.</p>
-  <div class="exemple"><p>Camille corrige la fiche d'un yaourt de 60 à 54 kcal pour 100 g. Ses prises alimentaires contenant ce yaourt gardent leurs cinq valeurs jusqu'à la prochaine réécriture de la ligne ; et sa recette « bol du matin », qui contient ce yaourt, garde les siennes tant qu'elle ne la ré-enregistre pas.</p></div>
+
+  <h3 id="invariants-rien-de-derivable-n-est-stocke">1. Rien de dérivable n'est stocké</h3>
+  <p>Aucune grandeur calculable à partir d'autres attributs ne possède d'attribut à elle. La durée d'un sommeil n'existe nulle part : elle se calcule des deux instants complets par <code>sleepMinutesBetween</code> (<code>src/features/sleep/sleep.utils.ts</code>), qui est la seule fonction à la produire. L'apport d'un repas se calcule de sa composition par <code>computeItemsNutrition</code> (<code>src/shared/food/food.nutrition.ts</code>). L'IMC, la perte totale, la dépense d'une séance, le poids courant se calculent à la lecture. En V2, l'âge est remplacé par l'année de naissance (<code>src/domaine/mesures.ts</code>) — un âge se périme, une année de naissance non. <span class="marque v2">V2</span></p>
+  <pre><code>duree_sommeil = instant(reveil) − instant(endormissement)   // jamais un attribut enregistré
+nutrition_repas = Σ computeQuantityNutrition(item.qty, fiche(item.foodId))</code></pre>
+  <p><strong>Une exception subsiste dans le code :</strong> une prise alimentaire porte cinq attributs nutritionnels (<code>calories</code>, <code>protein</code>, <code>carbs</code>, <code>fat</code>, <code>fiber</code>), déclarés transitoires dans <code>src/types.ts</code> et inscrits au « Reste à faire » de <code>CONVENTIONS.md</code>. <span class="marque">arbitrage non validé</span> L'invariant vérifiable qui reste sur eux est plus faible, et il est vrai :</p>
+  <pre><code>prise.{calories,protein,carbs,fat,fiber} = computeItemsNutrition(prise.items, fiches)
+                                            AU MOMENT DE LA DERNIÈRE ÉCRITURE de la prise</code></pre>
+  <p>Ce cache est recalculé à l'ajout et à la modification d'une prise (<code>src/app/useAppData.ts</code>), jamais entre deux. Il n'est pas un détail de mise en œuvre : c'est lui, et non la composition, que lisent les totaux du jour (<code>nutritionTotalsOn</code>, <code>src/features/home/homeOverview.ts</code>), les moyennes alimentaires (<code>src/features/meal-journal/mealAverages.ts</code>), la composition repas/en-cas (<code>src/features/meal-charts/mealVsSnack.ts</code>) et la synthèse du rapport. Un seul module recalcule à la lecture, celui du journal des repas (<code>src/versions/mixte/features/meal-journal/MealDayGroup.tsx</code>). Corriger une fiche d'aliment ne corrige donc pas l'historique déjà enregistré : elle ne change une prise qu'à la prochaine écriture de cette prise.</p>
+  <p><strong>S'il tombe :</strong> deux valeurs existent pour une même grandeur et divergent à la première correction. C'est déjà le cas ici, et l'écart est borné par l'invariant faible ci-dessus.</p>
+  <div class="exemple"><p>Camille corrige la fiche d'un yaourt de 60 à 54 kcal pour 100 g. Ses totaux du jour, ses moyennes et son rapport ne bougent pas : ils lisent le cache des prises. Seul le journal des repas, qui recalcule, rend la valeur corrigée. Rouvrir un repas et le réenregistrer aligne sa ligne sur la fiche corrigée.</p></div>
 
   <h3 id="invariants-on-reference-par-identifiant-jamais-par-nom">2. On référence par identifiant, jamais par nom</h3>
-  <p>Une ligne qui désigne une entrée d'un catalogue en porte l'identifiant, pas le libellé. Un composant de composition porte <code>foodId</code> et <code>isCustomFood</code> ; une prise de traitement et le profil portent un identifiant du catalogue des traitements (<code>src/shared/medication/treatment.catalog.ts</code>), résolu par <code>getTreatment</code>, qui rend <code>aucun</code> pour un identifiant inconnu. Les libellés hérités sont convertis une fois au chargement par <code>toTreatmentId</code>. En V2, le traitement se choisit dans le catalogue (<code>src/domaine/traitements.ts</code>) et ne se saisit jamais librement. <span class="marque v2">V2</span></p>
+  <p>Une ligne qui désigne une entrée d'un catalogue en porte l'identifiant, pas le libellé. Un composant de repas porte <code>foodId</code> et <code>isCustomFood</code> ; une prise de traitement et le profil portent un identifiant du catalogue des traitements (<code>src/shared/medication/treatment.catalog.ts</code>), résolu par <code>getTreatment</code>, qui rend <code>aucun</code> pour un identifiant inconnu. Les libellés hérités sont convertis une fois au chargement par <code>toTreatmentId</code>. En V2, le traitement se choisit dans le catalogue (<code>src/domaine/traitements.ts</code>) et ne se saisit jamais librement. <span class="marque v2">V2</span></p>
   <table>
     <thead><tr><th>Référence</th><th>Forme stockée</th><th>Tenu</th></tr></thead>
     <tbody>
       <tr><td>Aliment d'une composition</td><td><code>foodId</code> + <code>isCustomFood</code></td><td>oui</td></tr>
-      <tr><td>Traitement d'une prise</td><td><code>brand?: string</code>, identifiant du catalogue, <em>facultatif</em></td><td>à moitié</td></tr>
-      <tr><td>Traitement du profil</td><td><code>glp1Brand</code>, identifiant du catalogue</td><td>oui</td></tr>
+      <tr><td>Traitement d'une prise, traitement du profil</td><td>identifiant du catalogue</td><td>oui</td></tr>
       <tr><td>Type d'un effet indésirable</td><td>nom (<code>type: string</code>)</td><td>non</td></tr>
       <tr><td>Discipline d'une séance</td><td>nom (<code>sport: string</code>)</td><td>non</td></tr>
       <tr><td>Activité d'un temps pour soi</td><td>nom (<code>activity: string</code>)</td><td>non</td></tr>
     </tbody>
   </table>
-  <p><strong>Quatre écarts sont constatés</strong>, tous inscrits au « reste à faire » de <code>CONVENTIONS.md</code>. Les types <code>SideEffectType</code> et <code>SportType</code> sont déclarés dans <code>src/types.ts</code> sans que <code>AppData</code> porte la table correspondante, et les trois journaux ci-dessus gardent un nom. Sur une prise de traitement, l'identifiant est facultatif : son absence n'est pas « aucun traitement » mais « celui du profil au moment de la lecture » (<code>src/types.ts:93-98</code>) — une résolution tardive que la règle est justement censée interdire. Enfin les deux champs portent encore le nom <code>brand</code> et <code>glp1Brand</code> alors qu'ils ne portent plus une marque. <span class="marque">arbitrage non validé</span></p>
-  <p><strong>S'il tombe :</strong> renommer une entrée casse l'historique qui la citait, et le nom stocké interdit toute traduction — deux langues donneraient deux valeurs pour la même chose.</p>
+  <p><strong>Trois écarts sont constatés dans le code</strong> : les types <code>SideEffectType</code> et <code>SportType</code> sont déclarés dans <code>src/types.ts</code> sans table correspondante, et les trois journaux ci-dessus gardent un nom là où la règle demande un identifiant. La dette n'est écrite qu'en partie : le « Reste à faire » de <code>CONVENTIONS.md</code> ne nomme que <code>SideEffectLog</code> et son <code>type: string</code> ; celle du temps pour soi ne vit que dans un commentaire de <code>src/types.ts</code> ; celle de la discipline d'une séance n'est écrite nulle part. <span class="marque">arbitrage non validé</span></p>
+  <p>L'identifiant lui-même n'est pas un identifiant de catalogue mais une clé de ligne, et sa fabrication n'est pas uniforme. Les prises alimentaires emploient un UUID v7 (<code>newId</code>, <code>src/shared/platform/id.ts</code>), dont les 74 bits aléatoires rendent la collision impraticable ; six journaux emploient un préfixe suivi de l'horloge — <code>w-</code>, <code>inj-</code>, <code>se-</code>, <code>step-</code>, <code>sport-</code>, <code>metime-</code>, <code>sleep-</code> — dans <code>src/app/useAppData.ts</code>. Deux écritures dans la même milliseconde y produiraient le même identifiant ; rien ne l'empêche et rien ne le détecte.</p>
+  <p><strong>S'il tombe :</strong> renommer une entrée casse l'historique qui la citait, et le nom stocké interdit toute traduction — deux langues donneraient deux valeurs pour la même chose. Et sur les identifiants de ligne : deux lignes indiscernables, une modification qui en touche deux, une suppression qui en emporte deux.</p>
 
-  <h3 id="invariants-l-identifiant-d-une-ligne-est-unique-et-stable">3. L'identifiant d'une ligne est unique et stable</h3>
-  <p>Chaque ligne d'un journal porte un <code>id</code> qui la désigne seule, et qui ne change pas de sa vie. Les deux invariants suivants s'appuient dessus : la suppression se fait par identifiant (<code>removeLogById</code>), et le remplacement d'une pesée du jour lui conserve le sien.</p>
-  <pre><code>∀ journal, ∀ a ≠ b ∈ journal : a.id ≠ b.id
-modifier(ligne) ⇒ ligne.id inchangé</code></pre>
-  <p><strong>La stabilité est tenue ; l'unicité ne l'est pas.</strong> Hors alimentation, les identifiants valent un préfixe suivi de l'horloge : <code>w-${Date.now()}</code>, <code>inj-</code>, <code>se-</code>, <code>step-</code>, <code>sport-</code>, <code>metime-</code>, <code>sleep-</code> (<code>src/app/useAppData.ts:233-401</code>). Deux écritures dans la même milliseconde donnent le même identifiant. Seules les prises alimentaires emploient un UUID v7 (<code>newId</code>, <code>src/shared/platform/id.ts</code>), qui est la convention écrite du nouveau modèle. Aucun test ni aucune garde ne couvre le cas. <span class="marque">arbitrage non validé</span></p>
-  <p><strong>S'il tombe :</strong> supprimer une ligne en supprime deux, et modifier l'une modifie l'autre.</p>
-
-  <h3 id="invariants-supprimer-supprime">4. Supprimer supprime</h3>
-  <p>La ligne supprimée quitte la sauvegarde. <code>removeLogById</code> (<code>src/shared/model/logbook.ts:42</code>) filtre le tableau ; plus aucune écriture ne pose de marque de suppression. Les sauvegardes antérieures sont nettoyées une fois au chargement par <code>purgeDeleted</code> (<code>src/shared/model/purgeDeleted.ts</code>), qui retire les lignes marquées et l'attribut de marque des autres. Il n'existe plus de lecture filtrée : la sauvegarde est l'ensemble des données. Tenu par <code>src/shared/model/logbook.test.ts</code> et <code>src/shared/model/purgeDeleted.test.ts</code>.</p>
+  <h3 id="invariants-supprimer-supprime">3. Supprimer supprime</h3>
+  <p>La ligne supprimée quitte la sauvegarde. <code>removeLogById</code> (<code>src/shared/model/logbook.ts</code>) filtre le tableau ; plus aucune écriture ne pose de marque de suppression. Les sauvegardes antérieures ont été nettoyées une fois au chargement par <code>purgeDeleted</code> (<code>src/shared/model/purgeDeleted.ts</code>), qui retire les lignes marquées et l'attribut de marque des autres.</p>
   <pre><code>∀ journal, ∀ id : après supprimer(journal, id), aucune ligne de journal n'a cet id</code></pre>
-  <p><strong>Une seule suppression est refusée</strong>, au nom de l'intégrité référentielle : supprimer un aliment personnalisé qui est ingrédient d'une recette (<code>recipesUsingFood</code>, <code>src/features/custom-food/customFood.utils.ts:136-148</code>), parce que le recalcul de la recette ignorerait silencieusement ce qu'il ne résout pas.</p>
+  <p><strong>Trois suppressions sont refusées, et par trois autorités différentes.</strong> Le modèle refuse la suppression d'un aliment personnalisé qui est ingrédient d'une recette (<code>recipesUsingFood</code>, <code>src/features/custom-food/customFood.utils.ts</code>), au nom de l'intégrité référentielle : le recalcul de la recette ignorerait silencieusement ce qu'il ne résout pas. Le code appelant refuse la suppression de la pesée de départ — <code>removeLogById</code> l'exécuterait sans broncher, on ne la lui demande jamais (invariant 11). La base distante refuse la suppression d'une réponse au sondage et d'un message de retour d'usage : <code>allow delete: if false</code> dans <code>firestore.rules</code>.</p>
   <details><summary>Cas limites</summary>
     <ul>
-      <li><code>purgeDeleted</code> traverse sept journaux ; ceux du temps pour soi et du sommeil, nés après l'abandon de la suppression logique, n'y figurent pas.</li>
-      <li>La suppression du compte efface d'abord le compte distant, puis tout le stockage local ; si l'effacement du compte échoue, rien n'est effacé.</li>
-      <li>Une suppression de plus, non nommée ici, a lieu au chargement : voir l'invariant nº 19.</li>
+      <li>Un journal absent vaut le journal vide : les sauvegardes anciennes ne portent pas tous les journaux.</li>
+      <li><code>purgeDeleted</code> traverse sept journaux (pesées, journalier, prises de traitement, prises alimentaires, effets indésirables, pas, séances) ; les journaux du temps pour soi et du sommeil, nés après l'abandon de la suppression logique, n'y figurent pas.</li>
+      <li>La suppression du compte efface d'abord le compte distant, puis tout le stockage local ; si l'effacement du compte échoue, rien n'est effacé (<code>src/versions/mixte/components/DeleteAccountBlock.tsx</code>).</li>
+      <li>Une consigne périmée survit dans la documentation de <code>isDayTaken</code> (<code>src/features/weight/weight.utils.ts</code>), qui demande encore qu'on lui passe une liste filtrée « car les pesées supprimées n'occupent plus leur jour ». Il n'y a plus de lecture filtrée ; la consigne contredit l'invariant à l'endroit précis où l'unicité de la pesée du jour se joue. <span class="marque">arbitrage non validé</span></li>
     </ul>
   </details>
   <p><strong>S'il tombe :</strong> chaque lecture doit filtrer, et une seule qui l'oublie compte des lignes mortes. C'est arrivé : les plafonds quotidiens comptaient les lignes marquées, une journée vidée était déclarée pleine, et l'écriture suivante écrasait une ligne invisible.</p>
 
-  <h3 id="invariants-un-journal-absent-vaut-le-journal-vide">5. Un journal absent vaut le journal vide</h3>
-  <p>Un journal manquant d'une sauvegarde n'est pas une erreur : il vaut zéro ligne. La garantie est portée par la signature de chaque fonction du modèle, sous la forme d'un tableau vide par défaut — <code>logs: T[] = []</code> dans <code>src/shared/model/logbook.ts</code>, <code>rows: T[] = []</code> dans <code>purgeDeleted.ts</code>, <code>history: WeightLog[] = []</code> dans <code>startingWeighIn.ts</code>, <code>logs: SleepLog[] = []</code> dans <code>sleep.utils.ts</code>. C'est ce qui rend lisible une sauvegarde écrite avant qu'un journal n'existe, et donc ce qui rend tenable l'invariant nº 19.</p>
-  <pre><code>journal absent ≡ journal vide ≢ erreur</code></pre>
-  <p>Tenu par <code>src/shared/model/logbook.test.ts</code> (« traite le journal absent comme un journal vide », deux fois).</p>
-  <p><strong>S'il tombe :</strong> ouvrir une sauvegarde ancienne lève une erreur, et l'invariant nº 19 emporte avec lui tout l'historique de qui n'a pas mis à jour depuis longtemps.</p>
-
-  <h3 id="invariants-une-valeur-absente-se-tait">6. Une valeur absente se tait</h3>
-  <p>Une grandeur calculée sur un ensemble vide rend l'absence, jamais zéro, jamais une valeur de remplacement. <code>nightMinutesOn</code> rend <code>null</code> quand aucune nuit ne porte cette date (<code>src/features/sleep/sleep.utils.ts:124</code>) ; les moyennes alimentaires rendent <code>null</code> sans journée renseignée (<code>src/features/meal-journal/mealAverages.ts</code>) ; une famille de prises sans ligne n'a pas de valeur plutôt qu'une valeur nulle (<code>src/features/meal-charts/mealVsSnack.ts</code>).</p>
+  <h3 id="invariants-une-valeur-absente-se-tait">4. Une valeur absente se tait</h3>
+  <p>Une grandeur calculée sur un ensemble vide rend l'absence, jamais zéro, jamais une moyenne de remplacement. <code>nightMinutesOn</code> rend <code>null</code> quand aucune nuit ne porte cette date ; les moyennes alimentaires rendent <code>null</code> sans journée renseignée (<code>src/features/meal-journal/mealAverages.ts</code>) ; une famille de prises sans ligne n'a pas de valeur plutôt qu'une valeur nulle (<code>src/features/meal-charts/mealVsSnack.ts</code>).</p>
   <pre><code>agréger(∅) = absence      // et non 0
-0 mesuré ≠ absence        // un zéro enregistré est une valeur</code></pre>
-  <p>La réciproque tient aussi : un zéro enregistré est une donnée, et <code>fillMealHunger</code> ne touche pas une prise qui porte déjà ses deux valeurs, zéro compris.</p>
-  <p><strong>Deux écarts, de sens opposés.</strong></p>
+0 mesuré ≠ absence        // un zéro saisi est une valeur</code></pre>
+  <p>Le dénominateur d'une moyenne n'est jamais le nombre de jours de la période, mais il n'a pas la même définition partout — trois règles coexistent, chacune dans sa fonction.</p>
+  <table>
+    <thead><tr><th>Moyenne</th><th>Dénominateur</th><th>Où</th></tr></thead>
+    <tbody>
+      <tr><td>Alimentation par jour</td><td>les dates portant au moins une prise</td><td><code>mealDailyAverages</code></td></tr>
+      <tr><td>Durée d'une nuit</td><td>les dates portant au moins une nuit <em>de durée strictement positive</em></td><td><code>nightMinutesDailyAverage</code>, <code>src/features/sleep/sleep.utils.ts</code></td></tr>
+      <tr><td>Qualité d'un sommeil</td><td>la somme des durées, chaque entrée pesant la sienne ; <code>null</code> si la durée totale est nulle</td><td><code>weightedQuality</code></td></tr>
+    </tbody>
+  </table>
+  <p>La réciproque tient aussi : un zéro enregistré est une donnée. La déduction de la faim ne touche pas une prise qui porte déjà ses deux valeurs, zéro compris.</p>
+  <p><strong>S'il tombe :</strong> un zéro se lit comme une nuit blanche ou un jeûne, c'est-à-dire comme une mesure ; le produit affirmerait une chose que personne n'a saisie.</p>
+  <div class="exemple"><p>Camille n'a rien enregistré du 14 septembre : sa moyenne de fibres de la semaine se calcule sur les six journées renseignées, et sa nuit du 14 n'existe pas — elle ne vaut pas zéro minute. Une nuit du 15 saisie avec un réveil antérieur à l'endormissement ne compterait pas non plus au dénominateur de sa durée moyenne de nuit.</p></div>
+
+  <h3 id="invariants-aucune-branche-ne-se-ferme-sur-un-silence">5. Aucune branche ne se ferme sur un silence</h3>
+  <p>Une question sans réponse ne décide rien ; seule une réponse explicite ouvre ou ferme une suite. En V1, les conditions qui posent une étape s'écrivent en égalité stricte à une réponse — <code>started === true</code>, <code>hasSessions === true</code>, <code>foodDiary === true</code> (<code>src/features/onboarding/onboarding.steps.ts</code>) — et jamais en simple vérité d'une valeur possiblement absente ; quand la condition doit rester ouverte au silence, elle s'écrit en négation d'une réponse donnée (<code>started !== true</code>, <code>goal !== 'stabiliser'</code>). Ce que les réponses activent suit la même règle : un suivi devient actif sur un <code>true</code> explicite, jamais sur une absence. Sauter une étape efface les réponses qu'elle portait (<code>clearStepAnswers</code>), pour qu'une valeur orpheline ne survive pas à la question retirée.</p>
+  <pre><code>condition(étape) = f(réponses explicites)      // jamais f(absence)
+sauter(étape) ⇒ effacer(réponses de l'étape)   // V1 seulement</code></pre>
+  <p>En V2 (<code>onboarding/parcours.ts</code>, <code>onboarding/reponses.ts</code>, <code>src/app/useParcours.ts</code>), la mécanique est celle d'une condition par étape et d'une condition de validation par étape, mais elle diverge sur deux points, et l'invariant n'y est pas tenu tel quel. <span class="marque v2">V2</span></p>
   <ul>
-    <li><strong>Le dénominateur.</strong> Les moyennes alimentaires divisent par le nombre de journées <em>renseignées</em>. Deux familles de moyennes divisent au contraire par les jours <em>écoulés depuis la première entrée</em>, bornes comprises, journées vides comprises : <code>entriesWeeklyAverageSinceFirst</code> (<code>src/features/home/homeOverview.ts:727-736</code>) et les moyennes du sport (<code>src/features/sport/sportAverages.ts:105-121</code>). C'est assumé — ces journaux n'enregistrent que des événements qui ont eu lieu, leur silence est une information — et les deux rendent <code>null</code> en deçà de sept jours de recul. La règle du dénominateur dépend donc du journal, et n'est pas universelle.</li>
-    <li><strong>La faim fabriquée.</strong> Une prise alimentaire à qui manquent ses deux niveaux de faim s'en voit attribuer deux, de 0 à 5, au chargement : <code>hungerOfSavedMeal</code> (<code>src/shared/model/appData.ts:200-216</code>) les déduit du moment de la journée, des calories de la prise et d'une somme des codes de caractères de son identifiant. Une valeur absente y est rendue parlante, et rien dans la ligne n'en garde la trace — c'est le contre-exemple le plus net de cet invariant. <span class="marque">arbitrage non validé</span></li>
+    <li>La condition de l'étape du poids visé est bien une égalité stricte (<code>objectif === 'perdre'</code>) ; celle de l'étape du traitement est une simple vérité de valeur (<code>reponses.traitementCommence</code>) — exactement la forme que l'invariant interdit. Elle n'est sûre que par une propriété du type, non énoncée : <code>traitementCommence</code> est un booléen non nullable, retenu d'avance à <code>true</code>. <span class="marque">arbitrage non validé</span></li>
+    <li>Rien n'efface les réponses d'une étape retirée. Répondre « stabiliser » retire l'étape du poids visé, mais <code>poidsCible</code> garde sa valeur de départ <code>'95.0'</code>. Seules les trois réponses du traitement se défont ensemble : répondre « non » remet la forme et la spécialité à <code>null</code>, changer de forme remet la spécialité à <code>null</code>. <span class="marque">arbitrage non validé</span></li>
   </ul>
-  <p>Un troisième cas est ambigu par construction et le code le dit : une qualité de sommeil laissée à sa valeur d'ouverture ne se distingue pas d'une qualité choisie (<code>DEFAULT_SLEEP_QUALITY</code>, <code>src/features/sleep/sleep.constants.ts:59</code>) ; les nuits déjà enregistrées à 0 le resteront. <span class="marque">arbitrage non validé</span></p>
-  <p><strong>S'il tombe :</strong> un zéro se lit comme une nuit blanche ou un jeûne, c'est-à-dire comme une mesure ; le produit affirme une chose que personne n'a enregistrée.</p>
-  <div class="exemple"><p>Camille n'a rien enregistré du 14 septembre : sa moyenne de fibres de la semaine se calcule sur les six journées renseignées, et sa nuit du 14 n'existe pas — elle ne vaut pas zéro minute. Ses moments pour soi par semaine, eux, se divisent bien par sept, journée vide comprise.</p></div>
+  <p>Deux étapes, et non une, rendent la condition de validation fausse : celle du traitement tant que la forme et la spécialité manquent toutes deux, et la dernière quand un mot de passe est commencé sans tenir ses huit signes. Un mot de passe vide la laisse vraie. Le commentaire du code, qui n'en annonce qu'une, est périmé.</p>
+  <p><strong>S'il tombe :</strong> une question sautée décide à la place de la personne, et le produit lui attribue un état qu'elle n'a pas déclaré — ou conserve une réponse à une question qui ne lui a jamais été posée.</p>
 
-  <h3 id="invariants-aucune-suite-ne-se-decide-sur-un-silence">7. Aucune suite ne se décide sur un silence</h3>
-  <p>Une question sans réponse ne décide rien ; seule une réponse explicite ouvre ou ferme une suite. Les conditions qui font poser une question s'écrivent en égalité stricte à une réponse (<code>started === true</code>, <code>hasSessions === true</code>, <code>foodDiary === true</code>, <code>src/features/onboarding/onboarding.steps.ts:83-93</code>) et jamais en simple vérité d'une valeur possiblement absente ; quand la condition doit rester ouverte au silence, elle s'écrit en négation d'une réponse donnée (<code>goal !== 'stabiliser'</code>). Ce que les réponses activent suit la même règle : une fonctionnalité s'active sur un <code>true</code> explicite, jamais sur une absence.</p>
-  <pre><code>question posée = f(réponses explicites)     // jamais f(absence)</code></pre>
-  <p><strong>En V1, une question retirée emporte ses réponses</strong> : <code>clearStepAnswers</code> et la table <code>STEP_ANSWER_KEYS</code> (<code>src/features/onboarding/onboarding.steps.ts:155-190</code>) effacent les clés qu'elle portait, pour qu'une valeur orpheline ne survive pas. Tenu par <code>src/features/onboarding/onboarding.steps.test.ts</code>.</p>
-  <p><strong>En V2 la mécanique est reprise, mais amputée</strong> (<code>parcours.ts</code>, <code>useParcours.ts</code>). <code>montre</code> dit quelles réponses conditionnent quelle question et <code>etapesVisibles</code> les filtre ; <code>peutValider</code> porte <em>deux</em> conditions bloquantes et non une : le traitement, tant que la forme et la spécialité manquent, et le compte, dès qu'un mot de passe est commencé sans atteindre huit signes — un mot de passe vide, lui, ne bloque pas (<code>parcours.ts:98-107</code>, <code>motDePasseValide</code> de <code>src/domaine/compte.ts</code>). Il n'existe en revanche <strong>aucun équivalent de <code>clearStepAnswers</code></strong> : passer de « perdre » à « stabiliser » retire la question du poids visé, mais <code>poidsCible</code> garde sa valeur. Seul le triplet du traitement se défait ensemble (<code>repondreTraitementCommence</code>, <code>repondreForme</code>). <span class="marque v2">V2</span> <span class="marque">arbitrage non validé</span> Tenu par <code>parcours.test.ts</code> et <code>compte.test.ts</code>.</p>
-  <p><strong>S'il tombe :</strong> une question sautée décide à la place de la personne, et le produit lui attribue un état qu'elle n'a pas déclaré.</p>
-
-  <h3 id="invariants-les-unites-stockees-sont-canoniques">8. Les unités stockées sont canoniques</h3>
-  <p>Chaque grandeur a une unité de stockage unique, et aucune étiquette d'unité n'accompagne une valeur enregistrée. Le système d'unités ne concerne que les deux bouts — ce qui entre, ce qui sort ; il ne touche pas la valeur écrite.</p>
+  <h3 id="invariants-les-unites-stockees-sont-canoniques">6. Les unités stockées sont canoniques</h3>
+  <p>Chaque grandeur a une unité de stockage unique, et aucune étiquette d'unité n'accompagne une valeur enregistrée. Le système d'unités choisi ne décide que de la saisie et de la restitution ; il ne touche jamais la valeur écrite. Aucune fonction ne vérifie cette propriété : elle tient par convention et par la localisation des conversions.</p>
   <table>
     <thead><tr><th>Grandeur</th><th>Unité stockée</th></tr></thead>
     <tbody>
-      <tr><td>Poids, mesures corporelles</td><td>kilogramme (une décimale, <code>roundWeight</code>), centimètre</td></tr>
+      <tr><td>Poids, mesures corporelles</td><td>kilogramme (une décimale), centimètre</td></tr>
       <tr><td>Taille</td><td>centimètre</td></tr>
       <tr><td>Quantité d'aliment</td><td>gramme pour un solide, millilitre pour un liquide</td></tr>
       <tr><td>Dose d'un traitement</td><td>milligramme</td></tr>
@@ -97,157 +111,183 @@ modifier(ligne) ⇒ ligne.id inchangé</code></pre>
       <tr><td>Énergie, macronutriments, fibres</td><td>kilocalorie, gramme</td></tr>
     </tbody>
   </table>
-  <p>Litres, kilomètres, livres, pouces et portions n'existent qu'aux deux bouts.</p>
-  <p><strong>En V2, la règle tient pour la taille et tombe pour le poids.</strong> <code>src/domaine/unites.ts</code> ne porte qu'une conversion, celle du pouce vers le centimètre et retour, appliquée aux deux bouts ; la taille recueillie est en centimètres quoi qu'il arrive (<code>tailleCm: number</code> dans <code>reponses.ts</code>). Le poids, lui, n'a <em>aucune</em> conversion : il est recueilli sous la forme d'une chaîne sans unité (<code>poids: '95.0'</code>), produite dans l'unité du système choisi et bornée par <code>POIDS_MAX[unite]</code>. En impérial, la valeur recueillie est donc en livres. La ligne « poids → kilogramme » du tableau ne vaut que pour la V1. <span class="marque v2">V2</span> <span class="marque">arbitrage non validé</span></p>
-  <p>Le pouce, enfin, n'est pas confiné aux deux fonctions de conversion comme leur commentaire l'affirme : il figure aussi dans <code>UNITES</code> et <code>UNITES_DU_SYSTEME</code> (<code>src/domaine/unites.ts:31</code> et <code>:60-63</code>) et dans <code>TAILLE_BORNES</code> (<code>src/domaine/mesures.ts:56-59</code>). Tenu, pour la taille, par <code>unites.test.ts</code>.</p>
+  <p>Litres, kilomètres, livres, pouces et portions n'existent qu'aux deux bouts. En V2, la conversion du pouce vit dans <code>tailleAffichee</code> et <code>tailleEnCm</code> (<code>src/domaine/unites.ts</code>), qui se disent en commentaire « les seuls endroits où le pouce existe » ; c'est inexact — <code>TAILLE_BORNES</code> écrit les bornes en pouces (20 à 118) dans <code>src/domaine/mesures.ts</code>, et <code>UNITES_DU_SYSTEME</code> associe <code>'in'</code> au système impérial dans <code>unites.ts</code>. <span class="marque">arbitrage non validé</span> Le plafond du poids, 999 kg ou 2000 lb, vit dans <code>mesures.ts</code> et non dans <code>unites.ts</code> : deux nombres ronds choisis chacun dans son unité, et non la conversion l'un de l'autre. <span class="marque v2">V2</span></p>
   <p><strong>S'il tombe :</strong> changer de système d'unités change la valeur des mesures déjà prises, et une même table mêle des grandeurs qui ne se comparent pas.</p>
-  <div class="exemple"><p>Camille mesure 168 cm : c'est ce qui est enregistré, quel que soit le système. En impérial, sa taille entre et sort en pouces — 66 in — et la valeur enregistrée ne bouge pas. Son poids de 96,0 kg, en revanche, serait aujourd'hui recueilli en V2 comme « 211.0 » si elle avait choisi l'impérial, sans qu'aucune unité n'accompagne le nombre.</p></div>
+  <div class="exemple"><p>Camille mesure 168 cm : c'est ce qui est stocké, quel que soit le système choisi ; en impérial elle lit 66 in. L'aller-retour n'est pas fidèle pour autant — les deux conversions arrondissent à l'entier : 167 cm se lisent aussi 66 in, et 66 in ressaisis valent 168 cm. Une taille peut donc gagner un centimètre en repassant par une saisie impériale ; 168 est l'une des rares valeurs stables.</p></div>
 
-  <h3 id="invariants-les-bornes-n-ecartent-que-l-absurde">9. Les bornes n'écartent que l'absurde</h3>
-  <p>Une borne existe pour refuser l'impossible, jamais pour dire à quelqu'un quel corps il a le droit d'avoir. Les bornes du modèle sont des constantes du domaine, hors de tout point de saisie, et les mêmes valent pour toutes les grandeurs de même nature — le poids actuel et le poids visé partagent leur plafond.</p>
-  <table>
-    <thead><tr><th>Grandeur</th><th>Bornes</th><th>Où</th></tr></thead>
-    <tbody>
-      <tr><td>Poids</td><td>1 à 999 kg, ou 1 à 2000 lb</td><td><code>POIDS_MAX</code>, <code>src/domaine/mesures.ts:22-25</code> <span class="marque v2">V2</span></td></tr>
-      <tr><td>Taille</td><td>50 à 300 cm, 20 à 118 in</td><td><code>TAILLE_BORNES</code>, <code>src/domaine/mesures.ts:56-59</code> <span class="marque v2">V2</span></td></tr>
-      <tr><td>Âge (et par là l'année de naissance)</td><td>1 à 130 ans, rapportés à l'année en cours par <code>bornesAnneeNaissance</code></td><td><code>AGE_MIN</code>, <code>AGE_MAX</code>, <code>src/domaine/mesures.ts:38-47</code> <span class="marque v2">V2</span></td></tr>
-      <tr><td>Sévérité d'un effet indésirable</td><td>1 à 5</td><td><code>src/types.ts:437</code>, en commentaire</td></tr>
-      <tr><td>Niveau de faim</td><td>0 à 5</td><td>clamp de <code>dansEchelle</code>, <code>src/shared/model/appData.ts:197</code></td></tr>
-      <tr><td>Qualité d'un sommeil</td><td>0 à 5, six termes nommés</td><td><code>SLEEP_QUALITY_LABELS</code>, <code>src/features/sleep/sleep.constants.ts:26-33</code></td></tr>
-    </tbody>
-  </table>
-  <p>Les deux plafonds du poids ne sont pas la conversion l'un de l'autre — 999 kg font 2 202 lb — mais deux nombres ronds choisis chacun dans son unité. Les bornes de la taille en pouces, elles, <em>sont</em> la conversion arrondie de celles en centimètres. Tenu par <code>unites.test.ts</code> (« n'écartent que l'absurde »).</p>
-  <p><strong>Trois échelles ne sont pas tenues par le type.</strong> <code>HungerLevel</code> (<code>0 | 1 | … | 5</code>) et <code>SeverityLevel</code> (<code>1 | … | 5</code>) sont déclarés dans <code>src/types.ts</code> et jamais employés : les champs correspondants valent <code>number</code>, avec un commentaire pour toute borne. Aucune écriture de la V1 ne vérifie une borne — <code>roundWeight</code> arrondit sans plafonner. La dette est inscrite dans <code>CONVENTIONS.md</code>. <span class="marque">arbitrage non validé</span></p>
-  <p><strong>S'il tombe :</strong> une valeur absurde traverse tout l'historique et fausse chaque moyenne, chaque écart et chaque échelle qui la croise, sans jamais se signaler.</p>
-
-  <h3 id="invariants-les-dates-sont-locales">10. Les dates sont locales</h3>
-  <p>Un jour s'écrit <code>AAAA-MM-JJ</code> et une heure <code>HH:MM</code>, sans fuseau : ce sont des heures murales, celles que la personne a vécues. Elles se produisent et se lisent segment par segment — <code>getLocalDateStr</code> lit l'année, le mois et le jour locaux ; <code>instantMinutes</code> découpe la chaîne plutôt que de la donner à un constructeur de date, qui l'interpréterait en temps universel. Seules les métadonnées techniques (<code>createdAt</code>, <code>updatedAt</code>, sur les recettes et les aliments personnalisés) sont des instants absolus en millisecondes.</p>
+  <h3 id="invariants-les-dates-sont-locales">7. Les dates sont locales</h3>
+  <p>Un jour s'écrit <code>AAAA-MM-JJ</code> et une heure <code>HH:MM</code>, sans fuseau : ce sont des heures murales, celles que la personne a vécues. Elles se produisent et se lisent segment par segment — <code>getLocalDateStr</code> lit l'année, le mois et le jour locaux ; <code>instantMinutes</code> découpe la chaîne plutôt que de la donner à un constructeur de date, qui l'interpréterait en temps universel.</p>
   <pre><code>jour = AAAA-MM-JJ local        // jamais toISOString().split('T')[0]
 comparaison de jours = comparaison de chaînes</code></pre>
-  <p><strong>L'écart est plus large qu'annoncé jusqu'ici.</strong> Les constructions nues d'une date depuis la seule chaîne du jour — les seules réellement relues en temps universel, à la différence de <code>new Date(`${date}T12:00:00`)</code> qui est locale — sont trois dans le code partagé : <code>src/features/home/homeOverview.ts:225</code>, <code>src/features/steps/steps.utils.ts:170</code>, <code>src/features/injections/injections.utils.ts:140</code>. Il s'en compte une cinquantaine de plus dans les gabarits de version (<code>src/versions/</code>). À l'ouest de Greenwich, chacune décale d'un jour la date qu'elle produit. <span class="marque">arbitrage non validé</span></p>
+  <p><strong>Cinq lectures au moins construisent encore une date depuis une chaîne de jour nue</strong>, ce qui la lit en temps universel et décale d'un jour à l'ouest de Greenwich : <code>src/features/home/homeOverview.ts:225</code> (l'écart depuis la dernière prise de traitement), <code>src/features/steps/steps.utils.ts:170</code>, <code>src/features/injections/injections.utils.ts:140</code>, <code>src/shared/body-metrics/bodyMetrics.utils.ts:18</code> (le tri des mesures corporelles) et <code>src/shared/date/date.relative.ts:21</code> — dans le format de date lui-même. <span class="marque">arbitrage non validé</span></p>
+  <p>Les instants absolus en millisecondes existent, et pas seulement en métadonnée technique. On en compte trois familles : <code>createdAt</code> et <code>updatedAt</code> sur les recettes et les aliments personnalisés ; l'instant d'envoi d'un retour d'usage et d'une réponse au sondage, ramené à un jour local pour compter les envois du jour (<code>countSendsOn</code>, <code>src/features/feedback/sendDailyCap.ts</code>) ; l'horodatage d'un échec de génération du rapport, qui est une heure serveur (<code>failedAt: serverTime()</code>, <code>src/features/feedback/remoteSubmit.ts</code>). Aucune ligne d'un journal de suivi n'en porte.</p>
   <p><strong>S'il tombe :</strong> une pesée du soir se range au lendemain, et le décalage varie avec le fuseau de la personne — donc avec ses voyages.</p>
 
-  <h3 id="invariants-l-ordre-est-celui-des-dates">11. L'ordre est celui des dates</h3>
-  <p>Aucun calcul ne se fie au rang d'une ligne dans son journal. L'ordre qui compte est celui porté par les lignes : <code>byDateTimeAsc</code> et <code>byDateTimeDesc</code> (<code>src/shared/model/logOrder.ts</code>, tenu par <code>logOrder.test.ts</code>) comparent la clé <code>date + T + heure</code>, l'heure absente valant midi ; à clé égale, l'ordre du tableau subsiste. Les journaux s'écrivent par ajout en fin de tableau : leur rang est l'ordre de création, et une ligne antidatée y arrive en dernier tout en appartenant au passé.</p>
+  <h3 id="invariants-l-ordre-est-celui-des-dates">8. L'ordre est celui des dates</h3>
+  <p>Aucun calcul ne doit se fier au rang d'une ligne dans son journal. L'ordre qui compte est celui porté par les lignes : <code>byDateTimeAsc</code> et <code>byDateTimeDesc</code> (<code>src/shared/model/logOrder.ts</code>) comparent la clé <code>date + T + heure</code>, l'heure absente valant midi ; à clé égale, l'ordre du tableau subsiste. Les journaux s'écrivent par ajout en fin de tableau : leur rang est l'ordre de création, et une ligne antidatée y arrive en dernier tout en appartenant au passé.</p>
   <pre><code>cle(ligne) = `${ligne.date}T${ligne.time || '12:00'}`
 poids courant = pesée maximale pour cle, jamais pesées[pesées.length − 1]</code></pre>
+  <p><strong>L'écart est structurel, non ponctuel.</strong> Au moins trois lectures du code vivant prennent la dernière ligne du tableau pour le poids courant, dont deux dans un module partagé par toutes les versions : <code>src/utils/badgeSystem.ts:272</code> et <code>:285</code> (l'objectif protéique et le badge qui en dépend) et <code>src/versions/mixte/components/PlusMenu.tsx:40</code> ; une douzaine d'autres vivent dans les versions gelées. Une pesée antidatée y fausse la perte annoncée. <span class="marque">arbitrage non validé</span></p>
   <details><summary>Cas limites</summary>
     <ul>
-      <li>La modification d'une pesée ne retrie pas le journal : le rang stocké cesse de suivre les dates, et seul le tri par la clé rétablit l'ordre au moment du calcul. <span class="marque">arbitrage non validé</span></li>
-      <li>Trois endroits prennent encore la dernière ligne du tableau pour le poids courant, tous dans le même gabarit de version : <code>src/versions/cartes/App.tsx:362</code>, <code>src/versions/cartes/components/PlusMenu.tsx:40</code>, <code>src/versions/cartes/components/MedicalReportExport.tsx:235</code>. Une pesée antidatée y fausse la perte annoncée. <span class="marque">arbitrage non validé</span></li>
+      <li>La modification d'une pesée ne retrie pas le journal : le rang stocké cesse de suivre les dates, et seul le tri à la lecture rétablit l'ordre. L'écart est assumé et couvert par un test dans <code>src/features/weight/weighInWrites.ts</code>. <span class="marque">arbitrage non validé</span></li>
+      <li>L'ajout d'une pesée, lui, retrie le tableau par date avant de l'écrire.</li>
     </ul>
   </details>
-  <p><strong>S'il tombe :</strong> une pesée antidatée passe pour la plus récente ; la perte totale, l'IMC et tout ce qui se compte depuis le départ partent du mauvais point.</p>
+  <p><strong>S'il tombe :</strong> une pesée antidatée passe pour la plus récente ; la perte, l'IMC et le rapport se calculent depuis le mauvais point.</p>
 
-  <h3 id="invariants-les-heures-tombent-sur-des-minutes-rondes">12. Les heures tombent sur des minutes rondes</h3>
-  <p>Toute heure enregistrée appartient à l'ensemble <code>0, 10, 15, 20, 30, 40, 45, 50</code>, arrondie vers le bas. La règle porte sur la valeur écrite, et <code>snapToRoundedMinutes</code> (<code>src/shared/date/date.local.ts</code>, tenu par <code>src/shared/date/date.test.ts</code>) est appliquée aux huit endroits qui écrivent une heure.</p>
+  <h3 id="invariants-les-heures-tombent-sur-des-minutes-rondes">9. Les heures tombent sur des minutes rondes</h3>
+  <p>Toute heure enregistrée appartient à l'ensemble <code>0, 10, 15, 20, 30, 40, 45, 50</code>, arrondie vers le bas. La règle vaut pour la valeur écrite, pas seulement pour celle proposée : <code>snapToRoundedMinutes</code> (<code>src/shared/date/date.local.ts</code>) est appelée en huit endroits, et en huit seulement.</p>
   <table>
-    <thead><tr><th>Écriture</th><th>Appliquant</th></tr></thead>
+    <thead><tr><th>Écriture</th><th>Où l'arrondi est appliqué</th></tr></thead>
     <tbody>
-      <tr><td>Ajout sous plafond quotidien, fusion d'une modification</td><td><code>snapLogTime</code>, <code>src/shared/model/logbook.ts:28-32</code></td></tr>
-      <tr><td>Ajout d'une pesée, modification d'une pesée</td><td><code>src/features/weight/weighInWrites.ts:129</code> et <code>:195</code></td></tr>
-      <tr><td>Les deux heures d'un sommeil, à l'ajout comme à la modification</td><td><code>snapSleepTimes</code>, <code>src/features/sleep/sleep.utils.ts:97</code>, appelée en <code>useAppData.ts:401</code> et <code>:413</code></td></tr>
-      <tr><td>Prise alimentaire, à l'ajout comme à la modification</td><td><code>src/app/useAppData.ts:440</code> et <code>:494</code></td></tr>
-      <tr><td>Les deux heures de rappel du profil</td><td><code>src/app/useAppData.ts:205-207</code></td></tr>
+      <tr><td>Fusion d'une modification de ligne</td><td><code>applyLogUpdate</code> → <code>snapLogTime</code>, <code>src/shared/model/logbook.ts:32</code></td></tr>
+      <tr><td>Ajout sous plafond quotidien</td><td><code>addLogWithinDailyCap</code> → <code>snapLogTime</code>, mêmes lignes</td></tr>
+      <tr><td>Ajout d'une pesée</td><td><code>src/features/weight/weighInWrites.ts:129</code></td></tr>
+      <tr><td>Modification d'une pesée</td><td><code>src/features/weight/weighInWrites.ts:195</code></td></tr>
+      <tr><td>Les deux heures d'un sommeil</td><td><code>snapSleepTimes</code>, <code>src/features/sleep/sleep.utils.ts:98</code></td></tr>
+      <tr><td>Ajout d'une prise alimentaire</td><td><code>src/app/useAppData.ts:440</code></td></tr>
+      <tr><td>Modification d'une prise alimentaire</td><td><code>src/app/useAppData.ts:494</code></td></tr>
+      <tr><td>Les deux heures de rappel du profil</td><td><code>src/app/useAppData.ts:205</code> et <code>:207</code></td></tr>
     </tbody>
   </table>
-  <p><code>snapSleepTimes</code> existe parce que la règle commune ne voit que le champ <code>time</code> : sans elle, l'heure d'endormissement d'un sommeil y échapperait.</p>
   <pre><code>minutes(heure enregistrée) ∈ {0,10,15,20,30,40,45,50}
 14:37 → 14:30    14:47 → 14:45    23:59 → 23:50    14:07 → 14:00</code></pre>
+  <p>Il n'existe pas de fonction d'ajout générique hors plafond : une écriture qui n'emprunterait aucun des huit chemins échapperait à la règle. C'est exactement la raison d'être de <code>snapSleepTimes</code> — l'ajout d'un sommeil n'emprunte ni <code>applyLogUpdate</code> ni <code>addLogWithinDailyCap</code>, et <code>snapLogTime</code> ne connaît de toute façon que l'attribut <code>time</code>, jamais <code>bedTime</code>.</p>
   <details><summary>Cas limites</summary>
     <ul>
-      <li>Une chaîne qui n'est pas <code>HH:MM</code>, ou dont les minutes dépassent 59, ressort telle quelle.</li>
-      <li>Une ligne sans attribut d'heure ressort inchangée.</li>
-      <li>Quand aucune heure n'est fournie, c'est l'heure locale arrondie de la même façon qui est écrite (<code>getRoundedLocalTimeStr</code>) : l'arrondi étant vers le bas, une heure enregistrée n'est jamais dans le futur.</li>
+      <li>Une chaîne qui n'est pas <code>HH:MM</code>, ou dont les minutes dépassent 59, ressort telle quelle (voir l'invariant 16).</li>
+      <li>Une ligne sans attribut d'heure ressort inchangée ; un total journalier de pas n'en porte pas.</li>
+      <li>L'heure proposée par défaut est l'heure locale ainsi arrondie : elle n'est donc jamais dans le futur.</li>
     </ul>
   </details>
   <p><strong>S'il tombe :</strong> deux heures voisines qui décrivent le même moment ne se regroupent plus, et l'ensemble des instants cesse d'être commun à tous les journaux.</p>
 
-  <h3 id="invariants-une-seule-pesee-par-jour">13. Une seule pesée par jour</h3>
-  <p>Le journal des pesées porte au plus une ligne par date. Enregistrer une pesée sur une date déjà prise met à jour la ligne du jour au lieu d'en créer une seconde (<code>addWeighIn</code>, <code>src/features/weight/weighInWrites.ts</code>, tenu par <code>weighInWrites.test.ts</code>) : elle garde son identifiant, son drapeau de départ, et les mesures corporelles que la nouvelle valeur ne fournit pas — une mesure non fournie n'est pas un effacement (<code>keptMeasurements</code>).</p>
-  <pre><code>∀ date d : |{ p ∈ pesées : p.date = d }| ≤ 1</code></pre>
+  <h3 id="invariants-une-seule-pesee-par-jour">10. Une seule pesée par jour</h3>
+  <p>À l'ajout, le journal des pesées porte au plus une ligne par date. Enregistrer une pesée sur une date déjà prise met à jour la ligne du jour au lieu d'en créer une seconde (<code>addWeighIn</code>, <code>src/features/weight/weighInWrites.ts</code>) : elle garde son identifiant, son drapeau de départ, et les mesures corporelles que la nouvelle saisie ne fournit pas — une mesure non fournie n'est pas un effacement.</p>
+  <pre><code>∀ date d : |{ p ∈ pesées : p.date = d }| ≤ 1      // garanti par addWeighIn SEUL</code></pre>
+  <p><strong>La modification ne tient pas la règle.</strong> <code>updateWeighIn</code> ne cherche pas si la date visée est occupée : déplacer une pesée sur un jour pris n'écrase rien et produit deux lignes. Ce qui l'empêche est hors du modèle : <code>isDayTaken</code> (<code>src/features/weight/weight.utils.ts</code>), appelée par trois modules appelants seulement — <code>InlineWeighInRow.tsx:86</code>, <code>WeightCalendar.tsx:174</code>, <code>WeightTracker.tsx:373</code>, sous <code>src/versions/mixte/features/weight/</code>. Un quatrième appelant, ou une reprise de sauvegarde, produirait deux pesées le même jour sans que rien ne s'y oppose. <span class="marque">arbitrage non validé</span></p>
   <details><summary>Cas limites</summary>
     <ul>
-      <li>La modification d'une pesée n'applique pas la règle : déplacer une pesée sur une date occupée n'écrase rien, c'est l'appelant qui refuse avant d'écrire. <span class="marque">arbitrage non validé</span></li>
       <li>Le remplacement conserve la nature de la ligne remplacée : se peser le jour du départ met à jour le départ, qui reste le départ.</li>
-      <li>Aucun autre journal ne porte cette contrainte ; les autres ont des plafonds quotidiens (2 prises de traitement, 15 effets indésirables, 15 séances, 15 temps pour soi, 15 sommeils par date de réveil, 30 prises alimentaires). Les quatre premiers écrasent la dernière ligne du jour (<code>addLogWithinDailyCap</code>, <code>src/shared/model/logbook.ts:67</code>), les deux derniers refusent l'écriture.</li>
+      <li>Aucun autre journal ne porte cette contrainte ; les autres ont des plafonds quotidiens (2 prises de traitement, 15 effets indésirables, 15 séances, 15 temps pour soi, 15 sommeils par date de réveil, 30 prises alimentaires), dont les quatre premiers écrasent la dernière ligne du jour et les deux derniers refusent l'écriture.</li>
+      <li>Déplacer une prise alimentaire vers une autre date la compte contre le plafond de la date visée, et le refus laisse la prise à sa date d'origine.</li>
     </ul>
   </details>
-  <p><strong>S'il tombe :</strong> deux poids coexistent pour un même jour et aucune règle ne dit lequel est le poids de ce jour ; la perte quotidienne et la cadence hebdomadaire deviennent ambiguës.</p>
-  <div class="exemple"><p>Camille, pesée à 85,2 kg le 12 septembre au matin, se repèse le soir à 85,1 : la ligne du 12 passe à 85,1 kg, garde son identifiant et garde le tour de taille enregistré le matin.</p></div>
+  <p><strong>S'il tombe :</strong> deux poids coexistent pour un même jour et aucune règle ne dit lequel est le poids de ce jour ; la perte quotidienne, la cadence hebdomadaire et le rapport deviennent ambigus.</p>
+  <div class="exemple"><p>Camille, pesée à 85,2 kg le 12 septembre au matin, se repèse le soir à 85,1 : la ligne du 12 passe à 85,1 kg, garde son identifiant et garde le tour de taille saisi le matin. Si elle avait à la place modifié la pesée du 11 pour la dater du 12, rien dans le modèle ne l'en aurait empêchée.</p></div>
 
-  <h3 id="invariants-le-depart-est-la-pesee-la-plus-ancienne">14. Le poids de départ est la pesée la plus ancienne</h3>
-  <p>Une pesée porte le drapeau de départ, et c'est la plus ancienne. Le drapeau est reposé après chaque écriture par <code>keepStartingOnOldest</code> (<code>src/features/weight/weighInWrites.ts:60-71</code>) : si la ligne marquée n'est ni la plus ancienne ni du même jour qu'elle, le drapeau est réécrit sur toute la liste — vrai sur la plus ancienne, faux partout ailleurs. Le départ se reconnaît à son drapeau, jamais à sa valeur : repasser par ce poids, ou le dépasser, ne fait pas d'une pesée ordinaire un départ (<code>findStartingWeighIn</code>, <code>src/shared/model/startingWeighIn.ts:38</code>). La règle a un pendant symétrique à l'écriture : dater le départ après une autre pesée est refusé.</p>
-  <pre><code>depart = min(journal, byDateTimeAsc)      // à date égale, le départ en place le reste</code></pre>
-  <p><strong>L'unicité, elle, n'est pas tenue.</strong> <code>keepStartingOnOldest</code> prend le premier drapeau trouvé et s'arrête là : <code>const current = entries.find(w =&gt; w.isStartingWeight); if (current &amp;&amp; (current.id === oldest.id || current.date === oldest.date)) return entries;</code>. Si ce premier drapeau est déjà sur la plus ancienne, un second drapeau posé plus loin survit indéfiniment. Même faiblesse au chargement : <code>ensureStartingWeighIn</code> s'arrête dès qu'<em>une</em> ligne porte le drapeau. La cardinalité exacte n'est donc pas <code>= 1</code> mais <code>≥ 1</code> dès qu'une sauvegarde en portait deux. <span class="marque">arbitrage non validé</span> Tenu, pour le reste, par <code>src/features/weight/weighInWrites.test.ts</code> et <code>src/shared/model/startingWeighIn.test.ts</code>.</p>
+  <h3 id="invariants-le-poids-de-depart-est-la-pesee-la-plus-ancienne">11. Le poids de départ est la pesée la plus ancienne, et ne se supprime pas</h3>
+  <p>Après un ajout ou une modification de pesée, le drapeau de départ est reposé sur la plus ancienne ligne du journal par <code>keepStartingOnOldest</code> (<code>src/features/weight/weighInWrites.ts</code>). Le départ se reconnaît à son drapeau, jamais à sa valeur : repasser par ce poids, ou le dépasser, ne fait pas d'une pesée ordinaire un départ (<code>findStartingWeighIn</code>, <code>src/shared/model/startingWeighIn.ts</code>).</p>
+  <pre><code>depart = min(journal, byDateTimeAsc)      // à date égale, le départ en place le reste
+vider(journal des pesées) = { p : p.estDepart }</code></pre>
+  <p><strong>L'unicité du drapeau n'est garantie par aucune écriture.</strong> <code>keepStartingOnOldest</code> cherche la <em>première</em> ligne marquée du tableau et sort sans rien réécrire si elle est la plus ancienne ou du même jour qu'elle. Un journal portant deux drapeaux dont le premier trouvé est le plus ancien ressort tel quel, avec ses deux drapeaux. La propriété « exactement une pesée porte le drapeau » n'est donc pas un invariant du modèle. <span class="marque">arbitrage non validé</span></p>
+  <p><strong>Deux chemins d'écriture sur cinq seulement reposent le drapeau.</strong> <code>addWeighIn</code> et <code>updateWeighIn</code> appellent <code>keepStartingOnOldest</code> ; les trois autres ne la traversent pas (<code>src/app/useAppData.ts</code>) :</p>
+  <table>
+    <thead><tr><th>Écriture du journal des pesées</th><th>Repose le drapeau</th><th>Effet sur le départ</th></tr></thead>
+    <tbody>
+      <tr><td>Ajouter une pesée</td><td>oui</td><td>une ligne antidatée devient le départ</td></tr>
+      <tr><td>Modifier une pesée</td><td>oui</td><td>antidater une pesée lui donne le départ</td></tr>
+      <tr><td>Supprimer une pesée (<code>removeLogById</code>)</td><td>non</td><td>si la ligne marquée disparaît, le journal reste sans départ</td></tr>
+      <tr><td>Vider le journal (<code>removeAllWeightsButStarting</code>)</td><td>non</td><td>filtre <em>sur le drapeau</em> : un journal sans drapeau devient vide</td></tr>
+      <tr><td>Écrire le poids de départ depuis le profil (<code>setStartingWeight</code>)</td><td>non</td><td>modifie la ligne marquée ; sans ligne marquée, en fabrique une, datée de la veille de la plus ancienne</td></tr>
+    </tbody>
+  </table>
+  <p>La non-suppression du départ est tenue hors du modèle : <code>removeLogById</code> exécuterait la suppression, mais aucun appelant ne la lui demande sur la ligne marquée (<code>InlineWeighInRow.tsx:259</code>, <code>WeightCalendar.tsx:122</code>). Le refus de dater le départ après une autre pesée l'est de même, en trois endroits appelants (<code>InlineWeighInRow.tsx:77</code>, <code>WeightCalendar.tsx:169</code>, <code>WeightTracker.tsx:357</code>). <span class="marque">arbitrage non validé</span></p>
   <details><summary>Cas limites</summary>
     <ul>
-      <li>Un journal vide reste vide : il n'y a rien à marquer, et l'invariant ne s'applique pas.</li>
+      <li>Un journal vide reste vide : il n'y a rien à marquer.</li>
       <li>La première pesée d'un journal vide devient le départ, puisqu'elle est la seule.</li>
-      <li>Le chargement d'une sauvegarde ancienne pose le drapeau à faux sur toutes les lignes et ne fabrique une ligne de départ que si l'ancien profil portait un <code>startingWeight</code> ; sinon le journal reste sans départ. Idempotent.</li>
+      <li>La conversion d'une sauvegarde ancienne (<code>ensureStartingWeighIn</code>) pose le drapeau à faux sur toutes les lignes, sauf celle qui portait l'identifiant historique <code>starting-weight-log</code>, et ne fabrique une ligne de départ que si l'ancien profil portait un poids de départ strictement positif ; elle est idempotente.</li>
     </ul>
   </details>
-  <p><strong>S'il tombe :</strong> la perte totale, la progression d'IMC et les paliers se comptent depuis une pesée qui n'est plus la première ; et si le drapeau disparaît en silence, le produit retombe sur un poids de départ qui n'a jamais été mesuré.</p>
-  <div class="exemple"><p>Camille est partie de 96,0 kg en mai 2026. Elle retrouve une pesée du 28 avril à 97,2 kg et l'enregistre : cette ligne devient le départ, la ligne de mai perd son drapeau, et la perte totale se recompte depuis 97,2.</p></div>
+  <p><strong>S'il tombe :</strong> la perte totale, la progression d'IMC, les paliers et le rapport se comptent depuis une pesée qui n'est plus la première ; et si le drapeau disparaît en silence, vider le journal des pesées le vide entièrement.</p>
+  <div class="exemple"><p>Camille est partie de 96,0 kg en mai 2026. Elle retrouve une pesée du 28 avril à 97,2 kg et l'enregistre : <code>addWeighIn</code> repose le drapeau, cette ligne devient le départ, la ligne de mai le perd, et la perte totale se recompte depuis 97,2.</p></div>
 
-  <h3 id="invariants-le-depart-ne-se-supprime-pas">15. Le poids de départ ne se supprime pas</h3>
-  <p>C'est un invariant distinct du précédent : il est tenu par une autre fonction, dans un autre fichier, et il tombe séparément. Supprimer une pesée n'est pas une capacité applicable à la ligne marquée, et vider le journal des pesées ne garde qu'elle — <code>removeAllWeightsButStarting</code> (<code>src/shared/model/startingWeighIn.ts</code>).</p>
-  <pre><code>vider(journal des pesées) = { p ∈ journal : p.estDepart }</code></pre>
-  <p><strong>La formule se retourne quand le drapeau manque.</strong> Sur un journal où aucune ligne ne le porte — cas que l'invariant nº 14 reconnaît possible, puisque <code>ensureStartingWeighIn</code> laisse tous les drapeaux à faux quand l'ancien profil n'avait pas de <code>startingWeight</code> — le filtre ne retient rien et tout est effacé, poids de départ compris. Cette capacité ne passe pas par <code>keepStartingOnOldest</code> : rien ne garantit la présence du drapeau au moment où elle s'exécute. <span class="marque">arbitrage non validé</span></p>
-  <p><strong>S'il tombe :</strong> la référence depuis laquelle se comptent la perte totale et la progression d'IMC disparaît sans qu'aucune saisie ne puisse la reconstituer.</p>
-
-  <h3 id="invariants-deux-plages-de-sommeil-ne-se-recouvrent-pas">16. Deux plages de sommeil ne se recouvrent pas</h3>
-  <p>Une entrée de sommeil est une plage entre deux instants complets : jour et heure de l'endormissement, jour et heure du réveil, tous les quatre enregistrés. Deux plages du journal n'ont jamais d'étendue commune. Le conflit se juge avant l'écriture, par <code>sleepRangesOverlap</code> et <code>findOverlappingSleep</code> (<code>src/features/sleep/sleep.utils.ts:412-437</code>, tenu par <code>sleep.utils.test.ts</code>) ; en cas de conflit, rien n'est écrit et la ligne visée garde ses valeurs.</p>
+  <h3 id="invariants-deux-plages-de-sommeil-ne-se-recouvrent-pas">12. Deux plages de sommeil ne se recouvrent pas — règle d'écriture, non invariant</h3>
+  <p>Une entrée de sommeil est une plage entre deux instants complets — jour et heure de l'endormissement, jour et heure du réveil, tous les quatre écrits, aucun déduit. La règle est écrite dans le domaine, par <code>sleepRangesOverlap</code> et <code>findOverlappingSleep</code> (<code>src/features/sleep/sleep.utils.ts</code>), mais <strong>aucune écriture du modèle ne l'applique</strong> : ni l'ajout ni la modification d'un sommeil (<code>src/app/useAppData.ts:394-416</code>) ne les appellent. Le contrôle vit chez trois appelants — <code>src/features/sleep/useSleepForm.ts:437</code>, <code>src/versions/mixte/features/sleep/JournalEntryCard.tsx:111</code>, <code>SleepCalendar.tsx:210</code> — et il ne court que <strong>si la plage a changé</strong>, ce que le code assume : deux lignes déjà en conflit dans l'historique ne sont pas touchées, et leurs autres attributs restent modifiables. Un journal peut donc contenir, et conserver indéfiniment, des plages qui se recouvrent. <span class="marque">arbitrage non validé</span></p>
   <pre><code>recouvre(a, b) = aDebut &lt; bFin ∧ bDebut &lt; aFin      // inégalités strictes
-∀ a ≠ b du journal : ¬recouvre(a, b)</code></pre>
-  <p>Les inégalités sont strictes : le bout-à-bout est permis — se rendormir à l'heure exacte d'un réveil n'est pas dormir deux fois. Une plage sans étendue (réveil antérieur ou égal à l'endormissement) ne recouvre rien : c'est la règle de la durée nulle qui la refuse, chaque refus gardant son propre motif. La date d'une entrée est celle du réveil, ce qui fait que la nuit précédant un jour porte, par construction, la date de ce jour. <span class="marque">arbitrage non validé</span></p>
-  <p><strong>Un des quatre repères est posé par déduction avant d'être enregistré</strong> : le jour d'endormissement vaut la veille du réveil pour une nuit, le jour même pour une sieste, et se repose seul tant que les heures n'ont pas été touchées (<code>src/features/sleep/useSleepForm.ts:268</code>, <code>:322</code>, <code>:367</code>). Il est corrigeable, mais il n'est pas fourni. Le stockage, lui, porte bien les quatre.</p>
+règle appliquée à l'écriture : ¬∃ ligne du journal, hors la ligne éditée, recouvrant la plage candidate
+                               — et seulement si la plage candidate diffère de l'ancienne</code></pre>
+  <p>Les inégalités sont strictes : le bout-à-bout est permis — se rendormir à l'heure exacte d'un réveil n'est pas dormir deux fois. Une plage sans étendue (réveil antérieur ou égal à l'endormissement) ne recouvre rien : c'est la règle de la durée nulle qui la refuse, chaque refus gardant son propre motif. La date d'une entrée est celle du réveil, ce qui fait que la nuit précédant un jour porte, par construction, la date de ce jour.</p>
   <details><summary>Cas limites</summary>
     <ul>
-      <li>La ligne en cours de modification est exclue de la recherche de conflit, faute de quoi elle se verrait elle-même.</li>
-      <li>Une plage dont un des quatre repères est illisible ne recouvre rien.</li>
-      <li>Le journal du sommeil refuse au-delà de quinze entrées portant la même date de réveil, sans rien écrire.</li>
-      <li>Aucune borne haute ne pèse sur la durée d'une plage : une plage de plusieurs jours est acceptable pour le modèle.</li>
+      <li>La ligne en cours de modification est exclue de la recherche de conflit (<code>excludeId</code>), faute de quoi elle se verrait elle-même et toute retouche serait refusée.</li>
+      <li>Une plage dont un des quatre repères est illisible ne recouvre rien : <code>instantMinutes</code> rend <code>null</code> et <code>sleepRangesOverlap</code> rend faux (voir l'invariant 16).</li>
+      <li>Le journal du sommeil refuse au-delà de quinze entrées portant la même date de réveil, sans rien écrire ; ce plafond-là, lui, est bien tenu par le modèle.</li>
+      <li>Aucune borne haute ne pèse sur la durée d'une plage : plusieurs jours sont acceptables pour le modèle.</li>
     </ul>
   </details>
   <p><strong>S'il tombe :</strong> le sommeil cumulé d'une journée peut dépasser la journée, et le temps d'éveil — du réveil du matin à l'endormissement du soir, moins les siestes — devient négatif.</p>
-  <div class="exemple"><p>Camille dort du 12 septembre 23:10 au 13 septembre 07:00. Une sieste du 13 de 06:30 à 08:00 est refusée ; une sieste du 13 de 07:00 à 08:00 est acceptée, parce qu'elle touche la nuit sans la recouvrir.</p></div>
+  <div class="exemple"><p>Camille dort du 12 septembre 23:10 au 13 septembre 07:00. Une sieste du 13 de 06:30 à 08:00 est refusée ; une sieste du 13 de 07:00 à 08:00 est acceptée, parce qu'elle touche la nuit sans la recouvrir. Si deux plages en conflit existaient déjà dans son journal, elle pourrait en changer la qualité ou les notes sans que le refus ne se déclenche.</p></div>
 
-  <h3 id="invariants-les-fibres-comptent-partout">17. Les fibres comptent partout</h3>
-  <p>Partout où le produit compte des nutriments, il en compte cinq : énergie, protéines, glucides, lipides et fibres. Le type <code>Nutrition</code> et sa valeur nulle <code>ZERO_NUTRITION</code> portent les cinq attributs (<code>src/shared/food/food.nutrition.ts:4-19</code>) ; <code>computeQuantityNutrition</code> et <code>computeItemsNutrition</code> les calculent tous les cinq ; une fiche d'aliment, personnalisée ou non, donne ses fibres pour 100 g comme le reste (<code>src/data/mealConstants.ts</code>) ; le profil porte un objectif quotidien de fibres, à 25 g par défaut (<code>dailyNutritionGoals</code>, <code>src/features/home/homeOverview.ts:821-841</code>) ; un palier quotidien s'atteint indépendamment pour les protéines et pour les fibres ; les moyennes alimentaires rendent des fibres par jour ; la répartition calorique compte les fibres à part des glucides, à 2 kcal par gramme.</p>
-  <pre><code>Nutrition = { calories, protein, carbs, fat, fiber }   // cinq, toujours</code></pre>
-  <p><code>food.nutrition.ts</code> n'a pas de test à lui ; les cinq valeurs sont exercées indirectement par <code>src/shared/food/food.composition.test.ts</code> et <code>food.resolve.test.ts</code>.</p>
+  <h3 id="invariants-les-fibres-ne-manquent-nulle-part">13. Les fibres ne manquent nulle part</h3>
+  <p>Les fibres sont un nutriment à part entière et ne sont jamais rangées avec les glucides. Le type <code>Nutrition</code> et sa valeur nulle portent cinq attributs — <code>calories</code>, <code>protein</code>, <code>carbs</code>, <code>fat</code>, <code>fiber</code> ; <code>computeQuantityNutrition</code> et <code>computeItemsNutrition</code> les calculent tous les cinq ; une fiche d'aliment, personnalisée ou non, donne ses fibres pour 100 g comme le reste ; le profil porte un objectif quotidien de fibres, à 25 g par défaut (<code>dailyNutritionGoals</code>, <code>src/features/home/homeOverview.ts</code>) ; un palier du jour est franchi pour les protéines et pour les fibres indépendamment, avec deux mémoires distinctes (<code>src/features/meal-form/paliersNutritifs.ts</code>) ; la répartition calorique compte les fibres à part, à 2 kcal par gramme (<code>KCAL_PER_GRAM</code>, <code>src/features/meal-charts/mealVsSnack.ts</code>).</p>
+  <pre><code>Nutrition = { calories, protein, carbs, fat, fiber }              // cinq
+DailyNutritionGoals = MealDailyAverages = { calories, protein, fiber }   // trois</code></pre>
+  <p><strong>La symétrie s'arrête là.</strong> Le type des totaux journaliers et des objectifs n'en porte que trois — énergie, protéines, fibres — et c'est lui que lisent le total du jour (<code>nutritionTotalsOn</code>), les objectifs du profil (<code>dailyNutritionGoals</code>) et les moyennes du journal des repas (<code>MealDailyAverages</code>, <code>src/features/meal-journal/mealAverages.ts</code>). Glucides et lipides manquent à ces trois endroits ; les fibres, elles, ne manquent nulle part. <span class="marque">arbitrage non validé</span></p>
   <p><strong>S'il tombe :</strong> une composition dont les macronutriments ne rendent pas l'énergie annoncée, un objectif quotidien muet sur le nutriment que le traitement rend justement critique, et une répartition qui range les fibres avec les glucides.</p>
 
-  <h3 id="invariants-une-seule-personne-par-installation">18. Une seule personne par installation</h3>
-  <p>Le modèle porte un profil, un jeu de journaux, une installation. Il n'existe ni profils multiples, ni partage de compte, ni rôle tiers, ni comparaison entre personnes. Tout tient sous une clé de stockage unique — <code>STORAGE_KEY = 'glp1_app_companion_data'</code> (<code>src/app/useAppData.ts:80</code>) — derrière une couche de stockage unique (<code>src/shared/platform/storage.ts</code>, « ne jamais appeler <code>localStorage</code> directement en dehors de ce fichier »). Les données de suivi ne sont synchronisées nulle part : changer d'appareil ne transporte pas l'historique.</p>
-  <p><strong>Il existe cependant une base distante, et un compte.</strong> Quatre collections reçoivent des écritures du client (<code>firestore.rules</code>, <code>src/shared/platform/firestore.ts</code>, <code>src/features/auth/</code>) :</p>
-  <table>
-    <thead><tr><th>Collection</th><th>Ce qui part</th><th>Acte de la personne</th></tr></thead>
-    <tbody>
-      <tr><td><code>surveys/{uid}</code></td><td>les réponses d'un sondage</td><td>explicite</td></tr>
-      <tr><td><code>feedbacks/{uid}/messages/{id}</code></td><td>un message écrit par la personne</td><td>explicite</td></tr>
-      <tr><td><code>mail/{id}</code></td><td>la mise en file d'un courrier</td><td>conséquence des deux précédents et du suivant</td></tr>
-      <tr><td><code>reportErrors/{uid}/failures/{id}</code></td><td>l'échec d'une production de document : bornes de la période demandée, nombre d'entrées par journal, étape et durée</td><td><strong>aucun</strong> — écrit tout seul quand un compte est connecté (<code>recordReportExportFailure</code>, <code>src/features/feedback/remoteSubmit.ts:332</code>)</td></tr>
-    </tbody>
-  </table>
-  <p>Aucune de ces quatre écritures ne porte de donnée de santé : ni poids, ni dose, ni composition, ni note — <code>ReportExportFailure</code> (<code>src/features/report/exportFailure.ts:185-208</code>) ne porte que des comptes et des bornes, et le code l'écrit en toutes lettres à l'endroit de l'envoi. L'énoncé exact est donc : <em>aucune donnée de santé ne quitte l'appareil sans un acte explicite</em>, et non « le seul flux sortant est un document que la personne transmet elle-même ». <span class="marque">arbitrage non validé</span></p>
-  <p>La V2 reprend le principe dans ses <code>GUIDELINES.md</code> (§ « Le produit ») : aucune donnée de santé hors de l'appareil sans acte explicite, rien de ce que le produit calcule n'est une recommandation médicale, pas de comparaison entre personnes, pas de synchronisation multi-appareils. <span class="marque v2">V2</span></p>
+  <h3 id="invariants-une-seule-personne-par-installation">14. Une seule personne par installation</h3>
+  <p>Le modèle porte un profil, un jeu de journaux, une installation. Il n'existe ni profils multiples, ni partage de compte, ni rôle tiers, ni comparaison entre personnes. Les données de suivi vivent sur l'appareil, sous une clé de stockage unique (<code>STORAGE_KEY = 'glp1_app_companion_data'</code>, <code>src/app/useAppData.ts</code>), derrière une couche de stockage unique (<code>src/shared/platform/storage.ts</code>) ; il n'y a ni base distante ni synchronisation pour elles, et changer d'appareil ne transporte pas l'historique. Les règles de la base distante (<code>firestore.rules</code>) ne déclarent aucune collection de santé : sondage, messages de retour d'usage, journal des échecs d'export, chacun rangé sous l'identifiant du compte, chacun illisible par un autre compte.</p>
+  <p><strong>L'énoncé exact du flux sortant est négatif :</strong> aucun flux sortant ne porte de donnée de santé. Il est faux de dire que le seul flux sortant est un document produit et transmis par la personne. Trois écritures distantes partent sans transmission explicite ou sans être un document : un message de retour d'usage et une réponse au sondage vont en base ; un échec de génération du rapport écrit de lui-même, dans un <code>catch</code>, un document sous <code>reportErrors/{uid}/failures</code> et met en file un courrier d'alerte (<code>recordReportExportFailure</code>, <code>src/features/feedback/remoteSubmit.ts</code>). Ce qu'ils portent est borné et vérifié : des comptes, des bornes et des réglages, jamais un poids, une dose, un contenu de repas ni une note. <span class="marque">arbitrage non validé</span></p>
+  <p><strong>Le point de rupture est ailleurs :</strong> le compte est distant (authentification Firebase) tandis que les données sont locales, et l'effacement local n'est déclenché qu'à la suppression du compte — <code>clearAll()</code> n'a qu'un seul appelant, <code>src/versions/mixte/components/DeleteAccountBlock.tsx</code>. Se déconnecter ne touche à rien ; se connecter avec un autre compte sur le même appareil laisse en place l'historique du précédent, et la seconde personne le lit comme le sien. <span class="marque">arbitrage non validé</span></p>
+  <p>La V2 reprend l'énoncé mot pour mot dans ses principes : aucune donnée de santé ne quitte l'appareil sans une demande explicite de la personne, aucune restitution ne peut se lire comme une recommandation médicale, aucune synchronisation multi-appareils. <span class="marque v2">V2</span></p>
   <p><strong>S'il tombe :</strong> la promesse tombe avec lui — et avec elle la raison pour laquelle une personne accepte d'enregistrer son poids, ses effets indésirables et ses doses.</p>
 
-  <h3 id="invariants-une-sauvegarde-ancienne-reste-lisible">19. Une sauvegarde ancienne reste lisible</h3>
-  <p>Une sauvegarde écrite par une version antérieure s'ouvre sans erreur. La lecture (<code>src/app/useAppData.ts:96-160</code>) procède en trois temps, dans cet ordre.</p>
+  <h3 id="invariants-le-format-ne-change-pas-sans-conversion">15. Le format ne change pas sans conversion</h3>
+  <p>Une sauvegarde écrite par une version antérieure reste lisible. Le chargement (<code>src/app/useAppData.ts</code>) procède en trois temps, dans cet ordre.</p>
   <ol>
-    <li><strong>Les traces des fonctionnalités supprimées sont écartées d'abord</strong>, et non à la fin : <code>delete parsed.waterLogs</code>, <code>delete parsed.milestones</code>, puis <code>hydrationTrackingEnabled</code>, <code>dailyWaterGoalMl</code> et <code>weightGoalsEnabled</code> du profil (<code>:105-114</code>). Sans cela, l'étalement de l'objet les recopierait sans fin.</li>
-    <li><strong>Une suppression, puis sept conversions.</strong> <code>dropPreMigrationMeals</code> (<code>:127</code>) jette de la sauvegarde toute prise alimentaire sans tableau <code>items</code> — <code>savedMeals.filter((meal) =&gt; Array.isArray(meal?.items))</code>, <code>src/shared/model/appData.ts:71-74</code>. C'est la seule étape du chargement qui détruit des données de la personne, et elle est irréversible ; le critère est l'absence du champ, jamais une liste vide. Viennent ensuite, dans l'ordre : <code>dropSeedData</code>, <code>migrateTreatmentIds</code>, <code>purgeDeleted</code>, <code>mergeSideEffectNotes</code>, <code>mergeTableTennisSport</code>, <code>fillMealHunger</code>, <code>ensureStartingWeighIn</code> (<code>:130</code>).</li>
-    <li><strong>Chaque étape est idempotente, par une garde nommable.</strong></li>
+    <li><strong>Les traces des fonctionnalités supprimées sont retirées de l'objet analysé, avant toute conversion</strong> : <code>waterLogs</code>, <code>milestones</code>, et dans le profil <code>hydrationTrackingEnabled</code>, <code>dailyWaterGoalMl</code>, <code>weightGoalsEnabled</code>. Sans cela, la recopie de l'objet les propagerait sans fin.</li>
+    <li>Le profil est fusionné avec ses valeurs par défaut, et les prises alimentaires antérieures à la bascule vers les compositions sont écartées (<code>dropPreMigrationMeals</code>).</li>
+    <li>La chaîne de conversions s'applique, du plus profond au plus extérieur : <code>dropSeedData</code> (retrait des lignes d'exemple), <code>migrateTreatmentIds</code> (libellés de traitement en identifiants), <code>purgeDeleted</code> (lignes marquées supprimées), <code>mergeSideEffectNotes</code> (fusion des notes d'effet indésirable), <code>mergeTableTennisSport</code> (fusion de deux disciplines en une), <code>fillMealHunger</code> (déduction de la faim manquante), <code>ensureStartingWeighIn</code> (mise en place de la pesée de départ). Chaque étape rend le même résultat appliquée deux fois.</li>
   </ol>
-  <pre><code>charger(charger(sauvegarde)) = charger(sauvegarde)
+  <pre><code>charger(charger(sauvegarde)) = charger(sauvegarde)</code></pre>
+  <p><strong>Le corollaire est un garde-fou, et il porte sur l'écriture, pas sur l'état.</strong> Si la sauvegarde est illisible, elle est recopiée telle quelle sous une clé de secours — une seule fois, et seulement si cette clé est libre. L'état chargé en mémoire est bien, alors, un profil d'usine avec sa pesée de départ semée : ce que le garde-fou empêche, c'est de l'<em>écrire</em> par-dessus la sauvegarde. Un drapeau posé avant l'initialisation coupe toute persistance de la session (<code>mayPersist</code>, <code>src/shared/model/loadGuard.ts</code>), et l'état est signalé plutôt que tu.</p>
+  <p><strong>S'il tombe :</strong> une conversion appliquée deux fois abîme les données qu'elle devait sauver, ou une lecture ratée efface un historique en le remplaçant par des valeurs d'usine.</p>
 
-purgeDeleted        if (!('deletedAt' in row)) return row
-fillMealHunger      typeof meal.hungerBefore === 'number' &amp;&amp; typeof meal.hungerAfter === 'number'
-ensureStartingWeighIn   if (drapeaux.some(w =&gt; w.isStartingWeight)) return …</code></pre>
-  <p>Tenu par <code>src/shared/model/appData.test.ts</code>, <code>purgeDeleted.test.ts</code> et <code>startingWeighIn.test.ts</code>.</p>
-  <p><strong>Le garde-fou de la lecture ratée.</strong> Si la sauvegarde est illisible, elle est recopiée telle quelle sous une clé de secours — une seule fois, et seulement si cette clé est libre —, puis <code>loadFailed</code> est posé et <code>mayPersist</code> interdit toute écriture de la session (<code>:139-171</code>). Ce qui est empêché est l'<em>écriture</em>, pas le remplacement : l'état de la session <em>est</em> le profil d'usine, <code>INITIAL_PROFILE</code> assorti d'une pesée de départ semée à <code>INITIAL_STARTING_WEIGHT</code> (<code>:148-157</code>). Le produit tient cette session pour non écrivable ; les valeurs présentes sont des valeurs d'usine que personne n'a enregistrées.</p>
-  <p><strong>S'il tombe :</strong> une conversion appliquée deux fois abîme les données qu'elle devait sauver, ou une lecture ratée efface un historique en le recouvrant de valeurs d'usine.</p>
+  <h3 id="invariants-la-forme-d-une-date-ou-d-une-heure-n-est-verifie">16. Aucune écriture ne vérifie la forme d'une date ou d'une heure</h3>
+  <p>Toute ligne devrait porter une date <code>AAAA-MM-JJ</code> lisible et, quand elle en porte une, une heure <code>HH:MM</code>. Rien ne le tient : les deux lecteurs du dépôt se taisent au lieu de refuser.</p>
+  <table>
+    <thead><tr><th>Fonction</th><th>Entrée mal formée</th><th>Ce qu'elle rend</th></tr></thead>
+    <tbody>
+      <tr><td><code>snapToRoundedMinutes</code></td><td>chaîne hors <code>HH:MM</code>, ou minutes &gt; 59</td><td>la chaîne, telle quelle</td></tr>
+      <tr><td><code>minutesOfDay</code></td><td>idem, ou heures &gt; 23</td><td><code>null</code></td></tr>
+      <tr><td><code>instantMinutes</code></td><td>date hors <code>AAAA-MM-JJ</code>, ou heure illisible</td><td><code>null</code></td></tr>
+      <tr><td><code>sleepMinutesBetween</code></td><td>un des quatre repères illisible</td><td><code>0</code></td></tr>
+      <tr><td><code>sleepRangesOverlap</code></td><td>un repère illisible</td><td><code>false</code></td></tr>
+    </tbody>
+  </table>
+  <p>Les commentaires du code renvoient la vérification aux appelants (« c'est aux validations des saisies de la refuser »). <span class="marque">arbitrage non validé</span></p>
+  <p><strong>S'il tombe — c'est-à-dire dès qu'une date illisible entre :</strong> l'invariant 12 s'annule en silence sur la ligne concernée, sa durée vaut zéro, elle sort du dénominateur des moyennes de nuit, et rien ne la signale.</p>
+
+  <h3 id="invariants-une-valeur-graduee-reste-dans-son-echelle">17. Une valeur graduée reste dans son échelle, une mesure dans ses bornes</h3>
+  <p>La V2 tient les bornes dans le domaine, hors de toute saisie, pour que la même règle vaille partout (<code>src/domaine/mesures.ts</code>). <span class="marque v2">V2</span></p>
+  <table>
+    <thead><tr><th>Grandeur</th><th>Bornes V2</th><th>Bornes V1</th></tr></thead>
+    <tbody>
+      <tr><td>Poids</td><td><code>POIDS_MAX</code> : 999 kg, 2000 lb</td><td>aucune</td></tr>
+      <tr><td>Taille</td><td><code>TAILLE_BORNES</code> : 50–300 cm, 20–118 in</td><td>aucune</td></tr>
+      <tr><td>Âge</td><td><code>AGE_MIN</code> 1, <code>AGE_MAX</code> 130, rapportés à l'année en cours par <code>bornesAnneeNaissance</code></td><td>aucune</td></tr>
+      <tr><td>Qualité d'un sommeil</td><td>—</td><td><code>number</code></td></tr>
+      <tr><td>Sévérité d'un effet indésirable</td><td>—</td><td><code>number</code> (<code>SeverityLevel</code> = 1|2|3|4|5, déclaré, jamais employé)</td></tr>
+      <tr><td>Faim avant et après une prise</td><td>—</td><td><code>number</code> (<code>HungerLevel</code> = 0|…|5, déclaré, jamais employé)</td></tr>
+    </tbody>
+  </table>
+  <p>En V2, ces bornes ne valident plus une saisie libre : elles bornent la liste des valeurs choisissables, si bien qu'il n'y a plus de valeur incorrecte à refuser. En V1, une valeur graduée hors échelle est écrite sans résistance ; la dette est au « Reste à faire » de <code>CONVENTIONS.md</code>. <span class="marque">arbitrage non validé</span></p>
+  <p><strong>S'il tombe :</strong> une moyenne pondérée par la qualité, une répartition des sévérités ou une déduction de la faim se calculent sur une valeur qui n'appartient pas à leur échelle, sans qu'aucune lecture ne puisse le détecter.</p>
+
+  <h3 id="invariants-ce-que-devient-une-violation-deja-enregistree">Ce que devient une violation déjà enregistrée</h3>
+  <p>Les invariants ci-dessus parlent de ce qui suit une écriture. Sur une sauvegarde qui les viole déjà, le code applique trois politiques différentes, et n'en énonce aucune.</p>
+  <table>
+    <thead><tr><th>Violation déjà en place</th><th>Politique</th><th>Où</th></tr></thead>
+    <tbody>
+      <tr><td>Drapeau de départ absent, ou posé ailleurs que sur la plus ancienne</td><td>réparée rétroactivement, à la prochaine pesée ajoutée ou modifiée</td><td><code>keepStartingOnOldest</code></td></tr>
+      <tr><td>Deux drapeaux de départ</td><td>non réparée si le premier trouvé est le plus ancien</td><td><code>keepStartingOnOldest</code></td></tr>
+      <tr><td>Lignes marquées supprimées</td><td>purgées une fois, au chargement, sur sept journaux</td><td><code>purgeDeleted</code></td></tr>
+      <tr><td>Plages de sommeil qui se recouvrent</td><td>tolérées explicitement ; seules les intersections nouvelles sont refusées</td><td><code>JournalEntryCard.tsx:104-110</code></td></tr>
+      <tr><td>Deux pesées le même jour, date illisible, valeur hors échelle</td><td>aucune politique : rien ne les cherche</td><td>—</td></tr>
+    </tbody>
+  </table>
+  <p>Aucune vérification d'ensemble ne rejoue les invariants sur une sauvegarde chargée : le chargement convertit et répare au coup par coup.</p>
 </section>
