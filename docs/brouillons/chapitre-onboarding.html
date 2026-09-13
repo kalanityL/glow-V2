@@ -1,0 +1,104 @@
+<section id="onboarding">
+  <h2>3. L'arrivée : l'onboarding <a class="retour" href="#sommaire">↑ sommaire</a></h2>
+  <p>L'onboarding est le parcours du premier lancement de la <span class="marque v2">V2</span> : neuf écrans qui règlent l'application (thème, langue, unités) puis recueillent l'objectif, les poids, le traitement, l'avatar et l'identité. Il s'adresse à la personne qui installe l'application. Rien n'y est obligatoire, hormis nommer son traitement quand on dit l'avoir commencé et tenir huit signes quand on commence un mot de passe. Le questionnaire de la V1 (<code>src/features/onboarding</code>, 24 étapes) est remplacé ; il n'écrivait ni profil, ni journaux, ni modules.</p>
+
+  <h3 id="onboarding-le-parcours">Le parcours et ses boutons <span class="marque v2">V2</span></h3>
+  <p>Chaque page a trois zones : l'entête (logo, mot-symbole et, à partir de « Avez-vous commencé votre traitement GLP-1 ? », les billes du décompte), la zone du milieu, seule à défiler, et la rangée des boutons au bas de l'écran. « Précédent » est absent du premier écran. « Suivant » s'éteint, sans disparaître, quand l'étape refuse de laisser passer ; sur le dernier écran il ne porte que le mot-symbole. Le bouton « retour » de la barre du téléphone recule d'une étape et s'éteint à moitié sur la première. Chaque écran s'ouvre en haut de sa zone.</p>
+  <details><summary>Les règles derrière les chiffres</summary>
+    <ul>
+      <li>Étapes visibles selon les réponses : neuf étapes dans un ordre fixe ; « Quel poids visez-vous ? » ne se montre qu'à qui veut perdre du poids, « Quel traitement » qu'à qui a répondu Oui ; la liste se recalcule à chaque réponse. <a href="spec-technique.html#onboarding-etapes-visibles-selon-les-reponses">→ technique</a></li>
+      <li>Ce qui bloque Suivant : « Quel traitement » tant que la forme ou la spécialité manque ; « Dernière étape » si un mot de passe commencé fait moins de huit signes ; nulle part ailleurs, une question sans réponse se saute. <a href="spec-technique.html#onboarding-ce-qui-bloque-suivant">→ technique</a></li>
+      <li>Décompte des écrans : une bille par étape visible, allumée pour chaque étape passée, sans aucun texte ; l'écran courant compte parmi ceux qui restent, la dernière bille ne s'allume donc jamais dans le parcours. <span class="marque">arbitrage non validé</span> <a href="spec-technique.html#onboarding-decompte-des-ecrans">→ technique</a></li>
+      <li>Langue détectée : l'application parle la première langue du navigateur qu'elle sait servir (français, anglais), sinon le français ; le choix fait à l'écran n'est pas lu. <a href="spec-technique.html#onboarding-langue-detectee">→ technique</a></li>
+      <li>Rien n'est enregistré : les réponses vivent en mémoire, un rechargement les perd, et le bouton du dernier écran ne mène nulle part. <span class="marque non">non implémenté</span> <a href="spec-technique.html#onboarding-rien-n-est-enregistre">→ technique</a></li>
+    </ul>
+  </details>
+  <div class="exemple"><p>Camille répond « Perdre du poids » puis « Oui » : elle voit les neuf écrans. Qui répond « Stabiliser mon poids » puis « Non » n'en voit que sept, et les billes le disent.</p></div>
+
+  <h3 id="onboarding-theme">Thème <span class="marque v2">V2</span></h3>
+  <figure class="telephone" data-capture="onboarding-v2/etape-theme-ciel"><figcaption>Le premier écran, titre « Choisissez », deux cadres sans nom ; Ciel, le premier, est retenu d'avance et habille la page.</figcaption></figure>
+  <figure class="telephone" data-capture="onboarding-v2/etape-theme-ciel-fonce"><figcaption>Le même écran après un appui sur le second cadre : toute la page est passée en Ciel foncé.</figcaption></figure>
+  <p>Un cadre par thème, sans son nom écrit (il est dit aux lecteurs d'écran) ; chaque cadre montre son propre fond même quand l'autre habille la page. Toucher un cadre change aussitôt l'entête, le titre, les cadres et le bouton. Deux thèmes : Ciel (jour) et Ciel foncé (nuit). Pas de « Précédent » ; « Suivant » occupe la rangée.</p>
+  <details><summary>Les règles derrière les chiffres</summary>
+    <ul>
+      <li>Thème appliqué à la page : le thème retenu pose sa classe sur la page de l'onboarding ; le contour du téléphone et sa barre du bas ne le suivent pas. <a href="spec-technique.html#onboarding-theme-applique-a-la-page">→ technique</a></li>
+    </ul>
+  </details>
+
+  <h3 id="onboarding-langue-unites">Langue et unités <span class="marque v2">V2</span></h3>
+  <figure class="telephone" data-capture="onboarding-v2/etape-langue-unites-ciel"><figcaption>« Langue » : Français · English ; « Unités » : cm · kg · inch · pound. Camille garde Français et cm · kg.</figcaption></figure>
+  <p>Deux questions, chacune sur une ligne. Français et cm · kg sont retenus d'avance. Toucher « English » fait passer les unités à inch · pound sous les yeux ; toucher « Français » les ramène à cm · kg ; les unités se rechoisissent ensuite librement. Les unités sont branchées : le poids et la taille se saisissent dans le système choisi. La langue est une maquette : recueillie, elle ne change pas les textes.</p>
+  <details><summary>Les règles derrière les chiffres</summary>
+    <ul>
+      <li>La langue repose les unités : français → cm · kg, anglais → inch · pound, en un seul geste ; le dernier geste l'emporte sur des unités réglées à la main juste avant. <a href="spec-technique.html#onboarding-la-langue-repose-les-unites">→ technique</a></li>
+    </ul>
+  </details>
+
+  <h3 id="onboarding-objectif">Objectif <span class="marque v2">V2</span></h3>
+  <figure class="telephone" data-capture="onboarding-v2/etape-objectif-ciel"><figcaption>« Vous souhaitez… » : Perdre du poids, retenu d'avance, et Stabiliser mon poids, empilés pleine largeur.</figcaption></figure>
+  <p>Deux réponses, la première retenue d'avance. « Stabiliser mon poids » retire l'écran du poids visé du parcours ; « Perdre du poids » le remet.</p>
+
+  <h3 id="onboarding-poids">Poids actuel <span class="marque v2">V2</span></h3>
+  <figure class="telephone" data-capture="onboarding-v2/etape-poids-ciel"><figcaption>« Quel est votre poids actuel ? » ; le champ ouvert sur ses deux roues : Camille vient de poser 96 aux kilos et va toucher 0 à la centaine de grammes.</figcaption></figure>
+  <p>Un champ affiche les kilos, le séparateur de la langue (virgule en français), puis la centaine de grammes (0, 100 … 900) ; l'unité est écrite hors du champ. 95,0 est proposé d'avance. Toucher le champ ouvre deux roues ensemble, le cran retenu au milieu de chacune : les kilos de 1 à 999 (les livres de 1 à 2 000, avec une seconde roue de 0 à 9), puis la centaine de grammes. Le kilo ne referme pas le panneau ; la centaine le referme et vaut confirmation ; un clic à côté ou Échap referment aussi. Aucun message de refus : les roues n'offrent que des valeurs possibles.</p>
+  <details><summary>Les règles derrière les chiffres</summary>
+    <ul>
+      <li>Plafonds du poids par unité : 999 kg et 2 000 lb, deux plafonds ronds et non la conversion l'un de l'autre ; ils bornent la roue. <a href="spec-technique.html#onboarding-plafonds-du-poids-par-unite">→ technique</a></li>
+      <li>Poids gardé en texte avec un point : « 96.0 » quelle que soit la langue, la virgule n'étant qu'affichée ; la valeur reste celle de la roue si l'on revient changer d'unités. <a href="spec-technique.html#onboarding-poids-garde-en-texte-avec-un-point">→ technique</a></li>
+      <li>Stockage métrique du poids : un poids choisi en livres devrait être ramené en kilogrammes ; aujourd'hui il est gardé tel quel. <span class="marque non">non implémenté</span> <a href="spec-technique.html#onboarding-stockage-metrique-du-poids">→ technique</a></li>
+      <li>Ouverture et fermeture des roues : un geste ouvre les colonnes, la dernière colonne referme, le clic dehors et Échap referment ; commun au poids, à l'année de naissance et à la taille. <a href="spec-technique.html#onboarding-ouverture-et-fermeture-des-roues">→ technique</a></li>
+    </ul>
+  </details>
+  <div class="exemple"><p>Camille pèse 96 kg : roue de gauche sur 96, roue de droite sur 0. Le champ affiche 96,0 kg ; la réponse gardée est « 96.0 ».</p></div>
+
+  <h3 id="onboarding-poids-cible">Poids visé <span class="marque v2">V2</span></h3>
+  <figure class="telephone" data-capture="onboarding-v2/etape-poids-cible-ciel"><figcaption>« Quel poids visez-vous ? » ; Camille a posé 78,0 kg ; le champ s'était ouvert sur 95,0, pas sur ses 96 kg.</figcaption></figure>
+  <p>Le même écran que le poids actuel, seule la question change. Il ne se montre qu'à qui veut perdre du poids. Sa valeur est indépendante : même défaut de 95,0, aucune copie du poids actuel, aucune borne tirée de lui.</p>
+  <details><summary>Les règles derrière les chiffres</summary>
+    <ul>
+      <li>Poids actuel et poids visé jamais liés : deux réponses distinctes, mêmes bornes, même défaut, aucune mémorisation de l'une vers l'autre. <a href="spec-technique.html#onboarding-poids-actuel-et-poids-vise-jamais-lies">→ technique</a></li>
+    </ul>
+  </details>
+
+  <h3 id="onboarding-traitement">Traitement commencé ? <span class="marque v2">V2</span></h3>
+  <figure class="telephone" data-capture="onboarding-v2/etape-traitement-ciel"><figcaption>« Avez-vous commencé votre traitement GLP-1 ? », Oui retenu d'avance ; à droite de la marque, neuf billes dont cinq allumées.</figcaption></figure>
+  <p>Une question, Oui · Non sur une ligne, Oui retenu d'avance : il y a toujours une réponse, l'écran ne bloque rien. C'est ici que les billes apparaissent. Répondre Non efface la forme et la spécialité déjà choisies et retire l'écran suivant du parcours ; l'avatar vient alors tout de suite après.</p>
+  <details><summary>Les règles derrière les chiffres</summary>
+    <ul>
+      <li>Les réponses du traitement se défont ensemble : Non efface la forme et la spécialité ; changer de forme efface la spécialité. <a href="spec-technique.html#onboarding-les-reponses-du-traitement-se-defont-ensemble">→ technique</a></li>
+    </ul>
+  </details>
+
+  <h3 id="onboarding-quel-traitement">Quel traitement <span class="marque v2">V2</span></h3>
+  <figure class="telephone" data-capture="onboarding-v2/etape-quel-traitement-ciel"><figcaption>Sans titre : « Forme » Injection · Comprimé, puis « Traitement » à deux par ligne ; Camille a choisi Injection puis Ozempic, et « Suivant » vient de s'allumer.</figcaption></figure>
+  <p>Seul écran sans titre : les deux intitulés disent la question. La forme n'a pas de réponse d'avance ; la liste des spécialités n'apparaît qu'une fois la forme choisie. Injection : Ozempic, Wegovy, Mounjaro, Zepbound, Saxenda, Victoza, Trulicity, Rétatrutide, Autre. Comprimé : Rybelsus, Wegovy, Foundayo, Autre. « Suivant » reste éteint tant que la forme et la spécialité ne sont pas toutes deux choisies. Ni dose, ni date de début, ni posologie ne sont demandées.</p>
+  <details><summary>Les règles derrière les chiffres</summary>
+    <ul>
+      <li>Catalogue des traitements : treize spécialités, neuf injections et quatre comprimés, chaque forme finissant par Autre ; les noms sont des marques, non traduits, et la réponse gardée est l'identifiant (« ozempic », « wegovy-oral »). <a href="spec-technique.html#onboarding-catalogue-des-traitements">→ technique</a></li>
+      <li>Ce qui bloque Suivant : forme et spécialité exigées ici, et nulle part ailleurs sauf le mot de passe. <a href="spec-technique.html#onboarding-ce-qui-bloque-suivant">→ technique</a></li>
+    </ul>
+  </details>
+
+  <h3 id="onboarding-avatar">Avatar <span class="marque v2">V2</span></h3>
+  <figure class="telephone" data-capture="onboarding-v2/etape-avatar-ciel"><figcaption>« Composez votre avatar » : le portrait figé sous l'entête, les réglages qui défilent dessous ; Camille a choisi Femme, cheveux longs châtains, yeux noisette, expression déterminée.</figcaption></figure>
+  <p>Le créateur d'avatar de la V1, sans photo ni tirage au hasard. Le portrait change à chaque touche et reste en place pendant que défilent huit réglages : Genre (Femme · Homme · Neutre), Peau (six pastilles), Coiffure (Courts, Longs, Bouclés, Frange, En brosse, Sans cheveux), Cheveux (six pastilles), Yeux (cinq pastilles), Visage (Ovale, Rond, Carré, Cœur), Expression (Joyeuse, Déterminée, Fière, Calme), Lunettes (Oui · Non). Le genre se voit sur le vêtement et la coiffure de départ ; il n'est plus demandé ailleurs. Les pastilles n'ont pas de nom écrit ; il est dit aux lecteurs d'écran (Blond, Noisette…).</p>
+  <details><summary>Les règles derrière les chiffres</summary>
+    <ul>
+      <li>Le genre amène sa coiffure : Homme → Courts, Femme → Longs, Neutre → Bouclés, posée en même temps que le genre ; la coiffure se rechoisit juste en dessous. <a href="spec-technique.html#onboarding-le-genre-amene-sa-coiffure">→ technique</a></li>
+      <li>Avatar de départ : Neutre, visage ovale, peau beige, yeux bleus, cheveux bouclés bruns, sans lunettes, expression joyeuse. <a href="spec-technique.html#onboarding-avatar-de-depart">→ technique</a></li>
+      <li>Les couleurs sont des données : les codes des teintes choisies (peau, yeux, cheveux) font partie de la réponse ; les couleurs du dessin (pupille, bouche, vêtement) n'en font pas partie. <a href="spec-technique.html#onboarding-les-couleurs-sont-des-donnees">→ technique</a></li>
+    </ul>
+  </details>
+
+  <h3 id="onboarding-profil">Dernière étape <span class="marque v2">V2</span></h3>
+  <figure class="telephone" data-capture="onboarding-v2/etape-profil-ciel"><figcaption>« Dernière étape » : 1978 et 168 cm côte à côte, « Camille », son adresse, un mot de passe de neuf signes ; le bouton du bas ne porte que le mot-symbole.</figcaption></figure>
+  <p>Cinq champs. Année de naissance (roue, 1980 d'avance) et Taille (roue, 165 cm d'avance, en pouces si le système est impérial) côte à côte, chacune d'une seule roue qui se referme au cran choisi. Prénom, Adresse e-mail et Mot de passe en champs texte ; prénom et adresse ne sont pas vérifiés. Sous le mot de passe, « Huit caractères au moins. » est écrit d'emblée et passe à l'accent du thème dès qu'un mot de passe de un à sept signes est tapé. Un mot de passe vide laisse passer. Le bouton porte le mot-symbole (nom lu : « Entre dans la galaxie GLP1LOW ») et, aujourd'hui, ne mène nulle part.</p>
+  <details><summary>Les règles derrière les chiffres</summary>
+    <ul>
+      <li>Bornes de l'année de naissance et de la taille : année de (année en cours − 130) à (année en cours − 1), soit 1896 à 2025 en 2026 ; taille de 50 à 300 cm ou de 20 à 118 in. <a href="spec-technique.html#onboarding-bornes-de-l-annee-de-naissance-et-de-la-taille">→ technique</a></li>
+      <li>Taille stockée en centimètres : la roue en pouces affiche cm ÷ 2,54 arrondi et rend pouces × 2,54 arrondi. <a href="spec-technique.html#onboarding-taille-stockee-en-centimetres">→ technique</a></li>
+      <li>Règle du mot de passe : huit signes au moins, seule contrainte ; vide ne bloque pas ; dite avant la faute, sous le champ. <a href="spec-technique.html#onboarding-regle-du-mot-de-passe">→ technique</a></li>
+    </ul>
+  </details>
+  <div class="exemple"><p>Camille tourne la roue de 1980 à 1978 et celle de la taille de 165 à 168 ; en « inch · pound », la même roue aurait montré 66 et gardé 168 cm. Elle tape « Camille », son adresse et un mot de passe de neuf signes : le bouton reste allumé.</p></div>
+</section>

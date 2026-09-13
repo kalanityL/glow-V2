@@ -1,0 +1,256 @@
+{
+ "inventions": [
+  {
+   "categorie": "enregistrement",
+   "fonctionnalite": "Dernière étape",
+   "texte": "À l'appui sur le mot-symbole, les réponses sont écrites dans un profil et une pesée de départ (96 kg pour Camille).",
+   "origine": "GUIDELINES §5 dit qu'aucune réponse n'est enregistrée ; l'inventaire V1 (startingWeighIn.ts) attend que l'onboarding écrive le poids de départ. Rien de tel dans le code."
+  },
+  {
+   "categorie": "navigation",
+   "fonctionnalite": "Dernière étape",
+   "texte": "Le bouton final ouvre la page d'accueil, puis invite à un premier enregistrement (une injection, un comprimé, un repas) et félicite.",
+   "origine": "Principes d'onboarding de TIPS-UX-UI repris dans GUIDELINES §4 ; il n'y a pas de page d'accueil, avancer sur le dernier écran ne fait rien (useParcours.avancer)."
+  },
+  {
+   "categorie": "validation",
+   "fonctionnalite": "Dernière étape",
+   "texte": "L'adresse e-mail est vérifiée (forme nom@domaine) et le prénom borné en longueur.",
+   "origine": "EtapeProfil ne pose que type=email et autoComplete ; compte.ts ne connaît que la longueur du mot de passe."
+  },
+  {
+   "categorie": "unités",
+   "fonctionnalite": "Poids actuel et Poids visé",
+   "texte": "Un poids saisi en livres est converti en kilogrammes au stockage, et la valeur se convertit quand on revient changer d'unités.",
+   "origine": "Règle « stockage toujours métrique » de GUIDELINES §3 ; reponses.ts garde la chaîne de la roue telle quelle et remet la conversion « là où on les enregistrera »."
+  },
+  {
+   "categorie": "langue",
+   "fonctionnalite": "Langue et unités",
+   "texte": "Choisir English fait passer les textes en anglais dès l'écran suivant.",
+   "origine": "Maquette assumée (EtapeLangueUnites) ; useTextes lit seulement la langue du navigateur."
+  },
+  {
+   "categorie": "cohérence",
+   "fonctionnalite": "Poids visé",
+   "texte": "Le poids visé est borné par le poids actuel quand on veut perdre, ou proposé à partir de lui.",
+   "origine": "Refusé explicitement le 2026-09-07 (reponses.ts : « ne sont pas les memes valeurs ») ; les deux champs ne se touchent jamais."
+  },
+  {
+   "categorie": "traitement",
+   "fonctionnalite": "Quel traitement",
+   "texte": "La date de début, la dose (0,25 mg pour Camille) et la semaine de cure sont demandées avec la spécialité.",
+   "origine": "Les chiffres de Camille invitaient à les placer ici ; la V1 demandait « depuis quand » ; la V2 ne demande que la forme et la spécialité."
+  },
+  {
+   "categorie": "décompte",
+   "fonctionnalite": "Le parcours et ses boutons",
+   "texte": "Les billes ne comptent que les écrans à partir du traitement (quatre pour Camille).",
+   "origine": "ETAPE_DEBUT_DECOMPTE le laissait croire ; useParcours compte toutes les étapes visibles (neuf billes, cinq allumées sur l'écran du traitement)."
+  },
+  {
+   "categorie": "accessibilité",
+   "fonctionnalite": "Roues",
+   "texte": "Les roues se parcourent aux flèches du clavier.",
+   "origine": "GUIDELINES §5 : non fait."
+  },
+  {
+   "categorie": "saisie",
+   "fonctionnalite": "Poids actuel",
+   "texte": "Une saisie libre au clavier en plus des roues, avec message de refus hors bornes.",
+   "origine": "NumberField de la V1 ; la V2 n'a que les roues et GUIDELINES §4 dit le message « Poids saisi incorrect » supprimé."
+  },
+  {
+   "categorie": "parcours",
+   "fonctionnalite": "Le parcours et ses boutons",
+   "texte": "Un bouton « Passer cette étape » comme dans la V1, qui efface les réponses de l'étape.",
+   "origine": "onboarding.steps.ts de la V1 ; en V2, passer se fait par « Suivant » avec la valeur d'avance, et rien ne s'efface."
+  },
+  {
+   "categorie": "avatar",
+   "fonctionnalite": "Avatar",
+   "texte": "L'avatar est enregistré avec le profil et affiché dans l'entête de l'application.",
+   "origine": "Commentaires de domaine/avatar.ts (« sera enregistré avec son profil ») ; rien n'existe après l'onboarding."
+  },
+  {
+   "categorie": "thème",
+   "fonctionnalite": "Thème",
+   "texte": "Le thème choisi est mémorisé d'un lancement à l'autre.",
+   "origine": "La V1 mémorisait le thème (getSelectedTheme) ; en V2 rien n'est persisté."
+  },
+  {
+   "categorie": "parcours",
+   "fonctionnalite": "Le parcours et ses boutons",
+   "texte": "Si une réponse changée en arrière raccourcit la liste sous l'étape courante, le parcours retombe sur la dernière étape visible.",
+   "origine": "Garde-fou réel de useParcours (rang borné), mais inatteignable par les gestes de l'écran : reculer abaisse toujours le rang avant qu'une réponse change. Laissé à la spec technique."
+  }
+ ],
+ "glossaire": [
+  {
+   "terme": "Étape",
+   "definition": "Un écran du parcours, identifié : theme, langue-unites, objectif, poids, poids-cible, traitement, quel-traitement, avatar, profil."
+  },
+  {
+   "terme": "Parcours",
+   "definition": "La liste ordonnée des étapes visibles, recalculée à chaque réponse, et le rang de l'étape courante."
+  },
+  {
+   "terme": "Réponses",
+   "definition": "Tout ce que l'onboarding recueille, avec ses valeurs de départ ; vit en mémoire seulement."
+  },
+  {
+   "terme": "Billes",
+   "definition": "Le décompte des écrans : une pastille par étape visible, allumée quand l'étape est passée, sans texte."
+  },
+  {
+   "terme": "Roue (sélecteur à roues)",
+   "definition": "Colonne de crans qui s'ouvre au toucher du champ ; deux roues pour le poids, une pour l'année de naissance et la taille."
+  },
+  {
+   "terme": "Système d'unités",
+   "definition": "Métrique (cm · kg) ou impérial (inch · pound) ; décide de l'unité de saisie et d'affichage, la langue en pose le défaut."
+  },
+  {
+   "terme": "Forme",
+   "definition": "La façon de prendre le traitement : injection ou comprimé."
+  },
+  {
+   "terme": "Spécialité",
+   "definition": "Le nom de marque du traitement, choisi dans le catalogue ; chaque forme finit par Autre."
+  },
+  {
+   "terme": "Thème",
+   "definition": "L'habillage de la page, Ciel ou Ciel foncé, choisi au premier écran."
+  },
+  {
+   "terme": "Avatar",
+   "definition": "Le portrait composé : genre, visage, peau, yeux, coiffure, cheveux, lunettes, expression."
+  },
+  {
+   "terme": "Mot-symbole",
+   "definition": "Le nom GLP1LOW dessiné ; seul contenu du bouton du dernier écran."
+  },
+  {
+   "terme": "peutValider",
+   "definition": "La règle du parcours qui éteint « Suivant » quand une étape refuse de laisser passer."
+  }
+ ],
+ "index": [
+  {
+   "terme": "Thème",
+   "ancre": "onboarding-theme"
+  },
+  {
+   "terme": "Ciel, Ciel foncé",
+   "ancre": "onboarding-theme"
+  },
+  {
+   "terme": "Langue",
+   "ancre": "onboarding-langue-unites"
+  },
+  {
+   "terme": "Unités (cm · kg, inch · pound)",
+   "ancre": "onboarding-langue-unites"
+  },
+  {
+   "terme": "Objectif",
+   "ancre": "onboarding-objectif"
+  },
+  {
+   "terme": "Poids actuel",
+   "ancre": "onboarding-poids"
+  },
+  {
+   "terme": "Roues (sélecteur de poids)",
+   "ancre": "onboarding-poids"
+  },
+  {
+   "terme": "Séparateur décimal",
+   "ancre": "onboarding-poids"
+  },
+  {
+   "terme": "Poids visé",
+   "ancre": "onboarding-poids-cible"
+  },
+  {
+   "terme": "Traitement commencé",
+   "ancre": "onboarding-traitement"
+  },
+  {
+   "terme": "Forme du traitement",
+   "ancre": "onboarding-quel-traitement"
+  },
+  {
+   "terme": "Spécialité",
+   "ancre": "onboarding-quel-traitement"
+  },
+  {
+   "terme": "Catalogue des traitements",
+   "ancre": "onboarding-quel-traitement"
+  },
+  {
+   "terme": "Avatar",
+   "ancre": "onboarding-avatar"
+  },
+  {
+   "terme": "Genre",
+   "ancre": "onboarding-avatar"
+  },
+  {
+   "terme": "Coiffure",
+   "ancre": "onboarding-avatar"
+  },
+  {
+   "terme": "Année de naissance",
+   "ancre": "onboarding-profil"
+  },
+  {
+   "terme": "Taille",
+   "ancre": "onboarding-profil"
+  },
+  {
+   "terme": "Prénom",
+   "ancre": "onboarding-profil"
+  },
+  {
+   "terme": "Adresse e-mail",
+   "ancre": "onboarding-profil"
+  },
+  {
+   "terme": "Mot de passe",
+   "ancre": "onboarding-profil"
+  },
+  {
+   "terme": "Billes (décompte)",
+   "ancre": "onboarding-le-parcours"
+  },
+  {
+   "terme": "Précédent, Suivant",
+   "ancre": "onboarding-le-parcours"
+  },
+  {
+   "terme": "Bouton retour du téléphone",
+   "ancre": "onboarding-le-parcours"
+  },
+  {
+   "terme": "Étapes visibles",
+   "ancre": "onboarding-le-parcours"
+  },
+  {
+   "terme": "Questionnaire V1 (remplacé)",
+   "ancre": "onboarding"
+  }
+ ],
+ "ecrans_illustres": [
+  "onboarding-v2/etape-theme-ciel",
+  "onboarding-v2/etape-theme-ciel-fonce",
+  "onboarding-v2/etape-langue-unites-ciel",
+  "onboarding-v2/etape-objectif-ciel",
+  "onboarding-v2/etape-poids-ciel",
+  "onboarding-v2/etape-poids-cible-ciel",
+  "onboarding-v2/etape-traitement-ciel",
+  "onboarding-v2/etape-quel-traitement-ciel",
+  "onboarding-v2/etape-avatar-ciel",
+  "onboarding-v2/etape-profil-ciel"
+ ]
+}

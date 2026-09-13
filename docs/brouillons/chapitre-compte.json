@@ -1,0 +1,238 @@
+{
+ "inventions": [
+  {
+   "categorie": "Connexion",
+   "fonctionnalite": "Mot de passe oublié",
+   "texte": "Un lien « Mot de passe oublié » enverrait un e-mail de réinitialisation.",
+   "origine": "Réflexe de toute page de connexion ; LoginPage.tsx n'en a pas et auth.ts n'appelle jamais sendPasswordResetEmail."
+  },
+  {
+   "categorie": "Session",
+   "fonctionnalite": "Déconnexion volontaire",
+   "texte": "Un bouton « Se déconnecter » dans Mon compte ou dans Configuration & Plus.",
+   "origine": "Le seul appel à signOutUser est le bouton « Se reconnecter » du bloc de suppression, visible seulement après un refus auth/requires-recent-login."
+  },
+  {
+   "categorie": "Session",
+   "fonctionnalite": "Délai de connexion récente",
+   "texte": "Dire que Firebase exige une connexion de moins de cinq minutes pour supprimer le compte.",
+   "origine": "Comportement du SDK Firebase, pas du code lu ; auth.ts ne fixe aucun délai, il ne fait que prévoir le code d'erreur."
+  },
+  {
+   "categorie": "Session",
+   "fonctionnalite": "Verrou après inactivité",
+   "texte": "Redemander le mot de passe après une période d'inactivité ou à chaque lancement.",
+   "origine": "Attente naturelle sur des données de santé ; la session est gardée sans limite de durée (auth.ts, persistance locale du SDK)."
+  },
+  {
+   "categorie": "Sauvegarde",
+   "fonctionnalite": "Restauration à l'écran d'une sauvegarde illisible",
+   "texte": "Proposer à l'utilisatrice de restaurer la copie de secours au lancement suivant.",
+   "origine": "Le message du bloc dit où est la copie mais aucun écran utilisateur ne la remet ; dataBackup.ts ne sert que la page d'administration (hors périmètre)."
+  },
+  {
+   "categorie": "Sauvegarde",
+   "fonctionnalite": "Copie de secours avant suppression du compte",
+   "texte": "Faire une copie horodatée avant clearAll pour offrir un retour en arrière.",
+   "origine": "La mise en garde promet l'inverse (« Rien n'est gardé en réserve ») et clearAll efface aussi les copies existantes."
+  },
+  {
+   "categorie": "Suppression",
+   "fonctionnalite": "Effacement des données distantes",
+   "texte": "Supprimer aussi les documents Firestore liés au compte (retours, sondage, courriers).",
+   "origine": "DeleteAccountBlock n'appelle que deleteCurrentUser puis clearAll ; rien n'est écrit ni effacé en base."
+  },
+  {
+   "categorie": "Avertissement médical",
+   "fonctionnalite": "Version de l'acceptation",
+   "texte": "Redemander l'acceptation quand le texte légal change.",
+   "origine": "Le suffixe _v1 de la clé hasAcceptedMedicalDisclaimer_v1 le suggère ; aucun mécanisme ne compare une version."
+  },
+  {
+   "categorie": "V2",
+   "fonctionnalite": "Création effective du compte",
+   "texte": "Le bouton du dernier écran créerait le compte et ouvrirait une session.",
+   "origine": "GUIDELINES.md § 5 : le bouton ne mène nulle part, aucune réponse n'est enregistrée, pas de Firebase."
+  },
+  {
+   "categorie": "V2",
+   "fonctionnalite": "Format de l'adresse e-mail",
+   "texte": "Vérifier la forme de l'adresse e-mail avant d'avancer.",
+   "origine": "Le champ est type=email sans règle dans domaine/compte.ts ; la longueur du mot de passe est la seule contrainte (2026-09-08)."
+  },
+  {
+   "categorie": "Données sur l'appareil",
+   "fonctionnalite": "Quota du stockage",
+   "texte": "Chiffrer un plafond (environ 5 Mo) et prévenir avant saturation.",
+   "origine": "dataBackup.ts évoque ~5 Mo en commentaire ; aucun écran ne mesure ni n'avertit, l'écriture échoue en silence."
+  }
+ ],
+ "glossaire": [
+  {
+   "terme": "Session",
+   "definition": "État de connexion mémorisé par le SDK Firebase sur l'appareil, gardé sans limite de durée jusqu'à une déconnexion explicite."
+  },
+  {
+   "terme": "Verrou (AuthGate)",
+   "definition": "Composant qui ne rend l'application qu'à une session connectée quand Firebase est configuré ; sans configuration, il laisse passer."
+  },
+  {
+   "terme": "Firebase",
+   "definition": "Service Google qui porte les comptes (e-mail + mot de passe ou Google) ; il ne reçoit aucune donnée de suivi."
+  },
+  {
+   "terme": "Stockage local",
+   "definition": "localStorage du navigateur, atteint uniquement par shared/platform/storage.ts ; toute erreur y est avalée."
+  },
+  {
+   "terme": "Sauvegarde",
+   "definition": "Le JSON unique de toutes les données de suivi, sous la clé glp1_app_companion_data, réécrit à chaque changement."
+  },
+  {
+   "terme": "Clé de secours",
+   "definition": "glp1_app_companion_data__secours : copie brute d'une sauvegarde illisible, écrite une seule fois, jamais recouverte."
+  },
+  {
+   "terme": "Copie de secours horodatée",
+   "definition": "Copie de la sauvegarde sous une clé __secours-AAAA-MM-JJ-HHMMSS, vérifiée par relecture, listée dans un index ; réservée à l'administration."
+  },
+  {
+   "terme": "Session en lecture seule",
+   "definition": "Session où plus rien n'est écrit dans le stockage, après une sauvegarde illisible, jusqu'au rechargement."
+  },
+  {
+   "terme": "Profil d'usine",
+   "definition": "Le profil et la pesée de départ (95 kg, la veille à 08:00) avec lesquels l'application démarre sans sauvegarde."
+  },
+  {
+   "terme": "Avertissement médical",
+   "definition": "Page à trois onglets (Cadre, Vie Privée, Sécurité), obligatoire au premier lancement, consultable ensuite depuis le pied de chaque page."
+  },
+  {
+   "terme": "Connexion récente",
+   "definition": "Exigence de Firebase (code auth/requires-recent-login) pour supprimer un compte sur une session ancienne ; l'écran propose alors « Se reconnecter »."
+  },
+  {
+   "terme": "clearAll",
+   "definition": "Effacement en bloc de tout le stockage local, session Firebase et acceptation médicale comprises ; réservé à la suppression du compte."
+  }
+ ],
+ "index": [
+  {
+   "terme": "Page de connexion",
+   "ancre": "compte-page-de-connexion"
+  },
+  {
+   "terme": "Continuer avec Google",
+   "ancre": "compte-page-de-connexion"
+  },
+  {
+   "terme": "Inscription (absente)",
+   "ancre": "compte-page-de-connexion"
+  },
+  {
+   "terme": "Écran d'attente de session",
+   "ancre": "compte-ecran-d-attente-de-session"
+  },
+  {
+   "terme": "Session mémorisée",
+   "ancre": "compte-ecran-d-attente-de-session"
+  },
+  {
+   "terme": "Verrou (AuthGate)",
+   "ancre": "compte-ecran-d-attente-de-session"
+  },
+  {
+   "terme": "Avertissement médical",
+   "ancre": "compte-page-information-medicale-avertissement-medical"
+  },
+  {
+   "terme": "Information Médicale",
+   "ancre": "compte-page-information-medicale-avertissement-medical"
+  },
+  {
+   "terme": "hasAcceptedMedicalDisclaimer_v1",
+   "ancre": "compte-page-information-medicale-avertissement-medical"
+  },
+  {
+   "terme": "Info Santé & Confidentialité",
+   "ancre": "compte-page-information-medicale-avertissement-medical"
+  },
+  {
+   "terme": "glp1_app_companion_data",
+   "ancre": "compte-donnees-sur-l-appareil"
+  },
+  {
+   "terme": "Stockage local",
+   "ancre": "compte-donnees-sur-l-appareil"
+  },
+  {
+   "terme": "Profil d'usine",
+   "ancre": "compte-donnees-sur-l-appareil"
+  },
+  {
+   "terme": "Copies de secours horodatées",
+   "ancre": "compte-donnees-sur-l-appareil"
+  },
+  {
+   "terme": "Sauvegarde illisible",
+   "ancre": "compte-bloc-limite-atteinte-sauvegarde-illisible"
+  },
+  {
+   "terme": "Clé de secours (__secours)",
+   "ancre": "compte-bloc-limite-atteinte-sauvegarde-illisible"
+  },
+  {
+   "terme": "Limite atteinte (bloc)",
+   "ancre": "compte-bloc-limite-atteinte-sauvegarde-illisible"
+  },
+  {
+   "terme": "Session en lecture seule",
+   "ancre": "compte-bloc-limite-atteinte-sauvegarde-illisible"
+  },
+  {
+   "terme": "Mon compte",
+   "ancre": "compte-page-mon-compte"
+  },
+  {
+   "terme": "Abonnement, paiement, factures",
+   "ancre": "compte-page-mon-compte"
+  },
+  {
+   "terme": "Supprimer mon compte",
+   "ancre": "compte-bloc-supprimer-mon-compte"
+  },
+  {
+   "terme": "Se reconnecter",
+   "ancre": "compte-bloc-supprimer-mon-compte"
+  },
+  {
+   "terme": "Déconnexion",
+   "ancre": "compte-bloc-supprimer-mon-compte"
+  },
+  {
+   "terme": "clearAll",
+   "ancre": "compte-bloc-supprimer-mon-compte"
+  },
+  {
+   "terme": "Connexion récente (auth/requires-recent-login)",
+   "ancre": "compte-bloc-supprimer-mon-compte"
+  },
+  {
+   "terme": "Mot de passe (V2)",
+   "ancre": "compte-dans-la-v2"
+  },
+  {
+   "terme": "E-mail (V2)",
+   "ancre": "compte-dans-la-v2"
+  }
+ ],
+ "ecrans_illustres": [
+  "profil-compte/page-de-connexion",
+  "profil-compte/ecran-d-attente-de-session",
+  "profil-compte/page-information-medicale-avertissement-medical",
+  "transversal/bloc-limite-atteinte-sauvegarde-illisible",
+  "profil-compte/page-mon-compte",
+  "profil-compte/bloc-supprimer-mon-compte"
+ ]
+}

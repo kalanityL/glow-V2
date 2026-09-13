@@ -37,9 +37,9 @@ ni thèmes, sans les TODO ; aucune maquette inventée ; captures V1 en Nostalgic
   plafond d'usage).
 - 20 chapitres ÉCRITS mais NON VÉRIFIÉS (les réfutateurs ont été coupés) ;
   seuls `compte` et `onboarding` ont leur réfutation, sans correction ; le
-  chapitre 21 (`non-implemente`) n'est pas écrit. Résultats dans
-  `/private/tmp/claude-501/-Users-beauty-Desktop-GLOW-GIT-APP-V2/4f237620-7356-4a0e-861c-339563e2ef7b/tasks/w17twnc87.output`
-  et le journal du workflow.
+  chapitre 21 (`non-implemente`) n'est pas écrit. TOUT EST À L'ABRI DANS LE
+  DÉPÔT : `docs/brouillons/` (chapitres, inventions, réfutations, inventaire,
+  manifeste des captures — voir son LISEZ-MOI).
 
 **Comment reprendre (après son oui) — les deux workflows se REPRENNENT, les
 agents finis rejouent depuis le cache :**
