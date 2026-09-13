@@ -52,6 +52,17 @@ agents finis rejouent depuis le cache :**
   corrigé.
 - Piège : les plafonds d'usage coupent les agents (« session limit ») ; les
   workflows se relancent à l'identique après la remise à zéro.
+- **Piège de la reprise, vu le 2026-09-13 : `resumeFromRunId` ne lit le cache
+  que dans le dossier de la session COURANTE.** Les deux runs ont été lancés
+  depuis `~/Desktop/GLOW`, donc leur cache vit sous
+  `~/.claude/projects/-Users-beauty-Desktop-GLOW/<session>/subagents/workflows/<run>/`,
+  pas sous `-Users-beauty-Desktop-GLOW-GIT-APP-V2/`. Relancer sans rien faire
+  rejoue TOUT depuis zéro, en silence. Le geste : copier le dossier du run
+  (`journal.jsonl` + les `agent-*.jsonl`) dans
+  `<session courante>/subagents/workflows/<run>/` AVANT de relancer, puis
+  vérifier le journal juste après le lancement — seuls les agents encore à
+  faire doivent apparaître en `started`. Fait ce jour : captures 3 agents
+  restants sur 11, rédaction 6 relancés sur 63.
 
 ## À arbitrer (décisions à toi)
 
