@@ -3,13 +3,15 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Les chapitres écrits — brouillons</title>
+<title>GLP1LOW — Les chapitres écrits — brouillons</title>
 <link rel="stylesheet" href="style.css">
 <style>
 .figure-absente { border: 1px dashed var(--filet); border-radius: 10px; padding: 10px 14px; color: var(--encre-douce); font-size: 14px; margin: 0; }
-.avertissement { border-left: 3px solid #b45309; background: #fff7ed; color: #7a5200; padding: 12px 16px; border-radius: 0 10px 10px 0; margin: 0 0 32px; }
-.avertissement p:first-child { margin-top: 0; }
-.avertissement p:last-child { margin-bottom: 0; }
+.table-ecrans { columns: 2; column-gap: 32px; font-size: 15px; }
+.table-ecrans li { break-inside: avoid; }
+.table-ecrans li.sans-image { color: var(--encre-douce); }
+.annexes { list-style: none; margin: 12px 0 0; padding: 12px 0 0; border-top: 1px solid var(--filet); columns: 2; column-gap: 32px; }
+.annexes li { break-inside: avoid; margin: 2px 0; }
 </style>
 </head>
 <body>
@@ -21,10 +23,10 @@
 </div>
 
 <h1>Les chapitres écrits — brouillons</h1>
-<div class="avertissement">
-<p><strong>Brouillons — réfutés contre le code, pas encore relus par toi.</strong> Ces 21 chapitres ont été écrits depuis l'inventaire de la V1 et son code, puis attaqués un à un par un vérificateur qui a relu le code, puis corrigés d'après ses réfutations. Ce que le code ne fondait pas a été retiré et rangé dans les inventions.</p>
-<p>Ils ne sont pas pour autant la spécification : ils n'ont pas été relus par toi, leurs figures ne sont pas toutes là, et les renvois vers la <a href="spec-technique.html">spécification technique</a> pointent dans le vide tant qu'elle n'existe pas. La <a href="spec-fonctionnelle.html">spécification fonctionnelle</a> reste vide jusqu'à ton feu vert.</p>
-</div>
+<p class="sous-titre">La même matière que la spécification, sans sa table des écrans ni son glossaire.</p>
+
+<p class="etat">Cette page sert à relire les chapitres pendant qu'on y travaille. Le document publié, avec sa table des écrans, son glossaire et son index, est la <a href="spec-fonctionnelle.html">spécification fonctionnelle</a>.</p>
+
 <nav class="sommaire" id="sommaire">
 <h2>Sommaire</h2>
 <ol>
@@ -50,6 +52,7 @@
 <li><a href="#partage">Le partage</a></li>
 <li><a href="#non-implemente">Décidé mais non implémenté, arbitrages non validés</a></li>
 </ol>
+
 </nav>
 
 <section id="produit">
@@ -3220,9 +3223,10 @@
 </section>
 
 
-<h2 id="figures">Les figures <a class="retour" href="#sommaire">↑ sommaire</a></h2>
-<p>267 figures appelées, 30 sans fichier, 9 retrouvées à un tiret près.</p>
-<h3>Sans fichier</h3>
+<h2 id="figures">État des figures <a class="retour" href="#sommaire">↑ sommaire</a></h2>
+<p>267 figures appelées par les chapitres, 27 sans capture, 8 retrouvées à un tiret près.</p>
+<h3 id="figures-absentes">Sans capture</h3>
+<p class="note">Ces écrans sont décrits dans les chapitres mais n'ont pas d'image. Il faudra les capturer, ou retirer la figure.</p>
 <ul>
 <li><code>accueil/bloc-palier-d-imc-franchi</code></li>
 <li><code>accueil/widget-de-felicitation</code></li>
@@ -3252,7 +3256,7 @@
 <li><code>transversal/page-de-connexion</code></li>
 <li><code>transversal/questionnaire-d-accueil-simulation</code></li>
 </ul>
-<h3>Retrouvées à un tiret près</h3>
+<h3 id="figures-rapprochees">Retrouvées à un tiret près</h3>
 <p class="note">Le chapitre écrit le premier nom, le fichier porte le second. C'est le chapitre qu'il faudra corriger, pas le fichier.</p>
 <ul>
 <li><code>activite/bloc-de-quoi-c-est-fait-blocdequoicestfait</code> → <code>activite/bloc-de-quoi-cest-fait-blocdequoicestfait</code></li>
