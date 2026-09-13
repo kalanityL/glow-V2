@@ -35,94 +35,159 @@
    "fonctionnalite": "Carte Injections",
    "texte": "Pour un traitement en comprimé, la carte s'appellerait « Comprimé », comme la carte du module sur la page Modules.",
    "origine": "Amélioration venue du contraste entre la page Modules (treatmentSectionLabel) et la page Notifications (libellé « Injections » écrit en dur, ligne 524 de NotificationsSettings.tsx)."
+  },
+  {
+   "categorie": "Modules",
+   "fonctionnalite": "Page vitrée",
+   "texte": "La vitre du module éteint épouserait le bord haut de la barre du bas dans les deux menus.",
+   "origine": "Phrase retirée du chapitre après réfutation : le commentaire du code l'affirme (« les deux barres font la même hauteur »), mais la vitre est ancrée à bottom-16 (64 px) alors que la barre standard fait h-12 (48 px) — il reste 16 px de page nette. App.tsx:2770, 2609, 2681 ; la seule capture existante est prise en menu simplifié."
+  },
+  {
+   "categorie": "Modules",
+   "fonctionnalite": "Tiroir Tendances — état du module",
+   "texte": "La carte « Actif sanguin » et la carte « Effets secondaires » du tiroir Tendances se griseraient et porteraient la phrase d'activation comme les cinq autres quand leur module est éteint.",
+   "origine": "Phrase généralisée à tort dans le chapitre, corrigée : les deux cartes sont rendues avec enabled codé en dur à true (TrendDrawer.tsx:413-424 et 988-998) et MODULES_TENDANCE ne connaît que meals, sport, metime, sleep, steps. La demande du 2026-08-29 (« propager bien partout les affichages et comportements de module desactivé ») le voudrait, et TODO-CLAUDE-V1.md:667-671 laisse le point ouvert."
+  },
+  {
+   "categorie": "Modules",
+   "fonctionnalite": "Masquage complet",
+   "texte": "Un module Effets secondaires masqué quitterait aussi le tiroir Tendances.",
+   "origine": "Phrase corrigée après réfutation : le filtre !isModuleHidden ne s'applique qu'à la liste rows, et la huitième case est rendue après le .map (TrendDrawer.tsx:955 et 988-998). Les tiroirs Ajouter et Journal, eux, tiennent la règle (navigation.ts:225)."
+  },
+  {
+   "categorie": "Notifications",
+   "fonctionnalite": "Titre de la page",
+   "texte": "La page Notifications perdrait son second titre « Notifications », comme la page Modules a perdu le sien.",
+   "origine": "Symétrie venue de la demande du 2026-08-27 « supprimer le 2eme titre module », appliquée à la seule page Modules (NotificationsSettings.tsx:216-227) ; le doublon subsiste page Notifications (lignes 499-510) et le chapitre le décrit désormais tel quel."
+  },
+  {
+   "categorie": "Modules",
+   "fonctionnalite": "Page Modules — état des cartes",
+   "texte": "La capture de la page Modules montrerait qui a allumé quoi (modules activés d'office contre modules allumés par l'utilisatrice).",
+   "origine": "Légende retirée après réfutation : la capture appelée montre les sept cartes « ACTIVÉ » (données de la graine) et rien à l'écran ne distingue un défaut d'un choix. L'écran ne porte aucune trace de l'origine d'un état."
+  },
+  {
+   "categorie": "Notifications",
+   "fonctionnalite": "Carte Prochain rendez-vous médical",
+   "texte": "Un rendez-vous nommé (« Dr Lefèvre », 06/10/2026, 10:30) figurerait sur une capture.",
+   "origine": "Légende retirée après réfutation : aucune capture ne porte de nom de médecin ni de date de rendez-vous — la capture dépliée montre le champ vide sur son placeholder et « JJ/MM/AAAA ». Ces valeurs ne subsistent que dans l'exemple rédactionnel, qui suit le format réel du récapitulatif."
+  },
+  {
+   "categorie": "Modules",
+   "fonctionnalite": "Modules en V2",
+   "texte": "La V2 garderait les sept modules et leur page.",
+   "origine": "Présupposé de la phrase « L'onboarding V2 ne pose aucune question de module », reformulée : GUIDELINES.md et les deux TODO du dépôt V2 ne disent rien de la page Modules (aucune occurrence du mot), et parcours.ts:29-65 ne compte que neuf étapes, aucune de module. Seules « de VRAIES notifications du téléphone » sont décidées."
   }
  ],
  "glossaire": [
   {
    "terme": "Module",
-   "definition": "L'un des sept suivis activables : traitement (Injections ou Comprimé), effets secondaires, repas et en-cas, nombre de pas, activité physique, un temps pour soi, sommeil ; la pesée n'en est pas un."
+   "definition": "Un des sept suivis qu'on allume, éteint ou masque depuis la page Modules : Injections ou Comprimé, Effets secondaires, Repas et en-cas, Nombre de pas, Activité physique, Un temps pour soi, Sommeil. La pesée n'en est pas un."
   },
   {
-   "terme": "Module éteint",
-   "definition": "Module désactivé : retiré du menu du bas, grisé dans les tiroirs, sa page est vitrée ; ses données sont conservées."
+   "terme": "Drapeau d'activation",
+   "definition": "La case du profil qui dit si un module est allumé. Absente, elle vaut allumé pour Injections/Comprimé et Effets secondaires, éteint pour les cinq autres."
   },
   {
-   "terme": "Module masqué",
-   "definition": "Module éteint dont la case « Masquer dans l'application. » est cochée : il disparaît des tiroirs et son badge « à activer » quitte la page Badges."
+   "terme": "Masquage",
+   "definition": "Case « Masquer dans l'application. », offerte sous une carte éteinte seulement : le module quitte alors le menu du bas, les raccourcis d'ajout, les tiroirs Ajouter et Journal et la page Badges. Rallumer le module efface le masquage."
   },
   {
    "terme": "Page vitrée",
-   "definition": "Page d'un module éteint, couverte du verre des tiroirs et ne laissant lire que la phrase « Activez le module … », qui mène à la carte du module."
+   "definition": "Page d'un module éteint : le verre des tiroirs la couvre jusqu'à 64 px du bas et ne laisse lire que sa phrase d'activation, qui mène à la carte du module."
   },
   {
-   "terme": "Rappel hebdomadaire",
-   "definition": "Rappel d'injections à jour fixe (Lundi à Dimanche) et heure fixe."
+   "terme": "Menu simplifié / menu standard",
+   "definition": "Les deux barres du bas. La simplifiée fait 64 px et porte les tiroirs (Ajouter, Journal, Tendances, Menu) ; la standard fait 48 px et aligne les pages des modules allumés."
   },
   {
-   "terme": "Rappel personnalisé",
-   "definition": "Rappel d'injections tous les N jours (1 à 30) à partir d'une date, à heure fixe."
+   "terme": "Tiroir",
+   "definition": "Panneau ouvert depuis la barre du menu simplifié. Ajouter et Journal listent les modules éteints en grisé et retirent les masqués ; Tendances montre huit cartes, dont cinq seulement suivent l'état du module."
   },
   {
-   "terme": "Délai de notification",
-   "definition": "Avance du rappel de rendez-vous médical : 1 heure, 2 heures, 1 jour, 2 jours, 3 jours ou 1 semaine avant."
+   "terme": "Rappel d'injections",
+   "definition": "Réglage enregistré dans le profil : hebdomadaire (jour et heure) ou personnalisé (fréquence de 1 à 30 jours, date de départ, heure). Rien ne le lit pour sonner ; seule la ligne de la cure de l'accueil le reflète."
   },
   {
-   "terme": "Minutes rondes",
-   "definition": "Les seules minutes qu'une heure enregistrée peut porter : 00, 10, 15, 20, 30, 40, 45, 50."
+   "terme": "Rappel de rendez-vous médical",
+   "definition": "Réglage enregistré dans le profil : nom du médecin, délai (1 heure à 1 semaine avant), date et heure du rendez-vous. Rien ne le lit pour sonner et rien ne le reprend hors de sa carte."
+  },
+  {
+   "terme": "Minute ronde",
+   "definition": "00, 10, 15, 20, 30, 40, 45 ou 50. L'enregistrement du profil ramène les deux heures de rappel à la minute ronde inférieure."
   }
  ],
  "index": [
   {
    "terme": "Modules (page)",
-   "ancre": "modules-page-modules"
+   "ancre": "#modules-page-modules"
   },
   {
-   "terme": "Activation d'un module",
-   "ancre": "modules-page-modules"
-  },
-  {
-   "terme": "Défauts des modules",
-   "ancre": "modules-page-modules"
-  },
-  {
-   "terme": "Masquer dans l'application",
-   "ancre": "modules-page-modules"
-  },
-  {
-   "terme": "Activation automatique par la navigation",
-   "ancre": "modules-page-modules"
-  },
-  {
-   "terme": "Page vitrée",
-   "ancre": "modules-page-vitree"
+   "terme": "Masquer dans l'application.",
+   "ancre": "#modules-page-modules"
   },
   {
    "terme": "Module éteint",
-   "ancre": "modules-page-vitree"
+   "ancre": "#modules-page-modules"
+  },
+  {
+   "terme": "Module masqué",
+   "ancre": "#modules-page-modules"
+  },
+  {
+   "terme": "Tiroir Tendances (état des modules)",
+   "ancre": "#modules-page-modules"
+  },
+  {
+   "terme": "Activation par la navigation",
+   "ancre": "#modules-page-modules"
+  },
+  {
+   "terme": "Page vitrée",
+   "ancre": "#modules-page-d-un-module-eteint"
+  },
+  {
+   "terme": "Phrase d'activation d'un module",
+   "ancre": "#modules-page-d-un-module-eteint"
   },
   {
    "terme": "Notifications (page)",
-   "ancre": "modules-page-notifications"
+   "ancre": "#modules-page-notifications"
   },
   {
    "terme": "Rappel d'injections",
-   "ancre": "modules-page-notifications"
+   "ancre": "#modules-page-notifications"
   },
   {
-   "terme": "Rappel de rendez-vous médical",
-   "ancre": "modules-page-notifications"
+   "terme": "Hebdomadaire (Jour fixe)",
+   "ancre": "#modules-page-notifications"
   },
   {
-   "terme": "Minutes rondes",
-   "ancre": "modules-page-notifications"
+   "terme": "Fréquence (rappel personnalisé)",
+   "ancre": "#modules-page-notifications"
   },
   {
-   "terme": "Rappels : Dim / 7j / Non (accueil)",
-   "ancre": "modules-page-notifications"
+   "terme": "Prochain rendez-vous médical",
+   "ancre": "#modules-page-notifications"
+  },
+  {
+   "terme": "Combien de temps avant notifier ?",
+   "ancre": "#modules-page-notifications"
+  },
+  {
+   "terme": "Rappels : Dim / 7j / Non",
+   "ancre": "#modules-page-notifications"
+  },
+  {
+   "terme": "Minute ronde",
+   "ancre": "#modules-page-notifications"
   }
  ],
  "ecrans_illustres": [
   "profil-compte/page-modules",
-  "profil-compte/page-notifications"
+  "profil-compte/page-modules-module-desactive",
+  "activite/page-vitree-dun-module-eteint",
+  "profil-compte/page-notifications",
+  "profil-compte/page-notifications-rappels-actives"
  ]
 }

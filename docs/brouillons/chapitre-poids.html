@@ -1,16 +1,24 @@
 <section id="poids">
   <h2>6. Le poids <a class="retour" href="#sommaire">↑ sommaire</a></h2>
-  <p>Le domaine tient le journal des pesées — une par jour, en kilogrammes à une décimale, à une heure aux minutes rondes — avec un poids de départ marqué d'un drapeau, un poids visé et neuf mensurations facultatives. Il en tire le journal et le calendrier, l'histogramme Cadence, la courbe de poids, l'IMC et ses paliers, la progression vers l'objectif et la confirmation de chaque pesée. En V2, seul l'onboarding existe : un poids actuel et, si l'objectif est « Perdre du poids », un poids visé ; aucune réponse n'est encore enregistrée. <span class="marque v2">V2</span></p>
+  <p>Le domaine tient le journal des pesées — une par jour, en kilogrammes à une décimale, à une heure aux minutes rondes — avec un poids de départ marqué d'un drapeau, un poids visé et neuf mensurations facultatives. Tout ce que l'application dit du poids, de l'IMC et de la progression vers l'objectif se lit dans cette table. En V2, seul l'onboarding existe : un poids actuel et, si l'objectif est « Perdre du poids », un poids visé ; aucune réponse n'est encore enregistrée. <span class="marque v2">V2</span></p>
 
   <h3 id="poids-page-balance-onglet-history">Page « Balance »</h3>
   <figure class="telephone" data-capture="poids/page-balance-onglet-history"><figcaption>La page Balance de Camille le 12/09/2026 : la ligne d'outils, le calendrier de septembre avec 85.2 sur le 5 et 84.5 sur le 12, puis les blocs Cadence et Courbe de poids.</figcaption></figure>
-  <p>La page empile le formulaire de saisie (ou la carte de confirmation qui le remplace après un enregistrement), la ligne d'outils Journal / Calendrier avec « + ajouter », le journal ou le calendrier — jamais les deux, calendrier par défaut —, l'histogramme « Cadence » et le graphe « Courbe de poids ». Chaque bloc a sa période. On y arrive par l'entrée « Balance » du menu bas, les tuiles Départ / Actuel des homes, la carte Balance du tiroir Tendances, le lien « Voir la page » des surimpressions et le bouton du bloc palier d'IMC. Le « + » flottant apparaît quand la ligne d'outils sort de l'écran ; le titre de page « Balance » ouvre aussi le formulaire.</p>
+  <p>La page ordinaire commence à la ligne d'outils Journal / Calendrier : le formulaire de saisie, et la carte de confirmation qui le remplace après un enregistrement, ne sont montés qu'à la demande, au-dessus d'elle. Suivent le journal ou le calendrier — jamais les deux, calendrier par défaut —, l'histogramme « Cadence » et le graphe « Courbe de poids », chacun avec sa période. On y arrive par l'entrée « Balance » du menu bas, les tuiles Départ / Actuel des homes, le lien « Ajouter une saisie » de la carte Balance du tiroir Tendances, le lien « Voir la page » des surimpressions et le bouton du bloc palier d'IMC. Le « + » flottant apparaît quand le curseur Journal / Calendrier sort de l'écran ; le titre de page « Balance » ouvre aussi le formulaire.</p>
   <details><summary>Les règles derrière les chiffres</summary>
     <ul>
-      <li>La vue est « journal » seulement si le stockage le dit, sinon « calendrier » ; le choix est retenu sous <code>glp1_weight_history_view</code>. <a href="spec-technique.html#poids-vue-historique-par-defaut-et-memorisation">→ technique</a></li>
       <li>Périodes : 7, 14, 30, 90 derniers jours, Depuis le début, Choisir ; défaut 30 jours ; « 7 derniers jours » va d'aujourd'hui − 6 à aujourd'hui ; une clé par bloc (journal, Cadence, courbe). <a href="spec-technique.html#poids-periodes-options-defaut-memorisation">→ technique</a></li>
       <li>Les bornes « du … au … » s'éditent en place et basculent le sélecteur en « Choisir » ; une borne égale à son repli s'écrit « début » ou « aujourd'hui ». <a href="spec-technique.html#poids-bornes-du-au">→ technique</a></li>
       <li>L'ordre qui compte est celui des dates et heures portées par les lignes (heure absente = 12:00), jamais l'ordre de saisie. <a href="spec-technique.html#poids-ordre-des-lignes-de-journal">→ technique</a></li>
+    </ul>
+  </details>
+
+  <h3 id="poids-barre-d-outils-de-l-historique-curseur-journal-calendrier-aj">Barre d'outils de l'historique</h3>
+  <figure class="telephone" data-capture="poids/barre-d-outils-de-l-historique-curseur-journal-calendrier-aj"><figcaption>La ligne d'outils de la page Balance : les deux carreaux, le fond glissé sur le carreau calendrier, « + ajouter » à droite.</figcaption></figure>
+  <p>Un curseur segmenté à deux carreaux — une grille de mois, une pile de lignes — et le bouton « + ajouter ». Aucun mot : chaque carreau montre la vue qu'il donne, le nom ne vit que dans l'infobulle et pour les lecteurs d'écran. C'est le curseur seul qui arme le « + » flottant en sortant de l'écran, pas le bouton d'ajout. La même barre sert aux autres pages à journal, chacune sous sa propre clé.</p>
+  <details><summary>Les règles derrière les chiffres</summary>
+    <ul>
+      <li>La vue est « journal » seulement si le stockage le dit, sinon « calendrier » ; le choix de Balance est retenu sous <code>glp1_weight_history_view</code>. <a href="spec-technique.html#poids-vue-historique-par-defaut-et-memorisation">→ technique</a></li>
     </ul>
   </details>
 
@@ -21,12 +29,11 @@
     <ul>
       <li>Le poids est arrondi au dixième à l'écriture, jamais à l'affichage. <a href="spec-technique.html#poids-arrondi-du-poids-a-l-ecriture">→ technique</a></li>
       <li>L'heure enregistrée est ramenée à la minute ronde inférieure (0, 10, 15, 20, 30, 40, 45, 50) ; l'heure proposée est l'heure locale ainsi arrondie. <a href="spec-technique.html#poids-heure-ramenee-aux-minutes-rondes">→ technique</a></li>
-      <li>Bornes V1 : poids de 0,1 à 1000 kg, une décimale ; mensuration de 1 à 300 cm ou vide <span class="marque">arbitrage non validé</span> ; message « Un poids entre 0,1 et 1000 kg est attendu. ». La V2 fixe 1–999 kg ou 1–2000 lb comme plafond de la roue de saisie : plus rien à refuser. <span class="marque v2">V2</span> <a href="spec-technique.html#poids-bornes-de-saisie">→ technique</a></li>
+      <li>Bornes V1 : poids de 0,1 à 1000 kg, une décimale ; mensuration de 1 à 300 cm ou vide <span class="marque">arbitrage non validé</span> ; message « Un poids entre 0,1 et 1000 kg est attendu. ». La V2 fixe 999 kg ou 2000 lb comme plafond de la roue de saisie : plus rien à refuser. <span class="marque v2">V2</span> <a href="spec-technique.html#poids-bornes-de-saisie">→ technique</a></li>
       <li>À la frappe : virgule → point, tout sauf chiffres et point retiré, une seule décimale. <a href="spec-technique.html#poids-nettoyage-de-la-saisie-du-poids">→ technique</a></li>
-      <li>Défauts : aujourd'hui, heure courante arrondie ; depuis le calendrier, le jour cliqué ; la pesée créée n'est jamais un départ. <a href="spec-technique.html#poids-valeurs-par-defaut-du-formulaire-d-ajout">→ technique</a></li>
+      <li>Défauts : aujourd'hui, heure courante arrondie ; depuis le calendrier, le jour cliqué. La charge écrite porte « pas un départ », mais le drapeau est aussitôt reposé sur la pesée la plus ancienne : sur un journal vide, la pesée créée devient le départ. <a href="spec-technique.html#poids-valeurs-par-defaut-du-formulaire-d-ajout">→ technique</a></li>
       <li>Une seule pesée par jour : un ajout sur un jour pris met à jour la ligne du jour (identifiant, drapeau et mensurations non ressaisies conservés) ; sinon la ligne s'insère et l'historique est retrié. <a href="spec-technique.html#poids-une-seule-pesee-par-jour-a-l-ajout">→ technique</a></li>
       <li>Le formulaire annonce le remplacement (« Une saisie existe déjà le JJ/MM/AAAA. L'application ne prend en compte qu'une saisie par jour : celle-ci sera remplacée. ») et n'écrit qu'au second clic ; si l'occupant est le départ, c'est lui qui prend le poids et la ligne déplacée disparaît ; changer la date rouvre la question. <a href="spec-technique.html#poids-formulaire-sur-un-jour-occupe-confirmation-puis-remplacement">→ technique</a></li>
-      <li>Dater le départ après une autre pesée est refusé : « Le poids de départ est le poids le plus ancien connu. Il ne peut pas être ultérieur à un autre poids connu. » <a href="spec-technique.html#poids-refus-le-depart-ne-peut-pas-etre-date-apres-une-autre-pesee">→ technique</a></li>
       <li>Un champ de mensuration rempli écrase, un champ vide conserve la valeur de la pesée remplacée ; masquer la grille vide les neuf champs ; en modification sans remplacement, un champ vidé retire la mesure. <a href="spec-technique.html#poids-fusion-des-mensurations">→ technique</a></li>
       <li>Les neuf mesures, dans cet ordre, trois par ligne. <a href="spec-technique.html#poids-ordre-et-libelles-des-neuf-mensurations">→ technique</a></li>
       <li>La modification fusionne la charge dans la ligne visée sans retrier l'historique ni appliquer « une seule par jour » : c'est l'écran qui refuse avant. <span class="marque">arbitrage non validé</span> <a href="spec-technique.html#poids-modification-deux-ecarts-assumes-avec-l-ajout">→ technique</a></li>
@@ -34,13 +41,22 @@
   </details>
   <div class="exemple"><p>Camille se repèse le 12/09 à 20:10 et saisit 85,1. Le message annonce le remplacement ; au second clic, la ligne du 12/09 passe à 85.1 kg, 20:10, et garde les mensurations du matin.</p></div>
 
+  <h3 id="poids-avis-de-refus-poids-de-depart">Avis de refus « poids de départ »</h3>
+  <figure class="telephone" data-capture="poids/avis-de-refus-poids-de-depart"><figcaption>L'avis encadré sous le champ Date : « Le poids de départ est le poids le plus ancien connu. Il ne peut pas être ultérieur à un autre poids connu. », avec sa croix de fermeture.</figcaption></figure>
+  <p>Un encadré à part, en italique, avec une croix pour le fermer. Il porte un seul texte et sert aux deux endroits qui refusent le même geste : le formulaire de pesée et la ligne de journal en édition.</p>
+  <details><summary>Les règles derrière les chiffres</summary>
+    <ul>
+      <li>Dater le départ après une autre pesée est refusé, dans le formulaire comme sur la ligne. <a href="spec-technique.html#poids-refus-le-depart-ne-peut-pas-etre-date-apres-une-autre-pesee">→ technique</a></li>
+    </ul>
+  </details>
+
   <h3 id="poids-carte-de-confirmation-de-pesee-equivalences-insolites">Carte de confirmation de pesée</h3>
   <figure class="telephone" data-capture="poids/carte-de-confirmation-de-pesee-equivalences-insolites"><figcaption>Après la saisie du 12/09 : « Votre nouvelle saisie « 84,5 kg » a bien été ajoutée à votre journal. », puis « dernière perte enregistrée -0.7 kg » et « Depuis le début -11.5 kg », chacune avec son dessin et son texte d'équivalence.</figcaption></figure>
-  <p>Une seule carte remplace le formulaire : le message — « Votre poids de départ a bien été mis à jour. », « Votre nouvelle saisie « xx,x kg » a bien été ajoutée à votre journal. » ou « Votre saisie « xx,x kg » a bien été mise à jour. » — puis, s'il y a une perte à fêter, le bloc « dernière perte enregistrée » et le bloc « Depuis le début », et un bouton « OK ». Le poids y est écrit avec une virgule ; partout ailleurs le site écrit un point. Après une édition depuis le tiroir Journal, la même carte s'affiche en portail par-dessus le tiroir. Le choix des objets est décrit au chapitre 16.</p>
+  <p>Une seule carte remplace le formulaire : le message — « Votre poids de départ a bien été mis à jour. », « Votre nouvelle saisie « xx,x kg » a bien été ajoutée à votre journal. » ou « Votre saisie « xx,x kg » a bien été mise à jour. » — puis, s'il y a une perte à fêter, le bloc « dernière perte enregistrée » et le bloc « Depuis le début », et un bouton « OK ». Le poids y est écrit avec une virgule ; partout ailleurs le site écrit un point. Après une édition depuis le tiroir Journal, la même carte s'affiche en portail par-dessus le tiroir.</p>
   <details><summary>Les règles derrière les chiffres</summary>
     <ul>
       <li>La confirmation parle de la pesée touchée, à sa date dans le journal d'après l'écriture : perte contre la pesée qui la précède (sinon le départ), perte contre le départ, « la plus récente » si elle est la dernière du journal ; éditer le départ ne fête rien. <a href="spec-technique.html#poids-contenu-de-la-confirmation-de-pesee">→ technique</a></li>
-      <li>Équivalences si l'IMC de la pesée ≥ 19 (22 sans taille), perte depuis le départ &gt; 0, pesée la plus récente, pas le départ ; le bloc « dernière perte » n'apparaît que si elle est positive et diffère au dixième de la perte totale. <a href="spec-technique.html#poids-conditions-d-affichage-de-la-carte-de-confirmation">→ technique</a></li>
+      <li>Équivalences si l'IMC de la pesée ≥ 19 (22 sans taille), perte depuis le départ &gt; 0, pesée la plus récente, pas le départ ; le bloc « dernière perte » exige en plus une pesée antérieure au journal, une perte positive et une valeur qui diffère au dixième de la perte totale. <a href="spec-technique.html#poids-conditions-d-affichage-de-la-carte-de-confirmation">→ technique</a></li>
     </ul>
   </details>
   <div class="exemple"><p>Camille corrige sa pesée du 05/09 de 85,2 à 85,0 : la carte dit « Votre saisie « 85,0 kg » a bien été mise à jour. » sans équivalence, cette pesée n'étant pas la dernière du journal.</p></div>
@@ -53,7 +69,7 @@
       <li>Liste = historique trié par date décroissante puis filtré par la période (clé <code>history_weight_list</code>) ; la poubelle exige au moins une ligne et <code>deleteAllButtonsEnabled</code> non faux. <a href="spec-technique.html#poids-journal-liste-et-suppression-totale">→ technique</a></li>
       <li>Édition en place sur un jour déjà pris : « Une saisie existe déjà le JJ/MM/AAAA. » et la date revient ; commit ignoré si poids illisible ou ≤ 0, date vide, ou rien de changé. <a href="spec-technique.html#poids-edition-en-place-sur-un-jour-occupe-refus">→ technique</a></li>
       <li>Le départ ne se supprime pas ; « Tout supprimer » laisse un journal réduit à la pesée de départ. <a href="spec-technique.html#poids-le-poids-de-depart-ne-se-supprime-pas">→ technique</a></li>
-      <li>Après chaque écriture, le drapeau est reposé sur la pesée la plus ancienne ; à date égale, le départ en place reste. <a href="spec-technique.html#poids-le-poids-de-depart-est-la-pesee-la-plus-ancienne">→ technique</a></li>
+      <li>Après un ajout ou une modification, le drapeau est reposé sur la pesée la plus ancienne ; à date égale, le départ en place reste. Une suppression et l'écriture du poids depuis le profil ne repassent pas par là. <a href="spec-technique.html#poids-le-poids-de-depart-est-la-pesee-la-plus-ancienne">→ technique</a></li>
       <li>Le départ se reconnaît à son drapeau, jamais à sa valeur. <a href="spec-technique.html#poids-le-depart-se-reconnait-a-son-drapeau-jamais-a-sa-valeur">→ technique</a></li>
     </ul>
   </details>
@@ -71,24 +87,25 @@
 
   <h3 id="poids-histogramme-cadence-perte-par-semaine">Histogramme « Cadence »</h3>
   <figure class="telephone" data-capture="poids/histogramme-cadence-perte-par-semaine"><figcaption>« Cadence » sur les 30 derniers jours : cinq barres de semaine ancrées au 14/08, bilan « -2.6 kg / -3 % entre le 14/08 et aujourd'hui », « Perte moyenne par semaine : -0.5 kg », axe de -1 à 2 kg avec le zéro.</figcaption></figure>
-  <p>Bandeau, bornes et période propres (clé <code>history_weekly_loss</code>), phrase de bilan — total en kg et en % du poids de début de période, « depuis le début » quand la première semaine part de la date du départ, puis « Perte » ou « Prise » « moyenne par semaine » —, titre « Perte par semaine », une barre par semaine étiquetée du JJ/MM de son premier jour, infobulle au clic (« Semaine du JJ/MM/AAAA », « Poids moyen », « Perte moyenne » ou « Prise moyenne »), légende « Perte de poids (- kg) » / « Prise de poids (+ kg) ». Avec la seule pesée de départ : « Ajouter un nouvel enregistrement pour générer le graphique hebdomadaire. » ; sans semaine dans la plage : « Modifiez la plage sélectionnée pour voir le graphique hebdomadaire. »</p>
+  <p>Bandeau, bornes et période propres (clé <code>history_weekly_loss</code>), phrase de bilan — total en kg et en % du poids de début de période, l'intervalle « entre le JJ/MM et aujourd'hui », puis « Perte » ou « Prise » « moyenne par semaine » —, titre « Perte par semaine », une barre par semaine étiquetée du JJ/MM de son premier jour, infobulle au clic (« Semaine du JJ/MM/AAAA », « Poids moyen », « Perte moyenne » ou « Prise moyenne »), légende « Perte de poids (- kg) » / « Prise de poids (+ kg) ». Avec la seule pesée de départ : « Ajouter un nouvel enregistrement pour générer le graphique hebdomadaire. » ; sans semaine dans la plage : « Modifiez la plage sélectionnée pour voir le graphique hebdomadaire. »</p>
   <details><summary>Les règles derrière les chiffres</summary>
     <ul>
+      <li>Quand la première semaine part de la date du départ, l'intervalle s'écrit « depuis le début et aujourd'hui » : la mention remplace la borne basse, pas la borne haute. <a href="spec-technique.html#poids-bilan-de-la-periode-bandeau-cadence">→ technique</a></li>
       <li>Un jour ne compte que par sa dernière pesée (heure la plus tardive, 12:00 si absente). <a href="spec-technique.html#poids-une-pesee-par-jour-pour-les-calculs-la-derniere-du-jour">→ technique</a></li>
       <li>Semaines de 7 jours ; poids d'un jour sans pesée interpolé linéairement, prolongé à plat hors des pesées ; « Perte moyenne » = poids du début de semaine − poids de fin (positive = perte). <a href="spec-technique.html#poids-decoupage-en-semaines-cadence">→ technique</a></li>
       <li>Hors « Depuis le début », les semaines partent de la borne basse de la période (coupure de la fenêtre ou date choisie, repli plus ancienne pesée) jusqu'à la borne haute (aujourd'hui ou date choisie). <a href="spec-technique.html#poids-ancrage-des-semaines-sur-la-periode-page-balance">→ technique</a></li>
       <li>En « Depuis le début », découpage sur l'historique depuis la première pesée puis filtrage. <a href="spec-technique.html#poids-filtrage-des-semaines">→ technique</a></li>
       <li>Bilan : total = somme des pertes hebdo ; % rapporté au poids de début de la première semaine affichée ; moyenne = total / nombre de semaines ; une décimale. <a href="spec-technique.html#poids-bilan-de-la-periode-bandeau-cadence">→ technique</a></li>
-      <li>Axe entier ancré sur zéro, une marge d'un kilo de chaque côté ; une perte exactement nulle se dessine en trait pointillé. <a href="spec-technique.html#poids-axe-vertical-de-cadence">→ technique</a></li>
+      <li>Axe : plancher entier des pertes moins un kilo, plafond entier du plus grand des pertes et de 1 kg plus un kilo, puis bornes arrondies à un pas de <code>max(1, amplitude ÷ 4)</code> — l'axe monte donc au moins à +2. Une perte exactement nulle se dessine en trait pointillé. <a href="spec-technique.html#poids-axe-vertical-de-cadence">→ technique</a></li>
     </ul>
   </details>
 
   <h3 id="poids-graphe-courbe-de-poids">Graphe « Courbe de poids »</h3>
   <figure class="telephone" data-capture="poids/graphe-courbe-de-poids"><figcaption>« Courbe de poids » sur 30 jours : courbe lissée de 87.1 à 84.5 kg, axe de 84 à 88 kg au pas de 1, cinq graduations JJ/MM, cinq ronds « Jour de saisie ».</figcaption></figure>
-  <p>Bandeau, bornes et période (clé <code>history_weight_chart</code>, partagée avec la surimpression du tiroir Tendances). Axe des dates à cinq graduations, axe des kg à gauche, courbe lissée avec fondu, prolongée à plat de la dernière pesée à aujourd'hui, au plus dix ronds « Jour de saisie ». Infobulle au clic : la date, « Poids : x kg » si une pesée existe ce jour-là, sinon le dernier poids connu avec « (enregistré le JJ/MM) », et « Aucune saisie ce jour-là » avant la première pesée. Avec moins de deux lignes (départ compris) : « Données de graphique insuffisantes ». Le traitement n'est pas tracé sur ce graphe.</p>
+  <p>Bandeau, bornes et période (clé <code>history_weight_chart</code>, partagée avec la surimpression du tiroir Tendances). Axe des dates à cinq graduations, axe des kg à gauche, courbe lissée avec fondu, prolongée à plat de la dernière pesée à aujourd'hui, au plus dix ronds « Jour de saisie ». Infobulle au clic : la date, « Poids : x kg » si une pesée existe ce jour-là, sinon le dernier poids connu avec « (enregistré le JJ/MM) », et « Aucune saisie ce jour-là » avant la première pesée. Avec moins de deux lignes (départ compris) : « Données de graphique insuffisantes ».</p>
   <details><summary>Les règles derrière les chiffres</summary>
     <ul>
-      <li>Fenêtre : aujourd'hui − N jours pour les fenêtres fixes ; « Depuis le début » ajoute deux jours d'air avant la première donnée et s'arrête à aujourd'hui ; « Choisir » remet les bornes dans l'ordre. <a href="spec-technique.html#poids-fenetre-temporelle-de-la-courbe-de-poids">→ technique</a></li>
+      <li>Fenêtre : aujourd'hui − N jours pour les fenêtres fixes ; « Depuis le début » ajoute deux jours d'air avant la première donnée et s'arrête au plus tard des deux, dernière donnée ou aujourd'hui — une pesée datée du futur porte donc la fenêtre au-delà d'aujourd'hui ; « Choisir » remet les bornes dans l'ordre. <a href="spec-technique.html#poids-fenetre-temporelle-de-la-courbe-de-poids">→ technique</a></li>
       <li>Points toutes les 3 h ; à midi le poids réel de la pesée du jour, sinon une spline monotone qui passe par chaque pesée sans la dépasser, sinon le prolongement à plat. <a href="spec-technique.html#poids-construction-de-la-courbe-de-poids">→ technique</a></li>
       <li>Axe des kg : premier pas de 0,5 · 1 · 2 · 2,5 · 5 · 10 · 20 · 50 qui tient les poids affichés en six intervalles au plus, avec une demi-unité de marge. <a href="spec-technique.html#poids-axe-des-poids-de-la-courbe">→ technique</a></li>
       <li>Au-delà de dix pesées, dix repères espacés régulièrement, première et dernière toujours incluses. <a href="spec-technique.html#poids-reperes-de-pesee-sur-la-courbe">→ technique</a></li>
@@ -102,7 +119,7 @@
   <p>Couche vitrée ouverte depuis la home sections par la tuile « kg /semaine » de la rangée Progrès ou par la barre du bloc Salut. Chapeau : semaine de cure et, à partir de sept jours, la moyenne hebdomadaire. Arc du haut Départ → Objectif ; rangée des trois poids ; rangée des trois IMC et différence en points ; bande du bas avec l'arc parcouru Départ → Actuel et l'arc pointillé Actuel → Objectif. Départ et Actuel ouvrent la page Balance, Objectif ouvre le profil. En reprise (actuel &gt; départ), Actuel passe à gauche de Départ, l'arc parcouru remonte et la ligne « IMC : ±x » disparaît.</p>
   <details><summary>Les règles derrière les chiffres</summary>
     <ul>
-      <li>Semaine de cure depuis la date de la pesée de départ : jours = écart entre minuits locaux ; semaine = jours ÷ 7 + 1 ; « 1 jour » au minimum. <a href="spec-technique.html#poids-semaine-de-cure">→ technique</a></li>
+      <li>Semaine de cure depuis la date de la pesée de départ : jours = écart entre minuits locaux ; semaine = partie entière de jours ÷ 7, plus 1 ; « 1 jour » au minimum. <a href="spec-technique.html#poids-semaine-de-cure">→ technique</a></li>
       <li>Moyenne = (actuel − départ) × 7 / jours de cure ; affichée seulement à partir de 7 jours. <a href="spec-technique.html#poids-moyenne-hebdomadaire-de-la-home-weeklyrate">→ technique</a></li>
       <li>Pourcentage = (actuel − départ) / départ × 100. <a href="spec-technique.html#poids-pourcentage-du-poids-de-depart">→ technique</a></li>
       <li>Arcs : objectif − départ, objectif − actuel, actuel − départ ; les trois pourcentages sont rapportés au poids de départ ; vrai signe moins ; pas d'arc sans départ ou sans objectif. <a href="spec-technique.html#poids-etiquettes-des-arcs-du-bloc-suivi">→ technique</a></li>
@@ -124,13 +141,26 @@
     </ul>
   </details>
 
+  <h3 id="poids-tuiles-d-equivalence-insolite-de-la-home-standard-depuis-le">Tuiles d'équivalence insolite de la home standard</h3>
+  <figure class="telephone" data-capture="poids/tuiles-d-equivalence-insolite-de-la-home-standard-depuis-le"><figcaption>Sous le bloc Salut : bandeau « DERNIÈRE PERTE ENREGISTRÉE », « -0.7 kg », le dessin des objets et la phrase qui les nomme ; plus bas, la même tuile en « DEPUIS LE DÉBUT » à -11.5 kg.</figcaption></figure>
+  <p>Deux tuiles de lecture, sans geste propre : « dernière perte enregistrée » sous le bloc Salut, « Depuis le début » plus bas. Chacune porte son bandeau, la valeur signée en kilogrammes, le dessin des objets assignés et le texte qui les énumère. Le choix des objets est décrit au chapitre 16.</p>
+  <details><summary>Les règles derrière les chiffres</summary>
+    <ul>
+      <li>Une tuile paraît si l'IMC actuel est ≥ 19 — nul sans taille, donc rien —, si sa perte est positive et si la perte totale l'est aussi ; quand les deux pertes sont égales au dixième, « Depuis le début » prend la place de la dernière perte et reste seule. <a href="spec-technique.html#poids-affichage-des-tuiles-de-perte-homes">→ technique</a></li>
+    </ul>
+  </details>
+
+  <h3 id="poids-defile-des-dernieres-entrees-entree-pesee">Défilé des dernières entrées : le carré « Pesée »</h3>
+  <figure class="telephone" data-capture="poids/defile-des-dernieres-entrees-entree-pesee"><figcaption>Le défilé de la home standard : le carré « Pesée » du 12/09, 07:30, 84.5 kg, entre un carré repas et un carré injection.</figcaption></figure>
+  <p>Un carré par ligne de journal des sept derniers jours, tous journaux confondus, du plus récent au plus ancien, défilable au doigt. Celui d'une pesée porte la date, l'heure, le pèse-personne, le mot « Pesée » et le poids en kilogrammes ; le clic mène à la page Balance. Le défilé disparaît quand il n'a rien à montrer.</p>
+
   <h3 id="poids-rangee-progres-evolution-de-la-home-sections">Rangée « Progrès » de la home sections</h3>
   <figure class="telephone" data-capture="poids/rangee-progres-evolution-de-la-home-sections"><figcaption>« Progrès » : « ≈ -0.6 kg /semaine », « -4.1 points d'IMC », « -11.5 kg en 19 semaines » avec ses objets, « -0.7 kg en 1 semaine ».</figcaption></figure>
-  <p>Deux à quatre mini-tuiles : moyenne hebdomadaire, points d'IMC, perte totale, dernière perte — chacune avec sa durée et, pour les pertes, son dessin insolite. La première ouvre la surimpression « Balance », la deuxième « Où en est l'IMC », les pertes leur équivalence en entier. Le titre devient « Évolution » quand le poids actuel n'est plus sous le départ.</p>
+  <p>Deux à quatre mini-tuiles : moyenne hebdomadaire, points d'IMC, perte totale, dernière perte. Les deux tuiles de perte portent leur durée et leur dessin insolite ; l'hebdomadaire porte « /semaine » sous son chiffre, celle d'IMC un cadran. La première ouvre la surimpression « Balance », la deuxième « Où en est l'IMC », les pertes leur équivalence en entier. Le titre devient « Évolution » quand le poids actuel n'est plus sous le départ.</p>
   <details><summary>Les règles derrière les chiffres</summary>
     <ul>
       <li>Candidates par rang : semaine (cure ≥ 7 jours), IMC (points calculables), perte totale, dernière perte ; quatre au plus, deux au moins. <a href="spec-technique.html#poids-rangee-progres-candidates-et-plafond">→ technique</a></li>
-      <li>Tuiles de perte seulement si IMC ≥ 19 et perte &gt; 0 ; la dernière perte se tait si elle égale la perte totale au dixième. <a href="spec-technique.html#poids-affichage-des-tuiles-de-perte-homes">→ technique</a></li>
+      <li>Tuiles de perte seulement si l'IMC est ≥ 19, la perte de la tuile positive et la perte totale positive ; l'égalité au dixième entre les deux pertes ne les départage pas ici, contrairement à la home standard. <a href="spec-technique.html#poids-affichage-des-tuiles-de-perte-homes">→ technique</a></li>
       <li>Points d'IMC = (actuel − départ) / taille², arrondi sur la différence ; nul sans taille ou sans départ. <a href="spec-technique.html#poids-points-d-imc-gagnes-ou-perdus">→ technique</a></li>
       <li>Durée : « en n jours » sous sept jours, sinon « en N semaines » arrondies ; la perte totale court du départ à la dernière pesée, la dernière perte de l'avant-dernière à la dernière. <a href="spec-technique.html#poids-duree-d-une-perte-home-sections">→ technique</a></li>
     </ul>
@@ -145,7 +175,7 @@
   <p>En tête des deux homes : ce qui reste à perdre jusqu'au poids visé (« 0 kg » une fois atteint) et une barre animée avec son pourcentage. Cliquer la cible ouvre un champ pour changer le poids visé ; sur la home sections, la barre ouvre la surimpression « Balance ». La V2 pose d'abord l'objectif — « Perdre du poids » (défaut) ou « Stabiliser mon poids » — et ne demande un poids visé qu'à qui veut perdre ; ce poids n'est jamais lié au poids actuel. <span class="marque v2">V2</span></p>
   <details><summary>Les règles derrière les chiffres</summary>
     <ul>
-      <li>Progression = (départ − actuel) / (départ − cible) × 100, bornée 0–100 ; cible au-dessus du départ → 100 si atteinte, sinon 0. <a href="spec-technique.html#poids-progression-vers-l-objectif-barre-du-bloc-salut">→ technique</a></li>
+      <li>Progression = (départ − actuel) / (départ − cible) × 100, bornée 0–100 ; cible égale ou supérieure au départ → 100 si l'actuel l'a atteinte, sinon 0. <a href="spec-technique.html#poids-progression-vers-l-objectif-barre-du-bloc-salut">→ technique</a></li>
       <li>Reste = actuel − cible au dixième, affiché « -x kg » si positif ; la cible saisie est enregistrée si elle est un nombre &gt; 0. <a href="spec-technique.html#poids-reste-a-perdre-bloc-salut">→ technique</a></li>
     </ul>
   </details>
@@ -171,8 +201,8 @@
   </details>
 
   <h3 id="poids-tiroir-journal-pesees">Tiroir « Journal » : pesées</h3>
-  <figure class="telephone" data-capture="poids/tiroir-journal-pesees"><figcaption>Le tiroir Journal du menu simplifié, onglet Balance : les lignes du 12/09 au 04/05 « Départ », menu ⋯ ouvert sur Modifier / Supprimer.</figcaption></figure>
-  <p>Tout l'historique, sans filtre de période, avec la même édition en place que la page ; Supprimer agit sans confirmation ; Modifier renvoie vers la page Balance ; la carte de confirmation s'affiche en portail par-dessus le tiroir.</p>
+  <figure class="telephone" data-capture="poids/tiroir-journal-pesees"><figcaption>Le tiroir Journal du menu simplifié : la carte Balance et ses trois demi-cartes « 12/09 · 84.5 kg », « 05/09 · 85.2 kg », « 29/08 · 85.9 kg » ; le journal complet ouvert par-dessus, menu ⋯ sur Modifier / Supprimer.</figcaption></figure>
+  <p>La carte Balance du tiroir montre les trois dernières pesées en demi-cartes « JJ/MM · xx kg » — ni heure, ni mot « Pesée ». Le clic ouvre par-dessus tout l'historique, sans filtre de période, avec les lignes de la page et leur édition en place ; Supprimer agit sans confirmation, Modifier renvoie vers la page Balance, et la carte de confirmation s'affiche en portail par-dessus le tiroir.</p>
   <details><summary>Les règles derrière les chiffres</summary>
     <ul>
       <li>Tri croissant date + heure puis décroissant par date, stable. <a href="spec-technique.html#poids-ordre-d-affichage-du-journal-dans-le-tiroir">→ technique</a></li>
@@ -181,25 +211,45 @@
 
   <h3 id="poids-tiroir-tendances-carte-balance-et-son-graphe-en-surimpressio">Tiroir « Tendances » : carte « Balance »</h3>
   <figure class="telephone" data-capture="poids/tiroir-tendances-carte-balance-et-son-graphe-en-surimpressio"><figcaption>Carte « Balance » : silhouette de tendance sur 14 jours et « 86.2 → 84.5 kg », lien « Ajouter une saisie ».</figcaption></figure>
-  <p>La carte ouvre la courbe de poids en surimpression, avec la période de la page ; « Ajouter une saisie » ouvre le formulaire.</p>
+  <p>La carte ouvre la courbe de poids en surimpression, avec la période de la page, le tiroir restant ouvert derrière la vitre ; elle ne mène pas à la page. Le seul chemin vers la page depuis cette carte est « Ajouter une saisie », qui ouvre le formulaire.</p>
   <details><summary>Les règles derrière les chiffres</summary>
     <ul>
       <li>Pour chacun des 14 derniers jours, le poids de la dernière pesée à cette date ou avant, sinon la première pesée ; texte « début → fin kg » ou la seule valeur connue. <a href="spec-technique.html#poids-tendance-du-poids-tiroir-tendances">→ technique</a></li>
     </ul>
   </details>
 
-  <h3 id="poids-page-mon-profil-taille-poids-de-depart-objectif-final">Profil : taille, poids de départ, objectif final</h3>
-  <figure class="telephone" data-capture="poids/page-mon-profil-taille-poids-de-depart-objectif-final"><figcaption>Les cases Taille 168 cm, Poids de départ 96 kg et Objectif final 70 kg du profil de Camille, éditables en place.</figcaption></figure>
-  <p>Le poids de départ affiché est lu dans la table des pesées ; l'écrire ici change le poids de la pesée à drapeau sans toucher sa date ni ses mensurations. L'objectif et la taille vont au profil. La V2 ne demande à l'onboarding ni poids de départ ni date : un « poids actuel » (95,0 par défaut, deux roues : kilos et centaines de grammes, la centaine referme) et un poids visé ; leur enregistrement n'existe pas encore. <span class="marque v2">V2</span> <span class="marque non">non implémenté</span></p>
+  <h3 id="poids-menu-carte-d-identite">Menu « + » : carte d'identité</h3>
+  <figure class="telephone" data-capture="poids/menu-carte-d-identite"><figcaption>La carte du menu « + » : le prénom de Camille, la pastille « Ozempic », « -11.5 kg » et « 0.25 mg ».</figcaption></figure>
+  <p>La carte en tête du menu « + » porte le prénom, le traitement, la perte de poids et la dernière dose. Rien ne s'y clique côté poids.</p>
   <details><summary>Les règles derrière les chiffres</summary>
     <ul>
-      <li>Refus « Un poids entre 0,1 et 1000 kg est attendu. » ; virgule acceptée, une décimale. <a href="spec-technique.html#poids-edition-du-profil-poids-de-depart-et-objectif">→ technique</a></li>
-      <li>Sans pesée de départ, la case en crée une à 08:00, datée d'hier ou de la veille de la plus ancienne pesée. <span class="marque">arbitrage non validé</span> <a href="spec-technique.html#poids-poids-de-depart-saisi-depuis-le-profil">→ technique</a></li>
-      <li>Sur un stockage vierge, une pesée de départ à 95 kg est semée, datée d'hier. <a href="spec-technique.html#poids-poids-de-depart-seme-a-l-installation">→ technique</a></li>
-      <li>Une sauvegarde d'avant la bascule (poids de départ dans le profil) est convertie une fois en pesée à drapeau. <a href="spec-technique.html#poids-conversion-de-l-ancien-profil-en-pesee-de-depart">→ technique</a></li>
-      <li>L'objectif est arrondi au dixième à l'enregistrement. <a href="spec-technique.html#poids-arrondi-du-poids-a-l-ecriture">→ technique</a></li>
+      <li>La perte est le poids de départ moins celui de la dernière ligne du tableau — pas de la pesée la plus récente par date : une modification ne retrie pas l'historique. <a href="spec-technique.html#poids-perte-affichee-dans-le-menu">→ technique</a></li>
     </ul>
   </details>
 
-  <p>Ailleurs : les pas, l'activité et le métabolisme lisent le poids actif à une date — la dernière pesée à cette date ou avant, repli départ, objectif, puis 80 kg <a href="spec-technique.html#poids-poids-actif-a-une-date-autres-modules">→ technique</a> ; le menu « + » affiche une perte calculée sur la dernière ligne du tableau et non sur la pesée la plus récente par date <a href="spec-technique.html#poids-perte-affichee-dans-le-menu">→ technique</a> ; le rapport médical reprend pesées et mensurations (chapitre du rapport) ; les équivalences insolites sont au chapitre 16.</p>
+  <h3 id="poids-page-mon-profil-taille-poids-de-depart-objectif-final">Profil : taille, poids de départ, objectif final</h3>
+  <figure class="telephone" data-capture="poids/page-mon-profil-taille-poids-de-depart-objectif-final"><figcaption>Les cases Taille 168 cm, Poids de départ 96 kg et Objectif final 70 kg du profil de Camille, éditables en place.</figcaption></figure>
+  <p>Trois cases s'éditent en place, chacune validée à la perte du focus ou sur Entrée ; un refus rend la valeur enregistrée et affiche son message. Le poids de départ affiché est lu dans la table des pesées : l'écrire ici change le poids de la pesée à drapeau sans toucher sa date ni ses mensurations ; l'objectif et la taille vont au profil. Le bouton « … » ouvre le formulaire complet, qui reprend les mêmes trois champs et empile ses refus au-dessus de « Valider ». La V2 ne demande à l'onboarding ni poids de départ ni date : un « poids actuel » (95,0 par défaut, deux roues — kilos et centaines de grammes, la centaine referme le panneau), un poids visé si l'objectif est de perdre, et la taille à la dernière étape (165 cm par défaut) ; leur enregistrement n'existe pas encore. <span class="marque v2">V2</span> <span class="marque non">non implémenté</span></p>
+  <details><summary>Les règles derrière les chiffres</summary>
+    <ul>
+      <li>Poids et objectif : virgule acceptée, une décimale, arrondi à l'enregistrement, refus « Un poids entre 0,1 et 1000 kg est attendu. » <a href="spec-technique.html#poids-edition-du-profil-poids-de-depart-et-objectif">→ technique</a></li>
+      <li>Taille : de 50 à 300 cm, refus « Une taille entre 50 et 300 cm est attendue. » <a href="spec-technique.html#poids-bornes-de-saisie">→ technique</a></li>
+      <li>Sans pesée de départ, la case en crée une à 08:00, datée d'hier ou de la veille de la plus ancienne pesée. <span class="marque">arbitrage non validé</span> <a href="spec-technique.html#poids-poids-de-depart-saisi-depuis-le-profil">→ technique</a></li>
+      <li>Sur un stockage vierge, une pesée de départ à 95 kg est semée, datée d'hier. <a href="spec-technique.html#poids-poids-de-depart-seme-a-l-installation">→ technique</a></li>
+      <li>Une sauvegarde d'avant la bascule (poids de départ dans le profil) est convertie une fois en pesée à drapeau. <a href="spec-technique.html#poids-conversion-de-l-ancien-profil-en-pesee-de-depart">→ technique</a></li>
+    </ul>
+  </details>
+
+  <h3 id="poids-rapport-medical-pdf-poids-et-mensurations">Rapport médical : poids et mensurations</h3>
+  <figure class="telephone" data-capture="poids/rapport-medical-pdf-poids-et-mensurations"><figcaption>L'encart d'identité du rapport de Camille : Poids de départ 96 kg le 04/05/2026, Taille 168 cm, Poids actuel 84.5 kg, IMC actuel 29.9 kg/m², Objectif 70 kg, Variation totale -11.5, Reste à l'objectif 14.5 kg.</figcaption></figure>
+  <p>Le PDF reprend les pesées et les mensurations en trois endroits : l'encart d'identité, les tuiles de synthèse de la période et l'annexe B. La section « Le poids et les mensurations » se coche avant l'export, avec la période. Le document lui-même est au chapitre du rapport.</p>
+  <details><summary>Les règles derrière les chiffres</summary>
+    <ul>
+      <li>Encart : poids actuel = dernière ligne après tri par date (départ si le journal est vide) ; IMC = actuel / taille², « Non calculable » sans taille ; « Variation totale » = départ − actuel signé ; « Reste à l'objectif » = max(0, actuel − cible) ; la tuile « Depuis le JJ/MM/AAAA » n'existe que si la pesée à drapeau existe. <a href="spec-technique.html#poids-rapport-encart-et-synthese">→ technique</a></li>
+      <li>« Perdus / sem. (poids d'entrée) » = pourcentage de perte de la période divisé par le nombre de semaines du même découpage que Cadence. <a href="spec-technique.html#poids-rapport-pourcentage-perdu-par-semaine">→ technique</a></li>
+      <li>Annexe B : tableau Date / Poids / Poitrine / Taille / Hanches / Autres mesures dès qu'une mensuration existe sur la période ; sinon un calendrier mensuel dont la case porte le poids de la dernière pesée du jour, sans unité. <a href="spec-technique.html#poids-rapport-annexe-b-et-calendrier">→ technique</a></li>
+    </ul>
+  </details>
+
+  <p>Ailleurs : les pas, l'activité et le métabolisme lisent le poids actif à une date — la dernière pesée à cette date ou avant, repli départ, objectif, puis 80 kg <a href="spec-technique.html#poids-poids-actif-a-une-date-autres-modules">→ technique</a> ; les équivalences insolites sont au chapitre 16.</p>
 </section>

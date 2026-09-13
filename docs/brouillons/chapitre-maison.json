@@ -8,12 +8,6 @@
   },
   {
    "categorie": "exemple",
-   "fonctionnalite": "Bloc Mes pas",
-   "texte": "Écrire la durée de marche de Camille (« 1h08 » pour 6 240 pas).",
-   "origine": "stepsWalkingMinutes n'a pas été lue ; seule la vitesse de référence 4,2 km/h est vérifiée. Laissé « durée » sans chiffre."
-  },
-  {
-   "categorie": "exemple",
    "fonctionnalite": "Section Dynamique — le verdict",
    "texte": "Le métabolisme au repos de Camille (≈ 1 533 kcal/jour) est calculé avec Mifflin-St Jeor (femme, 48 ans, 168 cm, 88,4 kg).",
    "origine": "computeMetabolismSummary n'a pas été lu ; l'inventaire prend la formule telle que les commentaires la décrivent. Le chiffre de l'exemple repose sur cette hypothèse."
@@ -22,13 +16,13 @@
    "categorie": "comportement",
    "fonctionnalite": "Templates d'accueil",
    "texte": "Dire quel template la personne voit réellement sur GLP1LOW (standard par défaut, mais une valeur enregistrée depuis la page des thèmes peut imposer sections ou blocs).",
-   "origine": "La page qui écrit le choix (thèmes) est hors périmètre et n'a pas été lue ; le chapitre ne décrit que le défaut de homeChoice.ts."
+   "origine": "La page qui écrit le choix (thèmes) est hors périmètre et n'a pas été lue ; le chapitre ne décrit que le défaut de homeChoice.ts et la relecture des valeurs anciennes « carre » et « fines-lignes »."
   },
   {
    "categorie": "amélioration",
    "fonctionnalite": "Fête « Dynamique débloquée »",
    "texte": "Corriger le message « elle vous attend en haut de l'accueil », faux sur la home standard (dernier bloc) et sur la home sections (deuxième section).",
-   "origine": "Constat de lecture (CelebrationDynamique.tsx vs Maison.tsx) ; une correction serait une décision, pas un fait de code."
+   "origine": "Constat de lecture (CelebrationDynamique.tsx vs Maison.tsx) ; une correction serait une décision, pas un fait de code. La remarque a été retirée du corps du chapitre : elle y était un commentaire éditorial, pas une description d'écran."
   },
   {
    "categorie": "comportement",
@@ -39,8 +33,8 @@
   {
    "categorie": "comportement",
    "fonctionnalite": "Bloc palier d'IMC franchi",
-   "texte": "Décrire la mise en page et les textes exacts du bloc (titre, disposition des deux paliers).",
-   "origine": "BmiMilestoneBlock n'a pas été lu ; seuls les champs que Maison.tsx lui passe et les deux actions de l'inventaire sont décrits."
+   "texte": "Décrire la mise en page fine du bloc (dimensions, aplats, position des deux paliers dans le panneau).",
+   "origine": "BmiMilestoneBlock.tsx a été lu pour les textes, les deux régimes (au-dessus et en dessous de 18,5) et le libellé du bouton, qui sont désormais dans le chapitre ; la mise en page elle-même ne porte aucune donnée et n'est pas décrite."
   },
   {
    "categorie": "exemple",
@@ -59,146 +53,190 @@
    "fonctionnalite": "Tiroirs Journal et Tendance",
    "texte": "Décrire le menu simplifié lui-même et la manière de le choisir.",
    "origine": "App.tsx dit seulement que ces tiroirs n'existent qu'en menu simplifié (getSelectedMenu) ; le réglage du menu n'a pas été lu et relève d'un autre chapitre."
+  },
+  {
+   "categorie": "comportement",
+   "fonctionnalite": "Widget de félicitation",
+   "texte": "Dire d'où le widget s'ouvre aujourd'hui : une page d'essai qui liste les douze types et tire un contenu simulé.",
+   "origine": "Réfutation acceptée : cette page (FelicitationsPage) n'est atteignable que depuis AdminSettings, domaine administration, hors périmètre. Le chapitre se borne à constater qu'aucun écran de ce périmètre n'ouvre le widget."
+  },
+  {
+   "categorie": "comportement",
+   "fonctionnalite": "Bloc calendrier",
+   "texte": "Décrire la coquille de calendrier commune (grille lundi→dimanche, bulle par jour, ajout sur jour vide, navigation par chevrons ou glissé).",
+   "origine": "L'inventaire la range dans ce chapitre mais précise qu'aucune home ne la monte : elle n'appartient à aucun écran de la Maison, et la décrire ici inventerait une présence."
+  },
+  {
+   "categorie": "exemple",
+   "fonctionnalite": "Bloc « Aujourd'hui »",
+   "texte": "Donner les glucides et les lipides de Camille pour compléter les cinq colonnes du bilan du jour.",
+   "origine": "Seuls les kcal, les protéines et les fibres de sa journée sont posés par les exemples des autres chapitres ; deux macros de plus auraient été inventées. La figure nomme les colonnes sans les chiffrer toutes."
+  },
+  {
+   "categorie": "exemple",
+   "fonctionnalite": "Bloc Mes pas",
+   "texte": "Chiffrer les kcal dépensées par les 6 240 pas de Camille.",
+   "origine": "getStepsCaloriesForLog et calculateStepCalories n'ont pas été lues. Le pourcentage, la distance et la durée, eux, sont désormais calculés depuis les constantes du module (8 000 pas, 0,00076 km/pas, 95 pas/minute) et écrits dans l'exemple."
+  },
+  {
+   "categorie": "règle",
+   "fonctionnalite": "Section « Progrès » / « Évolution »",
+   "texte": "Dire ce que la personne voit quand aucune tuile ne passe ses conditions : un titre de section et une grille vides.",
+   "origine": "Le code rend le séparateur et la grille sans condition sur le nombre de tuiles, mais ce rendu n'a pas été observé ; affirmer ce qui s'affiche alors dépasserait la lecture."
+  },
+  {
+   "categorie": "comportement",
+   "fonctionnalite": "Carré traitement",
+   "texte": "Aligner les deux homes sur les prises datées du futur : la home standard les compte, la home sections les écarte.",
+   "origine": "Réfutation acceptée, l'écart est vérifié (currentTreatmentInjections vs currentTreatmentSeries) et décrit tel quel dans le chapitre ; le corriger serait une décision."
   }
  ],
  "glossaire": [
   {
-   "terme": "Template d'accueil",
-   "definition": "L'un des trois dessins de la home (standard, sections, blocs) ; standard tant que rien n'est enregistré."
+   "terme": "Home (template d'accueil)",
+   "definition": "L'un des trois gabarits de la page d'accueil de la version Mixte : standard, sections (carrés nus) ou blocs (le même que sections, habillé en cartes). Le choix est enregistré par version ; sans choix, c'est standard."
   },
   {
-   "terme": "Bandeau",
-   "definition": "La bande titrée collée au bord haut d'un bloc de la home standard."
+   "terme": "Bloc « Salut »",
+   "definition": "Tête des trois homes : avatar, salutation, reste à perdre, barre d'avancement vers la cible, ligne « Cure » et « Rappels », badges débloqués."
   },
   {
-   "terme": "Couche vitrée",
-   "definition": "Une carte unique posée par-dessus la page floutée, bornée au cadre du téléphone, fermée par la croix, la vitre ou la barre."
+   "terme": "Carré poids (Évolution)",
+   "definition": "Grand carré de la home standard : semaine de cure, perte moyenne par semaine, arc départ→objectif, les trois poids, l'IMC masqué et la variation en % du poids de départ."
   },
   {
-   "terme": "Tiroir",
-   "definition": "Un panneau qui glisse depuis un bord de l'écran (Journal, Tendance, Dynamique) et se ferme au clic à côté."
+   "terme": "Carré traitement",
+   "definition": "Grand carré de la home standard consacré au traitement en cours : semaine depuis la première prise de la série, doses initiale, actuelle et active, nombre de prises et milligrammes cumulés, ressenti du jour."
   },
   {
-   "terme": "Menu simplifié",
-   "definition": "La barre du bas qui porte les boutons Journal et Tendances ; sans elle, ces deux tiroirs n'existent pas."
-  },
-  {
-   "terme": "Module",
-   "definition": "Un suivi qu'on allume ou éteint (traitement, effets, repas, pas, activité physique, sommeil, temps pour soi) ; éteint, ses blocs disparaissent ou se grisent."
-  },
-  {
-   "terme": "Pesée de départ",
-   "definition": "La pesée marquée comme origine de la cure ; elle date la semaine de cure et fixe le poids de départ."
-  },
-  {
-   "terme": "Poids cible",
-   "definition": "Le poids visé, enregistré au profil ; le bloc Salut affiche ce qu'il reste à perdre pour l'atteindre."
+   "terme": "Bloc « Aujourd'hui »",
+   "definition": "Bilan nutritionnel du jour sur la home standard : kcal, protéines, glucides, lipides, fibres, et deux barres d'objectif protéines et fibres."
   },
   {
    "terme": "Semaine de cure",
-   "definition": "Le rang de la semaine en cours depuis la pesée de départ : jours écoulés ÷ 7 + 1."
-  },
-  {
-   "terme": "Perte moyenne par semaine",
-   "definition": "(poids actuel − poids de départ) × 7 ÷ jours écoulés, affichée à partir de sept jours."
-  },
-  {
-   "terme": "Équivalence insolite",
-   "definition": "La perte de poids traduite en objets du quotidien, avec un dessin et une phrase."
-  },
-  {
-   "terme": "Dynamique",
-   "definition": "La section qui projette ce que la balance devrait faire au vu des sept derniers jours ; dévoilée après sept jours d'usage."
-  },
-  {
-   "terme": "Verdict",
-   "definition": "L'un des cinq sens de la Dynamique : stable, légère hausse, légère baisse, hausse marquée, baisse marquée."
-  },
-  {
-   "terme": "Différentiel",
-   "definition": "Calories ingérées moins dépenses (métabolisme au repos, pas, activité physique) sur sept jours ; 8 000 kcal valent un kilo."
-  },
-  {
-   "terme": "Sens d'une période",
-   "definition": "Hausse, baisse ou stable des sept derniers jours par rapport aux sept précédents, au seuil de 5 %."
-  },
-  {
-   "terme": "Sparkline",
-   "definition": "La courbe lissée sans échelle ni chiffre des cartes du tiroir Tendance."
+   "definition": "Rang de la semaine en cours, compté depuis la pesée de départ : partie entière des jours écoulés divisés par sept, plus un. La première semaine est la n° 1."
   },
   {
    "terme": "Série du traitement en cours",
-   "definition": "Les prises du traitement courant depuis le dernier changement de traitement ; elle donne les doses initiale, actuelle et cumulée."
+   "definition": "Les prises du traitement courant en remontant l'historique jusqu'au premier changement de traitement. Revenir à un traitement déjà pris n'en rouvre pas l'ancien épisode."
   },
   {
-   "terme": "Niveau sanguin actif",
-   "definition": "La concentration encore active du traitement, calculée sur les prises des 60 derniers jours."
-  },
-  {
-   "terme": "Humeur du jour",
-   "definition": "Serein, modéré ou difficile, déduit des sévérités des effets secondaires déclarés dans la journée."
+   "terme": "Concentration active",
+   "definition": "Dose encore présente dans le sang, cumulée par molécule selon un modèle pharmacocinétique. Les soixante derniers jours choisissent les molécules en jeu ; le cumul porte sur tout leur historique."
   },
   {
    "terme": "Palier d'IMC",
-   "definition": "Une catégorie d'IMC (insuffisance pondérale, corpulence normale, surpoids, obésité I, II, III) ; « franchi » quand la catégorie actuelle est meilleure que celle du départ."
+   "definition": "Tranche de corpulence indexée (insuffisance pondérale, corpulence normale, surpoids, obésité I, II, III). Un palier est franchi quand l'index actuel est inférieur à celui du départ."
   },
   {
-   "terme": "Points d'IMC",
-   "definition": "La variation d'IMC entre le départ et aujourd'hui, au dixième."
+   "terme": "Perte totale (« Depuis le début »)",
+   "definition": "Écart entre le poids de départ et le poids actuel."
   },
   {
-   "terme": "Badge",
-   "definition": "Une récompense à paliers (bronze, argent, or) affichée au bord droit du bloc Salut une fois débloquée."
+   "terme": "Dernière perte",
+   "definition": "Écart entre l'avant-dernière et la dernière pesée. Égale à la perte totale au dixième près, elle s'efface au profit de celle-ci sur la home standard."
+  },
+  {
+   "terme": "Équivalence insolite",
+   "definition": "Traduction d'une perte en objets du quotidien : un dessin et une phrase, assignés par la pesée elle-même."
+  },
+  {
+   "terme": "Défilé des journaux",
+   "definition": "Bande horizontale de petits carrés, un par entrée des sept derniers jours, tous journaux mélangés sauf les pas, du plus récent au plus ancien."
+  },
+  {
+   "terme": "Dynamique",
+   "definition": "Section qui annonce, en une phrase, ce que la balance devrait faire au vu du bilan des sept derniers jours. Elle se débloque après sept jours."
+  },
+  {
+   "terme": "Différentiel",
+   "definition": "Bilan calorique des sept derniers jours : ce qui est ingéré moins le métabolisme au repos, les pas et l'activité physique. Huit mille kilocalories valent un kilo."
+  },
+  {
+   "terme": "Verdict",
+   "definition": "Lecture du différentiel en cinq tendances : à peu près stable, légère hausse, légère baisse, hausse relativement marquée, baisse relativement marquée."
+  },
+  {
+   "terme": "Tuile de sens",
+   "definition": "Petite tuile de la section Dynamique qui dit par une flèche le sens des sept derniers jours par rapport aux sept précédents, pour les repas, l'activité physique ou les pas."
+  },
+  {
+   "terme": "Mini-tuile",
+   "definition": "Tuile paramétrée qui porte les valeurs de « Progrès » et de « Côte à côte » : préfixe, valeur, unité, seconde mesure, libellé, sous-valeur, colonne de période, infobulle."
+  },
+  {
+   "terme": "Section verrouillée",
+   "definition": "Enveloppe qui dépolit son contenu, le retire du clic et de la tabulation, et pose par-dessus un message centré sur carte."
+  },
+  {
+   "terme": "Couche vitrée",
+   "definition": "Carte unique posée par-dessus la page floutée, bornée au cadre du téléphone, avec bandeau, croix, contenu et lien « Voir la page »."
+  },
+  {
+   "terme": "Tiroir",
+   "definition": "Panneau qui glisse depuis un bord de l'écran : Journal depuis la gauche, Tendance et Dynamique depuis le haut avant de s'arrimer au menu du bas."
+  },
+  {
+   "terme": "Surimpression",
+   "definition": "Contenu d'une page — un journal complet, un graphe, une équivalence — montré par-dessus l'écran courant vitré, sans quitter la home ni le tiroir."
+  },
+  {
+   "terme": "Menu simplifié",
+   "definition": "Variante du menu du bas où les boutons « Journal » et « Tendances » remplacent des onglets ; seule elle donne accès aux deux tiroirs correspondants."
+  },
+  {
+   "terme": "Module",
+   "definition": "Suivi activable (traitement, effets, repas, pas, activité physique, sommeil, temps pour soi). Drapeau absent : allumé pour le traitement et les effets, éteint pour les autres. Éteint, un module peut en plus être masqué."
+  },
+  {
+   "terme": "Objectifs du jour",
+   "definition": "1 400 kcal, protéines égales au poids multiplié par 1,5 g, 25 g de fibres, sauf valeurs saisies au profil."
+  },
+  {
+   "terme": "Ressenti du jour",
+   "definition": "Humeur déduite des effets secondaires déclarés le jour même : serein, modéré ou difficile, selon la somme des sévérités."
+  },
+  {
+   "terme": "Ajout rapide",
+   "definition": "Rangée de boutons « + », un par page à formulaire dont le module est allumé, dans l'ordre du menu du bas."
   }
  ],
  "index": [
   {
    "terme": "Accueil (onglet)",
-   "ancre": "maison"
-  },
-  {
-   "terme": "Template d'accueil",
    "ancre": "maison-home-standard-maison-page"
   },
   {
-   "terme": "Home standard",
-   "ancre": "maison-home-standard-maison-page"
+   "terme": "Actif (dose)",
+   "ancre": "maison-carre-traitement-home-standard"
   },
   {
-   "terme": "Tuile de perte",
-   "ancre": "maison-home-standard-maison-page"
+   "terme": "Actif sanguin (carte de tendance)",
+   "ancre": "maison-tiroir-tendance-des-15-derniers-jours"
   },
   {
-   "terme": "Dernière perte enregistrée",
-   "ancre": "maison-home-standard-maison-page"
+   "terme": "Ajout rapide (section)",
+   "ancre": "maison-section-ajout-rapide-home-sections"
   },
   {
-   "terme": "Depuis le début",
-   "ancre": "maison-home-standard-maison-page"
+   "terme": "Arc départ→objectif",
+   "ancre": "maison-carre-poids-evolution-home-standard"
   },
   {
-   "terme": "Boutons de coin",
-   "ancre": "maison-home-standard-maison-page"
+   "terme": "Aujourd'hui (bloc)",
+   "ancre": "maison-carre-aujourd-hui-de-l-accueil-standard"
   },
   {
-   "terme": "Bloc Salut",
+   "terme": "Avancement vers la cible",
    "ancre": "maison-bloc-salut-partage-par-les-trois-homes"
   },
   {
-   "terme": "Objectif (reste à perdre)",
+   "terme": "Avatar (bloc Salut)",
    "ancre": "maison-bloc-salut-partage-par-les-trois-homes"
   },
   {
-   "terme": "Barre d'avancement",
-   "ancre": "maison-bloc-salut-partage-par-les-trois-homes"
-  },
-  {
-   "terme": "Cure (ligne)",
-   "ancre": "maison-bloc-salut-partage-par-les-trois-homes"
-  },
-  {
-   "terme": "Rappels",
-   "ancre": "maison-bloc-salut-partage-par-les-trois-homes"
+   "terme": "Avertissement médical",
+   "ancre": "maison-pied-de-page-medical-les-deux-homes"
   },
   {
    "terme": "Badges (bloc Salut)",
@@ -209,283 +247,365 @@
    "ancre": "maison-bloc-salut-partage-par-les-trois-homes"
   },
   {
-   "terme": "Poids cible",
+   "terme": "Balance (couche vitrée)",
+   "ancre": "maison-couches-vitrees-de-la-home-sections-surimpressionvitree"
+  },
+  {
+   "terme": "Balance à plateaux (projection)",
+   "ancre": "maison-tiroir-dynamique-calcul-de-la-projection"
+  },
+  {
+   "terme": "Blocs (template)",
+   "ancre": "maison-home-sections-blocs-page"
+  },
+  {
+   "terme": "Bouton « + » de coin",
+   "ancre": "maison-home-standard-maison-page"
+  },
+  {
+   "terme": "Calories du jour",
+   "ancre": "maison-section-en-direct-home-sections"
+  },
+  {
+   "terme": "Catégorie d'IMC",
+   "ancre": "maison-carre-poids-evolution-home-standard"
+  },
+  {
+   "terme": "Cible (édition sur place)",
    "ancre": "maison-bloc-salut-partage-par-les-trois-homes"
   },
   {
-   "terme": "Carré poids",
-   "ancre": "maison-carre-poids-evolution-home-standard"
-  },
-  {
-   "terme": "Semaine de cure",
-   "ancre": "maison-carre-poids-evolution-home-standard"
-  },
-  {
-   "terme": "Perte moyenne par semaine",
-   "ancre": "maison-carre-poids-evolution-home-standard"
-  },
-  {
-   "terme": "Arc départ → objectif",
-   "ancre": "maison-carre-poids-evolution-home-standard"
-  },
-  {
-   "terme": "IMC (masquage)",
-   "ancre": "maison-carre-poids-evolution-home-standard"
-  },
-  {
-   "terme": "Variation en % du poids de départ",
-   "ancre": "maison-carre-poids-evolution-home-standard"
-  },
-  {
-   "terme": "Palier d'IMC franchi",
-   "ancre": "maison-bloc-palier-d-imc-franchi"
-  },
-  {
-   "terme": "Carré traitement",
+   "terme": "Concentration active",
    "ancre": "maison-carre-traitement-home-standard"
   },
   {
-   "terme": "Dose initiale / actuelle / active",
-   "ancre": "maison-carre-traitement-home-standard"
+   "terme": "Confidentialité (mention)",
+   "ancre": "maison-pied-de-page-medical-les-deux-homes"
   },
   {
-   "terme": "Milligrammes cumulés",
-   "ancre": "maison-carre-traitement-home-standard"
+   "terme": "Côte à côte (section)",
+   "ancre": "maison-section-cote-a-cote-home-sections"
   },
   {
-   "terme": "Smiley du ressenti",
-   "ancre": "maison-carre-traitement-home-standard"
+   "terme": "Couches vitrées",
+   "ancre": "maison-couches-vitrees-de-la-home-sections-surimpressionvitree"
   },
   {
-   "terme": "Humeur du jour",
-   "ancre": "maison-carre-traitement-home-standard"
+   "terme": "Cure (ligne du bloc Salut)",
+   "ancre": "maison-bloc-salut-partage-par-les-trois-homes"
   },
   {
-   "terme": "Traitement non commencé",
-   "ancre": "maison-carre-traitement-home-standard"
-  },
-  {
-   "terme": "Mes pas",
-   "ancre": "maison-bloc-mes-pas-home-standard"
-  },
-  {
-   "terme": "Objectif de pas (8 000)",
-   "ancre": "maison-bloc-mes-pas-home-standard"
-  },
-  {
-   "terme": "Défilé des journaux",
+   "terme": "Défilé des dernières entrées",
    "ancre": "maison-defile-des-dernieres-entrees-de-journaux"
   },
   {
-   "terme": "Dynamique (section)",
-   "ancre": "maison-section-dynamique-bloc-du-verdict-partage"
+   "terme": "Dépoli (contenu verrouillé)",
+   "ancre": "maison-section-verrouillee-composant"
   },
   {
-   "terme": "Verdict",
-   "ancre": "maison-section-dynamique-bloc-du-verdict-partage"
+   "terme": "Depuis le début (tuile)",
+   "ancre": "maison-home-standard-maison-page"
   },
   {
-   "terme": "Déblocage (7 jours)",
-   "ancre": "maison-section-dynamique-bloc-du-verdict-partage"
-  },
-  {
-   "terme": "Section verrouillée",
-   "ancre": "maison-section-dynamique-bloc-du-verdict-partage"
-  },
-  {
-   "terme": "Fête Dynamique débloquée",
-   "ancre": "maison-fete-dynamique-debloquee"
-  },
-  {
-   "terme": "Confettis",
-   "ancre": "maison-fete-dynamique-debloquee"
-  },
-  {
-   "terme": "Tiroir Dynamique",
-   "ancre": "maison-tiroir-dynamique-calcul-de-la-projection"
+   "terme": "Dernière perte (tuile)",
+   "ancre": "maison-home-standard-maison-page"
   },
   {
    "terme": "Différentiel",
    "ancre": "maison-tiroir-dynamique-calcul-de-la-projection"
   },
   {
-   "terme": "Métabolisme au repos",
+   "terme": "Distance de marche",
+   "ancre": "maison-bloc-mes-pas-home-standard"
+  },
+  {
+   "terme": "Doses initiale et actuelle",
+   "ancre": "maison-carre-traitement-home-standard"
+  },
+  {
+   "terme": "Durée de marche estimée",
+   "ancre": "maison-bloc-mes-pas-home-standard"
+  },
+  {
+   "terme": "Dynamique (bloc du verdict)",
+   "ancre": "maison-section-dynamique-bloc-du-verdict-partage"
+  },
+  {
+   "terme": "Dynamique (fête du déblocage)",
+   "ancre": "maison-fete-dynamique-debloquee"
+  },
+  {
+   "terme": "Dynamique (tiroir)",
    "ancre": "maison-tiroir-dynamique-calcul-de-la-projection"
   },
   {
-   "terme": "Projection (balance)",
-   "ancre": "maison-tiroir-dynamique-calcul-de-la-projection"
+   "terme": "Dynamique (trois sens)",
+   "ancre": "maison-section-dynamique-rangee-des-trois-sens-home-sections"
   },
   {
-   "terme": "Avertissement médical",
-   "ancre": "maison-pied-de-page-medical-les-deux-homes"
+   "terme": "Effets secondaires (matrice)",
+   "ancre": "maison-matrice-des-effets-secondaires-par-moment-de-la-journee"
   },
   {
-   "terme": "Pied de page",
-   "ancre": "maison-pied-de-page-medical-les-deux-homes"
+   "terme": "En direct (pastille)",
+   "ancre": "maison-carre-aujourd-hui-de-l-accueil-standard"
+  },
+  {
+   "terme": "En direct (section)",
+   "ancre": "maison-section-en-direct-home-sections"
+  },
+  {
+   "terme": "Équivalence insolite (surimpression)",
+   "ancre": "maison-surimpression-d-une-equivalence-insolite-home-sections"
+  },
+  {
+   "terme": "Évolution (titre de section)",
+   "ancre": "maison-section-progres-evolution-home-sections"
+  },
+  {
+   "terme": "Félicitation (widget)",
+   "ancre": "maison-widget-de-felicitation"
+  },
+  {
+   "terme": "Fenêtre de période (7/14/30/90 jours)",
+   "ancre": "maison-surimpression-du-graphe-principal-tiroir-tendance"
+  },
+  {
+   "terme": "Fibres (barre d'objectif)",
+   "ancre": "maison-carre-aujourd-hui-de-l-accueil-standard"
+  },
+  {
+   "terme": "Format des nombres",
+   "ancre": "maison-home-standard-maison-page"
+  },
+  {
+   "terme": "Franchissement de palier (date)",
+   "ancre": "maison-bloc-palier-d-imc-franchi"
+  },
+  {
+   "terme": "Graphe principal (surimpression)",
+   "ancre": "maison-surimpression-du-graphe-principal-tiroir-tendance"
   },
   {
    "terme": "Home sections",
    "ancre": "maison-home-sections-blocs-page"
   },
   {
-   "terme": "Home blocs",
-   "ancre": "maison-home-sections-blocs-page"
+   "terme": "Home standard",
+   "ancre": "maison-home-standard-maison-page"
   },
   {
-   "terme": "Ajout rapide",
-   "ancre": "maison-section-ajout-rapide-home-sections"
+   "terme": "Humeur du jour",
+   "ancre": "maison-carre-traitement-home-standard"
   },
   {
-   "terme": "« + » flottant",
-   "ancre": "maison-section-ajout-rapide-home-sections"
+   "terme": "IMC (ligne masquée)",
+   "ancre": "maison-carre-poids-evolution-home-standard"
   },
   {
-   "terme": "En direct",
+   "terme": "IMC (palier franchi)",
+   "ancre": "maison-bloc-palier-d-imc-franchi"
+  },
+  {
+   "terme": "IMC (points gagnés ou perdus)",
+   "ancre": "maison-section-progres-evolution-home-sections"
+  },
+  {
+   "terme": "Insuffisance pondérale (alerte)",
+   "ancre": "maison-bloc-palier-d-imc-franchi"
+  },
+  {
+   "terme": "Invitation « 1er repas »",
    "ancre": "maison-section-en-direct-home-sections"
   },
   {
-   "terme": "Bande kcal",
+   "terme": "Journal (tiroir)",
+   "ancre": "maison-tiroir-journal"
+  },
+  {
+   "terme": "Journal d'une page (surimpression)",
+   "ancre": "maison-surimpression-du-journal-d-une-page-tiroir-journal"
+  },
+  {
+   "terme": "kcal des pas",
+   "ancre": "maison-bloc-mes-pas-home-standard"
+  },
+  {
+   "terme": "kg par semaine",
+   "ancre": "maison-carre-poids-evolution-home-standard"
+  },
+  {
+   "terme": "Médaillon (Côte à côte)",
+   "ancre": "maison-section-cote-a-cote-home-sections"
+  },
+  {
+   "terme": "Menus (couche vitrée)",
+   "ancre": "maison-couches-vitrees-de-la-home-sections-surimpressionvitree"
+  },
+  {
+   "terme": "Mes pas (bloc)",
+   "ancre": "maison-bloc-mes-pas-home-standard"
+  },
+  {
+   "terme": "Métabolisme au repos (tiroir)",
+   "ancre": "maison-tiroir-dynamique-calcul-de-la-projection"
+  },
+  {
+   "terme": "Mini-tuile",
+   "ancre": "maison-mini-tuile-composant-de-la-famille-progres-cote-a-cote"
+  },
+  {
+   "terme": "Modules (défauts d'un drapeau absent)",
+   "ancre": "maison-home-standard-maison-page"
+  },
+  {
+   "terme": "Mouvement réduit",
+   "ancre": "maison-widget-de-felicitation"
+  },
+  {
+   "terme": "Niveau sanguin actif (tuile)",
    "ancre": "maison-section-en-direct-home-sections"
+  },
+  {
+   "terme": "Nouveau Cap Franchi",
+   "ancre": "maison-bloc-palier-d-imc-franchi"
+  },
+  {
+   "terme": "Objectif de pas (8 000)",
+   "ancre": "maison-bloc-mes-pas-home-standard"
   },
   {
    "terme": "Objectifs nutritionnels du jour",
    "ancre": "maison-section-en-direct-home-sections"
   },
   {
-   "terme": "Niveau sanguin actif",
+   "terme": "Où en est l'IMC (couche)",
+   "ancre": "maison-couches-vitrees-de-la-home-sections-surimpressionvitree"
+  },
+  {
+   "terme": "Paliers de dose (couche)",
+   "ancre": "maison-couches-vitrees-de-la-home-sections-surimpressionvitree"
+  },
+  {
+   "terme": "Pas (tuile En direct)",
    "ancre": "maison-section-en-direct-home-sections"
   },
   {
-   "terme": "Trois sens (repas, activité, pas)",
-   "ancre": "maison-section-dynamique-rangee-des-trois-sens-home-sections"
+   "terme": "Pied de page médical",
+   "ancre": "maison-pied-de-page-medical-les-deux-homes"
   },
   {
-   "terme": "Sens d'une période",
-   "ancre": "maison-section-dynamique-rangee-des-trois-sens-home-sections"
-  },
-  {
-   "terme": "Progrès / Évolution",
-   "ancre": "maison-section-progres-evolution-home-sections"
-  },
-  {
-   "terme": "Points d'IMC",
-   "ancre": "maison-section-progres-evolution-home-sections"
-  },
-  {
-   "terme": "Mini-tuile",
-   "ancre": "maison-section-progres-evolution-home-sections"
-  },
-  {
-   "terme": "Durée d'une perte",
-   "ancre": "maison-section-progres-evolution-home-sections"
-  },
-  {
-   "terme": "Équivalence insolite",
-   "ancre": "maison-surimpression-d-une-equivalence-insolite-home-sections"
-  },
-  {
-   "terme": "Côte à côte",
+   "terme": "Pluriel des unités",
    "ancre": "maison-section-cote-a-cote-home-sections"
   },
   {
-   "terme": "Début | aujourd'hui",
-   "ancre": "maison-section-cote-a-cote-home-sections"
+   "terme": "Progrès (section)",
+   "ancre": "maison-section-progres-evolution-home-sections"
   },
   {
-   "terme": "Moyenne par jour / par semaine",
-   "ancre": "maison-section-cote-a-cote-home-sections"
+   "terme": "Projection (phrase)",
+   "ancre": "maison-tiroir-dynamique-calcul-de-la-projection"
   },
   {
-   "terme": "Médaillon",
-   "ancre": "maison-section-cote-a-cote-home-sections"
+   "terme": "Protéines (barre d'objectif)",
+   "ancre": "maison-carre-aujourd-hui-de-l-accueil-standard"
   },
   {
-   "terme": "Couche vitrée",
-   "ancre": "maison-couches-vitrees-de-la-home-sections-surimpressionvitree"
+   "terme": "Prise datée du futur",
+   "ancre": "maison-carre-traitement-home-standard"
   },
   {
-   "terme": "Menus (couche)",
-   "ancre": "maison-couches-vitrees-de-la-home-sections-surimpressionvitree"
+   "terme": "Rappels (ligne du bloc Salut)",
+   "ancre": "maison-bloc-salut-partage-par-les-trois-homes"
   },
   {
-   "terme": "Balance (couche)",
-   "ancre": "maison-couches-vitrees-de-la-home-sections-surimpressionvitree"
+   "terme": "Reste à perdre",
+   "ancre": "maison-bloc-salut-partage-par-les-trois-homes"
   },
   {
-   "terme": "Où en est l'IMC",
-   "ancre": "maison-couches-vitrees-de-la-home-sections-surimpressionvitree"
-  },
-  {
-   "terme": "Paliers de dose",
-   "ancre": "maison-couches-vitrees-de-la-home-sections-surimpressionvitree"
-  },
-  {
-   "terme": "Tiroir Journal",
-   "ancre": "maison-tiroir-journal"
-  },
-  {
-   "terme": "Menu simplifié",
-   "ancre": "maison-tiroir-journal"
-  },
-  {
-   "terme": "Journal en surimpression",
-   "ancre": "maison-surimpression-du-journal-d-une-page-tiroir-journal"
-  },
-  {
-   "terme": "Tiroir Tendance",
-   "ancre": "maison-tiroir-tendance-des-15-derniers-jours"
-  },
-  {
-   "terme": "Tendance des 15 derniers jours",
-   "ancre": "maison-tiroir-tendance-des-15-derniers-jours"
-  },
-  {
-   "terme": "Sparkline",
-   "ancre": "maison-tiroir-tendance-des-15-derniers-jours"
-  },
-  {
-   "terme": "Bascule titre ↔ valeurs",
-   "ancre": "maison-tiroir-tendance-des-15-derniers-jours"
-  },
-  {
-   "terme": "Graphe principal en surimpression",
-   "ancre": "maison-surimpression-du-graphe-principal-tiroir-tendance"
-  },
-  {
-   "terme": "Période (fenêtre temporelle)",
-   "ancre": "maison-surimpression-du-graphe-principal-tiroir-tendance"
-  },
-  {
-   "terme": "Matrice des effets",
-   "ancre": "maison-matrice-des-effets-secondaires-par-moment-de-la-journee"
-  },
-  {
-   "terme": "Widget de félicitation",
-   "ancre": "maison-widget-de-felicitation"
-  },
-  {
-   "terme": "Félicitations (types)",
-   "ancre": "maison-widget-de-felicitation"
+   "terme": "Salut (bloc)",
+   "ancre": "maison-bloc-salut-partage-par-les-trois-homes"
   },
   {
    "terme": "Scène de particules",
    "ancre": "maison-widget-de-felicitation"
   },
   {
-   "terme": "Mouvement réduit",
-   "ancre": "maison-widget-de-felicitation"
+   "terme": "Section verrouillée",
+   "ancre": "maison-section-verrouillee-composant"
+  },
+  {
+   "terme": "Semaine de cure",
+   "ancre": "maison-carre-poids-evolution-home-standard"
+  },
+  {
+   "terme": "Semaine de traitement",
+   "ancre": "maison-carre-traitement-home-standard"
+  },
+  {
+   "terme": "Sommeil (couche vitrée)",
+   "ancre": "maison-couches-vitrees-de-la-home-sections-surimpressionvitree"
+  },
+  {
+   "terme": "Sparkline (courbe de tendance)",
+   "ancre": "maison-tiroir-tendance-des-15-derniers-jours"
+  },
+  {
+   "terme": "Template d'accueil (choix)",
+   "ancre": "maison-home-standard-maison-page"
+  },
+  {
+   "terme": "Tendance des 15 derniers jours (tiroir)",
+   "ancre": "maison-tiroir-tendance-des-15-derniers-jours"
+  },
+  {
+   "terme": "Traitement non commencé (invite)",
+   "ancre": "maison-carre-traitement-home-standard"
+  },
+  {
+   "terme": "Trois sens (tuiles)",
+   "ancre": "maison-section-dynamique-rangee-des-trois-sens-home-sections"
+  },
+  {
+   "terme": "Trophée (objectif atteint)",
+   "ancre": "maison-section-en-direct-home-sections"
+  },
+  {
+   "terme": "Tuile de perte",
+   "ancre": "maison-home-standard-maison-page"
+  },
+  {
+   "terme": "Un temps pour soi (couche)",
+   "ancre": "maison-couches-vitrees-de-la-home-sections-surimpressionvitree"
+  },
+  {
+   "terme": "Variation en % du poids de départ",
+   "ancre": "maison-carre-poids-evolution-home-standard"
+  },
+  {
+   "terme": "Verdict de la dynamique",
+   "ancre": "maison-section-dynamique-bloc-du-verdict-partage"
+  },
+  {
+   "terme": "Vitesse de marche de référence",
+   "ancre": "maison-bloc-mes-pas-home-standard"
+  },
+  {
+   "terme": "Voir mon évolution et mes graphiques",
+   "ancre": "maison-bloc-palier-d-imc-franchi"
   }
  ],
  "ecrans_illustres": [
   "accueil/home-standard-maison-page",
   "accueil/bloc-salut-partage-par-les-trois-homes",
+  "alimentation/carre-aujourd-hui-de-l-accueil-standard",
   "accueil/carre-poids-evolution-home-standard",
   "accueil/bloc-palier-d-imc-franchi",
   "accueil/carre-traitement-home-standard",
   "accueil/bloc-mes-pas-home-standard",
   "accueil/defile-des-dernieres-entrees-de-journaux",
   "accueil/section-dynamique-bloc-du-verdict-partage",
+  "accueil/section-verrouillee-composant",
   "accueil/fete-dynamique-debloquee",
   "accueil/tiroir-dynamique-calcul-de-la-projection",
   "accueil/pied-de-page-medical-les-deux-homes",
@@ -496,6 +616,7 @@
   "accueil/section-progres-evolution-home-sections",
   "accueil/surimpression-d-une-equivalence-insolite-home-sections",
   "accueil/section-cote-a-cote-home-sections",
+  "accueil/mini-tuile-composant-de-la-famille-progres-cote-a-cote",
   "accueil/couches-vitrees-de-la-home-sections-surimpressionvitree",
   "accueil/tiroir-journal",
   "accueil/surimpression-du-journal-d-une-page-tiroir-journal",

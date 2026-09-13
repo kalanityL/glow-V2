@@ -1,0 +1,332 @@
+{
+ "inventions": [
+  {
+   "categorie": "Modèle de données",
+   "fonctionnalite": "Migration des types vers des tables",
+   "texte": "Comment convertir un historique où SideEffectLog.type est un nom libre vers un typeId référencé : créer une entrée de table par nom distinct rencontré, en slug pour les entrées livrées et en UUID pour celles créées, puis réécrire chaque ligne. CONVENTIONS.md pose la décision, aucun code n'écrit ce chemin de conversion.",
+   "origine": "L'inventaire dit que les interfaces sont déclarées sans table et que la règle « référence par identifiant » demande typeId ; il ne dit nulle part comment passer de l'un à l'autre, et rien dans le dépôt ne l'esquisse."
+  },
+  {
+   "categorie": "Félicitations",
+   "fonctionnalite": "Calcul des jalons de félicitation",
+   "texte": "Une passe unique au chargement qui compte les journées remplies depuis les sept journaux, mémorise le dernier jalon fêté et ne rejoue rien, sur le modèle de badgeCelebration.ts (glp1_badge_tiers_connus). DECLENCHEMENTS.md décrit les jalons, pas la mécanique.",
+   "origine": "La célébration des badges compare un palier courant à un palier connu persisté ; l'analogie est tentante pour les jalons de calendrier, mais aucune ligne de code ne la propose et le fichier dit explicitement de ne rien arbitrer avant l'implémentation."
+  },
+  {
+   "categorie": "Retours et sondage",
+   "fonctionnalite": "File d'attente hors connexion",
+   "texte": "Ranger l'alerte non partie dans le stockage local avec son horodatage, la rejouer au prochain envoi réussi, et purger la file comme le journal des envois du sondage le fait déjà à deux jours.",
+   "origine": "Le commentaire de remoteSubmit.ts dit qu'une file serait possible et qu'elle n'est pas écrite ; la forme qu'elle prendrait — clé, purge, moment du rejeu — est de moi seul. Le vérificateur a eu raison sur un point : le cas décrit par le code n'est pas la coupure réseau mais le mode local ou l'absence de compte ; le chapitre le dit désormais ainsi."
+  },
+  {
+   "categorie": "Dette",
+   "fonctionnalite": "Nettoyage du code mort",
+   "texte": "Supprimer d'un même lot nextDoseMessage, lastDose, currentTime, TimeOfDayChart, la branche page de BlocSuiviPoids, mealCountsLast7Days, meTimeMinutesLast7Days, TIER_TILE_CLASS et JournalViewMode, plutôt que de les garder chacun « le temps que le sujet se pose ».",
+   "origine": "Chaque point est constaté séparément dans l'inventaire, souvent avec la mention « gardée avec ses tests » ; les regrouper en un lot est une proposition d'organisation, pas un fait du code, et plusieurs de ces gardes sont explicitement voulues. JournalViewMode y est en outre mal placé : le type est consommé par useMealJournal, que la page Menus monte."
+  },
+  {
+   "categorie": "Alimentation",
+   "fonctionnalite": "Avertissement sur une recette amputée",
+   "texte": "Refuser le ré-enregistrement d'une recette dont un ingrédient est introuvable, ou l'écrire sous le formulaire à l'accent du thème avant que la valeur baisse.",
+   "origine": "Le code qualifie le défaut de « connu, non traité » : rien ne dit ce qu'il faudra faire, et refuser plutôt qu'avertir change le comportement d'un écran sans décision."
+  },
+  {
+   "categorie": "Traitement",
+   "fonctionnalite": "Conservation du nom libre à la migration",
+   "texte": "Garder le nom saisi de l'ancien « Autre traitement » dans un champ de notes de la première prise, pour ne pas le perdre à la conversion.",
+   "origine": "Le commentaire du catalogue dit que le nom est perdu « faute d'endroit où le conserver » ; désigner cet endroit est une décision de modèle que personne n'a prise."
+  },
+  {
+   "categorie": "Accueil",
+   "fonctionnalite": "Tuile des pas pleine largeur quand les repas sont coupés",
+   "texte": "Marquer comme arbitrage de Claude, « à défaire d'un mot », le fait que la tuile des pas prenne toute la largeur quand le module repas est éteint.",
+   "origine": "Retiré du chapitre. Le col-span-2 existe bien quand foodTrackingEnabled est faux, mais aucun commentaire d'arbitrage ne l'accompagne : la formule « à défaire d'un mot » n'apparaît qu'une fois dans le fichier, et elle couvre l'autre cas — repas et pas coupés tous les deux —, déjà consigné. La marque était de moi."
+  },
+  {
+   "categorie": "Accueil",
+   "fonctionnalite": "Bloc « Nouveau palier IMC atteint » comme écran mort",
+   "texte": "Consacrer un écran entier du chapitre au bloc de palier d'IMC franchi, présenté comme le plus riche des chemins morts.",
+   "origine": "Manque écarté après vérification. Le bloc est vivant : la home standard l'ouvre au clic sur la ligne IMC, et App.tsx l'ouvre seul dès qu'une pesée fait descendre d'une classe, avec mémoire du dernier palier notifié. Seuls l'œil et le clic de la home à sections sont éteints par CARRES_SUIVI, et le chapitre le dit maintenant en ces termes."
+  },
+  {
+   "categorie": "Métabolisme",
+   "fonctionnalite": "Une entrée du bilan métabolique dans ce chapitre",
+   "texte": "Ajouter au chapitre une ligne ou un écran sur le bilan métabolique, pour que le titre de la section tienne sa promesse.",
+   "origine": "Manque écarté : aucune règle décidée absente du code ni aucun arbitrage de Claude n'a été trouvé sur MetabolismTracker. La correction retenue est l'inverse — le titre de la section est devenu « Rapport, badges, partage »."
+  },
+  {
+   "categorie": "Accueil",
+   "fonctionnalite": "injectionRecency sans lecteur",
+   "texte": "Ranger injectionRecency parmi les fonctions de homeOverview sans lecteur dans les homes.",
+   "origine": "Retiré du chapitre. La home standard de la Mixte l'importe et l'appelle pour la ligne de fraîcheur de la dernière prise. Les cinq autres noms de la ligne restent sans appelant."
+  },
+  {
+   "categorie": "Félicitations",
+   "fonctionnalite": "Point d'entrée du widget de félicitation",
+   "texte": "Donner au widget une porte dans l'application — un déclenchement au chargement de la home, comme la fête « Dynamique débloquée » — plutôt que de le laisser sans chemin le jour où les jalons seront calculés.",
+   "origine": "Le seul écran qui ouvre le widget est la page d'essai « Félicitations », qui relève de l'administration et sort du périmètre. Ce que le chapitre peut dire est qu'aucun écran de l'application ne l'ouvre ; où la porte devra se poser n'est écrit nulle part."
+  },
+  {
+   "categorie": "Documentation",
+   "fonctionnalite": "Captures des écrans non montés",
+   "texte": "Illustrer la variante « page » du bloc Suivi du poids, les cartes journalières des pas et les analyses textuelles des graphes repas par des captures, comme les autres écrans du chapitre.",
+   "origine": "Ces trois-là ne figurent pas parmi les écrans de l'inventaire et rien ne les rend : aucun nom de capture existant ne leur correspond, et en inventer un ferait échouer l'insertion. Ils sont donc décrits sans figure."
+  },
+  {
+   "categorie": "Modèle de données",
+   "fonctionnalite": "Conversion des sauvegardes au renommage de mysteryBadgeHidden",
+   "texte": "Accompagner le passage de mysteryBadgeHidden à un nom positif d'une conversion des sauvegardes existantes.",
+   "origine": "Retiré du chapitre. types.ts consigne la décision inverse, mot pour mot : « aucune sauvegarde n'est à ménager et aucune migration n'est à écrire »."
+  }
+ ],
+ "glossaire": [
+  {
+   "terme": "Arbitrage non validé",
+   "definition": "Choix pris par Claude faute d'instruction, consigné dans le code pour être discuté. Il tient jusqu'à décision contraire."
+  },
+  {
+   "terme": "Non implémenté",
+   "definition": "Règle décidée, ou spécification écrite, dont le code ne porte rien — ou dont le code porte tout sauf le chemin qui y mène."
+  },
+  {
+   "terme": "V2",
+   "definition": "Le chantier de réécriture en cours. Sur un point qu'elle a tranché, la V2 prime sur la V1 décrite ici."
+  },
+  {
+   "terme": "Journée remplie",
+   "definition": "Journée portant au moins une saisie parmi injection, comprimé, effet secondaire, menu, activité physique, temps pour soi et sommeil. Les pas ne comptent jamais : leur relevé est automatique."
+  },
+  {
+   "terme": "Jalon",
+   "definition": "Seuil d'usage ou de progression qui déclencherait une félicitation : nombre de journées remplies, mois ou années d'utilisation, part de l'objectif de poids atteinte."
+  },
+  {
+   "terme": "Escalier des doses",
+   "definition": "La suite des paliers de dose d'un traitement, du premier au palier en cours. Le vocabulaire suit la forme : « injections » ou « comprimés »."
+  },
+  {
+   "terme": "Couche vitrée",
+   "definition": "Bloc d'une page ouvert par-dessus l'accueil, sur un fond dépoli. Le contenu est celui de la page ; seule la disposition change."
+  },
+  {
+   "terme": "Chemin mort",
+   "definition": "Code écrit, parfois testé, qu'aucune interaction ne peut atteindre : composant non monté, fonction sans appelant, branche derrière un interrupteur à faux."
+  },
+  {
+   "terme": "Palier de badge",
+   "definition": "Niveau d'un badge (bronze, argent, or…). Son franchissement ouvre un bloc de célébration au-dessus de la page courante."
+  },
+  {
+   "terme": "Heure murale locale",
+   "definition": "Date et heure lues à l'horloge de la personne, sans fuseau. Décidées sous la forme d'un champ unique, elles restent stockées en date et heure séparées."
+  },
+  {
+   "terme": "Coupure au changement de traitement",
+   "definition": "Règle du 2026-08-09 : les calculs remontent le journal jusqu'à la première prise d'un autre traitement et s'arrêtent là. Elle borne la série en cours."
+  },
+  {
+   "terme": "Branche d'étape",
+   "definition": "Condition qui fait apparaître ou disparaître une étape du questionnaire d'accueil. Elle se ferme sur un oui ou un non explicite, jamais sur une absence de réponse."
+  }
+ ],
+ "index": [
+  {
+   "terme": "analyzeMealProgress",
+   "ancre": "non-implemente-accueil-tiroirs"
+  },
+  {
+   "terme": "analyzeSportProgress",
+   "ancre": "non-implemente-accueil-tiroirs"
+  },
+  {
+   "terme": "Analyses textuelles des graphes repas",
+   "ancre": "non-implemente-analyses-textuelles-des-graphes-repas"
+  },
+  {
+   "terme": "averageWeeklyChange",
+   "ancre": "non-implemente-poids-et-mensurations"
+  },
+  {
+   "terme": "Bandeau de débogage du PDF",
+   "ancre": "non-implemente-rapport-badges-partage"
+  },
+  {
+   "terme": "BODY_MAP_SITES",
+   "ancre": "non-implemente-traitement"
+  },
+  {
+   "terme": "Bornes de saisie",
+   "ancre": "non-implemente-modele-de-donnees"
+  },
+  {
+   "terme": "CARRES_SUIVI",
+   "ancre": "non-implemente-accueil-tiroirs"
+  },
+  {
+   "terme": "Cartes journalières des pas",
+   "ancre": "non-implemente-cartes-journalieres-defilables-des-pas"
+  },
+  {
+   "terme": "Cartographie corporelle",
+   "ancre": "non-implemente-traitement"
+  },
+  {
+   "terme": "Chemins morts",
+   "ancre": "non-implemente-accueil-tiroirs"
+  },
+  {
+   "terme": "computeDailySwipeList",
+   "ancre": "non-implemente-cartes-journalieres-defilables-des-pas"
+  },
+  {
+   "terme": "Corrélation, seuils de lecture",
+   "ancre": "non-implemente-rapport-badges-partage"
+  },
+  {
+   "terme": "createdAt / updatedAt",
+   "ancre": "non-implemente-modele-de-donnees"
+  },
+  {
+   "terme": "CustomFood",
+   "ancre": "non-implemente-modele-de-donnees"
+  },
+  {
+   "terme": "DECLENCHEMENTS.md",
+   "ancre": "non-implemente-widget-de-felicitation"
+  },
+  {
+   "terme": "Dynamique, place de la section",
+   "ancre": "non-implemente-accueil-tiroirs"
+  },
+  {
+   "terme": "Escalier des doses",
+   "ancre": "non-implemente-traitement"
+  },
+  {
+   "terme": "FAQ",
+   "ancre": "non-implemente-profil-compte-retours"
+  },
+  {
+   "terme": "File d'attente des retours",
+   "ancre": "non-implemente-profil-compte-retours"
+  },
+  {
+   "terme": "Formes mélangées",
+   "ancre": "non-implemente-traitement"
+  },
+  {
+   "terme": "Histogramme « Composition moyenne / h »",
+   "ancre": "non-implemente-histogramme-composition-moyenne-h-non-monte"
+  },
+  {
+   "terme": "HungerLevel",
+   "ancre": "non-implemente-modele-de-donnees"
+  },
+  {
+   "terme": "IMC, échelle et étiquettes",
+   "ancre": "non-implemente-poids-et-mensurations"
+  },
+  {
+   "terme": "Jalons de félicitation",
+   "ancre": "non-implemente-widget-de-felicitation"
+  },
+  {
+   "terme": "JournalViewMode",
+   "ancre": "non-implemente-modele-de-donnees"
+  },
+  {
+   "terme": "localDateTime",
+   "ancre": "non-implemente-modele-de-donnees"
+  },
+  {
+   "terme": "Matrice matin / après-midi / soir",
+   "ancre": "non-implemente-effets-secondaires"
+  },
+  {
+   "terme": "mealCountsLast7Days",
+   "ancre": "non-implemente-alimentation"
+  },
+  {
+   "terme": "MessageActiviteEnregistree",
+   "ancre": "non-implemente-activite-sommeil-pas-temps-pour-soi"
+  },
+  {
+   "terme": "MessageRepasEnregistre",
+   "ancre": "non-implemente-alimentation"
+  },
+  {
+   "terme": "meTimeMinutesLast7Days",
+   "ancre": "non-implemente-activite-sommeil-pas-temps-pour-soi"
+  },
+  {
+   "terme": "mysteryBadgeHidden",
+   "ancre": "non-implemente-rapport-badges-partage"
+  },
+  {
+   "terme": "nextDoseMessage",
+   "ancre": "non-implemente-traitement"
+  },
+  {
+   "terme": "onDeleteItem, tiroir Journal",
+   "ancre": "non-implemente-accueil-tiroirs"
+  },
+  {
+   "terme": "Palier suivant, absence",
+   "ancre": "non-implemente-traitement"
+  },
+  {
+   "terme": "Pesée de départ",
+   "ancre": "non-implemente-poids-et-mensurations"
+  },
+  {
+   "terme": "QR code de partage",
+   "ancre": "non-implemente-rapport-badges-partage"
+  },
+  {
+   "terme": "Questionnaire d'accueil",
+   "ancre": "non-implemente-questionnaire-d-accueil-simulation"
+  },
+  {
+   "terme": "Recette amputée",
+   "ancre": "non-implemente-alimentation"
+  },
+  {
+   "terme": "Repas vs en-cas",
+   "ancre": "non-implemente-alimentation"
+  },
+  {
+   "terme": "SideEffectType",
+   "ancre": "non-implemente-modele-de-donnees"
+  },
+  {
+   "terme": "Sommeil × nutrition",
+   "ancre": "non-implemente-graphes-croises-sommeil-nutrition-sleepnutritionchart-mis-de"
+  },
+  {
+   "terme": "Suivi hydratation",
+   "ancre": "non-implemente-profil-compte-retours"
+  },
+  {
+   "terme": "TIER_TILE_CLASS",
+   "ancre": "non-implemente-effets-secondaires"
+  },
+  {
+   "terme": "useShareSport",
+   "ancre": "non-implemente-activite-sommeil-pas-temps-pour-soi"
+  },
+  {
+   "terme": "Variante « page » du bloc Suivi du poids",
+   "ancre": "non-implemente-variante-page-du-bloc-suivi-du-poids"
+  },
+  {
+   "terme": "Widget de félicitation",
+   "ancre": "non-implemente-widget-de-felicitation"
+  }
+ ],
+ "ecrans_illustres": [
+  "transversal/questionnaire-d-accueil-simulation",
+  "alimentation/histogramme-composition-moyenne-h-non-monte",
+  "activite/graphes-croises-sommeil-nutrition-sleepnutritionchart-mis-de",
+  "accueil/widget-de-felicitation"
+ ]
+}

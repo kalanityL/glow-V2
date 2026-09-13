@@ -63,271 +63,487 @@
   {
    "categorie": "exemples",
    "fonctionnalite": "Camille",
-   "texte": "Objectif final 80 kg ; dernière pesée 91,4 kg le 12 septembre 2026 ; dernière injection 1 mg ; e-mail camille@example.com ; formulaire ouvert depuis la Balance ; deux messages dans l'historique.",
+   "texte": "Objectif final 80 kg ; dernière pesée 91,4 kg le 12 septembre 2026 ; dernière injection 1 mg ; e-mail camille@example.com ; formulaire ouvert depuis la Balance ; deux messages dans l'historique ; rappel d'injection le lundi à 20:00.",
    "origine": "Valeurs choisies pour les exemples, hors des chiffres imposés (née en 1978, 168 cm, 96 kg en mai 2026, Ozempic 0,25 mg en semaine 1) ; à aligner avec les autres chapitres."
+  },
+  {
+   "categorie": "profil",
+   "fonctionnalite": "Modifier le profil",
+   "texte": "L'âge et la taille sont arrondis à l'entier le plus proche : taper « 47,6 » dans Âge enregistre 48.",
+   "origine": "Réfutation retenue. sanitizeInteger appelle bien Math.round, mais aucun chemin d'interface ne lui passe jamais une décimale : dès qu'une case porte une règle, NumberField tronque à chaque frappe (decimals = 0 pour l'âge et la taille). J'avais décrit du code mort comme un comportement ; le chapitre écrit maintenant la troncature et l'exemple donne 47."
+  },
+  {
+   "categorie": "profil",
+   "fonctionnalite": "Modifier le profil",
+   "texte": "Une saisie refusée n'est jamais enregistrée : la case revient à la valeur enregistrée.",
+   "origine": "Réfutation retenue. C'est la doctrine annoncée par le commentaire de ProfileInlineField, et c'est vrai du seul champ de texte. Les quatre cases chiffrées reviennent à la dernière valeur valable traversée et la remontent à la case, qui l'enregistre si elle diffère du profil. Le chapitre décrit maintenant les deux comportements séparément."
+  },
+  {
+   "categorie": "avatar",
+   "fonctionnalite": "Importer une photo d'avatar",
+   "texte": "Le refus de poids écrit « Cette photo pèse 18,4 Mo », avec une virgule décimale.",
+   "origine": "Réfutation retenue. formatBytes passe par formatNumber, dont le contrat depuis le 2026-08-28 est un point à l'affichage. J'avais francisé une citation ; le chapitre écrit « 18.4 Mo »."
+  },
+  {
+   "categorie": "navigation",
+   "fonctionnalite": "Aperçu profil du menu Configuration & Plus",
+   "texte": "La perte de poids s'écrit toujours avec une décimale, gabarit « -X.X kg ».",
+   "origine": "Réfutation retenue. Le parseFloat autour du toFixed(1) fait tomber le zéro de queue : une perte de 5 kg s'écrit « -5 kg ». Le gabarit annonçait une forme que l'écran ne tient pas."
+  },
+  {
+   "categorie": "navigation",
+   "fonctionnalite": "Bouton avatar du header",
+   "texte": "L'avatar du header est présent sur toutes les pages sauf Mon Profil.",
+   "origine": "Réfutation retenue. Sur Mon ciel, l'entête entier n'est pas rendu (App.tsx, !isMonCiel), donc l'avatar non plus. Le chapitre nomme les deux exceptions."
+  },
+  {
+   "categorie": "V2",
+   "fonctionnalite": "Onboarding — poids et taille",
+   "texte": "La V2 stocke le poids en kilogrammes quelle que soit l'unité de saisie.",
+   "origine": "Réfutation retenue. GUIDELINES et unites.ts n'affirment le stockage métrique que de la taille (tailleCm) ; reponses.poids garde la chaîne rendue par la roue, donc des livres en système impérial. J'avais généralisé une règle affichée comme « à venir » dans les commentaires. À trancher : c'est peut-être une décision manquante plutôt qu'un choix."
+  },
+  {
+   "categorie": "V2",
+   "fonctionnalite": "Onboarding — profil",
+   "texte": "L'onboarding V2 recueille tout le profil par roues bornées, sans aucune saisie libre.",
+   "origine": "Réfutation retenue. Le prénom, l'e-mail et le mot de passe sont des champs texte libres sur le même écran ; seules l'année de naissance, la taille et les deux poids passent par des roues."
+  },
+  {
+   "categorie": "sondage",
+   "fonctionnalite": "Alerte de mises à jour du sondage",
+   "texte": "L'alerte sondage part au 11e envoi du jour.",
+   "origine": "Réfutation retenue. updateCount est un cumul serveur sur toute la vie du compte, qui ne redescend jamais ; la phrase, posée juste après le plafond quotidien, faisait lire un décompte de journée. Le chapitre le dit maintenant en propre."
+  },
+  {
+   "categorie": "sondage",
+   "fonctionnalite": "Journal des envois du sondage",
+   "texte": "Le journal des envois garde les deux dernières journées locales.",
+   "origine": "Réfutation retenue. C'est une fenêtre glissante de 48 heures en millisecondes, qui ne coïncide pas avec les journées locales dont le plafond se compte — précisément autour d'un changement d'heure ou en fin de soirée."
+  },
+  {
+   "categorie": "avis",
+   "fonctionnalite": "Contexte d'envoi d'un retour",
+   "texte": "Le contexte se limite à la page d'origine, la version, le thème, le cadre, la langue et le fuseau.",
+   "origine": "Réfutation retenue. La parenthèse se lisait comme exhaustive et laissait de côté l'agent utilisateur, la taille d'écran, toutes les langues annoncées, le mode de compilation, l'instant en trois formes, la home, le menu et l'ensemble de polices. Rien de tout cela n'est une donnée de santé, mais l'inventaire était incomplet de moitié."
+  },
+  {
+   "categorie": "profil",
+   "fonctionnalite": "Bloc de remerciement de Mon Profil",
+   "texte": "« Thank you for trusting GLP1LOW — Together we all can make it happen », cité entre guillemets avec un tiret.",
+   "origine": "Réfutation retenue. Citation reconstruite : l'écran affiche trois lignes centrées, sans tiret, le mot-symbole dessiné seul sur sa ligne et une étoile en fin de dernière ligne."
+  },
+  {
+   "categorie": "navigation",
+   "fonctionnalite": "Page Configuration & Plus",
+   "texte": "« Sécurité » et « Avertissements & Confidentialité » comme deux entrées, et une liste de cartes donnée pour complète.",
+   "origine": "Réfutation retenue. Le libellé est d'un seul tenant, chaque carte porte en plus une phrase de description, et la liste rendue compte une carte de plus qui est hors périmètre. Le chapitre ne présente donc plus l'énumération comme exhaustive."
+  },
+  {
+   "categorie": "avatar",
+   "fonctionnalite": "Écriture des octets",
+   "texte": "« Au-delà de 1 Mo », et une décimale garantie.",
+   "origine": "Réfutation retenue. Le seuil est un « supérieur ou égal », et formatNumber laisse tomber le zéro de queue — d'où « 12 Mo » dans le message de refus."
+  },
+  {
+   "categorie": "rappels",
+   "fonctionnalite": "Notifications",
+   "texte": "Les rappels réglés sur cette page déclenchent une notification à l'heure dite.",
+   "origine": "Aucun appel à l'API Notification, à requestPermission ni à un service worker dans src : la page n'écrit que des champs du profil. Le chapitre le dit ; reste à savoir si l'envoi est prévu, abandonné ou délégué à une application native."
+  },
+  {
+   "categorie": "connexion",
+   "fonctionnalite": "Page de connexion",
+   "texte": "Une réinitialisation de mot de passe, ou une création de compte depuis la page.",
+   "origine": "Le pied de page dit explicitement qu'il n'y a pas d'inscription libre, et aucun lien « mot de passe oublié » n'existe. L'absence est délibérée côté inscription, muette côté oubli."
   }
  ],
  "glossaire": [
   {
-   "terme": "Pesée de départ",
-   "definition": "La pesée du journal marquée isStartingWeight ; son poids est le poids de départ, unique, plus jamais un champ du profil."
+   "terme": "Pesée marquée départ",
+   "definition": "L'entrée de l'historique de poids portant le drapeau de départ. C'est elle, et non un champ du profil, que la case « Poids de départ » modifie ou crée."
   },
   {
-   "terme": "Objectif final",
-   "definition": "Le poids visé en kg, champ du profil, arrondi à 0,1 kg à l'enregistrement."
+   "terme": "Poids de départ semé",
+   "definition": "95 kg écrits à l'installation quand aucune pesée n'est marquée départ ; ils servent de référence à la perte affichée."
   },
   {
-   "terme": "Médicament prescrit",
-   "definition": "Le traitement choisi dans le catalogue et enregistré par identifiant ; « aucun » s'affiche « Pas de traitement »."
+   "terme": "Profil d'usine",
+   "definition": "Le profil livré avant tout réglage : « Chloé », femme, 42 ans, 168 cm, objectif 72,0 kg, « Pas de traitement »."
   },
   {
-   "terme": "Édition en place",
-   "definition": "Cliquer une valeur du récapitulatif la remplace par un champ, enregistré quand il perd le focus ou sur Entrée."
+   "terme": "Dernière valeur valable traversée",
+   "definition": "Dans un champ chiffré, la dernière saisie acceptable vue depuis l'ouverture du champ. Un refus y ramène le champ, et cette valeur est enregistrée si elle diffère du profil."
   },
   {
    "terme": "Refus",
-   "definition": "Message qui dit ce qu'une saisie doit être ; la valeur refusée n'est jamais enregistrée."
+   "definition": "Le message bleu qui dit ce qu'un champ attend. Jamais le mot « erreur » : une saisie refusée est une attente que le champ n'avait pas annoncée."
   },
   {
-   "terme": "Avatar",
-   "definition": "Le visage de l'utilisatrice, composé d'un genre, d'une peau et de cheveux : un émoji en V1, un dessin en V2 ; enregistré dans le profil."
+   "terme": "Minutes rondes",
+   "definition": "0, 10, 15, 20, 30, 40, 45, 50 : toute heure retenue par l'application est ramenée à la plus grande de ces minutes qui lui est inférieure ou égale."
   },
   {
-   "terme": "Photo d'avatar",
-   "definition": "Image recadrée au carré et réduite à 256 px, enregistrée dans le profil comme adresse data:image/ (V1 seulement)."
+   "terme": "Module",
+   "definition": "Un suivi activable — traitement, effets secondaires, repas, pas, activité physique, temps pour soi, sommeil. Éteint, il est grisé ; masqué, il disparaît."
   },
   {
-   "terme": "Plafond quotidien",
-   "definition": "Dix envois par jour local pour les avis et le sondage ; l'envoi de trop est refusé, jamais écrasé."
+   "terme": "Masquage complet",
+   "definition": "Case offerte sous un module éteint : cochée, le module ne paraît plus du tout, ni dans les menus ni dans les pages."
   },
   {
-   "terme": "Journal des envois",
-   "definition": "Les instants d'envoi du sondage, gardés deux jours, qui servent à compter le plafond."
-  },
-  {
-   "terme": "Page d'origine",
-   "definition": "L'onglet quitté pour ouvrir un formulaire, lu à l'ouverture et joint au courrier."
-  },
-  {
-   "terme": "Contexte d'envoi",
-   "definition": "Réglages d'affichage et état du navigateur joints à un envoi ; aucune donnée de santé."
-  },
-  {
-   "terme": "Courrier",
-   "definition": "Document déposé dans la collection mail et expédié par une extension vers la boîte de l'équipe, réponse vers l'auteure."
-  },
-  {
-   "terme": "Attestation médicale",
-   "definition": "La case du premier lancement dont l'acceptation est un drapeau du stockage local ; sans lui, la page légale s'impose."
-  },
-  {
-   "terme": "Stockage local",
-   "definition": "Le localStorage du navigateur : profil et journaux sous une seule clé, avis, sondage et drapeaux à côté ; vidé par la suppression du compte."
+   "terme": "Verrou",
+   "definition": "La porte d'entrée de l'application. Active seulement si la clé d'API Firebase est remplie ; sinon l'application s'ouvre sans compte."
   },
   {
    "terme": "Mot-symbole",
-   "definition": "Le dessin « GLP1LOW » qui remplace le nom écrit dans les textes."
+   "definition": "Le nom GLP1LOW dessiné, jamais écrit en texte brut là où la mise en forme est possible."
+  },
+  {
+   "terme": "Avatar composé",
+   "definition": "Un avatar fait de réglages (genre, peau, coupe, cheveux…) et non choisi dans une galerie. En V1 il est rendu par un émoji, en V2 par un dessin."
+  },
+  {
+   "terme": "Data URL",
+   "definition": "L'adresse qui porte l'image elle-même, encodée dans le texte. C'est sous cette forme que la photo d'avatar est enregistrée sur l'appareil."
+  },
+  {
+   "terme": "Plafond quotidien",
+   "definition": "Dix envois par journée locale, avis et sondage confondus. Le onzième est refusé et déclenche un courrier d'alerte."
+  },
+  {
+   "terme": "Compteur cumulé de mises à jour",
+   "definition": "Le nombre d'envois du sondage depuis la création du compte, tenu côté serveur. Il ne redescend jamais et n'a rien à voir avec la journée locale."
+  },
+  {
+   "terme": "Contexte d'envoi",
+   "definition": "Les réglages d'affichage et l'état du navigateur joints à un avis ou à une réponse au sondage. Aucune donnée de santé n'y figure."
+  },
+  {
+   "terme": "Page d'origine",
+   "definition": "L'onglet quitté pour ouvrir le formulaire d'avis ou le sondage, lu à l'ouverture et cité dans le courrier."
+  },
+  {
+   "terme": "Drapeau d'acceptation légale",
+   "definition": "La marque, dans le stockage local, qui dit que l'information médicale a été lue et acceptée. Absente, la page s'impose au démarrage."
+  },
+  {
+   "terme": "Stockage local",
+   "definition": "L'espace du navigateur où profil, journaux et réglages vivent, sous une seule clé. La suppression du compte le vide entièrement."
+  },
+  {
+   "terme": "Arbitrage non validé",
+   "definition": "Un choix pris par Claude faute d'instruction, signalé comme tel dans le chapitre pour être discuté."
+  },
+  {
+   "terme": "Point décimal",
+   "definition": "Le séparateur employé à l'affichage depuis le 2026-08-28. Les zéros de queue tombent : « 12 Mo », « -5 kg »."
   }
  ],
  "index": [
   {
-   "terme": "Configuration & Plus",
-   "ancre": "profil-configuration-plus"
+   "terme": "Accès privé (page de connexion)",
+   "ancre": "profil-page-de-connexion"
   },
   {
-   "terme": "Perte de poids (aperçu)",
-   "ancre": "profil-configuration-plus"
-  },
-  {
-   "terme": "GLP1LOW et vous",
-   "ancre": "profil-configuration-plus"
-  },
-  {
-   "terme": "Mon Profil",
+   "terme": "Âge (case du profil)",
    "ancre": "profil-mon-profil"
   },
   {
-   "terme": "Édition en place",
-   "ancre": "profil-mon-profil"
+   "terme": "Alerte de plafond (courrier)",
+   "ancre": "profil-avis-et-feedback"
   },
   {
-   "terme": "Poids de départ",
-   "ancre": "profil-mon-profil"
+   "terme": "Alerte sondage (courrier)",
+   "ancre": "profil-sondage"
   },
   {
-   "terme": "Objectif final",
-   "ancre": "profil-mon-profil"
+   "terme": "Aléatoire (avatar)",
+   "ancre": "profil-composer-l-avatar"
   },
   {
-   "terme": "Médicament prescrit",
-   "ancre": "profil-mon-profil"
+   "terme": "Attente de session",
+   "ancre": "profil-ecran-d-attente-de-session"
   },
   {
-   "terme": "Certification d'essai clinique",
-   "ancre": "profil-mon-profil"
+   "terme": "Autres suggestions (sondage)",
+   "ancre": "profil-sondage"
   },
   {
-   "terme": "Profil d'usine (Chloé)",
-   "ancre": "profil-mon-profil"
-  },
-  {
-   "terme": "Année de naissance (V2)",
-   "ancre": "profil-mon-profil"
-  },
-  {
-   "terme": "Bornes (âge, taille, poids)",
-   "ancre": "profil-mon-profil"
-  },
-  {
-   "terme": "Modifier mon profil",
-   "ancre": "profil-modifier-mon-profil"
-  },
-  {
-   "terme": "Refus empilés",
-   "ancre": "profil-modifier-mon-profil"
-  },
-  {
-   "terme": "Mon Avatar",
+   "terme": "Avatar (bloc Mon Avatar)",
    "ancre": "profil-mon-avatar"
   },
   {
-   "terme": "Genre",
-   "ancre": "profil-mon-avatar"
-  },
-  {
-   "terme": "Composer l'avatar",
-   "ancre": "profil-composer-l-avatar"
-  },
-  {
-   "terme": "Aléatoire",
-   "ancre": "profil-composer-l-avatar"
-  },
-  {
-   "terme": "Émoji (avatar)",
-   "ancre": "profil-composer-l-avatar"
-  },
-  {
-   "terme": "Utiliser ma photo",
-   "ancre": "profil-utiliser-ma-photo"
-  },
-  {
-   "terme": "HEIC",
-   "ancre": "profil-utiliser-ma-photo"
-  },
-  {
-   "terme": "Le Miroir de GLP1LOW",
-   "ancre": "profil-miroir-et-remerciement"
-  },
-  {
-   "terme": "Mes préférences de compte",
-   "ancre": "profil-miroir-et-remerciement"
-  },
-  {
-   "terme": "Bouton avatar (header)",
+   "terme": "Avatar du header",
    "ancre": "profil-bouton-avatar-du-header"
-  },
-  {
-   "terme": "Mon compte",
-   "ancre": "profil-mon-compte"
-  },
-  {
-   "terme": "Abonnement",
-   "ancre": "profil-mon-compte"
-  },
-  {
-   "terme": "Mot de passe (V2)",
-   "ancre": "profil-mon-compte"
-  },
-  {
-   "terme": "Supprimer mon compte",
-   "ancre": "profil-supprimer-mon-compte"
-  },
-  {
-   "terme": "Se reconnecter",
-   "ancre": "profil-supprimer-mon-compte"
-  },
-  {
-   "terme": "Avis et Feedback",
-   "ancre": "profil-avis-et-feedback"
-  },
-  {
-   "terme": "Ressenti global",
-   "ancre": "profil-avis-et-feedback"
-  },
-  {
-   "terme": "Consentement de recontact",
-   "ancre": "profil-avis-et-feedback"
-  },
-  {
-   "terme": "Plafond quotidien",
-   "ancre": "profil-avis-et-feedback"
-  },
-  {
-   "terme": "Alerte plafond",
-   "ancre": "profil-avis-et-feedback"
-  },
-  {
-   "terme": "Page d'origine",
-   "ancre": "profil-avis-et-feedback"
-  },
-  {
-   "terme": "Contexte d'envoi",
-   "ancre": "profil-avis-et-feedback"
-  },
-  {
-   "terme": "Courrier",
-   "ancre": "profil-avis-et-feedback"
-  },
-  {
-   "terme": "Vos messages récents",
-   "ancre": "profil-messages-recents"
-  },
-  {
-   "terme": "Sondage",
-   "ancre": "profil-sondage"
-  },
-  {
-   "terme": "Propositions du sondage",
-   "ancre": "profil-sondage"
-  },
-  {
-   "terme": "ALERTE sondage",
-   "ancre": "profil-sondage"
-  },
-  {
-   "terme": "Modifier mes réponses",
-   "ancre": "profil-sondage-remerciement"
-  },
-  {
-   "terme": "FAQ",
-   "ancre": "profil-faq"
-  },
-  {
-   "terme": "Information Médicale",
-   "ancre": "profil-information-medicale"
   },
   {
    "terme": "Avertissement Médical",
    "ancre": "profil-information-medicale"
   },
   {
-   "terme": "Attestation",
+   "terme": "Avis et Feedback (formulaire)",
+   "ancre": "profil-avis-et-feedback"
+  },
+  {
+   "terme": "Badges (entrée du menu)",
+   "ancre": "profil-menu-parametres"
+  },
+  {
+   "terme": "Bug (type de retour)",
+   "ancre": "profil-avis-et-feedback"
+  },
+  {
+   "terme": "Cadre clinique (onglet légal)",
    "ancre": "profil-information-medicale"
   },
   {
-   "terme": "Info Santé & Confidentialité",
+   "terme": "Catalogue de traitements",
+   "ancre": "profil-mon-profil"
+  },
+  {
+   "terme": "Catégorie d'un retour",
+   "ancre": "profil-avis-et-feedback"
+  },
+  {
+   "terme": "Certification rétatrutide",
+   "ancre": "profil-mon-profil"
+  },
+  {
+   "terme": "Ciel (entrée du menu)",
+   "ancre": "profil-menu-parametres"
+  },
+  {
+   "terme": "Configuration & Plus",
+   "ancre": "profil-configuration-plus"
+  },
+  {
+   "terme": "Connexion (page)",
+   "ancre": "profil-page-de-connexion"
+  },
+  {
+   "terme": "Consentement à être recontactée",
+   "ancre": "profil-avis-et-feedback"
+  },
+  {
+   "terme": "Contexte d'envoi",
+   "ancre": "profil-avis-et-feedback"
+  },
+  {
+   "terme": "Corbeille (message de retour)",
+   "ancre": "profil-messages-recents"
+  },
+  {
+   "terme": "Coupe de cheveux",
+   "ancre": "profil-composer-l-avatar"
+  },
+  {
+   "terme": "Couleur de peau",
+   "ancre": "profil-composer-l-avatar"
+  },
+  {
+   "terme": "Courrier à l'équipe",
+   "ancre": "profil-avis-et-feedback"
+  },
+  {
+   "terme": "Créateur d'avatar",
+   "ancre": "profil-composer-l-avatar"
+  },
+  {
+   "terme": "Effets secondaires (module)",
+   "ancre": "profil-page-modules"
+  },
+  {
+   "terme": "Export (section du menu)",
+   "ancre": "profil-menu-parametres"
+  },
+  {
+   "terme": "Factures et reçus",
+   "ancre": "profil-mon-compte"
+  },
+  {
+   "terme": "FAQ",
+   "ancre": "profil-faq"
+  },
+  {
+   "terme": "Firebase (verrou)",
+   "ancre": "profil-ecran-d-attente-de-session"
+  },
+  {
+   "terme": "Genre (choix)",
+   "ancre": "profil-mon-avatar"
+  },
+  {
+   "terme": "GLP1LOW et vous (section)",
+   "ancre": "profil-menu-parametres"
+  },
+  {
+   "terme": "Google (connexion)",
+   "ancre": "profil-page-de-connexion"
+  },
+  {
+   "terme": "HEIC (format refusé)",
+   "ancre": "profil-utiliser-ma-photo"
+  },
+  {
+   "terme": "Heure de rappel",
+   "ancre": "profil-page-notifications"
+  },
+  {
+   "terme": "Idée (type de retour)",
+   "ancre": "profil-avis-et-feedback"
+  },
+  {
+   "terme": "Information Médicale",
+   "ancre": "profil-information-medicale"
+  },
+  {
+   "terme": "Injections (rappel)",
+   "ancre": "profil-page-notifications"
+  },
+  {
+   "terme": "Masquer dans l'application",
+   "ancre": "profil-page-modules"
+  },
+  {
+   "terme": "Médicament prescrit",
+   "ancre": "profil-mon-profil"
+  },
+  {
+   "terme": "Menu Paramètres",
+   "ancre": "profil-menu-parametres"
+  },
+  {
+   "terme": "Mes préférences de compte (lien)",
+   "ancre": "profil-lien-mes-preferences-de-compte"
+  },
+  {
+   "terme": "Messages récents (historique)",
+   "ancre": "profil-messages-recents"
+  },
+  {
+   "terme": "Minutes rondes",
+   "ancre": "profil-page-notifications"
+  },
+  {
+   "terme": "Miroir de GLP1LOW",
+   "ancre": "profil-miroir-et-remerciement"
+  },
+  {
+   "terme": "Modifier mon profil (formulaire)",
+   "ancre": "profil-modifier-mon-profil"
+  },
+  {
+   "terme": "Modules (page)",
+   "ancre": "profil-page-modules"
+  },
+  {
+   "terme": "Mon abonnement",
+   "ancre": "profil-mon-compte"
+  },
+  {
+   "terme": "Mon compte (page)",
+   "ancre": "profil-mon-compte"
+  },
+  {
+   "terme": "Mon Profil (page)",
+   "ancre": "profil-mon-profil"
+  },
+  {
+   "terme": "Moyens de paiement",
+   "ancre": "profil-mon-compte"
+  },
+  {
+   "terme": "Notifications (page)",
+   "ancre": "profil-page-notifications"
+  },
+  {
+   "terme": "Objectif final",
+   "ancre": "profil-mon-profil"
+  },
+  {
+   "terme": "Perte de poids affichée",
+   "ancre": "profil-configuration-plus"
+  },
+  {
+   "terme": "Photo d'avatar",
+   "ancre": "profil-utiliser-ma-photo"
+  },
+  {
+   "terme": "Plafond de dix envois",
+   "ancre": "profil-avis-et-feedback"
+  },
+  {
+   "terme": "Poids de départ (case)",
+   "ancre": "profil-mon-profil"
+  },
+  {
+   "terme": "Préférences (section du menu)",
+   "ancre": "profil-menu-parametres"
+  },
+  {
+   "terme": "Prénom ou Pseudo",
+   "ancre": "profil-mon-profil"
+  },
+  {
+   "terme": "Rendez-vous médical (rappel)",
+   "ancre": "profil-page-notifications"
+  },
+  {
+   "terme": "Remerciement (bloc de Mon Profil)",
+   "ancre": "profil-miroir-et-remerciement"
+  },
+  {
+   "terme": "Remerciement (sondage)",
+   "ancre": "profil-sondage-remerciement"
+  },
+  {
+   "terme": "Ressenti global",
+   "ancre": "profil-avis-et-feedback"
+  },
+  {
+   "terme": "Se reconnecter (suppression)",
+   "ancre": "profil-supprimer-mon-compte"
+  },
+  {
+   "terme": "Sécurité, Avertissements & Confidentialité",
+   "ancre": "profil-configuration-plus"
+  },
+  {
+   "terme": "Social (carte)",
+   "ancre": "profil-configuration-plus"
+  },
+  {
+   "terme": "Sondage (formulaire)",
+   "ancre": "profil-sondage"
+  },
+  {
+   "terme": "Suppression du compte",
+   "ancre": "profil-supprimer-mon-compte"
+  },
+  {
+   "terme": "Taille (case du profil)",
+   "ancre": "profil-mon-profil"
+  },
+  {
+   "terme": "Vie privée (onglet légal)",
    "ancre": "profil-information-medicale"
   }
  ],
  "ecrans_illustres": [
+  "profil-compte/page-de-connexion",
+  "profil-compte/ecran-d-attente-de-session",
   "profil-compte/page-configuration-plus-plusmenu",
+  "profil-compte/menu-parametres-sections-preferences-export-glp1low-et-vous",
   "profil-compte/page-mon-profil-bloc-recapitulatif",
   "profil-compte/formulaire-modifier-mon-profil",
   "profil-compte/bloc-mon-avatar",
   "profil-compte/createur-d-avatar-onglet-composer-l-avatar",
   "profil-compte/createur-d-avatar-onglet-utiliser-ma-photo",
   "profil-compte/bloc-le-miroir-de-glp1low-et-message-de-remerciement",
+  "profil-compte/lien-mes-preferences-de-compte",
   "profil-compte/bouton-avatar-du-header",
+  "profil-compte/page-modules",
+  "profil-compte/page-notifications",
   "profil-compte/page-mon-compte",
   "profil-compte/bloc-supprimer-mon-compte",
   "profil-compte/page-avis-et-feedback-formulaire",

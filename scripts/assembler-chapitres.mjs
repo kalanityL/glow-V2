@@ -149,8 +149,8 @@ const total = manquantes.length + rapprochees.length + morceaux.join('').match(/
 const figures = (morceaux.join('').match(/data-capture=/g) ?? []).length
 
 const avertissement = `<div class="avertissement">
-<p><strong>Brouillons — rien ici n'est vérifié.</strong> Ces ${ids.length} chapitres ont été écrits depuis l'inventaire de la V1 et son code, mais n'ont pas encore été réfutés contre le code ni corrigés. Ils peuvent contenir des affirmations que le code ne fonde pas.</p>
-<p>La spécification, elle, est <a href="spec-fonctionnelle.html">là</a> : un chapitre n'y entre qu'une fois réfuté et corrigé.</p>
+<p><strong>Brouillons — réfutés contre le code, pas encore relus par toi.</strong> Ces ${ids.length} chapitres ont été écrits depuis l'inventaire de la V1 et son code, puis attaqués un à un par un vérificateur qui a relu le code, puis corrigés d'après ses réfutations. Ce que le code ne fondait pas a été retiré et rangé dans les inventions.</p>
+<p>Ils ne sont pas pour autant la spécification : ils n'ont pas été relus par toi, leurs figures ne sont pas toutes là, et les renvois vers la <a href="spec-technique.html">spécification technique</a> pointent dans le vide tant qu'elle n'existe pas. La <a href="spec-fonctionnelle.html">spécification fonctionnelle</a> reste vide jusqu'à ton feu vert.</p>
 </div>`
 
 const pied = `<h2 id="figures">Les figures <a class="retour" href="#sommaire">↑ sommaire</a></h2>

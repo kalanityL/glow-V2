@@ -34,112 +34,140 @@
    "categorie": "amélioration",
    "fonctionnalite": "PDF — bandeau",
    "texte": "Retirer la mention « thème : … » du bandeau avant toute remise à un médecin.",
-   "origine": "Le code la marque provisoire et explique comment la retirer ; la décision de la retirer n'est pas prise."
+   "origine": "Le code la marque provisoire et explique comment la retirer ; la décision de la retirer n'est pas prise. La phrase du chapitre qui la décrivait a été supprimée comme hors périmètre (machinerie de thèmes V1)."
   },
   {
    "categorie": "comportement supposé",
    "fonctionnalite": "Panneau d'attente",
    "texte": "La capture d'écran du panneau d'attente suppose de figer une animation CSS de quelques secondes ; l'état montré dépendra du moment de la prise de vue.",
    "origine": "Le panneau n'existe que pendant la génération ; sa capture n'a pas été tentée."
+  },
+  {
+   "categorie": "comportement supposé",
+   "fonctionnalite": "PDF — II. Poids et doses, III. Tolérance",
+   "texte": "Les deux paragraphes de repli du générateur — « Aucune pesée enregistrée sur cette période. » et « Aucun effet secondaire déclaré sur cette période. » — ne peuvent pas s'imprimer depuis la page « Export » : le masque de runExport n'inclut une section que si la période porte la donnée. Ils ne s'afficheraient que par un autre appelant du générateur.",
+   "origine": "Réfutation retenue : les deux phrases étaient présentées dans le chapitre comme un comportement visible. Elles existent bien dans le code (medicalReportPdf.ts:2516 et :2547) mais aucun chemin de l'écran ne les atteint ; l'existence d'un futur appelant qui les atteindrait est une supposition."
+  },
+  {
+   "categorie": "amélioration",
+   "fonctionnalite": "PDF — V. Sommeil, graphique",
+   "texte": "En noir et blanc, les cinq paliers de teinte des barres de sommeil disparaissent (une seule encre hachurée) ; on pourrait rendre le palier par la densité de hachure, comme la texture rend déjà la distinction des deux séries du graphique des doses.",
+   "origine": "Constat en lisant le peintre de barres (palette.patterned court-circuite sleepBarTier) ; aucune demande ni décision ne porte là-dessus."
+  },
+  {
+   "categorie": "amélioration",
+   "fonctionnalite": "PDF — V. Sommeil, graphique",
+   "texte": "L'axe des durées ne descend jamais sous 5 h : une période où seules des siestes sont relevées dessine des barres écrasées au bas du cadre. Un plancher calé sur la plus longue durée relevée serait plus lisible.",
+   "origine": "Constat de code (Math.max(5, …)) ; la valeur 5 n'est justifiée nulle part comme une décision, et l'amélioration n'a été ni demandée ni évaluée."
+  },
+  {
+   "categorie": "règle plausible",
+   "fonctionnalite": "Sous-bloc « Export détaillé sur mesure »",
+   "texte": "Le carreau « Les effets secondaires ressentis » devrait suivre la règle des cinq carreaux de module (module allumé et données sur la période) ; il est rendu sans garde, donc cochable alors que la section ne sera jamais dessinée. hasSideEffectsData est calculée mais n'est employée qu'au masque.",
+   "origine": "Réfutation retenue : le chapitre affirmait la garde. Le fait est écrit dans le chapitre ; l'idée que ce soit un oubli à corriger, plutôt qu'un choix, est une supposition — les effets secondaires sont devenus un module le 2026-08-29, après la grille."
   }
  ],
  "glossaire": [
   {
-   "terme": "Période",
-   "definition": "Fenêtre de dates qui commande tout le rapport : 7, 14, 30 ou 90 derniers jours, Depuis le début, ou bornes choisies."
-  },
-  {
    "terme": "Bornes effectives",
-   "definition": "Les deux dates réellement appliquées : date de coupure ou borne saisie au début, borne saisie ou aujourd'hui à la fin."
+   "definition": "Les deux dates que la période désigne réellement, replis compris : le début saisi ou la coupure de la fenêtre ou la plus ancienne entrée, et la fin saisie ou aujourd'hui."
   },
   {
-   "terme": "Section (du rapport)",
-   "definition": "Un des huit journaux cochables de l'export sur mesure ; le journal des injections est inclus d'office."
+   "terme": "Fenêtre fixe",
+   "definition": "Une des quatre durées du sélecteur (7, 14, 30, 90 derniers jours) : sa coupure vaut aujourd'hui − N + 1, sa fin est toujours aujourd'hui."
+  },
+  {
+   "terme": "Depuis le début",
+   "definition": "Position du sélecteur qui remonte à la plus ancienne entrée des journaux scannés ; la borne de début s'affiche « début »."
+  },
+  {
+   "terme": "Export détaillé sur mesure",
+   "definition": "Le chemin long de l'export : la grille de huit carreaux, le tirage, et le bouton « Télécharger le rapport »."
+  },
+  {
+   "terme": "Carreau",
+   "definition": "Case-icône de la grille du sur-mesure, allumée (coche en coin) ou éteinte (voilée de gris) ; son libellé est son nom accessible et son infobulle, pas son étiquette."
   },
   {
    "terme": "Masque des données disponibles",
-   "definition": "Règle qui n'imprime une section cochée que si son module est actif et si la période contient des données."
+   "definition": "Le filtre appliqué aux cases cochées : une section n'est dessinée que si la période porte sa donnée et, pour les effets secondaires, si son module est allumé."
   },
   {
    "terme": "Tirage",
-   "definition": "Palette du document : noir et blanc, couleurs du thème (défaut) ou neutre ; choix non mémorisé."
+   "definition": "L'habillage du document : noir et blanc, couleurs du thème, ou neutre quand aucune des deux cases n'est cochée."
   },
   {
-   "terme": "Palette dérivée",
-   "definition": "Palette calculée au clic à partir des jetons CSS du thème courant, encres assombries et surfaces éclaircies pour le papier."
+   "terme": "Palette neutre",
+   "definition": "Le tirage sans marque : graphite, bandeau ardoise en aplat, lisible photocopié."
+  },
+  {
+   "terme": "Sommaire d'attente",
+   "definition": "La liste des sections retenues, affichée sous le bouton pendant la génération, chaque ligne recevant sa coche à son tour."
+  },
+  {
+   "terme": "Mouvement réduit",
+   "definition": "Réglage système qui supprime les animations : le sommaire est alors posé coché d'emblée, curseur immobile sur la dernière ligne, et rien n'est attendu avant le téléchargement."
   },
   {
    "terme": "Cartouche",
-   "definition": "Mini-tuile du PDF : une valeur en gros, son « ≈ » et son unité en petit, une légende dessous ; cinq au plus par rangée."
+   "definition": "Mini-tuile de la synthèse : une valeur découpée en préfixe, nombre en gros et unité en petit, sous un libellé."
   },
   {
-   "terme": "Jour couvert",
-   "definition": "Chaque jour entre les bornes de la période, bornes comprises."
+   "terme": "Jours couverts",
+   "definition": "Nombre de jours entre les deux bornes de la période, bornes comprises."
   },
   {
-   "terme": "Journée documentée",
-   "definition": "Date distincte portant au moins une entrée dans un journal emporté (relevé de pas à 0 exclu)."
+   "terme": "Journées documentées",
+   "definition": "Dates distinctes portant au moins une entrée dans les journaux retenus ; un relevé de pas à 0 ne compte pas."
   },
   {
-   "terme": "Poids de repère (actuel)",
-   "definition": "Pesée la plus récente de tout l'historique, hors période ; sert à l'IMC, à la variation totale et au reste à l'objectif."
+   "terme": "Poids de repère",
+   "definition": "La pesée la plus récente de tout l'historique, qui sert de « Poids actuel » au document et de référence à l'objectif protéique."
   },
   {
-   "terme": "Pesée de départ",
-   "definition": "Pesée marquée comme départ de la cure ; donne le poids et la date « Depuis le … »."
+   "terme": "Poids de départ",
+   "definition": "La pesée marquée comme départ dans l'historique ; elle date la ligne « Depuis le … » de la synthèse."
   },
   {
    "terme": "Palier de dose",
-   "definition": "Tracé en pointillé du graphique poids / doses : la dose d'une prise est tenue jusqu'à la prise suivante."
+   "definition": "Le tracé en pointillé du graphique II : la dose tenue d'une prise à la suivante, puis jusqu'au bord droit du cadre."
   },
   {
-   "terme": "Palier de sévérité",
-   "definition": "Léger (1), modéré (2–3), sévère (4–5) ; compté par effet dans la synthèse, par pire effet du jour dans l'annexe C."
+   "terme": "Carte de calendrier fusionnée",
+   "definition": "Deux ou trois mois voisins réunis sous un même bandeau (« Juillet / Août 2026 ») quand ils partagent une semaine."
   },
   {
    "terme": "Annexe",
-   "definition": "Détail d'un journal en fin de document : grilles mensuelles (A, C, D, E, F, G) ou tableau (B avec mensurations, pas)."
-  },
-  {
-   "terme": "Grille fusionnée",
-   "definition": "Carte réunissant deux ou trois mois voisins qui partagent une semaine, cette semaine n'étant imprimée qu'une fois."
-  },
-  {
-   "terme": "Carnet (Détails des journées)",
-   "definition": "Dernier chapitre : chaque journée documentée, dans l'ordre, avec toutes ses lignes de journal."
-  },
-  {
-   "terme": "Équivalence insolite",
-   "definition": "Phrase « Soit l'équivalent de : … » traduisant la perte de période en objets du quotidien, si la section est cochée."
+   "definition": "Une des sept grilles ou tableaux (A à G) qui déroulent un journal complet sur la période, après les cinq sections."
   },
   {
    "terme": "Fiche d'échec",
-   "definition": "Enregistrement d'un export tombé : erreur, étape, période, cases, volumes (comptes seulement), tirage, temps écoulé ; écrite en base et signalée par courrier."
+   "definition": "Le rapport d'incident envoyé quand la génération tombe : erreur, étape, période, cases, volumes et tirage — des comptes et des bornes, jamais une valeur de santé."
   },
   {
-   "terme": "Étape d'export",
-   "definition": "Moment où un échec survient : préparation, palette, construction, enregistrement."
-  },
-  {
-   "terme": "Journée en cours figée",
-   "definition": "Compte de pas d'aujourd'hui relevé une fois à l'arrivée sur la page et réutilisé tel quel dans le carreau des pas."
+   "terme": "Contexte d'envoi",
+   "definition": "Le bloc technique partagé avec les formulaires de feedback (version, thème, navigateur, écran, langue, fuseau, mode de compilation), joint tel quel à la fiche d'échec."
   }
  ],
  "index": [
   {
-   "terme": "Rapport médical",
-   "ancre": "rapport"
-  },
-  {
-   "terme": "Page Export",
+   "terme": "Rapport médical (page Export)",
    "ancre": "rapport-bloc-rapport-medical"
   },
   {
-   "terme": "Période du rapport",
+   "terme": "Sélecteur de période du rapport",
    "ancre": "rapport-bloc-rapport-medical"
   },
   {
-   "terme": "Bornes « du … au … »",
+   "terme": "« Choisissez une période valide »",
+   "ancre": "rapport-bloc-rapport-medical"
+  },
+  {
+   "terme": "« du … à aujourd'hui »",
+   "ancre": "rapport-bloc-rapport-medical"
+  },
+  {
+   "terme": "Depuis le début",
    "ancre": "rapport-bloc-rapport-medical"
   },
   {
@@ -147,7 +175,11 @@
    "ancre": "rapport-export-detaille-sur-mesure"
   },
   {
-   "terme": "Sections du rapport",
+   "terme": "Grille des huit carreaux",
+   "ancre": "rapport-export-detaille-sur-mesure"
+  },
+  {
+   "terme": "« Le sommeil (nuits et siestes) »",
    "ancre": "rapport-export-detaille-sur-mesure"
   },
   {
@@ -159,23 +191,15 @@
    "ancre": "rapport-export-detaille-sur-mesure"
   },
   {
-   "terme": "Tirage",
+   "terme": "Nom du fichier Bilan_GLP1",
    "ancre": "rapport-export-detaille-sur-mesure"
   },
   {
-   "terme": "Télécharger le rapport",
+   "terme": "Fiche d'échec d'export",
    "ancre": "rapport-export-detaille-sur-mesure"
   },
   {
-   "terme": "Échec d'export",
-   "ancre": "rapport-export-detaille-sur-mesure"
-  },
-  {
-   "terme": "Fiche d'échec",
-   "ancre": "rapport-export-detaille-sur-mesure"
-  },
-  {
-   "terme": "Nom du fichier PDF",
+   "terme": "Étapes d'export (préparation, palette, construction, enregistrement)",
    "ancre": "rapport-export-detaille-sur-mesure"
   },
   {
@@ -183,11 +207,19 @@
    "ancre": "rapport-panneau-d-attente"
   },
   {
-   "terme": "Sommaire qui se coche",
+   "terme": "Plancher d'affichage (450 ms)",
    "ancre": "rapport-panneau-d-attente"
   },
   {
-   "terme": "Sur cette période",
+   "terme": "Mouvement réduit",
+   "ancre": "rapport-panneau-d-attente"
+  },
+  {
+   "terme": "Sur cette période (carreaux de comptes)",
+   "ancre": "rapport-sur-cette-periode"
+  },
+  {
+   "terme": "Distance parcourue (pas × 0,00076)",
    "ancre": "rapport-sur-cette-periode"
   },
   {
@@ -195,11 +227,11 @@
    "ancre": "rapport-sur-cette-periode"
   },
   {
-   "terme": "Pas figés (journée en cours)",
-   "ancre": "rapport-sur-cette-periode"
+   "terme": "Bandeau du PDF",
+   "ancre": "rapport-pdf-bandeau-et-identite"
   },
   {
-   "terme": "Bandeau du PDF",
+   "terme": "« Patiente non nommée »",
    "ancre": "rapport-pdf-bandeau-et-identite"
   },
   {
@@ -207,19 +239,35 @@
    "ancre": "rapport-pdf-bandeau-et-identite"
   },
   {
-   "terme": "IMC (PDF)",
+   "terme": "En-tête courant",
    "ancre": "rapport-pdf-bandeau-et-identite"
   },
   {
-   "terme": "Pied de page du PDF",
+   "terme": "Pied de page médical",
    "ancre": "rapport-pdf-bandeau-et-identite"
   },
   {
-   "terme": "Synthèse (PDF)",
+   "terme": "IMC actuel du document",
+   "ancre": "rapport-pdf-bandeau-et-identite"
+  },
+  {
+   "terme": "Reste à l'objectif",
+   "ancre": "rapport-pdf-bandeau-et-identite"
+  },
+  {
+   "terme": "Police embarquée en sous-ensemble",
+   "ancre": "rapport-pdf-bandeau-et-identite"
+  },
+  {
+   "terme": "Sauts de page",
+   "ancre": "rapport-pdf-bandeau-et-identite"
+  },
+  {
+   "terme": "Synthèse (section I)",
    "ancre": "rapport-pdf-i-synthese"
   },
   {
-   "terme": "Cartouches",
+   "terme": "Entre 2 injections / prises",
    "ancre": "rapport-pdf-i-synthese"
   },
   {
@@ -227,35 +275,43 @@
    "ancre": "rapport-pdf-i-synthese"
   },
   {
-   "terme": "Entre 2 injections",
+   "terme": "Part de la recommandation (fibres, protéines)",
    "ancre": "rapport-pdf-i-synthese"
   },
   {
-   "terme": "Graphique poids / doses",
+   "terme": "Paliers de sévérité",
+   "ancre": "rapport-pdf-i-synthese"
+  },
+  {
+   "terme": "Activité par semaine",
+   "ancre": "rapport-pdf-i-synthese"
+  },
+  {
+   "terme": "Graphique poids et doses",
    "ancre": "rapport-pdf-ii-poids-et-doses"
   },
   {
-   "terme": "Équivalence insolite (PDF)",
+   "terme": "Équivalence insolite dans le PDF",
    "ancre": "rapport-pdf-ii-poids-et-doses"
   },
   {
-   "terme": "Tolérance (PDF)",
+   "terme": "Tolérance (section III)",
    "ancre": "rapport-pdf-iii-tolerance"
   },
   {
-   "terme": "Jauges d'intensité",
+   "terme": "Jauge par type d'effet",
    "ancre": "rapport-pdf-iii-tolerance"
   },
   {
-   "terme": "Activité et nutrition (PDF)",
+   "terme": "Activité et nutrition (section IV)",
    "ancre": "rapport-pdf-iv-activite-et-nutrition"
   },
   {
-   "terme": "Sommeil et temps pour soi (PDF)",
+   "terme": "Sommeil et temps pour soi (section V)",
    "ancre": "rapport-pdf-v-sommeil-et-temps-pour-soi"
   },
   {
-   "terme": "Graphique sommeil / qualité",
+   "terme": "Graphique durée et qualité du sommeil",
    "ancre": "rapport-pdf-v-sommeil-et-temps-pour-soi"
   },
   {
@@ -267,7 +323,15 @@
    "ancre": "rapport-pdf-annexes-a-a-g"
   },
   {
-   "terme": "Tableau des pesées et mensurations",
+   "terme": "Totaux de la journée (annexe D)",
+   "ancre": "rapport-pdf-annexes-a-a-g"
+  },
+  {
+   "terme": "Tableau des pas (annexe E)",
+   "ancre": "rapport-pdf-annexes-a-a-g"
+  },
+  {
+   "terme": "Encres nutritionnelles",
    "ancre": "rapport-pdf-annexes-a-a-g"
   },
   {
@@ -275,7 +339,7 @@
    "ancre": "rapport-pdf-details-des-journees"
   },
   {
-   "terme": "Nuit du … au …",
+   "terme": "Nommage des nuits",
    "ancre": "rapport-pdf-details-des-journees"
   }
  ],

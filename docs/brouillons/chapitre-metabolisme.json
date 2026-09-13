@@ -4,13 +4,13 @@
    "categorie": "Navigation",
    "fonctionnalite": "Calculer et consulter le bilan métabolique des 7 derniers jours",
    "texte": "Écrire par quelle entrée de menu la page s'ouvre.",
-   "origine": "Aucun menu ni lien de la Mixte ne mène à l'onglet metabolism : la table partagée allTabs porte une entrée « Métabolisme », mais ni BOTTOM_MENU_ORDER ni le menu Paramètres ne la reprennent, et aucun setActiveTab('metabolism') n'existe hors du montage dans App.tsx. J'aurais voulu décrire un chemin d'accès."
+   "origine": "Aucun menu ni lien de la Mixte ne mène à l'onglet metabolism : la table partagée allTabs porte une entrée « Métabolisme », mais ni BOTTOM_MENU_ORDER (navigation.ts:30) ni le menu Paramètres ne la reprennent, et aucun setActiveTab('metabolism') n'existe hors du montage dans App.tsx. J'aurais voulu décrire un chemin d'accès."
   },
   {
    "categorie": "Profil (V2)",
    "fonctionnalite": "Calculer et consulter le bilan métabolique des 7 derniers jours",
    "texte": "Dériver l'âge de l'année de naissance pour la formule de Mifflin-St Jeor.",
-   "origine": "La V2 recueille anneeNaissance (reponses.ts) ; la formule V1 lit profile.age en années. Aucun code ne fait la conversion."
+   "origine": "La V2 recueille anneeNaissance (screens/onboarding/reponses.ts, défaut 1980) ; la formule V1 lit profile.age en années. Aucun code ne fait la conversion."
   },
   {
    "categorie": "Unités (V2)",
@@ -22,12 +22,18 @@
    "categorie": "Fenêtre",
    "fonctionnalite": "Calculer et consulter le bilan métabolique des 7 derniers jours",
    "texte": "Exclure du bilan les repas et séances saisis à une heure encore à venir.",
-   "origine": "La projection de l'accueil (divination.ts) filtre par hasOccurred avant d'appeler computeMetabolismSummary ; la page ne le fait pas. Tentation d'aligner les deux."
+   "origine": "La projection de l'accueil (divination.ts:337-340) filtre par hasOccurred avant d'appeler computeMetabolismSummary ; la page ne le fait pas. Tentation d'aligner les deux."
+  },
+  {
+   "categorie": "Accueil",
+   "fonctionnalite": "Calculer et consulter le bilan métabolique des 7 derniers jours",
+   "texte": "Aligner la dépense totale de l'accueil sur celle de la page, avec un seul arrondi.",
+   "origine": "divination.ts:351-356 recompose la dépense en round(ΣMB) + round(Σpas) + round(Σsport), là où metabolism.utils.ts:191 fait round(ΣMB + Σactif) : les deux écrans peuvent différer de quelques kcal le même jour. Tentation de corriger plutôt que de décrire."
   },
   {
    "categorie": "Tendance",
    "fonctionnalite": "Calculer et consulter le bilan métabolique des 7 derniers jours",
-   "texte": "Justifier les seuils 4 000 / 8 000 / 14 000 kcal par une équivalence en kilos (0,5 / 1 / 1,75 kg à 8 000 kcal par kilo).",
+   "texte": "Justifier les seuils 4 000 / 8 000 / 14 000 kcal par une équivalence en kilos (0.5 / 1 / 1.75 kg à 8 000 kcal par kilo).",
    "origine": "getEnergyTrend ne documente pas ses seuils ; l'équivalence 8 000 kcal = 1 kg n'est écrite que pour la projection de l'accueil (KCAL_PER_KILO)."
   },
   {
@@ -43,6 +49,12 @@
    "origine": "Une journée sans saisie vaut 0 kcal ingérée et aucun signal n'existe à l'écran. Supposition d'un comportement souhaitable."
   },
   {
+   "categorie": "Données manquantes",
+   "fonctionnalite": "Calculer et consulter le bilan métabolique des 7 derniers jours",
+   "texte": "Avertir qu'un bilan de carnet neuf repose sur la seule pesée de départ et sur zéro repas.",
+   "origine": "Sur un carnet neuf, la page annonce « Perte de poids » et un déficit de 11 403 kcal qui ne viennent que de l'absence de saisies. Rien à l'écran ne le dit ; j'ai eu envie d'un avertissement qu'aucune décision n'établit."
+  },
+  {
    "categorie": "Pas simulés",
    "fonctionnalite": "Calculer et consulter le bilan métabolique des 7 derniers jours",
    "texte": "Dire si les relevés de pas marqués isSimulated comptent dans le bilan.",
@@ -53,44 +65,66 @@
    "fonctionnalite": "Calculer et consulter le bilan métabolique des 7 derniers jours",
    "texte": "Homogénéiser l'écriture des milliers entre les blocs de synthèse et le tableau journalier.",
    "origine": "Les totaux passent par formatNumber (espace insécable) ; MetabolismDailyTable et la ligne « MB (N) + Activités (N) » écrivent les nombres bruts. Tentation de décrire un format unique."
+  },
+  {
+   "categorie": "Formats",
+   "fonctionnalite": "Calculer et consulter le bilan métabolique des 7 derniers jours",
+   "texte": "Faire passer la balance positive par le formateur, comme la balance négative.",
+   "origine": "MetabolismSummaryBlocks.tsx:83 écrit `+${Math.round(netBalance)}` en dur pour un surplus et n'appelle formatNumber que dans l'autre branche : « +5147 » face à « -5 147 ». Le chapitre le décrit ; l'envie de l'appeler un défaut à corriger n'y a pas sa place."
+  },
+  {
+   "categorie": "Formats",
+   "fonctionnalite": "Calculer et consulter le bilan métabolique des 7 derniers jours",
+   "texte": "Écrire le poids moyen (7j) à une décimale fixe (« 86.0 »).",
+   "origine": "MetabolismBreakdownDetails.tsx:36 arrondit à une décimale au plus et l.65 rend la valeur brute, hors formateur : un poids moyen rond s'affiche « 86 ». Envie d'un format stable, non décidée."
+  },
+  {
+   "categorie": "Poids",
+   "fonctionnalite": "Calculer et consulter le bilan métabolique des 7 derniers jours",
+   "texte": "Trancher entre deux pesées du même jour par leur heure.",
+   "origine": "bodyMetrics.utils.ts:18-26 trie sur la seule date et ignore WeightLog.time (types.ts:20), pourtant renseigné : l'ordre du tableau décide. Une règle « la plus tardive gagne » serait plausible mais n'est écrite nulle part."
   }
  ],
  "glossaire": [
   {
    "terme": "Métabolisme de base (MB)",
-   "definition": "Énergie dépensée au repos sur une journée, en kcal, calculée chaque jour par la formule de Mifflin-St Jeor avec le poids du jour."
+   "definition": "Énergie minimale dépensée au repos pour maintenir les fonctions vitales, calculée chaque jour à partir du genre, de l'âge, de la taille et du poids de ce jour."
   },
   {
    "terme": "Mifflin-St Jeor",
-   "definition": "Formule 10 × poids (kg) + 6,25 × taille (cm) − 5 × âge, + 5 pour un homme, − 161 pour une femme, moyenne des deux pour le genre neutre."
-  },
-  {
-   "terme": "Calories ingérées",
-   "definition": "Somme des calories des repas et en-cas datés d'une journée."
-  },
-  {
-   "terme": "Dépense active",
-   "definition": "Calories des pas et des séances d'activité physique d'une journée."
+   "definition": "Formule de 1990 employée pour le MB : 10 × poids + 6.25 × taille − 5 × âge, + 5 pour un homme, − 161 pour une femme, moyenne des deux pour un genre neutre."
   },
   {
    "terme": "MET",
-   "definition": "Multiple de la dépense au repos attribué à un sport ou à une allure ; MET × poids (kg) × heures donne des kcal."
+   "definition": "Coût énergétique d'une activité rapporté au repos ; multiplié par le poids en kilos et la durée en heures, il donne les kilocalories d'une séance."
+  },
+  {
+   "terme": "Courbe d'allure",
+   "definition": "Table qui associe une vitesse en km/h à un MET, pour les sports acceptant une distance ; entre deux ancrages, la valeur est interpolée."
+  },
+  {
+   "terme": "Dépense active",
+   "definition": "Somme, sur un jour, des calories des séances d'activité physique et des calories des pas ; s'ajoute au MB pour former la dépense du jour."
   },
   {
    "terme": "Balance énergétique",
-   "definition": "Calories ingérées moins calories dépensées (MB + dépense active), négative en déficit, positive en surplus."
+   "definition": "Calories ingérées moins calories dépensées, sur un jour ou sur les 7 jours ; négative, c'est un déficit, positive, un surplus."
   },
   {
    "terme": "Tendance",
-   "definition": "Libellé déduit de la balance des 7 jours, de « Stable » à « Perte de poids marquée » ou « Prise de poids marquée »."
+   "definition": "Lecture de la balance des 7 jours en sept libellés, de « Perte de poids marquée » à « Prise de poids marquée », selon des seuils de 4 000, 8 000 et 14 000 kcal."
   },
   {
    "terme": "Poids à une date",
-   "definition": "Dernière pesée datée au plus tard ce jour, ou un poids de repli (départ, visé, première pesée, 80 kg)."
+   "definition": "Poids de la pesée la plus récente datée au plus tard ce jour ; à défaut, pesée de départ, poids visé, première pesée, puis 80 kg."
   },
   {
-   "terme": "Fenêtre de 7 jours",
-   "definition": "Les 7 dates locales d'aujourd'hui − 6 à aujourd'hui."
+   "terme": "Foulée",
+   "definition": "Longueur d'un pas, estimée à taille × 0.414 ; elle convertit un nombre de pas en distance, puis en durée de marche à 4.2 km/h."
+  },
+  {
+   "terme": "Divination",
+   "definition": "Projection de poids de l'accueil : la même soustraction que le bilan, convertie en grammes à raison de 8 000 kcal le kilo, saisies à venir exclues."
   }
  ],
  "index": [
@@ -111,7 +145,7 @@
    "ancre": "metabolisme-bilan-metabolique-page-metabolisme"
   },
   {
-   "terme": "Tendance (balance)",
+   "terme": "Tendance de la balance",
    "ancre": "metabolisme-bilan-metabolique-page-metabolisme"
   },
   {
@@ -127,19 +161,24 @@
    "ancre": "metabolisme-bilan-metabolique-page-metabolisme"
   },
   {
+   "terme": "MET",
+   "ancre": "metabolisme-bilan-metabolique-page-metabolisme"
+  },
+  {
    "terme": "Détail journalier",
    "ancre": "metabolisme-bilan-metabolique-page-metabolisme"
   },
   {
-   "terme": "Poids moyen (7 j)",
+   "terme": "Divination (projection de poids)",
    "ancre": "metabolisme-bilan-metabolique-page-metabolisme"
   },
   {
-   "terme": "MET",
+   "terme": "Poids à une date",
    "ancre": "metabolisme-bilan-metabolique-page-metabolisme"
   }
  ],
  "ecrans_illustres": [
-  "metabolisme-rapport-badges/bilan-metabolique-page-metabolisme"
+  "metabolisme-rapport-badges/bilan-metabolique-page-metabolisme",
+  "metabolisme-rapport-badges/bilan-metabolique-page-metabolisme-suite"
  ]
 }

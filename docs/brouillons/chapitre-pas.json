@@ -59,93 +59,131 @@
    "fonctionnalite": "Un relevé par jour",
    "texte": "Que l'application refuse deux relevés à la même date.",
    "origine": "La SPEC V1 § 4.6 dit « une entrée par jour », mais le code additionne plusieurs relevés d'une date (calendrier, moyennes de l'accueil) et rien ne l'interdit."
+  },
+  {
+   "categorie": "Amélioration",
+   "fonctionnalite": "Graphe des pas",
+   "texte": "Fixer l'échelle de l'axe vertical à 1,25 × le maximum de la fenêtre.",
+   "origine": "Réfutation retenue, phrase retirée du chapitre : dans StepsTrendChart, le facteur 1,25 ne sert qu'à mesurer la largeur de la colonne d'étiquettes (yAxisWidth) ; le YAxis n'a aucun domain et le traceur choisit son échelle."
+  },
+  {
+   "categorie": "Comportement supposé",
+   "fonctionnalite": "Tuiles de l'accueil",
+   "texte": "Que la tuile des pas prenne toute la largeur quand le module des repas est éteint.",
+   "origine": "Réfutation retenue, phrase retirée du chapitre : le col-span-2 de MaisonSections vit dans la branche où le module des PAS est éteint et s'applique aux deux tuiles restantes. L'arbitrage de Claude porte sur « repas coupés ET pas coupés », hors périmètre des pas."
+  },
+  {
+   "categorie": "Comportement supposé",
+   "fonctionnalite": "Tiroir Tendances",
+   "texte": "Qu'une carte n'existe que pour les modules allumés.",
+   "origine": "Réfutation retenue, phrase corrigée : la ligne est dans le tableau quoi qu'il arrive (enabled: Boolean(profile.stepsTrackingEnabled)) et la carte d'un module éteint est seulement voilée, avec son message d'activation."
+  },
+  {
+   "categorie": "Comportement supposé",
+   "fonctionnalite": "Navigation depuis le tiroir Tendances",
+   "texte": "Que toucher la carte « Pas » du tiroir mène à la page des pas.",
+   "origine": "Réfutation retenue, chemin retiré de la liste : GRAPHES_EN_SURIMPRESSION['steps'] ouvre le graphe par-dessus ; seul le lien « Voir mes pas » d'une carte sans donnée navigue."
+  },
+  {
+   "categorie": "Règle plausible",
+   "fonctionnalite": "Relevés datés dans le futur",
+   "texte": "Un plafond à aujourd'hui pour les moyennes, le cumul, le journal et les tuiles de l'accueil.",
+   "origine": "Tous ces calculs ne posent qu'un prédicat bas (log.date >= borne) ; seul computeStepsChartData s'arrête à aujourd'hui. Rien dans le code ni dans les décisions lues ne dit ce que devient un relevé futur."
+  },
+  {
+   "categorie": "Amélioration",
+   "fonctionnalite": "Journal des pas",
+   "texte": "Dérouler le journal en entier au lieu de le contenir dans une boîte de 160 px.",
+   "origine": "StepsJournal borne sa liste à max-h-[160px] ; le compte du bandeau annonce bien plus de lignes qu'il n'en montre. Aucune décision lue ne fixe cette hauteur."
+  },
+  {
+   "categorie": "Comportement supposé",
+   "fonctionnalite": "Graphe des pas en surimpression",
+   "texte": "Que le titre du graphe disparaisse dans le bandeau de la surimpression.",
+   "origine": "Formulation du manque signalé ; EnteteGraphe fait redescendre l'intitulé en texte simple de 11 px dans le bloc — il change de place, il ne disparaît pas."
   }
  ],
  "glossaire": [
   {
    "terme": "Relevé de pas",
-   "definition": "Ligne datée portant un nombre de pas ; au plus une par jour dans le jeu de données semé."
+   "definition": "Une ligne du journal des pas : une date et un nombre de pas. Rien ne le saisit dans la V1 ; plusieurs relevés peuvent porter la même date."
   },
   {
    "terme": "Objectif quotidien",
-   "definition": "8 000 pas, constante de tout le suivi, non réglable."
+   "definition": "8 000 pas, constante du suivi. Aucun écran ne le règle."
   },
   {
    "terme": "Journée relevée",
-   "definition": "Date qui a un relevé à plus de zéro pas ; seule unité des moyennes de l'accueil et des kcal/j du tiroir Tendances."
+   "definition": "Une date qui porte au moins un relevé de pas non nul. C'est le dénominateur des moyennes de l'accueil, à la différence des moyennes de la page, qui divisent par le nombre de relevés."
   },
   {
-   "terme": "Statistiques/j",
-   "definition": "Moyennes par relevé sur une fenêtre : les 30 derniers jours sur la page, depuis la date du cumul sous la couche vitrée."
-  },
-  {
-   "terme": "Cumul",
-   "definition": "Total de pas, distance, durée et vitesse moyenne depuis une date de départ."
-  },
-  {
-   "terme": "Date de départ du cumul",
-   "definition": "Date choisie dans le bandeau « Depuis le … », retenue localement ; à défaut, le plus ancien relevé."
-  },
-  {
-   "terme": "Durée de marche estimée",
-   "definition": "Pas divisés par 95, écrite « Nmin » sous l'heure, « HhMM » au-delà."
-  },
-  {
-   "terme": "Vitesse de référence",
-   "definition": "4.2 km/h, constante affichée sur les cartes et dans la bulle du calendrier ; le cumul calcule la sienne."
-  },
-  {
-   "terme": "Couche vitrée",
-   "definition": "Blocs d'une page montés par-dessus l'accueil sous un verre, avec un lien vers la page."
-  },
-  {
-   "terme": "Curseur calendrier / journal",
-   "definition": "Commutateur à deux vues de la page, calendrier par défaut, choix retenu par page."
-  },
-  {
-   "terme": "Sélecteur de période",
-   "definition": "7, 14, 30, 90 derniers jours, Depuis le début, Choisir ; bornes « du … au … » éditables ; 30 jours par défaut."
-  },
-  {
-   "terme": "Tiroir Journal",
-   "definition": "Tiroir de la barre qui liste les derniers relevés de chaque journal et ouvre le journal complet."
-  },
-  {
-   "terme": "Tiroir Tendances",
-   "definition": "Tiroir de la barre qui montre 14 jours par module allumé et ouvre le graphe de la page."
-  },
-  {
-   "terme": "Sens (Dynamique)",
-   "definition": "Hausse, baisse ou stable des 7 derniers jours contre les 7 précédents, seuil de 5 %."
-  },
-  {
-   "terme": "Module",
-   "definition": "Suivi que la personne allume ou éteint ; les pas sont le module « Nombre de Pas »."
+   "terme": "Foulée",
+   "definition": "Longueur d'un pas estimée à taille × 0,414 cm ; sert au seul calcul des calories, la distance affichée employant 0,00076 km par pas."
   },
   {
    "terme": "Kpas",
-   "definition": "Millier de pas, unité de la carte Pas du tiroir Tendances."
+   "definition": "Millier de pas ; unité de la carte « Pas » du tiroir Tendances (« 6.8 Kpas/j »)."
+  },
+  {
+   "terme": "Module",
+   "definition": "Bloc de fonctionnalité qu'un drapeau du profil allume ou éteint. Ici stepsTrackingEnabled : éteint, la page n'est pas montée."
+  },
+  {
+   "terme": "Page vitrée",
+   "definition": "Écran d'un module éteint : rien n'est monté, un voile porte la seule phrase d'activation, qui mène à la page Modules."
+  },
+  {
+   "terme": "Couche vitrée",
+   "definition": "Blocs d'une page montés par-dessus l'accueil, le reste de l'écran flouté ; celle des pas empile la carte du jour et le bloc « Depuis le … »."
+  },
+  {
+   "terme": "Tiroir Journal",
+   "definition": "Tiroir de la barre listant les dernières entrées de chaque journal ; la case des pas ouvre l'historique complet par-dessus."
+  },
+  {
+   "terme": "Tiroir Tendances",
+   "definition": "Tiroir de la barre montrant une carte de silhouette sur 14 jours par domaine ; le toucher ouvre le graphe de la page en surimpression."
+  },
+  {
+   "terme": "Curseur calendrier ↔ journal",
+   "definition": "Bascule de la page entre la grille mensuelle et la liste ; le choix est retenu d'une visite à l'autre."
+  },
+  {
+   "terme": "Fenêtre de période",
+   "definition": "7, 14, 30, 90 derniers jours, Depuis le début ou Choisir. Une fenêtre de N jours part d'aujourd'hui − (N − 1)."
+  },
+  {
+   "terme": "Bornes « du … au … »",
+   "definition": "Les deux dates de la période, écrites dans le bandeau et éditables ; les modifier bascule en « Choisir »."
+  },
+  {
+   "terme": "Cumul « Depuis le … »",
+   "definition": "Total de pas, distance, durée et vitesse moyenne depuis une date de départ éditable, retenue d'une visite à l'autre."
+  },
+  {
+   "terme": "Statistiques/j",
+   "definition": "Carte des moyennes par jour d'une fenêtre : calories, pas, pourcentage d'objectif, distance, durée, vitesse."
+  },
+  {
+   "terme": "Journée simulée",
+   "definition": "Mention de la bulle du calendrier pour un relevé portant le drapeau isSimulated, posé par le jeu de données semé."
+  },
+  {
+   "terme": "Sens (hausse, baisse, stable)",
+   "definition": "Comparaison des deux moitiés d'une fenêtre de 14 jours ; sous 5 % d'écart relatif, stable."
+  },
+  {
+   "terme": "En direct, Dynamique, Côte à côte",
+   "definition": "Les trois emplacements de l'accueil « sections » où le domaine des pas paraît : le compte du jour, la flèche de sens, les deux moyennes par jour."
   }
  ],
  "index": [
   {
-   "terme": "Pas (page)",
-   "ancre": "pas-page-pas-stepstracker"
+   "terme": "Pas du jour",
+   "ancre": "pas-carte-aujourd-hui"
   },
   {
-   "terme": "Marche (bande de titre)",
-   "ancre": "pas-page-pas-stepstracker"
-  },
-  {
-   "terme": "Module Nombre de Pas",
-   "ancre": "pas"
-  },
-  {
-   "terme": "Podomètre",
-   "ancre": "pas"
-  },
-  {
-   "terme": "Objectif quotidien (8 000)",
+   "terme": "Objectif quotidien (8 000 pas)",
    "ancre": "pas-carte-aujourd-hui"
   },
   {
@@ -153,7 +191,7 @@
    "ancre": "pas-carte-aujourd-hui"
   },
   {
-   "terme": "Distance par pas",
+   "terme": "Distance parcourue (km)",
    "ancre": "pas-carte-aujourd-hui"
   },
   {
@@ -161,7 +199,7 @@
    "ancre": "pas-carte-aujourd-hui"
   },
   {
-   "terme": "Vitesse 4.2 km/h",
+   "terme": "Vitesse de marche (4.2 km/h)",
    "ancre": "pas-carte-aujourd-hui"
   },
   {
@@ -173,7 +211,7 @@
    "ancre": "pas-carte-statistiques-j"
   },
   {
-   "terme": "Bravo ! (face de carte)",
+   "terme": "Face « Bravo ! »",
    "ancre": "pas-carte-statistiques-j"
   },
   {
@@ -189,15 +227,19 @@
    "ancre": "pas-journal-des-pas"
   },
   {
-   "terme": "Tout supprimer (journal de marche)",
-   "ancre": "pas-journal-des-pas"
-  },
-  {
    "terme": "Sélecteur de période",
    "ancre": "pas-journal-des-pas"
   },
   {
-   "terme": "Depuis le … (cumul)",
+   "terme": "Bornes « du … au … »",
+   "ancre": "pas-journal-des-pas"
+  },
+  {
+   "terme": "Tout supprimer (journal de marche)",
+   "ancre": "pas-journal-des-pas"
+  },
+  {
+   "terme": "Cumul « Depuis le … »",
    "ancre": "pas-bloc-depuis-le"
   },
   {
@@ -205,48 +247,84 @@
    "ancre": "pas-bloc-depuis-le"
   },
   {
-   "terme": "Graphe des pas",
+   "terme": "Graphe des pas par jour",
    "ancre": "pas-graphe-suivi-de-votre-nombre-de-pas-par-jour"
   },
   {
-   "terme": "Infobulle (objectif atteint / pas restants)",
+   "terme": "Seuil objectif (ligne pointillée)",
    "ancre": "pas-graphe-suivi-de-votre-nombre-de-pas-par-jour"
   },
   {
-   "terme": "Couche vitrée Pas",
+   "terme": "Infobulle du graphe",
+   "ancre": "pas-graphe-suivi-de-votre-nombre-de-pas-par-jour"
+  },
+  {
+   "terme": "Mode daltonien",
+   "ancre": "pas-graphe-suivi-de-votre-nombre-de-pas-par-jour"
+  },
+  {
+   "terme": "Page sans aucun relevé",
+   "ancre": "pas-page-sans-aucun-releve"
+  },
+  {
+   "terme": "Graphe en surimpression",
+   "ancre": "pas-graphe-des-pas-en-surimpression"
+  },
+  {
+   "terme": "Couche vitrée « Pas »",
    "ancre": "pas-couche-vitree-pas"
   },
   {
-   "terme": "En direct (tuile pas)",
+   "terme": "Tuile « En direct » des pas",
    "ancre": "pas-tuiles-home-du-domaine-pas"
   },
   {
-   "terme": "Dynamique (sens des pas)",
+   "terme": "Tuile « Dynamique » des pas",
    "ancre": "pas-tuiles-home-du-domaine-pas"
   },
   {
-   "terme": "Côte à côte (moyennes de pas)",
+   "terme": "Tuiles « Côte à côte » des pas",
    "ancre": "pas-tuiles-home-du-domaine-pas"
   },
   {
-   "terme": "Mes pas (accueil standard)",
+   "terme": "Moyenne de pas depuis le début",
    "ancre": "pas-tuiles-home-du-domaine-pas"
   },
   {
-   "terme": "Journée relevée",
+   "terme": "Moyenne de pas sur 7 jours",
    "ancre": "pas-tuiles-home-du-domaine-pas"
   },
   {
-   "terme": "Tiroir Journal",
+   "terme": "Bloc « Mes pas » (accueil standard)",
+   "ancre": "pas-tuiles-home-du-domaine-pas"
+  },
+  {
+   "terme": "Tiroir Journal (case des pas)",
    "ancre": "pas-tiroir-journal"
   },
   {
-   "terme": "Tiroir Tendances",
+   "terme": "Tiroir Tendances (carte « Pas »)",
    "ancre": "pas-tiroir-tendances"
   },
   {
-   "terme": "Kpas",
+   "terme": "Kpas/j",
    "ancre": "pas-tiroir-tendances"
+  },
+  {
+   "terme": "Module Nombre de Pas",
+   "ancre": "pas"
+  },
+  {
+   "terme": "Podomètre natif",
+   "ancre": "pas"
+  },
+  {
+   "terme": "Curseur calendrier ↔ journal",
+   "ancre": "pas-page-pas-stepstracker"
+  },
+  {
+   "terme": "Relevés datés dans le futur",
+   "ancre": "pas-page-pas-stepstracker"
   }
  ],
  "ecrans_illustres": [

@@ -83,89 +83,221 @@
    "fonctionnalite": "Le parcours et ses boutons",
    "texte": "Si une réponse changée en arrière raccourcit la liste sous l'étape courante, le parcours retombe sur la dernière étape visible.",
    "origine": "Garde-fou réel de useParcours (rang borné), mais inatteignable par les gestes de l'écran : reculer abaisse toujours le rang avant qu'une réponse change. Laissé à la spec technique."
+  },
+  {
+   "categorie": "thème",
+   "fonctionnalite": "Thème",
+   "texte": "Le liseré du cadre retenu prend une teinte différente selon le thème actif.",
+   "origine": "On attend d'un accent qu'il varie d'un thème à l'autre ; --accent vaut #5fc0ff dans ciel.css comme dans ciel-fonce.css, le liseré est donc le même bleu partout."
+  },
+  {
+   "categorie": "thème",
+   "fonctionnalite": "Thème",
+   "texte": "Toucher un cadre repeint aussi les deux cadres aux couleurs du thème retenu.",
+   "origine": "Réfutation retenue : chaque cadre porte sa propre classe de thème (EtapeTheme.tsx:32, page.css .carte-theme { background: var(--fond) }), son fond et son encre ne changent jamais avec la page."
+  },
+  {
+   "categorie": "avatar",
+   "fonctionnalite": "Avatar",
+   "texte": "Le créateur d'avatar est celui de la V1 en périmètre, repris tel quel.",
+   "origine": "GUIDELINES §4 l'écrit ainsi, mais dans la version Mixte le visage est un émoji depuis le 2026-08-09, la forme du visage, les yeux et les lunettes ne changent plus le dessin et l'expression ne se choisit plus ; le créateur dessiné à huit réglages vient d'une version hors périmètre. La provenance a donc été retirée du chapitre."
+  },
+  {
+   "categorie": "décompte",
+   "fonctionnalite": "Le parcours et ses boutons",
+   "texte": "Les billes s'accompagnent d'un compte lisible, « 5 sur 9 ».",
+   "origine": "Un décompte appelle un chiffre ; Progression.tsx n'affiche aucun texte, le compte n'existe que dans role=\"progressbar\" et ses aria-value."
+  },
+  {
+   "categorie": "traitement",
+   "fonctionnalite": "Quel traitement",
+   "texte": "Choisir « Autre » ouvre un champ pour écrire le nom de sa spécialité.",
+   "origine": "« Autre » appelle une précision ; traitements.ts n'a que les identifiants autre-injection et autre-comprime, aucun champ libre, et GUIDELINES §3 interdit la saisie d'un traitement à la main."
+  },
+  {
+   "categorie": "langue",
+   "fonctionnalite": "Poids actuel",
+   "texte": "Le séparateur décimal suit la langue choisie à l'écran : point après « English », virgule après « Français ».",
+   "origine": "separateurDecimal existe bien dans les deux dictionnaires, mais useTextes lit la langue du navigateur : le choix de l'écran ne change pas la virgule affichée."
+  },
+  {
+   "categorie": "enregistrement",
+   "fonctionnalite": "Le parcours et ses boutons",
+   "texte": "L'onboarding ne se rejoue pas au second lancement.",
+   "origine": "Un onboarding se fait une fois ; App.tsx ne monte que <Onboarding> et rien ne retient que le parcours a été fait."
+  },
+  {
+   "categorie": "accessibilité",
+   "fonctionnalite": "Thème",
+   "texte": "Le nom du thème s'affiche sous son cadre.",
+   "origine": "Un choix nommé se lit mieux ; le nom n'est qu'en aria-label depuis le 2026-09-07, le cadre EST le thème."
   }
  ],
  "glossaire": [
   {
-   "terme": "Étape",
-   "definition": "Un écran du parcours, identifié : theme, langue-unites, objectif, poids, poids-cible, traitement, quel-traitement, avatar, profil."
+   "terme": "Onboarding",
+   "definition": "Le parcours du premier lancement : sept à neuf écrans qui règlent l'application puis recueillent l'objectif, les poids, le traitement, l'avatar et l'identité."
   },
   {
-   "terme": "Parcours",
-   "definition": "La liste ordonnée des étapes visibles, recalculée à chaque réponse, et le rang de l'étape courante."
+   "terme": "Étape visible",
+   "definition": "Un écran que les réponses font apparaître. Deux étapes sur neuf sont conditionnelles ; la liste se recalcule à chaque réponse."
   },
   {
-   "terme": "Réponses",
-   "definition": "Tout ce que l'onboarding recueille, avec ses valeurs de départ ; vit en mémoire seulement."
+   "terme": "Bille",
+   "definition": "Un point du décompte, un par étape visible, allumé pour chaque étape passée. Les billes n'apparaissent qu'à partir de « Avez-vous commencé votre traitement GLP-1 ? »."
   },
   {
-   "terme": "Billes",
-   "definition": "Le décompte des écrans : une pastille par étape visible, allumée quand l'étape est passée, sans texte."
+   "terme": "Zone qui défile",
+   "definition": "La bande du milieu de l'écran, seule à défiler. L'entête, le portrait de l'avatar et la rangée des boutons restent figés."
   },
   {
-   "terme": "Roue (sélecteur à roues)",
-   "definition": "Colonne de crans qui s'ouvre au toucher du champ ; deux roues pour le poids, une pour l'année de naissance et la taille."
+   "terme": "Sélecteur à roues",
+   "definition": "Un champ qui ouvre une ou deux colonnes de crans, le cran retenu placé au milieu. Le clic dehors et Échap le referment."
+  },
+  {
+   "terme": "Cran",
+   "definition": "Une valeur d'une roue. Les roues ne proposent que des valeurs possibles : il n'y a rien à refuser."
+  },
+  {
+   "terme": "Centaine de grammes",
+   "definition": "Le second cran d'un poids en kilos : 0, 100 … 900. En livres, le même cran est un dixième et s'écrit 0 à 9."
   },
   {
    "terme": "Système d'unités",
-   "definition": "Métrique (cm · kg) ou impérial (inch · pound) ; décide de l'unité de saisie et d'affichage, la langue en pose le défaut."
+   "definition": "cm · kg ou inch · pound. Il décide de l'affichage et de la saisie, jamais de la valeur stockée."
   },
   {
-   "terme": "Forme",
-   "definition": "La façon de prendre le traitement : injection ou comprimé."
-  },
-  {
-   "terme": "Spécialité",
-   "definition": "Le nom de marque du traitement, choisi dans le catalogue ; chaque forme finit par Autre."
+   "terme": "Séparateur décimal",
+   "definition": "La virgule en français, le point en anglais. C'est un séparateur d'affichage : les valeurs sont gardées avec un point."
   },
   {
    "terme": "Thème",
-   "definition": "L'habillage de la page, Ciel ou Ciel foncé, choisi au premier écran."
+   "definition": "L'habillage de la page : Ciel (jour) ou Ciel foncé (nuit). Il pose sa classe sur la page de l'onboarding."
+  },
+  {
+   "terme": "Forme",
+   "definition": "La façon dont un traitement se prend : Injection ou Comprimé. Elle commande la liste des spécialités."
+  },
+  {
+   "terme": "Spécialité",
+   "definition": "Le nom de marque du traitement, choisi dans le catalogue. La réponse gardée est l'identifiant, pas le nom."
   },
   {
    "terme": "Avatar",
-   "definition": "Le portrait composé : genre, visage, peau, yeux, coiffure, cheveux, lunettes, expression."
+   "definition": "Un portrait dessiné composé de huit réglages. Le genre en fait partie : il se voit sur le vêtement et sur la coiffure de départ."
   },
   {
    "terme": "Mot-symbole",
-   "definition": "Le nom GLP1LOW dessiné ; seul contenu du bouton du dernier écran."
-  },
-  {
-   "terme": "peutValider",
-   "definition": "La règle du parcours qui éteint « Suivant » quand une étape refuse de laisser passer."
+   "definition": "La marque dessinée. Elle tient dans l'entête, et remplace le mot « Suivant » sur le bouton du dernier écran."
   }
  ],
  "index": [
   {
-   "terme": "Thème",
+   "terme": "Année de naissance",
+   "ancre": "onboarding-profil"
+  },
+  {
+   "terme": "Autre (spécialité)",
+   "ancre": "onboarding-quel-traitement"
+  },
+  {
+   "terme": "Avatar",
+   "ancre": "onboarding-avatar"
+  },
+  {
+   "terme": "Avatar de départ",
+   "ancre": "onboarding-avatar"
+  },
+  {
+   "terme": "Billes du décompte",
+   "ancre": "onboarding-le-parcours"
+  },
+  {
+   "terme": "Bornes de la taille",
+   "ancre": "onboarding-profil"
+  },
+  {
+   "terme": "Catalogue des traitements",
+   "ancre": "onboarding-quel-traitement"
+  },
+  {
+   "terme": "Centaine de grammes",
+   "ancre": "onboarding-poids"
+  },
+  {
+   "terme": "Ciel foncé",
    "ancre": "onboarding-theme"
   },
   {
-   "terme": "Ciel, Ciel foncé",
-   "ancre": "onboarding-theme"
+   "terme": "Coiffure",
+   "ancre": "onboarding-avatar"
   },
   {
-   "terme": "Langue",
+   "terme": "Comprimé",
+   "ancre": "onboarding-quel-traitement"
+  },
+  {
+   "terme": "Couleurs de l'avatar",
+   "ancre": "onboarding-avatar"
+  },
+  {
+   "terme": "Décompte des écrans",
+   "ancre": "onboarding-le-parcours"
+  },
+  {
+   "terme": "Étapes conditionnelles",
+   "ancre": "onboarding-le-parcours"
+  },
+  {
+   "terme": "Expression",
+   "ancre": "onboarding-avatar"
+  },
+  {
+   "terme": "Forme du traitement",
+   "ancre": "onboarding-quel-traitement"
+  },
+  {
+   "terme": "Genre",
+   "ancre": "onboarding-avatar"
+  },
+  {
+   "terme": "Injection",
+   "ancre": "onboarding-quel-traitement"
+  },
+  {
+   "terme": "Langue détectée",
+   "ancre": "onboarding-le-parcours"
+  },
+  {
+   "terme": "Langue (maquette)",
    "ancre": "onboarding-langue-unites"
   },
   {
-   "terme": "Unités (cm · kg, inch · pound)",
-   "ancre": "onboarding-langue-unites"
+   "terme": "Mot de passe",
+   "ancre": "onboarding-profil"
+  },
+  {
+   "terme": "Mot-symbole",
+   "ancre": "onboarding-le-parcours"
   },
   {
    "terme": "Objectif",
    "ancre": "onboarding-objectif"
   },
   {
+   "terme": "Ozempic",
+   "ancre": "onboarding-quel-traitement"
+  },
+  {
+   "terme": "Pastilles de couleur",
+   "ancre": "onboarding-avatar"
+  },
+  {
+   "terme": "Plafonds du poids",
+   "ancre": "onboarding-poids"
+  },
+  {
    "terme": "Poids actuel",
-   "ancre": "onboarding-poids"
-  },
-  {
-   "terme": "Roues (sélecteur de poids)",
-   "ancre": "onboarding-poids"
-  },
-  {
-   "terme": "Séparateur décimal",
    "ancre": "onboarding-poids"
   },
   {
@@ -173,72 +305,44 @@
    "ancre": "onboarding-poids-cible"
   },
   {
-   "terme": "Traitement commencé",
-   "ancre": "onboarding-traitement"
+   "terme": "Précédent (bouton)",
+   "ancre": "onboarding-le-parcours"
   },
   {
-   "terme": "Forme du traitement",
-   "ancre": "onboarding-quel-traitement"
+   "terme": "Rien n'est enregistré",
+   "ancre": "onboarding-le-parcours"
   },
   {
-   "terme": "Spécialité",
-   "ancre": "onboarding-quel-traitement"
+   "terme": "Roues (sélecteur)",
+   "ancre": "onboarding-poids"
   },
   {
-   "terme": "Catalogue des traitements",
-   "ancre": "onboarding-quel-traitement"
+   "terme": "Séparateur décimal",
+   "ancre": "onboarding-poids"
   },
   {
-   "terme": "Avatar",
-   "ancre": "onboarding-avatar"
+   "terme": "Suivant (bouton)",
+   "ancre": "onboarding-le-parcours"
   },
   {
-   "terme": "Genre",
-   "ancre": "onboarding-avatar"
-  },
-  {
-   "terme": "Coiffure",
-   "ancre": "onboarding-avatar"
-  },
-  {
-   "terme": "Année de naissance",
-   "ancre": "onboarding-profil"
+   "terme": "Systèmes d'unités",
+   "ancre": "onboarding-langue-unites"
   },
   {
    "terme": "Taille",
    "ancre": "onboarding-profil"
   },
   {
-   "terme": "Prénom",
-   "ancre": "onboarding-profil"
+   "terme": "Thème",
+   "ancre": "onboarding-theme"
   },
   {
-   "terme": "Adresse e-mail",
-   "ancre": "onboarding-profil"
+   "terme": "Traitement commencé",
+   "ancre": "onboarding-traitement"
   },
   {
-   "terme": "Mot de passe",
-   "ancre": "onboarding-profil"
-  },
-  {
-   "terme": "Billes (décompte)",
+   "terme": "Zones figées",
    "ancre": "onboarding-le-parcours"
-  },
-  {
-   "terme": "Précédent, Suivant",
-   "ancre": "onboarding-le-parcours"
-  },
-  {
-   "terme": "Bouton retour du téléphone",
-   "ancre": "onboarding-le-parcours"
-  },
-  {
-   "terme": "Étapes visibles",
-   "ancre": "onboarding-le-parcours"
-  },
-  {
-   "terme": "Questionnaire V1 (remplacé)",
-   "ancre": "onboarding"
   }
  ],
  "ecrans_illustres": [
@@ -247,10 +351,13 @@
   "onboarding-v2/etape-langue-unites-ciel",
   "onboarding-v2/etape-objectif-ciel",
   "onboarding-v2/etape-poids-ciel",
+  "onboarding-v2/etape-poids-selecteur-ouvert-ciel",
   "onboarding-v2/etape-poids-cible-ciel",
   "onboarding-v2/etape-traitement-ciel",
   "onboarding-v2/etape-quel-traitement-ciel",
+  "onboarding-v2/etape-quel-traitement-injection-ciel",
   "onboarding-v2/etape-avatar-ciel",
+  "onboarding-v2/etape-avatar-bas-ciel",
   "onboarding-v2/etape-profil-ciel"
  ]
 }

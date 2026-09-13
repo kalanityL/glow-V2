@@ -52,7 +52,7 @@
    "categorie": "V2",
    "fonctionnalite": "Création effective du compte",
    "texte": "Le bouton du dernier écran créerait le compte et ouvrirait une session.",
-   "origine": "GUIDELINES.md § 5 : le bouton ne mène nulle part, aucune réponse n'est enregistrée, pas de Firebase."
+   "origine": "GUIDELINES.md § 5 : le bouton ne mène nulle part, aucune réponse n'est enregistrée, pas de Firebase. Phrase « le compte se crée sur le dernier écran de l'onboarding » retirée du chapitre après réfutation : useParcours.ts:108 borne avancer() à la dernière étape, aucun stockage dans src/."
   },
   {
    "categorie": "V2",
@@ -65,174 +65,261 @@
    "fonctionnalite": "Quota du stockage",
    "texte": "Chiffrer un plafond (environ 5 Mo) et prévenir avant saturation.",
    "origine": "dataBackup.ts évoque ~5 Mo en commentaire ; aucun écran ne mesure ni n'avertit, l'écriture échoue en silence."
+  },
+  {
+   "categorie": "Données sur l'appareil",
+   "fonctionnalite": "Copies de secours horodatées",
+   "texte": "Décrire le mécanisme de copies horodatées (clé glp1_app_companion_data__secours-AAAA-MM-JJ-HHMMSS, index trié, copie vérifiée par relecture, restauration qui met d'abord l'état courant à l'abri) et son garde-fou de stockage plein (« La sauvegarde de secours n’a PAS pu être écrite… », ok faux : l'appelant ne doit rien écrire).",
+   "origine": "Paragraphe retiré du chapitre : les seuls appelants de backUpCurrentSave, listBackups et restoreBackup sont DataGeneratorPage.tsx, la page d'administration, hors périmètre. Aucun écran d'utilisatrice ne voit ce mécanisme, y compris après une sauvegarde illisible."
+  },
+  {
+   "categorie": "Connexion",
+   "fonctionnalite": "Opposition V1 / V2 sur l'inscription libre",
+   "texte": "Dire que la création de compte dans l'onboarding V2 contredit « Les comptes sont créés par l'administratrice — pas d'inscription libre. »",
+   "origine": "Commentaire éditorial sans appui : la phrase décrit la politique de la V1, aucune décision V2 ne la reprend. Retiré du chapitre."
+  },
+  {
+   "categorie": "Avertissement médical",
+   "fonctionnalite": "Porte depuis l'accueil",
+   "texte": "Ouvrir l'avertissement médical depuis un bouton de la home.",
+   "origine": "Les deux boutons de la home menaient à onOpenLegalModal ; ils sont retirés depuis le 2026-08-26 (MaisonSections.tsx:4849-4855, Maison.tsx:1148-1154). La prop est encore reçue, plus jamais câblée. Mention « ou depuis l'accueil » retirée du chapitre."
+  },
+  {
+   "categorie": "Connexion",
+   "fonctionnalite": "Fermeture de session à la suppression sans Firebase",
+   "texte": "Dire que la suppression ramène toujours sur la page de connexion.",
+   "origine": "Vrai seulement si isAuthConfigured ; sans configuration, AuthGate laisse passer et le rechargement rouvre l'application sur le profil d'usine et l'avertissement médical (DeleteAccountBlock.tsx:124-137, AuthGate.tsx:16-17). Phrase corrigée dans le chapitre."
+  },
+  {
+   "categorie": "Données sur l'appareil",
+   "fonctionnalite": "Journal vide après une sauvegarde illisible",
+   "texte": "Dire qu'après une sauvegarde illisible l'application repart de journaux vides.",
+   "origine": "Faux pour les pesées : le catch retombe sur le return final de l'initialiseur, qui sème la pesée de départ à 95 kg de la veille 08:00 (useAppData.ts:127-155, startingWeighIn.ts:158-164). Corrigé dans le chapitre et dans l'exemple."
+  },
+  {
+   "categorie": "Suppression",
+   "fonctionnalite": "Liste écrite des clés effacées",
+   "texte": "Énumérer les clés que la suppression efface, comme une garantie de complétude.",
+   "origine": "clearAll appelle localStorage.clear() : storage.ts:80-91 refuse justement la liste écrite à la main, qui vieillirait mal. Les clés citées dans le chapitre sont des exemples relevés dans le code, pas un inventaire exhaustif."
   }
  ],
  "glossaire": [
   {
+   "terme": "Verrou d'authentification",
+   "definition": "Condition qui rend la page de connexion obligatoire : la configuration Firebase porte une clé. Sans elle, l'application s'ouvre sans compte."
+  },
+  {
    "terme": "Session",
-   "definition": "État de connexion mémorisé par le SDK Firebase sur l'appareil, gardé sans limite de durée jusqu'à une déconnexion explicite."
-  },
-  {
-   "terme": "Verrou (AuthGate)",
-   "definition": "Composant qui ne rend l'application qu'à une session connectée quand Firebase est configuré ; sans configuration, il laisse passer."
-  },
-  {
-   "terme": "Firebase",
-   "definition": "Service Google qui porte les comptes (e-mail + mot de passe ou Google) ; il ne reçoit aucune donnée de suivi."
-  },
-  {
-   "terme": "Stockage local",
-   "definition": "localStorage du navigateur, atteint uniquement par shared/platform/storage.ts ; toute erreur y est avalée."
+   "definition": "État connecté mémorisé par le SDK dans le stockage local de l'appareil, sans limite de durée ; seule une déconnexion explicite y met fin."
   },
   {
    "terme": "Sauvegarde",
-   "definition": "Le JSON unique de toutes les données de suivi, sous la clé glp1_app_companion_data, réécrit à chaque changement."
+   "definition": "Le JSON unique sous la clé glp1_app_companion_data : profil et journaux, réécrit à chaque changement d'état."
   },
   {
-   "terme": "Clé de secours",
-   "definition": "glp1_app_companion_data__secours : copie brute d'une sauvegarde illisible, écrite une seule fois, jamais recouverte."
-  },
-  {
-   "terme": "Copie de secours horodatée",
-   "definition": "Copie de la sauvegarde sous une clé __secours-AAAA-MM-JJ-HHMMSS, vérifiée par relecture, listée dans un index ; réservée à l'administration."
-  },
-  {
-   "terme": "Session en lecture seule",
-   "definition": "Session où plus rien n'est écrit dans le stockage, après une sauvegarde illisible, jusqu'au rechargement."
-  },
-  {
-   "terme": "Profil d'usine",
-   "definition": "Le profil et la pesée de départ (95 kg, la veille à 08:00) avec lesquels l'application démarre sans sauvegarde."
-  },
-  {
-   "terme": "Avertissement médical",
-   "definition": "Page à trois onglets (Cadre, Vie Privée, Sécurité), obligatoire au premier lancement, consultable ensuite depuis le pied de chaque page."
-  },
-  {
-   "terme": "Connexion récente",
-   "definition": "Exigence de Firebase (code auth/requires-recent-login) pour supprimer un compte sur une session ancienne ; l'écran propose alors « Se reconnecter »."
+   "terme": "Couche de stockage",
+   "definition": "shared/platform/storage.ts, seul point de lecture et d'écriture du stockage local ; en cas d'indisponibilité, la lecture rend null et l'écriture échoue en silence."
   },
   {
    "terme": "clearAll",
-   "definition": "Effacement en bloc de tout le stockage local, session Firebase et acceptation médicale comprises ; réservé à la suppression du compte."
+   "definition": "Effacement en bloc de tout le stockage local, réservé à la suppression du compte ; emporte la session mémorisée et l'acceptation médicale."
+  },
+  {
+   "terme": "Clé de secours",
+   "definition": "glp1_app_companion_data__secours, où la chaîne illisible est recopiée telle quelle, une seule fois, quand la sauvegarde ne se lit pas."
+  },
+  {
+   "terme": "Profil d'usine",
+   "definition": "Le profil de départ d'une installation vierge, aussi utilisé pour compléter un profil chargé auquel des champs manquent."
+  },
+  {
+   "terme": "Pesée de départ semée",
+   "definition": "La pesée que l'application crée d'elle-même faute de sauvegarde lisible : 95 kg, la veille à 08:00, référence des calculs de perte."
+  },
+  {
+   "terme": "Acceptation médicale",
+   "definition": "La clé hasAcceptedMedicalDisclaimer_v1 ; tant qu'elle ne vaut pas 'true', la page légale occupe seule l'écran."
+  },
+  {
+   "terme": "Bloc « Limite atteinte »",
+   "definition": "Bandeau en tête de page qui porte aussi bien les refus de plafond que le message de sauvegarde illisible ; se ferme par OK."
+  },
+  {
+   "terme": "Clé héritée",
+   "definition": "Clé du stockage local qui n'est plus jamais écrite et ne subsiste que pour être effacée à la réinitialisation (glp1_meals_cleared, glp1_last_celebrated_weight)."
+  },
+  {
+   "terme": "Mot-symbole",
+   "definition": "Le nom GLP1LOW dessiné plutôt qu'écrit en texte brut ; il titre la page de connexion et porte le bouton du dernier écran de l'onboarding V2."
+  },
+  {
+   "terme": "Connexion récente",
+   "definition": "Exigence de Firebase pour supprimer un compte ; son refus (auth/requires-recent-login) déclenche le bouton « Se reconnecter »."
   }
  ],
  "index": [
   {
    "terme": "Page de connexion",
-   "ancre": "compte-page-de-connexion"
+   "ancre": "#compte-page-de-connexion"
   },
   {
    "terme": "Continuer avec Google",
-   "ancre": "compte-page-de-connexion"
+   "ancre": "#compte-page-de-connexion"
   },
   {
-   "terme": "Inscription (absente)",
-   "ancre": "compte-page-de-connexion"
+   "terme": "Messages d'échec de connexion",
+   "ancre": "#compte-page-de-connexion"
+  },
+  {
+   "terme": "Adresse e-mail non valide",
+   "ancre": "#compte-page-de-connexion"
+  },
+  {
+   "terme": "Pas d'inscription libre",
+   "ancre": "#compte-page-de-connexion"
+  },
+  {
+   "terme": "Verrou d'authentification",
+   "ancre": "#compte-page-de-connexion"
   },
   {
    "terme": "Écran d'attente de session",
-   "ancre": "compte-ecran-d-attente-de-session"
+   "ancre": "#compte-ecran-d-attente-de-session"
   },
   {
    "terme": "Session mémorisée",
-   "ancre": "compte-ecran-d-attente-de-session"
-  },
-  {
-   "terme": "Verrou (AuthGate)",
-   "ancre": "compte-ecran-d-attente-de-session"
+   "ancre": "#compte-ecran-d-attente-de-session"
   },
   {
    "terme": "Avertissement médical",
-   "ancre": "compte-page-information-medicale-avertissement-medical"
+   "ancre": "#compte-page-information-medicale-avertissement-medical"
   },
   {
-   "terme": "Information Médicale",
-   "ancre": "compte-page-information-medicale-avertissement-medical"
+   "terme": "Information Médicale (premier lancement)",
+   "ancre": "#compte-page-information-medicale-avertissement-medical"
   },
   {
-   "terme": "hasAcceptedMedicalDisclaimer_v1",
-   "ancre": "compte-page-information-medicale-avertissement-medical"
+   "terme": "Onglet Cadre",
+   "ancre": "#compte-page-information-medicale-avertissement-medical"
+  },
+  {
+   "terme": "Onglet Vie Privée",
+   "ancre": "#compte-page-information-medicale-avertissement-medical"
+  },
+  {
+   "terme": "Onglet Sécurité",
+   "ancre": "#compte-page-information-medicale-avertissement-medical"
   },
   {
    "terme": "Info Santé & Confidentialité",
-   "ancre": "compte-page-information-medicale-avertissement-medical"
+   "ancre": "#compte-page-information-medicale-avertissement-medical"
+  },
+  {
+   "terme": "Données 100 % locales",
+   "ancre": "#compte-page-information-medicale-avertissement-medical"
+  },
+  {
+   "terme": "hasAcceptedMedicalDisclaimer_v1",
+   "ancre": "#compte-page-information-medicale-avertissement-medical"
   },
   {
    "terme": "glp1_app_companion_data",
-   "ancre": "compte-donnees-sur-l-appareil"
+   "ancre": "#compte-donnees-sur-l-appareil"
   },
   {
-   "terme": "Stockage local",
-   "ancre": "compte-donnees-sur-l-appareil"
+   "terme": "Couche de stockage",
+   "ancre": "#compte-donnees-sur-l-appareil"
   },
   {
    "terme": "Profil d'usine",
-   "ancre": "compte-donnees-sur-l-appareil"
+   "ancre": "#compte-donnees-sur-l-appareil"
   },
   {
-   "terme": "Copies de secours horodatées",
-   "ancre": "compte-donnees-sur-l-appareil"
+   "terme": "Pesée de départ semée (95 kg)",
+   "ancre": "#compte-donnees-sur-l-appareil"
+  },
+  {
+   "terme": "Clés héritées",
+   "ancre": "#compte-donnees-sur-l-appareil"
+  },
+  {
+   "terme": "glow_menu_mixte",
+   "ancre": "#compte-donnees-sur-l-appareil"
   },
   {
    "terme": "Sauvegarde illisible",
-   "ancre": "compte-bloc-limite-atteinte-sauvegarde-illisible"
+   "ancre": "#compte-bloc-limite-atteinte-sauvegarde-illisible"
   },
   {
-   "terme": "Clé de secours (__secours)",
-   "ancre": "compte-bloc-limite-atteinte-sauvegarde-illisible"
+   "terme": "Clé de secours",
+   "ancre": "#compte-bloc-limite-atteinte-sauvegarde-illisible"
   },
   {
-   "terme": "Limite atteinte (bloc)",
-   "ancre": "compte-bloc-limite-atteinte-sauvegarde-illisible"
+   "terme": "Bloc « Limite atteinte »",
+   "ancre": "#compte-bloc-limite-atteinte-sauvegarde-illisible"
   },
   {
-   "terme": "Session en lecture seule",
-   "ancre": "compte-bloc-limite-atteinte-sauvegarde-illisible"
+   "terme": "Mes préférences de compte",
+   "ancre": "#compte-lien-mes-preferences-de-compte"
   },
   {
    "terme": "Mon compte",
-   "ancre": "compte-page-mon-compte"
+   "ancre": "#compte-page-mon-compte"
   },
   {
-   "terme": "Abonnement, paiement, factures",
-   "ancre": "compte-page-mon-compte"
+   "terme": "Mon abonnement",
+   "ancre": "#compte-page-mon-compte"
+  },
+  {
+   "terme": "Moyens de paiement",
+   "ancre": "#compte-page-mon-compte"
+  },
+  {
+   "terme": "Factures et reçus",
+   "ancre": "#compte-page-mon-compte"
   },
   {
    "terme": "Supprimer mon compte",
-   "ancre": "compte-bloc-supprimer-mon-compte"
-  },
-  {
-   "terme": "Se reconnecter",
-   "ancre": "compte-bloc-supprimer-mon-compte"
-  },
-  {
-   "terme": "Déconnexion",
-   "ancre": "compte-bloc-supprimer-mon-compte"
+   "ancre": "#compte-bloc-supprimer-mon-compte"
   },
   {
    "terme": "clearAll",
-   "ancre": "compte-bloc-supprimer-mon-compte"
+   "ancre": "#compte-bloc-supprimer-mon-compte"
   },
   {
-   "terme": "Connexion récente (auth/requires-recent-login)",
-   "ancre": "compte-bloc-supprimer-mon-compte"
+   "terme": "Connexion récente exigée",
+   "ancre": "#compte-bloc-supprimer-mon-compte"
   },
   {
-   "terme": "Mot de passe (V2)",
-   "ancre": "compte-dans-la-v2"
+   "terme": "Se reconnecter",
+   "ancre": "#compte-bloc-supprimer-mon-compte"
   },
   {
-   "terme": "E-mail (V2)",
-   "ancre": "compte-dans-la-v2"
+   "terme": "Suppression sans Firebase",
+   "ancre": "#compte-bloc-supprimer-mon-compte"
+  },
+  {
+   "terme": "Dernière étape (V2)",
+   "ancre": "#compte-dans-la-v2"
+  },
+  {
+   "terme": "Règle des huit caractères (V2)",
+   "ancre": "#compte-dans-la-v2"
+  },
+  {
+   "terme": "Mot-symbole",
+   "ancre": "#compte-dans-la-v2"
   }
  ],
  "ecrans_illustres": [
   "profil-compte/page-de-connexion",
   "profil-compte/ecran-d-attente-de-session",
   "profil-compte/page-information-medicale-avertissement-medical",
+  "profil-compte/avertissement-medical",
   "transversal/bloc-limite-atteinte-sauvegarde-illisible",
+  "profil-compte/lien-mes-preferences-de-compte",
   "profil-compte/page-mon-compte",
-  "profil-compte/bloc-supprimer-mon-compte"
+  "profil-compte/bloc-supprimer-mon-compte",
+  "onboarding-v2/derniere-etape"
  ]
 }

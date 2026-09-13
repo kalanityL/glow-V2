@@ -10,13 +10,13 @@
    "categorie": "Cartes de partage",
    "fonctionnalite": "Choix de l'entrée à partager",
    "texte": "La personne choisirait l'entrée à partager (une pesée passée, un repas précis) plutôt que la dernière.",
-   "origine": "Chaque carte ne lit que la dernière entrée par date et heure ; aucun mécanisme de choix n'est écrit."
+   "origine": "Chaque carte ne lit que la dernière entrée par date et heure ; aucun mécanisme de choix n'est écrit. Réfutation retenue : « la dernière entrée » est d'ailleurs faux pour cinq des quinze cartes (recette = aliment personnalisé le plus récemment créé, badges = palier courant sur toute la sauvegarde, équivalences = poids de départ moins poids courant, graphe = trente jours de points, journée d'alimentation = tous les repas du jour)."
   },
   {
    "categorie": "Cartes de partage",
    "fonctionnalite": "Mention « exemple » sur une carte remplie par l'exemple figé",
    "texte": "Une carte remplie par l'exemple figé porterait une mention, pour ne pas être partagée comme une vraie donnée.",
-   "origine": "Le code refuse explicitement cette mention (« la maquette ne dit rien ») ; le partage réel n'existant pas, le risque n'a pas été tranché."
+   "origine": "Le code refuse explicitement cette mention (« la maquette ne dit rien ») ; le partage réel n'existant pas, le risque n'a pas été tranché. Réfutation retenue : la page qui montre la maquette le signale déjà deux fois (pastille « Exemple », message « Aucune donnée réelle pour cet élément… »), la carte elle-même non."
   },
   {
    "categorie": "Cartes de partage",
@@ -34,7 +34,7 @@
    "categorie": "QR code",
    "fonctionnalite": "QR code réel vers les magasins d'applications",
    "texte": "Le QR encoderait l'adresse d'une page qui redirige vers l'App Store ou le Play Store.",
-   "origine": "La demande du 2026-08-19 cite « un qrcode vers l'app sur les stores » ; ni l'adresse ni l'encodeur n'existent."
+   "origine": "La demande du 2026-08-19 cite « un qrcode vers l'app sur les stores » ; ni l'adresse ni l'encodeur n'existent. Réfutation retenue : le faux motif ne figure que sur les maquettes de la page d'administration ; la carte JPEG du badge, seul partage branché, n'en porte aucun."
   },
   {
    "categorie": "Partage d'un badge",
@@ -46,55 +46,81 @@
    "categorie": "Partage d'un badge",
    "fonctionnalite": "Partage unifié sur la couche de plateforme",
    "texte": "Le partage de badge passerait par shared/platform/share (shareNative) comme le prévoit la règle « aucune API web hors de shared/platform ».",
-   "origine": "Le code le note comme à faire « à la conversion » native ; l'auteur du code a choisi de ne pas l'aligner maintenant parce que le contrat diffère (URL jointe au fichier, retrait des fichiers refusés)."
+   "origine": "Le code le note comme à faire « à la conversion » native ; l'auteur du code a choisi de ne pas l'aligner maintenant parce que le contrat diffère (URL jointe au fichier, retrait des fichiers refusés). Réfutation retenue : la phrase du chapitre disait à tort que la couche de plateforme n'est utilisée par aucun écran (ShareBlock l'appelle, monté hors périmètre), et elle décrit une architecture de code — retirée du chapitre, marque « arbitrage non validé » comprise."
   },
   {
    "categorie": "Partage",
    "fonctionnalite": "Position de la V2 sur le partage",
    "texte": "La V2 reprendrait le partage de badge et les cartes tels quels.",
-   "origine": "GUIDELINES.md § 4 et src/screens/onboarding de la V2 ne mentionnent pas le partage ; rien ne permet de l'affirmer ni de l'infirmer."
+   "origine": "GUIDELINES.md § 4 et src/screens/onboarding de la V2 ne mentionnent pas le partage (vérifié : aucune occurrence utile de « partage » ou « share » dans le src/ de la V2) ; rien ne permet de l'affirmer ni de l'infirmer."
+  },
+  {
+   "categorie": "Partage",
+   "fonctionnalite": "Destinations du partage",
+   "texte": "Le partage viserait des destinations nommées : messagerie, réseau social.",
+   "origine": "Phrase retirée du chapitre (réfutation retenue) : l'application remet un objet à la feuille de partage du système, qui décide seule des applications proposées ; aucune destination n'est nommée dans le code."
+  },
+  {
+   "categorie": "Partage d'un badge",
+   "fonctionnalite": "Détection de la plateforme",
+   "texte": "Le repli presse-papier serait le comportement des navigateurs de bureau.",
+   "origine": "Parenthèse retirée du chapitre (réfutation retenue) : badgeShare.ts ne teste que la présence de navigator.share, sans détection de plateforme ; des navigateurs de bureau l'exposent, et des contextes mobiles ne l'exposent pas."
+  },
+  {
+   "categorie": "Partage d'un badge",
+   "fonctionnalite": "Avis quand la copie échoue",
+   "texte": "Un échec de la copie dans le presse-papier s'annoncerait à l'écran.",
+   "origine": "Le code n'écrit qu'une trace en console : la personne touche Partager et rien ne se passe. Aucun message d'erreur n'est décidé ; le chapitre se borne à constater le silence."
+  },
+  {
+   "categorie": "Partage d'un badge",
+   "fonctionnalite": "Notice au bloc de célébration",
+   "texte": "Le bloc de célébration afficherait la même notice que la page Badges quand le partage retombe sur le presse-papier.",
+   "origine": "Il appelle le partage sans lui passer de fonction de notice ; l'écart avec la page Badges est dans le code, aucune décision ne le tranche."
+  },
+  {
+   "categorie": "Cartes de partage",
+   "fonctionnalite": "Présence des maquettes dans la spec fonctionnelle",
+   "texte": "Les quinze maquettes de cartes de partage, leur cadre commun, le faux QR code et les dix-neuf entrées de liste seraient décrits comme une fonction du carnet.",
+   "origine": "Réfutation retenue : elles ne vivent que dans la page d'administration « Templates des partages » (ShareTemplatesPage), hors périmètre. Trois h3, le tableau des quinze cartes et la section du QR code ont été retirés, ainsi que les trois figures qui les illustraient — captures inexistantes, rangées par TODO-CLAUDE.md parmi les absentes « par construction »."
+  },
+  {
+   "categorie": "Cartes de partage",
+   "fonctionnalite": "Défauts relevés sur les maquettes (hors périmètre, non écrits)",
+   "texte": "La carte « Ma dernière perte » écrit un moins en dur (« --1.1 kg » pour une reprise, « -0 » pour une pesée identique) ; la carte « Ma collection de badges » annonce « 4 badges sur 4 » quand aucun badge n'est décroché ; le graphe « Mon sommeil sur 30 jours » se calcule à partir d'aujourd'hui et se videra passé trente jours après l'exemple figé du 18/08/2026 ; les maquettes lisent les journaux sans filtrer les lignes marquées supprimées.",
+   "origine": "Constatés dans shareTemplates.tsx et signalés par le vérificateur, mais portant sur une page d'administration : rien n'en est écrit dans le chapitre."
+  },
+  {
+   "categorie": "Partage",
+   "fonctionnalite": "Répartition entre le chapitre Badges et le chapitre Partage",
+   "texte": "Le partage d'un badge serait décrit deux fois, au chapitre Badges et ici.",
+   "origine": "Réfutation retenue en partie : le chapitre Badges en donne le résumé et renvoie ici pour le détail. Le détail reste dans ce chapitre, qui n'a plus d'autre contenu ; à l'assemblage, décider si le résumé du chapitre Badges se réduit au renvoi."
   }
  ],
  "glossaire": [
   {
-   "terme": "Carte de partage",
-   "definition": "Image verticale (proportion 4/5) qui résume une donnée du carnet avec le prénom, l'avatar et le pied GLP1LOW, destinée à sortir de l'application."
-  },
-  {
-   "terme": "Maquette",
-   "definition": "Rendu à l'écran de ce qu'une carte de partage montrera, sans image produite ni partage possible."
-  },
-  {
    "terme": "Feuille de partage",
-   "definition": "Panneau du système (navigator.share) qui propose les applications de destination d'un texte, d'un lien ou d'un fichier."
+   "definition": "Panneau du système qui propose les applications de destination d'un texte, d'un lien ou d'un fichier."
   },
   {
    "terme": "Repli presse-papier",
-   "definition": "Quand le système n'a pas de feuille de partage, le texte est copié dans le presse-papier à la place."
+   "definition": "Quand le système n'offre pas de feuille de partage, le texte est copié dans le presse-papier à la place."
   },
   {
-   "terme": "Tampon",
-   "definition": "Date et heure de l'entrée partagée, écrites « JJ/MM/AAAA · HH:MM » à droite du titre de la carte."
+   "terme": "Carte de badge",
+   "definition": "Image JPEG carrée fabriquée au moment du partage : palier, dessin du badge, titre, règle du palier atteint, marque GLP1LOW."
   },
   {
-   "terme": "Exemple figé",
-   "definition": "Données d'exemple datées du 18/08/2026 qu'une carte affiche quand le journal concerné est vide."
+   "terme": "Badge en grand",
+   "definition": "Bloc refermable de la page Badges, ouvert par un clic sur le dessin d'un badge gagné ; il porte le bouton Partager."
+  },
+  {
+   "terme": "Bloc de célébration",
+   "definition": "Félicitations affichées en tête de page quand un badge monte d'un palier ; il porte le second bouton Partager."
   },
   {
    "terme": "Palier",
    "definition": "Niveau atteint par un badge : éveil, bronze, argent ou or."
-  },
-  {
-   "terme": "Équivalence insolite",
-   "definition": "Perte de poids traduite en objets du quotidien, avec leur dessin et la phrase « soit l'équivalent de … »."
-  },
-  {
-   "terme": "Niveau sanguin actif",
-   "definition": "Quantité de molécule estimée présente dans le corps, en mg, calculée à partir des prises ; la carte d'injection le trace sur 14 jours."
-  },
-  {
-   "terme": "QR code",
-   "definition": "Motif carré lisible par l'appareil photo ; sur les cartes, un faux motif fixe qui ne se scanne pas."
   }
  ],
  "index": [
@@ -103,11 +129,11 @@
    "ancre": "partage-partager-un-badge"
   },
   {
-   "terme": "navigator.share",
+   "terme": "Feuille de partage",
    "ancre": "partage-partager-un-badge"
   },
   {
-   "terme": "Presse-papier",
+   "terme": "Presse-papier (repli)",
    "ancre": "partage-partager-un-badge"
   },
   {
@@ -115,66 +141,31 @@
    "ancre": "partage-partager-un-badge"
   },
   {
-   "terme": "Cartes de partage",
-   "ancre": "partage-les-cartes-de-partage"
+   "terme": "Texte partagé",
+   "ancre": "partage-partager-un-badge"
   },
   {
-   "terme": "Maquettes de partage",
-   "ancre": "partage-les-cartes-de-partage"
+   "terme": "Adresse de la page partagée",
+   "ancre": "partage-partager-un-badge"
   },
   {
-   "terme": "Cadre commun (prénom, avatar, pied)",
-   "ancre": "partage-les-cartes-de-partage"
+   "terme": "Badge en grand",
+   "ancre": "partage-partager-un-badge"
   },
   {
-   "terme": "Exemple figé",
-   "ancre": "partage-les-cartes-de-partage"
+   "terme": "Bloc de célébration (Partager)",
+   "ancre": "partage-partager-un-badge"
   },
   {
-   "terme": "Tampon",
-   "ancre": "partage-les-cartes-de-partage"
+   "terme": "Notice « Lien et texte de partage copiés »",
+   "ancre": "partage-partager-un-badge"
   },
   {
-   "terme": "Carte Pesée",
-   "ancre": "partage-les-cartes-de-partage"
-  },
-  {
-   "terme": "Carte Recette",
-   "ancre": "partage-les-cartes-de-partage"
-  },
-  {
-   "terme": "Carte Équivalence",
-   "ancre": "partage-les-cartes-de-partage"
-  },
-  {
-   "terme": "Carte Graphe du sommeil",
-   "ancre": "partage-les-cartes-de-partage"
-  },
-  {
-   "terme": "Carte Injection / prise",
-   "ancre": "partage-la-carte-d-une-injection-ou-d-une-prise"
-  },
-  {
-   "terme": "Niveau sanguin sur 14 jours",
-   "ancre": "partage-la-carte-d-une-injection-ou-d-une-prise"
-  },
-  {
-   "terme": "Carte Ressenti",
-   "ancre": "partage-la-carte-d-un-ressenti"
-  },
-  {
-   "terme": "Mots d'intensité",
-   "ancre": "partage-la-carte-d-un-ressenti"
-  },
-  {
-   "terme": "QR code (faux)",
-   "ancre": "partage-le-faux-qr-code"
+   "terme": "Données non partageables",
+   "ancre": "partage"
   }
  ],
  "ecrans_illustres": [
-  "metabolisme-rapport-badges/page-badges",
-  "metabolisme-rapport-badges/cartes-de-partage-15-maquettes",
-  "traitement/carte-de-partage-une-injection-prise-de-comprime-domaine-voi",
-  "effets-secondaires/maquette-de-partage-un-effet-secondaire-mon-ressenti"
+  "metabolisme-rapport-badges/page-badges-badge-en-grand"
  ]
 }

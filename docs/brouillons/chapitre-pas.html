@@ -1,24 +1,25 @@
 <section id="pas">
   <h2>9. Les pas <a class="retour" href="#sommaire">↑ sommaire</a></h2>
-  <p>Le suivi des pas montre à la personne combien elle marche : le compte du jour face à un objectif, des moyennes, un cumul, un calendrier, un journal et un graphe. La V1 n'a aucune saisie de pas : les relevés viennent d'un jeu de données semé, un relevé par date ; en V2 native, ils viendront du podomètre réel du téléphone <span class="marque v2">V2</span>. La source native décidée le 2026-08-15 n'existe pas encore <span class="marque non">non implémenté</span>.</p>
+  <p>Le suivi des pas montre à la personne combien elle marche : le compte du jour face à un objectif, des moyennes, un cumul, un calendrier, un journal et un graphe. La V1 n'a aucune saisie de pas : les relevés viennent d'un jeu de données semé, un relevé par date. La source native décidée le 2026-08-15 n'existe pas dans le code <span class="marque non">non implémenté</span> ; la V2 range le podomètre réel du téléphone parmi les consignes du jour de la conversion native <span class="marque v2">V2</span>.</p>
 
-  <p>Le suivi est un module : le drapeau <code>stepsTrackingEnabled</code> du profil le monte ou non, et viser la page des pas depuis le menu ou une tuile l'allume automatiquement. Une page atteinte depuis un tiroir alors que le module est éteint s'affiche sous un verre qui ne porte que « Activez le module Nombre de Pas pour pouvoir suivre l'évolution de vos pas. », lien vers le réglage du module (chapitre Profil).</p>
+  <p>Le suivi est un module : sans le drapeau <code>stepsTrackingEnabled</code> du profil, la page n'est pas montée. Naviguer vers elle depuis le menu ou une tuile allume le module au passage. Seul le tiroir Journal y mène sans le rallumer : l'écran est alors vide, sous une vitre qui ne porte que « Activez le module Nombre de Pas pour pouvoir suivre l'évolution de vos pas. », lien vers la carte du module sur la page Modules (chapitre 18).</p>
 
   <h3 id="pas-page-pas-stepstracker">Page « Pas »</h3>
   <figure class="telephone" data-capture="activite/page-pas-stepstracker"><figcaption>La page de Camille le 12/09/2026 : 6 480 pas aujourd'hui, la carte Statistiques/j, le calendrier de septembre, le bloc « Depuis le 01/09/2026 : 84 600 pas » et le graphe des 30 derniers jours.</figcaption></figure>
-  <p>De haut en bas : les deux cartes « Aujourd'hui » et « Statistiques/j », un curseur calendrier ↔ journal (calendrier par défaut, choix retenu d'une visite à l'autre), le bloc « Depuis le … » (absent tant qu'il n'y a aucun relevé), le graphe « Suivi de votre nombre de pas par jour ». Aucun bouton d'ajout, aucun formulaire, aucune modification d'un relevé. La bande de titre dit « Marche ». On y arrive par le menu, le lien « Voir la page » de la couche vitrée, le médaillon des tuiles côte à côte de l'accueil ou une carte du tiroir Tendances.</p>
+  <p>De haut en bas : les deux cartes « Aujourd'hui » et « Statistiques/j », un curseur calendrier ↔ journal (calendrier par défaut, choix retenu d'une visite à l'autre), le bloc « Depuis le … » (absent tant qu'il n'y a aucun relevé), le graphe « Suivi de votre nombre de pas par jour ». Aucun bouton d'ajout, aucun formulaire, aucune modification d'un relevé. La bande de titre dit « Marche ». On y arrive par le menu, le lien « Voir la page » de la couche vitrée ou du graphe en surimpression, le médaillon et le pied « Voir la page Pas » des tuiles côte à côte, ou le lien « Voir mes pas » d'une carte Tendances sans donnée.</p>
   <details><summary>Les règles derrière les chiffres</summary>
     <ul>
       <li>L'objectif quotidien vaut 8 000 pas partout ; rien ne permet de le régler. <a href="spec-technique.html#pas-objectif-quotidien-de-pas">→ technique</a></li>
-      <li>Viser l'onglet des pas allume le module s'il est éteint ; le sommeil et le temps pour soi n'ont pas ce confort. <a href="spec-technique.html#pas-activation-automatique-des-modules-pas-et-sport">→ technique</a></li>
-      <li>Le curseur retient « journal » ou « calendrier » sous la clé <code>glp1_steps_history_view</code> ; sans « + ajouter » sur cette page. <a href="spec-technique.html#pas-curseur-calendrier-journal">→ technique</a></li>
+      <li>Naviguer vers la page des pas allume le module s'il est éteint — comme les repas et le sport, à la différence du sommeil et du temps pour soi. <a href="spec-technique.html#pas-activation-automatique-des-modules-pas-et-sport">→ technique</a></li>
+      <li>Le curseur retient « journal » ou « calendrier » sous la clé <code>glp1_steps_history_view</code>. <a href="spec-technique.html#pas-curseur-calendrier-journal">→ technique</a></li>
       <li>Nombres aux milliers groupés par une espace insécable et décimales au point (« 4.9 ») ; dates JJ/MM/AAAA dans les listes, JJ/MM sur les graphes. <a href="spec-technique.html#pas-formats-communs-des-nombres-et-dates">→ technique</a></li>
+      <li>Un relevé daté dans le futur n'est écarté nulle part : il entre dans les moyennes, le cumul, le journal et les tuiles. Seul le graphe s'arrête à aujourd'hui. <a href="spec-technique.html#pas-points-du-graphe-des-pas">→ technique</a></li>
     </ul>
   </details>
 
   <h3 id="pas-carte-aujourd-hui">Carte « Aujourd'hui »</h3>
-  <figure class="telephone" data-capture="activite/carte-aujourd-hui-stepsherocards-carte-gauche"><figcaption>6 480 pas sur 8 000, Objectif 81 %, 336 kcal, 4.9 km, 1h08, 4.2 km/h.</figcaption></figure>
-  <p>Le compte du jour, « / 8 000 », les calories dépensées, une barre « Objectif » avec son pourcentage, puis trois valeurs : distance en km, durée de marche estimée, vitesse. La durée s'écrit « 45min » sous l'heure, « 1h08 » au-delà. La vitesse est une constante d'affichage, jamais une mesure.</p>
+  <figure class="telephone" data-capture="activite/carte-aujourd-hui-stepsherocards-carte-gauche"><figcaption>6 480 pas sur 8 000, Objectif 81 %, 336 kcal en tête de carte, 4.9 km, 1h08, 4.2 km/h.</figcaption></figure>
+  <p>La ligne de tête porte l'intitulé « Aujourd'hui » et, à droite, les calories dépensées. Au centre, le compte du jour et « / 8 000 ». Dessous, une barre « Objectif » avec son pourcentage, puis trois valeurs : distance en km, durée de marche estimée, vitesse. La durée s'écrit « 45min » sous l'heure, « 1h08 » au-delà.</p>
   <details><summary>Les règles derrière les chiffres</summary>
     <ul>
       <li>Pas du jour = le premier relevé daté d'aujourd'hui, 0 sinon ; pourcentage = pas / 8 000, arrondi, plafonné à 100. <a href="spec-technique.html#pas-pourcentage-d-objectif-du-jour">→ technique</a></li>
@@ -26,24 +27,24 @@
       <li>Durée = pas / 95 pas par minute, arrondie à la minute. <a href="spec-technique.html#pas-duree-de-marche-estimee">→ technique</a></li>
       <li>Vitesse affichée : 4.2 km/h, fixe. <a href="spec-technique.html#pas-vitesse-de-marche-de-reference">→ technique</a></li>
       <li>Calories = 3,5 × poids × heures de marche, où la foulée vaut taille × 0,414 cm et la marche va à 4,2 km/h ; taille du profil, 170 cm à défaut. <a href="spec-technique.html#pas-calories-des-pas">→ technique</a></li>
-      <li>Le poids est celui de la dernière pesée datée au plus tard du jour du relevé ; avant toute pesée, le poids de départ, sinon le poids visé, sinon 80 kg. <a href="spec-technique.html#pas-poids-a-une-date">→ technique</a></li>
+      <li>Le poids est celui de la dernière pesée datée au plus tard du jour du relevé ; à défaut le poids de départ, sinon le poids visé, sinon la pesée la plus ancienne, sinon 80 kg. <a href="spec-technique.html#pas-poids-a-une-date">→ technique</a></li>
     </ul>
   </details>
   <div class="exemple"><p>Camille (168 cm, pesée à 89,4 kg le 10/09) a 6 480 pas le 12/09 : foulée 0,6955 m, 4,507 km parcourus à 4,2 km/h, soit 1,073 h ; 3,5 × 89,4 × 1,073 = 336 kcal. La carte affiche 4.9 km (6 480 × 0,00076), 1h08 (6 480 / 95 = 68 min) et 81 %.</p></div>
 
   <h3 id="pas-carte-statistiques-j">Carte « Statistiques/j »</h3>
-  <figure class="telephone" data-capture="activite/carte-statistiques-j-cartestatistiquespas-et-face-bravo"><figcaption>Moyennes de Camille sur les 30 derniers jours : 7 350 pas, 381 kcal, Moyenne 86 %, 5.6 km, 1h17, 4.2 km/h ; au dos, « Bravo ! ».</figcaption></figure>
-  <p>Même mise en page que la carte du jour, en moyennes par jour : calories, pas, barre « Moyenne » et pourcentage, distance, durée, 4.2 km/h. Sur la page, la fenêtre est fixe : les 30 derniers jours. Un toucher retourne la carte sur « Bravo ! Excellent travail ! Continuez sur cette belle lancée ! », quel que soit le résultat.</p>
+  <figure class="telephone" data-capture="activite/carte-statistiques-j-cartestatistiquespas-et-face-bravo"><figcaption>Moyennes de Camille sur la fenêtre de la page : 7 350 pas, 381 kcal, Moyenne 86 %, 5.6 km, 1h17, 4.2 km/h ; au dos, « Bravo ! ».</figcaption></figure>
+  <p>Même mise en page que la carte du jour, en moyennes par jour : calories, pas, barre « Moyenne » et pourcentage, distance, durée, 4.2 km/h. Sur la page, la fenêtre est fixe : tout relevé daté d'aujourd'hui − 30 jours ou après. Un toucher retourne la carte sur « Bravo ! Excellent travail ! Continuez sur cette belle lancée ! », quel que soit le résultat.</p>
   <details><summary>Les règles derrière les chiffres</summary>
     <ul>
-      <li>Les moyennes divisent par le nombre de relevés de la fenêtre, pas par le nombre de jours ; la « Moyenne » en % est la moyenne des pourcentages journaliers, chacun plafonné à 100 ; fenêtre vide : tout à 0. <a href="spec-technique.html#pas-moyennes-statistiques-j-depuis-une-date">→ technique</a></li>
-      <li>Sur la page, la borne est aujourd'hui − 30 jours ; sous la couche vitrée, la date du bloc « Depuis le … ». <a href="spec-technique.html#pas-fenetre-des-statistiques-sur-la-page-vs-sous-la-couche">→ technique</a></li>
+      <li>Les moyennes divisent par le nombre de relevés de la fenêtre, pas par le nombre de jours ; la « Moyenne » en % est la moyenne des pourcentages journaliers, chacun plafonné à 100 ; fenêtre vide : tout à 0, vitesse 4.2. <a href="spec-technique.html#pas-moyennes-statistiques-j-depuis-une-date">→ technique</a></li>
+      <li>Sur la page, le filtre est « daté d'aujourd'hui − 30 jours ou après », soit 31 journées et aucune borne haute ; sous la couche vitrée, la borne est la date du bloc « Depuis le … ». <a href="spec-technique.html#pas-fenetre-des-statistiques-sur-la-page-vs-sous-la-couche">→ technique</a></li>
     </ul>
   </details>
 
   <h3 id="pas-calendrier-des-pas">Calendrier des pas</h3>
   <figure class="telephone" data-capture="activite/calendrier-des-pas-stepscalendar-et-sa-bulle"><figcaption>Septembre 2026 chez Camille, « 6.5k » sur le 12, « 9.7k » sur le 10 ; la bulle du 10 : 9 680 pas, 1h42, 4.2 km/h.</figcaption></figure>
-  <p>Grille mensuelle du lundi au dimanche ; chaque jour relevé porte son total, écrit en milliers dès 1 000 (« 9.7k »). Chevrons ou glissé horizontal pour changer de mois, du mois du premier relevé au mois courant. Toucher un jour relevé ouvre une bulle en lecture seule : pas, durée estimée, vitesse, et « Journée simulée » si le relevé porte ce drapeau. Un jour vide ne réagit pas. Rien ne se supprime depuis le calendrier.</p>
+  <p>Grille mensuelle du lundi au dimanche ; chaque jour relevé porte son total, écrit en milliers dès 1 000 (« 9.7k »). Chevrons ou glissé horizontal pour changer de mois, du mois du premier relevé au mois courant. Toucher un jour relevé ouvre une bulle en lecture seule : pas, durée estimée, vitesse, et « Journée simulée » si le relevé porte ce drapeau ; une date à plusieurs relevés donne un bloc par relevé. Un jour vide ne réagit pas. Rien ne se supprime depuis le calendrier.</p>
   <details><summary>Les règles derrière les chiffres</summary>
     <ul>
       <li>La tuile additionne les relevés d'une même date ; ≥ 1 000 → milliers à une décimale suivis de « k ». <a href="spec-technique.html#pas-tuile-du-calendrier-des-pas">→ technique</a></li>
@@ -52,20 +53,21 @@
   </details>
 
   <h3 id="pas-journal-des-pas">Journal des pas</h3>
-  <figure class="telephone" data-capture="activite/journal-des-pas-stepsjournal-stepsjournalrow"><figcaption>« Journal (12) » du 01/09 au 12/09 : la ligne du 12/09/2026, 6 480 pas, 81 %, -336 kcal (en cours) ; celle du 10/09/2026, 9 680 pas, barre pleine, 121 %, -502 kcal.</figcaption></figure>
-  <p>Liste du plus récent au plus ancien, filtrée par période (7, 14, 30, 90 derniers jours, Depuis le début, Choisir ; 30 jours par défaut) avec les bornes « du … au … » éditables. Par ligne : le nombre de pas, une barre d'objectif, le pourcentage, « -N kcal », « (en cours) » si la ligne est d'aujourd'hui, la date. Le menu à trois points supprime la ligne ; la corbeille du bandeau ouvre, dans le bloc, la confirmation « tout le journal de marche ». Vide : « Aucun pas enregistré pour l'instant. Commencez à marcher ! » ou « Aucun pas enregistré sur cette période. ».</p>
+  <figure class="telephone" data-capture="activite/journal-des-pas-stepsjournal-stepsjournalrow"><figcaption>« Journal (24) » du 14/08 au 12/09 : la ligne du 12/09/2026, 6 480 pas, 81 %, -336 kcal (en cours) ; celle du 10/09/2026, 9 680 pas, barre pleine, 121 %, -502 kcal.</figcaption></figure>
+  <p>Liste du plus récent au plus ancien, filtrée par période (7, 14, 30, 90 derniers jours, Depuis le début, Choisir ; 30 jours par défaut) avec les bornes « du … au … » éditables. Par ligne : le nombre de pas, une barre d'objectif, le pourcentage, « -N kcal », « (en cours) » si la ligne est d'aujourd'hui, la date. La liste défile dans une boîte de 160 px : le compte du bandeau dit les relevés de la période, pas les lignes visibles. Le menu à trois points supprime la ligne ; la corbeille du bandeau ouvre, dans le bloc, la confirmation « tout le journal de marche ». Vide : « Aucun pas enregistré pour l'instant. Commencez à marcher ! » ou « Aucun pas enregistré sur cette période. ».</p>
   <details><summary>Les règles derrière les chiffres</summary>
     <ul>
       <li>La barre est plafonnée à 100 %, le pourcentage écrit ne l'est pas. <a href="spec-technique.html#pas-pourcentage-d-une-ligne-de-journal">→ technique</a></li>
       <li>Tri par date décroissante puis filtre de période ; clé <code>glp1_period_steps_journal</code>. <a href="spec-technique.html#pas-tri-et-filtre-du-journal-des-pas">→ technique</a></li>
-      <li>Une fenêtre de N jours va d'aujourd'hui − (N − 1) à aujourd'hui ; les bornes de Choisir vides sont illimitées. <a href="spec-technique.html#pas-selecteur-de-periode-commun">→ technique</a></li>
-      <li>« Tout supprimer » n'apparaît que si le journal n'est pas vide et si le profil ne l'interdit pas. <a href="spec-technique.html#pas-bouton-tout-supprimer">→ technique</a></li>
+      <li>Une fenêtre de N jours part d'aujourd'hui − (N − 1) et n'a pas de borne haute ; dans Choisir, une borne vide est illimitée de son côté. <a href="spec-technique.html#pas-selecteur-de-periode-commun">→ technique</a></li>
+      <li>Les bornes affichées sont celles de la période retenue ; les modifier bascule en Choisir. <a href="spec-technique.html#pas-bornes-du-au-d-un-journal">→ technique</a></li>
+      <li>La corbeille n'apparaît que si la période retenue porte au moins une ligne et si le profil n'interdit pas les suppressions totales. <a href="spec-technique.html#pas-bouton-tout-supprimer">→ technique</a></li>
     </ul>
   </details>
 
   <h3 id="pas-bloc-depuis-le">Bloc « Depuis le … »</h3>
   <figure class="telephone" data-capture="activite/bloc-depuis-le-cumulativestepsstats"><figcaption>« Depuis le 01/09/2026 : 84 600 pas » puis 64.3 km, 14h51, 4.3 km/h.</figcaption></figure>
-  <p>Le cumul depuis une date : total de pas dans le bandeau, puis distance, durée et vitesse moyenne, sans étiquette. La date, soulignée en pointillé, s'édite au toucher dans le calendrier maison ; chaque changement est retenu d'une visite à l'autre. Sans date choisie, le cumul part du plus ancien relevé.</p>
+  <p>Le cumul depuis une date : total de pas dans le bandeau, puis distance, durée et vitesse moyenne, sans étiquette. La date, soulignée en pointillé, s'édite au toucher dans le calendrier maison ; chaque changement est retenu d'une visite à l'autre. Sans date choisie, le cumul part du plus ancien relevé. Le bloc n'existe pas tant que le journal est vide.</p>
   <details><summary>Les règles derrière les chiffres</summary>
     <ul>
       <li>Relevés datés ≥ la date de départ ; km = total × 0,00076 ; minutes = total / 95 ; vitesse = km / heures, une décimale, 4.2 si la durée est nulle. <a href="spec-technique.html#pas-cumul-depuis-une-date">→ technique</a></li>
@@ -79,24 +81,30 @@
   <p>Une barre par jour de la fenêtre, 0 les jours sans relevé, étiquettes JJ/MM ; une ligne pointillée marque l'objectif ; même sélecteur de période que le journal, avec ses bornes. Toucher une barre ouvre l'infobulle, la refermer la laisse fermée jusqu'au toucher suivant. Légende : « Pas mesurés » et « Seuil objectif (8 000) ». Le mode daltonien du profil hachure les barres.</p>
   <details><summary>Les règles derrière les chiffres</summary>
     <ul>
-      <li>Fenêtres de N jours, « Depuis le début » à partir du premier relevé, « Choisir » entre les deux bornes ; clé <code>glp1_period_steps_chart</code>. <a href="spec-technique.html#pas-points-du-graphe-des-pas">→ technique</a></li>
-      <li>Infobulle : date longue, « N pas », puis « Objectif atteint ! » ou « N pas restants » ; axe vertical à 1,25 × le maximum. <a href="spec-technique.html#pas-infobulle-du-graphe-des-pas">→ technique</a></li>
+      <li>Fenêtres de N jours d'aujourd'hui − (N − 1) à aujourd'hui, « Depuis le début » à partir du premier relevé, « Choisir » entre les deux bornes — une borne vide y retombe sur aujourd'hui − 6 jours au début, sur aujourd'hui à la fin, et non sur l'illimité du journal ; clé <code>glp1_period_steps_chart</code>. <a href="spec-technique.html#pas-points-du-graphe-des-pas">→ technique</a></li>
+      <li>Infobulle : date longue, « N pas », puis « Objectif atteint ! » ou « N pas restants ». <a href="spec-technique.html#pas-infobulle-du-graphe-des-pas">→ technique</a></li>
     </ul>
   </details>
 
+  <h3 id="pas-page-sans-aucun-releve">La page sans aucun relevé</h3>
+  <p>Carte « Aujourd'hui » à 0 pas, 0 kcal, 0 % ; carte « Statistiques/j » à zéro sur toute la ligne, sauf les 4.2 km/h ; calendrier sans aucune tuile, aucun jour cliquable ; journal « Aucun pas enregistré pour l'instant. Commencez à marcher ! », sans corbeille ; graphe à 30 barres nulles ; aucun bloc « Depuis le … ».</p>
+
+  <h3 id="pas-graphe-des-pas-en-surimpression">Graphe des pas en surimpression</h3>
+  <p>Toucher la carte « Pas » du tiroir Tendances monte le graphe de la page par-dessus, sur la vitre, en un bloc unique : bandeau « PAS » avec la croix de fermeture, les outils de période sur une rangée sous le bandeau, le graphe dépouillé de son cadre — son intitulé « Suivi de votre nombre de pas par jour » redescend en texte simple dans le bloc —, puis le lien « Voir la page ». La période est la même que celle de la page : la régler ici la règle là-bas. La croix ou un toucher sur la vitre referment.</p>
+
   <h3 id="pas-couche-vitree-pas">Couche vitrée « Pas »</h3>
   <figure class="telephone" data-capture="activite/couche-vitree-pas-surimpressionpas"><figcaption>Par-dessus l'accueil de Camille : la carte « Aujourd'hui » en pleine largeur, puis « Depuis le 01/09/2026 : 84 600 pas », un trait, et Statistiques/j recalculées depuis le 01/09 : 7 050 pas, 5.4 km, 1h14.</figcaption></figure>
-  <p>Ouverte depuis la tuile « En direct » des pas ou les tuiles côte à côte de l'accueil, titrée « Pas », avec un lien « Voir la page ». Deux blocs empilés : la carte du jour, puis le bloc « Depuis le … » qui accueille sous un trait la carte Statistiques/j. Une seule date gouverne le bloc : les moyennes portent sur les relevés mêmes que le cumul additionne. La date s'édite comme sur la page et le choix est partagé avec elle.</p>
+  <p>Ouverte depuis la tuile « En direct » des pas ou les tuiles côte à côte de l'accueil, titrée « Pas », avec un lien « Voir la page ». Deux blocs empilés : la carte du jour, puis le bloc « Depuis le … » qui accueille sous un trait la carte Statistiques/j. Une seule date gouverne ce second bloc : les moyennes portent sur les relevés mêmes que le cumul additionne. La date s'édite comme sur la page et le choix est partagé avec elle. Sans aucun relevé, le bloc « Depuis le … » disparaît, et la carte Statistiques/j qu'il héberge avec lui : la couche ne montre plus que la carte du jour.</p>
   <details><summary>Les règles derrière les chiffres</summary>
     <ul>
       <li>Statistiques/j = moyennes depuis la date effective du cumul (date choisie, sinon plus ancien relevé). <a href="spec-technique.html#pas-fenetre-des-statistiques-sur-la-page-vs-sous-la-couche">→ technique</a></li>
     </ul>
   </details>
-  <div class="exemple"><p>Depuis le 01/09, 12 relevés totalisent 84 600 pas : la carte de la couche donne 84 600 / 12 = 7 050 pas par jour, alors que la même carte sur la page, calée sur les 30 derniers jours, dit 7 350.</p></div>
+  <div class="exemple"><p>Depuis le 01/09, 12 relevés totalisent 84 600 pas : la carte de la couche donne 84 600 / 12 = 7 050 pas par jour, alors que la même carte sur la page, calée sur les trente derniers jours, dit 7 350.</p></div>
 
   <h3 id="pas-tuiles-home-du-domaine-pas">Tuiles de l'accueil</h3>
-  <figure class="telephone" data-capture="activite/tuiles-home-du-domaine-pas"><figcaption>En direct : 6 480 ; Dynamique : « En hausse sur les 7 derniers jours des pas, par rapport aux 7 jours précédents » ; Côte à côte : 7 200 depuis le début, 7 029 sur les 7 derniers jours.</figcaption></figure>
-  <p>Trois emplacements de l'accueil « sections », visibles seulement si le module est allumé. « En direct » : les pas du jour, touche → couche vitrée. « Dynamique » : le sens des 7 derniers jours contre les 7 précédents (hausse, baisse, stable), touche → tiroir du calcul. « Côte à côte » : la moyenne par jour depuis le début et celle des 7 derniers jours, l'empreinte pour unité, pied « Voir la page Pas », sans bouton d'ajout ; la rangée n'apparaît que si l'une des deux moyennes existe. Quand le module des repas est éteint, la tuile des pas prend toute la largeur <span class="marque">arbitrage non validé</span>. L'accueil « standard » porte un bloc « Mes pas » qui reprend la carte du jour (chapitre Accueil).</p>
+  <figure class="telephone" data-capture="activite/tuiles-home-du-domaine-pas"><figcaption>En direct : 6 480 ; Dynamique : l'empreinte des pas et une flèche vers le haut ; Côte à côte : 7 200 depuis le début, 7 029 sur les 7 derniers jours.</figcaption></figure>
+  <p>Trois emplacements de l'accueil « sections », visibles seulement si le module est allumé. « En direct » : les pas du jour, touche → couche vitrée. « Dynamique » : deux pictos seulement, l'empreinte du domaine et la flèche de sens (hausse, baisse, stable) ; la phrase « En hausse sur les 7 derniers jours des pas, par rapport aux 7 jours précédents » est l'infobulle de survol, jamais affichée ; touche → tiroir du calcul. « Côte à côte » : la moyenne par jour depuis le début et celle des 7 derniers jours, l'empreinte pour unité, pied « Voir la page Pas », sans bouton d'ajout ; la rangée n'apparaît que si l'une des deux moyennes existe. L'accueil « standard » porte un bloc « Mes pas » qui reprend la carte du jour (chapitre 4).</p>
   <details><summary>Les règles derrière les chiffres</summary>
     <ul>
       <li>Moyenne depuis le début : pas additionnés par date, journées à 0 écartées, divisée par le nombre de journées relevées ; absente sans journée. <a href="spec-technique.html#pas-moyenne-de-pas-par-jour-home-depuis-le-debut">→ technique</a> Une journée à zéro pas est traitée comme un podomètre éteint et ne compte pas <span class="marque">arbitrage non validé</span>.</li>
@@ -104,15 +112,15 @@
       <li>Sens : sommes des deux moitiés de 14 jours (0 sans relevé) ; écart relatif sous 5 % → stable, sinon hausse ou baisse ; une moitié à zéro se tranche par comparaison directe ; sans aucun relevé → stable. <a href="spec-technique.html#pas-sens-hausse-baisse-stable-tuiles-dynamique">→ technique</a> Le seuil de 5 % est un choix de Claude <span class="marque">arbitrage non validé</span>.</li>
     </ul>
   </details>
-  <div class="exemple"><p>Camille : 46 100 pas du 30/08 au 05/09, 49 200 du 06/09 au 12/09 ; écart +6,7 %, au-dessus de 5 % : « En hausse ». Les 7 derniers jours donnent 49 200 / 7 = 7 029 pas par jour.</p></div>
+  <div class="exemple"><p>Camille : 46 100 pas du 30/08 au 05/09, 49 200 du 06/09 au 12/09 ; écart +6,7 %, au-dessus de 5 % : flèche vers le haut. Les sept journées relevées de la semaine donnent 49 200 / 7 = 7 029 pas par jour.</p></div>
 
   <h3 id="pas-tiroir-journal">Tiroir Journal</h3>
   <figure class="telephone" data-capture="activite/tiroir-journal-lignes-des-quatre-journaux"><figcaption>Case des pas : « 12/09 · 6 480 pas », « 11/09 · 7 120 pas », « 10/09 · 9 680 pas ».</figcaption></figure>
-  <p>Le tiroir de l'accueil liste les trois derniers relevés, « JJ/MM · N pas », sans calories ; « Rien d'enregistré » sinon. Toucher la case ouvre le journal complet par-dessus, avec les mêmes lignes que la page ; supprimer renvoie à la page. Un module éteint ouvre sa page vitrée.</p>
+  <p>Le tiroir de l'accueil liste les trois derniers relevés, « JJ/MM · N pas », sans calories ; « Rien d'enregistré » sinon. Toucher la case ouvre par-dessus tout l'historique, du plus récent au plus ancien, avec les lignes mêmes de la page — mais sans son filtre de période ni sa boîte de défilement. Supprimer renvoie à la page. Un module éteint ouvre sa page vitrée.</p>
 
   <h3 id="pas-tiroir-tendances">Tiroir Tendances</h3>
   <figure class="telephone" data-capture="activite/tiroir-tendances-cartes-activite-physique-temps-pour-soi-som"><figcaption>Carte « Pas » : silhouette de 14 jours, et au dos « 6.8 Kpas/j  −350 kcal/j ».</figcaption></figure>
-  <p>Une carte par module allumé, silhouette des 14 derniers jours ; un chevron bascule le titre vers les valeurs : moyenne en « Kpas/j » et dépense « −N kcal/j ». Toucher la carte ouvre le graphe de la page en surimpression. Sans aucun relevé : « Pas encore de données » ; des relevés mais une série plate : « Pas encore de tendance » ; dans les deux cas un lien « Voir mes pas » ouvre la page.</p>
+  <p>Une carte par domaine, silhouette des 14 derniers jours ; toucher le titre ou le chevron bascule le titre vers les valeurs : moyenne en « Kpas/j » et dépense « −N kcal/j ». Toucher la carte ouvre le graphe de la page en surimpression. Sans aucun relevé : « Pas encore de données » ; des relevés mais une série plate : « Pas encore de tendance » ; dans les deux cas un lien « Voir mes pas » ouvre la page. La carte d'un module éteint reste en place, voilée : au toucher, elle écrit dans sa zone de courbe « Activez le module Nombre de Pas pour pouvoir suivre l'évolution de vos pas. », qui mène à la page Modules.</p>
   <details><summary>Les règles derrière les chiffres</summary>
     <ul>
       <li>Série de 14 valeurs, 0 les jours sans relevé ; la moyenne en Kpas divise donc par 14 ; les kcal/j ne divisent que par les journées relevées, et ne s'affichent que si ≥ 1. <a href="spec-technique.html#pas-tendance-des-pas-tiroir-tendances">→ technique</a></li>

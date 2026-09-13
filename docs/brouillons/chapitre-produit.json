@@ -34,7 +34,7 @@
    "categorie": "objet",
    "fonctionnalite": "Une seule personne par installation",
    "texte": "Deux comptes ouverts sur le même navigateur partagent la même sauvegarde.",
-   "origine": "Déduit de la clé unique glp1_app_companion_data, qui ne porte pas l'identifiant du compte ; comportement non vérifié."
+   "origine": "Déduit de la clé unique glp1_app_companion_data, qui ne porte pas l'identifiant du compte ; comportement non vérifié. La déduction est écrite au chapitre comme conséquence de la clé, non comme observation."
   },
   {
    "categorie": "questionnaire",
@@ -46,188 +46,389 @@
    "categorie": "non-but",
    "fonctionnalite": "Réseau social",
    "texte": "La page « Configuration & Plus » est inatteignable en usage normal.",
-   "origine": "L'inventaire n'a trouvé aucune entrée de menu vers l'onglet « plus » ; je n'ai pas relu App.tsx en entier et j'ai écrit « qu'aucune entrée de menu relevée n'atteint »."
+   "origine": "Doute levé depuis : aucune référence à l'onglet « plus » hors de App.tsx (highlightedTab, rendu, et un retour par défaut), et aucune entrée de menu ne le vise. La phrase est donc entrée au chapitre comme un fait ; l'invention est levée."
+  },
+  {
+   "categorie": "principe",
+   "fonctionnalite": "Une valeur absente se tait",
+   "texte": "Aucun rythme hebdomadaire n'est affiché avant sept jours de recul ou avec moins de deux pesées ; dans ce cas rien n'est écrit, ni zéro ni tiret.",
+   "origine": "Réfutation retenue. Le seuil (MIN_DAYS_FOR_WEEKLY_RATE = 7, moins de deux pesées → null) ne vit que dans averageWeeklyChange, appelée uniquement par la surimpression des paliers de dose. Les trois accueils réécrivent la formule à la main sans borne (MaisonSections.tsx:1083, BlocSuiviPoids.tsx:303, Maison.tsx:249) et signedKg rend « -0 ». Le chapitre dit maintenant les deux comportements."
+  },
+  {
+   "categorie": "principe",
+   "fonctionnalite": "Dates locales",
+   "texte": "Seules les dates relatives construisent une date depuis une chaîne, ce que la couche de dates interdit ailleurs.",
+   "origine": "Réfutation retenue. homeOverview.ts:225, steps.utils.ts:170 et injections.utils.ts:140 construisent une Date depuis un AAAA-MM-JJ, alors que date.local.ts:104-127 l'interdit. La phrase a été corrigée pour nommer ces trois calculs."
+  },
+  {
+   "categorie": "principe",
+   "fonctionnalite": "Unités canoniques (V1)",
+   "texte": "Un aliment saisi en litres ou en kilos est multiplié par mille avant enregistrement.",
+   "origine": "Réfutation retenue. fromLargeUnit (food.units.ts:61) n'est appelée nulle part — sa seule autre occurrence est la ré-export de shared/food/index.ts:10 — et le formulaire d'aliment n'offre que « 100 g » et « 100 ml » (CustomFoodPage.tsx:28-29). Phrase retirée."
+  },
+  {
+   "categorie": "non-but",
+   "fonctionnalite": "Objet connecté",
+   "texte": "Une entrée de pas peut être marquée simulée.",
+   "origine": "Réfutation retenue. isSimulated n'existe qu'en déclaration (types.ts:294) et en lecture (StepsCalendar.tsx:110) ; l'ajout d'un pas (useAppData.ts:300-310) ne pose pas le champ. Le chapitre dit maintenant que le drapeau n'est jamais écrit."
+  },
+  {
+   "categorie": "objet",
+   "fonctionnalite": "Posture médicale",
+   "texte": "Le produit ne pose pas de diagnostic.",
+   "origine": "Réfutation retenue. Aucun texte du code n'affirme cela ; l'avertissement (LegalPrivacyPage.tsx:141) ne parle que de dispositif médical et de posologies, et l'attestation de « aucun conseil médical ». À l'inverse le produit annonce une catégorie de corpulence (BmiMilestoneBlock) et trace une concentration sanguine modélisée. Phrase remplacée par les citations exactes."
+  },
+  {
+   "categorie": "objet",
+   "fonctionnalite": "Catalogue des traitements",
+   "texte": "Chaque forme finit par « Autre » (V1 comme V2).",
+   "origine": "Réfutation retenue. En V1 l'entrée s'appelle « Autre traitement », avec les libellés « Autre traitement (Injection) » et « Autre traitement (Comprimé oral) » (treatment.catalog.ts:174, 219) ; « Autre » est le nom V2 (domaine/traitements.ts). Les deux libellés sont maintenant distingués."
+  },
+  {
+   "categorie": "objet",
+   "fonctionnalite": "Compte (V2)",
+   "texte": "La V2 recueille un mot de passe de huit signes au moins, seule contrainte.",
+   "origine": "Réfutation retenue. peutValider ne bloque qu'un mot de passe COMMENCÉ : « return reponses.motDePasse.length === 0 || motDePasseValide(...) ». Un mot de passe vide passe. Phrase corrigée."
+  },
+  {
+   "categorie": "principe",
+   "fonctionnalite": "Aucune branche ne se ferme sur un silence (V2)",
+   "texte": "Une seule étape bloque, celle qui demande quel traitement.",
+   "origine": "Réfutation retenue. Deux étapes bloquent : « quel-traitement » et « profil » quand un mot de passe commencé n'atteint pas huit signes. J'avais repris le commentaire d'en-tête de parcours.ts (« une seule étape bloque aujourd'hui ») au lieu du corps de peutValider."
+  },
+  {
+   "categorie": "contrainte",
+   "fonctionnalite": "React Native à venir (V2)",
+   "texte": "Aucune API du navigateur hors d'un seul fichier.",
+   "origine": "Réfutation retenue. GUIDELINES.md:49-51 nomme trois endroits : main.tsx, index.html et src/plateforme/navigateur.ts. Corrigé."
+  },
+  {
+   "categorie": "principe",
+   "fonctionnalite": "Sommeil",
+   "texte": "Durée de sommeil = réveil − endormissement, zéro si le réveil précède.",
+   "origine": "Réfutation retenue. sleep.utils.ts:50-52 rend aussi zéro quand le réveil ÉGALE l'endormissement, et quand une date ou une heure est illisible. Les trois cas sont maintenant écrits."
+  },
+  {
+   "categorie": "objet",
+   "fonctionnalite": "Reprise depuis la V1 (V2)",
+   "texte": "Repartie de zéro sans rien copier de la V1 : ce qui en vient est repris pièce par pièce.",
+   "origine": "Réfutation retenue. La phrase se contredisait et perdait la condition qui fait la règle : « à sa demande explicite, et STRICTEMENT ce dont on a besoin », « ne jamais aller puiser dans la V1 de soi-même » (GUIDELINES.md:28-35). Condition restaurée."
+  },
+  {
+   "categorie": "objet",
+   "fonctionnalite": "Questionnaire d'accueil V1",
+   "texte": "Dans le questionnaire V1, le poids actuel est demandé tant que « j'ai déjà commencé » n'est pas un oui explicite ; passer une étape efface ses réponses ; le questionnaire n'écrit rien hormis le thème.",
+   "origine": "Réfutation retenue, deux fois. D'abord hors périmètre : ce questionnaire est une simulation atteignable seulement depuis la page d'administration (AdminSettings.tsx:332). Ensuite faux sur le fond : OnboardingPage.tsx:161-163 écrit à chaque changement l'état complet sous glow_onboarding_sim_mixte — ce qu'il n'écrit pas, c'est la sauvegarde de l'application. Le paragraphe entier a été retiré ; le principe s'appuie désormais sur l'onboarding V2 seul."
+  },
+  {
+   "categorie": "transversal",
+   "fonctionnalite": "Aiguillage des versions",
+   "texte": "La V1 livre trois versions de l'interface sous une seule sauvegarde, aiguillées par le fragment d'adresse.",
+   "origine": "Vrai dans le code (VersionRouter.tsx, versions.ts : initiale, cartes, mixte ; src/versions/ contient les trois dossiers), et c'est ce qui donne son poids à « une seule personne par installation ». Écarté du chapitre parce que la consigne pose que Initiale et Cartes n'existent pas ; le chapitre ne nomme donc aucune version et parle de « la V1 »."
+  },
+  {
+   "categorie": "contrainte",
+   "fonctionnalite": "Plafonds quotidiens",
+   "texte": "La personne peut retrouver la ligne écrasée par un plafond.",
+   "origine": "Rien ne la conserve : addLogWithinDailyCap (logbook.ts:77-88) fusionne la nouvelle saisie dans la dernière ligne du jour et la valeur précédente disparaît. J'aurais voulu écrire qu'un retour en arrière existe ; il n'existe pas."
+  },
+  {
+   "categorie": "contrainte",
+   "fonctionnalite": "Copies de secours horodatées",
+   "texte": "Les copies de secours se font toutes seules, à intervalle régulier.",
+   "origine": "dataBackup.ts n'expose que des verbes (backUpCurrentSave, restoreBackup, writeWithBackup) ; aucun déclencheur périodique n'a été trouvé, et le seul appelant relevé est la page d'administration, hors périmètre. Le chapitre dit donc « peuvent être faites », sans dire par qui."
   }
  ],
  "glossaire": [
   {
-   "terme": "Cure",
-   "definition": "La période de traitement GLP-1 suivie par le carnet, comptée depuis la pesée de départ."
-  },
-  {
-   "terme": "Prise",
-   "definition": "Une injection ou un comprimé enregistré : date, heure, dose en milligrammes, site, traitement."
-  },
-  {
-   "terme": "Pesée de départ",
-   "definition": "La pesée de référence, reconnue à son drapeau isStartingWeight et jamais à sa valeur ; elle ne se supprime pas."
-  },
-  {
-   "terme": "Catalogue des traitements",
-   "definition": "La liste livrée avec le produit dans laquelle le traitement se choisit ; chaque forme (injection, comprimé) finit par « Autre »."
-  },
-  {
-   "terme": "Unité canonique",
-   "definition": "L'unité dans laquelle une grandeur est stockée (kg, cm, g ou ml, mg, min, m, années) ; la conversion n'existe qu'à la saisie et à l'affichage."
-  },
-  {
-   "terme": "Date locale",
-   "definition": "Un jour AAAA-MM-JJ ou une heure HH:MM lus sur l'horloge de l'appareil, sans fuseau : l'heure murale vécue."
-  },
-  {
-   "terme": "Minute ronde",
-   "definition": "L'une des minutes 0, 10, 15, 20, 30, 40, 45, 50 ; toute heure enregistrée y est ramenée vers le bas."
-  },
-  {
    "terme": "Sauvegarde",
-   "definition": "L'ensemble des données de suivi, un seul JSON dans le stockage local de l'appareil sous une clé unique."
+   "definition": "L'unique document JSON qui contient tout ce que la personne a saisi, écrit sous la clé glp1_app_companion_data du stockage local à chaque changement."
+  },
+  {
+   "terme": "Journal",
+   "definition": "Une liste datée d'un même genre de ligne : pesées, prises, effets secondaires, repas, pas, séances, sommeils, temps pour soi."
+  },
+  {
+   "terme": "Ligne",
+   "definition": "Une entrée d'un journal : un identifiant, une date AAAA-MM-JJ, le plus souvent une heure HH:MM, et les valeurs propres à son genre."
   },
   {
    "terme": "Module",
-   "definition": "Un domaine de suivi qui s'active ou se désactive (repas, pas, sport, temps pour soi, sommeil, traitement, effets secondaires)."
+   "definition": "Un des sept suivis qu'on allume ou éteint (traitement, effets secondaires, repas, pas, activité physique, temps pour soi, sommeil) ; éteint, il disparaît des menus et des tuiles."
   },
   {
-   "terme": "Restitution",
-   "definition": "Toute lecture des données saisies : total, moyenne, courbe, échéance, document PDF. Jamais une recommandation."
+   "terme": "Module masqué",
+   "definition": "Un module éteint dont on a coché « Masquer dans l'application. » : il disparaît aussi des tiroirs, où les modules éteints restent d'ordinaire visibles et grisés."
   },
   {
-   "terme": "Document médical",
-   "definition": "Le PDF produit sur une période choisie, à remettre à un professionnel de santé ; il porte la mention qu'il ne constitue pas un avis médical."
+   "terme": "Coquille",
+   "definition": "Le cadre commun à toutes les pages : entête, bande de titre, zone défilante, pied, barre du bas et bouton de retour."
   },
   {
-   "terme": "Onboarding",
-   "definition": "Le parcours de premier lancement ; simulation qui n'écrit rien en V1, seul contenu de la V2 à ce jour."
+   "terme": "Tiroir",
+   "definition": "Un panneau qui glisse par-dessus la page depuis un bord de l'écran, ouvert par une entrée du menu simplifié ; un seul à la fois."
   },
   {
-   "terme": "V1",
-   "definition": "L'application web du dépôt REPO-GIT-LOCAL, dont ce document relève le comportement."
+   "terme": "Vitre",
+   "definition": "La couche floutée posée sur une page dont le module est éteint, ou sous un tiroir ouvert ; elle laisse voir la page sans y agir."
   },
   {
-   "terme": "V2",
-   "definition": "L'application repartie de zéro le 6 septembre 2026 dans le dépôt GIT-APP-V2 ; quand elle a décidé autrement, elle prime."
+   "terme": "Plafond quotidien",
+   "definition": "Le nombre maximal de lignes qu'un journal accepte pour une même date. Selon le journal, il refuse la saisie ou écrase la dernière ligne du jour."
   },
   {
-   "terme": "Branche",
-   "definition": "Une question du parcours qui n'apparaît que si une réponse explicite l'ouvre ; une question passée ne décide rien."
+   "terme": "Pesée de départ",
+   "definition": "La ligne du journal des pesées marquée comme départ, référence de toutes les pertes affichées. Elle n'est pas supprimable et survit à un vidage du journal."
+  },
+  {
+   "terme": "Profil d'usine",
+   "definition": "Le profil fictif (Chloé, 42 ans, 168 cm) et la pesée de 95 kg posés à l'installation quand aucune sauvegarde n'existe."
+  },
+  {
+   "terme": "Minute ronde",
+   "definition": "Une des huit minutes que le produit accepte d'enregistrer : 0, 10, 15, 20, 30, 40, 45, 50. Toute heure saisie y est ramenée vers le bas."
+  },
+  {
+   "terme": "Catalogue des traitements",
+   "definition": "La liste fermée des spécialités GLP-1 et de leur forme, avec en V1 leur molécule, leurs paliers de dose et leur cinétique. Un traitement ne se saisit jamais à la main."
+  },
+  {
+   "terme": "Palier de dose",
+   "definition": "Une période pendant laquelle la dose déclarée ne change pas, découpée depuis le journal des prises."
+  },
+  {
+   "terme": "Fenêtre de période",
+   "definition": "L'intervalle sur lequel un graphe ou un journal est filtré : 7, 14, 30, 90 derniers jours, depuis le début, ou des bornes choisies ; 30 jours par défaut."
+  },
+  {
+   "terme": "Clé de secours",
+   "definition": "La clé où une sauvegarde illisible est recopiée telle quelle au chargement, une seule fois ; la session passe alors en lecture seule."
+  },
+  {
+   "terme": "Copie de secours horodatée",
+   "definition": "Un double de la sauvegarde rangé sous une clé datée à la seconde, référencé dans un index, et déclaré bon seulement après avoir été relu à l'identique."
+  },
+  {
+   "terme": "Verdict de dynamique",
+   "definition": "La phrase qui clôt la projection des sept derniers jours, choisie parmi cinq : à peu près stable, légère baisse, légère hausse, baisse relativement marquée, hausse relativement marquée."
+  },
+  {
+   "terme": "Ajout rapide",
+   "definition": "Les raccourcis qui ouvrent une page avec son formulaire d'ajout déjà déplié, depuis le panneau de la roue, le tiroir Ajouter ou le « + » de l'accueil."
+  },
+  {
+   "terme": "Refus de formulaire",
+   "definition": "Le message affiché sur la ligne entière avant le bouton Valider quand une saisie est impossible ; il n'apparaît qu'après un clic sur Valider et s'efface dès qu'on retouche le champ."
   }
  ],
  "index": [
   {
-   "terme": "Objet du produit",
-   "ancre": "produit-objet-et-posture"
+   "terme": "Avatar",
+   "ancre": "#produit-la-coquille"
   },
   {
    "terme": "Avertissement médical",
-   "ancre": "produit-objet-et-posture"
+   "ancre": "#produit-information-medicale"
   },
   {
-   "terme": "Catalogue des traitements",
-   "ancre": "produit-objet-et-posture"
-  },
-  {
-   "terme": "Compte (Firebase, Google)",
-   "ancre": "produit-objet-et-posture"
-  },
-  {
-   "terme": "Une seule personne par installation",
-   "ancre": "produit-objet-et-posture"
-  },
-  {
-   "terme": "Rien de dérivable n'est stocké",
-   "ancre": "produit-les-principes"
-  },
-  {
-   "terme": "Référence par identifiant",
-   "ancre": "produit-les-principes"
-  },
-  {
-   "terme": "Unités canoniques",
-   "ancre": "produit-les-principes"
-  },
-  {
-   "terme": "Système métrique / impérial",
-   "ancre": "produit-les-principes"
-  },
-  {
-   "terme": "Dates locales",
-   "ancre": "produit-les-principes"
-  },
-  {
-   "terme": "Minutes rondes",
-   "ancre": "produit-les-principes"
-  },
-  {
-   "terme": "Supprimer supprime",
-   "ancre": "produit-les-principes"
-  },
-  {
-   "terme": "Valeur absente (se tait)",
-   "ancre": "produit-les-principes"
-  },
-  {
-   "terme": "Branche fermée sur un silence",
-   "ancre": "produit-les-principes"
-  },
-  {
-   "terme": "Cache nutritionnel des repas",
-   "ancre": "produit-les-principes"
-  },
-  {
-   "terme": "Stockage local",
-   "ancre": "produit-contraintes"
-  },
-  {
-   "terme": "Flux sortants (PDF, avis, Open Food Facts, Google)",
-   "ancre": "produit-contraintes"
-  },
-  {
-   "terme": "Sauvegarde illisible",
-   "ancre": "produit-contraintes"
+   "terme": "Badges (félicitation)",
+   "ancre": "#produit-la-coquille"
   },
   {
    "terme": "Bornes de saisie",
-   "ancre": "produit-contraintes"
+   "ancre": "#produit-contraintes"
   },
   {
-   "terme": "Saisie impossible",
-   "ancre": "produit-contraintes"
+   "terme": "Bouton « + » flottant",
+   "ancre": "#produit-le-plus-de-la-maison"
   },
   {
-   "terme": "Non-buts",
-   "ancre": "produit-non-buts"
+   "terme": "Calendrier maison",
+   "ancre": "#produit-les-champs-communs"
   },
   {
-   "terme": "Objectifs quotidiens par défaut",
-   "ancre": "produit-non-buts"
+   "terme": "Catalogue des traitements",
+   "ancre": "#produit-objet-et-posture"
   },
   {
-   "terme": "Suivi hydrique (supprimé)",
-   "ancre": "produit-non-buts"
+   "terme": "Champ heure",
+   "ancre": "#produit-les-champs-communs"
   },
   {
-   "terme": "Objectifs de poids à paliers (supprimés)",
-   "ancre": "produit-non-buts"
+   "terme": "Champ numérique borné",
+   "ancre": "#produit-les-champs-communs"
   },
   {
-   "terme": "V2",
-   "ancre": "produit-la-v2"
+   "terme": "Clé de sauvegarde",
+   "ancre": "#produit-objet-et-posture"
   },
   {
-   "terme": "React Native",
-   "ancre": "produit-la-v2"
+   "terme": "Compte (connexion)",
+   "ancre": "#produit-page-de-connexion"
   },
   {
-   "terme": "Multilingue",
-   "ancre": "produit-la-v2"
+   "terme": "Compte (suppression)",
+   "ancre": "#produit-page-mon-compte"
   },
   {
-   "terme": "Administration (hors périmètre)",
-   "ancre": "produit-hors-perimetre"
+   "terme": "Copies de secours",
+   "ancre": "#produit-contraintes"
   },
   {
-   "terme": "Thèmes (hors périmètre)",
-   "ancre": "produit-hors-perimetre"
+   "terme": "Coquille",
+   "ancre": "#produit-la-coquille"
+  },
+  {
+   "terme": "Dates locales",
+   "ancre": "#produit-les-principes"
+  },
+  {
+   "terme": "Firebase",
+   "ancre": "#produit-page-de-connexion"
+  },
+  {
+   "terme": "IMC (palier)",
+   "ancre": "#produit-objet-et-posture"
+  },
+  {
+   "terme": "Identifiants (référence par)",
+   "ancre": "#produit-les-principes"
+  },
+  {
+   "terme": "Limite atteinte (bloc)",
+   "ancre": "#produit-bloc-limite-atteinte"
+  },
+  {
+   "terme": "Menu du bas simplifié",
+   "ancre": "#produit-menu-du-bas-simplifie"
+  },
+  {
+   "terme": "Menu du bas standard",
+   "ancre": "#produit-menu-du-bas-standard"
+  },
+  {
+   "terme": "Minutes rondes",
+   "ancre": "#produit-les-champs-communs"
+  },
+  {
+   "terme": "Modules",
+   "ancre": "#produit-page-modules"
+  },
+  {
+   "terme": "Mot de passe (V2)",
+   "ancre": "#produit-objet-et-posture"
+  },
+  {
+   "terme": "Notifications et rappels",
+   "ancre": "#produit-page-notifications"
+  },
+  {
+   "terme": "Onboarding V2",
+   "ancre": "#produit-la-v2"
+  },
+  {
+   "terme": "Open Food Facts",
+   "ancre": "#produit-contraintes"
+  },
+  {
+   "terme": "Pesée de départ",
+   "ancre": "#produit-l-etat-de-depart"
+  },
+  {
+   "terme": "Plafonds quotidiens",
+   "ancre": "#produit-contraintes"
+  },
+  {
+   "terme": "Profil d'usine",
+   "ancre": "#produit-l-etat-de-depart"
+  },
+  {
+   "terme": "Rapport PDF",
+   "ancre": "#produit-objet-et-posture"
+  },
+  {
+   "terme": "React Native (contrainte)",
+   "ancre": "#produit-la-v2"
+  },
+  {
+   "terme": "Refus de formulaire",
+   "ancre": "#produit-refus-et-periode"
+  },
+  {
+   "terme": "Sélecteur de période",
+   "ancre": "#produit-refus-et-periode"
+  },
+  {
+   "terme": "Social (lien)",
+   "ancre": "#produit-non-buts"
+  },
+  {
+   "terme": "Sommeil (durée)",
+   "ancre": "#produit-les-principes"
+  },
+  {
+   "terme": "Stockage local",
+   "ancre": "#produit-contraintes"
+  },
+  {
+   "terme": "Suppression franche",
+   "ancre": "#produit-les-principes"
+  },
+  {
+   "terme": "Tiroir Ajouter",
+   "ancre": "#produit-menu-du-bas-simplifie"
+  },
+  {
+   "terme": "Tiroir Dynamique",
+   "ancre": "#produit-tiroir-dynamique"
+  },
+  {
+   "terme": "Tiroir Journal",
+   "ancre": "#produit-menu-du-bas-simplifie"
+  },
+  {
+   "terme": "Tiroir Tendance",
+   "ancre": "#produit-menu-du-bas-simplifie"
+  },
+  {
+   "terme": "Unités canoniques",
+   "ancre": "#produit-les-principes"
+  },
+  {
+   "terme": "Valeur absente",
+   "ancre": "#produit-les-principes"
+  },
+  {
+   "terme": "Vitre de module éteint",
+   "ancre": "#produit-la-coquille"
   }
  ],
- "ecrans_illustres": []
+ "ecrans_illustres": [
+  "transversal/page-de-connexion",
+  "transversal/ecran-d-attente-de-session",
+  "transversal/page-information-medicale-avertissement-medical",
+  "transversal/coquille-mixte-appshell-cadre-telephone-entete-bande-de-titr",
+  "transversal/bloc-limite-atteinte-sauvegarde-illisible",
+  "transversal/menu-du-bas-standard",
+  "transversal/panneau-de-la-roue-menu-standard-preferences-export-glp1low",
+  "transversal/bouton-flottant",
+  "transversal/petit-menu-de-la-maison",
+  "transversal/menu-du-bas-simplifie",
+  "transversal/tiroir-ajouter",
+  "transversal/tiroir-journal",
+  "transversal/tiroir-tendance-des-15-derniers-jours",
+  "transversal/tiroir-menu-parametres-en-cases",
+  "transversal/tiroir-dynamique-divination",
+  "transversal/page-configuration-plus",
+  "transversal/page-modules",
+  "transversal/page-notifications",
+  "transversal/page-mon-compte",
+  "transversal/champ-date-calendrier-maison",
+  "transversal/champ-heure-minutes-rondes",
+  "transversal/champ-numerique-borne",
+  "transversal/refus-de-formulaire-liste-avant-le-bouton-valider",
+  "transversal/selecteur-de-periode-logique-partagee",
+  "onboarding-v2/quel-traitement",
+  "onboarding-v2/profil"
+ ]
 }

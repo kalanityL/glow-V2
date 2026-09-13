@@ -3,8 +3,8 @@
   {
    "categorie": "règle supposée",
    "fonctionnalite": "Évaluer le palier de chaque badge",
-   "texte": "Écrire que le « poids actuel » du Requin protéiné est la pesée la plus récente par date. Le code prend la dernière ligne de l'historique : l'ajout d'une pesée retrie par date, mais la modification d'une pesée ne retrie pas (updateWeighIn), donc après un changement de date la dernière ligne peut ne pas être la plus récente. Le chapitre dit « dernière pesée de l'historique » sans trancher.",
-   "origine": "Doute de l'inventaire ; lecture de src/features/weight/weighInWrites.ts."
+   "texte": "Écrire que le « poids actuel » du Requin protéiné est la pesée la plus récente par date. Le code prend la dernière ligne de l'historique : l'ajout d'une pesée retrie par date, mais la modification d'une pesée ne retrie pas (updateWeighIn), donc après un changement de date la dernière ligne peut ne pas être la plus récente. Le chapitre dit « la dernière ligne de l'historique des pesées » sans trancher.",
+   "origine": "Doute de l'inventaire ; lecture de src/features/weight/weighInWrites.ts. Réfutation retenue : la formulation « dernière pesée » a été remplacée par « dernière ligne »."
   },
   {
    "categorie": "comportement supposé",
@@ -40,64 +40,176 @@
    "categorie": "V2",
    "fonctionnalite": "toutes",
    "texte": "Aucune décision V2 sur les badges : GUIDELINES.md § 4 et src/screens/onboarding n'en parlent pas ; le chapitre ne porte donc aucune marque V2.",
-   "origine": "Recherche de « badge » et « TrackingEnabled » dans GIT-APP-V2/src, sans résultat."
+   "origine": "Recherche de « badge » et « TrackingEnabled » dans GIT-APP-V2/src et GUIDELINES.md, sans résultat."
   },
   {
    "categorie": "convention",
    "fonctionnalite": "Consulter les badges, leurs règles et le badge en grand",
-   "texte": "Les slugs des data-capture réduisent une suite de caractères non alphanumériques à un seul tiret (« Pavé de badges / badge mystère du bloc Salut » → pave-de-badges-badge-mystere-du-bloc-salut). Si l'outil de capture remplace chaque caractère par un tiret, ce nom-là diverge (« badges---badge »).",
-   "origine": "Consigne de slug ambiguë sur les suites de caractères."
+   "texte": "Les data-capture reprennent désormais le nom des fichiers réellement présents dans docs/captures/metabolisme-rapport-badges/, et non le slug de la consigne : l'outil de capture SUPPRIME les apostrophes au lieu de les remplacer par un tiret (« Bloc de célébration d'un badge débloqué » → bloc-de-celebration-dun-badge-debloque), et réduit toute suite de caractères non alphanumériques à un seul tiret (« Pavé de badges / badge mystère du bloc Salut » → pave-de-badges-badge-mystere-du-bloc-salut). La consigne de slug donnerait « d-un » et la figure ne se résoudrait pas.",
+   "origine": "Réfutation retenue ; ls docs/captures/metabolisme-rapport-badges/ et recoupement avec pdf-bandeau-encart-didentite-… (« d'identité » → « didentite »)."
+  },
+  {
+   "categorie": "donnée inventée",
+   "fonctionnalite": "Consulter les badges, leurs règles et le badge en grand",
+   "texte": "Supprimé : « Camille a deux badges débloqués — Hérisson Marcheur BRONZE, Lapin des Fibres ÉVEIL —, le Requin protéiné à débloquer et le Kangourou Musclé à activer, son module Activité Physique étant éteint. » Rien ne le fonde : la capture montre un seul badge débloqué (Hérisson Marcheur ARGENT, 4/7j), trois badges à débloquer et aucune section « Badges à activer ». La légende décrit désormais la capture.",
+   "origine": "Réfutation retenue ; lecture de docs/captures/metabolisme-rapport-badges/page-badges.png."
+  },
+  {
+   "categorie": "donnée inventée",
+   "fonctionnalite": "Évaluer le palier de chaque badge",
+   "texte": "Supprimé : « Camille pèse 89,4 kg, objectif 134 g de protéines », et « sur les sept derniers jours elle ne l'a atteint que le 8 septembre : 1/7j ». Le jeu de référence donne 85,9 kg et 129 g ; le détail « 1/7j » et la date du 8 septembre ne sont attestés nulle part.",
+   "origine": "Réfutation retenue ; capture pave-de-badges-badge-mystere-du-bloc-salut.png (pesée 12/09 85.9 kg, cible protéines 129 g) et graine Camille de TODO-CLAUDE.md."
+  },
+  {
+   "categorie": "donnée inventée",
+   "fonctionnalite": "Célébrer un palier décroché",
+   "texte": "Supprimé : « Camille saisit 8 400 pas ». La capture ne montre ni la saisie ni le nombre de pas, seulement « 4/7j à ≥ 8 000 pas ».",
+   "origine": "Réfutation retenue ; capture bloc-de-celebration-dun-badge-debloque.png."
+  },
+  {
+   "categorie": "comportement supposé",
+   "fonctionnalite": "Célébrer un palier décroché",
+   "texte": "Supprimé : « ses pas ont continué d'être enregistrés » pendant que le module était éteint, et « s'il était passé or entre-temps, une seule fête s'ouvre ». Aucune passerelle santé n'existe dans le code (aucune occurrence de healthkit, pedometer, google fit, health connect) : rien n'enregistre de pas tout seul, et un module éteint n'offre pas sa page de saisie. Le commentaire de badgeCelebration.ts qui parle d'enregistrement « quel que soit l'état des interrupteurs » décrit le modèle de données, pas une saisie qui continuerait. L'exemple se limite au rallumage au même palier.",
+   "origine": "Réfutation retenue ; grep sur les passerelles santé dans REPO-GIT-LOCAL/src."
+  },
+  {
+   "categorie": "règle supposée",
+   "fonctionnalite": "Consulter les badges, leurs règles et le badge en grand",
+   "texte": "Non écrit : la carte « Afficher le badge mystère » n'existe que si la page reçoit le rappel d'écriture du profil (onSaveProfile ? … : null, BadgesPage.tsx:137). Le seul appelant du code le passe toujours (App.tsx:2500) : la condition n'a pas d'effet observable et n'a donc pas sa place dans une spécification fonctionnelle.",
+   "origine": "Manque signalé ; lecture de BadgesPage.tsx et de son unique montage dans App.tsx."
+  },
+  {
+   "categorie": "écran supposé",
+   "fonctionnalite": "Consulter les badges, leurs règles et le badge en grand",
+   "texte": "Non écrit : un bouton retour vers l'Accueil sur la page Badges. Le rappel onBack est bien passé par App.tsx (setActiveTab('maison')), mais BadgesPage ne l'appelle jamais — il est déclaré, déstructuré, et inutilisé, comme onNavigateToTab. Aucun bouton retour n'existe donc à l'écran, et la capture n'en montre aucun.",
+   "origine": "Manque signalé, écarté après lecture : grep onBack sur BadgesPage.tsx ne rend que la déclaration et la déstructuration."
+  },
+  {
+   "categorie": "hors périmètre",
+   "fonctionnalite": "Consulter les badges, leurs règles et le badge en grand",
+   "texte": "Non écrit : le bouton « Info Santé & Confidentialité » visible en pied de page-badges-suite.png. Il n'appartient pas à BadgesPage mais au cadre commun de l'application ; il relève du chapitre transversal.",
+   "origine": "Lecture de la capture puis recherche du libellé, absent de BadgesPage.tsx."
+  },
+  {
+   "categorie": "convention",
+   "fonctionnalite": "toutes",
+   "texte": "Les libellés d'écran qui contiennent un emoji sont décrits, non recopiés : le texte de partage est dit « ouvert d'un emoji trophée », les pastilles de célébration « chacune précédée de son emoji », la phrase de félicitations « précédée d'un emoji de fête ». La consigne de style interdit l'emoji dans le chapitre ; la citation exacte l'exigerait.",
+   "origine": "Conflit entre la consigne « aucun emoji » et l'exactitude des libellés (badgeShare.ts:32, UnlockedBadgeBlock.tsx:41-72 et :147)."
   }
  ],
  "glossaire": [
   {
    "terme": "Badge",
-   "definition": "Récompense de régularité liée à un module (pas, repas, activité physique), tenue à un palier."
+   "definition": "Une des quatre récompenses de l'application — Hérisson Marcheur, Lapin des Fibres, Requin protéiné, Kangourou Musclé —, attachée à un module de suivi et évaluée sur les données de ce module."
   },
   {
    "terme": "Palier",
-   "definition": "L'un des cinq niveaux d'un badge — aucun, éveil, bronze, argent, or ; le plus haut atteint est retenu."
+   "definition": "Un des cinq niveaux d'un badge, du plus bas au plus haut : aucun, éveil, bronze, argent, or. Le palier retenu est le plus haut atteint."
   },
   {
    "terme": "Éveil",
-   "definition": "Premier palier, obtenu en remplissant le critère du badge sur la journée en cours ou la précédente."
+   "definition": "Le premier palier : le critère du badge rempli sur une seule journée, la journée en cours ou la précédente. Pour le Kangourou Musclé, une séance enregistrée suffit."
   },
   {
    "terme": "Journée réussie",
-   "definition": "Journée dont le total (pas, fibres ou protéines) atteint le seuil du badge."
+   "definition": "Journée dont le total atteint le seuil du badge : 8 000 pas, 25 g de fibres, ou l'objectif de protéines."
   },
   {
    "terme": "Fenêtre glissante",
-   "definition": "Les N derniers jours comptés, journée en cours comprise (7 ou 10 selon le palier)."
+   "definition": "Les N derniers jours, journée en cours comprise. Trois fenêtres : 2 jours pour l'éveil, 7 jours pour les paliers de journées, 10 jours pour deux paliers du Kangourou Musclé."
   },
   {
-   "terme": "Équivalent intensif / modéré",
-   "definition": "Durée d'une séance pondérée par son intensité : en intensif 1 / 0,67 / 0,33 (intensive / modérée / douce), en modéré 1,5 / 1 / 0,5."
+   "terme": "Entrée déjà survenue",
+   "definition": "Entrée dont la date est passée, ou dont la date est aujourd'hui et l'heure atteinte. Les badges ne comptent qu'elles ; les pas, sans heure, comptent dès que leur date est aujourd'hui ou passée."
   },
   {
-   "terme": "Objectif protéines",
-   "definition": "Poids actuel × 1,5 g, arrondi ; seuil quotidien du Requin protéiné."
+   "terme": "Équivalent intensif",
+   "definition": "Minutes d'activité physique ramenées à l'intensif : une minute intensive vaut 1, modérée 0,67, douce 0,33."
+  },
+  {
+   "terme": "Équivalent modéré",
+   "definition": "Minutes d'activité physique ramenées au modéré : une minute intensive vaut 1,5, modérée 1, douce 0,5."
+  },
+  {
+   "terme": "Objectif de protéines",
+   "definition": "Le poids actuel multiplié par 1,5 g, arrondi. Le poids actuel est la dernière ligne de l'historique des pesées, ou 70 kg si cet historique est vide."
   },
   {
    "terme": "Badge mystère",
-   "definition": "Cocarde « ? » du bloc Salut, affichée tant qu'aucun badge n'est débloqué ; masquable depuis la page Badges."
+   "definition": "Le badge « ? » — cocarde argent, point d'interrogation — qui tient la place au bord droit du bloc Salut tant qu'aucun badge n'est débloqué, et mène à la page Badges. Le curseur « Afficher le badge mystère » le montre ou le retire."
   },
   {
    "terme": "Palier connu",
-   "definition": "Dernier palier observé d'un badge, mémorisé sur l'appareil pour décider d'une célébration."
+   "definition": "Le dernier palier observé pour un badge, mémorisé sur l'appareil hors de la sauvegarde des données. Il sert de point de comparaison : une montée par rapport à lui se fête."
   },
   {
-   "terme": "Badge à activer",
-   "definition": "Badge dont le module de suivi est désactivé sans être masqué ; il n'est pas évalué."
-  },
-  {
-   "terme": "Module masqué",
-   "definition": "Module désactivé que l'utilisatrice a en plus masqué ; ses badges quittent la page Badges."
+   "terme": "Carte de partage",
+   "definition": "L'image JPEG de 600 × 600 fabriquée au partage d'un badge : niveau, dessin, titre, règle du palier, logo GLP1LOW et mention de provenance."
   }
  ],
  "index": [
   {
-   "terme": "Kangourou Musclé",
+   "terme": "Badge mystère",
+   "ancre": "badges-page-badges"
+  },
+  {
+   "terme": "Badge en grand",
+   "ancre": "badges-page-badges"
+  },
+  {
+   "terme": "Badges (page)",
+   "ancre": "badges-page-badges"
+  },
+  {
+   "terme": "Badges à activer (section)",
+   "ancre": "badges-page-badges"
+  },
+  {
+   "terme": "Badges à débloquer (section)",
+   "ancre": "badges-page-badges"
+  },
+  {
+   "terme": "Badges débloqués (section)",
+   "ancre": "badges-page-badges"
+  },
+  {
+   "terme": "Règles d'obtention (bloc)",
+   "ancre": "badges-page-badges"
+  },
+  {
+   "terme": "Célébration d'un palier",
+   "ancre": "badges-celebration-d-un-palier"
+  },
+  {
+   "terme": "Palier (éveil, bronze, argent, or)",
+   "ancre": "badges-les-quatre-badges-et-leurs-paliers"
+  },
+  {
+   "terme": "Journée réussie",
+   "ancre": "badges-les-quatre-badges-et-leurs-paliers"
+  },
+  {
+   "terme": "Fenêtre de 7 jours",
+   "ancre": "badges-les-quatre-badges-et-leurs-paliers"
+  },
+  {
+   "terme": "Fenêtre de 10 jours",
+   "ancre": "badges-les-quatre-badges-et-leurs-paliers"
+  },
+  {
+   "terme": "Équivalent intensif",
+   "ancre": "badges-les-quatre-badges-et-leurs-paliers"
+  },
+  {
+   "terme": "Équivalent modéré",
+   "ancre": "badges-les-quatre-badges-et-leurs-paliers"
+  },
+  {
+   "terme": "Objectif de protéines",
+   "ancre": "badges-les-quatre-badges-et-leurs-paliers"
+  },
+  {
+   "terme": "Hérisson Marcheur",
    "ancre": "badges-les-quatre-badges-et-leurs-paliers"
   },
   {
@@ -109,69 +221,32 @@
    "ancre": "badges-les-quatre-badges-et-leurs-paliers"
   },
   {
-   "terme": "Hérisson Marcheur",
+   "terme": "Kangourou Musclé",
    "ancre": "badges-les-quatre-badges-et-leurs-paliers"
-  },
-  {
-   "terme": "Paliers (éveil, bronze, argent, or)",
-   "ancre": "badges-les-quatre-badges-et-leurs-paliers"
-  },
-  {
-   "terme": "Équivalent intensif / modéré",
-   "ancre": "badges-les-quatre-badges-et-leurs-paliers"
-  },
-  {
-   "terme": "Objectif protéines (poids × 1,5 g)",
-   "ancre": "badges-les-quatre-badges-et-leurs-paliers"
-  },
-  {
-   "terme": "Fenêtre glissante (7 ou 10 jours)",
-   "ancre": "badges-les-quatre-badges-et-leurs-paliers"
-  },
-  {
-   "terme": "Page Badges",
-   "ancre": "badges-page-badges"
-  },
-  {
-   "terme": "Badge à débloquer",
-   "ancre": "badges-page-badges"
-  },
-  {
-   "terme": "Badge à activer",
-   "ancre": "badges-page-badges"
-  },
-  {
-   "terme": "Règles d'obtention",
-   "ancre": "badges-page-badges"
-  },
-  {
-   "terme": "Badge en grand",
-   "ancre": "badges-page-badges"
-  },
-  {
-   "terme": "Célébration d'un palier",
-   "ancre": "badges-bloc-de-celebration-d-un-badge-debloque"
-  },
-  {
-   "terme": "Palier connu",
-   "ancre": "badges-bloc-de-celebration-d-un-badge-debloque"
-  },
-  {
-   "terme": "Badge mystère",
-   "ancre": "badges-pave-de-badges-badge-mystere-du-bloc-salut"
   },
   {
    "terme": "Pavé de badges (bloc Salut)",
-   "ancre": "badges-pave-de-badges-badge-mystere-du-bloc-salut"
+   "ancre": "badges-pave-de-badges-du-bloc-salut"
   },
   {
    "terme": "Partage d'un badge",
+   "ancre": "badges-partage-d-un-badge"
+  },
+  {
+   "terme": "Carte de partage (JPEG 600 × 600)",
+   "ancre": "badges-partage-d-un-badge"
+  },
+  {
+   "terme": "Presse-papier (repli de partage)",
    "ancre": "badges-partage-d-un-badge"
   }
  ],
  "ecrans_illustres": [
   "metabolisme-rapport-badges/page-badges",
-  "metabolisme-rapport-badges/bloc-de-celebration-d-un-badge-debloque",
+  "metabolisme-rapport-badges/page-badges-suite",
+  "metabolisme-rapport-badges/page-badges-regles",
+  "metabolisme-rapport-badges/page-badges-badge-en-grand",
+  "metabolisme-rapport-badges/bloc-de-celebration-dun-badge-debloque",
   "metabolisme-rapport-badges/pave-de-badges-badge-mystere-du-bloc-salut"
  ]
 }

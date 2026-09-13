@@ -4,7 +4,7 @@
    "categorie": "Journal",
    "fonctionnalite": "Ligne du journal (JournalEntryCard)",
    "texte": "La note d'une ligne du journal serait tronquée à l'affichage (« … ») quand elle dépasse la largeur.",
-   "origine": "L'inventaire écrit « note en italique tronquée », mais ses doutes précisent que la troncature n'a été vérifiée que par les en-têtes de fichiers ; je n'ai pas lu InlineEditableNote. Le chapitre dit seulement « note en italique »."
+   "origine": "Levée : InlineEditableNote rend la note avec `truncate` (shared/ui/InlineEditableNote.tsx:41) et le placeholder d'édition en place est « Notes (facultatif) » (JournalEntryCard.tsx:214). Les deux sont désormais écrits dans le chapitre ; entrée conservée pour mémoire."
   },
   {
    "categorie": "Graphique Impact",
@@ -28,7 +28,7 @@
    "categorie": "Calendrier",
    "fonctionnalite": "Consulter le calendrier des effets",
    "texte": "Le calendrier des effets serait aussi monté en lecture seule dans une couche vitrée de la home, valeurs figées, sans Modifier ni Supprimer.",
-   "origine": "DayEffectLines porte un garde-fou « sans écrivain » écrit pour un montage dans la couche vitrée de la home (2026-08-30), mais la home ouvre aujourd'hui la matrice, pas le calendrier. Je n'ai trouvé aucun montage de SideEffectCalendar sans onUpdateSideEffect ; le chapitre ne mentionne pas ce mode."
+   "origine": "DayEffectLines porte un garde-fou « sans écrivain » écrit pour un montage dans la couche vitrée de la home (2026-08-30), mais la home ouvre aujourd'hui la matrice, pas le calendrier. Je n'ai trouvé aucun montage de SideEffectCalendar sans onUpdateSideEffect ; le chapitre dit maintenant que ce mode existe dans le code et ne s'atteint pas."
   },
   {
    "categorie": "Ajout rapide",
@@ -46,108 +46,242 @@
    "categorie": "Formulaire",
    "fonctionnalite": "Ajouter un ressenti",
    "texte": "Le plafond quotidien remplacerait le ressenti le plus récent par l'heure, et non la dernière ligne saisie du jour.",
-   "origine": "addLogWithinDailyCap écrase la dernière ligne du tableau portant la date, c'est-à-dire la dernière saisie, quelle que soit son heure. Le chapitre décrit ce que fait le code."
+   "origine": "addLogWithinDailyCap écrase la dernière ligne du tableau portant la date, c'est-à-dire la dernière saisie, quelle que soit son heure (logbook.ts:83-86). Le chapitre dit maintenant explicitement « la dernière ligne saisie de ce jour, quelle que soit son heure »."
   },
   {
    "categorie": "Module",
    "fonctionnalite": "Activer, désactiver, masquer le module Effets secondaires",
    "texte": "Le module éteint conserverait ses données et les réafficherait au rallumage.",
    "origine": "Plausible puisque handleToggleSideEffects ne touche que les deux drapeaux du profil, mais je n'ai pas lu de règle explicite sur la conservation de sideEffectHistory à l'extinction. Non écrit."
+  },
+  {
+   "categorie": "Rapport PDF",
+   "fonctionnalite": "Exporter le rapport médical",
+   "texte": "Sans donnée, la section « III Tolérance » afficherait « Aucun effet secondaire déclaré sur cette période. »",
+   "origine": "Réfutation retenue : la phrase existe dans le code (medicalReportPdf.ts:2537) mais est inatteignable — `include.sideEffects` exige déjà `filteredSideEffects.length > 0` (MedicalReportExport.tsx:1440, 1465, 1677) et ces mêmes lignes alimentent seStats. La phrase a été retirée du chapitre : c'est un état d'écran qui n'existe pas."
+  },
+  {
+   "categorie": "Formulaire",
+   "fonctionnalite": "Ajouter un ressenti",
+   "texte": "L'intensité reviendrait à 0 à chaque ouverture du formulaire d'ajout, quel que soit le chemin.",
+   "origine": "openAddForm réinitialise l'effet, la date et l'heure mais pas la sévérité (useSideEffectForm.ts:119-127) ; seul resetForm remet DEFAULT_SEVERITY. Rouvrir l'ajout depuis le titre de page sur un formulaire déjà ouvert conserve donc la valeur poussée. Le chapitre décrit ce que fait le code, l'homogénéisation n'est pas décidée."
+  },
+  {
+   "categorie": "Journal",
+   "fonctionnalite": "Éditer une ligne en place",
+   "texte": "L'édition en place du journal accepterait 0/5, comme celle de la bulle du calendrier.",
+   "origine": "Les deux éditeurs divergent (1 à 5 au journal, 0 à 5 dans la bulle) ; le chapitre le marque « non implémenté » mais aligner les deux échelles n'a pas été décidé."
+  },
+  {
+   "categorie": "Bulle du calendrier",
+   "fonctionnalite": "Consulter et modifier les effets d'un jour",
+   "texte": "Retirer du code le mode lecture seule des lignes de bulle, aujourd'hui inatteignable.",
+   "origine": "`modifiable = !!onUpdateSideEffect` (SideEffectCalendar.tsx:338) ; seul SideEffectsTracker monte le calendrier, et il passe toujours le gestionnaire. Le chapitre le signale, la suppression est une décision de code, pas de spécification."
+  },
+  {
+   "categorie": "Ligne d'outils",
+   "fonctionnalite": "Basculer entre journal et calendrier",
+   "texte": "Un libellé « Calendrier » / « Journal » sous les deux carreaux, pour lever l'ambiguïté du dessin seul.",
+   "origine": "Écarté d'office : la demande du 2026-08-25 interdit toute explication textuelle du basculement (« tout doit decouler du graphisme, aucune explication textuel de switch »). Consigné pour éviter qu'on le repropose."
   }
  ],
  "glossaire": [
   {
-   "terme": "Ressenti",
-   "definition": "Une déclaration d'effet secondaire : effet, intensité, date, heure, note facultative."
-  },
-  {
    "terme": "Intensité",
-   "definition": "Note de 0 (Imperceptible) à 5 (Élevé) portée par un ressenti ; affichée « n/5 »."
+   "definition": "Entier de 0 à 5 porté par un ressenti, avec son mot au formulaire : Imperceptible, Léger, Modéré, Marqué, Fort, Élevé."
   },
   {
    "terme": "Effet actif",
-   "definition": "Effet de la liste des 36 que la personne a coché ; seuls les effets actifs sont proposés dans les sélecteurs."
-  },
-  {
-   "terme": "Score d'impact",
-   "definition": "Somme des intensités déclarées un jour, en « pts » ; la grandeur du graphique « Impact »."
+   "definition": "Libellé retenu dans la sélection de l'utilisatrice parmi les 36 connus ; 12 par défaut, la liste est triée en français et mémorisée sur l'appareil."
   },
   {
    "terme": "Note moyenne du jour",
-   "definition": "Moyenne des intensités d'un jour, une décimale au plus, écrite « x/5 » dans la tuile du calendrier."
+   "definition": "Moyenne arithmétique des intensités du jour, arrondie à une décimale et suffixée « /5 » ; c'est ce que porte une tuile du calendrier."
+  },
+  {
+   "terme": "Score d'impact",
+   "definition": "Somme des intensités d'un jour, exprimée en « pts » ; c'est l'ordonnée du graphique « Impact »."
   },
   {
    "terme": "Palier de sévérité",
-   "definition": "Classement d'un jour ou d'un effet en léger (intensité ≤ 1), modéré (2–3) ou sévère (≥ 4) ; sert au rapport PDF."
+   "definition": "Léger, modéré ou sévère selon le maximum des intensités du jour (sévère au-dessus de 3, modéré au-dessus de 1) ; ne sert plus qu'au rapport PDF."
   },
   {
    "terme": "Humeur du jour",
-   "definition": "Ton serein, modéré ou difficile calculé sur les effets du jour ; visage et phrase sur la home."
-  },
-  {
-   "terme": "Moment de la journée",
-   "definition": "Matin (avant 12 h), après-midi (12 h à 18 h), soir (18 h et après), d'après l'heure du ressenti."
+   "definition": "Serein, modéré ou difficile : serein si la somme des intensités du jour est nulle, difficile si elle dépasse 8 ou si une intensité atteint 4, modéré sinon."
   },
   {
    "terme": "Cran",
-   "definition": "L'un des quatre niveaux d'une case de la matrice : rien, légère (1–2), modérée (3), marquée (4–5)."
+   "definition": "Repli de l'intensité sur quatre niveaux dans la matrice : rien, légère (1–2), modérée (3), marquée (4–5)."
   },
   {
-   "terme": "Plafond quotidien",
-   "definition": "Quinze ressentis par jour ; le suivant remplace la dernière ligne du jour."
-  },
-  {
-   "terme": "Période",
-   "definition": "Fenêtre du journal ou du graphique : 7, 14, 30 ou 90 derniers jours, Depuis le début, Choisir ; 30 jours par défaut."
+   "terme": "Moment de la journée",
+   "definition": "Matin avant 12 h, après-midi de 12 h à 18 h, soir à partir de 18 h, d'après l'heure portée par la ligne — non l'instant de la saisie."
   },
   {
    "terme": "Minutes rondes",
-   "definition": "Heures autorisées : minutes 0, 10, 15, 20, 30, 40, 45, 50 ; toute heure est arrondie vers le bas."
+   "definition": "0, 10, 15, 20, 30, 40, 45 et 50 ; toute heure est arrondie vers le bas à l'une d'elles, à la saisie comme à l'enregistrement."
   },
   {
-   "terme": "Bulle",
-   "definition": "Info-bulle d'un jour du calendrier : deux effets au plus, éditables, avec « Voir plus » et « Ajouter un enregistrement »."
+   "terme": "Plafond quotidien",
+   "definition": "15 ressentis par jour au plus ; le seizième écrase la dernière ligne créée de ce jour et déclenche l'avis « Limite atteinte »."
+  },
+  {
+   "terme": "Fenêtre fixe",
+   "definition": "Période choisie au sélecteur (7, 14, 30, 90 derniers jours, Depuis le début) ; sa fin n'est pas datée, s'écrit « aujourd'hui » et se lit « du … à aujourd'hui »."
+  },
+  {
+   "terme": "Bandeau de confirmation",
+   "definition": "Bloc en tête de page après un ajout ou une modification ; se ferme à la croix, ou seul une fois lu 800 ms et sorti de l'écran par un défilement au geste."
+  },
+  {
+   "terme": "Module « Effets secondaires »",
+   "definition": "Drapeau du profil qui commande la présence du domaine ; absent du profil, il vaut allumé. Éteint, l'entrée quitte le menu du bas et la page se vitre."
+  },
+  {
+   "terme": "Masquage",
+   "definition": "Case « Masquer dans l'application. », offerte sous un module éteint seulement, qui retire en plus le module des tiroirs ; rallumer le module l'efface."
+  },
+  {
+   "terme": "Vue d'historique",
+   "definition": "Journal ou calendrier ; le calendrier est le défaut, et le choix est mémorisé sur l'appareil."
+  },
+  {
+   "terme": "Type nettoyé",
+   "definition": "Nom de l'effet débarrassé de son préfixe non alphabétique, et de sa parenthèse finale quand le sélecteur est fermé."
   }
  ],
  "index": [
   {
-   "terme": "Ajouter / Gérer",
-   "ancre": "effets-panneau-effets-secondaires-disponibles-ajouter-gerer"
+   "terme": "Effets secondaires (page)",
+   "ancre": "effets-page-effets-secondaires-tracker"
   },
   {
-   "terme": "Bloc de détail du jour",
-   "ancre": "effets-bloc-de-detail-du-jour-effets-du-jj-mm-aaaa-n"
+   "terme": "Bandeau de confirmation",
+   "ancre": "effets-page-effets-secondaires-tracker"
   },
   {
-   "terme": "Bornes « du … au … »",
-   "ancre": "effets-vue-journal-des-effets-secondaires"
+   "terme": "« + » flottant",
+   "ancre": "effets-page-effets-secondaires-tracker"
   },
   {
-   "terme": "Bulle du calendrier",
-   "ancre": "effets-bulle-d-un-jour-du-calendrier"
+   "terme": "Ajout rapide",
+   "ancre": "effets-page-effets-secondaires-tracker"
   },
   {
-   "terme": "Calendrier des effets",
-   "ancre": "effets-vue-calendrier-des-effets-secondaires"
+   "terme": "side-effect-chart-section",
+   "ancre": "effets-page-effets-secondaires-tracker"
   },
   {
-   "terme": "Cran (matrice)",
-   "ancre": "effets-surimpression-vitree-effets-secondaires-matrice-matin-apres"
+   "terme": "Migration description → note",
+   "ancre": "effets-page-effets-secondaires-tracker"
   },
   {
-   "terme": "Défilé récent",
-   "ancre": "effets-carre-effet-du-defile-recent-de-la-home-standard"
+   "terme": "Module « Effets secondaires »",
+   "ancre": "effets-carte-module-effets-secondaires-page-modules"
   },
   {
-   "terme": "Effets actifs",
-   "ancre": "effets-panneau-effets-secondaires-disponibles-ajouter-gerer"
+   "terme": "Masquer dans l'application",
+   "ancre": "effets-carte-module-effets-secondaires-page-modules"
+  },
+  {
+   "terme": "Page vitrée",
+   "ancre": "effets-page-vitree-du-module-eteint"
+  },
+  {
+   "terme": "Ligne d'outils de l'historique",
+   "ancre": "effets-ligne-d-outils-de-l-historique-calendrier-journal-ajouter"
+  },
+  {
+   "terme": "« + ajouter »",
+   "ancre": "effets-ligne-d-outils-de-l-historique-calendrier-journal-ajouter"
+  },
+  {
+   "terme": "Vue d'historique",
+   "ancre": "effets-ligne-d-outils-de-l-historique-calendrier-journal-ajouter"
   },
   {
    "terme": "Formulaire « Nouveau ressenti »",
    "ancre": "effets-formulaire-nouveau-ressenti-modifier-le-ressenti"
   },
   {
+   "terme": "Intensité",
+   "ancre": "effets-formulaire-nouveau-ressenti-modifier-le-ressenti"
+  },
+  {
+   "terme": "Minutes rondes",
+   "ancre": "effets-formulaire-nouveau-ressenti-modifier-le-ressenti"
+  },
+  {
+   "terme": "Note (280 caractères)",
+   "ancre": "effets-formulaire-nouveau-ressenti-modifier-le-ressenti"
+  },
+  {
+   "terme": "Plafond quotidien de 15 ressentis",
+   "ancre": "effets-formulaire-nouveau-ressenti-modifier-le-ressenti"
+  },
+  {
+   "terme": "Avis « Limite atteinte »",
+   "ancre": "effets-avis-limite-atteinte"
+  },
+  {
+   "terme": "Panneau « Ajouter / Gérer »",
+   "ancre": "effets-panneau-effets-secondaires-disponibles-ajouter-gerer"
+  },
+  {
+   "terme": "Effets actifs par défaut",
+   "ancre": "effets-panneau-effets-secondaires-disponibles-ajouter-gerer"
+  },
+  {
+   "terme": "Recherche d'effet",
+   "ancre": "effets-panneau-effets-secondaires-disponibles-ajouter-gerer"
+  },
+  {
+   "terme": "Vue Journal",
+   "ancre": "effets-vue-journal-des-effets-secondaires"
+  },
+  {
+   "terme": "Période (7, 14, 30, 90 jours)",
+   "ancre": "effets-vue-journal-des-effets-secondaires"
+  },
+  {
+   "terme": "Bornes « du … à aujourd'hui »",
+   "ancre": "effets-vue-journal-des-effets-secondaires"
+  },
+  {
+   "terme": "Ligne du journal",
+   "ancre": "effets-ligne-du-journal-journalentrycard"
+  },
+  {
+   "terme": "Édition en place",
+   "ancre": "effets-ligne-du-journal-journalentrycard"
+  },
+  {
+   "terme": "« Tout supprimer »",
+   "ancre": "effets-bloc-de-confirmation-supprimer-tout"
+  },
+  {
+   "terme": "Vue Calendrier",
+   "ancre": "effets-vue-calendrier-des-effets-secondaires"
+  },
+  {
+   "terme": "Note moyenne du jour",
+   "ancre": "effets-vue-calendrier-des-effets-secondaires"
+  },
+  {
+   "terme": "Bulle d'un jour",
+   "ancre": "effets-bulle-d-un-jour-du-calendrier"
+  },
+  {
+   "terme": "Bloc de détail du jour",
+   "ancre": "effets-bloc-de-detail-du-jour-effets-du-jj-mm-aaaa-n"
+  },
+  {
    "terme": "Graphique « Impact »",
+   "ancre": "effets-graphique-impact-tendance-de-tolerance"
+  },
+  {
+   "terme": "Score d'impact",
    "ancre": "effets-graphique-impact-tendance-de-tolerance"
   },
   {
@@ -155,28 +289,40 @@
    "ancre": "effets-tuile-ressentis-du-jour-de-la-rangee-en-direct-home-sections"
   },
   {
-   "terme": "Intensité (0–5)",
-   "ancre": "effets-formulaire-nouveau-ressenti-modifier-le-ressenti"
-  },
-  {
-   "terme": "Journal des effets",
-   "ancre": "effets-vue-journal-des-effets-secondaires"
-  },
-  {
-   "terme": "Limite atteinte",
-   "ancre": "effets-formulaire-nouveau-ressenti-modifier-le-ressenti"
+   "terme": "Badge du carré traitement",
+   "ancre": "effets-badge-ressentis-du-jour-du-carre-traitement-home-standard"
   },
   {
    "terme": "Matrice matin / après-midi / soir",
    "ancre": "effets-surimpression-vitree-effets-secondaires-matrice-matin-apres"
   },
   {
-   "terme": "Module Effets secondaires",
-   "ancre": "effets-page-effets-secondaires-tracker"
+   "terme": "Cran",
+   "ancre": "effets-surimpression-vitree-effets-secondaires-matrice-matin-apres"
   },
   {
-   "terme": "Note moyenne du jour",
-   "ancre": "effets-vue-calendrier-des-effets-secondaires"
+   "terme": "Tiroir « Tendance »",
+   "ancre": "effets-carte-effets-secondaires-du-tiroir-tendance-des-15-derniers"
+  },
+  {
+   "terme": "Tiroir « Journal »",
+   "ancre": "effets-carte-effets-secondaires-du-tiroir-journal"
+  },
+  {
+   "terme": "Défilé récent",
+   "ancre": "effets-carre-effet-du-defile-recent-de-la-home-standard"
+  },
+  {
+   "terme": "Rapport médical PDF",
+   "ancre": "effets-export-du-rapport-medical-case-les-effets-secondaires-ressen"
+  },
+  {
+   "terme": "Section III Tolérance",
+   "ancre": "effets-export-du-rapport-medical-case-les-effets-secondaires-ressen"
+  },
+  {
+   "terme": "Annexe C",
+   "ancre": "effets-export-du-rapport-medical-case-les-effets-secondaires-ressen"
   },
   {
    "terme": "Palier de sévérité",
@@ -185,45 +331,19 @@
   {
    "terme": "Partage « Mon ressenti »",
    "ancre": "effets-maquette-de-partage-un-effet-secondaire-mon-ressenti"
-  },
-  {
-   "terme": "Plafond quotidien",
-   "ancre": "effets-formulaire-nouveau-ressenti-modifier-le-ressenti"
-  },
-  {
-   "terme": "Rapport médical (effets)",
-   "ancre": "effets-export-du-rapport-medical-case-les-effets-secondaires-ressen"
-  },
-  {
-   "terme": "Score d'impact",
-   "ancre": "effets-graphique-impact-tendance-de-tolerance"
-  },
-  {
-   "terme": "Supprimer tout",
-   "ancre": "effets-vue-journal-des-effets-secondaires"
-  },
-  {
-   "terme": "Tiroir Journal (effets)",
-   "ancre": "effets-carte-effets-secondaires-du-tiroir-journal"
-  },
-  {
-   "terme": "Tiroir Tendance (effets)",
-   "ancre": "effets-carte-effets-secondaires-du-tiroir-tendance-des-15-derniers"
-  },
-  {
-   "terme": "Visage du ressenti (home standard)",
-   "ancre": "effets-badge-ressentis-du-jour-du-carre-traitement-home-standard"
-  },
-  {
-   "terme": "Voir plus",
-   "ancre": "effets-bulle-d-un-jour-du-calendrier"
   }
  ],
  "ecrans_illustres": [
   "effets-secondaires/page-effets-secondaires-tracker",
+  "effets-secondaires/carte-module-effets-secondaires-page-modules",
+  "effets-secondaires/page-vitree-du-module-eteint",
+  "effets-secondaires/ligne-d-outils-de-l-historique-calendrier-journal-ajouter",
   "effets-secondaires/formulaire-nouveau-ressenti-modifier-le-ressenti",
+  "effets-secondaires/avis-limite-atteinte",
   "effets-secondaires/panneau-effets-secondaires-disponibles-ajouter-gerer",
   "effets-secondaires/vue-journal-des-effets-secondaires",
+  "effets-secondaires/ligne-du-journal-journalentrycard",
+  "effets-secondaires/bloc-de-confirmation-supprimer-tout",
   "effets-secondaires/vue-calendrier-des-effets-secondaires",
   "effets-secondaires/bulle-d-un-jour-du-calendrier",
   "effets-secondaires/bloc-de-detail-du-jour-effets-du-jj-mm-aaaa-n",

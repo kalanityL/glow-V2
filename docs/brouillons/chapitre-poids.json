@@ -65,97 +65,159 @@
    "fonctionnalite": "Calculer et afficher l'IMC",
    "texte": "Nommer les bandes insuffisance pondérale, corpulence normale et obésité III sur l'échelle.",
    "origine": "Trois bandes sur six sont sans mot depuis le retrait de la ligne de classe ; l'arbitrage est consigné dans SurimpressionImc, pas décidé."
+  },
+  {
+   "categorie": "Home sections",
+   "fonctionnalite": "Suivre la progression vers l'objectif",
+   "texte": "La tuile « dernière perte » de la rangée Progrès se tait quand elle égale la perte totale au dixième.",
+   "origine": "Phrase retirée du chapitre : lossesEqual n'existe que dans Maison.tsx (home standard) et WeighInSubmissionCard ; showLastLoss de MaisonSections ne compare jamais les deux pertes. Seul le commentaire du code le laissait croire."
+  },
+  {
+   "categorie": "Home sections",
+   "fonctionnalite": "Suivre la progression vers l'objectif",
+   "texte": "Une durée sous chacune des quatre mini-tuiles de la rangée Progrès.",
+   "origine": "Phrase retirée du chapitre : seules les deux tuiles de perte appellent lossSpanLabel ; l'hebdomadaire porte « /semaine » en unité de repli, celle d'IMC un picto en sous-libellé."
+  },
+  {
+   "categorie": "Tiroir Tendances",
+   "fonctionnalite": "Consulter la tendance du poids",
+   "texte": "La carte « Balance » du tiroir Tendances emmène à la page Balance.",
+   "origine": "Phrase retirée du chapitre : weight figure dans GRAPHES_EN_SURIMPRESSION, la carte ouvre donc le graphe par-dessus le tiroir. Le commentaire de TrendDrawer qui annonce la navigation est périmé ; seul « Ajouter une saisie » mène à la page."
+  },
+  {
+   "categorie": "Cadence",
+   "fonctionnalite": "Lire la cadence de perte",
+   "texte": "Le bandeau écrit « depuis le début » à la place de l'intervalle, sans « et aujourd'hui ».",
+   "origine": "Le code concatène toujours « et {periodEndLabel} » : la phrase lue est « … depuis le début et aujourd'hui ». La retoucher serait une décision, pas une correction."
+  },
+  {
+   "categorie": "Courbe de poids",
+   "fonctionnalite": "Visualiser la courbe de poids",
+   "texte": "La fenêtre « Depuis le début » s'arrête à aujourd'hui.",
+   "origine": "endMs = max(dernière donnée, aujourd'hui) : une pesée ou une injection datée du futur étire l'axe au-delà. Le commentaire du code assume ce cas ; le plafonner serait une décision."
   }
  ],
  "glossaire": [
   {
    "terme": "Pesée",
-   "definition": "Une ligne du journal : date AAAA-MM-JJ, heure HH:MM aux minutes rondes, poids en kg à une décimale, neuf mensurations facultatives en cm."
+   "definition": "Une ligne du journal du poids : date, heure, poids en kilogrammes à une décimale, éventuellement neuf mensurations. Une seule par jour."
   },
   {
    "terme": "Poids de départ",
-   "definition": "La pesée qui porte le drapeau isStartingWeight ; toujours la plus ancienne du journal ; ne se supprime pas."
+   "definition": "La pesée portant le drapeau isStartingWeight, reposé sur la plus ancienne après chaque ajout ou modification. Elle ne se supprime pas."
   },
   {
-   "terme": "Poids visé (objectif)",
-   "definition": "profile.targetWeight, en kg, arrondi au dixième ; référence de la barre de progression et des arcs."
+   "terme": "Poids actuel",
+   "definition": "La pesée la plus récente par date, ou le poids de départ à défaut."
+  },
+  {
+   "terme": "Poids visé",
+   "definition": "Le poids cible du profil (« Objectif final »), indépendant du poids actuel et du poids de départ."
   },
   {
    "terme": "Mensurations",
-   "definition": "Neuf tours en cm attachés à une pesée : poitrine, taille, hanches, bras, sous-poitrine, fesses, cuisses, genoux, mollets."
+   "definition": "Neuf mesures facultatives en centimètres attachées à une pesée : poitrine, taille, hanches, bras, sous-poitrine, fesses, cuisses, genoux, mollets."
   },
   {
-   "terme": "Journal",
-   "definition": "La liste des pesées de la période choisie, la plus récente en tête, chaque ligne éditable en place."
+   "terme": "Minute ronde",
+   "definition": "L'heure d'une pesée est ramenée à la minute ronde inférieure parmi 0, 10, 15, 20, 30, 40, 45, 50."
   },
   {
-   "terme": "Calendrier",
-   "definition": "La grille mensuelle des pesées, une tuile par jour, ajout sur jour vide seulement."
+   "terme": "Poids actif à une date",
+   "definition": "Le poids retenu par les autres modules pour un jour donné : dernière pesée à cette date ou avant, puis départ, objectif, 80 kg."
   },
   {
-   "terme": "Cadence",
-   "definition": "L'histogramme de la perte par semaine avec son bilan de période (total, % du poids de début, moyenne par semaine)."
+   "terme": "Perte totale",
+   "definition": "Poids de départ moins poids actuel, positive quand le poids a baissé."
   },
   {
-   "terme": "Courbe de poids",
-   "definition": "La courbe lissée des pesées sur une fenêtre, prolongée à plat jusqu'à aujourd'hui."
-  },
-  {
-   "terme": "Période",
-   "definition": "Fenêtre 7, 14, 30 ou 90 derniers jours, Depuis le début, ou bornes choisies ; mémorisée par bloc ; défaut 30 jours."
-  },
-  {
-   "terme": "Minutes rondes",
-   "definition": "0, 10, 15, 20, 30, 40, 45, 50 : toute heure enregistrée est ramenée à la plus grande minute ronde inférieure ou égale."
-  },
-  {
-   "terme": "Une pesée par jour",
-   "definition": "Règle du journal : un ajout sur un jour pris remplace la ligne du jour ; pour les calculs, la dernière pesée du jour fait foi."
+   "terme": "Dernière perte",
+   "definition": "Avant-dernière pesée moins dernière pesée."
   },
   {
    "terme": "IMC",
-   "definition": "Poids en kg divisé par la taille en mètres au carré, arrondi au dixième ; 0 sans taille."
+   "definition": "Poids divisé par le carré de la taille en mètres, arrondi au dixième ; vaut 0 sans taille connue."
   },
   {
    "terme": "Palier d'IMC",
-   "definition": "L'une des six classes : insuffisance pondérale (< 18,5), corpulence normale, surpoids (≥ 25), obésité I (≥ 30), II (≥ 35), III (≥ 40)."
+   "definition": "Une des six classes d'IMC ; le bloc de palier emploie une table de libellés distincte de la ligne IMC du carré poids."
   },
   {
-   "terme": "Cap franchi",
-   "definition": "Un seuil d'IMC (18,5 · 25 · 30 · 35 · 40) traversé entre l'IMC du départ et celui d'aujourd'hui."
-  },
-  {
-   "terme": "Points d'IMC",
-   "definition": "(actuel − départ) / taille², arrondi sur la différence ; négatif quand le poids descend."
+   "terme": "Cap d'IMC",
+   "definition": "Une graduation de l'échelle (18,5 · 25 · 30 · 35 · 40) franchie entre l'IMC de départ et l'IMC actuel."
   },
   {
    "terme": "Semaine de cure",
-   "definition": "Rang de la semaine depuis la date de la pesée de départ : jours écoulés ÷ 7 + 1."
+   "definition": "Partie entière du nombre de jours écoulés depuis la pesée de départ divisé par sept, plus un."
   },
   {
-   "terme": "Perte totale / dernière perte",
-   "definition": "Départ − actuel ; avant-dernière pesée − dernière pesée, par dates."
+   "terme": "Moyenne hebdomadaire",
+   "definition": "(Poids actuel − poids de départ) × 7 / jours de cure, affichée à partir de sept jours."
+  },
+  {
+   "terme": "Cadence",
+   "definition": "L'histogramme de la perte par semaine sur la période choisie, une barre par tranche de sept jours."
+  },
+  {
+   "terme": "Courbe de poids",
+   "definition": "Le graphe lissé du poids sur la période, un point toutes les trois heures, le poids réel à midi des jours pesés."
+  },
+  {
+   "terme": "Période",
+   "definition": "La fenêtre d'un bloc : 7, 14, 30, 90 derniers jours, Depuis le début ou Choisir ; 30 jours par défaut, retenue par bloc."
+  },
+  {
+   "terme": "Bornes « du … au … »",
+   "definition": "Les deux dates éditables d'un bloc ; les toucher bascule le sélecteur de période en « Choisir »."
+  },
+  {
+   "terme": "Vue Journal / Calendrier",
+   "definition": "Les deux présentations exclusives de l'historique ; le calendrier par défaut, le choix retenu par page."
+  },
+  {
+   "terme": "Reprise",
+   "definition": "Poids actuel strictement supérieur au poids de départ ; la surimpression Balance retourne alors ses arcs."
   },
   {
    "terme": "Équivalence insolite",
-   "definition": "Une perte traduite en objets du quotidien, avec dessin et texte (chapitre 16)."
+   "definition": "La traduction d'une perte en objets du quotidien, dessin et phrase, décrite au chapitre 16."
   },
   {
    "terme": "Surimpression",
-   "definition": "Couche vitrée ouverte par-dessus la home sections (Balance, Où en est l'IMC)."
+   "definition": "Une couche vitrée ouverte par-dessus la page ou le tiroir, sans quitter l'écran courant."
   },
   {
-   "terme": "Home standard / home sections",
-   "definition": "Les deux gabarits d'accueil ; le carré poids vit sur la première, la rangée Progrès et les surimpressions sur la seconde."
+   "terme": "Demi-carte",
+   "definition": "La ligne résumée d'une des trois dernières entrées d'un journal dans le tiroir Journal : « JJ/MM · xx kg » pour la balance."
   },
   {
-   "terme": "Tiroirs Journal et Tendances",
-   "definition": "Les panneaux du menu simplifié : le premier liste les pesées, le second montre la tendance sur 14 jours."
+   "terme": "Annexe B",
+   "definition": "La partie du rapport médical réservée aux pesées et mensurations : un tableau si une mesure existe sur la période, sinon un calendrier des poids."
   }
  ],
  "index": [
   {
    "terme": "Page Balance",
+   "ancre": "poids-page-balance-onglet-history"
+  },
+  {
+   "terme": "Barre d'outils de l'historique",
+   "ancre": "poids-barre-d-outils-de-l-historique-curseur-journal-calendrier-aj"
+  },
+  {
+   "terme": "Curseur Journal / Calendrier",
+   "ancre": "poids-barre-d-outils-de-l-historique-curseur-journal-calendrier-aj"
+  },
+  {
+   "terme": "« + » flottant",
+   "ancre": "poids-page-balance-onglet-history"
+  },
+  {
+   "terme": "Périodes",
+   "ancre": "poids-page-balance-onglet-history"
+  },
+  {
+   "terme": "Bornes « du … au … »",
    "ancre": "poids-page-balance-onglet-history"
   },
   {
@@ -167,23 +229,23 @@
    "ancre": "poids-formulaire-nouvelle-saisie-modifier-la-saisie"
   },
   {
-   "terme": "Une pesée par jour",
-   "ancre": "poids-formulaire-nouvelle-saisie-modifier-la-saisie"
-  },
-  {
-   "terme": "Minutes rondes",
-   "ancre": "poids-formulaire-nouvelle-saisie-modifier-la-saisie"
-  },
-  {
    "terme": "Bornes de saisie du poids",
    "ancre": "poids-formulaire-nouvelle-saisie-modifier-la-saisie"
   },
   {
-   "terme": "Confirmation de pesée",
-   "ancre": "poids-carte-de-confirmation-de-pesee-equivalences-insolites"
+   "terme": "Minute ronde",
+   "ancre": "poids-formulaire-nouvelle-saisie-modifier-la-saisie"
   },
   {
-   "terme": "Équivalences insolites",
+   "terme": "Une seule pesée par jour",
+   "ancre": "poids-formulaire-nouvelle-saisie-modifier-la-saisie"
+  },
+  {
+   "terme": "Avis de refus « poids de départ »",
+   "ancre": "poids-avis-de-refus-poids-de-depart"
+  },
+  {
+   "terme": "Carte de confirmation de pesée",
    "ancre": "poids-carte-de-confirmation-de-pesee-equivalences-insolites"
   },
   {
@@ -191,11 +253,11 @@
    "ancre": "poids-journal-des-pesees"
   },
   {
-   "terme": "Poids de départ",
+   "terme": "Tout supprimer",
    "ancre": "poids-journal-des-pesees"
   },
   {
-   "terme": "Tout supprimer (pesées)",
+   "terme": "Drapeau de départ",
    "ancre": "poids-journal-des-pesees"
   },
   {
@@ -215,8 +277,8 @@
    "ancre": "poids-graphe-courbe-de-poids"
   },
   {
-   "terme": "Période",
-   "ancre": "poids-page-balance-onglet-history"
+   "terme": "Jour de saisie (repère)",
+   "ancre": "poids-graphe-courbe-de-poids"
   },
   {
    "terme": "Surimpression Balance",
@@ -227,7 +289,7 @@
    "ancre": "poids-surimpression-balance-bloc-suivi-du-poids-variante-surimpres"
   },
   {
-   "terme": "Arcs Départ / Actuel / Objectif",
+   "terme": "Moyenne hebdomadaire",
    "ancre": "poids-surimpression-balance-bloc-suivi-du-poids-variante-surimpres"
   },
   {
@@ -243,7 +305,27 @@
    "ancre": "poids-carre-poids-de-la-home-standard-semaine-n-n"
   },
   {
+   "terme": "Tuiles d'équivalence insolite",
+   "ancre": "poids-tuiles-d-equivalence-insolite-de-la-home-standard-depuis-le"
+  },
+  {
+   "terme": "Perte totale",
+   "ancre": "poids-tuiles-d-equivalence-insolite-de-la-home-standard-depuis-le"
+  },
+  {
+   "terme": "Dernière perte",
+   "ancre": "poids-tuiles-d-equivalence-insolite-de-la-home-standard-depuis-le"
+  },
+  {
+   "terme": "Défilé des dernières entrées",
+   "ancre": "poids-defile-des-dernieres-entrees-entree-pesee"
+  },
+  {
    "terme": "Rangée Progrès",
+   "ancre": "poids-rangee-progres-evolution-de-la-home-sections"
+  },
+  {
+   "terme": "Rangée Évolution",
    "ancre": "poids-rangee-progres-evolution-de-la-home-sections"
   },
   {
@@ -251,23 +333,23 @@
    "ancre": "poids-rangee-progres-evolution-de-la-home-sections"
   },
   {
-   "terme": "Début | aujourd'hui",
+   "terme": "Sous-section « début | aujourd'hui »",
    "ancre": "poids-sous-section-debut-aujourd-hui-poids-home-sections"
   },
   {
-   "terme": "Poids visé",
+   "terme": "Bloc Salut",
    "ancre": "poids-bloc-salut-objectif-de-poids-et-barre-de-progression"
   },
   {
-   "terme": "Progression vers l'objectif",
+   "terme": "Barre de progression",
    "ancre": "poids-bloc-salut-objectif-de-poids-et-barre-de-progression"
   },
   {
-   "terme": "Objectif perdre / stabiliser (V2)",
+   "terme": "Reste à perdre",
    "ancre": "poids-bloc-salut-objectif-de-poids-et-barre-de-progression"
   },
   {
-   "terme": "Échelle d'IMC",
+   "terme": "Où en est l'IMC",
    "ancre": "poids-surimpression-ou-en-est-l-imc"
   },
   {
@@ -275,7 +357,7 @@
    "ancre": "poids-surimpression-ou-en-est-l-imc"
   },
   {
-   "terme": "Palier d'IMC",
+   "terme": "Nouveau palier IMC atteint",
    "ancre": "poids-bloc-nouveau-palier-imc-atteint-vigilance-imc"
   },
   {
@@ -287,25 +369,47 @@
    "ancre": "poids-tiroir-journal-pesees"
   },
   {
+   "terme": "Demi-carte de pesée",
+   "ancre": "poids-tiroir-journal-pesees"
+  },
+  {
    "terme": "Tiroir Tendances",
    "ancre": "poids-tiroir-tendances-carte-balance-et-son-graphe-en-surimpressio"
   },
   {
-   "terme": "Profil : poids de départ et objectif",
+   "terme": "Menu « + »",
+   "ancre": "poids-menu-carte-d-identite"
+  },
+  {
+   "terme": "Profil : poids de départ",
    "ancre": "poids-page-mon-profil-taille-poids-de-depart-objectif-final"
   },
   {
-   "terme": "Onboarding V2 : poids actuel et poids visé",
+   "terme": "Profil : taille",
    "ancre": "poids-page-mon-profil-taille-poids-de-depart-objectif-final"
   },
   {
-   "terme": "Poids actif à une date",
+   "terme": "Objectif final",
    "ancre": "poids-page-mon-profil-taille-poids-de-depart-objectif-final"
+  },
+  {
+   "terme": "Onboarding V2 (poids)",
+   "ancre": "poids-page-mon-profil-taille-poids-de-depart-objectif-final"
+  },
+  {
+   "terme": "Rapport médical (poids)",
+   "ancre": "poids-rapport-medical-pdf-poids-et-mensurations"
+  },
+  {
+   "terme": "Annexe B",
+   "ancre": "poids-rapport-medical-pdf-poids-et-mensurations"
   }
  ],
  "ecrans_illustres": [
   "poids/page-balance-onglet-history",
+  "poids/barre-d-outils-de-l-historique-curseur-journal-calendrier-aj",
   "poids/formulaire-nouvelle-saisie-modifier-la-saisie",
+  "poids/avis-de-refus-poids-de-depart",
   "poids/carte-de-confirmation-de-pesee-equivalences-insolites",
   "poids/journal-des-pesees",
   "poids/calendrier-des-poids",
@@ -313,6 +417,8 @@
   "poids/graphe-courbe-de-poids",
   "poids/surimpression-balance-bloc-suivi-du-poids-variante-surimpres",
   "poids/carre-poids-de-la-home-standard-semaine-n-n",
+  "poids/tuiles-d-equivalence-insolite-de-la-home-standard-depuis-le",
+  "poids/defile-des-dernieres-entrees-entree-pesee",
   "poids/rangee-progres-evolution-de-la-home-sections",
   "poids/sous-section-debut-aujourd-hui-poids-home-sections",
   "poids/bloc-salut-objectif-de-poids-et-barre-de-progression",
@@ -320,6 +426,8 @@
   "poids/bloc-nouveau-palier-imc-atteint-vigilance-imc",
   "poids/tiroir-journal-pesees",
   "poids/tiroir-tendances-carte-balance-et-son-graphe-en-surimpressio",
-  "poids/page-mon-profil-taille-poids-de-depart-objectif-final"
+  "poids/menu-carte-d-identite",
+  "poids/page-mon-profil-taille-poids-de-depart-objectif-final",
+  "poids/rapport-medical-pdf-poids-et-mensurations"
  ]
 }

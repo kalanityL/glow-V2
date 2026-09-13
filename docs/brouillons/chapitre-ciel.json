@@ -10,7 +10,7 @@
    "categorie": "compte à rebours",
    "fonctionnalite": "Modification de la date cible par l'utilisateur",
    "texte": "Écrire que l'utilisateur peut régler la date cible depuis son profil.",
-   "origine": "countdownTargetDate est un champ de UserProfile (src/types.ts) avec un défaut dans useAppData.ts ; aucun écran du périmètre ne l'écrit."
+   "origine": "countdownTargetDate est un champ de UserProfile (src/types.ts:232) avec un défaut dans useAppData.ts ; aucun écran du périmètre ne l'écrit."
   },
   {
    "categorie": "étoiles",
@@ -22,7 +22,7 @@
    "categorie": "hibou",
    "fonctionnalite": "Action au clic du hibou",
    "texte": "Donner une action au hibou (message, secret, lien vers le jeu).",
-   "origine": "SleepingOwl accepte une propriété onClick que MonCiel ne renseigne pas ; seul l'effet d'appui (whileTap) joue."
+   "origine": "SleepingOwl accepte une propriété onClick que MonCiel ne renseigne pas (MonCiel.tsx:459) ; seul l'effet d'appui (whileTap) joue."
   },
   {
    "categorie": "jeu",
@@ -34,56 +34,124 @@
    "categorie": "jeu",
    "fonctionnalite": "Lien vers le compte Instagram officiel",
    "texte": "Écrire que le lien mène au compte Instagram de GLP1LOW.",
-   "origine": "Le règlement parle d'un « compte Instagram officiel » ; le lien du panneau pointe vers https://www.instagram.com sans identifiant de compte."
+   "origine": "Le règlement parle d'un « compte Instagram officiel » ; le lien du panneau pointe vers https://www.instagram.com sans identifiant de compte (MonCiel.tsx:483-490)."
   },
   {
    "categorie": "compte à rebours",
    "fonctionnalite": "Format à deux chiffres",
    "texte": "Affirmer que les jours sont bornés à 99.",
-   "origine": "padStart(2, '0') complète à deux chiffres mais ne tronque pas ; au-delà de 99 jours le nombre s'affiche en entier. Je l'ai écrit « deux chiffres au moins », sans prétendre à une borne."
+   "origine": "padStart(2, '0') complète à deux chiffres mais ne tronque pas ; au-delà de 99 jours le nombre s'affiche en entier. Écrit « deux chiffres au moins », sans prétendre à une borne."
+  },
+  {
+   "categorie": "compte à rebours",
+   "fonctionnalite": "Repli sur la date par défaut",
+   "texte": "Écrire que le 15 novembre 2026 sert de repli quand la date cible est mal formée.",
+   "origine": "Réfutation retenue : le repli ne joue que si la chaîne ne donne pas trois segments (MonCiel.tsx:210-222). « ab-cd-ef » affiche « NaN : NaN : NaN : NaN » et « 2026-13-45 » roule au 14/02/2027. Le chapitre décrit ces deux issues au lieu d'annoncer un repli général ; aucun message d'erreur ni garde-fou n'existe, et en inventer un serait une amélioration."
+  },
+  {
+   "categorie": "scène",
+   "fonctionnalite": "Scène identique pour tous",
+   "texte": "Écrire que la scène est la même pour tous les utilisateurs.",
+   "origine": "Réfutation retenue : l'invariance décidée le 2026-08-16 porte sur les thèmes (MonCiel.tsx:7-15), pas sur les utilisateurs, et la date cible du compte à rebours vient du profil, donc varie d'un utilisateur à l'autre. Les thèmes étant hors périmètre, la phrase est retirée sans être remplacée."
+  },
+  {
+   "categorie": "scène",
+   "fonctionnalite": "Jetons de défilement propres aux panneaux",
+   "texte": "Dire que les panneaux déclarent leur propre ambre de barre de défilement au lieu d'hériter du thème actif.",
+   "origine": "Fondé (CIEL_SCROLL_TOKENS, MonCiel.tsx:12-15), mais relève des thèmes, hors périmètre du document."
+  },
+  {
+   "categorie": "compte à rebours",
+   "fonctionnalite": "Où se règle la date cible",
+   "texte": "Dire depuis quel écran la date cible se modifie.",
+   "origine": "AdminSettings.tsx:598-599 l'écrit ; l'administration est hors périmètre. La formule « aucun écran du périmètre ne la modifie » a été retirée : elle laissait croire à une date immuable et faisait apparaître la mécanique du document."
+  },
+  {
+   "categorie": "jeu",
+   "fonctionnalite": "Décision sur le jeu-concours",
+   "texte": "Retirer le jeu, ou le reformuler en clin d'œil sans lot.",
+   "origine": "L'audit de sincérité du 2026-08-20 (TODO-CLAUDE-V1.md:989) propose l'un ou l'autre ; aucune décision n'est prise et le code affiche toujours le règlement complet. Le chapitre se contente de marquer la promesse « non implémenté »."
+  },
+  {
+   "categorie": "scène",
+   "fonctionnalite": "Sortie par le bouton retour",
+   "texte": "Écrire qu'on quitte la scène par le bouton retour.",
+   "origine": "Aucun bouton retour n'est rendu sur Mon Ciel (l'entête est masquée, MonCiel ne reçoit pas d'onBack) et l'application ne gère pas popstate. La phrase est supprimée : seule la barre du bas fait sortir."
+  },
+  {
+   "categorie": "étoiles",
+   "fonctionnalite": "Étoiles de l'entête et étoiles de la scène",
+   "texte": "Présenter les quatre étoiles d'argent de l'entête comme un aperçu des dix étoiles de la scène.",
+   "origine": "Ce sont les mêmes dessins (Star3D, type silver) mais quatre boutons de navigation distincts (App.tsx:1900-1936), sans citation ni lien avec les dix étoiles ; le rapprochement serait une lecture, pas un fait."
+  },
+  {
+   "categorie": "jeu",
+   "fonctionnalite": "Captures des trois panneaux",
+   "texte": "Illustrer « Message Étoilé », « Ciel ! » et « Règlement du jeu ».",
+   "origine": "Manque retenu : le dossier docs/captures/metabolisme-rapport-badges/ ne contient que mon-ciel.png. Les trois figures sont posées avec leurs noms de capture (mon-ciel-message-etoile, mon-ciel-ciel, mon-ciel-reglement-du-jeu) ; les légendes décrivent ce que les captures montreront et restent à prendre."
   }
  ],
  "glossaire": [
   {
    "terme": "Mon Ciel",
-   "definition": "Scène nocturne plein écran de la Mixte (onglet mon-ciel) : compte à rebours, dix étoiles, hibou, jeu-concours."
+   "definition": "Scène nocturne plein écran, sans donnée de suivi : compte à rebours, dix étoiles, hibou endormi, jeu-concours. Onglet « mon-ciel »."
+  },
+  {
+   "terme": "Date cible",
+   "definition": "Champ countdownTargetDate du profil, au format AAAA-MM-JJ, pris à 0 h 00 locale ; 15 novembre 2026 par défaut. C'est la borne du compte à rebours."
   },
   {
    "terme": "Compte à rebours",
-   "definition": "Temps restant, en jours, heures, minutes et secondes, jusqu'à la date cible à minuit heure locale, recalculé chaque seconde et figé à zéro une fois la date passée."
-  },
-  {
-   "terme": "Date cible (countdownTargetDate)",
-   "definition": "Champ du profil au format AAAA-MM-JJ qui fixe la fin du compte à rebours ; 2026-11-15 par défaut."
-  },
-  {
-   "terme": "Étoile dorée / étoile argentée",
-   "definition": "Les cinq étoiles d'or et les cinq d'argent de la scène, numérotées de 1 à 5 dans leur couleur, chacune ouvrant une citation."
-  },
-  {
-   "terme": "Message Étoilé",
-   "definition": "Panneau en bas de la scène qui affiche « Étoile Dorée|Argentée #n : « citation » » après un toucher sur une étoile."
-  },
-  {
-   "terme": "Étoiles de l'entête",
-   "definition": "Les quatre étoiles d'argent de l'entête des autres pages ; chacune ouvre Mon Ciel."
+   "definition": "Quatre cases JOURS : HEURES : MIN : SEC, chaque nombre sur deux chiffres au moins, recalculées chaque seconde depuis l'écart à la date cible, jamais négatives."
   },
   {
    "terme": "Fonctionnalité cachée",
-   "definition": "Objet du jeu-concours, annoncé par la phrase du compte à rebours et le règlement ; le code ne le définit pas."
+   "definition": "Ce que la phrase de la scène et le règlement du jeu invitent à découvrir. L'application ne la nomme nulle part et l'échéance ne déclenche rien."
+  },
+  {
+   "terme": "Étoile d'or, étoile d'argent",
+   "definition": "Dix étoiles à positions fixes, cinq de chaque couleur, qui flottent en continu et ouvrent chacune une citation. Les quatre étoiles d'argent de l'entête, elles, ne font qu'ouvrir la scène."
+  },
+  {
+   "terme": "Message Étoilé",
+   "definition": "Panneau ouvert par une étoile : « Étoile Dorée|Argentée #n : « citation » » et un bouton « Fermer »."
   },
   {
    "terme": "Panneau « Ciel ! »",
-   "definition": "Panneau du jeu ouvert par « Jouez ! » : invitation à écrire sur Instagram, lien vers le règlement, bouton Fermer."
+   "definition": "Panneau du jeu, ouvert par le bouton « Jouez ! » : invitation à écrire sur Instagram, promesse d'abonnements, accès au règlement."
   },
   {
    "terme": "Règlement du jeu",
-   "definition": "Panneau de quatre puces qui remplace le panneau « Ciel ! » : ouvert à tous, participation par message direct avec preuve, abonnements tirés au sort, sans obligation d'achat."
+   "definition": "Panneau de quatre puces qui remplace le panneau « Ciel ! » : ouverture à tous, participation par message direct avec preuve, tirage au sort, sans obligation d'achat."
+  },
+  {
+   "terme": "Panneau amarré",
+   "definition": "Panneau posé en bas de la scène, à trois pixels des bords, plafonné en hauteur et défilant au-delà, sans voile ni blocage de ce qui est derrière."
+  },
+  {
+   "terme": "Particules",
+   "definition": "Quarante-cinq points blancs scintillants dont la position, la taille, la durée et le retard sont tirés au hasard à chaque ouverture de la page."
+  },
+  {
+   "terme": "Hibou endormi",
+   "definition": "Dessin posé à 38 % de la largeur au-dessus de la barre du bas : il respire en boucle, laisse monter trois « z » et se comprime à l'appui, sans autre effet."
   }
  ],
  "index": [
   {
    "terme": "Mon Ciel",
+   "ancre": "ciel-mon-ciel"
+  },
+  {
+   "terme": "Ciel (entrée de menu)",
+   "ancre": "ciel-mon-ciel"
+  },
+  {
+   "terme": "GLP1LOW et vous (section de menu)",
+   "ancre": "ciel-mon-ciel"
+  },
+  {
+   "terme": "Préférences et raccourcis",
    "ancre": "ciel-mon-ciel"
   },
   {
@@ -99,7 +167,15 @@
    "ancre": "ciel-mon-ciel"
   },
   {
-   "terme": "Étoiles de l'entête",
+   "terme": "Fonctionnalité cachée",
+   "ancre": "ciel-mon-ciel"
+  },
+  {
+   "terme": "Étoiles d'argent de l'entête",
+   "ancre": "ciel-mon-ciel"
+  },
+  {
+   "terme": "Particules",
    "ancre": "ciel-mon-ciel"
   },
   {
@@ -107,8 +183,12 @@
    "ancre": "ciel-mon-ciel"
   },
   {
-   "terme": "Fonctionnalité cachée",
-   "ancre": "ciel-mon-ciel"
+   "terme": "Étoile d'or",
+   "ancre": "ciel-le-message-d-une-etoile"
+  },
+  {
+   "terme": "Étoile d'argent",
+   "ancre": "ciel-le-message-d-une-etoile"
   },
   {
    "terme": "Message Étoilé",
@@ -116,14 +196,6 @@
   },
   {
    "terme": "Citations des étoiles",
-   "ancre": "ciel-le-message-d-une-etoile"
-  },
-  {
-   "terme": "Étoile dorée",
-   "ancre": "ciel-le-message-d-une-etoile"
-  },
-  {
-   "terme": "Étoile argentée",
    "ancre": "ciel-le-message-d-une-etoile"
   },
   {
@@ -143,11 +215,14 @@
    "ancre": "ciel-le-jeu-et-son-reglement"
   },
   {
-   "terme": "Jeu-concours",
+   "terme": "Panneau amarré",
    "ancre": "ciel-le-jeu-et-son-reglement"
   }
  ],
  "ecrans_illustres": [
-  "metabolisme-rapport-badges/mon-ciel"
+  "metabolisme-rapport-badges/mon-ciel",
+  "metabolisme-rapport-badges/mon-ciel-message-etoile",
+  "metabolisme-rapport-badges/mon-ciel-ciel",
+  "metabolisme-rapport-badges/mon-ciel-reglement-du-jeu"
  ]
 }

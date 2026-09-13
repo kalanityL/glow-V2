@@ -21,8 +21,8 @@
   {
    "categorie": "Navigation",
    "fonctionnalite": "Activation du module",
-   "texte": "La page des modules (cible module-metime-tracking) qui allume le temps pour soi n'a pas été lue : je ne décris pas le geste d'activation, seulement le fait que la navigation ne l'allume pas.",
-   "origine": "Doute noté dans l'inventaire ; hors chemins cités."
+   "texte": "Le geste d'activation est maintenant décrit (carte « module-metime-tracking », pastille, bascule, case « Masquer dans l'application. »). Ce que je ne dis toujours pas : ce que le masquage retire exactement, écran par écran — je ne l'ai pas suivi hors de la page Modules.",
+   "origine": "NotificationsSettings.tsx:420-457 et masquerModule (:156-183) lus ; les consommateurs de meTimeModuleHidden ne l'ont pas été."
   },
   {
    "categorie": "Navigation",
@@ -47,121 +47,193 @@
    "fonctionnalite": "Minutes des 7 derniers jours",
    "texte": "La fonction meTimeMinutesLast7Days existe sans appelant (arbitrage de Claude, gardée « le temps que le sujet se pose ») ; rien à l'écran, donc rien dans le chapitre.",
    "origine": "src/features/home/homeOverview.ts ; arbitrages_de_claude de l'inventaire."
+  },
+  {
+   "categorie": "Périmètre",
+   "fonctionnalite": "Décisions V2",
+   "texte": "J'avais écrit « la V2 ne touche pas à ce domaine ». Supprimé : rien ne le décide, c'est une absence que j'avais présentée comme une décision consignée. Le temps pour soi n'est ni gardé ni supprimé par la V2 — il n'y est simplement pas question.",
+   "origine": "Réfutation retenue. GUIDELINES.md § 4 (l.321-359) ne cite pas le domaine ; src/screens/onboarding n'a aucune étape le concernant."
+  },
+  {
+   "categorie": "Graphe « Suivi »",
+   "fonctionnalite": "Infobulle",
+   "texte": "J'avais écrit qu'un second clic ferme la bulle. Faux : la croix ferme, un clic sur le graphe réarme, et tout le reste — survol, sortie de zone, re-rendu — est sans effet. Corrigé dans le chapitre. Ce que je ne dis pas, faute d'avoir lu DismissableCursor : si le trait de curseur disparaît lui aussi quand la bulle est fermée.",
+   "origine": "Réfutation retenue : src/shared/charts/tooltipDismiss.ts:39-71 (bug du 2026-08-16) ; DismissableCursor monté par MeTimeChart.tsx:146-148, non lu."
+  },
+  {
+   "categorie": "Formulaire",
+   "fonctionnalite": "Durée « Autre » — refus silencieux",
+   "texte": "J'avais écrit qu'une durée illisible ou nulle passe sans message. Faux sur cette page : MeTimeTracker juge le refus avant le hook et affiche le message même pour un champ vide. La branche silencieuse de useMeTimeForm (:119) existe mais n'est plus atteignable depuis la page Mixte — je ne dis pas si un autre appelant l'atteint.",
+   "origine": "Réfutation retenue : MeTimeTracker.tsx:63-82 ; useMeTimeForm.ts:14 (DURATION_PRESETS) et :119."
+  },
+  {
+   "categorie": "Rapport médical",
+   "fonctionnalite": "Section « Un temps pour soi » du PDF",
+   "texte": "Je nomme le carreau « Sur cette période » et la case d'export, tous deux lus dans MedicalReportExport. Ce que contient la section V du PDF (« Sommeil et temps pour soi ») — colonnes, tri, agrégats — n'a pas été lu : c'est l'affaire du chapitre du rapport.",
+   "origine": "MedicalReportExport.tsx:1435, 1598-1599, 1686, 1749 lus ; le rendu PDF ne l'a pas été."
+  },
+  {
+   "categorie": "Accueil",
+   "fonctionnalite": "Couche vitrée",
+   "texte": "Je décris la couche telle que MaisonSections la monte (titre, picto, BlocMesMoments sur le journal entier, lien unique « Voir la page »). Je n'affirme rien du geste de fermeture propre à SurimpressionVitree — croix, clic hors du panneau — faute d'avoir lu le composant.",
+   "origine": "MaisonSections.tsx:5221-5231 lu ; SurimpressionVitree non lu."
   }
  ],
  "glossaire": [
   {
    "terme": "Moment pour soi",
-   "definition": "Une entrée du journal « Un temps pour soi » : une activité, une durée en minutes, une date, une heure et des notes facultatives."
+   "definition": "Une ligne du journal du domaine : date, heure, activité, durée en minutes et notes facultatives."
   },
   {
    "terme": "Activité (temps pour soi)",
-   "definition": "L'une des neuf entrées du catalogue (Spa, Manucure, Sortie cinéma…) ; aucune valeur énergétique ne lui est attachée."
+   "definition": "Le nom du moment, choisi dans un catalogue de neuf entrées dont six sont actives par défaut ; la sélection active se règle au panneau « Moments pour soi disponibles »."
   },
   {
-   "terme": "Activités actives",
-   "definition": "Le sous-ensemble du catalogue proposé dans les sélecteurs, réglé par le panneau « Ajouter/Gérer » et conservé sur l'appareil."
-  },
-  {
-   "terme": "Score quotidien",
-   "definition": "Les minutes de temps pour soi d'une journée rapportées à une heure, de 0 à 10 : 60 minutes ou plus valent 10."
-  },
-  {
-   "terme": "Période",
-   "definition": "Fenêtre d'un journal ou d'un graphe : 7, 14, 30, 90 derniers jours, Depuis le début ou Choisir ; 30 jours par défaut, mémorisée bloc par bloc."
-  },
-  {
-   "terme": "Bornes « du … au … »",
-   "definition": "Les deux dates de la période, écrites dans le bandeau et éditables ; les modifier bascule en « Choisir »."
-  },
-  {
-   "terme": "Minute ronde",
-   "definition": "Minute autorisée pour une heure enregistrée : 0, 10, 15, 20, 30, 40, 45 ou 50 ; l'heure saisie est arrondie vers le bas."
+   "terme": "Score Temps pour soi",
+   "definition": "Note quotidienne de 0 à 10 du graphe « Suivi » : les minutes du jour rapportées à une heure et plafonnées à 10."
   },
   {
    "terme": "Plafond quotidien",
-   "definition": "Quinze moments par jour ; la saisie suivante remplace la dernière ligne du jour, avec l'avis « Limite atteinte »."
+   "definition": "Quinze moments par jour ; au seizième, la nouvelle saisie remplace la dernière ligne du jour et l'avis « Limite atteinte » s'affiche."
+  },
+  {
+   "terme": "Minute ronde",
+   "definition": "L'une des huit minutes retenues par le champ heure (0, 10, 15, 20, 30, 40, 45, 50) ; toute heure enregistrée y est ramenée vers le bas."
+  },
+  {
+   "terme": "Module « Un temps pour soi »",
+   "definition": "Drapeau meTimeTrackingEnabled du profil, faux par défaut, réglé sur la page Modules ; il commande l'onglet, les tuiles et les cartes du domaine."
+  },
+  {
+   "terme": "Page vitrée",
+   "definition": "La page d'un module éteint, couverte de verre et réduite à une phrase soulignée qui mène à la carte du module."
   },
   {
    "terme": "Couche vitrée",
-   "definition": "Bloc ouvert par-dessus la home, le reste flouté ; celle du temps pour soi montre le bloc des moments."
+   "definition": "Panneau posé sur l'accueil, ouvert par une tuile ; celle du domaine montre le bloc des moments et un lien « Voir la page »."
   },
   {
-   "terme": "Module",
-   "definition": "Drapeau du profil qui allume ou éteint le domaine ; éteint, sa page s'affiche vitrée et ses tuiles disparaissent."
+   "terme": "Bloc des moments",
+   "definition": "Deux séries à fenêtres fixes — 7 derniers jours, depuis le début — comptant les moments par activité, en barres proportionnelles au nombre de fois."
+  },
+  {
+   "terme": "Fenêtre de période",
+   "definition": "L'intervalle du sélecteur (7, 14, 30, 90 jours, depuis le début, ou choisi) ; inclusive, elle compte aujourd'hui et les jours précédents, sur des dates locales."
+  },
+  {
+   "terme": "Vue Calendrier / Journal",
+   "definition": "Les deux présentations de l'historique, commandées par un curseur ; le calendrier est la vue par défaut et le choix se retient d'une visite à l'autre."
+  },
+  {
+   "terme": "Silhouette (tiroir Tendances)",
+   "definition": "Le tracé des minutes par jour sur les 14 derniers jours porté par la carte du domaine, avec son total en heures et minutes."
   }
  ],
  "index": [
   {
-   "terme": "Un temps pour soi (page)",
-   "ancre": "temps-pour-soi-page-un-temps-pour-soi-metimetracker"
-  },
-  {
-   "terme": "Moment pour soi",
-   "ancre": "temps-pour-soi-formulaire-nouveau-moment-pour-soi-modifier-le-moment-pour-s"
-  },
-  {
-   "terme": "Durée d'un moment",
-   "ancre": "temps-pour-soi-formulaire-nouveau-moment-pour-soi-modifier-le-moment-pour-s"
-  },
-  {
-   "terme": "Heure arrondie (minute ronde)",
-   "ancre": "temps-pour-soi-formulaire-nouveau-moment-pour-soi-modifier-le-moment-pour-s"
-  },
-  {
-   "terme": "Plafond quotidien (15 moments)",
-   "ancre": "temps-pour-soi-page-un-temps-pour-soi-metimetracker"
-  },
-  {
-   "terme": "Catalogue des activités",
+   "terme": "Ajouter/Gérer (entrée du sélecteur)",
    "ancre": "temps-pour-soi-panneau-moments-pour-soi-disponibles-managemetimeblock"
   },
   {
-   "terme": "Ajouter/Gérer (temps pour soi)",
+   "terme": "Activités disponibles (catalogue de neuf)",
    "ancre": "temps-pour-soi-panneau-moments-pour-soi-disponibles-managemetimeblock"
   },
   {
-   "terme": "Journal des moments",
-   "ancre": "temps-pour-soi-journal-un-temps-pour-soi-et-sa-ligne-journalentrycard-me-ti"
+   "terme": "Bandeau de confirmation",
+   "ancre": "temps-pour-soi-page-un-temps-pour-soi-metimetracker"
   },
   {
-   "terme": "Tout supprimer (moments)",
-   "ancre": "temps-pour-soi-journal-un-temps-pour-soi-et-sa-ligne-journalentrycard-me-ti"
+   "terme": "Bloc des moments",
+   "ancre": "temps-pour-soi-bloc-mes-moments-blocmesmoments"
+  },
+  {
+   "terme": "Bouton « + » flottant",
+   "ancre": "temps-pour-soi-page-un-temps-pour-soi-metimetracker"
+  },
+  {
+   "terme": "Bulle d'un jour (calendrier)",
+   "ancre": "temps-pour-soi-calendrier-un-temps-pour-soi-metimecalendar-et-bulle-daymeti"
   },
   {
    "terme": "Calendrier des moments",
    "ancre": "temps-pour-soi-calendrier-un-temps-pour-soi-metimecalendar-et-bulle-daymeti"
   },
   {
-   "terme": "Score quotidien (temps pour soi)",
-   "ancre": "temps-pour-soi-graphe-suivi-du-temps-pour-soi-metimechart"
-  },
-  {
-   "terme": "Suivi (graphe du temps pour soi)",
-   "ancre": "temps-pour-soi-graphe-suivi-du-temps-pour-soi-metimechart"
-  },
-  {
-   "terme": "Mes moments (bloc)",
-   "ancre": "temps-pour-soi-bloc-mes-moments-blocmesmoments"
-  },
-  {
    "terme": "Couche vitrée « Un temps pour soi »",
-   "ancre": "temps-pour-soi-tuiles-home-du-domaine-temps-pour-soi"
+   "ancre": "temps-pour-soi-couches-vitrees-de-la-home-sections-surimpressionvitree"
   },
   {
-   "terme": "Moments par semaine",
-   "ancre": "temps-pour-soi-tuiles-home-du-domaine-temps-pour-soi"
+   "terme": "Durée « Autre » (1 à 480 minutes)",
+   "ancre": "temps-pour-soi-formulaire-nouveau-moment-pour-soi-modifier-le-moment-pour-s"
   },
   {
-   "terme": "Tendances (carte Temps pour soi)",
+   "terme": "Formulaire d'un moment",
+   "ancre": "temps-pour-soi-formulaire-nouveau-moment-pour-soi-modifier-le-moment-pour-s"
+  },
+  {
+   "terme": "Graphe « Suivi »",
+   "ancre": "temps-pour-soi-graphe-suivi-du-temps-pour-soi-metimechart"
+  },
+  {
+   "terme": "Infobulle du score",
+   "ancre": "temps-pour-soi-graphe-suivi-du-temps-pour-soi-metimechart"
+  },
+  {
+   "terme": "Journal des moments",
+   "ancre": "temps-pour-soi-journal-un-temps-pour-soi-et-sa-ligne-journalentrycard-me-ti"
+  },
+  {
+   "terme": "Limite atteinte (quinze par jour)",
+   "ancre": "temps-pour-soi-page-un-temps-pour-soi-metimetracker"
+  },
+  {
+   "terme": "Masquer dans l'application",
+   "ancre": "temps-pour-soi-carte-du-module-page-modules"
+  },
+  {
+   "terme": "Module « Un temps pour soi »",
+   "ancre": "temps-pour-soi-carte-du-module-page-modules"
+  },
+  {
+   "terme": "Page « Un temps pour soi »",
+   "ancre": "temps-pour-soi-page-un-temps-pour-soi-metimetracker"
+  },
+  {
+   "terme": "Page vitrée du module éteint",
+   "ancre": "temps-pour-soi-page-vitree-d-un-module-eteint"
+  },
+  {
+   "terme": "Rapport médical (carreau et section)",
+   "ancre": "temps-pour-soi"
+  },
+  {
+   "terme": "Score Temps pour soi",
+   "ancre": "temps-pour-soi-graphe-suivi-du-temps-pour-soi-metimechart"
+  },
+  {
+   "terme": "Sélecteur de période",
+   "ancre": "temps-pour-soi-journal-un-temps-pour-soi-et-sa-ligne-journalentrycard-me-ti"
+  },
+  {
+   "terme": "Tiroir Journal",
    "ancre": "temps-pour-soi-tiroirs-journal-et-tendances"
   },
   {
-   "terme": "Tiroir Journal (temps pour soi)",
+   "terme": "Tiroir Tendances",
    "ancre": "temps-pour-soi-tiroirs-journal-et-tendances"
+  },
+  {
+   "terme": "Tout supprimer (corbeille)",
+   "ancre": "temps-pour-soi-journal-un-temps-pour-soi-et-sa-ligne-journalentrycard-me-ti"
+  },
+  {
+   "terme": "Tuiles de l'accueil (moyenne / semaine)",
+   "ancre": "temps-pour-soi-tuiles-home-du-domaine-temps-pour-soi"
   }
  ],
  "ecrans_illustres": [
+  "profil-compte/page-modules",
+  "activite/page-vitree-d-un-module-eteint",
   "activite/page-un-temps-pour-soi-metimetracker",
   "activite/formulaire-nouveau-moment-pour-soi-modifier-le-moment-pour-s",
   "activite/panneau-moments-pour-soi-disponibles-managemetimeblock",
@@ -170,6 +242,7 @@
   "activite/graphe-suivi-du-temps-pour-soi-metimechart",
   "activite/bloc-mes-moments-blocmesmoments",
   "activite/tuiles-home-du-domaine-temps-pour-soi",
+  "accueil/couches-vitrees-de-la-home-sections-surimpressionvitree",
   "activite/tiroir-journal-lignes-des-quatre-journaux",
   "activite/tiroir-tendances-cartes-activite-physique-temps-pour-soi-som"
  ]
