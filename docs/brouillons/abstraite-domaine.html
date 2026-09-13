@@ -1,0 +1,186 @@
+<section id="domaine">
+  <h2>1. Le domaine <a class="retour" href="#sommaire">↑ sommaire</a></h2>
+  <p>Le produit modélise une personne sous traitement GLP-1 et le relevé de sa cure, sur un appareil, pour elle seule. Ce chapitre pose l'acteur, la portée, les non-buts, les domaines de relevé et le vocabulaire que les neuf chapitres suivants emploient sans le redéfinir.</p>
+
+  <h3 id="domaine-ce-qui-est-modelise">Ce qui est modélisé</h3>
+  <p>Trois choses. Un <strong>profil</strong> : qui est la personne, ce qu'elle prend, ce qu'elle vise, ce qu'elle suit, ce qu'on doit lui rappeler. Des <strong>journaux</strong> : des collections de lignes datées, une ligne par fait relevé. Des <strong>référentiels</strong> : les listes que la personne compose elle-même et auxquelles ses lignes renvoient.</p>
+  <p>Le profil et les journaux forment la <strong>sauvegarde</strong> : un document unique, un seul profil, neuf collections, sous une clé de stockage unique. Les référentiels ne sont <em>pas</em> dans ce document : chacun vit sous sa propre clé, à côté. Aucune structure ne porte plus d'un profil, aucune ligne ne porte d'identifiant de personne : l'appartenance des données à la personne est celle de l'appareil, non celle d'un document.</p>
+  <table>
+    <tr><th>Membre de la sauvegarde</th><th>Cardinalité</th><th>Rôle</th></tr>
+    <tr><td>profil</td><td>exactement 1</td><td>Identité, corps, traitement suivi, objectifs, drapeaux d'activation des domaines, rappels.</td></tr>
+    <tr><td>pesées</td><td>0..n</td><td>Journal du poids et des mensurations.</td></tr>
+    <tr><td>prises</td><td>0..n</td><td>Journal du traitement.</td></tr>
+    <tr><td>repas</td><td>0..n</td><td>Journal alimentaire.</td></tr>
+    <tr><td>effets secondaires</td><td>0..n</td><td>Journal des ressentis.</td></tr>
+    <tr><td>pas</td><td>0..n</td><td>Journal de la marche.</td></tr>
+    <tr><td>séances</td><td>0..n</td><td>Journal de l'activité physique.</td></tr>
+    <tr><td>moments pour soi</td><td>0..n</td><td>Journal du temps pour soi.</td></tr>
+    <tr><td>sommeils</td><td>0..n</td><td>Journal des nuits et des siestes.</td></tr>
+    <tr><td>journées</td><td>0..n</td><td>Collection déclarée et morte : elle ne porte qu'un identifiant et une date, aucun geste de la personne n'y écrit, et les seules écritures existantes sont la collection vide et le jeu de démonstration. <span class="marque non">non implémenté</span></td></tr>
+  </table>
+  <p>Six de ces collections sont facultatives dans le document — repas, effets secondaires, pas, séances, moments pour soi, sommeils : une sauvegarde ancienne peut ne pas les porter, et leur absence vaut collection vide. Le profil, les pesées, les prises et les journées sont toujours présents.</p>
+
+  <h3 id="domaine-les-capacites">Les capacités</h3>
+  <p><strong>Enregistrer</strong> : créer, modifier et supprimer une ligne dans l'un des huit journaux de relevé, créer, modifier et supprimer une entrée de référentiel, et modifier le profil. <strong>Dériver</strong> : calculer des totaux, des moyennes, des écarts, des séries temporelles, des échéances, des paliers et des projections à partir des lignes, sans rien réécrire. <strong>Importer</strong> : verser dans les référentiels une fiche nutritionnelle obtenue d'une base ouverte à partir d'un code-barres, et une photographie choisie sur l'appareil, réencodée et enregistrée dans le profil. <strong>Rendre transmissible</strong> : produire, sur une période choisie, un document destiné à un professionnel de santé.</p>
+  <p>Le contenu du document transmissible n'est pas exactement « les domaines activés qui portent au moins une ligne sur la période ». Deux écarts sont dans le code : une rubrique qui n'est pas un domaine de relevé y entre, retenue d'avance et croisée avec aucune condition de disponibilité ; et le temps pour soi, même activé et pourvu de lignes, est exclu du chemin court, son masque de disponibilité valant faux en permanence.</p>
+  <p>Trois écritures de journal seulement n'ont pas pour cause un enregistrement de la personne : à l'installation, une pesée de départ de 95,0 kg est semée, datée de la veille, à 08:00 ; le jeu de données de démonstration remplace les journaux entiers ; les conversions de forme sont rejouées à <em>chaque</em> chargement d'une sauvegarde — elles ne sont pas appliquées une fois, elles sont idempotentes, ce qui n'est pas la même chose.</p>
+
+  <h3 id="domaine-l-acteur-unique">L'acteur unique</h3>
+  <p>Une seule personne par installation. Il n'existe ni liste de profils, ni rôle distinct, ni notion de tiers autorisé : le modèle n'a nulle part où loger une seconde personne.</p>
+  <p>Un compte — adresse électronique et mot de passe, ou fournisseur tiers — ne fait qu'ouvrir l'accès quand il est configuré ; il ne porte, ne transporte et ne sépare aucune donnée de suivi. La sauvegarde n'est pas indexée par compte : deux comptes ouverts tour à tour sur le même appareil lisent et écrivent le même document. Sans configuration d'authentification, l'accès est ouvert sans compte. Le compte sert d'axe de rangement aux seuls flux techniques.</p>
+  <p>La V2 n'a pas de compte : elle recueille une adresse et un mot de passe, et ne porte du sujet qu'une règle, une longueur d'au moins huit signes, un mot de passe vide n'étant pas refusé. Ni ouverture de session, ni fournisseur tiers, ni suppression de compte n'y existent. <span class="marque v2">V2</span></p>
+  <p>Le genre de la personne est une donnée du profil, à trois valeurs : homme, femme, neutre. Il a trois usages : le calcul du métabolisme de base, où la valeur neutre donne la moyenne des deux formules et où un genre absent est lu comme « femme » ; l'identité portée par le document de synthèse ; et le jeu de démonstration, où il décide d'un taux d'entretien calorique (28, 31 ou 29,5 kcal par kilogramme), d'un prénom et d'une silhouette. Le profil porte en outre une silhouette et un avatar, lequel porte lui aussi un genre : trois emplacements pour une même notion. En V2, le genre n'est plus une donnée à part : il est une composante de l'avatar, parce qu'il s'y voit. <span class="marque v2">V2</span></p>
+
+  <h3 id="domaine-la-portee">La portée</h3>
+  <p>Toutes les données de relevé vivent sur l'appareil, dans un stockage local, derrière une couche d'accès unique. Elles n'y tiennent pas sous une seule clé : la sauvegarde en occupe une, chaque référentiel la sienne, et une vingtaine d'autres portent des marques d'état — jours de première ouverture, paliers déjà fêtés, périodes retenues, compteurs. Il n'existe aucune base distante de suivi, aucune synchronisation, aucune reprise sur un second appareil.</p>
+  <p>Conséquences à assumer, toutes vraies du modèle : changer d'appareil ne transporte rien ; effacer le stockage local efface l'historique ; un stockage indisponible ou plein fait échouer l'écriture en silence. Une sauvegarde illisible n'est jamais écrasée : sa chaîne brute est recopiée sous une clé de secours si celle-ci est libre, et plus rien n'est écrit <em>sous la clé de la sauvegarde</em> pendant la session. La garde ne connaît que cette clé : les référentiels et les marques d'état continuent d'être écrits normalement.</p>
+  <table>
+    <tr><th>Flux</th><th>Sens</th><th>Ce qui passe</th></tr>
+    <tr><td>Document de synthèse</td><td>sortant, sur geste</td><td>Les valeurs relevées de la période retenue.</td></tr>
+    <tr><td>Fichier peint depuis une distinction</td><td>sortant, sur geste</td><td>Un fichier JPEG remis au partage de l'appareil ; aucune valeur mesurée.</td></tr>
+    <tr><td>Fiche par code-barres</td><td>entrant, sur geste</td><td>Un code-barres part, une fiche nutritionnelle revient, vérifiée valeur par valeur, et devient une entrée du référentiel des aliments.</td></tr>
+    <tr><td>Photographie d'avatar</td><td>entrant, local</td><td>Un fichier de l'appareil, recadré au carré, ramené à 256 px, réencodé et enregistré dans le profil.</td></tr>
+    <tr><td>Réponse au sondage</td><td>sortant, technique</td><td>Un document par compte, fusionné à chaque envoi.</td></tr>
+    <tr><td>Avis, idée, anomalie</td><td>sortant, technique</td><td>Un document par message, rangé sous le compte.</td></tr>
+    <tr><td>Fiche d'un échec de production du document</td><td>sortant, technique</td><td>Cause et étape, bornes de la période demandée et son nombre de jours, ce qui était retenu et ce que le masque en gardait, et des <em>nombres</em> de lignes par journal. Aucune valeur mesurée.</td></tr>
+    <tr><td>Courrier</td><td>sortant, technique</td><td>Une file de messages à expédier, écrite en création seule et jamais relue.</td></tr>
+  </table>
+
+  <h3 id="domaine-les-non-buts">Les non-buts</h3>
+  <p>Ce que le produit ne modélise pas, et qu'aucune capacité ne doit introduire.</p>
+  <table>
+    <tr><th>Non-but</th><th>Ce qu'il exclut, et ce qu'il n'exclut pas</th></tr>
+    <tr><td>Pas de diagnostic</td><td>Aucun état de santé n'est déduit d'un relevé. L'exception est nommée et unique : l'indice de masse corporelle est rangé en six catégories cliniques, dont « Insuffisance pondérale » et « Corpulence normale » — c'est bien une qualification de normalité, et c'est la seule du modèle.</td></tr>
+    <tr><td>Pas de posologie</td><td>Aucune dose n'est corrigée ni prescrite. Mais le catalogue V1 porte des paliers de dose explicitement destinés à la saisie — 0,25 · 0,5 · 1 · 1,7 · 2 · 2,4 mg pour le sémaglutide injectable, 2,5 à 15 mg pour le tirzépatide, 3 · 7 · 14 mg pour le sémaglutide oral — et une dose est retenue d'avance : le premier palier. Le catalogue de la V2 ne porte que des identifiants, des noms et des formes. <span class="marque v2">V2</span></td></tr>
+    <tr><td>Pas de conseil</td><td>Aucune recommandation nutritionnelle, sportive ou médicamenteuse n'est engendrée. Les objectifs quotidiens sont des valeurs par défaut modifiables, pas des prescriptions.</td></tr>
+    <tr><td>Pas de comparaison</td><td>Aucune donnée d'une autre personne n'entre dans le modèle : ni classement, ni moyenne de population, ni réseau.</td></tr>
+    <tr><td>Pas de synchronisation</td><td>Aucun compte partagé, aucun accès soignant, aucune copie distante des journaux.</td></tr>
+    <tr><td>Pas de capteur</td><td>Aucune connexion à un objet connecté ni à une plateforme de santé : tout relevé est écrit par la personne.</td></tr>
+  </table>
+  <p>Cinq dérivations vont plus loin que le relevé brut, et elles se nomment : le franchissement d'un palier de corpulence, qui nomme l'ancienne et la nouvelle catégorie ; l'estimation de la quantité de molécule active dans l'organisme, dérivée des demi-vies du catalogue ; la projection de poids des sept jours à venir, tirée du bilan énergétique de la semaine écoulée à raison de 8 000 kcal par kilogramme, et nommée en cinq verdicts de « stable » à « baisse marquée » ; le verdict de tendance énergétique, quatre paliers en valeur absolue à 4 000, 8 000 et 14 000 kcal ; et les analyses en prose des séries alimentaires, un moteur de règles qui énonce corrélation ou absence de corrélation à partir des points calculés. Le document produit porte une mention qui le désigne comme document de suivi personnel destiné à l'échange avec un professionnel de santé et non comme avis médical.</p>
+
+  <h3 id="domaine-les-domaines-de-releve">Les domaines de relevé</h3>
+  <p>Huit domaines. Sept portent un drapeau d'activation ; le poids n'en a pas et ne se désactive pas.</p>
+  <table>
+    <tr><th>Domaine</th><th>Ce qu'une ligne enregistre</th><th>Par date</th><th>Drapeau</th></tr>
+    <tr><td>Poids</td><td>Date, heure facultative, poids en kg, jusqu'à neuf mensurations en cm, un drapeau de départ obligatoire.</td><td>1 au plus à la création : une ligne du même jour est fusionnée, en gardant son identifiant, son drapeau et les mensurations non fournies. À la modification, la règle ne s'applique pas.</td><td>aucun</td></tr>
+    <tr><td>Traitement</td><td>Date, heure, dose en mg, zone d'administration, note, identifiant de traitement facultatif.</td><td>2 au plus ; au-delà, la dernière ligne du jour est fusionnée avec la nouvelle.</td><td>absent vaut activé</td></tr>
+    <tr><td>Effets secondaires</td><td>Date, heure, type d'effet, sévérité entière de 1 à 5, note.</td><td>15 au plus ; au-delà, fusion avec la dernière du jour.</td><td>absent vaut activé</td></tr>
+    <tr><td>Alimentation</td><td>Date, heure, famille du repas, composition (au moins une quantité d'aliment), faim avant et après, entières de 0 à 5.</td><td>30 au plus ; au-delà, l'enregistrement est refusé. Déplacer un repas vers une autre date est jugé comme un ajout à cette date.</td><td>absent vaut désactivé</td></tr>
+    <tr><td>Pas</td><td>Date, nombre de pas. Aucune heure.</td><td>sans plafond, et sans unicité : rien n'empêche deux lignes d'une même date.</td><td>absent vaut désactivé pour l'accès, activé pour les distinctions</td></tr>
+    <tr><td>Activité physique</td><td>Date, heure, nom de l'activité, intensité ressentie (douce, modérée, intensive), durée en minutes, distance facultative en mètres, note.</td><td>15 au plus ; au-delà, fusion avec la dernière du jour.</td><td>absent vaut désactivé pour l'accès, activé pour les distinctions</td></tr>
+    <tr><td>Temps pour soi</td><td>Date, heure, nom de l'activité, durée en minutes, note. Ni intensité ni dépense : ce n'est pas de l'exercice.</td><td>15 au plus ; au-delà, fusion avec la dernière du jour.</td><td>absent vaut désactivé</td></tr>
+    <tr><td>Sommeil</td><td>Nature (nuit ou sieste), jour et heure d'endormissement, jour et heure de réveil, qualité entière de 0 à 5, note.</td><td>15 au plus par date de réveil ; au-delà, l'enregistrement est refusé. Une plage qui recouvre une plage existante est refusée avant écriture.</td><td>absent vaut désactivé</td></tr>
+  </table>
+  <p>Un domaine désactivé n'accepte plus d'enregistrement et ne fournit aucun contenu au document de synthèse. Désactiver n'efface rien : les lignes restent dans la sauvegarde et reviennent telles quelles à la réactivation.</p>
+  <p>La lecture d'un drapeau absent n'est pas unique dans le code, et c'est un défaut, pas une règle. L'accès aux domaines lit l'absence comme <em>activé</em> pour le traitement et les effets secondaires, <em>désactivé</em> pour les cinq autres. L'évaluation des distinctions lit la même absence comme <em>activé</em> pour l'activité physique et pour les pas, et n'accepte l'alimentation que sur un drapeau explicitement vrai. Un domaine peut donc être hors d'accès et malgré tout évalué.</p>
+  <details><summary>Cas limites</summary>
+    <p>Une ligne de pas peut porter un drapeau « simulée » : il est déclaré et lu, mais aucun code ne l'écrit. <span class="marque non">non implémenté</span></p>
+    <p>Une date portant plusieurs relevés de pas n'a pas une seule valeur : une lecture somme les lignes de la date, une autre moyenne les lignes sans les regrouper, une troisième ne retient que la première trouvée. <span class="marque">arbitrage non validé</span></p>
+    <p>La date d'un sommeil est celle du <em>réveil</em> : une nuit du 17 à 23 h au 18 à 7 h appartient au 18. <span class="marque">arbitrage non validé</span></p>
+    <p>Les deux jours du sommeil sont écrits et non déduits de l'ordre des heures ; c'est ce qui permet de refuser un réveil antérieur à l'endormissement. Le contact bout à bout est permis : les deux inégalités du test de recouvrement sont strictes.</p>
+    <p>La zone d'administration d'une prise est une chaîne libre dans le modèle. Sept zones sont cataloguées, rien ne les impose. <span class="marque">arbitrage non validé</span></p>
+  </details>
+
+  <h3 id="domaine-la-ligne-de-releve">La ligne de relevé</h3>
+  <p>Toute ligne, quel que soit son journal, porte un identifiant et une date locale. La plupart portent une heure locale. Aucune ne porte d'instant de création ni de modification. Rien d'autre n'est commun.</p>
+  <pre><code>ligne      = { id: string, date: 'AAAA-MM-JJ', time?: 'HH:MM', … }
+ordre      = tri stable sur `${date}T${time || '12:00'}`
+supprimer  = journal.filter(l => l.id !== id)          // la ligne quitte la sauvegarde
+modifier   = journal.map(l => l.id === u.id ? { ...l, ...u } : l)   // fusion : une propriété absente n'efface rien</code></pre>
+  <p>L'unicité de l'identifiant n'est garantie que pour les repas, dont l'identifiant est universel et ordonné dans le temps. Les sept autres journaux composent le leur d'un préfixe et de l'instant de création à la milliseconde : deux créations dans la même milliseconde produisent la même valeur.</p>
+  <p>L'identifiant est presque opaque. Trois lectures en tirent une information : le chargement écarte les lignes d'exemple d'anciennes livraisons à leur préfixe ; la conversion de la pesée de départ reconnaît sa ligne à un identifiant en dur quand le drapeau manque ; et la fabrication d'une valeur de faim absente s'écarte d'un cran selon la somme des codes de caractères de l'identifiant, pour rester reproductible sans tirer au sort.</p>
+  <p>Toute heure retenue est ramenée à la minute ronde inférieure parmi <code>0, 10, 15, 20, 30, 40, 45, 50</code>, à la création comme à la modification, y compris les deux heures d'un sommeil et les heures de rappel du profil. À défaut d'heure indiquée, c'est l'heure locale ainsi arrondie qui est écrite, donc jamais une heure future.</p>
+
+  <h3 id="domaine-les-referentiels">Les référentiels</h3>
+  <p>Ce sont les listes propres à la personne. Elles ne sont pas dans la sauvegarde, une clé de stockage chacune, et les lignes de journal en dépendent.</p>
+  <table>
+    <tr><th>Référentiel</th><th>Contenu d'une entrée</th><th>Ce qui y renvoie</th></tr>
+    <tr><td>Aliments personnalisés</td><td>Identifiant, nom, énergie et macronutriments pour 100 g ou 100 ml, nature liquide ou solide, code-barres facultatif conservé en chaîne, marque de recette, instants de création et de modification.</td><td>Chaque quantité d'aliment d'un repas, par identifiant.</td></tr>
+    <tr><td>Compteurs de choix d'aliments</td><td>Nombre de fois qu'un aliment a été retenu.</td><td>Rien : dérivé d'usage, il n'est référencé par aucune ligne.</td></tr>
+    <tr><td>Repas favoris</td><td>Une composition mémorisée, réutilisable comme base d'un repas.</td><td>Rien : une reprise recopie, elle ne référence pas.</td></tr>
+    <tr><td>Types d'effets actifs</td><td>Un libellé.</td><td>Chaque ligne d'effet secondaire, <em>par ce libellé</em>.</td></tr>
+    <tr><td>Activités physiques actives</td><td>Un nom, dont le catalogue livré tire un équivalent métabolique.</td><td>Chaque séance, par ce nom.</td></tr>
+    <tr><td>Moments pour soi actifs</td><td>Un nom.</td><td>Chaque moment pour soi, par ce nom.</td></tr>
+  </table>
+  <p>Les instants de création et de modification n'existent que sur des entrées de référentiel, jamais sur une ligne de journal. La création dans le référentiel des aliments est plafonnée par jour : 50 aliments et 20 recettes, quotas indépendants, refus sans écrasement, une entrée supprimée le jour même rendant sa place. Une entrée sans instant de création n'est comptée dans aucun quota.</p>
+  <p>Une recette n'est pas un type à part : c'est un aliment personnalisé portant sa composition et une marque. Le type de recette autonome déclaré dans le modèle n'a aucun magasin. <span class="marque non">non implémenté</span></p>
+  <p>À côté des référentiels vivent deux <strong>catalogues</strong>, livrés avec le produit et non modifiables : la table des aliments de référence, et le catalogue des traitements.</p>
+
+  <h3 id="domaine-unites-et-precision">Unités et précision</h3>
+  <p>Chaque grandeur est stockée dans une unité canonique, et une seule. Aucune étiquette d'unité n'accompagne une valeur : l'unité est celle de la grandeur, pas de la valeur.</p>
+  <table>
+    <tr><th>Grandeur</th><th>Unité stockée</th><th>Arrondi à l'écriture</th></tr>
+    <tr><td>Poids d'une pesée, poids visé</td><td>kilogramme</td><td>dixième</td></tr>
+    <tr><td>Distance d'une séance</td><td>mètre</td><td>entier</td></tr>
+    <tr><td>Mensuration</td><td>centimètre</td><td>aucun : la valeur est enregistrée telle qu'elle est reçue</td></tr>
+    <tr><td>Taille</td><td>centimètre</td><td>aucun en V1 ; en V2 la conversion depuis le pouce arrondit à l'entier</td></tr>
+    <tr><td>Dose</td><td>milligramme</td><td>aucun : un palier du catalogue, ou une valeur libre enregistrée telle quelle</td></tr>
+    <tr><td>Quantité d'aliment</td><td>gramme ou millilitre, selon la nature de l'aliment</td><td>aucun</td></tr>
+    <tr><td>Durée</td><td>minute</td><td>entier</td></tr>
+    <tr><td>Énergie</td><td>kilocalorie</td><td>—</td></tr>
+    <tr><td>Macronutriments</td><td>gramme</td><td>—</td></tr>
+    <tr><td>Pas</td><td>unité</td><td>entier</td></tr>
+    <tr><td>Sévérité</td><td>entier de 1 à 5</td><td>—</td></tr>
+    <tr><td>Faim, qualité de sommeil</td><td>entier de 0 à 5</td><td>—</td></tr>
+    <tr><td>Heure de relevé</td><td>HH:MM local</td><td>minute ronde inférieure</td></tr>
+    <tr><td>Instant technique</td><td>millisecondes depuis l'époque Unix</td><td>—</td></tr>
+  </table>
+  <p>La personne choisit un <strong>système de mesure</strong>, métrique ou impérial, qui ne décide que de l'unité dans laquelle une valeur est reçue et restituée, jamais de celle dans laquelle elle est stockée. En V1, ce choix est déclaré dans le profil et n'est ni écrit ni lu. <span class="marque non">non implémenté</span> En V2, la langue amène son système par défaut — français avec le métrique, anglais avec l'impérial — et il reste rechoisissable ensuite ; changer de langue repose le système, le dernier geste l'emportant. <span class="marque v2">V2</span> La taille se convertit aux deux bouts, à raison de 2,54 cm par pouce, chaque conversion arrondissant à l'entier ; le pouce existe une troisième fois, comme fourchette de bornes propre. La conversion du poids entre kilogramme et livre n'existe pas : un poids choisi en livres serait retenu tel quel. <span class="marque non">non implémenté</span></p>
+  <p>Les bornes n'écartent que l'absurde et ne disent jamais à quelqu'un quel corps il a le droit d'avoir : âge de 1 à 130 ans, taille de 50 à 300 cm ou de 20 à 118 pouces, poids jusqu'à 999 kg ou 2 000 livres — deux plafonds ronds, chacun choisi dans son unité, et non la conversion l'un de l'autre. <span class="marque v2">V2</span> La V2 remplace l'âge par l'<strong>année de naissance</strong>, dont les bornes sont celles de l'âge rapportées à l'année en cours, passée par l'appelant : un âge se périme, une année de naissance non. <span class="marque v2">V2</span></p>
+
+  <h3 id="domaine-les-invariants">Les invariants</h3>
+  <p>Ils valent pour tout le domaine et priment sur les cas particuliers des chapitres suivants.</p>
+  <table>
+    <tr><th>Invariant</th><th>Ce qu'il interdit, et sa portée réelle</th></tr>
+    <tr><td>Rien de dérivable n'est stocké</td><td>Une durée de sommeil, une dépense de séance, la valeur nutritionnelle d'un repas ne sont pas des données : elles se recalculent. Corriger la fiche d'un aliment corrige tout l'historique. Trois manquements subsistent, tous nommés plus bas.</td></tr>
+    <tr><td>On référence par identifiant</td><td>Vrai de l'aliment et du traitement : les renommer ne touche aucune ligne. Faux du type d'effet secondaire, de l'activité physique et du moment pour soi, qui sont référencés par leur libellé — renommer y a déjà exigé une conversion de sauvegarde pour ne pas faire changer des calories déjà enregistrées.</td></tr>
+    <tr><td>Les dates sont locales</td><td>Aucun fuseau, aucun suffixe universel sur une date ou une heure de relevé : ce sont les heures murales vécues. Aucune ligne ne porte d'instant absolu ; seules les entrées de référentiel en portent.</td></tr>
+    <tr><td>Supprimer supprime</td><td>Aucune ligne conservée sous une marque de suppression, aucun filtrage à la lecture. Les commentaires de type décrivant une suppression logique décrivent un état disparu.</td></tr>
+    <tr><td>Une valeur absente se tait</td><td>Aucun zéro, tiret ni moyenne implicite à la place d'une donnée manquante. La règle est tenue par la variation hebdomadaire, qui rend l'absence de valeur en deçà de sept jours de recul, d'une seule pesée ou d'aucune ; elle ne l'est pas par la moyenne hebdomadaire d'un bilan de période, sans borne et divisant par un nombre de tranches de sept jours arrondi au supérieur.</td></tr>
+    <tr><td>Le passé ne se réécrit pas</td><td>Changer le traitement suivi ne modifie aucune prise déjà enregistrée ; une prise sans traitement explicite se rattache à celui du profil au moment de la lecture, ce qui n'est pas « aucun traitement ».</td></tr>
+    <tr><td>La pesée de départ est la plus ancienne</td><td>Le drapeau se replace à chaque écriture du journal du poids : une pesée antidatée devient le départ, un drapeau perdu se repose sur la plus ancienne, et un historique qui en porterait deux est nettoyé. À date égale, le départ en place reste le départ.</td></tr>
+    <tr><td>Un format enregistré ne change pas sans migration</td><td>Toute évolution de forme est une conversion idempotente, rejouée à chaque chargement.</td></tr>
+  </table>
+  <p>Trois manquements au premier invariant sont connus et signalés là où ils portent : la valeur nutritionnelle d'un repas est stockée et recalculée à chaque écriture, en attendant que tous les calculs partent de la composition ; le libellé de la famille d'un repas est stocké alors qu'il se dérive entièrement de la famille, et il est lui aussi recalculé à chaque écriture ; et une prise sans identifiant de traitement se résout à la lecture, ce qui fait dépendre le passé du profil courant.</p>
+  <p>Un invariant de la V2 est énoncé mais non tenu : « aucune branche ne se ferme sur un silence ». Aucune branche ne se ferme, en effet — une question sans réponse se saute. Mais deux branches s'<em>ouvrent</em> sur une valeur que personne n'a confirmée : la question du poids visé paraît parce que l'objectif vaut « perdre » d'avance, et la question du traitement paraît parce que « avez-vous commencé » vaut « oui » d'avance. <span class="marque">arbitrage non validé</span></p>
+
+  <h3 id="domaine-ce-qui-peut-effacer">Ce qui peut effacer</h3>
+  <p>L'effacement en masse a trois portées, et elles ne détruisent pas la même chose.</p>
+  <table>
+    <tr><th>Capacité</th><th>Précondition</th><th>Effet</th></tr>
+    <tr><td>Vider un journal</td><td>un drapeau du profil, absent valant permis, que la personne peut mettre à faux — auquel cas le geste n'existe plus pour aucun journal</td><td>Ce journal-là devient vide. Une exception : vider le journal du poids conserve la pesée portant le drapeau de départ.</td></tr>
+    <tr><td>Vider tous les journaux</td><td>ce geste n'est atteignable que par les outils d'administration, hors périmètre de ce document</td><td>Les huit journaux de relevé et la collection des journées sont vidés, à l'exception de la pesée de départ. Le profil est intact : identité, traitement, drapeaux d'activation, objectifs et rappels survivent. Les référentiels aussi.</td></tr>
+    <tr><td>Supprimer le compte</td><td>le compte est supprimé d'abord, quand l'authentification est configurée ; en cas d'échec, rien n'est effacé</td><td>Tout le stockage local est effacé entièrement : sauvegarde, référentiels et marques d'état, profil compris.</td></tr>
+  </table>
+  <p>La pesée de départ est épargnée parce que sans elle la perte totale, les distinctions et le document de synthèse n'ont plus de référence. Elle se reconnaît à son drapeau et jamais à sa valeur : repasser par son poids de départ, ou le dépasser, ne fait pas d'une pesée ordinaire un départ. Mais le drapeau, lui, se déplace : il suit toujours la pesée la plus ancienne.</p>
+
+  <h3 id="domaine-le-vocabulaire">Le vocabulaire</h3>
+  <p>Les termes ci-dessous sont employés dans ce sens exact partout dans le document, et ne sont pas redéfinis.</p>
+  <table>
+    <tr><th>Terme</th><th>Sens</th></tr>
+    <tr><td>Sauvegarde</td><td>Le document unique qui porte le profil et les neuf collections. Ne porte pas les référentiels.</td></tr>
+    <tr><td>Profil</td><td>L'unique enregistrement décrivant la personne, ses objectifs, ses drapeaux d'activation et ses rappels.</td></tr>
+    <tr><td>Journal</td><td>Une collection de lignes datées d'un même domaine.</td></tr>
+    <tr><td>Ligne</td><td>Un fait relevé : identifiant, date locale, souvent une heure locale, et les données propres à son domaine.</td></tr>
+    <tr><td>Référentiel</td><td>Une liste composée par la personne, hors de la sauvegarde, à laquelle des lignes renvoient : aliments, favoris, types d'effets, activités, moments.</td></tr>
+    <tr><td>Catalogue</td><td>Une liste livrée avec le produit et non modifiable : la table des aliments de référence, le catalogue des traitements.</td></tr>
+    <tr><td>Domaine de relevé</td><td>L'un des huit sujets suivis. Sept portent un drapeau d'activation.</td></tr>
+    <tr><td>Prise</td><td>Une administration du traitement, injection ou comprimé. Jamais « injection » seul : la forme dépend du traitement.</td></tr>
+    <tr><td>Pesée</td><td>Une ligne du journal du poids, mensurations comprises.</td></tr>
+    <tr><td>Pesée de départ</td><td>La pesée la plus ancienne, seule à porter le drapeau de départ, référence de la perte totale.</td></tr>
+    <tr><td>Traitement</td><td>Une entrée du catalogue des traitements, jamais une chaîne libre. En V1 : identifiant, nom court, libellé complet, forme, molécule, paliers de dose, demi-vie d'élimination, demi-vie d'absorption, part de la dose portée au sang, rythme de prise usuel, exigence éventuelle d'une certification d'essai clinique. En V2 : identifiant, nom, forme. <span class="marque v2">V2</span></td></tr>
+    <tr><td>Molécule</td><td>Le principe actif d'un traitement, nul pour les entrées génériques. C'est l'axe des cumuls, pas le nom commercial ni la forme.</td></tr>
+    <tr><td>Cure</td><td>Le suivi d'une personne sous traitement, de la pesée de départ à aujourd'hui — jamais jusqu'au dernier relevé. Sa durée est le dénominateur de la variation hebdomadaire.</td></tr>
+    <tr><td>Série en cours</td><td>Les prises du traitement porté par le profil, depuis le dernier changement de traitement, celles datées dans le futur exclues. Revenir à un traitement déjà pris ouvre une nouvelle série, sans rouvrir l'ancienne.</td></tr>
+    <tr><td>Fenêtre</td><td>Un intervalle de dates sur lequel une dérivation est calculée.</td></tr>
+    <tr><td>Distinction</td><td>Un palier — aucun, éveil, bronze, argent, or — évalué à partir d'un journal sur une fenêtre récente. Ne se stocke pas : seul le dernier palier connu est mémorisé, hors de la sauvegarde, pour ne pas fêter deux fois le même.</td></tr>
+    <tr><td>Plafond quotidien de lignes</td><td>Le nombre maximal de lignes qu'une date accepte dans un journal donné. À ne pas confondre avec les plafonds quotidiens de <em>création</em> du référentiel des aliments (50 et 20) ni avec celui des envois techniques (10).</td></tr>
+  </table>
+
+  <div class="exemple">
+    <p>L'installation de Camille porte un profil — née en 1978, 168 cm, poids visé, Ozempic, traitement et effets secondaires accessibles d'office — huit journaux et ses référentiels. À cette installation, une pesée de 95,0 kg a été semée, datée de la veille, à 08:00, avec le drapeau de départ. Sa pesée du 12 mai 2026, 96,0 kg, ne prend donc le drapeau que si elle devient la plus ancienne : tant que la pesée semée subsiste, c'est elle la référence de la perte totale, et Camille apparaît en prise de poids. Une pesée antidatée au 1<sup>er</sup> mai, elle, prendrait le drapeau à l'écriture. Sa série en cours est la suite de ses prises d'Ozempic ; le jour où elle passerait à un Wegovy injectable, les prises déjà faites resteraient des prises d'Ozempic, et le cumul de sémaglutide se poursuivrait sans rupture. Si elle change d'appareil, rien ne la suit.</p>
+  </div>
+
+  <p>Rien de ce qui précède n'est enregistré par la V2 à ce jour : le recueil initial tient ses réponses en mémoire, et elles ne survivent pas à la session. <span class="marque non">non implémenté</span></p>
+</section>

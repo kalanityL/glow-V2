@@ -1,0 +1,344 @@
+{
+ "inventions": [
+  {
+   "categorie": "Badges",
+   "fonctionnalite": "Rendu d'un palier",
+   "texte": "Le palier « aucun » est dessiné désaturé à 65 %, et le tracé d'un badge a cinq tailles (28, 36, 56, 80, 112 px) sur un carré de 120 unités.",
+   "origine": "Règle de rendu seule (src/versions/mixte/components/BadgeIcon.tsx, components/badge/BadgeFrame.tsx) ; aucun effet sur les données ni sur les transitions."
+  },
+  {
+   "categorie": "Badges",
+   "fonctionnalite": "Regroupement des badges en trois familles",
+   "texte": "Les badges se répartissent en « débloqués » (catégorie évaluable, palier ≠ aucun), « à débloquer » (catégorie évaluable, palier aucun) et « à activer » (catégorie non évaluable, second drapeau faux).",
+   "origine": "Regroupement de restitution seul (src/versions/mixte/components/BadgesPage.tsx) ; les trois familles se déduisent du palier et de la condition d'évaluation, elles ne sont pas un état supplémentaire."
+  },
+  {
+   "categorie": "Modules",
+   "fonctionnalite": "Ce que commande le second drapeau d'un module",
+   "texte": "Un module éteint reste énuméré en grisé dans les listes secondaires alors qu'un module au second drapeau vrai en disparaît, et la surface d'un domaine éteint reste atteignable sous un voile.",
+   "origine": "Règles de restitution seules (src/versions/mixte/app/navigation.ts, src/versions/mixte/App.tsx) : `isModuleHidden` n'est lu par aucun calcul de données. Le chapitre garde le champ, ses défauts et ses règles d'écriture — qui sont des faits de données — et laisse ici son effet. Réfutation juste : l'en-tête « drapeau de masquage » nommait une apparence."
+  },
+  {
+   "categorie": "Rappels",
+   "fonctionnalite": "Déclenchement d'un rappel",
+   "texte": "Un rappel de prise sonnerait au jour et à l'heure retenus, ou tous les N jours depuis la date de départ ; un rappel de rendez-vous sonnerait à l'instant du rendez-vous moins le délai choisi.",
+   "origine": "Aucun planificateur, aucune notification, aucun minuteur dans le dépôt (grep sur Notification, requestPermission, scheduleNotification : aucun résultat) ; reminderEnabled et medicalReminderEnabled ne sont lus que pour être redits."
+  },
+  {
+   "categorie": "Session",
+   "fonctionnalite": "Création de compte par e-mail",
+   "texte": "Un compte se créerait depuis le produit par e-mail et mot de passe, avec vérification de l'adresse.",
+   "origine": "Réfutation juste, et la formulation d'origine était trop large : src/shared/platform/auth.ts n'exporte aucun `createUserWithEmailAndPassword`, mais `signInWithGoogle` appelle `signInWithPopup(GoogleAuthProvider)` (auth.ts:80-82), qui CRÉE le compte à la première connexion d'une adresse inconnue — rien ne le bride. Le chapitre dit désormais les deux chemins ; seule la création par e-mail est inventée."
+  },
+  {
+   "categorie": "Avertissement",
+   "fonctionnalite": "Blocage du produit tant que l'avertissement n'est pas accepté",
+   "texte": "Tant que l'avertissement n'est pas accepté, aucune autre capacité du produit n'est accessible.",
+   "origine": "Réfutation juste : rien dans les données ne l'impose. Le drapeau n'est lu que par une branche de rendu qui remplace le contenu de la page (src/versions/mixte/App.tsx:799-812, 2056-2065) ; aucun calcul, aucune écriture, aucune migration ne le consulte."
+  },
+  {
+   "categorie": "Badges",
+   "fonctionnalite": "Nom du drapeau du badge mystère",
+   "texte": "Le drapeau enregistré s'appelle mysteryBadgeHidden, de polarité inverse à ce qui est proposé ; la polarité est retournée à la lecture, en un seul endroit, et le renommage est différé.",
+   "origine": "Arbitrage de Claude consigné dans l'inventaire (src/versions/mixte/components/BadgesPage.tsx), non validé par l'utilisatrice."
+  },
+  {
+   "categorie": "Stockage",
+   "fonctionnalite": "Stockage indisponible",
+   "texte": "Quand le stockage local est refusé (navigation privée, quota), chaque écriture échoue en silence : l'acceptation de l'avertissement serait redemandée à chaque ouverture, aucun palier connu ne se retiendrait et l'ancienneté d'usage se redéduirait à chaque fois.",
+   "origine": "Déduit du contrat de src/shared/platform/storage.ts (toute erreur avalée, lecture → null) ; comportement non observé."
+  },
+  {
+   "categorie": "Réglages",
+   "fonctionnalite": "Interrupteurs d'administration",
+   "texte": "Cinq autres booléens du profil (quickAddEnabled, deleteAllButtonsEnabled, homeCornerButtonsEnabled, colorblindModeEnabled, insoliteLibraryEnabled) portent chacun un état avec un défaut propre.",
+   "origine": "Ils ne se règlent que depuis la surface d'administration (src/versions/mixte/components/AdminSettings.tsx) — hors périmètre déclaré. Le manque étant fondé, le chapitre les nomme désormais avec leurs défauts et énonce la règle qui les exclut du reste."
+  },
+  {
+   "categorie": "Ancienneté d'usage",
+   "fonctionnalite": "Ce que le déverrouillage ouvre",
+   "texte": "La capacité que sept jours d'usage déverrouillent est une restitution d'ensemble sur les sept derniers jours, dont la place et le titre changent au déverrouillage.",
+   "origine": "src/features/divination/dynamiqueUnlock.ts fonde le seuil, la date d'origine et le marqueur de signalement ; ce qui est déverrouillé relève de la restitution et n'a pas sa place ici."
+  },
+  {
+   "categorie": "Réglages",
+   "fonctionnalite": "Drapeau de lecture facilitée",
+   "texte": "Un champ easyReadingMode du profil (booléen ou entier) porterait un état du produit.",
+   "origine": "Hors périmètre : src/types.ts:231 le déclare, mais seule la version « cartes » le lit (src/versions/cartes/App.tsx:535-537, components/NotificationsSettings.tsx:25) ; la version décrite par cette spécification ne le consulte jamais."
+  },
+  {
+   "categorie": "Paliers nutritifs",
+   "fonctionnalite": "Félicitation quotidienne protéines et fibres",
+   "texte": "Franchir sa recommandation quotidienne de protéines ou de fibres ouvre une félicitation, une fois par jour et par nutriment.",
+   "origine": "Le mécanisme existe, pur et testé (src/features/meal-form/paliersNutritifs.ts, .test.ts), mais aucun fichier hors son test ne l'appelle : rien ne l'évalue et rien ne l'écrit à l'usage. Le chapitre décrit l'état et le marque non implémenté."
+  }
+ ],
+ "glossaire": [
+  {
+   "terme": "Allumé (module)",
+   "definition": "État effectif d'un module de suivi : la valeur de son drapeau d'activation si elle est écrite, sinon le défaut du module — allumé pour le traitement et les effets secondaires, éteint pour les cinq autres."
+  },
+  {
+   "terme": "Second drapeau (module)",
+   "definition": "Booléen facultatif du profil, un par module, écrit à faux par l'allumage explicite et ignoré par l'allumage implicite. Aucune règle de données ne le lit ; son seul effet relève de la restitution."
+  },
+  {
+   "terme": "Allumage implicite",
+   "definition": "Écriture de `drapeau = true` sur l'alimentation, les pas ou l'activité physique lorsqu'une capacité du domaine est demandée. N'écrit que ce champ."
+  },
+  {
+   "terme": "Survenu",
+   "definition": "Règle unique décidant si une entrée datée compte dans un état dérivé : date passée, ou date du jour avec une heure ≤ l'heure courante, l'heure absente valant survenu."
+  },
+  {
+   "terme": "Traitement résolu",
+   "definition": "`prise.traitement || profil.traitement || 'aucun'` — l'identifiant sous lequel une prise est lue."
+  },
+  {
+   "terme": "Série du traitement en cours",
+   "definition": "Suffixe final du journal des prises déjà survenues, trié par date puis heure, dont le traitement résolu égale celui du profil. Le filtre des prises à venir passe devant la coupure."
+  },
+  {
+   "terme": "Palier",
+   "definition": "Valeur d'un badge dans l'échelle ordonnée aucun < eveil < bronze < argent < or. Jamais enregistré : recalculé à chaque lecture."
+  },
+  {
+   "terme": "Évaluabilité",
+   "definition": "État d'un badge dit par le drapeau d'activation nu de sa catégorie : strictement vrai pour les deux badges d'alimentation, non faux pour les deux autres. Non évaluable, un badge n'a pas de palier."
+  },
+  {
+   "terme": "Palier connu",
+   "definition": "Dernier palier observé d'un badge, retenu hors sauvegarde. Absent = jamais observé. Il traverse l'extinction d'un module."
+  },
+  {
+   "terme": "Découverte",
+   "definition": "Première observation du palier d'un badge : l'entrée est écrite, rien n'est célébré."
+  },
+  {
+   "terme": "Progression",
+   "definition": "Palier observé dont le rang dépasse le rang connu : célébré une fois, puis écrit."
+  },
+  {
+   "terme": "Seuil protéines du badge",
+   "definition": "`round(poidsActuel × 1,5)` grammes, recalculé sans lire `dailyProteinGoal` — à distinguer de l'objectif du profil, que lit le reste du produit."
+  },
+  {
+   "terme": "Période",
+   "definition": "Suite de N dates locales finissant aujourd'hui, sur laquelle se comptent les journées d'un palier. Deux jours pour l'éveil, sept ou dix pour les autres."
+  },
+  {
+   "terme": "Palier d'IMC signalé",
+   "definition": "Entier hors sauvegarde, absent valant 99. Il ne se réécrit qu'en baissant, ce qui interdit de resignaler un palier déjà signalé."
+  },
+  {
+   "terme": "Paliers nutritifs fêtés",
+   "definition": "Couple (date, nutriments) hors sauvegarde, périmé par tout changement de jour. Mécanisme écrit et testé, jamais appelé."
+  },
+  {
+   "terme": "Hors sauvegarde",
+   "definition": "Conservé sous une clé propre du stockage local, à côté du document unique portant profil et journaux. Ni exporté ni partagé ; emporté par l'effacement total."
+  },
+  {
+   "terme": "Effacement total",
+   "definition": "Vidage intégral du stockage local, déclenché par la suppression du compte. Emporte la sauvegarde, toutes les clés hors sauvegarde et la session mémorisée, puis redémarre l'exécution."
+  },
+  {
+   "terme": "Verrou de compte",
+   "definition": "Actif lorsque le champ `apiKey` de la configuration d'authentification, écrite en dur dans une source du dépôt, est non vide. Il l'est aujourd'hui."
+  },
+  {
+   "terme": "Session en lecture seule",
+   "definition": "État volatil d'une exécution où l'analyse de la sauvegarde a échoué : plus aucune écriture du document de sauvegarde n'a lieu, les autres clés restant écrites."
+  },
+  {
+   "terme": "Clé de secours",
+   "definition": "Clé `<clé>__secours` où la sauvegarde illisible est recopiée brute, à la seule condition que la clé soit absente."
+  },
+  {
+   "terme": "Date de première ouverture",
+   "definition": "Date enregistrée hors sauvegarde ; à défaut la plus ancienne date de tous les journaux si elle n'est pas future ; à défaut aujourd'hui. Écrite une fois pour toutes."
+  },
+  {
+   "terme": "Ancienneté d'usage",
+   "definition": "Jours entiers, jamais négatifs, entre la date de première ouverture et aujourd'hui, en dates locales. Seuil de déverrouillage : 7."
+  },
+  {
+   "terme": "Questionnaire d'entrée (V2)",
+   "definition": "Neuf questions dont deux conditionnelles, portant le couple (réponses, rang). Rien n'en est persisté."
+  },
+  {
+   "terme": "Étapes retenues (V2)",
+   "definition": "Les étapes dont la condition est vraie pour les réponses courantes, dans l'ordre. Recalculées à chaque réponse."
+  },
+  {
+   "terme": "Rang borné (V2)",
+   "definition": "`min(rang, retenues.length − 1)`, relu à chaque lecture : une réponse qui raccourcit la liste ramène le rang sur la dernière étape retenue."
+  }
+ ],
+ "index": [
+  {
+   "terme": "Acceptation de l'avertissement",
+   "ancre": "etats-l-acceptation-de-l-avertissement"
+  },
+  {
+   "terme": "Allumage implicite",
+   "ancre": "etats-un-module-de-suivi"
+  },
+  {
+   "terme": "Ancienneté d'usage",
+   "ancre": "etats-l-anciennete-d-usage"
+  },
+  {
+   "terme": "Attestation d'essai clinique",
+   "ancre": "etats-le-traitement-declare"
+  },
+  {
+   "terme": "Badge, évaluabilité",
+   "ancre": "etats-le-palier-d-un-badge"
+  },
+  {
+   "terme": "Badge, palier",
+   "ancre": "etats-le-palier-d-un-badge"
+  },
+  {
+   "terme": "Badge mystère",
+   "ancre": "etats-les-etats-sans-effet"
+  },
+  {
+   "terme": "Célébration, critère",
+   "ancre": "etats-la-memoire-des-paliers"
+  },
+  {
+   "terme": "Clé de secours",
+   "ancre": "etats-la-session-en-lecture-seule"
+  },
+  {
+   "terme": "Compte, création",
+   "ancre": "etats-la-session"
+  },
+  {
+   "terme": "Compte, suppression",
+   "ancre": "etats-la-session"
+  },
+  {
+   "terme": "Découverte d'un badge",
+   "ancre": "etats-la-memoire-des-paliers"
+  },
+  {
+   "terme": "Déverrouillage signalé",
+   "ancre": "etats-l-anciennete-d-usage"
+  },
+  {
+   "terme": "Drapeau d'activation d'un module",
+   "ancre": "etats-un-module-de-suivi"
+  },
+  {
+   "terme": "Effacement total",
+   "ancre": "etats-ce-qui-porte-un-etat"
+  },
+  {
+   "terme": "Étapes retenues (V2)",
+   "ancre": "etats-ce-que-la-v2-decide-autrement"
+  },
+  {
+   "terme": "Fibres, seuil du badge",
+   "ancre": "etats-le-palier-d-un-badge"
+  },
+  {
+   "terme": "Hors sauvegarde",
+   "ancre": "etats-ce-qui-porte-un-etat"
+  },
+  {
+   "terme": "IMC, palier signalé",
+   "ancre": "etats-les-autres-memoires-de-celebration"
+  },
+  {
+   "terme": "Lecture seule",
+   "ancre": "etats-la-session-en-lecture-seule"
+  },
+  {
+   "terme": "Modules de suivi",
+   "ancre": "etats-un-module-de-suivi"
+  },
+  {
+   "terme": "Objectifs du profil (protéines, fibres)",
+   "ancre": "etats-le-palier-d-un-badge"
+  },
+  {
+   "terme": "Palier connu",
+   "ancre": "etats-la-memoire-des-paliers"
+  },
+  {
+   "terme": "Paliers nutritifs du jour",
+   "ancre": "etats-les-autres-memoires-de-celebration"
+  },
+  {
+   "terme": "Période d'évaluation",
+   "ancre": "etats-le-palier-d-un-badge"
+  },
+  {
+   "terme": "Pesée de départ semée",
+   "ancre": "etats-la-session-en-lecture-seule"
+  },
+  {
+   "terme": "Progression d'un badge",
+   "ancre": "etats-la-memoire-des-paliers"
+  },
+  {
+   "terme": "Protéines, seuil du badge",
+   "ancre": "etats-le-palier-d-un-badge"
+  },
+  {
+   "terme": "Questionnaire d'entrée (V2)",
+   "ancre": "etats-ce-que-la-v2-decide-autrement"
+  },
+  {
+   "terme": "Rang (V2)",
+   "ancre": "etats-ce-que-la-v2-decide-autrement"
+  },
+  {
+   "terme": "Rappel de prise",
+   "ancre": "etats-les-etats-sans-effet"
+  },
+  {
+   "terme": "Rappel de rendez-vous médical",
+   "ancre": "etats-les-etats-sans-effet"
+  },
+  {
+   "terme": "Reconnexion préalable",
+   "ancre": "etats-la-session"
+  },
+  {
+   "terme": "Second drapeau d'un module",
+   "ancre": "etats-un-module-de-suivi"
+  },
+  {
+   "terme": "Série du traitement en cours",
+   "ancre": "etats-le-traitement-declare"
+  },
+  {
+   "terme": "Session",
+   "ancre": "etats-la-session"
+  },
+  {
+   "terme": "Survenu (règle du futur)",
+   "ancre": "etats-ce-qui-a-deja-eu-lieu"
+  },
+  {
+   "terme": "Traitement d'une prise",
+   "ancre": "etats-le-traitement-declare"
+  },
+  {
+   "terme": "Traitement déclaré",
+   "ancre": "etats-le-traitement-declare"
+  },
+  {
+   "terme": "Traitement résolu",
+   "ancre": "etats-le-traitement-declare"
+  },
+  {
+   "terme": "Verrou de compte",
+   "ancre": "etats-la-session"
+  }
+ ]
+}

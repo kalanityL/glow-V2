@@ -1,0 +1,469 @@
+<section id="entites">
+  <h2>2. Les entités <a class="retour" href="#sommaire">↑ sommaire</a></h2>
+  <p>Ce chapitre énumère les objets que le produit conserve : leurs attributs, leurs types, leurs unités canoniques, leurs valeurs par défaut, leur identité et leurs cardinalités. Il nomme aussi ce que les types déclarent sans qu'aucune donnée ne soit derrière, et ce que la V2 a décidé autrement.</p>
+
+  <h3 id="entites-l-objet-racine-et-ses-tables">L'objet racine et ses tables</h3>
+  <p>Une personne, un appareil, une sauvegarde. L'objet racine (<code>AppData</code>) porte un profil et neuf tables de lignes datées ; il est conservé en un seul document JSON, sous la clé <code>glp1_app_companion_data</code>.</p>
+  <table>
+    <thead><tr><th>Attribut</th><th>Type</th><th>Obligatoire</th><th>Absent vaut</th></tr></thead>
+    <tbody>
+      <tr><td><code>profile</code></td><td><code>UserProfile</code></td><td>oui</td><td>—</td></tr>
+      <tr><td><code>weightHistory</code></td><td><code>WeightLog[]</code></td><td>oui</td><td>liste vide</td></tr>
+      <tr><td><code>dailyLogs</code></td><td><code>DailyLog[]</code></td><td>oui</td><td>liste vide</td></tr>
+      <tr><td><code>injectionHistory</code></td><td><code>InjectionLog[]</code></td><td>oui</td><td>liste vide</td></tr>
+      <tr><td><code>savedMeals</code></td><td><code>SavedMealLog[]</code></td><td>non</td><td>liste vide</td></tr>
+      <tr><td><code>sideEffectHistory</code></td><td><code>SideEffectLog[]</code></td><td>non</td><td>liste vide</td></tr>
+      <tr><td><code>stepLogs</code></td><td><code>StepLog[]</code></td><td>non</td><td>liste vide</td></tr>
+      <tr><td><code>sportLogs</code></td><td><code>SportLog[]</code></td><td>non</td><td>liste vide</td></tr>
+      <tr><td><code>meTimeLogs</code></td><td><code>MeTimeLog[]</code></td><td>non</td><td>liste vide</td></tr>
+      <tr><td><code>sleepLogs</code></td><td><code>SleepLog[]</code></td><td>non</td><td>liste vide</td></tr>
+    </tbody>
+  </table>
+  <p>Aucune de ces tables ne porte d'index ni de contrainte d'unicité. Huit d'entre elles sont en ordre d'insertion : une ligne s'ajoute en fin de tableau, y compris antidatée. La neuvième, <code>weightHistory</code>, n'a d'ordre stocké garanti d'aucune sorte — l'ajout d'une pesée retrie sur la seule <code>date</code>, la conversion qui fabrique la pesée de départ retrie sur date et heure, et la modification d'une pesée ne retrie pas. L'ordre qui fait foi est donc toujours celui que le lecteur reconstruit à partir des dates et heures portées par les lignes.</p>
+  <pre><code>cle(ligne) = ligne.date + "T" + (ligne.time || "12:00")   // comparaison lexicographique
+// le repli est sur une valeur FAUSSE, pas sur l'absence : une heure vide vaut midi elle aussi</code></pre>
+  <p>Deux endroits échappent à cette règle et méritent d'être connus. Le plafond quotidien, quand il réécrit « la dernière ligne du jour », désigne cette ligne par son <strong>rang</strong> dans le tableau, pas par son heure : antidater une saisie du jour fait donc écraser une ligne qui n'est pas forcément la plus tardive. Et la signature de la pesée la plus récente, celle qui gouverne l'assignation d'équivalences, replie une heure absente sur <code>00:00</code> et non sur midi. <span class="marque">arbitrage non validé</span></p>
+
+  <h3 id="entites-les-reserves-hors-de-l-objet-racine">Les réserves hors de l'objet racine</h3>
+  <p>Tout n'est pas dans l'objet racine. Dix-sept clés supplémentaires portent des données que ce chapitre décrit, parce qu'elles ne sont pas des lignes de suivi.</p>
+  <table>
+    <thead><tr><th>Clé</th><th>Contenu</th><th>Décrit en</th></tr></thead>
+    <tbody>
+      <tr><td><code>glp1_user_custom_foods</code></td><td>Aliments créés et recettes</td><td>L'aliment</td></tr>
+      <tr><td><code>glp1_favorite_meals</code></td><td>Menus favoris</td><td>Le menu favori</td></tr>
+      <tr><td><code>glp1_food_selection_counts</code></td><td>Compteurs de sélection d'aliment</td><td>Les états tenus hors de la sauvegarde</td></tr>
+      <tr><td><code>glp1_active_sports</code>, <code>glp1_active_side_effects</code>, <code>glp1_active_me_time</code></td><td>Trois listes d'entrées actives</td><td>Les listes d'entrées actives</td></tr>
+      <tr><td><code>glp1_badge_tiers_connus</code></td><td>Paliers de récompense connus</td><td>Les états tenus hors de la sauvegarde</td></tr>
+      <tr><td><code>glow_ludic_usage</code></td><td>Assignation d'équivalences et ses compteurs — <strong>seule clé de données à porter le préfixe <code>glow_</code></strong> et non <code>glp1_</code></td><td>Les états tenus hors de la sauvegarde</td></tr>
+      <tr><td><code>glp1_first_open_date</code></td><td>Date de première ouverture</td><td>Les états tenus hors de la sauvegarde</td></tr>
+      <tr><td><code>glp1_paliers_nutritifs_fetes</code>, <code>glp1_notified_bmi_tier_index</code>, <code>glp1_last_celebrated_weight</code>, <code>glp1_last_celebrated_weight_id</code>, <code>glp1_dynamique_celebrated</code></td><td>Cinq états de célébration</td><td>Les états tenus hors de la sauvegarde</td></tr>
+      <tr><td><code>glp1_user_feedbacks</code>, <code>glp1_user_survey_v2</code> (et <code>glp1_user_survey</code>, ancien format lu en repli, jamais réécrit)</td><td>Messages envoyés et réponse au questionnaire</td><td>Le compte et ce qui quitte l'appareil</td></tr>
+      <tr><td><code>glp1_app_companion_data__secours</code></td><td>Copie unique d'une sauvegarde illisible</td><td>Conventions communes, cas limites</td></tr>
+      <tr><td><code>glp1_app_companion_data__secours-index</code> et <code>…__secours-&lt;horodatage&gt;</code></td><td>Index et copies de secours</td><td>Les copies de secours</td></tr>
+    </tbody>
+  </table>
+  <p>Quinze autres clés existent et sont <strong>hors du périmètre de ce document</strong> : elles ne conservent que des préférences de restitution ou des états techniques. Huit clés <code>glp1_&lt;journal&gt;_history_view</code>, <code>glp1_period_blood_level_by_brand</code>, <code>glp1_meal_edit_notice_dismissed</code>, <code>glp1_send_cap_alert</code>, <code>glp1_test_data</code>, <code>hasAcceptedMedicalDisclaimer_v1</code>, plus les clés à préfixe <code>glow_</code> autres que <code>glow_ludic_usage</code>. Une seizième, <code>glp1_meals_cleared</code>, n'est plus jamais écrite : elle n'est conservée que pour être effacée.</p>
+
+  <h3 id="entites-conventions-communes-a-toutes-les-lignes">Conventions communes à toutes les lignes</h3>
+  <table>
+    <thead><tr><th>Convention</th><th>Règle</th></tr></thead>
+    <tbody>
+      <tr><td>Identité</td><td><code>id</code>, chaîne, posée à l'enregistrement, jamais réécrite. Pesées <code>w-&lt;ms&gt;</code>, prises <code>inj-&lt;ms&gt;</code>, ressentis <code>se-&lt;ms&gt;</code>, pas <code>step-&lt;ms&gt;</code>, séances <code>sport-&lt;ms&gt;</code>, moments <code>metime-&lt;ms&gt;</code>, nuits <code>sleep-&lt;ms&gt;</code> ; repas, quantités d'aliment et menus favoris reçoivent un UUID version 7 (<code>newId</code>), aliments personnalisés <code>user-custom-&lt;ms&gt;</code>.</td></tr>
+      <tr><td>Date</td><td><code>date</code> : chaîne <code>AAAA-MM-JJ</code>, jour <em>local</em>. Jamais un instant UTC tronqué.</td></tr>
+      <tr><td>Heure</td><td><code>time</code> : chaîne <code>HH:MM</code>, locale, ramenée à l'écriture à la minute ronde inférieure parmi 0, 10, 15, 20, 30, 40, 45, 50.</td></tr>
+      <tr><td>Instants techniques</td><td><code>createdAt</code>, <code>updatedAt</code>, <code>sentAt</code> : entiers, millisecondes depuis l'époque Unix. Distincts des dates locales.</td></tr>
+      <tr><td>Unités</td><td>Le stockage est métrique : kilogramme, centimètre, gramme, millilitre, milligramme, minute, mètre, kilocalorie. Aucune étiquette d'unité n'est enregistrée.</td></tr>
+      <tr><td>Grandeurs sans unité</td><td>Quatre valeurs ne portent pas d'unité et n'en attendent pas : le pas (<code>StepLog.steps</code>, un compte), trois échelles bornées (<code>severity</code> 1–5, <code>quality</code> 0–5, <code>hungerBefore</code> et <code>hungerAfter</code> 0–5) et l'équivalent métabolique du catalogue d'activités (<code>met</code>, sans dimension).</td></tr>
+      <tr><td>Décimales</td><td>Point décimal en stockage, quelle que soit la langue.</td></tr>
+      <tr><td>Références</td><td>Par identifiant — sauf <strong>trois</strong> exceptions héritées, où la clé stockée est le texte lui-même : une séance référence son activité par son nom (<code>SportLog.sport</code>), un moment pour soi par le sien (<code>MeTimeLog.activity</code>), un ressenti son effet par le sien (<code>SideEffectLog.type</code>). Renommer une entrée de l'un de ces trois catalogues coupe les lignes déjà enregistrées de leur entrée.</td></tr>
+      <tr><td>Suppression</td><td>Franche : la ligne quitte la sauvegarde. Aucun marqueur de suppression n'est conservé.</td></tr>
+      <tr><td>Modification</td><td>Fusion : les attributs absents de la charge sont conservés (<code>LogUpdate&lt;T&gt;</code> = <code>Omit&lt;T,'id'&gt; &amp; { id }</code>).</td></tr>
+      <tr><td>Dérivé</td><td>Rien de dérivable n'est stocké — deux exceptions assumées, le cache nutritionnel d'un repas et son <code>typeLabel</code>.</td></tr>
+    </tbody>
+  </table>
+  <details><summary>Cas limites</summary>
+    <p>Une sauvegarde illisible n'est pas écrasée : elle est recopiée une fois sous <code>glp1_app_companion_data__secours</code> — sans tiret final, à ne pas confondre avec le préfixe <code>__secours-</code> des copies horodatées —, et plus rien n'est écrit de la session.</p>
+    <p>Neuf conversions s'appliquent au chargement, toutes idempotentes : retrait des lignes d'exemple, retrait des repas sans composition, passage des traitements du libellé à l'identifiant, repli de l'ancienne note de ressenti, fusion des deux noms du tennis de table, remplissage des faims manquantes, purge des lignes anciennement marquées supprimées, pose du drapeau de pesée de départ, oubli des attributs du suivi hydrique et des objectifs de poids supprimés.</p>
+    <p>Deux identifiants peuvent coïncider lorsqu'ils dérivent de l'horloge à la milliseconde ; seuls les UUID version 7 ferment ce cas.</p>
+  </details>
+
+  <h3 id="entites-les-cardinalites">Les cardinalités</h3>
+  <table>
+    <thead><tr><th>Entité</th><th>Par journée</th><th>Au-delà</th></tr></thead>
+    <tbody>
+      <tr><td>Pesée</td><td>1</td><td>La ligne du jour est mise à jour : elle garde son identifiant, sa nature de départ, et les mensurations que la nouvelle saisie ne porte pas.</td></tr>
+      <tr><td>Prise de traitement</td><td>2</td><td>Réécriture de la dernière ligne du jour <em>au sens du rang</em> dans la table.</td></tr>
+      <tr><td>Ressenti</td><td>15</td><td>Idem.</td></tr>
+      <tr><td>Séance d'activité</td><td>15</td><td>Idem.</td></tr>
+      <tr><td>Moment pour soi</td><td>15</td><td>Idem.</td></tr>
+      <tr><td>Sommeil</td><td>15</td><td>Refus : rien n'est écrit.</td></tr>
+      <tr><td>Repas ou en-cas</td><td>30, comptés à la <em>date visée</em></td><td>Refus. Déplacer un repas vers une date pleine est refusé aussi ; le repas reste à sa date d'origine.</td></tr>
+      <tr><td>Relevé de pas</td><td>illimité</td><td>Plusieurs lignes peuvent porter la même date.</td></tr>
+      <tr><td>Aliment personnalisé</td><td>50 <em>créations</em></td><td>Refus. Une modification ne consomme rien.</td></tr>
+      <tr><td>Recette</td><td>20 <em>créations</em>, quota indépendant du précédent</td><td>Refus.</td></tr>
+      <tr><td>Menu favori</td><td>50 <em>créations</em></td><td>Refus.</td></tr>
+      <tr><td>Message envoyé</td><td>10 <em>envois</em></td><td>Refus.</td></tr>
+    </tbody>
+  </table>
+  <p>Le décompte porte sur les lignes réellement présentes : supprimer une ligne du jour rend sa place. Une entrée créée avant l'arrivée de son instant de création n'est comptée dans aucune journée.</p>
+
+  <h3 id="entites-le-profil">Le profil</h3>
+  <p>Un seul exemplaire (<code>UserProfile</code>), sans identifiant : il est l'attribut <code>profile</code> de l'objet racine. Il mêle l'identité corporelle, les objectifs quotidiens, les rappels et les interrupteurs de suivi.</p>
+  <table>
+    <thead><tr><th>Attribut</th><th>Type</th><th>Unité / valeurs</th><th>Obligatoire</th><th>Absent ou d'usine</th></tr></thead>
+    <tbody>
+      <tr><td><code>name</code></td><td>chaîne</td><td>—</td><td>oui</td><td>« Chloé »</td></tr>
+      <tr><td><code>gender</code></td><td>énuméré</td><td><code>homme</code> · <code>femme</code> · <code>neutre</code></td><td>oui</td><td><code>femme</code></td></tr>
+      <tr><td><code>age</code></td><td>entier</td><td>années</td><td>oui</td><td>42</td></tr>
+      <tr><td><code>height</code></td><td>nombre</td><td>centimètres</td><td>oui</td><td>168</td></tr>
+      <tr><td><code>targetWeight</code></td><td>nombre</td><td>kilogrammes, arrondi au dixième à l'écriture</td><td>oui</td><td>72,0</td></tr>
+      <tr><td><code>silhouetteType</code></td><td>énuméré</td><td>8 valeurs : <code>sablier</code>, <code>poire</code>, <code>pomme</code>, <code>rectangle</code>, <code>triangle_inverse</code>, <code>trapeze</code>, <code>oval</code>, <code>triangle</code></td><td>oui</td><td><code>sablier</code> — aucun enregistrement ne le réécrit, hors la fabrication de données d'essai</td></tr>
+      <tr><td><code>avatar</code></td><td><code>AvatarConfig</code></td><td>voir ci-dessous</td><td>oui</td><td>voir ci-dessous</td></tr>
+      <tr><td><code>glp1Brand</code></td><td>chaîne</td><td>identifiant du catalogue des traitements</td><td>oui</td><td><code>aucun</code></td></tr>
+      <tr><td><code>measurementSystem</code></td><td>énuméré</td><td><code>metric</code> · <code>imperial</code> — n'affecte que la saisie et la restitution, jamais le stockage</td><td>non</td><td><code>metric</code></td></tr>
+      <tr><td><code>reminderEnabled</code>, <code>reminderDay</code>, <code>reminderTime</code></td><td>booléen, entier 0–6 (0 = dimanche), <code>HH:MM</code></td><td>—</td><td>oui</td><td>faux, 0, « 20:00 »</td></tr>
+      <tr><td><code>injectionReminderType</code></td><td>énuméré</td><td><code>weekly</code> · <code>custom</code></td><td>non</td><td>absent</td></tr>
+      <tr><td><code>injectionReminderDaysInterval</code></td><td>entier</td><td>jours</td><td>non</td><td>absent</td></tr>
+      <tr><td><code>injectionReminderStartDate</code></td><td>chaîne</td><td><code>AAAA-MM-JJ</code></td><td>non</td><td>absent</td></tr>
+      <tr><td><code>medicalReminderEnabled</code></td><td>booléen</td><td>—</td><td>oui</td><td>faux</td></tr>
+      <tr><td><code>medicalReminderDate</code>, <code>medicalReminderTime</code>, <code>medicalReminderDoctor</code>, <code>medicalReminderNotifyBefore</code></td><td><code>AAAA-MM-JJ</code>, <code>HH:MM</code>, chaîne, chaîne (<code>1h</code>, <code>2h</code>, <code>1d</code>, <code>2d</code>…)</td><td>—</td><td>non</td><td>absents</td></tr>
+      <tr><td><code>countdownTargetDate</code></td><td>chaîne</td><td><code>AAAA-MM-JJ</code></td><td>non</td><td>« 2026-11-15 » d'usine</td></tr>
+      <tr><td><code>dailyCaloriesGoal</code></td><td>nombre</td><td>kilocalories</td><td>non</td><td>1 400</td></tr>
+      <tr><td><code>dailyProteinGoal</code></td><td>nombre</td><td>grammes</td><td>non</td><td>poids courant × 1,5, arrondi</td></tr>
+      <tr><td><code>dailyFiberGoal</code></td><td>nombre</td><td>grammes</td><td>non</td><td>25</td></tr>
+      <tr><td><code>foodTrackingEnabled</code>, <code>stepsTrackingEnabled</code>, <code>sportTrackingEnabled</code></td><td>booléens</td><td>—</td><td>oui</td><td>faux</td></tr>
+      <tr><td><code>meTimeTrackingEnabled</code>, <code>sleepTrackingEnabled</code></td><td>booléens</td><td>—</td><td>non</td><td>absent = <strong>désactivé</strong></td></tr>
+      <tr><td><code>treatmentTrackingEnabled</code>, <code>sideEffectsTrackingEnabled</code></td><td>booléens</td><td>—</td><td>non</td><td>absent = <strong>activé</strong></td></tr>
+      <tr><td>Quatorze attributs de restitution</td><td>booléens, l'un d'eux booléen ou nombre</td><td>Ils ne modélisent rien : aucun ne conditionne, ne dérive ni ne contraint une donnée conservée. Ils sont mentionnés ici parce qu'ils occupent le profil et qu'une réimplémentation les rencontrera, et nommés hors de ce chapitre. Sept d'entre eux ne portent une valeur vraie que pendant qu'un suivi est désactivé : réactiver ce suivi les remet à faux.</td><td>non</td><td>absents</td></tr>
+    </tbody>
+  </table>
+  <p>Trois attributs ont quitté le profil et subsistent dans les sauvegardes anciennes, lus par la seule conversion : <code>startingWeight</code>, <code>startingWeightDate</code>, <code>startingMeasurements</code>. Le poids de départ est devenu une pesée.</p>
+
+  <h3 id="entites-l-avatar">L'avatar</h3>
+  <p>Imbriqué dans le profil (<code>AvatarConfig</code>), sans identité propre. Trois de ses attributs sont des chaînes hexadécimales, prises chacune dans un nuancier fermé : ce sont des valeurs choisies et conservées, non des paramètres de rendu.</p>
+  <table>
+    <thead><tr><th>Attribut</th><th>Type</th><th>Valeurs</th><th>Obligatoire</th><th>D'usine</th></tr></thead>
+    <tbody>
+      <tr><td><code>gender</code></td><td>énuméré</td><td><code>homme</code> · <code>femme</code> · <code>neutre</code></td><td>oui</td><td><code>femme</code></td></tr>
+      <tr><td><code>faceShape</code></td><td>énuméré</td><td><code>oval</code> · <code>round</code> · <code>square</code> · <code>heart</code></td><td>oui</td><td><code>oval</code></td></tr>
+      <tr><td><code>skinColor</code></td><td>chaîne</td><td>hexadécimal, nuancier de <strong>6</strong> valeurs</td><td>oui</td><td><code>#FFE5D9</code></td></tr>
+      <tr><td><code>eyeColor</code></td><td>chaîne</td><td>hexadécimal, nuancier de <strong>5</strong></td><td>oui</td><td><code>#2E8B57</code></td></tr>
+      <tr><td><code>hairStyle</code></td><td>énuméré</td><td><code>court</code> · <code>long</code> · <code>boucle</code> · <code>chauve</code> · <code>frange</code> · <code>brosse</code></td><td>oui</td><td><code>long</code></td></tr>
+      <tr><td><code>hairColor</code></td><td>chaîne</td><td>hexadécimal, nuancier de <strong>6</strong></td><td>oui</td><td><code>#4E3629</code></td></tr>
+      <tr><td><code>hasGlasses</code></td><td>booléen</td><td>—</td><td>oui</td><td>faux</td></tr>
+      <tr><td><code>expression</code></td><td>énuméré</td><td><code>happy</code> · <code>determined</code> · <code>proud</code> · <code>calm</code></td><td>oui</td><td><code>happy</code></td></tr>
+      <tr><td><code>customPhotoUrl</code></td><td>chaîne</td><td>une image importée, conservée dans le profil ; renseignée, les huit attributs précédents ne sont plus lus</td><td>non</td><td>absent</td></tr>
+    </tbody>
+  </table>
+  <p>Le type déclare les trois attributs hexadécimaux comme des chaînes libres : rien ne contraint une valeur hors nuancier, et une sauvegarde peut en porter une.</p>
+
+  <h3 id="entites-la-pesee">La pesée</h3>
+  <p>Une ligne par journée pesée (<code>WeightLog</code>). Le poids est en kilogrammes, arrondi au dixième à l'écriture ; les neuf mensurations sont en centimètres et toutes facultatives.</p>
+  <table>
+    <thead><tr><th>Attribut</th><th>Type</th><th>Unité</th><th>Obligatoire</th></tr></thead>
+    <tbody>
+      <tr><td><code>id</code></td><td>chaîne</td><td>—</td><td>oui</td></tr>
+      <tr><td><code>date</code></td><td><code>AAAA-MM-JJ</code></td><td>jour local</td><td>oui</td></tr>
+      <tr><td><code>time</code></td><td><code>HH:MM</code></td><td>heure locale, minutes rondes</td><td>non — absente, elle vaut midi au tri</td></tr>
+      <tr><td><code>weight</code></td><td>nombre</td><td>kilogrammes, un décimal</td><td>oui</td></tr>
+      <tr><td><code>chest</code>, <code>waist</code>, <code>hips</code>, <code>arm</code>, <code>underbust</code>, <code>buttocks</code>, <code>thigh</code>, <code>knee</code>, <code>calf</code></td><td>nombres</td><td>centimètres</td><td>non</td></tr>
+      <tr><td><code>isStartingWeight</code></td><td>booléen</td><td>—</td><td><strong>oui</strong>, y compris à <code>false</code></td></tr>
+    </tbody>
+  </table>
+  <p>Le sous-ensemble des neuf mensurations porte un nom (<code>BodyMeasurements</code>) et se dérive de la pesée plutôt que de se recopier.</p>
+  <p>Invariants du départ, visés à chaque écriture :</p>
+  <pre><code>au plus une ligne porte isStartingWeight = true
+la ligne marquee est la plus ancienne au sens (date, heure)
+une pesee anterieure au depart DEVIENT le depart
+a date egale, le depart en place reste le depart
+vider l'historique epargne la ligne marquee</code></pre>
+  <details><summary>Cas limites</summary>
+    <p>Le départ se reconnaît à son drapeau, jamais à sa valeur : repasser par son poids de départ ne fait pas d'une pesée ordinaire un départ.</p>
+    <p>Le premier invariant n'est pas tenu dans tous les cas. La réparation cherche <em>le premier</em> drapeau rencontré ; s'il est déjà celui de la plus ancienne ligne, ou porte la même date qu'elle, elle sort sans rien réécrire. Un historique qui porterait deux drapeaux dont le premier est le bon les garde tous les deux. La réparation n'agit donc de façon sûre que sur l'historique sans drapeau, ou dont le drapeau n'est pas sur la plus ancienne ligne. <span class="marque">arbitrage non validé</span></p>
+    <p>Sur une sauvegarde ancienne sans drapeau, la conversion fabrique la pesée de départ à partir des trois attributs quittés du profil, à 08:00, ou à la veille de la plus ancienne pesée si aucune date n'était enregistrée.</p>
+  </details>
+  <div class="exemple"><p>Camille, 168 cm, part de 96,0 kg en mai 2026 : cette ligne porte le drapeau. Le 12 septembre elle enregistre 84,5 kg à 07:32, ramené à 07:30. Se peser à nouveau le même jour à 20:12 met à jour la ligne du 12 — même identifiant, 20:10, et les mensurations du matin conservées si elles ne sont pas ressaisies.</p></div>
+
+  <h3 id="entites-la-prise-de-traitement">La prise de traitement</h3>
+  <p>Une ligne par prise (<code>InjectionLog</code>) — injection ou comprimé, la même entité pour les deux formes.</p>
+  <table>
+    <thead><tr><th>Attribut</th><th>Type</th><th>Unité / valeurs</th><th>Obligatoire</th></tr></thead>
+    <tbody>
+      <tr><td><code>id</code></td><td>chaîne</td><td>—</td><td>oui</td></tr>
+      <tr><td><code>date</code></td><td><code>AAAA-MM-JJ</code></td><td>jour local</td><td>oui</td></tr>
+      <tr><td><code>time</code></td><td><code>HH:MM</code></td><td>minutes rondes</td><td>oui</td></tr>
+      <tr><td><code>dose</code></td><td>nombre</td><td>milligrammes</td><td>oui</td></tr>
+      <tr><td><code>site</code></td><td>chaîne</td><td>sept valeurs connues : <code>abdomen_gauche</code>, <code>abdomen_droit</code>, <code>cuisse_gauche</code>, <code>cuisse_droite</code>, <code>bras_gauche</code>, <code>bras_droit</code>, <code>prise_orale</code> ; le type accepte toute autre chaîne</td><td>oui</td></tr>
+      <tr><td><code>brand</code></td><td>chaîne</td><td>identifiant du catalogue. <strong>Absent signifie « celui du profil au moment de la lecture »</strong>, ce qui n'est pas « aucun »</td><td>non</td></tr>
+      <tr><td><code>notes</code></td><td>chaîne</td><td>texte libre</td><td>non</td></tr>
+    </tbody>
+  </table>
+
+  <h3 id="entites-le-catalogue-des-traitements">Le catalogue des traitements</h3>
+  <p>Données de référence livrées avec le produit, jamais écrites par la personne (<code>Treatment</code>) : treize spécialités, plus une entrée d'absence de traitement, tenue à part parce que ce n'est pas un traitement mais un état. Seul l'identifiant est enregistré ; le nom ne l'est jamais.</p>
+  <table>
+    <thead><tr><th>Attribut</th><th>Type</th><th>Unité / valeurs</th><th>Obligatoire</th></tr></thead>
+    <tbody>
+      <tr><td><code>id</code></td><td>chaîne</td><td>seule valeur enregistrée ailleurs</td><td>oui</td></tr>
+      <tr><td><code>name</code>, <code>label</code></td><td>chaînes</td><td>nom court et libellé complet</td><td>oui</td></tr>
+      <tr><td><code>form</code></td><td>énuméré</td><td><code>injection</code> · <code>oral</code></td><td>oui</td></tr>
+      <tr><td><code>molecule</code></td><td>chaîne ou <code>null</code></td><td><code>null</code> pour les entrées génériques et l'absence de traitement</td><td>oui</td></tr>
+      <tr><td><code>dosePresets</code></td><td>liste de nombres</td><td>milligrammes</td><td>oui</td></tr>
+      <tr><td><code>halfLifeHours</code>, <code>absorptionHalfLifeHours</code></td><td>nombres</td><td>heures</td><td>oui</td></tr>
+      <tr><td><code>doseScale</code></td><td>nombre</td><td>biodisponibilité relative à l'injection ; absent = 1</td><td>non</td></tr>
+      <tr><td><code>doseIntervalDays</code></td><td>entier</td><td>jours ; absent = 1 pour un comprimé, 7 pour une injection</td><td>non</td></tr>
+      <tr><td><code>requiresTrialCertification</code></td><td>booléen</td><td>molécule non commercialisée</td><td>non</td></tr>
+    </tbody>
+  </table>
+  <p>Identifiants : <code>ozempic</code>, <code>wegovy-injection</code>, <code>mounjaro</code>, <code>zepbound</code>, <code>saxenda</code>, <code>victoza</code>, <code>trulicity</code>, <code>retatrutide</code>, <code>autre-injection</code>, <code>rybelsus</code>, <code>wegovy-oral</code>, <code>orforglipron</code>, <code>autre-comprime</code>, plus <code>aucun</code>. Un identifiant inconnu se résout sur <code>aucun</code>.</p>
+
+  <h3 id="entites-le-repas">Le repas ou l'en-cas</h3>
+  <p>Une ligne par prise alimentaire (<code>SavedMealLog</code>). Sa composition est la source de vérité ; ses cinq valeurs nutritionnelles sont un cache recalculé à chaque écriture.</p>
+  <table>
+    <thead><tr><th>Attribut</th><th>Type</th><th>Unité / valeurs</th><th>Obligatoire</th></tr></thead>
+    <tbody>
+      <tr><td><code>id</code></td><td>chaîne (UUID v7)</td><td>—</td><td>oui</td></tr>
+      <tr><td><code>date</code>, <code>time</code></td><td><code>AAAA-MM-JJ</code>, <code>HH:MM</code></td><td>local, minutes rondes</td><td>oui</td></tr>
+      <tr><td><code>type</code></td><td>énuméré</td><td><code>breakfast</code> · <code>lunch</code> · <code>dinner</code> · <code>snacks</code> · <code>repas</code> · <code>snack</code></td><td>oui</td></tr>
+      <tr><td><code>typeLabel</code></td><td>chaîne</td><td>doublon dérivé de <code>type</code>, réécrit à chaque écriture ; seul <code>type</code> fait foi. Un type inconnu donne « En-cas »</td><td>oui</td></tr>
+      <tr><td><code>items</code></td><td><code>FoodQuantity[]</code></td><td><strong>au moins un</strong> ; retirer le dernier supprime le repas</td><td>oui</td></tr>
+      <tr><td><code>calories</code>, <code>protein</code>, <code>carbs</code>, <code>fat</code>, <code>fiber</code></td><td>nombres</td><td>kilocalories et grammes ; cache dérivé de <code>items</code></td><td>oui</td></tr>
+      <tr><td><code>hungerBefore</code>, <code>hungerAfter</code></td><td>entiers</td><td>échelle 0–5</td><td>non</td></tr>
+    </tbody>
+  </table>
+  <p>Une quantité d'aliment (<code>FoodQuantity</code>) est imbriquée : elle n'existe pas hors de son parent et ne porte pas d'instants propres. Le même format sert aux repas, aux menus favoris et aux ingrédients d'une recette — avec une cardinalité différente : <code>items</code> ne peut jamais être vide, <code>recipeIngredients</code> le peut.</p>
+  <table>
+    <thead><tr><th>Attribut</th><th>Type</th><th>Unité / valeurs</th><th>Obligatoire</th></tr></thead>
+    <tbody>
+      <tr><td><code>id</code></td><td>chaîne (UUID v7)</td><td>régénéré à chaque copie ; aucune référence ne le vise</td><td>oui</td></tr>
+      <tr><td><code>foodId</code></td><td>chaîne</td><td>identifiant d'une entrée de la base de référence, ou d'un aliment personnalisé</td><td>oui</td></tr>
+      <tr><td><code>isCustomFood</code></td><td>booléen</td><td>dit laquelle des deux bases résoudre</td><td>oui</td></tr>
+      <tr><td><code>qty</code></td><td>nombre</td><td><strong>grammes</strong> pour un solide, <strong>millilitres</strong> pour un liquide — jamais autre chose</td><td>oui</td></tr>
+    </tbody>
+  </table>
+  <details><summary>Cas limites</summary>
+    <p>Les repas antérieurs au passage à une composition d'aliments portaient leur contenu dans une phrase ; ils sont écartés au chargement. Le critère est l'<em>absence</em> de <code>items</code>, jamais une liste vide.</p>
+    <p>La conversion des faims se déclenche dès qu'un repas ne porte pas <strong>ses deux</strong> valeurs, et elle en réécrit alors <strong>deux</strong>. Un repas qui portait <code>hungerBefore</code> sans <code>hungerAfter</code> voit donc sa valeur saisie remplacée par une valeur déduite. La prudence annoncée — « un 0 saisi reste un 0 saisi » — ne vaut que pour les lignes déjà complètes. <span class="marque">arbitrage non validé</span></p>
+    <p>Les valeurs déduites le sont du moment de la journée, de l'apport et de la somme des codes de caractères de l'identifiant : jamais d'un tirage au sort, et stables d'un chargement à l'autre.</p>
+    <p>Un aliment personnalisé supprimé laisse son item irrésoluble : le repas garde ses valeurs, l'item n'a plus de fiche.</p>
+  </details>
+
+  <h3 id="entites-l-aliment">L'aliment</h3>
+  <p>Deux bases distinctes, même forme (<code>CiqualFood</code>, dont <code>UserCustomFood</code> est un alias). La base de référence est livrée avec le produit et non modifiable ; celle des aliments créés vit sous la clé <code>glp1_user_custom_foods</code>.</p>
+  <table>
+    <thead><tr><th>Attribut</th><th>Type</th><th>Unité / valeurs</th><th>Obligatoire</th></tr></thead>
+    <tbody>
+      <tr><td><code>alim_code</code></td><td>chaîne</td><td>identité ; <code>user-custom-&lt;ms&gt;</code> pour une création</td><td>oui</td></tr>
+      <tr><td><code>alim_nom_fr</code></td><td>chaîne</td><td>libellé officiel ; à la création, première lettre mise en capitale et texte détouré</td><td>oui</td></tr>
+      <tr><td><code>nom_court</code></td><td>chaîne</td><td>nom abrégé, 32 signes visés. L'invariant vérifié est l'autre sens : aucune entrée dont le libellé officiel dépasse 30 signes n'en est dépourvue (0 manquant sur 3 258). La borne de 32, elle, n'est pas tenue : <code>13212</code> porte « Compote de pomme maison non sucrée », 34 signes</td><td>non</td></tr>
+      <tr><td><code>nom_generique</code></td><td>chaîne</td><td>nom de famille de l'aliment ; <strong>les collisions sont voulues</strong>, ce n'est pas un identifiant</td><td>non</td></tr>
+      <tr><td><code>calories</code>, <code>protein</code>, <code>carbs</code>, <code>fat</code>, <code>fiber</code></td><td>nombres</td><td>pour 100 g ou 100 ml</td><td>oui</td></tr>
+      <tr><td><code>isLiquid</code></td><td>booléen</td><td>nature de l'aliment ; à défaut, dérivée de <code>unit === 'ml'</code></td><td>non</td></tr>
+      <tr><td><code>unit</code></td><td>énuméré</td><td><code>g</code> · <code>ml</code> — attribut hérité</td><td>non</td></tr>
+      <tr><td><code>isUserCustom</code>, <code>isRecipe</code></td><td>booléens</td><td>origine de l'entrée et nature du quota qu'elle consomme</td><td>non</td></tr>
+      <tr><td><code>recipeIngredients</code></td><td><code>FoodQuantity[]</code></td><td>composition d'une recette, gardée pour pouvoir la reprendre ; les valeurs nutritionnelles n'en dépendent pas. <strong>Peut être vide</strong></td><td>non</td></tr>
+      <tr><td><code>barcode</code></td><td>chaîne</td><td>EAN-13 ou UPC-A ; <strong>chaîne et non nombre</strong>, les zéros de tête sont signifiants</td><td>non</td></tr>
+      <tr><td><code>valide</code></td><td>booléen</td><td>marque de revue du nom abrégé, posée hors de l'application</td><td>non</td></tr>
+      <tr><td><code>createdAt</code></td><td>entier</td><td>millisecondes ; posé à la création seule, jamais réécrit</td><td>non</td></tr>
+    </tbody>
+  </table>
+  <p>La base de référence compte 3 258 entrées, plus 2 entrées ajoutées à la main, soit 3 260 fiches résolvables : 2 425 portent un nom abrégé, les 3 258 portent un nom générique et leur nature liquide ou solide. Elle est indexée par identifiant ; une consommation ne s'y rapproche jamais par ressemblance de nom.</p>
+  <p>Une recette est un aliment personnalisé qui porte sa composition. Elle n'a pas de nom propre : son nom <em>est</em> celui de l'aliment qu'elle définit, et ses valeurs sont rapportées à 100 g de la composition entière.</p>
+  <pre><code>invariant : un ingredient de recette existe toujours
+=> supprimer un aliment reference par une recette est refuse</code></pre>
+  <details><summary>Cas limites</summary>
+    <p>L'unicité du nom se juge après détourage, mise en minuscules et retrait des accents, contre les deux bases à la fois ; une entrée en cours de modification ne se déclare pas en doublon d'elle-même.</p>
+    <p>Un attribut nutritionnel laissé vide à la création vaut zéro.</p>
+    <p>Les recettes d'avant le passage à une composition référencée se reprennent avec une composition vide — d'où la seule liste <code>FoodQuantity[]</code> du modèle qui puisse être vide. Rouvrir puis ré-enregistrer une telle recette abaisse ses valeurs nutritionnelles sans le dire : défaut connu, non traité. <span class="marque">arbitrage non validé</span></p>
+  </details>
+
+  <h3 id="entites-la-fiche-normalisee-et-l-apport">La fiche normalisée et l'apport</h3>
+  <p>Les deux bases décrivent la même chose sous des noms d'attributs différents. Toute consommation d'aliment est lue à travers une forme unique (<code>ResolvedFood</code>), et tout apport à travers un quintuplet nommé (<code>Nutrition</code>).</p>
+  <table>
+    <thead><tr><th>Type</th><th>Attributs</th><th>Règle</th></tr></thead>
+    <tbody>
+      <tr><td><code>ResolvedFood</code></td><td><code>id</code>, <code>name</code>, <code>calories</code>, <code>protein</code>, <code>carbs</code>, <code>fat</code>, <code>fiber</code>, <code>isLiquid</code> (obligatoire ici)</td><td>Construit depuis <code>CiqualFood</code> : <code>isLiquid: row.isLiquid ?? row.unit === 'ml'</code>. Une référence qui ne se résout pas rend <code>undefined</code> — cas réel et non exceptionnel, un aliment personnalisé pouvant être supprimé.</td></tr>
+      <tr><td><code>Nutrition</code></td><td>Les cinq valeurs, sans unité déclarée : kilocalories et grammes</td><td><code>ZERO_NUTRITION</code> est le neutre de la somme.</td></tr>
+      <tr><td><code>LegacyCustomFood</code></td><td><code>alim_code</code>, <code>alim_nom_fr</code>, les cinq valeurs, <code>isLiquid</code>, <code>unit</code></td><td>Forme héritée de la base des aliments créés, normalisée en <code>ResolvedFood</code> à la lecture. Transitoire.</td></tr>
+    </tbody>
+  </table>
+  <pre><code>apport(item) = fiche(item.foodId) * item.qty / 100      // les fiches valent pour 100 g ou 100 ml
+apport(repas) = somme des apports des items resolus     // un item non resolu est ignore, pas compte a zero</code></pre>
+
+  <h3 id="entites-le-menu-favori">Le menu favori</h3>
+  <p>Une composition nommée, réutilisable (<code>FavoriteMealItem</code>), conservée sous la clé <code>glp1_favorite_meals</code>. Elle reçoit une <em>copie</em> de la composition : modifier le repas d'origine ne la touche pas.</p>
+  <table>
+    <thead><tr><th>Attribut</th><th>Type</th><th>Valeurs</th><th>Obligatoire</th></tr></thead>
+    <tbody>
+      <tr><td><code>id</code></td><td>chaîne (UUID v7)</td><td>—</td><td>oui</td></tr>
+      <tr><td><code>title</code></td><td>chaîne</td><td>—</td><td>oui</td></tr>
+      <tr><td><code>type</code></td><td>énuméré</td><td><code>repas</code> · <code>snack</code></td><td>oui</td></tr>
+      <tr><td><code>items</code></td><td><code>FoodQuantity[]</code></td><td>—</td><td>oui</td></tr>
+      <tr><td><code>createdAt</code></td><td>entier</td><td>millisecondes ; absent, le menu ne compte dans aucun quota</td><td>non</td></tr>
+    </tbody>
+  </table>
+
+  <h3 id="entites-le-ressenti">Le ressenti</h3>
+  <p>Une ligne par effet ressenti (<code>SideEffectLog</code>).</p>
+  <table>
+    <thead><tr><th>Attribut</th><th>Type</th><th>Unité / valeurs</th><th>Obligatoire</th></tr></thead>
+    <tbody>
+      <tr><td><code>id</code></td><td>chaîne</td><td>—</td><td>oui</td></tr>
+      <tr><td><code>date</code>, <code>time</code></td><td><code>AAAA-MM-JJ</code>, <code>HH:MM</code></td><td>local, minutes rondes</td><td>oui</td></tr>
+      <tr><td><code>type</code></td><td>chaîne</td><td>le <em>nom</em> de l'effet, et non un identifiant — troisième exception à la règle de référence</td><td>oui</td></tr>
+      <tr><td><code>severity</code></td><td>entier</td><td>1 à 5, non borné par le type</td><td>oui</td></tr>
+      <tr><td><code>notes</code></td><td>chaîne</td><td>texte libre, enregistré tel quel ; un texte réduit à des espaces vaut absence</td><td>non</td></tr>
+    </tbody>
+  </table>
+  <p>Le catalogue des ressentis (<code>SideEffectOption</code>) porte deux attributs, <code>value</code> et <code>label</code>, tous deux égaux au même nom français : 36 entrées, dont 12 actives par défaut. <code>value</code> est ce qui est enregistré.</p>
+  <p>Un second attribut de texte libre, <code>description</code>, a existé ; il est replié dans <code>notes</code> au chargement, <code>notes</code> l'emportant quand les deux sont remplis.</p>
+
+  <h3 id="entites-le-releve-de-pas">Le relevé de pas</h3>
+  <table>
+    <thead><tr><th>Attribut</th><th>Type</th><th>Unité / valeurs</th><th>Obligatoire</th></tr></thead>
+    <tbody>
+      <tr><td><code>id</code></td><td>chaîne</td><td>—</td><td>oui</td></tr>
+      <tr><td><code>date</code></td><td><code>AAAA-MM-JJ</code></td><td>jour local — <strong>pas d'heure</strong></td><td>oui</td></tr>
+      <tr><td><code>steps</code></td><td>entier</td><td>nombre de pas, sans unité</td><td>oui</td></tr>
+      <tr><td><code>isSimulated</code></td><td>booléen</td><td>marque une ligne fabriquée et non relevée</td><td>non</td></tr>
+    </tbody>
+  </table>
+  <p>Seule entité sans plafond quotidien : plusieurs lignes peuvent porter la même date. <strong>Ce que vaut alors la journée n'est pas tranché par le modèle</strong> : la moyenne journalière et l'évaluation des récompenses somment les lignes d'une même date, tandis que la lecture des pas du jour retient la première ligne trouvée à cette date et ignore les suivantes. Deux relevés de 4 000 pas le même jour valent 8 000 d'un côté et 4 000 de l'autre. <span class="marque">arbitrage non validé</span></p>
+
+  <h3 id="entites-la-seance-d-activite">La séance d'activité</h3>
+  <table>
+    <thead><tr><th>Attribut</th><th>Type</th><th>Unité / valeurs</th><th>Obligatoire</th></tr></thead>
+    <tbody>
+      <tr><td><code>id</code></td><td>chaîne</td><td>—</td><td>oui</td></tr>
+      <tr><td><code>date</code>, <code>time</code></td><td><code>AAAA-MM-JJ</code>, <code>HH:MM</code></td><td>local, minutes rondes</td><td>oui</td></tr>
+      <tr><td><code>sport</code></td><td>chaîne</td><td><strong>le nom est la clé</strong> : c'est lui qui retrouve l'équivalent métabolique au catalogue. Le renommer couperait les séances enregistrées de leur dépense</td><td>oui</td></tr>
+      <tr><td><code>intensity</code></td><td>énuméré</td><td><code>douce</code> · <code>moderee</code> · <code>intensive</code></td><td>oui</td></tr>
+      <tr><td><code>duration</code></td><td>nombre</td><td>minutes</td><td>oui</td></tr>
+      <tr><td><code>distance</code></td><td>nombre</td><td><strong>mètres</strong> ; renseignée, la dépense se lit sur l'allure et non sur l'intensité</td><td>non</td></tr>
+      <tr><td><code>notes</code></td><td>chaîne</td><td>texte libre</td><td>non</td></tr>
+    </tbody>
+  </table>
+  <p>Le catalogue des activités (<code>SportPreset</code>) : 54 entrées, 7 actives par défaut.</p>
+  <table>
+    <thead><tr><th>Attribut</th><th>Type</th><th>Rôle</th></tr></thead>
+    <tbody>
+      <tr><td><code>value</code></td><td>chaîne</td><td>La clé enregistrée dans <code>SportLog.sport</code>.</td></tr>
+      <tr><td><code>label</code></td><td>chaîne</td><td>Égal à <code>value</code> pour toutes les entrées livrées.</td></tr>
+      <tr><td><code>met</code></td><td>nombre</td><td>Équivalent métabolique, sans dimension, arrondi au demi.</td></tr>
+    </tbody>
+  </table>
+  <p>Une conversion au chargement ramène « Ping-pong » et « Tennis de table » à la clé unique « Ping-pong/Tennis de table », sans quoi ces séances perdraient leur équivalent métabolique, et donc leur dépense.</p>
+
+  <h3 id="entites-le-moment-pour-soi">Le moment pour soi</h3>
+  <p>Même forme qu'une séance, sans intensité, sans distance et sans dépense (<code>MeTimeLog</code>).</p>
+  <table>
+    <thead><tr><th>Attribut</th><th>Type</th><th>Unité / valeurs</th><th>Obligatoire</th></tr></thead>
+    <tbody>
+      <tr><td><code>id</code></td><td>chaîne</td><td>—</td><td>oui</td></tr>
+      <tr><td><code>date</code>, <code>time</code></td><td><code>AAAA-MM-JJ</code>, <code>HH:MM</code></td><td>local, minutes rondes</td><td>oui</td></tr>
+      <tr><td><code>activity</code></td><td>chaîne</td><td>le nom, comme clé</td><td>oui</td></tr>
+      <tr><td><code>duration</code></td><td>nombre</td><td>minutes</td><td>oui</td></tr>
+      <tr><td><code>notes</code></td><td>chaîne</td><td>texte libre</td><td>non</td></tr>
+    </tbody>
+  </table>
+  <p>Le catalogue (<code>MeTimePreset</code>) porte deux attributs, <code>value</code> et <code>label</code>, égaux : 9 entrées, dont 6 actives par défaut.</p>
+
+  <h3 id="entites-la-nuit-ou-la-sieste">La nuit ou la sieste</h3>
+  <p>Une ligne par sommeil (<code>SleepLog</code>). Elle porte <strong>deux instants complets</strong>, jour et heure de chaque bout ; la durée n'est pas stockée.</p>
+  <table>
+    <thead><tr><th>Attribut</th><th>Type</th><th>Unité / valeurs</th><th>Obligatoire</th></tr></thead>
+    <tbody>
+      <tr><td><code>id</code></td><td>chaîne</td><td>—</td><td>oui</td></tr>
+      <tr><td><code>date</code></td><td><code>AAAA-MM-JJ</code></td><td><strong>la date du réveil</strong> : une nuit du 17 au 18 appartient au 18</td><td>oui</td></tr>
+      <tr><td><code>time</code></td><td><code>HH:MM</code></td><td><strong>l'heure du réveil</strong>, horodatage de la ligne</td><td>oui</td></tr>
+      <tr><td><code>bedDate</code></td><td><code>AAAA-MM-JJ</code></td><td>jour de l'endormissement, <em>écrit et non déduit</em></td><td>oui</td></tr>
+      <tr><td><code>bedTime</code></td><td><code>HH:MM</code></td><td>heure de l'endormissement, minutes rondes elle aussi</td><td>oui</td></tr>
+      <tr><td><code>kind</code></td><td>énuméré</td><td><code>nuit</code> · <code>sieste</code></td><td>oui</td></tr>
+      <tr><td><code>quality</code></td><td>entier</td><td>0 à 5. Une ligne enregistrée sans que la valeur soit touchée porte 3</td><td>oui</td></tr>
+      <tr><td><code>notes</code></td><td>chaîne</td><td>texte libre</td><td>non</td></tr>
+    </tbody>
+  </table>
+  <pre><code>duree(nuit) = instant(date, time) - instant(bedDate, bedTime)   // en minutes
+si reveil &lt;= endormissement : duree = 0, et l'enregistrement est refuse</code></pre>
+  <p>Écrire les deux jours est ce qui rend une donnée impossible reconnaissable : avec la seule paire d'heures, tout couple se lisait comme une nuit passée par minuit.</p>
+  <details><summary>Cas limites</summary>
+    <p>Une qualité à 0 enregistrée avant que 3 ne devienne la valeur non touchée est indiscernable d'un 0 choisi ; ces lignes ne sont pas réécrites.</p>
+  </details>
+
+  <h3 id="entites-la-marque-de-journee">La marque de journée</h3>
+  <p>Une ligne sans contenu (<code>DailyLog</code>) : deux attributs, et rien d'autre.</p>
+  <table>
+    <thead><tr><th>Attribut</th><th>Type</th><th>Unité / valeurs</th><th>Obligatoire</th></tr></thead>
+    <tbody>
+      <tr><td><code>id</code></td><td>chaîne</td><td>—</td><td>oui</td></tr>
+      <tr><td><code>date</code></td><td><code>AAAA-MM-JJ</code></td><td>jour local</td><td>oui</td></tr>
+    </tbody>
+  </table>
+  <p>Elle a porté trois contenus, tous disparus — les ressentis notés par symptôme, les quatre repas en texte libre, le total d'hydratation. Ne subsiste que sa <em>présence</em> à une date, lue par le choix de la phrase d'accueil et par le comptage du document médical. <span class="marque non">non implémenté</span> Aucun enregistrement n'en crée : seule la fabrication de données d'essai en écrit.</p>
+
+  <h3 id="entites-les-listes-d-entrees-actives">Les listes d'entrées actives</h3>
+  <p>Trois listes de chaînes, conservées hors de l'objet racine. Elles restreignent l'ensemble des valeurs qu'une nouvelle ligne peut porter ; elles ne retirent rien aux lignes déjà enregistrées, qui restent résolubles contre le catalogue complet.</p>
+  <table>
+    <thead><tr><th>Réserve</th><th>Type</th><th>Défaut</th></tr></thead>
+    <tbody>
+      <tr><td><code>glp1_active_sports</code></td><td>liste de clés d'activité</td><td>7 entrées sur 54</td></tr>
+      <tr><td><code>glp1_active_side_effects</code></td><td>liste de noms d'effets</td><td>12 entrées sur 36</td></tr>
+      <tr><td><code>glp1_active_me_time</code></td><td>liste de noms d'activités</td><td>6 entrées sur 9</td></tr>
+    </tbody>
+  </table>
+
+  <h3 id="entites-les-etats-tenus-hors-de-la-sauvegarde">Les états tenus hors de la sauvegarde</h3>
+  <p>Des états dérivés mais <em>mémorisés</em>, parce qu'ils décident d'un « déjà fêté » ou d'un « déjà vu » qu'aucun recalcul ne retrouverait.</p>
+  <table>
+    <thead><tr><th>État</th><th>Clé</th><th>Type</th><th>Ce qu'il retient</th></tr></thead>
+    <tbody>
+      <tr><td>Paliers de récompense connus (<code>BadgeTiersConnus</code>)</td><td><code>glp1_badge_tiers_connus</code></td><td><code>Record&lt;identifiant, palier&gt;</code>, palier parmi <code>aucun</code>, <code>eveil</code>, <code>bronze</code>, <code>argent</code>, <code>or</code></td><td>Le dernier palier observé de chacune des quatre récompenses. On part de l'état connu : un suivi éteint ne fait pas retomber son palier à « jamais observé ».</td></tr>
+      <tr><td>Assignation d'équivalences (<code>LudicUsageState</code>)</td><td><code>glow_ludic_usage</code></td><td><code>{ counts: Record&lt;nom, entier&gt;, assignment? }</code>, l'assignation portant <code>signature</code>, <code>totalKg?</code>, <code>lastKg?</code>, <code>total</code>, <code>last</code></td><td>Les compteurs par objet et l'assignation en cours, signée par l'identifiant, la date et l'heure de la pesée la plus récente, et par les deux pertes au dixième. Chaque nouvelle pesée réassigne, même à poids inchangé. Une assignation sans les deux pertes est tenue pour périmée.</td></tr>
+      <tr><td>Compteurs de sélection d'aliment</td><td><code>glp1_food_selection_counts</code></td><td><code>Record&lt;nom d'aliment, entier&gt;</code></td><td>Combien de fois chaque aliment a été retenu ; la table est relue avant chaque incrément.</td></tr>
+      <tr><td>Date de première ouverture</td><td><code>glp1_first_open_date</code></td><td>chaîne <code>AAAA-MM-JJ</code></td><td>L'ancre du délai de sept jours. À défaut, la donnée la plus ancienne de toutes les tables, ou aujourd'hui.</td></tr>
+      <tr><td>Paliers nutritionnels fêtés</td><td><code>glp1_paliers_nutritifs_fetes</code></td><td><code>{ date, nutriments: ('proteines'|'fibres')[] }</code></td><td>Ce qui a déjà été fêté ce jour-là.</td></tr>
+      <tr><td>Marques de célébration</td><td><code>glp1_notified_bmi_tier_index</code>, <code>glp1_last_celebrated_weight</code>, <code>glp1_last_celebrated_weight_id</code>, <code>glp1_dynamique_celebrated</code></td><td>chaînes nues</td><td>Le dernier palier d'IMC signalé, la dernière pesée fêtée (par valeur, puis par identifiant), et le fait que l'ouverture des fonctions du septième jour a déjà été signalée une fois.</td></tr>
+    </tbody>
+  </table>
+
+  <h3 id="entites-les-copies-de-secours">Les copies de secours</h3>
+  <p>Une copie intégrale de la sauvegarde, prise <em>avant</em> tout geste qui remplace en masse (<code>BackupEntry</code>). L'index des copies vit sous <code>glp1_app_companion_data__secours-index</code>, chaque copie sous <code>glp1_app_companion_data__secours-&lt;horodatage&gt;</code>.</p>
+  <table>
+    <thead><tr><th>Attribut</th><th>Type</th><th>Valeurs</th></tr></thead>
+    <tbody>
+      <tr><td><code>key</code></td><td>chaîne</td><td>où la copie se trouve</td></tr>
+      <tr><td><code>stamp</code></td><td>chaîne</td><td><code>AAAA-MM-JJ-HHMMSS</code>, heure locale</td></tr>
+      <tr><td><code>reason</code></td><td>chaîne</td><td>ce qui l'a déclenchée, en clair</td></tr>
+      <tr><td><code>size</code></td><td>entier</td><td>taille en signes</td></tr>
+    </tbody>
+  </table>
+  <p>Deux invariants : une copie n'en recouvre jamais une autre — un suffixe est ajouté jusqu'à trouver une clé libre — et une copie n'est déclarée faite qu'après avoir été relue et comparée signe pour signe. L'appelant a le droit de refuser d'écrire quand la mise à l'abri a échoué. Rien ne les efface automatiquement.</p>
+
+  <h3 id="entites-le-compte-et-ce-qui-quitte-l-appareil">Le compte et ce qui quitte l'appareil</h3>
+  <p>Le compte est distant ; les données de suivi ne le sont pas. Rien ne part sans un geste explicite, et aucune ligne de suivi ne part jamais.</p>
+  <table>
+    <thead><tr><th>Entité</th><th>Attributs</th><th>Portée</th></tr></thead>
+    <tbody>
+      <tr><td>Compte connecté (<code>AuthUser</code>)</td><td><code>id</code>, <code>email</code> ou <code>null</code>, <code>name</code> ou <code>null</code></td><td>La session est mémorisée jusqu'à déconnexion explicite. L'état de connexion vaut « en cours », « déconnecté » ou « connecté ».</td></tr>
+      <tr><td>Message envoyé (<code>FeedbackItem</code>)</td><td><code>id</code>, <code>type</code> (<code>avis</code> · <code>feature</code> · <code>bug</code>), <code>sentiment</code> (<code>content</code> · <code>neutre</code> · <code>pas_content</code>), <code>category</code>, <code>message</code>, <code>date</code> (libellé, non comparable), <code>sentAt</code> (ms), <code>acceptsContact</code></td><td>Conservé sur l'appareil sous <code>glp1_user_feedbacks</code> et copié à distance sous le compte, un document par message. <strong>Le type est déclaré plusieurs fois</strong>, avec des attributs divergents sur la même clé : <code>acceptsContact</code> n'existe que dans l'une des déclarations. Une même sauvegarde peut donc porter des messages des deux formes. <span class="marque">arbitrage non validé</span></td></tr>
+      <tr><td>Réponse au questionnaire (<code>StoredSurvey</code>)</td><td><code>ratings</code> : un dictionnaire de notes par proposition ; <code>otherSuggestion</code> ; <code>sendLog</code> : instants des envois</td><td><strong>Une seule réponse</strong>, sous <code>glp1_user_survey_v2</code>, réécrite à chaque envoi. Les notes sont rangées par clé et jamais par position, ce qui permet aux déclarations divergentes de cohabiter : l'une porte sept propositions (<code>albumPhotos</code>, <code>mealPhotos</code>, <code>wallet</code>, <code>journal</code>, <code>hydration</code>, <code>onlineSharing</code>, <code>printableBook</code>), une autre quatre (<code>albumPhotos</code>, <code>wallet</code>, <code>journal</code>, <code>scanNutrition</code>). À distance, un document unique par compte, fusionné, avec un cumul d'envois qui ne redescend jamais. <span class="marque">arbitrage non validé</span></td></tr>
+      <tr><td>Échec d'export</td><td>étape et cause</td><td>Un document par échec, sous le compte.</td></tr>
+    </tbody>
+  </table>
+  <p>Chaque envoi emporte un contexte technique : version, langue, fuseau, instant local, instant serveur, plus deux entiers de gabarit qui ne relèvent pas de ce document. Le consentement à être recontactée est absent des messages écrits avant qu'il ne soit demandé : il ne se présume pas.</p>
+
+  <h3 id="entites-declares-sans-table-derriere">Déclarés sans table derrière</h3>
+  <p>Ces types existent dans le modèle et décrivent la cible d'une migration entamée ; aucune donnée n'est enregistrée sous cette forme. <span class="marque non">non implémenté</span></p>
+  <table>
+    <thead><tr><th>Type</th><th>Ce qu'il déclare</th><th>Ce qui tient la place</th></tr></thead>
+    <tbody>
+      <tr><td><code>CustomFood</code></td><td><code>id</code>, <code>name</code>, cinq valeurs pour 100 g/ml, <code>isLiquid</code> obligatoire, <code>barcode</code>, <code>recipeId</code>, <code>createdAt</code>, <code>updatedAt</code></td><td><code>UserCustomFood</code>, aux attributs nommés autrement et sans <code>updatedAt</code></td></tr>
+      <tr><td><code>Recipe</code></td><td><code>id</code>, <code>ingredients</code>, <code>createdAt</code>, <code>updatedAt</code> — une recette sans nom, le nom étant celui de l'aliment qu'elle définit</td><td>L'attribut <code>recipeIngredients</code> de l'aliment personnalisé</td></tr>
+      <tr><td><code>SideEffectType</code></td><td><code>id</code>, <code>label</code>, <code>createdAt</code>, <code>updatedAt</code> — un effet référencé par identifiant et traduisible</td><td>Une liste de <em>noms</em> livrée, et le nom stocké dans chaque ligne</td></tr>
+      <tr><td><code>SportType</code></td><td>idem, plus <code>met</code></td><td>Le catalogue d'activités, référencé par son texte</td></tr>
+      <tr><td><code>HungerLevel</code>, <code>SeverityLevel</code></td><td>Entiers bornés, 0–5 et 1–5</td><td>Des <code>number</code> non bornés par le type</td></tr>
+      <tr><td><code>OnboardingAnswers</code>, <code>OnboardingState</code></td><td>Une trentaine d'attributs <strong>tous facultatifs</strong> : <code>theme</code>, <code>goal</code> (<code>perdre</code> · <code>stabiliser</code> · <code>masse</code>), <code>started</code>, <code>startedSince</code>, <code>startingWeight</code>, <code>startingWeightDate</code>, <code>currentWeight</code>, <code>currentWeightDate</code>, <code>targetWeight</code>, <code>height</code> (cm), <code>age</code> (années), <code>dailyActivity</code>, <code>hasSessions</code>, <code>sessionsCount</code>, <code>sessionsRate</code>, <code>sessionKinds</code>, <code>dailyActivityWish</code>, <code>sessionsWish</code>, <code>foodDiary</code>, <code>foodDiaryHelp</code> (0–5), <code>trackNutrition</code>, <code>trackSteps</code>, <code>trackSport</code>, <code>meTimePrefs</code>, <code>trackMeTime</code>, <code>gender</code>, <code>firstName</code> ; l'état ajoute <code>skipped</code>, la liste des étapes explicitement passées</td><td><strong>Rien.</strong> Aucun de ces attributs n'atteint la sauvegarde : le questionnaire d'accueil de la V1 ne produit aucune donnée conservée</td></tr>
+    </tbody>
+  </table>
+  <p>Deux entités ont été supprimées et ne doivent pas revenir : le relevé d'hydratation et les objectifs de poids à paliers. Leurs traces sont écartées à chaque chargement.</p>
+
+  <h3 id="entites-ce-que-la-v2-a-decide-autrement">Ce que la V2 a décidé autrement <span class="marque v2">V2</span></h3>
+  <p>La V2 ne conserve encore rien : l'objet des réponses (<code>Reponses</code>) vit en mémoire, aucun code n'écrit ni ne lit de stockage, et il ne survit pas à la fin de la session. <span class="marque non">non implémenté</span> Ce qu'elle a tranché sur les entités vaut néanmoins, et prime sur la V1.</p>
+  <table>
+    <thead><tr><th>Sujet</th><th>V1</th><th>V2</th></tr></thead>
+    <tbody>
+      <tr><td>Âge</td><td><code>age</code>, entier d'années — se périme</td><td><code>anneeNaissance</code>, entier. Bornes : de l'année courante moins 130 à l'année courante moins 1 ; l'appelant passe l'année, le modèle ne lit pas l'horloge. Défaut 1980</td></tr>
+      <tr><td>Taille</td><td><code>height</code>, centimètres</td><td><code>tailleCm</code>, centimètres, défaut 165. Bornes 50–300 cm, ou 20–118 pouces</td></tr>
+      <tr><td>Poids</td><td>arrondi au dixième</td><td>Chaîne à point décimal (« 95.0 »), défaut « 95.0 », convertie en nombre là où elle sera enregistrée. Plafonds 999 kg et 2 000 lb — deux plafonds ronds, non convertis l'un de l'autre. <code>poids</code> et <code>poidsCible</code> sont <strong>deux attributs qui ne se touchent jamais</strong></td></tr>
+      <tr><td>Objectif</td><td>trois valeurs : <code>perdre</code> · <code>stabiliser</code> · <code>masse</code></td><td>Deux : <code>perdre</code> · <code>stabiliser</code>. <code>poidsCible</code> n'a de sens que sur <code>perdre</code>, et n'est <strong>jamais</strong> dérivé de <code>poids</code></td></tr>
+      <tr><td>Système d'unités</td><td><code>measurementSystem</code> : <code>metric</code> · <code>imperial</code></td><td><code>Systeme</code> : <code>metrique</code> · <code>imperial</code>. <code>SYSTEME_PAR_LANGUE</code> associe <code>fr</code> à <code>metrique</code> et <code>en</code> à <code>imperial</code> ; l'attribut reste modifiable indépendamment. Le stockage demeure métrique, et la conversion du pouce tient en deux fonctions</td></tr>
+      <tr><td>Langue</td><td>absente du modèle</td><td><code>Langue</code> : <code>fr</code> · <code>en</code>. L'attribut existe, rien ne le lit encore <span class="marque non">non implémenté</span></td></tr>
+      <tr><td>Avatar</td><td><code>AvatarConfig</code>, plus <code>customPhotoUrl</code></td><td><code>Avatar</code> : <code>genre</code> (<code>femme</code> · <code>homme</code> · <code>neutre</code>), <code>formeVisage</code> (<code>ovale</code> · <code>rond</code> · <code>carre</code> · <code>coeur</code>), <code>couleurPeau</code> (nuancier fermé de 6), <code>couleurYeux</code> (5), <code>coiffure</code> (<code>court</code> · <code>long</code> · <code>boucle</code> · <code>frange</code> · <code>brosse</code> · <code>chauve</code>), <code>couleurCheveux</code> (6), <code>lunettes</code>, <code>expression</code> (<code>joyeuse</code> · <code>determinee</code> · <code>fiere</code> · <code>calme</code>). Les trois nuanciers sont ceux de la V1, valeur pour valeur. Pas d'équivalent de <code>customPhotoUrl</code>. Le genre fait partie de l'avatar et n'est plus une donnée à part ; <code>COIFFURE_DU_GENRE</code> associe une coiffure à chaque genre</td></tr>
+      <tr><td>Silhouette</td><td><code>silhouetteType</code>, obligatoire</td><td>Supprimée</td></tr>
+      <tr><td>Traitement</td><td><code>Treatment</code> : 11 attributs, dont posologie et cinétique</td><td><code>Traitement</code> : <code>id</code>, <code>nom</code>, <code>forme</code> (<code>injection</code> · <code>comprime</code>). Treize entrées, chaque forme finissant par « Autre ». Aucune posologie, aucune cinétique</td></tr>
+      <tr><td>Absence de traitement</td><td>une entrée <code>aucun</code> du catalogue</td><td>Un attribut à part, <code>traitementCommence</code>, booléen vrai par défaut et jamais nul. À faux, <code>formeTraitement</code> et <code>traitement</code> repassent à <code>null</code> ; changer <code>formeTraitement</code> remet <code>traitement</code> à <code>null</code></td></tr>
+      <tr><td>Compte</td><td>identité distante seule</td><td><code>email</code> et <code>motDePasse</code>, chaînes vides au départ. <strong>Une seule contrainte</strong>, huit signes au moins sur le mot de passe. Rien d'autre n'est vérifié</td></tr>
+    </tbody>
+  </table>
+  <div class="exemple"><p>Camille en V2 : <code>anneeNaissance</code> 1978, <code>tailleCm</code> 168, <code>poids</code> « 96.0 », <code>objectif</code> <code>perdre</code>, <code>traitementCommence</code> vrai, <code>formeTraitement</code> <code>injection</code>, <code>traitement</code> <code>ozempic</code>. Rien de tout cela n'est encore écrit nulle part.</p></div>
+</section>

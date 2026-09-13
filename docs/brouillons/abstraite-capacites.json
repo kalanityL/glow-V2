@@ -1,0 +1,464 @@
+{
+ "inventions": [
+  {
+   "categorie": "Plafonds quotidiens",
+   "fonctionnalite": "Ajouter une ligne sous plafond",
+   "texte": "Tous les plafonds quotidiens refusent la saisie de trop ; aucun ne remplace de ligne existante.",
+   "origine": "Arbitrage du rédacteur, marqué comme tel dans le chapitre. Le code fait refuser six plafonds (sommeil, repas, aliments, recettes, menus, envois) et écraser quatre (prises de traitement, ressentis, séances, moments pour soi) — addLogWithinDailyCap dans src/shared/model/logbook.ts. L'alignement est proposé au nom de la règle « rien ne détruit la donnée » du 2026-08-17 ; il n'a jamais été demandé."
+  },
+  {
+   "categorie": "Ressentis",
+   "fonctionnalite": "Modifier un ressenti",
+   "texte": "L'intensité d'un ressenti se modifie de 0 à 5 par tous les chemins.",
+   "origine": "Le code accepte 1 à 5 par un chemin (JournalEntryCard) et 0 à 5 par un autre (SideEffectCalendar), alors que l'échelle de référence va de 0 à 5. Le chapitre signale l'écart sans le trancher : la règle unique reste à décider."
+  },
+  {
+   "categorie": "Pas",
+   "fonctionnalite": "Consigner un relevé de pas",
+   "texte": "Une personne peut enregistrer un nombre de pas pour une journée.",
+   "origine": "handleAddStep existe dans src/app/useAppData.ts mais n'est passé à aucun consommateur de la version Mixte (StepsTracker ne reçoit que onDeleteStep, onUpdateStep, onClearAllSteps) : la capacité n'existe pas. Le podomètre réel du téléphone est décidé pour la conversion native (GUIDELINES V2 § 2.1), et rien n'en est écrit."
+  },
+  {
+   "categorie": "Rappels",
+   "fonctionnalite": "Être rappelée",
+   "texte": "Un rappel de prise ou de rendez-vous se déclenche à l'heure réglée.",
+   "origine": "Le réglage est enregistré dans le profil (NotificationsSettings, UserProfile) ; aucun code ne le lit pour déclencher quoi que ce soit. GUIDELINES V2 : de vraies notifications du téléphone, le jour de la conversion native."
+  },
+  {
+   "categorie": "Bibliothèque d'aliments",
+   "fonctionnalite": "Retrouver un aliment par son code-barres",
+   "texte": "Le code-barres se lit à l'appareil photo.",
+   "origine": "Le code se saisit ; la V1 ne fait que redessiner une représentation du code saisi (barcode.utils.ts). GUIDELINES V2 promet un vrai scan, avec saisie à la main en repli et chaque échec journalisé anonymement."
+  },
+  {
+   "categorie": "Prises de traitement",
+   "fonctionnalite": "Se voir proposer une zone",
+   "texte": "La zone proposée suit une rotation déterministe.",
+   "origine": "suggestInjectionSite tire au sort parmi les zones restantes : deux ouvertures ne proposent pas la même. Une rotation d'ordre fixe (nextRotationSite) existe dans le même fichier mais n'est appelée par personne. Le chapitre décrit le tirage au sort, qui est ce qui s'exécute."
+  },
+  {
+   "categorie": "Prises alimentaires",
+   "fonctionnalite": "Enregistrer une prise alimentaire",
+   "texte": "Seule la composition est stockée ; les cinq valeurs nutritionnelles se recalculent à la lecture.",
+   "origine": "Elles restent inscrites sur la ligne (SavedMealLog), contre la règle « rien de dérivable n'est stocké ». Le code les recalcule à chaque écriture et le commentaire du type les qualifie de cache transitoire. Le chapitre décrit l'état réel, pas l'état visé."
+  },
+  {
+   "categorie": "Sommeil",
+   "fonctionnalite": "Noter la qualité d'un sommeil",
+   "texte": "Une qualité non touchée reste absente, et se distingue d'une qualité choisie.",
+   "origine": "La qualité vaut 3 par défaut et est toujours écrite. Une qualité facultative avait été recommandée ; l'utilisatrice a tranché autrement en connaissance de cause le 2026-08-30. Les zéros déjà enregistrés restent ambigus."
+  },
+  {
+   "categorie": "Compte",
+   "fonctionnalite": "Ouvrir un compte",
+   "texte": "Le recueil initial de la V2 crée une identité auprès d'un service.",
+   "origine": "La V2 recueille prénom, adresse et secret et vérifie la longueur du secret (src/domaine/compte.ts, parcours.ts), mais n'enregistre aucune réponse : GUIDELINES § 5 dit qu'un rechargement perd tout, et rien n'est branché sur un service."
+  },
+  {
+   "categorie": "Fenêtres d'observation",
+   "fonctionnalite": "Borner dans le temps",
+   "texte": "Un relevé daté dans le futur est refusé à l'écriture.",
+   "origine": "Aucun journal ne le refuse. Certains décomptes l'écartent (currentTreatmentSeries, les distinctions, via hasOccurred), d'autres non. Aucune règle unique n'existe dans le code."
+  },
+  {
+   "categorie": "Distinctions",
+   "fonctionnalite": "La distinction non révélée",
+   "texte": "La distinction masquable obéit à une règle d'obtention.",
+   "origine": "Seul son masquage figure dans le code lu (mysteryBadgeHidden, BadgesPage, SalutBlock) : aucune règle d'obtention n'y est écrite."
+  },
+  {
+   "categorie": "Rendu — écarté du chapitre",
+   "fonctionnalite": "Écriture des nombres et des durées",
+   "texte": "Une dose s'écrit à deux décimales sous 10 mg, à une sous 100 mg, entière au-delà ; les durées s'écrivent « 45min » ou « 1h15 » ; les milliers se séparent d'une espace insécable ; le séparateur décimal suit la langue.",
+   "origine": "Règles de rendu, sans effet sur la donnée enregistrée : écartées d'un chapitre qui ne dit que les données et les capacités."
+  },
+  {
+   "categorie": "Rendu — écarté du chapitre",
+   "fonctionnalite": "Ordre et vue par défaut d'un journal",
+   "texte": "Un journal se restitue du plus récent au plus ancien, et la vue par défaut d'un historique est la grille mensuelle, mémorisée par endroit.",
+   "origine": "Ordres de tri et vue retenue : rendu seul. Ce qui est structurant — l'ordre porté par les dates et heures, jamais l'ordre d'enregistrement — est resté dans le chapitre."
+  },
+  {
+   "categorie": "Rendu — écarté du chapitre",
+   "fonctionnalite": "Choisir le tirage du document médical",
+   "texte": "Trois tirages du document se choisissent : sans couleur, aux teintes du produit, ou neutre.",
+   "origine": "Décision de rendu : le contenu du document, ses rubriques et ses chiffres ne changent pas d'un tirage à l'autre."
+  }
+ ],
+ "glossaire": [
+  {
+   "terme": "Capacité",
+   "definition": "Un verbe offert à la personne : il lit l'état des données, juge une saisie, puis écrit tout son effet ou n'écrit rien. Une capacité ne rend jamais un résultat partiel."
+  },
+  {
+   "terme": "Précondition",
+   "definition": "Ce qui doit être vrai des données ou de la saisie pour qu'une capacité écrive. Faute de quoi elle refuse, sans effet de bord."
+  },
+  {
+   "terme": "Refus",
+   "definition": "L'issue d'une capacité dont une précondition n'est pas tenue : rien n'est écrit et la cause est nommée. Un refus s'efface dès que la grandeur fautive est retouchée."
+  },
+  {
+   "terme": "Plafond quotidien",
+   "definition": "Le nombre maximal de lignes qu'un journal accepte pour une même date. Il compte les lignes réellement présentes à la date visée, jamais au jour courant. Deux régimes : refuser, ou remplacer la dernière ligne de la journée."
+  },
+  {
+   "terme": "Date visée",
+   "definition": "La date que porte la ligne écrite, choisie par la personne — pas la date du geste. Tous les plafonds et toutes les règles d'unicité s'y rapportent."
+  },
+  {
+   "terme": "Minute ronde",
+   "definition": "Une des huit valeurs de minutes retenues par le produit : 0, 10, 15, 20, 30, 40, 45 ou 50. Toute heure enregistrée est ramenée à la plus grande minute ronde inférieure ou égale."
+  },
+  {
+   "terme": "Rognage",
+   "definition": "Le retrait des espaces de bord d'un texte avant de le juger. Un texte vide après rognage vaut absence ; le texte conservé, lui, n'est pas rogné."
+  },
+  {
+   "terme": "Suppression franche",
+   "definition": "Le retrait effectif d'une ligne de la sauvegarde, par opposition à une marque de suppression. Le produit ne connaît que la suppression franche."
+  },
+  {
+   "terme": "Pesée",
+   "definition": "Une ligne du journal du poids : date, heure, poids en kilogrammes au dixième, et jusqu'à neuf mensurations facultatives. Au plus une par jour."
+  },
+  {
+   "terme": "Pesée de départ",
+   "definition": "La pesée marquée d'un drapeau, référence de toute perte, de toute progression et des distinctions. Invariant : c'est la plus ancienne, et le drapeau est reposé sur elle après chaque écriture. Elle ne se supprime pas."
+  },
+  {
+   "terme": "Mensuration",
+   "definition": "Une des neuf mesures corporelles facultatives en centimètres attachées à une pesée. Absente n'est pas nulle : une mensuration non renseignée n'est pas zéro."
+  },
+  {
+   "terme": "Prise de traitement",
+   "definition": "Le fait d'avoir pris son traitement à un instant : date, heure, dose en milligrammes, zone, notes facultatives, identifiant du traitement. Le mot vaut pour une injection comme pour un comprimé."
+  },
+  {
+   "terme": "Catalogue de traitements",
+   "definition": "La liste fermée des spécialités déclarables, chacune avec sa forme. Chaque forme finit par une entrée « Autre ». Le profil porte un identifiant, jamais un nom."
+  },
+  {
+   "terme": "Prise alimentaire",
+   "definition": "Un repas ou un en-cas : une composition, une date, une heure, deux notes de faim, et cinq valeurs nutritionnelles calculées de la composition."
+  },
+  {
+   "terme": "Composition",
+   "definition": "La liste ordonnée des couples { référence d'aliment, quantité } d'une prise, d'un menu ou d'une recette. Une prise en porte toujours au moins un."
+  },
+  {
+   "terme": "Aliment personnel",
+   "definition": "Une entrée créée par la personne : nom unique, cinq valeurs pour 100 g ou 100 ml, une nature solide ou liquide, un instant de création. Cinquante créations par jour au plus."
+  },
+  {
+   "terme": "Recette",
+   "definition": "Un aliment personnel qui porte sa propre composition. Ses valeurs pour 100 g en sont calculées puis arrondies à l'entier. Vingt créations par jour au plus, quota indépendant."
+  },
+  {
+   "terme": "Menu favori",
+   "definition": "Une composition nommée et réutilisable, sans date, sans heure et sans faim. Le reprendre copie sa composition ; aucun lien n'est créé avec les prises qui en découlent."
+  },
+  {
+   "terme": "Ressenti",
+   "definition": "La déclaration d'un effet indésirable : type pris dans la liste active, intensité entière de 0 à 5, date, heure, note facultative de 280 signes au plus."
+  },
+  {
+   "terme": "Sommeil",
+   "definition": "Une plage : jour et heure d'endormissement, jour et heure de réveil, une nature (nuit ou sieste), une qualité de 0 à 5. La date de la ligne est celle du réveil ; la durée n'est jamais stockée."
+  },
+  {
+   "terme": "Recouvrement",
+   "definition": "L'intersection de deux plages de sommeil. Interdite : deux sommeils ne peuvent pas se recouvrir. Bout à bout est permis."
+  },
+  {
+   "terme": "Séance",
+   "definition": "Une activité physique : activité de la liste active, durée en minutes (ou nombre d'étages), intensité, distance facultative en mètres, date et heure."
+  },
+  {
+   "terme": "Moment pour soi",
+   "definition": "Le décalque d'une séance sans intensité ni distance : une activité, une durée de 1 à 480 minutes, une date et une heure."
+  },
+  {
+   "terme": "Relevé de pas",
+   "definition": "Une date et un nombre de pas, sans heure. Plusieurs relevés d'une même date s'additionnent ; aucun n'est créé par la personne dans la V1."
+  },
+  {
+   "terme": "Domaine de relevé",
+   "definition": "L'un des sept suivis activables indépendamment. Deux drapeaux : actif, et masqué — ce second ne vaut que sur un domaine éteint. Éteindre un domaine ne détruit rien."
+  },
+  {
+   "terme": "Liste de référence restreinte",
+   "definition": "Un catalogue fermé dont la personne retient un sous-ensemble non vide. Trois existent : types de ressenti, activités physiques, activités de temps pour soi."
+  },
+  {
+   "terme": "Système d'unités",
+   "definition": "Métrique ou impérial. Il décide de l'unité de saisie et de lecture, jamais de l'unité de stockage, qui est métrique sans exception et sans étiquette."
+  },
+  {
+   "terme": "Fenêtre d'observation",
+   "definition": "La borne temporelle appliquée à un ensemble de relevés : 7, 14, 30 ou 90 derniers jours (jour courant compris), depuis le début, ou deux bornes libres facultatives."
+  },
+  {
+   "terme": "Distinction",
+   "definition": "Un constat de régularité sur une fenêtre courte, à cinq paliers ordonnés : aucun, éveil, bronze, argent, or. Une montée est constatée une fois ; une descente ne l'est pas."
+  },
+  {
+   "terme": "Journée réussie",
+   "definition": "Une journée dont le total d'une grandeur atteint le seuil d'une distinction : 25 g de fibres, le poids courant × 1,5 en grammes de protéines, 8 000 pas."
+  },
+  {
+   "terme": "Journée documentée",
+   "definition": "Une date portée par au moins un relevé des journaux considérés. Un relevé de pas nul n'en fait pas une."
+  },
+  {
+   "terme": "Objectif quotidien",
+   "definition": "Une valeur de comparaison journalière. Trois se règlent (énergie, protéines, fibres), une non (8 000 pas). L'objectif de protéines par défaut suit le poids courant."
+  }
+ ],
+ "index": [
+  {
+   "terme": "Capacité (ce qu'elle engage)",
+   "ancre": "capacites-ce-qu-une-capacite-engage"
+  },
+  {
+   "terme": "Plafond quotidien",
+   "ancre": "capacites-ce-qu-une-capacite-engage"
+  },
+  {
+   "terme": "Minute ronde",
+   "ancre": "capacites-ce-qu-une-capacite-engage"
+  },
+  {
+   "terme": "Date visée",
+   "ancre": "capacites-ce-qu-une-capacite-engage"
+  },
+  {
+   "terme": "Suppression franche",
+   "ancre": "capacites-ce-qu-une-capacite-engage"
+  },
+  {
+   "terme": "Ouvrir une session",
+   "ancre": "capacites-le-compte-et-la-session"
+  },
+  {
+   "terme": "Ouvrir un compte",
+   "ancre": "capacites-le-compte-et-la-session"
+  },
+  {
+   "terme": "Supprimer le compte et toutes les données",
+   "ancre": "capacites-le-compte-et-la-session"
+  },
+  {
+   "terme": "Avertissement médical",
+   "ancre": "capacites-le-compte-et-la-session"
+  },
+  {
+   "terme": "Profil",
+   "ancre": "capacites-qui-l-on-est"
+  },
+  {
+   "terme": "Année de naissance",
+   "ancre": "capacites-qui-l-on-est"
+  },
+  {
+   "terme": "Taille",
+   "ancre": "capacites-qui-l-on-est"
+  },
+  {
+   "terme": "Avatar",
+   "ancre": "capacites-qui-l-on-est"
+  },
+  {
+   "terme": "Genre",
+   "ancre": "capacites-qui-l-on-est"
+  },
+  {
+   "terme": "Système d'unités",
+   "ancre": "capacites-qui-l-on-est"
+  },
+  {
+   "terme": "Domaine de relevé",
+   "ancre": "capacites-ce-que-l-on-suit"
+  },
+  {
+   "terme": "Masquer un domaine",
+   "ancre": "capacites-ce-que-l-on-suit"
+  },
+  {
+   "terme": "Catalogue de traitements",
+   "ancre": "capacites-le-traitement-declare"
+  },
+  {
+   "terme": "Déclarer son traitement",
+   "ancre": "capacites-le-traitement-declare"
+  },
+  {
+   "terme": "Essai clinique (attestation)",
+   "ancre": "capacites-le-traitement-declare"
+  },
+  {
+   "terme": "Prise de traitement",
+   "ancre": "capacites-les-prises-de-traitement"
+  },
+  {
+   "terme": "Dose",
+   "ancre": "capacites-les-prises-de-traitement"
+  },
+  {
+   "terme": "Zone d'injection",
+   "ancre": "capacites-les-prises-de-traitement"
+  },
+  {
+   "terme": "Pesée",
+   "ancre": "capacites-les-pesees"
+  },
+  {
+   "terme": "Pesée de départ",
+   "ancre": "capacites-les-pesees"
+  },
+  {
+   "terme": "Poids visé",
+   "ancre": "capacites-les-pesees"
+  },
+  {
+   "terme": "Mensuration",
+   "ancre": "capacites-les-pesees"
+  },
+  {
+   "terme": "Prise alimentaire",
+   "ancre": "capacites-les-prises-alimentaires"
+  },
+  {
+   "terme": "Composition",
+   "ancre": "capacites-les-prises-alimentaires"
+  },
+  {
+   "terme": "Faim avant / après",
+   "ancre": "capacites-les-prises-alimentaires"
+  },
+  {
+   "terme": "Fibres",
+   "ancre": "capacites-les-prises-alimentaires"
+  },
+  {
+   "terme": "Aliment personnel",
+   "ancre": "capacites-la-bibliotheque-d-aliments-et-les-menus"
+  },
+  {
+   "terme": "Recette",
+   "ancre": "capacites-la-bibliotheque-d-aliments-et-les-menus"
+  },
+  {
+   "terme": "Menu favori",
+   "ancre": "capacites-la-bibliotheque-d-aliments-et-les-menus"
+  },
+  {
+   "terme": "Code-barres",
+   "ancre": "capacites-la-bibliotheque-d-aliments-et-les-menus"
+  },
+  {
+   "terme": "Ressenti",
+   "ancre": "capacites-les-ressentis"
+  },
+  {
+   "terme": "Intensité",
+   "ancre": "capacites-les-ressentis"
+  },
+  {
+   "terme": "Séance d'activité physique",
+   "ancre": "capacites-l-activite-physique"
+  },
+  {
+   "terme": "Distance",
+   "ancre": "capacites-l-activite-physique"
+  },
+  {
+   "terme": "Étages",
+   "ancre": "capacites-l-activite-physique"
+  },
+  {
+   "terme": "Sommeil",
+   "ancre": "capacites-le-sommeil"
+  },
+  {
+   "terme": "Recouvrement",
+   "ancre": "capacites-le-sommeil"
+  },
+  {
+   "terme": "Qualité de sommeil",
+   "ancre": "capacites-le-sommeil"
+  },
+  {
+   "terme": "Moment pour soi",
+   "ancre": "capacites-le-temps-pour-soi"
+  },
+  {
+   "terme": "Relevé de pas",
+   "ancre": "capacites-les-pas"
+  },
+  {
+   "terme": "Cumul des pas",
+   "ancre": "capacites-les-pas"
+  },
+  {
+   "terme": "Liste de référence restreinte",
+   "ancre": "capacites-les-listes-de-reference"
+  },
+  {
+   "terme": "Objectif quotidien",
+   "ancre": "capacites-les-objectifs-quotidiens"
+  },
+  {
+   "terme": "Rappel de prise",
+   "ancre": "capacites-les-rappels"
+  },
+  {
+   "terme": "Rappel de rendez-vous",
+   "ancre": "capacites-les-rappels"
+  },
+  {
+   "terme": "Fenêtre d'observation",
+   "ancre": "capacites-les-fenetres-d-observation"
+  },
+  {
+   "terme": "Document médical",
+   "ancre": "capacites-le-document-medical"
+  },
+  {
+   "terme": "Journée documentée",
+   "ancre": "capacites-le-document-medical"
+  },
+  {
+   "terme": "Partage",
+   "ancre": "capacites-le-partage"
+  },
+  {
+   "terme": "Distinction",
+   "ancre": "capacites-les-distinctions"
+  },
+  {
+   "terme": "Palier",
+   "ancre": "capacites-les-distinctions"
+  },
+  {
+   "terme": "Journée réussie",
+   "ancre": "capacites-les-distinctions"
+  },
+  {
+   "terme": "Retour (avis, idée, signalement)",
+   "ancre": "capacites-les-retours"
+  },
+  {
+   "terme": "Questionnaire",
+   "ancre": "capacites-les-retours"
+  },
+  {
+   "terme": "Effacer",
+   "ancre": "capacites-effacer"
+  },
+  {
+   "terme": "Vider un journal",
+   "ancre": "capacites-effacer"
+  }
+ ]
+}

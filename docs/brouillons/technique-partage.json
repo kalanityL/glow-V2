@@ -1,0 +1,168 @@
+{
+ "inventions": [
+  {
+   "categorie": "poids du fichier",
+   "fonctionnalite": "Partage d'un badge",
+   "texte": "Le poids en octets de la carte JPEG produite et une éventuelle limite de taille de la feuille de partage.",
+   "origine": "Le code ne mesure ni ne borne la taille du blob ; aucune valeur n'est vérifiable à la ligne."
+  },
+  {
+   "categorie": "compatibilité plateforme",
+   "fonctionnalite": "Partage d'un badge",
+   "texte": "Le détail de ce que chaque système accepte réellement (iOS joint le fichier mais ignore l'adresse, Android affiche le titre, etc.).",
+   "origine": "Le code délègue entièrement à navigator.canShare et navigator.share ; le comportement par système n'est écrit nulle part dans le dépôt."
+  },
+  {
+   "categorie": "décision V2",
+   "fonctionnalite": "Partage d'un badge",
+   "texte": "Ce que devient le partage en V2 : conservé tel quel, réécrit sur la couche shared/platform, ou retiré.",
+   "origine": "GIT-APP-V2/src ne contient aucun code de partage et GUIDELINES.md n'en dit rien."
+  },
+  {
+   "categorie": "correction du texte de la notice",
+   "fonctionnalite": "Partage d'un badge",
+   "texte": "Que la notice « Lien et texte de partage copiés » soit un défaut à corriger, ou que l'adresse doive rejoindre le presse-papier.",
+   "origine": "Le code copie le texte seul ; rien n'indique laquelle des deux moitiés, le message ou la copie, est l'erreur."
+  },
+  {
+   "categorie": "durée d'affichage",
+   "fonctionnalite": "Partage d'un badge",
+   "texte": "Une durée d'effacement automatique de la notice de la page Badges.",
+   "origine": "Aucun setTimeout dans BadgesPage : la notice n'est effacée que par setShareNotice(null) au clic sur le dessin d'un badge."
+  }
+ ],
+ "glossaire": [
+  {
+   "terme": "Feuille de partage",
+   "definition": "Panneau du système d'exploitation ouvert par navigator.share, qui choisit seul les applications de destination. L'application ne sait ni ce qui est proposé, ni ce qui est retenu."
+  },
+  {
+   "terme": "navigator.share",
+   "definition": "Appel du navigateur qui remet une charge (titre, texte, adresse, fichiers) à la feuille de partage. Son absence est le seul critère de bascule vers le presse-papier."
+  },
+  {
+   "terme": "navigator.canShare",
+   "definition": "Test préalable qui dit si une charge donnée est partageable. Appelé deux fois : sur le fichier seul, puis sur la charge complète."
+  },
+  {
+   "terme": "AbortError",
+   "definition": "Nom d'erreur rendu par navigator.share quand la personne ferme la feuille de partage. Avalé sans trace ni message."
+  },
+  {
+   "terme": "Palier (BadgeTier)",
+   "definition": "Niveau d'un badge parmi aucun, eveil, bronze, argent, or, dans cet ordre croissant. Le partage n'en lit que le libellé et le critère correspondant."
+  },
+  {
+   "terme": "Critère de palier",
+   "definition": "Phrase de badge.criteria décrivant la condition du palier atteint. Écrite sur la carte ; le palier aucun retombe sur le critère bronze."
+  },
+  {
+   "terme": "Carte de partage",
+   "definition": "Image carrée peinte au canvas 2D par renderBadgeCardFile : 600 × 600 unités mises à l'échelle 2, exportées en JPEG 1 200 × 1 200 px."
+  },
+  {
+   "terme": "Rendu 2×",
+   "definition": "ctx.scale(2, 2) appliqué à un canvas de 1 200 px de côté : les coordonnées restent écrites dans un espace de 600, le fichier sort au double."
+  },
+  {
+   "terme": "BadgeDrawing",
+   "definition": "Composant React qui dessine un badge, passé en argument par l'écran qui partage. Rasterisé en SVG puis en image pour la carte."
+  },
+  {
+   "terme": "renderToStaticMarkup",
+   "definition": "Rendu du composant du badge en chaîne HTML hors du DOM, dont le SVG est extrait par expression régulière avant d'être chargé en blob."
+  },
+  {
+   "terme": "Repli presse-papier",
+   "definition": "Chemin sans navigator.share : copie du texte seul par navigator.clipboard.writeText, plus une notice à l'écran quand l'appelant a fourni onNotice."
+  }
+ ],
+ "index": [
+  {
+   "terme": "Partage d'un badge",
+   "ancre": "partage-partage-d-un-badge"
+  },
+  {
+   "terme": "shareBadgeItem",
+   "ancre": "partage-partage-d-un-badge"
+  },
+  {
+   "terme": "renderBadgeCardFile",
+   "ancre": "partage-partage-d-un-badge"
+  },
+  {
+   "terme": "Carte de partage (JPEG 1 200 × 1 200)",
+   "ancre": "partage-partage-d-un-badge"
+  },
+  {
+   "terme": "Qualité JPEG 0,95",
+   "ancre": "partage-partage-d-un-badge"
+  },
+  {
+   "terme": "navigator.share",
+   "ancre": "partage-partage-d-un-badge"
+  },
+  {
+   "terme": "navigator.canShare",
+   "ancre": "partage-partage-d-un-badge"
+  },
+  {
+   "terme": "AbortError",
+   "ancre": "partage-partage-d-un-badge"
+  },
+  {
+   "terme": "Presse-papier (repli)",
+   "ancre": "partage-partage-d-un-badge"
+  },
+  {
+   "terme": "Notice de partage",
+   "ancre": "partage-partage-d-un-badge"
+  },
+  {
+   "terme": "Couleurs des paliers sur la carte",
+   "ancre": "partage-partage-d-un-badge"
+  },
+  {
+   "terme": "Critère écrit sur la carte",
+   "ancre": "partage-partage-d-un-badge"
+  },
+  {
+   "terme": "Exception du Kangourou Musclé (athlete)",
+   "ancre": "partage-partage-d-un-badge"
+  },
+  {
+   "terme": "Nom de fichier badge-{id}-{palier}.jpg",
+   "ancre": "partage-partage-d-un-badge"
+  },
+  {
+   "terme": "ShareBlock (surface non affichée)",
+   "ancre": "partage-partage-d-un-badge"
+  },
+  {
+   "terme": "buildSportShareConfig",
+   "ancre": "partage-partage-d-un-badge"
+  },
+  {
+   "terme": "BadgeDefinition",
+   "ancre": "partage-entites"
+  },
+  {
+   "terme": "BadgeTier",
+   "ancre": "partage-entites"
+  },
+  {
+   "terme": "BadgeDrawing",
+   "ancre": "partage-entites"
+  },
+  {
+   "terme": "ShareData",
+   "ancre": "partage-entites"
+  }
+ ],
+ "ancres_traitees": [
+  "partage",
+  "partage-entites",
+  "partage-partage-d-un-badge"
+ ],
+ "ancres_sans_matiere": []
+}

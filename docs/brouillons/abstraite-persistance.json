@@ -1,0 +1,322 @@
+{
+ "inventions": [
+  {
+   "categorie": "Chiffrement",
+   "fonctionnalite": "Données de santé chiffrées au repos",
+   "texte": "Le document conservé serait chiffré, avec une clé dérivée du compte ou du séquestre de l'appareil.",
+   "origine": "Exigence écrite de la V2 (GUIDELINES.md § 1, contrainte permanente 1, consigne du 2026-08-26/27) pour le jour de la conversion native. Le code actuel n'a aucun chiffrement : `shared/platform/storage.ts` sérialise en JSON et écrit en clair."
+  },
+  {
+   "categorie": "Portabilité",
+   "fonctionnalite": "Exporter et réimporter son carnet",
+   "texte": "Une capacité pour emporter tout le document dans un fichier, puis le réinjecter sur un autre appareil.",
+   "origine": "Attendu naturel d'un carnet local. Rien de tel n'existe : la seule sortie est le bilan de suivi (`medicalReportPdf.ts`, document paginé, non relisible par le produit), et aucune capacité ne lit un fichier. La V2 exclut par ailleurs toute synchronisation multi-appareils."
+  },
+  {
+   "categorie": "Copies de secours",
+   "fonctionnalite": "Remettre une copie de secours",
+   "texte": "La personne choisirait une copie horodatée et la remettrait en place.",
+   "origine": "`shared/model/dataBackup.ts` porte `restoreBackup` et l'inventaire des copies, mais son seul appelant est l'espace d'administration, hors périmètre. La copie du sauvetage de lecture (`<clé>__secours`) n'a, elle, aucun appelant de remise."
+  },
+  {
+   "categorie": "Copies de secours",
+   "fonctionnalite": "Purge automatique des anciennes copies",
+   "texte": "Les copies les plus anciennes seraient effacées passé un nombre ou un âge.",
+   "origine": "Explicitement refusé dans `dataBackup.ts` : « Aucune sauvegarde de secours n'est jamais écrasée, ni effacée automatiquement […] Elles s'accumulent, et c'est assumé. » Seul l'effacement total les emporte."
+  },
+  {
+   "categorie": "Format",
+   "fonctionnalite": "Numéro de schéma du document",
+   "texte": "Le document porterait une version, et les migrations s'appliqueraient selon elle.",
+   "origine": "Aucun champ de version dans `AppData` (`src/types.ts`). Les dix conversions de `useAppData.ts` sont toutes idempotentes et reconnaissent la forme des données, ce qui tient lieu de versionnement."
+  },
+  {
+   "categorie": "Écriture",
+   "fonctionnalite": "Vérification de toutes les écritures",
+   "texte": "Chaque écriture du document serait relue et comparée, comme le fait la mise à l'abri.",
+   "origine": "Seules `backUpCurrentSave`, `writeWithBackup` et `restoreBackup` relisent. L'écriture ordinaire (`setItem(STORAGE_KEY, appData)` dans `useAppData.ts`) passe par une couche qui avale l'erreur en silence : une saisie perdue faute de place ne se signale pas."
+  },
+  {
+   "categorie": "Écriture",
+   "fonctionnalite": "Alerte de place bientôt épuisée",
+   "texte": "Un seuil préviendrait avant que le magasin ne sature.",
+   "origine": "Le quota d'environ cinq mégaoctets est cité en commentaire dans `dataBackup.ts` (« rien ne prévient ») ; l'application ne mesure jamais la place occupée et n'a aucun seuil."
+  },
+  {
+   "categorie": "Effacement",
+   "fonctionnalite": "Effacement sélectif des clés",
+   "texte": "L'effacement total retirerait les clés une à une, en épargnant ce qui n'appartient pas au compte.",
+   "origine": "Refusé dans `shared/platform/storage.ts` : `clearAll` efface tout le magasin, parce qu'une liste écrite à la main vieillirait mal. La seule suppression clé par clé du produit est celle des favoris de repas (`MealTracker.tsx`)."
+  },
+  {
+   "categorie": "Effacement",
+   "fonctionnalite": "Nettoyage des clés héritées",
+   "texte": "Les clés qui ne sont plus écrites disparaîtraient d'elles-mêmes au chargement.",
+   "origine": "Le commentaire des clés `LEGACY` (`versions/mixte/App.tsx`) dit qu'elles « ne subsistent que pour être effacées à la réinitialisation » ; aucune capacité ne les retire, seul l'effacement total les emporte."
+  },
+  {
+   "categorie": "Sorties",
+   "fonctionnalite": "Interrogation d'un service alimentaire",
+   "texte": "Un code-barres inconnu serait cherché auprès d'Open Food Facts.",
+   "origine": "Le texte légal cite Open Food Facts comme tiers, mais `features/custom-food/barcode.utils.ts` ne lit que la base embarquée et les aliments créés ; aucun appel réseau n'existe dans le code (aucun `fetch` hors des routes de développement)."
+  },
+  {
+   "categorie": "Sorties",
+   "fonctionnalite": "Envois distants anonymisés",
+   "texte": "Les envois porteraient un identifiant opaque plutôt que l'identité du compte.",
+   "origine": "`remoteSubmit.ts` écrit `uid`, `email` et `displayName` sur chaque document, et le courrier d'accompagnement porte l'adresse en clair dans son sujet."
+  },
+  {
+   "categorie": "Identifiants",
+   "fonctionnalite": "Identifiants uniformes",
+   "texte": "Toutes les lignes porteraient un UUID version 7.",
+   "origine": "`shared/platform/id.ts` produit des UUIDv7 et seuls les repas s'en servent ; pesées, prises, effets, pas, séances, moments et sommeil emploient encore le motif `<préfixe>-<instant en millisecondes>` (`useAppData.ts`), qui collisionne dans la même milliseconde."
+  },
+  {
+   "categorie": "Restitution",
+   "fonctionnalite": "Clés de présentation",
+   "texte": "Périodes retenues, mode de lecture d'un ensemble, apparence, disposition et bascules de tendance sont conservés sur l'appareil.",
+   "origine": "Règles d'affichage seules : elles ne changent aucune donnée. Citées ici pour l'inventaire de l'effacement, décrites nulle part ailleurs dans ce document."
+  }
+ ],
+ "glossaire": [
+  {
+   "terme": "Document unique",
+   "definition": "Le profil et les dix journaux, sérialisés en un seul JSON sous la clé glp1_app_companion_data, réécrit intégralement à chaque changement."
+  },
+  {
+   "terme": "Clé de stockage",
+   "definition": "Nom sous lequel une valeur est conservée dans le magasin local. Une clé fixe aussi sa convention d'accès : JSON, ou chaîne nue, et cela ne se change pas."
+  },
+  {
+   "terme": "Conversion de chargement",
+   "definition": "Transformation pure appliquée au document lu, avant tout usage. Les dix conversions s'enchaînent dans un ordre fixe et sont toutes idempotentes."
+  },
+  {
+   "terme": "Idempotence",
+   "definition": "Propriété d'une conversion qui, rejouée sur un document déjà converti, ne le change plus. C'est ce qui permet de les appliquer à chaque chargement."
+  },
+  {
+   "terme": "Session en lecture seule",
+   "definition": "État où le chargement a échoué : plus rien n'est écrit jusqu'au redémarrage, pour ne pas remplacer par du vide des données qu'on n'a pas su lire."
+  },
+  {
+   "terme": "Copie de sauvetage",
+   "definition": "Recopie brute du document illisible sous <clé>__secours. Écrite une seule fois : un second échec ne recouvre pas le premier sauvetage."
+  },
+  {
+   "terme": "Copie de secours",
+   "definition": "Recopie horodatée du document courant, faite avant qu'il ne soit remplacé. Sa clé porte l'horodatage local à la seconde ; aucune n'en recouvre une autre."
+  },
+  {
+   "terme": "Inventaire des copies",
+   "definition": "Liste JSON des copies de secours, une entrée par copie : clé, horodatage, motif, taille en caractères, du plus récent au plus ancien. Illisible vaut vide."
+  },
+  {
+   "terme": "Écriture protégée",
+   "definition": "Mise à l'abri, puis écriture, puis relecture de vérification. Si la mise à l'abri échoue, rien n'est écrit."
+  },
+  {
+   "terme": "Relecture de vérification",
+   "definition": "Comparaison caractère pour caractère de ce qui vient d'être écrit avec l'original. Seule parade contre une écriture qui échoue en silence."
+  },
+  {
+   "terme": "Suppression franche",
+   "definition": "Une ligne supprimée quitte la liste par son identifiant. Aucune marque de suppression n'est plus écrite, et les marques héritées sont purgées au chargement."
+  },
+  {
+   "terme": "Pesée de départ",
+   "definition": "La pesée qui sert de référence à la perte totale, aux distinctions et au bilan. Reconnue à son drapeau, unique, semée à 95,0 kg sur un appareil vierge, épargnée quand le journal des pesées est vidé."
+  },
+  {
+   "terme": "Effacement total",
+   "definition": "Compte distant supprimé d'abord, puis tout le magasin local en une fois, puis redémarrage. Un échec à la première étape n'efface rien."
+  },
+  {
+   "terme": "Contexte d'envoi",
+   "definition": "Ce qui accompagne un envoi distant hors du contenu : version, provenance, préférences de restitution, dimensions, langues, instant, fuseau, socle, mode de compilation. Aucune donnée de santé."
+  },
+  {
+   "terme": "Fiche d'échec",
+   "definition": "Ce qui est envoyé quand la production d'un bilan échoue : erreur, étape, bornes de période, sections, comptes d'entrées, durée. Des comptes et des bornes, jamais des valeurs."
+  }
+ ],
+ "index": [
+  {
+   "terme": "Document unique",
+   "ancre": "#persistance-le-document-unique"
+  },
+  {
+   "terme": "glp1_app_companion_data",
+   "ancre": "#persistance-le-document-unique"
+  },
+  {
+   "terme": "Propriétés facultatives",
+   "ancre": "#persistance-le-document-unique"
+  },
+  {
+   "terme": "Cache nutritionnel d'un repas",
+   "ancre": "#persistance-le-document-unique"
+  },
+  {
+   "terme": "Clés hors du document",
+   "ancre": "#persistance-ce-qui-vit-hors-du-document"
+  },
+  {
+   "terme": "Clés héritées",
+   "ancre": "#persistance-ce-qui-vit-hors-du-document"
+  },
+  {
+   "terme": "JSON ou chaîne nue",
+   "ancre": "#persistance-ce-qui-vit-hors-du-document"
+  },
+  {
+   "terme": "Aliments et recettes personnalisés",
+   "ancre": "#persistance-ce-qui-vit-hors-du-document"
+  },
+  {
+   "terme": "Réécriture intégrale",
+   "ancre": "#persistance-quand-l-ecriture-a-lieu"
+  },
+  {
+   "terme": "Échec silencieux d'écriture",
+   "ancre": "#persistance-quand-l-ecriture-a-lieu"
+  },
+  {
+   "terme": "Chaîne de conversions",
+   "ancre": "#persistance-le-chargement-et-ses-conversions"
+  },
+  {
+   "terme": "Idempotence",
+   "ancre": "#persistance-le-chargement-et-ses-conversions"
+  },
+  {
+   "terme": "Purge des lignes marquées",
+   "ancre": "#persistance-le-chargement-et-ses-conversions"
+  },
+  {
+   "terme": "Lignes de démonstration",
+   "ancre": "#persistance-le-chargement-et-ses-conversions"
+  },
+  {
+   "terme": "Profil d'usine",
+   "ancre": "#persistance-le-chargement-et-ses-conversions"
+  },
+  {
+   "terme": "Pesée de départ semée",
+   "ancre": "#persistance-le-chargement-et-ses-conversions"
+  },
+  {
+   "terme": "Garde-fou du chargement",
+   "ancre": "#persistance-quand-le-document-ne-se-lit-pas"
+  },
+  {
+   "terme": "Copie de sauvetage",
+   "ancre": "#persistance-quand-le-document-ne-se-lit-pas"
+  },
+  {
+   "terme": "Session en lecture seule",
+   "ancre": "#persistance-quand-le-document-ne-se-lit-pas"
+  },
+  {
+   "terme": "Copies de secours horodatées",
+   "ancre": "#persistance-les-copies-de-secours"
+  },
+  {
+   "terme": "Inventaire des copies",
+   "ancre": "#persistance-les-copies-de-secours"
+  },
+  {
+   "terme": "Relecture de vérification",
+   "ancre": "#persistance-les-copies-de-secours"
+  },
+  {
+   "terme": "Écriture protégée",
+   "ancre": "#persistance-les-copies-de-secours"
+  },
+  {
+   "terme": "Remise d'une copie",
+   "ancre": "#persistance-les-copies-de-secours"
+  },
+  {
+   "terme": "Quota du magasin",
+   "ancre": "#persistance-quand-la-place-manque"
+  },
+  {
+   "terme": "Suppression franche",
+   "ancre": "#persistance-effacer"
+  },
+  {
+   "terme": "Vider un journal",
+   "ancre": "#persistance-effacer"
+  },
+  {
+   "terme": "Aliment utilisé par une recette",
+   "ancre": "#persistance-effacer"
+  },
+  {
+   "terme": "Ordre de l'effacement total",
+   "ancre": "#persistance-effacer"
+  },
+  {
+   "terme": "Effacement en une fois",
+   "ancre": "#persistance-effacer"
+  },
+  {
+   "terme": "Bilan de suivi",
+   "ancre": "#persistance-ce-qui-sort-de-l-appareil"
+  },
+  {
+   "terme": "Image de progression",
+   "ancre": "#persistance-ce-qui-sort-de-l-appareil"
+  },
+  {
+   "terme": "Contexte d'envoi",
+   "ancre": "#persistance-ce-qui-sort-de-l-appareil"
+  },
+  {
+   "terme": "Plafond d'envois quotidien",
+   "ancre": "#persistance-ce-qui-sort-de-l-appareil"
+  },
+  {
+   "terme": "Fiche d'échec",
+   "ancre": "#persistance-ce-qui-sort-de-l-appareil"
+  },
+  {
+   "terme": "Code-barres, recherche locale",
+   "ancre": "#persistance-ce-qui-n-en-sort-jamais"
+  },
+  {
+   "terme": "Données qui ne sortent jamais",
+   "ancre": "#persistance-ce-qui-n-en-sort-jamais"
+  },
+  {
+   "terme": "Couche unique de stockage",
+   "ancre": "#persistance-les-contraintes-du-portage"
+  },
+  {
+   "terme": "UUID version 7",
+   "ancre": "#persistance-les-contraintes-du-portage"
+  },
+  {
+   "terme": "Chiffrement des données de santé",
+   "ancre": "#persistance-les-contraintes-du-portage"
+  },
+  {
+   "terme": "Secrets hors du paquet livré",
+   "ancre": "#persistance-les-contraintes-du-portage"
+  },
+  {
+   "terme": "Stockage métrique",
+   "ancre": "#persistance-les-contraintes-du-portage"
+  },
+  {
+   "terme": "Migration obligatoire",
+   "ancre": "#persistance-les-contraintes-du-portage"
+  },
+  {
+   "terme": "Absence de synchronisation",
+   "ancre": "#persistance-les-contraintes-du-portage"
+  }
+ ]
+}

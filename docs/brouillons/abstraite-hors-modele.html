@@ -1,0 +1,137 @@
+<section id="hors-modele">
+  <h2>10. Ce que le modèle ne fait pas <a class="retour" href="#sommaire">↑ sommaire</a></h2>
+  <p>Ce chapitre borne le modèle : ce qu'aucune entité ne porte, ce qu'aucune capacité n'écrit, ce que les types déclarent sans que rien ne l'emploie, et ce qu'une décision déjà prise coûterait en migration. Il énumère des faits vérifiés dans le code ; ce qui attend un choix est renvoyé à <a href="inspirations.html">inspirations.html</a>.</p>
+
+  <h3 id="hors-modele-la-forme-de-la-sauvegarde">La forme de la sauvegarde</h3>
+  <p>Une installation porte un seul agrégat, et cet agrégat est tout ce qui est conservé.</p>
+  <pre><code>AppData = {
+  profile:            UserProfile,     // exactement un, jamais zéro, jamais deux
+  weightHistory:      WeightLog[],     // requis
+  dailyLogs:          DailyLog[],      // requis
+  injectionHistory:   InjectionLog[],  // requis
+  savedMeals?:        SavedMealLog[],  // les six restantes sont facultatives ;
+  sideEffectHistory?: SideEffectLog[], // absente vaut liste vide
+  stepLogs?:          StepLog[],
+  sportLogs?:         SportLog[],
+  meTimeLogs?:        MeTimeLog[],
+  sleepLogs?:         SleepLog[],
+}</code></pre>
+  <p>Aucune propriété de cet agrégat ne désigne un propriétaire, une version, une origine ni un appareil. Un profil n'a ni identifiant, ni instant de création, ni instant de modification. Tout ce que ce chapitre énumère découle de cette forme.</p>
+
+  <h3 id="hors-modele-ce-qu-aucune-entite-ne-porte">Ce qu'aucune entité ne porte</h3>
+  <table>
+    <thead><tr><th>Absent du modèle</th><th>Ce que le modèle porte à la place</th><th>Conséquence</th></tr></thead>
+    <tbody>
+      <tr><td>Une deuxième personne</td><td>Un <code>UserProfile</code> unique. Un soignant n'existe que comme <code>medicalReminderDoctor?: string</code>, un nom libre posé sur un rappel.</td><td>Ni compte partagé, ni rôle de soignant, ni comparaison entre personnes : aucune donnée n'est attribuable à quelqu'un d'autre.</td></tr>
+      <tr><td>Un fuseau horaire</td><td>Des dates <code>AAAA-MM-JJ</code> et des heures <code>HH:MM</code>, heures murales locales, sans décalage ni suffixe.</td><td>Deux prises notées à 08:00 dans deux pays sont indiscernables ; un déplacement ne se rattrape pas après coup.</td></tr>
+      <tr><td>Une prescription</td><td><code>UserProfile.glp1Brand: string</code>, un identifiant de catalogue. La dose vit sur chaque prise (<code>InjectionLog.dose</code>, en mg). <code>Treatment.dosePresets: number[]</code> et <code>Treatment.doseIntervalDays?: number</code> appartiennent au catalogue, pas à la personne.</td><td>Rien ne dit ce qui est prescrit, ni quelle dose est attendue quand. Le rythme se déduit des prises déjà enregistrées.</td></tr>
+      <tr><td>Un épisode de traitement</td><td>Rien. La série courante se déduit du journal : on remonte les prises de la plus récente à la plus ancienne et on s'arrête au premier <code>brand</code> différent (<code>currentTreatmentInjections</code>).</td><td>Ni début, ni fin, ni date de changement. Une prise sans <code>brand</code> vaut « celui du profil au moment de la lecture » : changer <code>glp1Brand</code> réécrit la lecture du passé.</td></tr>
+      <tr><td>Une date de début de cure</td><td>La date de la pesée qui porte <code>isStartingWeight: true</code>. <code>cureWeek</code> compte les semaines depuis elle.</td><td>Un historique sans pesée de départ n'a pas de semaine de cure ; supprimer les pesées ne libère pas cette date, la pesée de départ n'étant pas supprimable.</td></tr>
+      <tr><td>Une date de naissance</td><td><code>UserProfile.age: number</code>, en années révolues.</td><td>L'âge ne vieillit pas seul : il reste celui du jour où il a été écrit. <span class="marque v2">V2</span> La V2 conserve <code>anneeNaissance: number</code>, bornée par l'âge 1–130 rapporté à l'année courante.</td></tr>
+      <tr><td>Une mensuration sans pesée</td><td><code>BodyMeasurements</code> est un <code>Pick</code> de <code>WeightLog</code> sur neuf propriétés facultatives, toutes en centimètres. <code>WeightLog.weight: number</code> est requis.</td><td>Enregistrer un tour de taille impose d'enregistrer un poids le même jour.</td></tr>
+      <tr><td>Une mesure du corps autre que le poids et neuf tours</td><td>Rien. Pas de glycémie, pas de tension, pas de résultat d'analyse, pas de température.</td><td>Le document transmissible ne peut rien porter de biologique.</td></tr>
+      <tr><td>Une pièce jointe</td><td>Aucun journal ne porte de fichier. La seule image du modèle est <code>AvatarConfig.customPhotoUrl?: string</code>, une photo recadrée au carré, ramenée à 256 px et réencodée en JPEG dans l'adresse elle-même.</td><td>Ni photographie d'un repas, ni ordonnance, ni cliché d'un pèse-personne.</td></tr>
+      <tr><td>Un moment dans une journée de pas</td><td><code>StepLog { id, date, steps: number, isSimulated?: boolean }</code> — pas d'heure.</td><td>Un total par journée, jamais une répartition dans la journée. <code>isSimulated</code> distingue le jeu de démonstration du reste, et rien d'autre : aucune propriété ne nomme l'appareil ou la méthode de comptage.</td></tr>
+      <tr><td>Une note libre sur quatre journaux</td><td><code>notes?: string</code> existe sur <code>InjectionLog</code>, <code>SideEffectLog</code>, <code>SportLog</code>, <code>MeTimeLog</code> et <code>SleepLog</code>.</td><td><code>WeightLog</code>, <code>SavedMealLog</code>, <code>StepLog</code> et <code>DailyLog</code> n'ont nulle part où mettre un mot.</td></tr>
+      <tr><td>Une hydratation</td><td>Rien. <code>waterLogs</code>, <code>profile.hydrationTrackingEnabled</code> et <code>profile.dailyWaterGoalMl</code> sont retirés à chaque chargement et disparaissent à l'écriture suivante.</td><td>Supprimée le 2026-08-07. <span class="marque v2">V2</span> La V2 la range parmi ce qu'on ne réintroduit pas.</td></tr>
+      <tr><td>Un objectif de poids à paliers</td><td>Rien. <code>milestones</code> et <code>profile.weightGoalsEnabled</code> sont retirés au chargement comme les traces d'hydratation. Il reste <code>UserProfile.targetWeight: number</code>, un seul poids visé en kg.</td><td>Supprimé le 2026-08-09. <span class="marque v2">V2</span> Même règle en V2.</td></tr>
+      <tr><td>Un objectif de pas</td><td><code>DEFAULT_DAILY_GOAL_STEPS = 8000</code>, une constante du domaine. Les seuls objectifs du profil sont <code>dailyCaloriesGoal?</code> (kcal, absent vaut 1 400), <code>dailyProteinGoal?</code> (g, absent vaut le poids courant × 1,5 arrondi) et <code>dailyFiberGoal?</code> (g, absent vaut 25).</td><td>Le pourcentage de pas atteint se rapporte à un nombre que personne ne peut changer.</td></tr>
+      <tr><td>Un historique du profil</td><td>Un enregistrement unique et muable, sans <code>createdAt</code>, <code>updatedAt</code> ni numéro de version.</td><td>Changer <code>targetWeight</code>, <code>height</code> ou <code>glp1Brand</code> n'en garde aucune trace : la valeur d'hier est perdue.</td></tr>
+      <tr><td>Un badge</td><td>Rien dans l'agrégat. Les paliers (<code>'aucun' | 'eveil' | 'bronze' | 'argent' | 'or'</code>) se recalculent à chaque lecture depuis les journaux.</td><td>Ni date de décrochage, ni ordre d'obtention. Seuls les derniers paliers observés sont retenus hors du carnet, sous <code>glp1_badge_tiers_connus</code>, pour ne pas refêter deux fois.</td></tr>
+      <tr><td>Une récurrence</td><td>Des propriétés du profil : <code>reminderDay: number</code> (0–6), <code>reminderTime: HH:MM</code>, <code>injectionReminderType?: 'weekly' | 'custom'</code>, <code>injectionReminderDaysInterval?: number</code>, <code>injectionReminderStartDate?</code>, et cinq propriétés de rappel médical.</td><td>Un exemplaire de chaque famille, jamais deux. Aucune occurrence n'est matérialisée, aucune n'est marquée faite ou manquée.</td></tr>
+      <tr><td>Un nom de traitement hors catalogue</td><td>Chaque famille du catalogue finit par une entrée « Autre ».</td><td>Un traitement absent du catalogue perd son nom : rien ne le conserve.</td></tr>
+    </tbody>
+  </table>
+
+  <h3 id="hors-modele-une-entite-que-rien-ne-cree">Une entité que rien ne crée</h3>
+  <p><code>DailyLog { id, date }</code> ne porte plus aucun contenu : elle a successivement porté les effets secondaires notés de 0 à 10, quatre repas en texte libre et le total d'hydratation du jour, tous retirés. Aucune capacité ordinaire n'en écrit une ; seule la génération de données de démonstration en pose. Deux lectures la parcourent, toutes deux pour y chercher la date la plus ancienne de la sauvegarde. La collection est donc requise, toujours vide en usage réel, et son seul effet possible est d'avancer la borne de départ des bilans.</p>
+
+  <h3 id="hors-modele-ce-qu-aucune-capacite-n-ecrit">Ce qu'aucune capacité n'écrit</h3>
+  <table>
+    <thead><tr><th>Geste absent</th><th>Ce que le code porte</th><th>Conséquence</th></tr></thead>
+    <tbody>
+      <tr><td>Créer un compte</td><td>L'authentification n'expose que six verbes : s'abonner à l'état de connexion, lire le compte courant, se connecter par courriel et mot de passe, se connecter par Google, se déconnecter, supprimer le compte.</td><td>Aucune inscription par courriel, aucune réinitialisation de mot de passe, aucun changement d'adresse. <span class="marque v2">V2</span> La V2 recueille courriel et mot de passe — huit signes au moins, seule contrainte — sans les enregistrer ni vérifier l'adresse.</td></tr>
+      <tr><td>Synchroniser</td><td>Le carnet entier tient dans une clé unique du stockage local, <code>glp1_app_companion_data</code>. La base distante ne reçoit que le sondage, les retours et les échecs d'export ; le contexte joint ne contient aucune donnée de santé.</td><td>Changer d'appareil ne transporte rien. Vider le stockage efface tout. Une écriture refusée par le stockage échoue en silence.</td></tr>
+      <tr><td>Exporter puis relire le carnet</td><td>Deux sorties seulement : un document PDF, et une image PNG de partage.</td><td>Ni l'un ni l'autre ne se relit. Aucune capacité n'importe de données, d'aucune forme.</td></tr>
+      <tr><td>Émettre un rappel</td><td>Les rappels sont des propriétés du profil. Aucun appel à une interface de notification n'existe dans le code.</td><td>Un rappel est une préférence conservée, jamais un événement. Rien ne se déclenche à l'heure dite.</td></tr>
+      <tr><td>Lire un code-barres optiquement</td><td>Le code EAN-13 ou UPC-A est enregistré en chiffres, puis cherché chez Open Food Facts — le seul appel sortant du produit hors retours.</td><td>Un code illisible sur l'emballage ne peut pas entrer autrement. Le code est conservé en chaîne pour garder ses zéros de tête.</td></tr>
+      <tr><td>Recevoir des pas d'un podomètre ou d'une plateforme de santé</td><td><code>StepLog.steps</code> s'écrit à la main, ou par la génération de démonstration.</td><td>Aucune connexion à un objet connecté. Une journée à zéro pas est traitée comme un compteur éteint et n'entre dans aucune moyenne.</td></tr>
+      <tr><td>Restaurer une ligne supprimée</td><td>Supprimer retire la ligne de la sauvegarde. L'ancien marquage <code>deletedAt</code> a été converti au chargement, la conversion est irréversible et idempotente.</td><td>Aucun rappel possible d'une ligne effacée. Seule exception : la pesée de départ n'a aucun chemin de suppression.</td></tr>
+      <tr><td>Choisir son système d'unités</td><td><code>UserProfile.measurementSystem?: 'metric' | 'imperial'</code> est déclaré et n'est ni lu ni écrit nulle part.</td><td>Tout est conservé et rendu en unités métriques. <span class="marque v2">V2</span> La V2 recueille le système (<code>'metrique' | 'imperial'</code>), avec un défaut apporté par la langue, et ne l'enregistre pas encore.</td></tr>
+      <tr><td>Modifier un aliment de la base de référence</td><td>Seuls les aliments créés depuis l'application se modifient ; un code-barres déjà connu rouvre sa fiche au lieu d'en créer une seconde.</td><td>Une valeur fausse de la base livrée ne se corrige qu'en créant un aliment à soi.</td></tr>
+      <tr><td>Dépasser un plafond quotidien</td><td>Par journée : 2 prises, 15 effets secondaires, 15 séances, 15 moments pour soi, 15 sommeils, 30 repas ou en-cas, 1 pesée.</td><td>Au-delà du plafond, la ligne la plus récente est remplacée plutôt qu'ajoutée, sauf pour les repas et le sommeil qui refusent. La règle de la pesée unique s'applique à l'ajout et non à la modification.</td></tr>
+    </tbody>
+  </table>
+
+  <h3 id="hors-modele-declare-sans-etre-employe">Déclaré sans être employé</h3>
+  <p>Ces déclarations existent dans les types et ne gouvernent rien : la donnée réelle est plus lâche, ou n'a pas de place où vivre.</p>
+  <table>
+    <thead><tr><th>Déclaration</th><th>Ce que porte la donnée réelle</th></tr></thead>
+    <tbody>
+      <tr><td><code>HungerLevel = 0 | 1 | 2 | 3 | 4 | 5</code></td><td><code>SavedMealLog.hungerBefore?: number</code> et <code>hungerAfter?: number</code> — un nombre quelconque. <span class="marque non">non implémenté</span></td></tr>
+      <tr><td><code>SeverityLevel = 1 | 2 | 3 | 4 | 5</code></td><td><code>SideEffectLog.severity: number</code> — un nombre quelconque. <span class="marque non">non implémenté</span></td></tr>
+      <tr><td><code>SideEffectType { id, label, createdAt, updatedAt }</code></td><td>Aucune collection <code>sideEffectTypes</code> dans l'agrégat ; <code>SideEffectLog.type: string</code> porte un nom. <span class="marque non">non implémenté</span></td></tr>
+      <tr><td><code>SportType { id, label, met, createdAt, updatedAt }</code></td><td>Aucune collection <code>sportTypes</code> ; <code>SportLog.sport: string</code> porte un nom, et le MET se relit dans un catalogue constant à partir de ce nom. <span class="marque non">non implémenté</span></td></tr>
+      <tr><td><code>Recipe</code> et <code>CustomFood</code>, le modèle cible des aliments</td><td>Le stockage garde la forme héritée de la base de référence (<code>alim_code</code>, <code>alim_nom_fr</code>), qu'un adaptateur convertit à la lecture. <span class="marque non">non implémenté</span></td></tr>
+      <tr><td><code>MeasurementSystem</code> et <code>UserProfile.measurementSystem?</code></td><td>Aucune lecture, aucune écriture. <span class="marque non">non implémenté</span></td></tr>
+      <tr><td><code>UserProfile.silhouetteType: SilhouetteType</code> (huit valeurs)</td><td>Écrit au profil d'usine et par la génération de démonstration ; la version courante ne le relit jamais.</td></tr>
+      <tr><td><code>UserProfile.easyReadingMode?: boolean | number</code></td><td>Conservé pour les sauvegardes existantes et les versions gelées ; retiré de la version courante le 2026-08-27.</td></tr>
+      <tr><td><code>JournalViewMode = 'survol' | 'vue' | 'plongee'</code></td><td>Un état figé à <code>'vue'</code> dans un module partagé, survivance des trois modes de lecture retirés.</td></tr>
+      <tr><td>Six zones corporelles avec leur code et leurs coordonnées</td><td>Une donnée qu'aucune capacité de la version courante ne consomme. <span class="marque non">non implémenté</span></td></tr>
+    </tbody>
+  </table>
+  <p>Les métadonnées <code>createdAt</code> et <code>updatedAt</code> — instants absolus, en millisecondes depuis l'époque Unix — n'existent que sur <code>Recipe</code>, <code>CustomFood</code>, <code>SideEffectType</code> et <code>SportType</code>. Aucun journal n'en porte, ni <code>UserProfile</code>, ni <code>AvatarConfig</code> : on ne peut donc pas savoir quand une ligne a été écrite, seulement à quelle date et à quelle heure elle se rapporte.</p>
+
+  <h3 id="hors-modele-des-noms-la-ou-la-regle-veut-des-identifiants">Des noms là où la règle veut des identifiants</h3>
+  <p>Le premier principe du modèle demande de référencer par identifiant et jamais par nom. Quatre endroits y dérogent, et un cinquième conserve une valeur dérivable.</p>
+  <ul>
+    <li><code>SideEffectLog.type: string</code> — le nom du symptôme.</li>
+    <li><code>SportLog.sport: string</code> — le nom du sport. Dans le catalogue des sports, la clé <em>est</em> le libellé français : <code>value === label</code>.</li>
+    <li><code>MeTimeLog.activity: string</code> — le nom de l'activité, même règle.</li>
+    <li><code>SavedMealLog.typeLabel: string</code> — recalculé depuis <code>type</code> à chaque écriture, et conservé quand même.</li>
+    <li>À l'inverse, <code>UserProfile.glp1Brand</code> et <code>InjectionLog.brand?</code> portent bien un identifiant de catalogue, sous un nom de « marque » qui n'est plus le bon.</li>
+  </ul>
+  <p>Conséquence directe, mesurée : renommer une entrée de catalogue impose de réécrire l'historique. La fusion de deux noms d'un même sport a exigé une conversion appliquée à chaque chargement ; sans elle, les séances des deux anciens noms seraient retombées sur l'entrée de repli et leurs calories auraient changé toutes seules, après coup. Conséquence indirecte : ces valeurs ne se traduisent pas.</p>
+
+  <h3 id="hors-modele-ce-qui-demanderait-une-migration">Ce qui demanderait une migration</h3>
+  <p>Ces points sont décidés ; le stockage porte encore l'ancienne forme, et le passage réécrit des données déjà enregistrées.</p>
+  <table>
+    <thead><tr><th>Décision</th><th>Ce que le stockage porte</th><th>Ce que coûte le passage</th></tr></thead>
+    <tbody>
+      <tr><td>Un horodatage unique <code>localDateTime</code>, heure murale locale sans fuseau</td><td><code>date: AAAA-MM-JJ</code> et <code>time: HH:MM</code> séparés, sur tous les journaux</td><td>Réécrire chaque ligne et chaque lecture. <span class="marque non">non implémenté</span> <span class="marque v2">V2</span> La V2 garde les deux séparés.</td></tr>
+      <tr><td>Référencer les symptômes et les sports par <code>typeId</code></td><td>Des noms libres, sans table où les ranger</td><td>Créer une entrée par nom distinct rencontré, puis réécrire chaque ligne. <span class="marque non">non implémenté</span></td></tr>
+      <tr><td>Ne rien stocker de dérivable</td><td>Cinq valeurs nutritionnelles sur <code>SavedMealLog</code> (<code>calories</code>, <code>protein</code>, <code>carbs</code>, <code>fat</code>, <code>fiber</code>), plus <code>typeLabel</code></td><td>Les retirer et recalculer partout, ce qui suppose que chaque lecture dispose de la base des aliments créés.</td></tr>
+      <tr><td>Des identifiants UUIDv7 et des métadonnées sur toutes les tables</td><td>Des identifiants fabriqués par préfixe et horodatage ; aucune métadonnée sur les journaux</td><td>Décider d'abord si les métadonnées s'étendent aux journaux.</td></tr>
+      <tr><td>Le stockage des aliments créés au nouveau modèle</td><td>La forme héritée de la base de référence</td><td>Convertir la base locale, puis retirer l'adaptateur de lecture. <span class="marque non">non implémenté</span></td></tr>
+      <tr><td>Un drapeau nommé au positif pour le badge mystère</td><td><code>mysteryBadgeHidden?: boolean</code>, dont la polarité est retournée en un seul endroit</td><td>Un renommage sans migration de données : aucune sauvegarde n'est à ménager. <span class="marque non">non implémenté</span></td></tr>
+    </tbody>
+  </table>
+  <p>Deux conversions sont, elles, déjà passées et ne peuvent pas revenir : le retrait des lignes marquées supprimées, et le remplacement des noms de traitement par leurs identifiants de catalogue.</p>
+
+  <h3 id="hors-modele-ce-que-la-v2-a-retire-ou-n-a-pas-repris">Ce que la V2 a retiré, ou n'a pas repris</h3>
+  <p>Sur ces points, la V2 tranche et l'emporte. <span class="marque v2">V2</span></p>
+  <ul>
+    <li>La V2 ne conserve encore rien : tout ce qu'elle recueille vit en mémoire, et un rechargement le perd. <span class="marque non">non implémenté</span></li>
+    <li>Son catalogue de traitements ne porte que des noms et des formes — ni paliers de dose, ni demi-vies. Aucune concentration active, aucun escalier de doses ne s'y calcule.</li>
+    <li>Ni poids de départ, ni date de départ : deux valeurs indépendantes, poids actuel et poids visé, qui ne se recopient jamais l'une dans l'autre.</li>
+    <li>L'avatar se compose, il ne se photographie pas et ne se tire pas au hasard. Le genre en fait partie et n'est plus une question à part.</li>
+    <li>Ni niveau d'activité, ni souhait d'activité : supprimés, à ne pas réintroduire.</li>
+    <li>Ni suivi hydrique, ni objectifs de poids à paliers, ni saisies rapides comme modèle.</li>
+    <li>La taille est conservée en centimètres et convertie aux deux bouts ; les mesures recueillies le sont en texte avec un point décimal, quelle que soit la langue.</li>
+    <li>La langue est recueillie sans être branchée : l'application parle la langue détectée. <span class="marque non">non implémenté</span></li>
+  </ul>
+
+  <details><summary>Cas limites</summary>
+    <p>Une sauvegarde illisible n'est pas écrasée : elle est recopiée une fois sous une clé de secours, et plus rien n'est écrit de la session.</p>
+    <p>Le stockage local plafonne autour de 5 Mo pour toute l'application, photo d'avatar comprise ; rien ne prévient avant le refus.</p>
+    <p>Une pesée antidatée plus ancienne que la pesée de départ devient la pesée de départ ; à date égale, le départ en place le reste.</p>
+    <p>Une prise sans identifiant de traitement est réputée du traitement courant, y compris quand ce traitement a changé depuis.</p>
+    <p>Les journaux acceptent des lignes datées du futur ; seules les analyses les écartent.</p>
+    <p>La durée d'un sommeil et les calories d'une séance ne sont jamais conservées : elles se recalculent à chaque lecture.</p>
+    <p>Une valeur absente se tait : aucune lecture ne lui substitue un zéro, un tiret ou une moyenne.</p>
+  </details>
+
+  <div class="exemple"><p>Camille, née en 1978, 168 cm, partie de 96 kg en mai 2026, sous Ozempic. Son profil conserve <code>age: 48</code> : en 2028 il dira toujours 48, faute d'année de naissance. Ses dix-neuf prises portent l'identifiant d'Ozempic, écrit à l'enregistrement ; une prise plus ancienne qui n'en porterait aucun serait relue comme une prise de Wegovy le jour où elle changerait de traitement. Sa semaine de cure se compte depuis la date de sa pesée à 96 kg, la seule chose qui tienne lieu de début de cure. Son objectif de pas vaut 8 000, qu'elle le veuille ou non. Et si elle change de téléphone, rien ne la suit.</p></div>
+
+  <p>Ce qui n'a pas pu être fondé sur le code est rangé à part : <a href="inspirations.html#migration-des-noms-vers-des-tables-de-reference">la migration des noms vers des tables de référence</a>, <a href="inspirations.html#emission-reelle-des-rappels">l'émission réelle des rappels</a>, <a href="inspirations.html#reprise-d-un-carnet-sur-un-autre-appareil">la reprise d'un carnet sur un autre appareil</a>, <a href="inspirations.html#historique-des-changements-de-profil">l'historique des changements de profil</a>, <a href="inspirations.html#objectif-de-pas-reglable">l'objectif de pas réglable</a>, <a href="inspirations.html#sort-de-l-entite-de-journee">le sort de l'entité de journée</a>.</p>
+</section>

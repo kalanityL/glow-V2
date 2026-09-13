@@ -1,0 +1,683 @@
+<section id="sommeil">
+  <h2>11. Le sommeil <a class="retour" href="#sommaire">↑ sommaire</a></h2>
+  <p>Ce chapitre donne les formules, les seuils et les ordres de contrôle du domaine sommeil : la durée déduite de deux instants complets, la qualité pondérée, les refus à l'enregistrement, les points des graphes, la frise des nuits et les moyennes de l'accueil. Il décrit la version Mixte de la V1 ; la V2 ne porte pas ce domaine.</p>
+
+  <h3 id="sommeil-entites">Entités</h3>
+  <p><code>SleepLog</code> est le seul objet stocké du domaine. Il vit dans <code>AppData.sleepLogs?: SleepLog[]</code>, tableau facultatif — absent tant qu'aucune entrée n'a été écrite. La durée n'est jamais un champ : elle se recalcule à chaque lecture.</p>
+  <table>
+    <thead><tr><th>Champ</th><th>Type</th><th>Unité canonique</th><th>Statut</th></tr></thead>
+    <tbody>
+      <tr><td><code>id</code></td><td><code>string</code></td><td>—</td><td>obligatoire ; forgé à l'ajout, <code>sleep-&lt;Date.now()&gt;</code></td></tr>
+      <tr><td><code>date</code></td><td><code>string</code></td><td><code>YYYY-MM-DD</code></td><td>obligatoire ; jour du <em>réveil</em></td></tr>
+      <tr><td><code>time</code></td><td><code>string</code></td><td><code>HH:MM</code> local</td><td>obligatoire ; heure du <em>réveil</em>, minute ronde</td></tr>
+      <tr><td><code>bedDate</code></td><td><code>string</code></td><td><code>YYYY-MM-DD</code></td><td>obligatoire ; jour de l'endormissement, écrit, jamais déduit</td></tr>
+      <tr><td><code>bedTime</code></td><td><code>string</code></td><td><code>HH:MM</code> local</td><td>obligatoire ; heure d'endormissement, minute ronde</td></tr>
+      <tr><td><code>kind</code></td><td><code>SleepKind = 'nuit' | 'sieste'</code></td><td>—</td><td>obligatoire</td></tr>
+      <tr><td><code>quality</code></td><td><code>number</code></td><td>index 0–5</td><td>obligatoire ; jamais vide, défaut 3 à la saisie</td></tr>
+      <tr><td><code>notes</code></td><td><code>string</code></td><td>—</td><td>facultatif ; <code>undefined</code> si la saisie est vide après <code>trim()</code></td></tr>
+    </tbody>
+  </table>
+  <p>Dérivé, donc non stocké : la durée en minutes (<code>sleepLogMinutes</code>), la durée totale d'une journée, la qualité pondérée, le temps d'éveil, le rattachement d'une nuit à une soirée, les libellés « du … au … ». Les formes intermédiaires <code>SleepDayPoint</code> (un point de graphe), <code>SleepRange</code> (les quatre champs de plage), <code>LigneNuit</code> et <code>LigneMoyenneSoir</code> (les lignes de la frise) sont construites à chaque rendu et ne sont jamais persistées.</p>
+  <p>Champs de <code>UserProfile</code> qui commandent le domaine : <code>sleepTrackingEnabled?: boolean</code> (absent = éteint ; le profil neuf l'écrit à <code>false</code>), <code>sleepModuleHidden?: boolean</code>, <code>deleteAllButtonsEnabled?: boolean</code>, <code>foodTrackingEnabled: boolean</code> (conditionne les graphes croisés), <code>colorblindModeEnabled?: boolean</code>. Les kcal des bulles et des points viennent de <code>AppData.savedMeals</code>.</p>
+  <p class="ancre">src/types.ts · src/app/useAppData.ts</p>
+
+  <h3 id="sommeil-navigation-vers-meals-steps-sports-allume-le-module">Navigation vers meals / steps / sports : allumage du module</h3>
+  <p><code>handleNavigate(tab)</code> et <code>handleQuickAddNavigate(tab)</code> forcent trois drapeaux et trois seulement, puis sauvent le profil.</p>
+  <pre><code>si tab = 'meals'  et !foodTrackingEnabled  → foodTrackingEnabled = true
+si tab = 'steps'  et !stepsTrackingEnabled → stepsTrackingEnabled = true
+si tab = 'sports' et !sportTrackingEnabled → sportTrackingEnabled = true
+si un drapeau a changé → handleSaveProfile(profil)
+setActiveTab(tab)</code></pre>
+  <p><code>'sleep'</code> et <code>'metime'</code> n'ont pas de branche : y naviguer ne change rien au profil. <code>naviguerVersPageEteinte(tab)</code> ne fait que <code>setActiveTab</code>, sans profil du tout.</p>
+  <p>La page <code>SleepTracker</code> est montée dès <code>activeTab === 'sleep'</code>, indépendamment du drapeau. C'est une couche séparée qui la vitre : <code>PAGES_MODULE['sleep'].flag = Boolean(profile.sleepTrackingEnabled)</code> ; à faux, un voile en <code>z-30</code> couvre la page et porte « Activez le module Sommeil pour pouvoir suivre l'évolution de votre sommeil. », dont le clic ouvre la page Modules et fait défiler jusqu'à <code>module-sleep-tracking</code>. <a href="spec-fonctionnelle.html#sommeil-page-sommeil">→ fonctionnelle</a></p>
+  <p class="ancre">src/versions/mixte/App.tsx · src/versions/mixte/app/navigation.ts</p>
+  <details><summary>Cas limites</summary>
+    <p>Drapeau absent du profil : <code>Boolean(undefined)</code> = éteint — le sommeil n'est pas dans <code>MODULES_ALLUMES_PAR_DEFAUT</code> (qui ne contient que <code>injection</code> et <code>symptoms</code>).</p>
+    <p>Arrivée par l'ajout rapide sur un sommeil éteint : la page s'ouvre, le formulaire s'auto-ouvre, le tout sous la vitre — le module reste éteint.</p>
+  </details>
+
+  <h3 id="sommeil-masquage-complet-d-un-module">Masquage complet d'un module</h3>
+  <p>Deux drapeaux, une conjonction.</p>
+  <pre><code>isModuleOn(profil, 'sleep')   = profil.sleepTrackingEnabled ?? false
+isModuleHidden(profil, 'sleep') = !isModuleOn(profil, 'sleep') && Boolean(profil.sleepModuleHidden)</code></pre>
+  <p>Un module allumé n'est donc jamais masqué, quelle que soit la valeur de <code>sleepModuleHidden</code>. La case « Masquer dans l'application » n'est rendue sur la page Modules que sous un module éteint (<code>{!isSleepEnabled &amp;&amp; masquerModule('sleepModuleHidden', 'Sommeil')}</code>). La bascule d'allumage écrit les deux champs en un seul enregistrement :</p>
+  <pre><code>handleToggleSleep() → onSaveProfile({
+  ...profile,
+  sleepTrackingEnabled: !isSleepEnabled,
+  ...(isSleepEnabled ? {} : { sleepModuleHidden: false }),
+})</code></pre>
+  <p>Rallumer efface donc le masquage ; éteindre le laisse tel quel.</p>
+  <p class="ancre">src/versions/mixte/app/navigation.ts · src/versions/mixte/components/NotificationsSettings.tsx</p>
+
+  <h3 id="sommeil-curseur-calendrier-journal">Curseur calendrier / journal</h3>
+  <p><code>useHistoryView(clé)</code> relit le stockage local et n'accepte qu'une valeur :</p>
+  <pre><code>vue initiale = (getItem(clé) === 'journal') ? 'journal' : 'calendrier'
+switchView(v) → setView(v) puis setItem(clé, v)</code></pre>
+  <p>Toute autre valeur — absente, <code>null</code>, corrompue, <code>'calendar'</code> — retombe sur <code>'calendrier'</code>. La clé du sommeil est <code>glp1_sleep_history_view</code>. Le « + ajouter » de la ligne d'outils n'est dessiné que si <code>onAdd</code> est passé ; le sommeil le passe.</p>
+  <p>Les deux vues s'excluent : <code>historyView === 'journal'</code> monte le bloc Journal, <code>historyView === 'calendrier'</code> monte <code>SleepCalendar</code>. <a href="spec-fonctionnelle.html#sommeil-page-sommeil">→ fonctionnelle</a></p>
+  <p class="ancre">src/versions/mixte/components/HistoryToolbar.tsx</p>
+
+  <h3 id="sommeil-flottant-et-ouverture-automatique">« + » flottant et ouverture automatique</h3>
+  <p>Trois mécanismes distincts ouvrent le formulaire.</p>
+  <p><strong>Armement du « + » flottant.</strong> <code>useOnScreen</code> pose un <code>IntersectionObserver</code> sur le bandeau de <code>HistoryToolbar</code> et appelle <code>onAddButtonOffScreenChange(!visible)</code>. L'App n'arme que dans un sens :</p>
+  <pre><code>armFloatingAdd(tab, offScreen) {
+  si offScreen → floatingAddArmedTabs[tab] = true   // jamais remis à false
+}</code></pre>
+  <p>L'état est vidé (<code>setFloatingAddArmedTabs({})</code>) à chaque changement d'onglet : le « + » réapparaît seulement après un nouveau défilement.</p>
+  <p><strong>Clic sur le « + » flottant.</strong> Il incrémente <code>openAddRequest</code>. La page compare à la valeur mémorisée et ignore celle trouvée au montage :</p>
+  <pre><code>si (openAddRequest ?? 0) === lastAddRequest → ne rien faire
+sinon lastAddRequest = openAddRequest ; openAddForm()</code></pre>
+  <p><strong>Ajout rapide.</strong> <code>autoOpenAdd</code> sert de valeur initiale à l'état d'ouverture — <code>useState(autoOpenAdd ?? false)</code> — donc le formulaire est déjà là à la première peinture ; un <code>useEffect</code> sur <code>autoOpenAdd</code> couvre le cas où la demande arrive après le montage.</p>
+  <p class="ancre">src/versions/mixte/features/sleep/SleepTracker.tsx · src/versions/mixte/App.tsx · src/shared/ui/useOnScreen.ts</p>
+  <details><summary>Cas limites</summary>
+    <p>Élément de référence détaché (<code>el === null</code>) : <code>useOnScreen</code> rappelle <code>onChange(true)</code> — considéré visible, donc pas d'armement.</p>
+    <p>Vue Journal ou vue Calendrier : la poignée vit sur la ligne d'outils, présente dans les deux — le « + » s'arme identiquement.</p>
+  </details>
+
+  <h3 id="sommeil-bouton-tout-supprimer">Bouton « Tout supprimer »</h3>
+  <p>La corbeille du bandeau Journal n'est rendue que si les trois conditions tiennent :</p>
+  <pre><code>sleepHistory.length &gt; 0
+&amp;&amp; onClearSleepHistory fourni
+&amp;&amp; profile?.deleteAllButtonsEnabled !== false</code></pre>
+  <p>La troisième est un <code>!== false</code> : le drapeau absent laisse le bouton. Le clic ouvre <code>ConfirmDeleteAllBlock</code> avec <code>itemLabel="tout le journal du sommeil"</code> ; la confirmation appelle <code>handleClearSleepHistory</code>, qui écrit <code>sleepLogs: []</code> — le tableau entier, sans filtre de période.</p>
+  <p class="ancre">src/versions/mixte/features/sleep/SleepTracker.tsx · src/app/useAppData.ts</p>
+  <details><summary>Cas limites</summary>
+    <p>Journal filtré vide mais historique non vide : la condition porte sur <code>sleepHistory</code>, pas sur <code>listHistory</code> — le bouton reste, et supprime tout, y compris hors période.</p>
+  </details>
+
+  <h3 id="sommeil-conventions-d-une-entree-de-sommeil">Conventions d'une entrée de sommeil</h3>
+  <p>Une entrée porte deux instants complets. <code>date</code> + <code>time</code> = le <em>réveil</em>, et c'est ce couple qui date la ligne partout : tri du journal, case du calendrier, point de graphe, plafond quotidien, tendance. <code>bedDate</code> + <code>bedTime</code> = l'endormissement, champ à part entière, écrit et corrigible, jamais déduit de <code>date</code>. <span class="marque">arbitrage non validé</span> (décision de conception du 2026-08-18, notée « à confirmer par l'utilisatrice » dans <code>src/types.ts</code>).</p>
+  <p>Conséquence : une nuit commencée le 10 à 23:10 et finie le 11 à 06:45 appartient au <strong>11</strong>. <code>kind</code> ne joue aucun rôle dans cette datation ; il ne sert qu'aux libellés, aux séries « nuit seule » et à la frise.</p>
+  <p class="ancre">src/types.ts</p>
+  <div class="exemple"><p>Camille enregistre sa nuit du 10 au 11/09/2026 : <code>{ date: '2026-09-11', time: '06:45', bedDate: '2026-09-10', bedTime: '23:10', kind: 'nuit', quality: 4 }</code>. Sa sieste du 11/09 : <code>{ date: '2026-09-11', time: '14:40', bedDate: '2026-09-11', bedTime: '14:00', kind: 'sieste', quality: 3 }</code>. Les deux sont datées du 11.</p></div>
+
+  <h3 id="sommeil-duree-d-un-sommeil">Durée d'un sommeil</h3>
+  <p>Une seule fonction la calcule, sur des instants absolus construits champ par champ — jamais par <code>new Date(chaîne)</code>, qui lirait le jour en UTC.</p>
+  <pre><code>minutesOfDay(t)   : /^(\d{2}):(\d{2})$/ ; h &gt; 23 ou m &gt; 59 → null ; sinon h × 60 + m
+instantMinutes(d, t) : /^(\d{4})-(\d{2})-(\d{2})$/ ; sinon null
+                       → Date.UTC(aaaa, mm−1, jj) / 60000 + minutesOfDay(t)
+
+sleepMinutesBetween(bedDate, bedTime, date, time) :
+  bed  = instantMinutes(bedDate, bedTime)
+  wake = instantMinutes(date, time)
+  si bed = null ou wake = null → 0
+  → wake &gt; bed ? wake − bed : 0
+
+sleepLogMinutes(log) = sleepMinutesBetween(log.bedDate, log.bedTime, log.date, log.time)</code></pre>
+  <p>Unité : minutes entières. Aucun plafond ici : deux jours d'écart donnent 2 880 min. Le résultat est toujours ≥ 0.</p>
+  <p class="ancre">src/features/sleep/sleep.utils.ts</p>
+  <details><summary>Cas limites</summary>
+    <p>Réveil antérieur à l'endormissement → 0, jamais un négatif.</p>
+    <p>Réveil égal à l'endormissement → 0 (<code>wake &gt; bed</code> est strict).</p>
+    <p>Heure sur un seul chiffre, « 7:00 » → <code>minutesOfDay</code> refuse le format → 0.</p>
+    <p>« 25:00 » ou « 12:75 » → hors bornes → 0.</p>
+    <p><code>bedDate</code> absent ou vide → 0 : la ligne vaut zéro minute partout.</p>
+  </details>
+  <div class="exemple"><p>Camille, 10/09 23:10 → 11/09 06:45 : <code>bed</code> = 29 816 640 + 1 390 = 29 818 030, <code>wake</code> = 29 818 080 + 405 = 29 818 485 ; différence = 455 min. Sa sieste 14:00 → 14:40 le même jour : 40 min.</p></div>
+
+  <h3 id="sommeil-formats-de-duree-du-sommeil">Formats de durée du sommeil</h3>
+  <p>Trois formateurs, jamais interchangeables. Tous bornent à 0 et arrondissent à la minute (<code>Math.max(0, Math.round(minutes))</code>).</p>
+  <pre><code>formatSleepDuration(m)   // sleep.utils.ts
+  h = ⌊total/60⌋ ; r = total mod 60
+  h = 0        → « r min »          (« 40 min », « 0 min »)
+  r = 0        → « h h »            (« 8 h »)
+  sinon        → « h h rr »         (« 7 h 35 », minutes sur 2 chiffres)
+
+formatSleepAverage(m)    // sleep.utils.ts
+  → « ⌊total/60⌋ h rr »  sans espaces, heures TOUJOURS écrites
+     465 → « 7h45 » ; 45 → « 0h45 » ; −10 → « 0h00 »
+
+formatCalendarDuration(m) // shared/calendar.ts
+  total &lt; 60 → « total min » collé (« 45min »)
+  sinon      → « ⌊total/60⌋ h rr » (« 7h35 », « 8h00 »)</code></pre>
+  <p>Répartition constatée : <code>formatSleepDuration</code> dans le formulaire, la ligne du journal et l'infobulle du graphe ; <code>formatSleepAverage</code> dans les tuiles « Côte à côte », la moyenne du graphe, la frise des nuits et le message des 12 h ; <code>formatCalendarDuration</code> dans les tuiles du calendrier, la bulle, les tiroirs Journal et Tendances.</p>
+  <p>Une seule surface retouche le résultat : la ligne de tête de la bulle du calendrier applique <code>formatCalendarDuration(duree).replace(/h00$/, 'h')</code>, d'où « de 8h » au lieu de « de 8h00 ».</p>
+  <p class="ancre">src/features/sleep/sleep.utils.ts · src/shared/calendar.ts · src/versions/mixte/features/sleep/SleepCalendar.tsx</p>
+  <div class="exemple"><p>455 min chez Camille : « 7 h 35 » dans le formulaire, « 7h35 » dans la tuile du 11/09 et sur la frise. 480 min : « 8 h », « 8h00 », et « de 8h » en tête de bulle. 40 min : « 40 min », « 0h40 », « 40min ».</p></div>
+
+  <h3 id="sommeil-valeurs-par-defaut-du-formulaire-de-sommeil">Valeurs par défaut du formulaire de sommeil</h3>
+  <pre><code>DEFAULT_TIMES = { nuit:   { bedTime: '23:00', wakeTime: '07:00' },
+                  sieste: { bedTime: '14:00', wakeTime: '15:00' } }
+DEFAULT_SLEEP_QUALITY = 3
+
+resetFields(nature = 'nuit') :
+  kind     = nature
+  bedTime  = DEFAULT_TIMES[nature].bedTime
+  wakeTime = DEFAULT_TIMES[nature].wakeTime
+  quality  = 3
+  date     = getLocalDateStr()                       // aujourd'hui
+  bedDate  = nature = 'nuit' ? previousDay(date) : date
+  notes    = '' ; showNotes = false</code></pre>
+  <p><code>openAddForm()</code> appelle <code>resetFields('nuit')</code>, vide <code>editingLogId</code>, <code>originalRange</code>, le refus de recouvrement et la question des 12 h, ouvre le bloc et remonte en haut de page.</p>
+  <p><strong>Changement de nature.</strong> Les heures ne suivent que si elles sont encore celles de l'<em>ancienne</em> nature :</p>
+  <pre><code>handleKindChange(nature) :
+  effacer overlapRefusal et longSleepConfirm
+  autre = DEFAULT_TIMES[kind]            // kind = l'ancienne nature
+  si bedTime = autre.bedTime et wakeTime = autre.wakeTime :
+       bedTime  = DEFAULT_TIMES[nature].bedTime
+       wakeTime = DEFAULT_TIMES[nature].wakeTime
+       bedDate  = nature = 'nuit' ? previousDay(date) : date
+  kind = nature</code></pre>
+  <p><strong>Modification.</strong> <code>startEdit(log)</code> mémorise la plage d'origine dans <code>originalRange</code>, efface les deux refus, puis recharge <code>kind</code>, <code>bedTime</code>, <code>bedDate</code>, <code>wakeTime</code> (depuis <code>log.time</code>), <code>quality</code>, <code>date</code>, <code>notes</code>, et déplie les notes si elles existent.</p>
+  <p><strong>Ajout depuis le calendrier.</strong> <code>openAddFormAt(d)</code> appelle <code>openAddForm()</code> — qui remet la date à aujourd'hui — <em>puis</em> <code>setDate(d)</code> et <code>setBedDate(previousDay(d))</code> : l'ordre est indispensable.</p>
+  <p class="ancre">src/features/sleep/useSleepForm.ts · src/versions/mixte/features/sleep/SleepTracker.tsx</p>
+  <details><summary>Cas limites</summary>
+    <p>Heures touchées puis bascule Nuit → Sieste : la comparaison échoue, les heures et <code>bedDate</code> restent tels quels ; seule <code>kind</code> change.</p>
+    <p>Bascule Nuit → Sieste sur les défauts : 14:00 → 15:00, <code>bedDate</code> = <code>date</code> — la sieste tient dans un jour.</p>
+    <p>Clic sur un jour vide du calendrier : <code>date</code> = ce jour, <code>bedDate</code> = la veille, même pour une sieste, la nature de départ étant « nuit ».</p>
+  </details>
+
+  <h3 id="sommeil-echelle-de-qualite">Échelle de qualité</h3>
+  <pre><code>SLEEP_QUALITY_LABELS = ['Très mauvaise', 'Mauvaise', 'Passable',
+                        'Correcte', 'Bonne', 'Excellente']   // index 0 → 5</code></pre>
+  <p>La liste fait l'échelle : le curseur va de 0 à <code>SLEEP_QUALITY_LABELS.length − 1</code>, la graduation en tire ses chiffres, le mot affiché est <code>SLEEP_QUALITY_LABELS[quality]</code>. <code>quality</code> est un entier stocké tel quel, jamais une chaîne ; l'édition en place du journal passe par une liste « n — libellé » et reconvertit avec <code>Number(...)</code>.</p>
+  <p>La qualité n'est pas facultative : <code>DEFAULT_SLEEP_QUALITY = 3</code> est écrit même si le curseur n'a pas été touché — rien ne distingue une note choisie d'une note laissée telle quelle. <span class="marque">arbitrage non validé</span> (arbitrage du 2026-08-30 : la valeur par défaut était 0, elle a été portée à 3 ; le champ facultatif recommandé n'a pas été retenu).</p>
+  <p class="ancre">src/features/sleep/sleep.constants.ts</p>
+
+  <h3 id="sommeil-refus-d-une-duree-nulle">Refus d'une durée nulle</h3>
+  <p>Deux gardes superposées. Le hook partagé refuse en silence, la page Mixte écrit le message.</p>
+  <pre><code>// SleepTracker.handleSubmit — jugé AVANT tout le reste
+si form.durationMinutes &lt;= 0 :
+    e.preventDefault()
+    durationRefusal = "L'heure de réveil et l'heure d'endormissement sont
+                       identiques : aucune durée de sommeil à enregistrer."
+    return
+durationRefusal = ''
+form.handleSubmit(e)
+
+// useSleepForm.handleSubmit — filet
+si durationMinutes &lt;= 0 : return       // rien n'est écrit, rien n'est dit</code></pre>
+  <p>Le refus est effacé par <code>changeBedTime</code>, <code>changeWakeTime</code>, <code>changeKind</code>, <code>openAddForm</code>, <code>openAddFormAt</code>, <code>startEdit</code> et <code>resetForm</code>. Il n'est <em>pas</em> effacé par un changement de date : <code>onDateChange</code> reçoit <code>form.setDate</code> sans passer par un enrobage qui viderait <code>durationRefusal</code>. Le message reste donc à l'écran jusqu'au clic suivant.</p>
+  <p>En édition en place (journal et bulle du calendrier), la garde est <code>si sleepMinutesBetween(...) &lt;= 0 → return</code> : la modification est abandonnée sans message et la ligne garde ses valeurs.</p>
+  <p class="ancre">src/versions/mixte/features/sleep/SleepTracker.tsx · src/features/sleep/useSleepForm.ts · src/versions/mixte/features/sleep/JournalEntryCard.tsx</p>
+
+  <h3 id="sommeil-confirmation-d-une-duree-12-h">Confirmation d'une durée &gt; 12 h</h3>
+  <pre><code>LONG_SLEEP_THRESHOLD_MINUTES = 12 × 60 = 720
+
+judgeLongSleepOnSubmit(kind, durationMinutes, armedMessage) :
+  si armedMessage ≠ ''            → { save: true,  message: armedMessage }
+  si durationMinutes &lt;= 720       → { save: true,  message: '' }
+  nature = kind = 'nuit' ? 'une nuit' : 'une sieste'
+  → { save: false,
+      message: `Êtes-vous sûre de vouloir enregistrer ${nature} de
+                ${formatSleepAverage(durationMinutes)} ? Sinon, vérifiez les
+                dates et heures d'endormissement et de réveil.` }</code></pre>
+  <p>Seuil <strong>strict</strong> : 720 min passent, 721 posent la question. La durée du message est écrite par <code>formatSleepAverage</code>, donc « 13h00 », « 31h35 ».</p>
+  <p><strong>Ordre dans <code>handleSubmit</code></strong> : durée nulle → question des 12 h → recouvrement → écriture. La question est donc posée avant le contrôle de recouvrement, en ajout comme en modification (aucune branche ne teste <code>editingLogId</code>).</p>
+  <p><strong>Armement.</strong> Le premier clic mémorise le message dans <code>longSleepConfirm</code> et sort sans écrire ; le bouton passe à « Confirmer mon choix » (<code>awaitingConfirmation = longSleepConfirm !== ''</code>). Le second clic voit <code>armedMessage</code> non vide et laisse passer. <code>clearingRefusal</code> enrobe <code>setBedTime</code>, <code>setWakeTime</code>, <code>setBedDate</code> et <code>setDate</code> : toute retouche d'heure ou de date vide <code>overlapRefusal</code> <em>et</em> <code>longSleepConfirm</code> ; <code>handleKindChange</code> les vide aussi. <code>longSleepConfirm</code> n'est remis à vide dans <code>handleSubmit</code> qu'après le passage du contrôle de recouvrement.</p>
+  <p class="ancre">src/features/sleep/useSleepForm.ts</p>
+  <details><summary>Cas limites</summary>
+    <p>Exactement 12 h 00 (720 min) : enregistré sans question.</p>
+    <p>Question armée puis saisie refusée pour recouvrement : <code>longSleepConfirm</code> reste armé, le bouton dit encore « Confirmer mon choix » ; retoucher la plage efface les deux messages.</p>
+    <p>Durée &gt; 12 h qui repasse sous le seuil après correction : l'armement est déjà tombé, le bouton redit « Valider ».</p>
+  </details>
+  <div class="exemple"><p>Camille date le réveil au 12/09 au lieu du 11/09 : 10/09 23:10 → 12/09 06:45 = 1 895 min. Premier clic : « Êtes-vous sûre de vouloir enregistrer une nuit de 31h35 ? … ». Elle corrige la date : la question tombe. Nouveau clic : 455 min ≤ 720, enregistré.</p></div>
+
+  <h3 id="sommeil-interdiction-des-plages-qui-se-recouvrent">Interdiction des plages qui se recouvrent</h3>
+  <pre><code>sleepRangesOverlap(a, b) :
+  aDebut = instantMinutes(a.bedDate, a.bedTime) ; aFin = instantMinutes(a.date, a.time)
+  bDebut = instantMinutes(b.bedDate, b.bedTime) ; bFin = instantMinutes(b.date, b.time)
+  si l'un des quatre est null            → false
+  si aFin &lt;= aDebut ou bFin &lt;= bDebut    → false     // plage sans étendue
+  → aDebut &lt; bFin && bDebut &lt; aFin                   // strict des deux côtés
+
+findOverlappingSleep(logs, candidate, excludeId) =
+  logs.filter(log =&gt; log.id ≠ excludeId && sleepRangesOverlap(log, candidate))</code></pre>
+  <p>Les deux comparaisons étant strictes, le bout-à-bout passe : une plage qui commence exactement à la fin d'une autre n'est pas un recouvrement.</p>
+  <p><strong>Formulaire.</strong> Le contrôle est sauté quand la plage est identique à l'originale :</p>
+  <pre><code>plageInchangee = editingLogId présent
+              && originalRange ≠ null
+              && originalRange.bedDate = bedDate
+              && originalRange.bedTime = bedTime
+              && originalRange.date    = date
+              && originalRange.time    = wakeTime
+si !plageInchangee :
+   conflits = findOverlappingSleep(sleepHistory ?? [], plage, editingLogId ?? undefined)
+   si conflits.length &gt; 0 :
+      overlapRefusal = sleepOverlapRefusal(conflits[0], editingLogId ? 'modification' : 'ajout')
+      return</code></pre>
+  <p><strong>Édition en place.</strong> Le contrôle ne court que si <code>bedTime</code>, <code>date</code> ou <code>time</code> ont bougé ; en cas de conflit, les trois champs du brouillon sont reposés sur les valeurs enregistrées avant d'afficher le message.</p>
+  <pre><code>formatSleepRange(r) = `du ${JJ/MM de r.bedDate} ${r.bedTime} au ${JJ/MM de r.date} ${r.time}`
+sleepOverlapRefusal(conflit, mode) =
+  `Deux sommeils ne peuvent pas se recouvrir : cette plage recoupe le sommeil
+   déjà enregistré ${formatSleepRange(conflit)}. ` +
+  (mode = 'modification'
+     ? 'La modification n'a pas été enregistrée : la ligne garde ses valeurs d'avant.'
+     : 'Rien n'a été enregistré.')</code></pre>
+  <p>Seul le <em>premier</em> conflit trouvé est cité, dans l'ordre du tableau <code>sleepLogs</code> — l'ordre d'insertion, pas l'ordre chronologique.</p>
+  <p class="ancre">src/features/sleep/sleep.utils.ts · src/features/sleep/useSleepForm.ts · src/versions/mixte/features/sleep/JournalEntryCard.tsx</p>
+  <details><summary>Cas limites</summary>
+    <p>Deux lignes déjà en conflit dans l'historique : ni l'une ni l'autre n'est contrôlée tant que sa plage ne bouge pas — leur nature, leur qualité et leurs notes restent modifiables.</p>
+    <p>Plage candidate de durée nulle : <code>sleepRangesOverlap</code> rend faux, mais le refus de durée nulle a déjà arrêté la saisie.</p>
+    <p>Ligne existante illisible (<code>bedDate</code> absent) : elle ne recouvre rien, donc ne bloque rien.</p>
+    <p>Le contrôle porte sur les heures <em>non arrondies</em> ; l'arrondi n'est appliqué qu'à l'écriture (voir plus bas).</p>
+  </details>
+  <div class="exemple"><p>Nuit de Camille enregistrée du 10/09 23:10 au 11/09 06:45. Sieste 11/09 06:30 → 07:30 : 06:30 &lt; 06:45 et 23:10 &lt; 07:30 → refusée, « … recoupe le sommeil déjà enregistré du 10/09 23:10 au 11/09 06:45. Rien n'a été enregistré. » Sieste 06:45 → 07:30 : <code>bDebut = aFin</code>, la première comparaison stricte échoue → acceptée.</p></div>
+
+  <h3 id="sommeil-plafond-quotidien-du-sommeil">Plafond quotidien du sommeil</h3>
+  <pre><code>SLEEP_DAILY_CAP = 15
+canAddSleepOn(logs, date, cap) = logs.filter(l =&gt; l.date = date).length &lt; cap
+
+handleAddSleep(log) :
+  si !canAddSleepOn(sleepLogs, log.date, 15) :
+      setLimitNotice("Limite atteinte pour cette journée : 15 saisies de
+                      sommeil au maximum. Rien n'a été enregistré.")
+      return                                   // aucune écriture
+  sleepLogs = [...sleepLogs, snapSleepTimes({ ...log, id: `sleep-${Date.now()}` })]</code></pre>
+  <p>Le sommeil n'emploie pas <code>addLogWithinDailyCap</code> (sport, temps pour soi), qui remplace la dernière ligne du jour : il <strong>refuse</strong>, rien n'est écrasé. Le compte porte sur <code>date</code>, donc sur le jour du réveil, et compte les nuits comme les siestes. Le plafond ne s'applique qu'à l'ajout : <code>handleUpdateSleep</code> ne le consulte pas.</p>
+  <p>Le refus est posé après coup, hors du formulaire : celui-ci a déjà appelé <code>onAddSleep</code>, fermé la carte et allumé le bandeau « Le sommeil a bien été ajouté à votre journal. » alors que rien n'a été écrit. <span class="marque">arbitrage non validé</span></p>
+  <p class="ancre">src/app/useAppData.ts · src/features/sleep/sleep.constants.ts · src/features/sleep/sleep.utils.ts</p>
+  <details><summary>Cas limites</summary>
+    <p>Déplacer par modification une seizième entrée vers un jour déjà plein : accepté, le plafond n'est pas relu.</p>
+    <p>Deux ajouts dans la même milliseconde : <code>Date.now()</code> rend le même identifiant — collision possible, non gardée.</p>
+  </details>
+
+  <h3 id="sommeil-arrondi-des-heures-du-sommeil">Arrondi des heures du sommeil</h3>
+  <pre><code>ROUNDED_MINUTES = [0, 10, 15, 20, 30, 40, 45, 50]
+
+snapToRoundedMinutes(t) :
+  si t ne vaut pas /^(\d{2}):(\d{2})$/ → t inchangé
+  mm = Number(minutes) ; si mm &gt; 59 → t inchangé
+  arrondi = dernier m de ROUNDED_MINUTES tel que m &lt;= mm   (sinon 0)
+  → `HH:arrondi`                                    // l'heure ne change jamais
+
+snapSleepTimes(log) = { ...log, time: snap(log.time), bedTime: snap(log.bedTime) }</code></pre>
+  <p>Toujours vers le bas — l'application ne produit jamais une heure future. Appliqué dans <code>handleAddSleep</code> et dans <code>handleUpdateSleep</code>, donc à l'écriture et non à la saisie : la durée affichée par le formulaire est calculée sur les heures brutes, la durée relue après enregistrement sur les heures arrondies. Le sélecteur d'heure maison ne propose que ces huit minutes ; une valeur héritée d'une autre minute reste affichée telle quelle, en champ désactivé.</p>
+  <p class="ancre">src/shared/date/date.local.ts · src/features/sleep/sleep.utils.ts · src/app/useAppData.ts · src/shared/ui/TimeSelect.tsx</p>
+  <details><summary>Cas limites</summary>
+    <p>06:47 → 06:45 ; 07:37 → 07:30 ; 22:58 → 22:50 ; 06:05 → 06:00 ; 06:45 inchangé.</p>
+    <p>Une saisie de 12 h 05 confirmée puis arrondie peut être enregistrée à 12 h 00 : la question des 12 h a jugé la valeur brute.</p>
+  </details>
+
+  <h3 id="sommeil-tri-du-journal-du-sommeil-et-calendrier">Tri du journal du sommeil et du calendrier</h3>
+  <p><strong>Journal.</strong> Tri décroissant sur l'instant de réveil, puis filtre de période — dans cet ordre.</p>
+  <pre><code>listHistory = [...sleepHistory]
+  .sort((a, b) =&gt; new Date(`${b.date}T${b.time || '00:00'}`) − new Date(`${a.date}T${a.time || '00:00'}`))
+  puis filterByTimeWindow(…, log =&gt; log.date, …)</code></pre>
+  <p><strong>Calendrier.</strong> Regroupement par jour de réveil, tri croissant à l'intérieur d'un jour.</p>
+  <pre><code>sleepsByDate(history) : Map&lt;date, SleepLog[]&gt;
+   clé = log.date ; chaque liste triée par (a.time ?? '').localeCompare(b.time ?? '')
+sleepDayMinutes(logs) = Σ sleepLogMinutes(log)      // nuit + siestes du jour</code></pre>
+  <p>La tuile affiche <code>formatCalendarDuration(sleepDayMinutes(logs))</code>.</p>
+  <p class="ancre">src/features/sleep/useSleepJournal.ts · src/features/sleep/sleepCalendar.ts · src/versions/mixte/features/sleep/SleepCalendar.tsx</p>
+  <details><summary>Cas limites</summary>
+    <p><code>time</code> vide : le journal le lit « 00:00 », le calendrier le compare comme chaîne vide, donc en tête de journée.</p>
+    <p>Deux entrées de même date et même heure : l'ordre relatif est celui du tableau source (tri stable).</p>
+  </details>
+  <div class="exemple"><p>Le 11/09 chez Camille : nuit 455 min + sieste 40 min = 495 min → tuile « 8h15 ». La bulle liste la nuit (06:45) avant la sieste (14:40) ; le journal les liste dans l'ordre inverse.</p></div>
+
+  <h3 id="sommeil-deplacement-de-la-date-d-une-ligne-de-sommeil">Déplacement de la date d'une ligne de sommeil</h3>
+  <p>En édition en place, le jour d'endormissement suit la date de réveil, l'écart conservé.</p>
+  <pre><code>bedDate = addDays(log.bedDate, daysBetween(log.date, nouvelleDate))</code></pre>
+  <p><code>daysBetween(debut, fin)</code> rend <code>Math.round((Date.UTC(fin) − Date.UTC(debut)) / 86 400 000)</code>, 0 si l'une des deux chaînes n'est pas <code>YYYY-MM-DD</code>. <code>addDays</code> passe par <code>Date.UTC</code> champ par champ.</p>
+  <p>Le même calcul sert l'affichage du brouillon avant enregistrement : <code>bedDateStr</code>, la durée montrée et le test « deux bords » le lisent tous les trois. La durée est donc invariante par déplacement de date. Le formulaire complet, lui, n'applique pas cette règle : <code>date</code> et <code>bedDate</code> y sont deux champs indépendants.</p>
+  <p class="ancre">src/versions/mixte/features/sleep/JournalEntryCard.tsx · src/shared/date/date.local.ts</p>
+  <div class="exemple"><p>Camille déplace au 13/09 sa nuit du 10 au 11/09 : <code>daysBetween('2026-09-11', '2026-09-13') = 2</code>, <code>bedDate = addDays('2026-09-10', 2) = '2026-09-12'</code>. La nuit devient celle du 12 au 13/09, toujours 7 h 35.</p></div>
+
+  <h3 id="sommeil-nommage-d-une-nuit-par-ses-deux-bords">Nommage d'une nuit par ses deux bords</h3>
+  <p>Le critère est <code>bedDate</code>, jamais <code>kind</code> : une sieste qui enjambe minuit dit ses deux jours, une « nuit » sans <code>bedDate</code> retombe sur la forme courte.</p>
+  <pre><code>sleepSpansTwoDays(span) = Boolean(span.bedDate) && span.bedDate ≠ span.date
+
+formatDayRangeStr(debut, fin) :
+  memeMois = debut.slice(0,7) = fin.slice(0,7)
+  gauche = memeMois ? debut.slice(8,10) : « JJ/MM de debut »
+  → `${gauche} au ${JJ/MM de fin}`
+
+formatSleepDays(span, forme = 'longue') :
+  si !sleepSpansTwoDays(span) → « JJ/MM de span.date »
+  plage = formatDayRangeStr(span.bedDate, span.date)
+  forme ≠ 'compacte' → plage
+  sinon → plage.replace(' au ', '→').replace(/\b0(\d)/g, '$1')
+
+formatSleepSpanWithWord(mot, span, forme) = `${mot} du ${formatSleepDays(span, forme)}`</code></pre>
+  <p>Le mois n'est porté que par la seconde date quand les deux le partagent. À cheval sur deux mois ou deux années, les deux dates s'écrivent en entier. L'élagage des zéros de tête (<code>\b0(\d)</code>) ne mord qu'en tête de nombre : « 10 » et « /10 » restent intacts, et il ne s'applique qu'à la forme compacte, donc jamais à une entrée d'un seul jour. Les chaînes sont découpées telles quelles, jamais converties en <code>Date</code>.</p>
+  <p>Forme compacte : uniquement le défilé des dernières entrées de l'accueil. Forme longue : bulle du calendrier, tiroir Journal, rapport PDF, cartes de partage.</p>
+  <p class="ancre">src/features/sleep/sleepLabel.ts · src/shared/date/date.utils.ts</p>
+  <details><summary>Cas limites</summary>
+    <p>« 2026-09-10 » → « 2026-09-11 » : « 10 au 11/09 », compacte « 10→11/9 ».</p>
+    <p>« 2026-08-31 » → « 2026-09-01 » : mois différents → « 31/08 au 01/09 », compacte « 31/8→1/9 ».</p>
+    <p><code>bedDate</code> égal à <code>date</code> ou absent : « 11/09 » dans les deux formes.</p>
+  </details>
+
+  <h3 id="sommeil-selecteur-de-periode-commun">Sélecteur de période commun</h3>
+  <pre><code>PERIOD_OPTIONS = [ '7days' « 7 derniers jours », '14days', '30days', '90days',
+                   'all' « Depuis le début », 'custom' « Choisir » ]
+DEFAULT_PERIOD = '30days'
+WINDOW_DAYS = { '7days': 7, '14days': 14, '30days': 30, '90days': 90 }
+
+getCutoffDateStr(window, customRange?) :
+  'all'    → null
+  'custom' → customRange?.startDate valide ? startDate : null
+  sinon    → getLocalDateStr(aujourd'hui − (WINDOW_DAYS[window] − 1) jours)
+
+filterByTimeWindow(items, window, getDate, customRange?) :
+  'all'    → tout
+  'custom' → garde si (!startDate ou d &gt;= startDate) et (!endDate ou d &lt;= endDate)
+  sinon    → garde si getDate(item) &gt;= getCutoffDateStr(window)</code></pre>
+  <p>Fenêtre inclusive, jour en cours compris ; comparaisons de chaînes <code>YYYY-MM-DD</code>, jamais de <code>Date</code>. Une fenêtre fixe n'a <strong>pas</strong> de borne haute : une entrée datée du futur y entre.</p>
+  <p><code>usePeriodWindow(clé)</code> persiste <code>{ window, customRange }</code> sous <code>glp1_period_&lt;clé&gt;</code>, retombe sur <code>DEFAULT_PERIOD</code> si la valeur relue n'est plus une fenêtre connue, et expose <code>rangeForFilter</code> (la plage, mais seulement en mode <code>custom</code>). <code>setCustomWindow(range)</code> bascule en <code>custom</code> et écrit les bornes en une seule persistance — enchaîner <code>setWindow</code> puis <code>setCustomRange</code> dans le même rendu repartirait de l'état d'avant.</p>
+  <p>Clés du domaine : <code>sleep_journal</code>, <code>sleep_chart</code>, <code>sleep_awake_chart</code>, <code>sleep_night_chart</code>, <code>sleep_quality_chart</code> — chaque bloc garde sa propre période.</p>
+  <p class="ancre">src/shared/time-window/periodOptions.ts · src/shared/time-window/timeWindow.utils.ts · src/shared/time-window/usePeriodWindow.ts</p>
+  <div class="exemple"><p>Le 12/09/2026, « 7 derniers jours » chez Camille : borne basse <code>2026-09-06</code>, aucune borne haute — sa nuit du 06/09 entre, une saisie datée du 20/09 aussi.</p></div>
+
+  <h3 id="sommeil-bornes-du-au-d-un-journal">Bornes « du … au … » d'un journal</h3>
+  <p><code>InlineCustomDateRange</code> reçoit deux jeux de valeurs selon le mode :</p>
+  <pre><code>range   = window = 'custom' ? period.customRange
+                            : { startDate: getCutoffDateStr(window) ?? '', endDate: '' }
+onChange = window = 'custom' ? period.setCustomRange
+                             : period.setCustomWindow
+fallbackStart = plus ancienne entrée du journal
+fallbackEnd   = getLocalDateStr()</code></pre>
+  <p>Hors mode Choisir, la borne haute est vide et s'affiche par le repli « aujourd'hui » ; modifier l'une ou l'autre appelle <code>setCustomWindow</code>, qui bascule en <code>custom</code> avec ces bornes en une écriture.</p>
+  <p>La plus ancienne entrée est calculée par repli sur aujourd'hui :</p>
+  <pre><code>oldestSleepDate = sleepHistory.reduce(
+   (min, log) =&gt; (log.date && log.date &lt; min) ? log.date : min,
+   getLocalDateStr())</code></pre>
+  <p>Un journal vide donne donc aujourd'hui, et une entrée datée du futur ne déplace pas la borne.</p>
+  <p class="ancre">src/versions/mixte/features/sleep/SleepTracker.tsx · src/shared/time-window/usePeriodWindow.ts</p>
+
+  <h3 id="sommeil-coquille-commune-des-calendriers">Coquille commune des calendriers</h3>
+  <p><code>CalendarBlock</code> porte la grille, la navigation et la bulle ; <code>SleepCalendar</code> ne fournit que le contenu des cases.</p>
+  <pre><code>grille = monthGrid(annéeAffichée, moisAffiché)      // lundi → dimanche, semaines complètes
+minKey = min(monthKey(aujourd'hui), monthKey(plus ancienne date à donnée))
+maxKey = monthKey(aujourd'hui)
+canPrev = monthKey(affiché) &gt; minKey ; canNext = monthKey(affiché) &lt; maxKey</code></pre>
+  <p>Glissé horizontal : départ mémorisé au contact, décision au relâcher — retenu si <code>|dx| &gt;= 48</code> px <em>et</em> <code>|dx| &gt; |dy|</code>, sinon le défilement vertical de la page l'emporte. Un clic sur un jour à donnée ouvre ou referme sa bulle ; un jour sans donnée appelle <code>onAddAt(date)</code> quand il est fourni. Un écouteur posé sur <code>document</code> referme la bulle au clic ailleurs, et la bulle se fait défiler dans le champ si elle déborde sous le menu. L'invite « Cliquez sur la date choisie pour saisir {premiereSaisie} » n'est rendue que si l'appelant passe <code>premiereSaisie</code> ; le sommeil le fait quand <code>history.length === 0</code>, avec « votre première nuit ou sieste ».</p>
+  <p>Ligne « Kcal » de la bulle : rendue seulement pour <code>log.kind === 'nuit'</code> et si <code>savedMeals</code> porte au moins un repas daté de <code>log.date</code> — le jour du <em>réveil</em> ; valeur <code>Math.round(nutritionTotalsOn(savedMeals, log.date).calories)</code>.</p>
+  <p class="ancre">src/versions/mixte/components/CalendarBlock.tsx · src/shared/calendar.ts · src/versions/mixte/features/sleep/SleepCalendar.tsx</p>
+
+  <h3 id="sommeil-points-des-graphes-du-sommeil">Points des graphes du sommeil</h3>
+  <p><code>computeSleepDays</code> construit un point par jour de la fenêtre, pour les quatre graphes à la fois.</p>
+  <pre><code>dayStartMs = minuit local d'aujourd'hui ; dayEndMs = dayStartMs + 86 400 000 − 1
+
+bornes :
+  '7days'|'14days'|'30days'|'90days' → startMs = dayStartMs − (n − 1) jours ; endMs = dayEndMs
+  'all'    → startMs = min des dates de l'historique (à midi), sinon dayStartMs − 6 j
+  'custom' → startMs = customStart à 00:00:00 (sinon dayStartMs − 6 j)
+             endMs   = customEnd  à 23:59:59 (sinon dayEndMs)
+
+échantillonnage :
+  diffDays  = round((endMs − startMs) / 86 400 000)
+  maxPoints = diffDays &gt; 60 ? 60 : max(diffDays + 1, 1)
+  step      = max(1, ⌊(diffDays + 1) / maxPoints⌋)
+  boucle : t = startMs ; t &lt;= endMs ; t += 86 400 000 × step</code></pre>
+  <p><code>step</code> ne dépasse 1 que si <code>⌊(diffDays + 1) / 60⌋ &gt;= 2</code>, c'est-à-dire <code>diffDays &gt;= 119</code>. Une fenêtre de 90 jours donne <code>diffDays = 90</code>, <code>step = ⌊91 / 60⌋ = 1</code>, donc 90 points ; 119 jours donnent <code>step = 2</code> et 60 points ; 180 jours donnent <code>step = ⌊181 / 60⌋ = 3</code> et 61 points.</p>
+  <p>Contenu d'un point (<code>SleepDayPoint</code>), avec <code>toHours(m) = round(m / 60 × 10) / 10</code> :</p>
+  <pre><code>dateFormatted = « JJ/MM »          date = YYYY-MM-DD       timestamp
+Sommeil        = toHours(sleepMinutesOn(logs, jour))          // toujours un nombre
+'Qualité'      = dayQualityOn(logs, jour)                     // ou null
+Nuit           = nightMinutes = null ? null : toHours(nightMinutes)
+'Qualité nuit' = nightQualityOn(logs, jour)                   // ou null
+'Éveil'        = awakeMinutes = null ? null : toHours(awakeMinutes)
+Kcal           = repas ce jour ? round(nutritionTotalsOn(meals, jour).calories) : null
+minutes, nightMinutes, awakeMinutes                            // les valeurs canoniques</code></pre>
+  <p>Les grandeurs canoniques restent en minutes : les heures ne sont qu'un habillage d'axe. <code>dropCurrentDay(points, todayStr)</code> retire le point du jour ; seul le graphe « Éveil et nutrition » l'appelle.</p>
+  <p class="ancre">src/features/sleep/sleep.utils.ts · src/features/sleep/useSleepChart.ts</p>
+  <details><summary>Cas limites</summary>
+    <p>Mode <code>all</code> sur un historique vide : <code>startMs</code> retombe à sept jours en arrière.</p>
+    <p>Mode <code>custom</code> avec <code>endDate</code> au-delà d'aujourd'hui : les points vont jusqu'à cette borne, avec des journées à 0.</p>
+    <p>Un jour sans entrée porte <code>Sommeil = 0</code> et <code>'Qualité' = null</code> : la barre est absente, la courbe n'est pas reliée (<code>connectNulls={false}</code>).</p>
+  </details>
+  <div class="exemple"><p>Fenêtre par défaut de Camille, 30 jours au 12/09/2026 : 30 points, du 14/08 au 12/09. Le point du 11/09 porte <code>Sommeil = round(495 / 60 × 10) / 10 = 8,3</code>, <code>Nuit = 7,6</code>, <code>'Qualité' = 3,9</code>.</p></div>
+
+  <h3 id="sommeil-qualite-moyenne-ponderee">Qualité moyenne pondérée</h3>
+  <pre><code>weightedQuality(logs) :
+  poids = 0 ; somme = 0
+  pour chaque log :
+     d = sleepLogMinutes(log)
+     si d &lt;= 0 → ignoré
+     poids += d ; somme += d × log.quality
+  si poids = 0 → null
+  → round((somme / poids) × 10) / 10</code></pre>
+  <p>Pondération par la durée, pas par le nombre d'entrées ; les entrées de durée nulle ou illisible sont écartées des deux côtés du quotient. Arrondi au dixième. Déclinaisons :</p>
+  <pre><code>dayQualityOn(logs, d)   = weightedQuality(entrées datées d)                 // nuit + siestes
+nightQualityOn(logs, d) = weightedQuality(entrées datées d de kind 'nuit')
+weightedQualityLast7Days(logs, now) = weightedQuality(logs filtrés date &gt;= aujourd'hui − 6)</code></pre>
+  <p>Sur la home, la tuile « depuis le début » appelle <code>weightedQuality(sleepLogs)</code> sur l'historique entier.</p>
+  <p class="ancre">src/features/sleep/sleep.utils.ts</p>
+  <details><summary>Cas limites</summary>
+    <p>Une seule entrée de durée &gt; 0 : la moyenne vaut sa qualité.</p>
+    <p>Toutes les entrées à durée nulle : <code>null</code> — l'infobulle affiche « — », la tuile disparaît.</p>
+    <p>Une longue nuit notée 5 et une courte notée 0 tirent peu la moyenne : (480 × 5 + 20 × 0) / 500 = 4,8.</p>
+  </details>
+  <div class="exemple"><p>Le 11/09 chez Camille : (455 × 4 + 40 × 3) / 495 = 1 940 / 495 = 3,919… → <strong>3,9</strong>.</p></div>
+
+  <h3 id="sommeil-moyenne-affichee-du-graphe-duree-et-qualite">Moyenne affichée du graphe « Durée et qualité »</h3>
+  <pre><code>totalMinutes  = Σ sleepLogMinutes(log) sur filteredLogs      // useSleepChart
+                filteredLogs = filterByTimeWindow(sleepHistory, window, l =&gt; l.date, rangeForFilter)
+daysWithSleep = chartData.filter(p =&gt; p.minutes &gt; 0).length  // SleepChart
+
+affiché si hasFilteredLogs && daysWithSleep &gt; 0 :
+   « ≈ » + formatSleepAverage(totalMinutes / daysWithSleep) + « /j de sommeil »</code></pre>
+  <p>Les deux termes ne sont pas bâtis sur le même ensemble. Le numérateur vient de <code>filterByTimeWindow</code>, qui, sur une fenêtre fixe, n'a qu'une borne basse : une saisie datée du futur y entre. Le dénominateur vient de <code>computeSleepDays</code>, dont la boucle s'arrête à <code>dayEndMs</code>, la fin d'aujourd'hui. La moyenne peut donc dépasser la plus longue journée tracée.</p>
+  <p>Une journée non saisie est une donnée manquante, pas une nuit à zéro : elle ne compte pas au dénominateur.</p>
+  <p class="ancre">src/versions/mixte/features/sleep/SleepChart.tsx · src/features/sleep/useSleepChart.ts</p>
+  <details><summary>Cas limites</summary>
+    <p>Entrée dans la fenêtre mais de durée nulle : <code>hasFilteredLogs</code> est vrai, <code>daysWithSleep</code> vaut 0 → la ligne n'est pas rendue.</p>
+    <p>Aucune entrée dans la fenêtre : « Aucun sommeil enregistré sur cette période. » à la place du tracé.</p>
+  </details>
+  <div class="exemple"><p>Sur les 30 derniers jours, Camille a 27 entrées totalisant 12 460 min réparties sur 27 journées tracées : 12 460 / 27 = 461,48 → <code>formatSleepAverage</code> arrondit à 461 → « ≈ 7h41 /j de sommeil ».</p></div>
+
+  <h3 id="sommeil-cumuls-d-une-journee-de-sommeil">Cumuls d'une journée de sommeil</h3>
+  <p>Cinq lectures d'une même journée, toutes indexées sur le jour du réveil.</p>
+  <pre><code>logsOn(logs, d)      = logs.filter(l =&gt; l.date = d)
+sleepMinutesOn(l, d) = Σ sleepLogMinutes des logsOn(d)              // nuit + siestes
+nightMinutesOn(l, d) = aucune 'nuit' ce jour ? null : Σ des 'nuit'
+napMinutesOn(l, d)   = Σ des 'sieste'                               // 0 si aucune
+dayQualityOn / nightQualityOn : voir la qualité pondérée
+sleepMinutesLast7Days(l, now) = Σ des entrées de date &gt;= aujourd'hui − 6</code></pre>
+  <p>Asymétrie voulue : <code>nightMinutesOn</code> rend <code>null</code> sans nuit — pour ne pas tracer un zéro qui se lirait comme une nuit blanche — quand <code>napMinutesOn</code> rend 0. <code>sleepMinutesOn</code> rend toujours un nombre.</p>
+  <p>Emplois : le total sert la tuile du calendrier, la barre du graphe, la tendance et les tuiles de l'accueil ; la nuit seule sert la série « Nuit », la série « Qualité nuit », le temps d'éveil et la frise ; les siestes seules ne servent qu'à retrancher du temps d'éveil. Les séries « Nuit », « Qualité nuit » et « Éveil » sont calculées à chaque rendu du graphe visible mais ne sont pas dessinées : seules « Sommeil » et « Qualité » le sont.</p>
+  <p class="ancre">src/features/sleep/sleep.utils.ts</p>
+  <div class="exemple"><p>Le 11/09 chez Camille : <code>sleepMinutesOn = 495</code>, <code>nightMinutesOn = 455</code>, <code>napMinutesOn = 40</code>, <code>dayQualityOn = 3,9</code>, <code>nightQualityOn = 4</code>.</p></div>
+
+  <h3 id="sommeil-palier-de-teinte-d-une-barre-de-sommeil">Palier de teinte d'une barre de sommeil</h3>
+  <pre><code>maxMinutes = max des point.minutes de chartData        // la plus longue journée AFFICHÉE
+
+sleepBarTier(minutes, maxMinutes) :
+  si maxMinutes &lt;= 0 ou minutes &lt;= 0 → 1
+  → min(5, max(1, ⌈5 × minutes / maxMinutes⌉))</code></pre>
+  <p>Cinq classes CSS <code>gc-sleep-t1</code> à <code>gc-sleep-t5</code>, posées par <code>&lt;Cell&gt;</code> barre par barre. L'échelle est relative à la fenêtre affichée, non à un idéal de sommeil : la plus longue journée est toujours au palier 5, et changer de période change toutes les teintes. En mode daltonien, la teinte n'est pas ré-encodée — les hachures de la série restent, la valeur est dans l'infobulle.</p>
+  <p class="ancre">src/features/sleep/sleep.utils.ts · src/versions/mixte/features/sleep/SleepChart.tsx</p>
+  <details><summary>Cas limites</summary>
+    <p>Journée à 0 min : palier 1, mais la barre est de hauteur nulle — invisible.</p>
+    <p>Fenêtre sans aucun sommeil : <code>maxMinutes = 0</code> → tout au palier 1.</p>
+    <p>Frontières pour <code>maxMinutes = 480</code> : 96 → 1, 97 → 2, 240 → 3, 385 → 5.</p>
+  </details>
+  <div class="exemple"><p>Sur 30 jours, la plus longue journée de Camille est le 12/09 avec 510 min. Le 11/09 (495 min) : ⌈5 × 495 / 510⌉ = ⌈4,85⌉ = 5. Une journée à 360 min : ⌈3,53⌉ = 4.</p></div>
+
+  <h3 id="sommeil-analyse-croisee-sommeil-nutrition-code-mis-de-cote">Analyse croisée sommeil × nutrition (code mis de côté)</h3>
+  <p>Trois graphes — « Éveil et nutrition », « Nuit précédente et nutrition », « Qualité de la nuit et nutrition » — sont écrits, leurs quatre <code>useSleepChart</code> tournent à chaque rendu de la page, mais le JSX est sous <code>{false &amp;&amp; croiseAlimentation &amp;&amp; …}</code> : rien n'est monté. Le menu de raccourcis qui les desservait est également sous <code>{false &amp;&amp; …}</code>. <span class="marque non">non implémenté</span></p>
+  <p><strong>Temps d'éveil.</strong></p>
+  <pre><code>awakeMinutesOn(logs, J) :
+  nuitsJ    = entrées 'nuit' datées J
+  nuitsJ+1  = entrées 'nuit' datées addDays(J, 1)
+  si l'une des deux listes est vide → null
+  reveil  = max des minutesOfDay(log.time)    sur nuitsJ      // le réveil le plus TARDIF
+  coucher = min des minutesOfDay(log.bedTime) sur nuitsJ+1    // l'endormissement le plus PRÉCOCE
+  brut    = coucher &gt; reveil ? coucher − reveil : coucher + 1440 − reveil
+  eveil   = brut − napMinutesOn(logs, J)
+  → eveil &gt; 0 ? eveil : null</code></pre>
+  <p>Définition retenue le 2026-08-18 : du réveil du matin à l'endormissement du soir, siestes déduites. <span class="marque">arbitrage non validé</span></p>
+  <p><strong>Journée en cours retirée.</strong> <code>dropCurrentDay(points, getLocalDateStr())</code>, appelé par le seul <code>useSleepChart('sleep_awake_chart', { excludeToday: true })</code> : un temps d'éveil n'existe pas tant qu'on ne s'est pas recouché.</p>
+  <p><strong>Corrélation.</strong></p>
+  <pre><code>CORRELATION_MIN_PAIRS = 7 ; CORRELATION_MODERATE = 0,3 ; CORRELATION_STRONG = 0,5
+
+paires = points où point[série] ≠ null ET point.Kcal ≠ null
+pearson(paires) : n &lt; 2 → null ; sxx = 0 ou syy = 0 → null ; sinon sxy / √(sxx × syy)
+
+readCorrelation(paires) :
+  paires &lt; 7        → 'trop-peu'
+  r = null          → 'variance-nulle'   (dit LAQUELLE des deux séries est plate)
+  |r| &lt; 0,3         → 'aucun'
+  |r| &gt;= 0,5        → 'net'    sinon 'modere' ; positive = r &gt; 0
+
+analyzeSleepNutrition ajoute toujours la réserve « pas une cause à effet » dès
+qu'un lien est constaté, et « L'échantillon reste modeste » sous 14 paires.</code></pre>
+  <p class="ancre">src/features/sleep/sleep.utils.ts · src/features/sleep/sleepAnalysis.ts · src/shared/analysis/analysis.ts · src/versions/mixte/features/sleep/SleepTracker.tsx</p>
+  <details><summary>Cas limites</summary>
+    <p>Nuit du jour J manquante, ou nuit du lendemain manquante : <code>null</code> — pas de point d'éveil.</p>
+    <p>Siestes plus longues que l'intervalle réveil → coucher : <code>eveil &lt;= 0</code> → <code>null</code>.</p>
+    <p><code>bedTime</code> illisible sur une nuit du lendemain : <code>minutesOfDay</code> rend <code>null</code>, le <code>?? 0</code> le compte comme minuit — le minimum peut être faussé vers le bas.</p>
+  </details>
+
+  <h3 id="sommeil-mot-d-apres-saisie-du-sommeil">Mot d'après-saisie du sommeil</h3>
+  <pre><code>GREAT_NIGHT_MINUTES = 8 × 60 = 480
+SHORT_NIGHT_MINUTES = 7 × 60 = 420
+GREAT_NIGHT_QUALITY = 4
+POOR_NIGHT_QUALITY  = 2
+
+sleepEncouragement({ kind, durationMinutes, quality, wakeDate, today }) :
+  si kind ≠ 'nuit'            → ''
+  si wakeDate ≠ today         → ''        // comparaison de chaînes, jamais de Date
+  si durationMinutes &lt;= 0     → ''
+
+  longue   = durationMinutes &gt; 480
+  courte   = durationMinutes &lt; 420
+  mauvaise = quality &lt;= 2
+  bonne    = quality &gt; 3                  // POOR_NIGHT_QUALITY + 1 → 4 et 5
+
+  1. longue && quality &gt; 4  → felicitation
+  2. courte && mauvaise     → courteEtMauvaise
+  3. courte && bonne        → courteEtBonne
+  4. courte                 → courteEtCorrecte
+  5. longue && mauvaise     → longueEtMauvaise
+  6. mauvaise               → suffisanteEtMauvaise
+  7. bonne                  → suffisanteEtBonne
+  8. sinon                  → suffisanteEtCorrecte</code></pre>
+  <p>L'ordre est celui du code : le premier cas vrai gagne. « Suffisante » n'est pas un test mais le reste — entre 420 et 480 minutes inclus. Le seuil des 7 h est un choix du code, non dicté. <span class="marque">arbitrage non validé</span></p>
+  <p>Le texte retenu est posé dans <code>successEncouragement</code> au moment de l'écriture, puis rendu en seconde ligne du bandeau de confirmation, qui s'efface après 3 000 ms, à sa sortie d'écran ou au clic sur sa croix. Aucune phrase ne nomme de jour.</p>
+  <p class="ancre">src/features/sleep/useSleepForm.ts · src/versions/mixte/features/sleep/SleepTracker.tsx</p>
+  <details><summary>Cas limites</summary>
+    <p>480 min exactement, qualité 5 : <code>longue</code> est faux (seuil strict) → cas 7, <code>suffisanteEtBonne</code>.</p>
+    <p>481 min, qualité 4 : <code>quality &gt; 4</code> est faux → cas 7, <code>suffisanteEtBonne</code> ; qualité 5 → cas 1, félicitation.</p>
+    <p>419 min, qualité 3 : cas 4, <code>courteEtCorrecte</code>. 420 min, qualité 3 : cas 8, <code>suffisanteEtCorrecte</code>.</p>
+    <p>Sieste, nuit d'archive, ou modification d'une nuit d'un autre jour : chaîne vide, le bandeau garde sa seule phrase.</p>
+  </details>
+  <div class="exemple"><p>Le samedi 12/09 au réveil, Camille enregistre 11/09 23:00 → 12/09 07:30, qualité 5 : 510 &gt; 480 et 5 &gt; 4 → félicitation. Même nuit saisie le 13/09 : <code>wakeDate</code> = 2026-09-12 ≠ 2026-09-13 → aucun mot.</p></div>
+
+  <h3 id="sommeil-frise-des-nuits-axe-et-rattachement">Frise des nuits : axe et rattachement</h3>
+  <pre><code>depuisMidi(m)  = ((m − 720) + 1440) mod 1440       // minutes depuis minuit → axe
+versMinuit(a)  = ((a + 720) mod 1440 + 1440) mod 1440
+
+soireeDeNuit(log) :
+  coucher = minutesOfDay(log.bedTime)
+  si coucher = null → log.bedDate
+  → coucher &gt;= 720 ? log.bedDate : previousDay(log.bedDate)</code></pre>
+  <p>Le tamis, commun aux deux frises :</p>
+  <pre><code>nuitsRetenuesParSoiree(logs) :
+  ignorer si kind ≠ 'nuit'
+  ignorer si sleepLogMinutes(log) &lt;= 0
+  ignorer si minutesOfDay(log.bedTime) = null
+  soirée = coucher &gt;= 720 ? bedDate : previousDay(bedDate)
+  garder, par soirée, la nuit de plus longue durée   (la première rencontrée à égalité)
+
+septDernieresNuits(logs, aujourdhui) :
+  7 lignes, i de 0 à 6 : soiree = addDays(aujourdhui, i − 7)   // J−7 … J−1
+  label = « JJJ.→JJJ. » (jours courts, lundi = 0)
+  sans nuit → { vide: true, coucherAxe: null, reveilAxe: null, minutes: 0, qualite: null }
+  sinon     → coucherAxe = depuisMidi(coucher) ; reveilAxe = coucherAxe + minutes</code></pre>
+  <p><code>reveilAxe</code> peut dépasser 1 440 : l'axe n'est pas replié, c'est ce qui permet de dessiner une barre continue par-dessus minuit. La soirée d'aujourd'hui (<code>i = 7</code>) n'est jamais construite : la fenêtre s'arrête à J−1. Les siestes n'entrent nulle part.</p>
+  <p class="ancre">src/features/sleep/sleepNightBands.ts</p>
+  <details><summary>Cas limites</summary>
+    <p>Endormissement à 12:00 pile : <code>coucher &gt;= 720</code> → soirée = <code>bedDate</code>.</p>
+    <p>Deux nuits sur une même soirée : la plus longue seule est dessinée, l'autre disparaît de la frise (mais reste dans le journal et le calendrier).</p>
+    <p>Nuit de durée nulle ou d'heure illisible : écartée, la soirée reste vide, rail en pointillé.</p>
+  </details>
+  <div class="exemple"><p>Camille s'endort le 06/09 à 00:30 et se réveille à 07:30 : <code>coucher = 30 &lt; 720</code> → soirée = 05/09, un samedi → ligne « sam.→dim. ». <code>coucherAxe = depuisMidi(30) = 750</code>, <code>minutes = 420</code>, <code>reveilAxe = 1 170</code>.</p></div>
+
+  <h3 id="sommeil-frise-des-nuits-moyennes-par-soir-de-semaine">Frise des nuits : moyennes par soir de semaine</h3>
+  <pre><code>moyennesParSoirDeSemaine(logs, aujourdhui) :
+  7 seaux (lundi = 0 … dimanche = 6)
+  pour chaque (soirée, nuit retenue) de nuitsRetenuesParSoiree :
+      si soiree &gt;= aujourdhui → ignorée        // la soirée du jour n'existe pas encore
+      seaux[indexJourSemaine(soiree)] ← { minutes, coucher, qualite }
+
+  coucherMoyen = moyenneCirculaireMinutes(couchers)
+  si aucun élément ou coucherMoyen = null → ligne vide (n = nombre de nuits)
+  minutes    = moyenne arithmétique des durées
+  coucherAxe = depuisMidi(coucherMoyen)
+  reveilAxe  = coucherAxe + minutes
+  qualite    = moyenne arithmétique des qualités (décimale, non arrondie ici)</code></pre>
+  <pre><code>moyenneCirculaireMinutes(minutes[]) :
+  n = 0 → null
+  x = Σ cos(2π·m/1440) ; y = Σ sin(2π·m/1440)
+  si √(x² + y²) / n &lt; 1e−6 → null           // couchers trop dispersés, pas de moyenne honnête
+  angle = atan2(y, x) ; si angle &lt; 0 → angle += 2π
+  → ((angle / 2π) × 1440) mod 1440</code></pre>
+  <p>La moyenne du coucher doit être circulaire : 23 h 50 et 00 h 10 donnent minuit, quand une moyenne ordinaire donnerait midi. La durée et la qualité, elles, sont des moyennes ordinaires. La barre moyenne va du coucher moyen au coucher moyen plus la durée moyenne : ce n'est pas le réveil moyen.</p>
+  <p>La couche n'affiche la seconde barre que si la moyenne est complète : <code>!vide &amp;&amp; coucherAxe !== null &amp;&amp; qualite !== null</code> ; sinon l'infobulle dit « Aucune nuit … enregistrée pour l'instant : pas de moyenne ». L'affichage arrondit au dixième avec virgule française (<code>qualiteMoyenneTexte</code>), et relit une position d'axe en heure par <code>heureLisible(a) = « HHhMM » de round(versMinuit(a)) mod 1440</code>.</p>
+  <p class="ancre">src/features/sleep/sleepNightBands.ts · src/versions/mixte/features/sleep/SurimpressionNuits.tsx</p>
+  <details><summary>Cas limites</summary>
+    <p>Couchers diamétralement opposés (21 h et 09 h à parts égales) : résultante quasi nulle → <code>null</code> → rail vide, alors que <code>n &gt; 0</code>.</p>
+    <p>Une seule nuit pour ce soir de semaine : la moyenne vaut cette nuit, <code>n = 1</code>, l'infobulle écrit « 1 nuit ».</p>
+    <p>La correspondance nuit ↔ moyenne se fait par <code>jour</code>, l'index du soir de semaine, pas par la date.</p>
+  </details>
+  <div class="exemple"><p>Deux samedis chez Camille, couchers 23:30 et 00:30, 8 h chacune, qualités 4 et 3 : moyenne circulaire des couchers = minuit, <code>coucherAxe = 720</code>, durée 480, <code>reveilAxe = 1 200</code>, qualité 3,5 → « coucher 00h00, durée 8h00, qualité 3,5/5 ».</p></div>
+
+  <h3 id="sommeil-frise-des-nuits-bornes-et-reperes">Frise des nuits : bornes et repères</h3>
+  <pre><code>bornesAxeNuits(lignes) :          // appelée sur [...nuits, ...moyennes] réunies
+  bords = tous les coucherAxe et reveilAxe non nuls
+  si aucun → { a: 480, b: 1320 }                  // 20 h → 10 h
+  a = ⌊(min(bords) − 30) / 60⌋ × 60
+  b = ⌈(max(bords) + 30) / 60⌉ × 60
+  si b − a &lt; 480 :                                // au moins huit heures
+      centre = (a + b) / 2 ; a = centre − 240 ; b = centre + 240
+  → { a, b }</code></pre>
+  <pre><code>reperesHeures({ a, b }, maxTraits = 7) :
+  candidats = [120, 180, 240, 360, 480]
+  pas = premier c tel que ⌊b/c⌋ − ⌈a/c⌉ + 1 &lt;= 7      (sinon 480)
+  pour m = ⌈a/pas⌉ × pas ; m &lt;= b ; m += pas :
+      heure   = ⌊versMinuit(m) / 60⌋
+      libelle = « HHh »  (deux chiffres)
+      minuit  = versMinuit(m) = 0</code></pre>
+  <p>La demi-heure de marge est prise avant l'arrondi à l'heure, donc la barre ne touche jamais le bord. Les deux frises partagent l'axe : les bornes sont calculées sur la réunion des deux jeux de lignes, sinon les barres ne se compareraient pas. Une barre qui dépasserait l'axe est clippée au rail à l'affichage.</p>
+  <p class="ancre">src/features/sleep/sleepNightBands.ts · src/versions/mixte/features/sleep/SurimpressionNuits.tsx</p>
+  <details><summary>Cas limites</summary>
+    <p>Aucune nuit sur les sept soirées et aucune moyenne : bornes par défaut 480 → 1 320, soit 20 h → 10 h ; pas de 120 min ⇒ 8 repères ne tiennent pas, le pas retenu est 180 min.</p>
+    <p>Une seule nuit très courte : l'étendue est ramenée à 480 min, recentrée sur le milieu — l'axe peut alors commencer sur une valeur non multiple de 60.</p>
+  </details>
+  <div class="exemple"><p>Les nuits de Camille tiennent entre <code>coucherAxe = 660</code> (23 h) et <code>reveilAxe = 1 170</code> (07 h 30) : <code>a = ⌊630/60⌋ × 60 = 600</code>, <code>b = ⌈1 200/60⌉ × 60 = 1 200</code>, étendue 600 ≥ 480. Pas de 120 : ⌊1 200/120⌋ − ⌈600/120⌉ + 1 = 6 ≤ 7 → repères 22h, 00h (marqué), 02h, 04h, 06h, 08h.</p></div>
+
+  <h3 id="sommeil-moyennes-de-sommeil-de-la-home">Moyennes de sommeil de la home</h3>
+  <pre><code>sleepDailyAverage(logs) :
+  journees = taille de l'ensemble des log.date distincts
+  si journees = 0 → null
+  → Σ sleepLogMinutes(log) / journees
+
+sleepDailyAverageLast7Days(logs, now) :
+  borne = getLocalDateStr(now − 6 × 86 400 000)
+  retenus = logs filtrés sur log.date &gt;= borne
+  journees = dates distinctes de retenus ; si 0 → null
+  → Σ sleepLogMinutes(retenus) / journees</code></pre>
+  <p>Le dénominateur est le nombre de <em>dates de réveil distinctes</em> renseignées, pas le nombre de jours de la fenêtre ni le nombre d'entrées : une nuit et une sieste le même jour comptent pour une journée. Une journée sans saisie ne compte pas. La fenêtre 7 jours va d'aujourd'hui − 6 à aujourd'hui, sans borne haute.</p>
+  <p>Les tuiles « Côte à côte » affichent <code>formatSleepAverage(valeur)</code> et n'apparaissent qu'à valeur non nulle : la rangée entière est absente si <code>sommeilMoyenCure === null &amp;&amp; sleepAverage === null</code>, et chaque tuile est absente individuellement si sa propre valeur est <code>null</code>. Les quatre tuiles ouvrent la couche des sept dernières nuits.</p>
+  <p>Variante réservée à la nuit seule, employée ailleurs : <code>nightMinutesDailyAverage</code> moyenne les <code>nightMinutesOn</code> par date de nuit et <strong>écarte les nuits de zéro minute</strong> du numérateur comme du dénominateur.</p>
+  <p class="ancre">src/features/sleep/sleep.utils.ts · src/versions/mixte/homes/sections/MaisonSections.tsx</p>
+  <details><summary>Cas limites</summary>
+    <p>Deux nuits de 8 h à deux mois d'écart : 960 / 2 = 480 → « 8h00 », la fenêtre « depuis le début » n'a pas de trous.</p>
+    <p>Deux nuits de 8 h dans les 7 derniers jours : 8 h, pas 16 / 7.</p>
+    <p>Historique vide ou absent : <code>null</code> — la tuile n'est pas rendue, jamais « 0h00 ».</p>
+  </details>
+  <div class="exemple"><p>Deux nuits de 8 h et une sieste d'1 h le même jour, rien d'autre : 1 020 min sur 2 dates distinctes = 510 → tuile 7 jours « 8h30 ».</p></div>
+
+  <h3 id="sommeil-tendance-du-sommeil-tiroir">Tendance du sommeil (tiroir)</h3>
+  <pre><code>TREND_DAYS = 14
+trendDates(14, today) = [getLocalDateStr(today − 13 j) … getLocalDateStr(today)]
+
+sleepTrend(sleepLogs, days = 14, today) :
+  si sleepLogs absent ou vide → []            // aucune série, la carte ne trace rien
+  → trendDates(days, today).map(d =&gt;
+       sleepLogs.some(l =&gt; l.date = d) ? sleepMinutesOn(sleepLogs, d) : 0)
+
+valeur de la carte = formatCalendarDuration(informedTrendMean(série)) + « /j »
+informedTrendMean(s) = moyenne des valeurs non nulles au sens de null ; [] → null</code></pre>
+  <p>La série ne contient jamais de <code>null</code> : un jour sans entrée vaut 0. <code>informedTrendMean</code> n'écarte que les <code>null</code>, donc les zéros comptent au dénominateur — la moyenne est bien un total sur 14 jours, contrairement à celles de l'accueil. La ligne de carte porte <code>enabled: Boolean(profile.sleepTrackingEnabled)</code>, l'état qui commande son grisé et son masquage.</p>
+  <p class="ancre">src/features/trends/trends.ts · src/versions/mixte/components/TrendDrawer.tsx</p>
+  <details><summary>Cas limites</summary>
+    <p>Historique entièrement hors des 14 jours : la série existe (14 zéros) et la carte affiche « 0min /j ».</p>
+    <p>Historique vide : la série est <code>[]</code>, <code>informedTrendMean</code> rend <code>null</code>, la carte n'affiche pas de valeur.</p>
+    <p>Une journée à saisie de durée nulle est comptée comme une journée renseignée à 0 min.</p>
+  </details>
+  <div class="exemple"><p>Deux nuits de 8 h et une sieste d'1 h le même jour, rien d'autre sur la quinzaine : 1 020 / 14 = 72,86 → <code>formatCalendarDuration</code> arrondit à 73 → « 1h13 /j ».</p></div>
+</section>

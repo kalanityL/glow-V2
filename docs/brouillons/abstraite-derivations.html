@@ -1,0 +1,446 @@
+<section id="derivations">
+  <h2>6. Les dérivations <a class="retour" href="#sommaire">↑ sommaire</a></h2>
+  <p>Ce chapitre énumère les grandeurs que le produit calcule à partir des journaux et du profil : leur formule, leurs entrées, leur unité canonique, leur fenêtre de temps et leur dénominateur. Chacune dit aussi ce qu'elle rend quand ses entrées manquent, parce que c'est la moitié de sa définition.</p>
+
+  <h3 id="derivations-la-regle-du-silence">La règle du silence, et ses exceptions</h3>
+  <p>Presque rien de dérivable n'est enregistré : la quasi-totalité des grandeurs de ce chapitre se recalculent à chaque lecture depuis les journaux et le profil. Deux conséquences : corriger une entrée corrige toutes les grandeurs qui en dépendent du même geste, et aucune migration n'est due lorsqu'une formule change.</p>
+  <p><strong>Deux grandeurs échappent à cette règle et sont persistées</strong>, parce qu'elles portent une mémoire que le recalcul détruirait :</p>
+  <table>
+    <thead><tr><th>Grandeur persistée</th><th>Contenu</th><th>Pourquoi</th></tr></thead>
+    <tbody>
+      <tr><td>Attribution d'équivalences insolites</td><td>les compteurs d'usage par objet, et l'attribution en cours avec la signature de la pesée qui l'a produite</td><td>la rotation entre objets se lit sur un compteur cumulé, qui n'existe nulle part ailleurs ; l'attribution doit rester stable entre deux pesées</td></tr>
+      <tr><td>Dernier palier de badge observé</td><td>un palier par distinction</td><td>une montée de palier se juge contre ce qui a déjà été observé, y compris entre deux sessions</td></tr>
+    </tbody>
+  </table>
+  <p>Une dérivation dont les entrées manquent doit rendre une absence, pas un zéro : <code>null</code> pour une grandeur numérique indisponible, une liste vide pour une décomposition impossible. Un zéro serait une mesure — « zéro kilocalorie » se lit comme un jeûne, « zéro pas » comme une journée immobile — alors que l'absence dit seulement que rien n'a été enregistré. <span class="marque">arbitrage non validé</span> <strong>Le code ne tient pas cette règle partout.</strong> Six dérivations rendent 0 ou une valeur inventée là où la règle voudrait une absence :</p>
+  <table>
+    <thead><tr><th>Dérivation</th><th>Ce qu'elle rend faute d'entrées</th></tr></thead>
+    <tbody>
+      <tr><td>Poids actif à une date</td><td>une chaîne de replis qui finit par 80 kg</td></tr>
+      <tr><td>Métabolisme de base</td><td>un calcul sur 42 ans, 170 cm et « femme »</td></tr>
+      <tr><td>Cadence depuis le départ</td><td>0 quand l'ancienneté de la cure est nulle ou négative</td></tr>
+      <tr><td>Variation en % du poids de départ</td><td>0 quand le poids de départ est nul ou négatif</td></tr>
+      <tr><td>Avancement vers la cible</td><td>0</td></tr>
+      <tr><td>Concentration sanguine</td><td>0, accompagné d'un drapeau « plusieurs molécules »</td></tr>
+      <tr><td>Score d'activité d'une journée sans séance</td><td>0 — ici légitime : l'absence de séance est une information</td></tr>
+      <tr><td>Moyenne et écart-type d'appoint</td><td>0 sur une liste vide</td></tr>
+    </tbody>
+  </table>
+  <table>
+    <thead><tr><th>Convention</th><th>Règle</th></tr></thead>
+    <tbody>
+      <tr><td>Signe d'une variation de poids</td><td>Négatif quand le poids descend, positif quand il monte. La grandeur nommée « perte » suit la convention inverse : positive quand on a perdu.</td></tr>
+      <tr><td>Précision d'un poids</td><td>Un dixième de kilogramme, la précision d'une balance ; appliqué à l'écriture de la pesée, donc hérité par tout ce qui la lit.</td></tr>
+      <tr><td>Précision d'une distance</td><td>Un dixième de kilomètre, arrondi dans le calcul — mais seulement sur la <em>distance moyenne</em> de marche. La distance totale cumulée sort du calcul non arrondie.</td></tr>
+      <tr><td>Unités canoniques</td><td>kilogramme, centimètre, gramme, millilitre, milligramme, mètre (distance d'une séance), minute (durée), kilocalorie, pas.</td></tr>
+      <tr><td>Jour</td><td>Date locale <code>AAAA-MM-JJ</code>.</td></tr>
+      <tr><td>Écart de jours</td><td><code>Math.round((Date.UTC(a2,m2−1,j2) − Date.UTC(a1,m1−1,j1)) / 86400000)</code> : les nombres d'année, de mois et de jour sont lus séparément puis reportés sur des instants UTC, jamais interprétés comme des instants locaux. C'est ce qui absorbe les jours de 23 et 25 heures. Le résultat passe par un arrondi. Une date illisible rend 0.</td></tr>
+      <tr><td>Ce qui a eu lieu</td><td>Une entrée est « survenue » si sa date est antérieure à aujourd'hui, ou si elle est d'aujourd'hui et que son heure est passée. <strong>Une entrée d'aujourd'hui sans heure est survenue</strong> : le prédicat ne substitue pas minuit, il compte la journée en cours en entier.</td></tr>
+    </tbody>
+  </table>
+  <p><strong>L'heure absente n'a pas une seule valeur dans le produit, mais trois conventions.</strong> C'est un écart de code, pas une règle :</p>
+  <table>
+    <thead><tr><th>Convention</th><th>Où</th></tr></thead>
+    <tbody>
+      <tr><td>Journée entière (pas de substitution)</td><td>le prédicat « a eu lieu »</td></tr>
+      <tr><td>12:00</td><td>l'ordre général des entrées datées, la dernière pesée d'une journée, l'instant d'une prise dans le calcul de concentration</td></tr>
+      <tr><td>00:00</td><td>la coupure de traitement de la série courante, la signature de la pesée la plus récente pour l'attribution d'équivalences</td></tr>
+    </tbody>
+  </table>
+  <p>L'ordre général de deux entrées datées est la comparaison lexicographique de <code>date + "T" + (heure ou "12:00")</code>. À date et heure égales, l'ordre d'enregistrement départage : la dernière ligne l'emporte.</p>
+  <p>Les entrées datées dans l'avenir sont écartées des paliers de badge, de la projection de poids, de la série du traitement en cours, de la fréquence de prise et des analyses de coïncidence. Elles ne sont pas écartées du bilan énergétique sur sept jours ni des moyennes de journal, qui filtrent seulement par date.</p>
+
+  <h3 id="derivations-le-poids-actif-a-une-date">Le poids actif à une date</h3>
+  <p>Presque toutes les dépenses énergétiques ont besoin d'un poids au jour considéré. Le poids actif d'un jour est la dernière pesée dont la date est inférieure ou égale à ce jour.</p>
+  <pre><code>poidsActif(jour) :
+  si le journal est vide       → poids de départ, sinon poids cible, sinon 80 kg
+  sinon, valeur initiale        = poids de départ
+                       sinon    poids cible du profil
+                       sinon    poids de la pesée la plus ANCIENNE
+                       sinon    80 kg
+  puis, en parcourant les pesées par date croissante :
+       toute pesée p telle que p.date &lt;= jour écrase la valeur</code></pre>
+  <p>La chaîne de replis compte donc quatre crans, et le quatrième — la pesée la plus ancienne — n'existe que lorsque l'historique n'est pas vide mais qu'aucune pesée ne précède le jour demandé. Cette dérivation ne se tait jamais : elle finit par 80 kg. Le poids de départ est celui de la pesée portant le drapeau de départ, pas la pesée la plus ancienne. Le tri interne se fait sur la date seule, l'heure n'y entre pas.</p>
+  <p>Le poids « actuel » d'un profil, lui, est la pesée la plus récente <em>par date et heure</em>, et non la dernière saisie ; une pesée antidatée ajoutée après coup ne devient pas le poids actuel. Deux pesées le même jour se départagent par l'heure la plus tardive, jamais par leur moyenne : une pesée du matin et une du soir ne décrivent pas le même poids. <strong>Sur un journal vide, le poids actuel est le poids de départ</strong> — il ne se tait pas non plus.</p>
+  <p>Le poids de départ, lu par les paliers de badge, retombe sur 70 kg quand aucune pesée de départ n'existe.</p>
+
+  <h3 id="derivations-imc-et-categories">IMC et catégories</h3>
+  <pre><code>imc = poidsKg / (tailleCm / 100)²      arrondi au dixième
+imc = 0 si la taille est inconnue ou nulle</code></pre>
+  <p>Les bornes de catégorie sont uniques dans le produit ; <strong>trois jeux de noms les habillent</strong>, et ils ne se comportent pas de la même façon sur un IMC nul.</p>
+  <table>
+    <thead><tr><th>Rang</th><th>Borne</th><th>Jeu court</th><th>Jeu à rang</th><th>Jeu à puce</th></tr></thead>
+    <tbody>
+      <tr><td>0</td><td>&lt; 18,5</td><td>Insuffisance pondérale</td><td>Insuffisance pondérale</td><td>Insuffisance pondérale</td></tr>
+      <tr><td>1</td><td>18,5 à &lt; 25</td><td>Corpulence normale</td><td>Corpulence normale</td><td>Corpulence normale</td></tr>
+      <tr><td>2</td><td>25 à &lt; 30</td><td>Surpoids</td><td>Surpoids</td><td>Surpoids</td></tr>
+      <tr><td>3</td><td>30 à &lt; 35</td><td>Obésité I</td><td>Obésité modérée (Classe I)</td><td>Obésité • Classe I</td></tr>
+      <tr><td>4</td><td>35 à &lt; 40</td><td>Obésité II</td><td>Obésité sévère (Classe II)</td><td>Obésité • Classe II</td></tr>
+      <tr><td>5</td><td>≥ 40</td><td>Obésité III</td><td>Obésité très sévère (Classe III)</td><td>Obésité • Classe III</td></tr>
+      <tr><td>99</td><td>≤ 0</td><td><em>n'existe pas</em></td><td>Inconnu</td><td><em>n'existe pas</em></td></tr>
+    </tbody>
+  </table>
+  <p><span class="marque">arbitrage non validé</span> Seul le jeu à rang connaît le cas « inconnu », et c'est aussi le seul dont le rang sert à comparer deux catégories. Les deux autres testent d'abord <code>imc &lt; 18,5</code> : <strong>une taille inconnue y produit « Insuffisance pondérale », pas « inconnu »</strong>, et rien ne garde ce chemin — l'IMC nul est lu sans condition préalable.</p>
+  <p>Les <strong>points d'IMC gagnés ou perdus</strong> depuis le départ se calculent sur la différence de poids, jamais en retranchant deux IMC déjà arrondis :</p>
+  <pre><code>pointsImc = (poidsActuel − poidsDepart) / (tailleM)²   arrondi au dixième
+null si tailleM &lt;= 0 ou poidsDepart &lt;= 0</code></pre>
+  <p>Le signe est celui de la variation : perdre du poids donne un nombre négatif.</p>
+  <p>La <strong>date de franchissement</strong> d'un rang visé est la date de la première pesée, dans l'ordre chronologique, dont le rang d'IMC est inférieur ou égal au rang visé — à condition que le rang du poids de départ lui soit strictement supérieur. Sans franchissement, la dérivation ne rend rien : entrer déjà dans la catégorie visée n'est pas un franchissement.</p>
+  <div class="exemple"><p>Camille, 168 cm : à 96 kg son IMC vaut 96 / 1,68² = 34,0 — rang 3, « Obésité I ». À 88 kg il vaut 31,2, même rang ; les points d'IMC valent (88 − 96) / 2,8224 = −2,8. Le rang 2 se franchira à 84,7 kg.</p></div>
+
+  <h3 id="derivations-le-metabolisme-de-base">Le métabolisme de base</h3>
+  <p>Formule de Mifflin-St Jeor, en kilocalories par jour, calculée sur le poids actif du jour :</p>
+  <pre><code>mbHomme = 10×poidsKg + 6,25×tailleCm − 5×age + 5
+mbFemme = 10×poidsKg + 6,25×tailleCm − 5×age − 161
+mb(neutre) = (mbHomme + mbFemme) / 2</code></pre>
+  <p>Les trois genres modélisés sont homme, femme et neutre ; le neutre est la moyenne arithmétique des deux autres, ce n'est pas une quatrième formule. Les entrées manquantes ne font pas taire le calcul : âge absent vaut 42 ans, taille absente 170 cm, genre absent « femme ». La valeur du jour est arrondie à l'unité ; le cumul de sept jours somme les valeurs non arrondies.</p>
+  <p><span class="marque v2">V2</span> Le profil n'enregistre plus un âge mais une <strong>année de naissance</strong>, dans les bornes d'un âge de 1 à 130 ans rapportées à l'année courante. L'âge de la formule devient donc lui-même une dérivation, année courante moins année de naissance ; la V2 n'en implémente encore aucune application. <span class="marque">arbitrage non validé</span> pour la question de savoir si l'âge se raffine par le jour de naissance, que le produit ne recueille pas.</p>
+  <div class="exemple"><p>Camille, née en 1978, 168 cm, 96 kg, genre femme, en 2026 : 960 + 1050 − 240 − 161 = 1 609 kcal par jour.</p></div>
+
+  <h3 id="derivations-les-depenses-actives">Les dépenses actives</h3>
+  <p>Deux sources, additionnées : les pas et les séances.</p>
+  <p><strong>Les pas.</strong> La foulée se déduit de la taille, la durée d'une vitesse de marche fixe de 4,2 km/h, la dépense d'un coût de 3,5 MET.</p>
+  <pre><code>foulée_km   = tailleCm × 0,414 / 100000
+distance_km = pas × foulée_km
+heures      = distance_km / 4,2
+kcal        = arrondi(3,5 × poidsKg × heures)</code></pre>
+  <p><strong>Les séances.</strong> Une séance porte un sport, une intensité ressentie (douce, modérée, intensive), une durée en minutes et une distance facultative en mètres. Le facteur d'intensité vaut 0,8 / 1,0 / 1,3.</p>
+  <pre><code>kcal = arrondi(MET × poidsKg × durée_h)
+MET  = MET_catalogue(sport) × facteur(intensité)          sans distance
+MET  = MET_allure(sport, allure)                           avec distance
+kcal = arrondi(0,05 × facteur(intensité) × poidsKg × étages)   montée d'escaliers
+allure_kmh = (distance_m / 1000) / (durée_min / 60)</code></pre>
+  <p>L'<strong>allure</strong> est donc elle-même une dérivation, en kilomètres par heure, tirée de la distance en mètres et de la durée en minutes. Elle n'est jamais enregistrée.</p>
+  <p>Le catalogue des sports compte <strong>54 entrées</strong>, de 2,5 à 12,0 MET. L'identité d'un sport est son libellé enregistré, pas un identifiant : c'est ce qui a obligé à migrer les entrées « Ping-pong » et « Tennis de table » vers un libellé fusionné. Un sport absent du catalogue prend 4,5 MET.</p>
+  <p>La montée d'escaliers est le seul sport dont la durée ne compte pas des minutes mais des <strong>étages</strong> ; partout où des minutes s'additionnent, un étage vaut une demi-minute.</p>
+  <p>Quand une distance est renseignée sur un sport qui en accepte une, l'allure <em>remplace</em> l'intensité ressentie : la multiplier encore compterait deux fois le même effort. Le MET se lit par interpolation linéaire sur une table d'ancrages allure → MET propre au sport, bloquée aux extrémités — ce qui rend une distance absurde inoffensive. Les huit sports à distance sont la marche, la randonnée, la course à pied, le vélo, la natation, le rameur, le ski de fond et le patinage.</p>
+  <p><span class="marque">arbitrage non validé</span> <strong>Les deux chemins ne se rejoignent pas sur tous les sports.</strong> Six tables contiennent bien un ancrage dont le MET vaut exactement le MET du catalogue — à cette allure de référence, le résultat est celui du calcul par intensité modérée. Deux n'en ont pas : la course à pied, dont le MET catalogue (8,0) tombe entre les ancrages 6,4 km/h → 6,0 et 8,0 km/h → 8,3 ; le rameur, dont le MET catalogue (6,0) tombe entre les ancrages 9 km/h → 4,8 et 12 km/h → 7,0. Pour ces deux sports, aucune allure ne retombe sur le calcul par intensité.</p>
+  <p>Le chemin « allure » est abandonné, et le calcul par intensité repris, si la distance n'est pas un nombre fini strictement positif, si la durée ne l'est pas, ou si le sport n'a pas de table.</p>
+
+  <h3 id="derivations-le-score-d-activite">Le score d'activité</h3>
+  <p>Une mesure d'effort distincte des kilocalories, qui ignore volontairement le MET du sport : elle mesure ce que la personne fait — combien de temps, à quelle intensité — et non ce que vaut la discipline.</p>
+  <pre><code>minutesPondérées(séance) = minutes(séance) × facteur(séance)
+minutes(séance)          = étages × 0,5 pour la montée d'escaliers, la durée sinon
+facteur(séance)          = MET_allure / MET_catalogue, borné à [0,8 ; 1,3]   avec distance
+                           facteur(intensité ressentie)                       sinon
+score(jour) = min(10 ; somme des minutesPondérées du jour × 10 / 78)</code></pre>
+  <p>Le facteur tiré de l'allure est borné exactement à la plage du ressenti, sans quoi une journée renseignée avec distance ne se comparerait plus à une journée renseignée sans. Le plafond de 10 fait qu'une séance de trois heures ne vaut pas trois journées : la mesure récompense la régularité. La provenance du facteur — allure ou ressenti — est rendue avec lui, parce qu'une allure très vive rend exactement 1,3 et qu'on ne peut pas la déduire du nombre. Une journée sans séance rend 0 : ici l'absence de séance est bien une information.</p>
+
+  <h3 id="derivations-la-balance-energetique">La balance énergétique</h3>
+  <p>Sur les sept derniers jours, aujourd'hui compris, jour par jour :</p>
+  <table>
+    <thead><tr><th>Grandeur du jour</th><th>Définition</th><th>Unité</th></tr></thead>
+    <tbody>
+      <tr><td>poids</td><td>poids actif à cette date</td><td>kg</td></tr>
+      <tr><td>mb</td><td>métabolisme de base sur ce poids</td><td>kcal, arrondi</td></tr>
+      <tr><td>ingéré</td><td>somme des calories des repas de la date</td><td>kcal, arrondi</td></tr>
+      <tr><td>kcalSéances</td><td>somme des dépenses des séances de la date</td><td>kcal</td></tr>
+      <tr><td>kcalPas</td><td>somme des dépenses des relevés de pas de la date</td><td>kcal</td></tr>
+      <tr><td>dépenseActive</td><td>kcalSéances + kcalPas</td><td>kcal</td></tr>
+      <tr><td>dépenseTotale</td><td>mb + dépenseActive</td><td>kcal, arrondi</td></tr>
+    </tbody>
+  </table>
+  <pre><code>sortie = arrondi(Σ mb + Σ dépenseActive)
+balance = Σ ingéré − sortie          positif = surplus, négatif = déficit</code></pre>
+  <p>Le sens de la balance se lit par bandes, sur sa valeur absolue en kilocalories cumulées sur sept jours. Le sens est la donnée ; les libellés qui l'habillent n'en sont pas.</p>
+  <table>
+    <thead><tr><th>|balance|</th><th>Sens</th><th>Degré</th></tr></thead>
+    <tbody>
+      <tr><td>≤ 4 000</td><td>stable</td><td>—</td></tr>
+      <tr><td>≤ 8 000</td><td>perte / prise</td><td>léger</td></tr>
+      <tr><td>≤ 14 000</td><td>perte / prise</td><td>franc</td></tr>
+      <tr><td>&gt; 14 000</td><td>perte / prise</td><td>marqué</td></tr>
+    </tbody>
+  </table>
+  <p>Les calories d'un repas ne sont pas ré-estimées ici : elles sont recalculées depuis les aliments du repas à chaque écriture de celui-ci, et lues telles quelles.</p>
+
+  <h3 id="derivations-la-projection-de-poids">La projection de poids</h3>
+  <p>La même balance énergétique, traduite en grammes, sur les sept derniers jours et en écartant cette fois toute saisie non survenue.</p>
+  <pre><code>dépenses     = arrondi(Σ mb) + arrondi(Σ kcalPas) + arrondi(Σ kcalSéances)
+différentiel = Σ ingéré − dépenses                      kcal
+grammes      = arrondi(différentiel / 8000 × 1000)      g</code></pre>
+  <p>Le taux de conversion — 8 000 kcal pour un kilogramme — est une constante du produit, posée par l'utilisatrice ; ce n'est pas la valeur physiologique usuelle. Les trois dépenses sont arrondies <em>avant</em> d'être sommées pour que la soustraction retombe exactement sur le différentiel rendu.</p>
+  <table>
+    <thead><tr><th>|grammes|</th><th>Verdict</th></tr></thead>
+    <tbody>
+      <tr><td>≤ 300</td><td>stable</td></tr>
+      <tr><td>300 &lt; g &lt; 1 000</td><td>légère hausse · légère baisse</td></tr>
+      <tr><td>≥ 1 000</td><td>hausse assez marquée · baisse assez marquée</td></tr>
+    </tbody>
+  </table>
+  <p><span class="marque">arbitrage non validé</span> La bande de 700 g à 1 000 g n'était pas nommée dans la consigne d'origine ; la lecture retenue étend « légère » jusqu'à 1 kg exclu.</p>
+
+  <h3 id="derivations-la-cadence-de-perte">La cadence de perte</h3>
+  <p>Quatre cadences coexistent, sur trois dénominateurs différents ; elles ne sont pas interchangeables.</p>
+  <p><strong>La cadence depuis le départ.</strong> Le dénominateur est le nombre de jours écoulés depuis la pesée de départ jusqu'à aujourd'hui, et non jusqu'à la dernière pesée.</p>
+  <pre><code>cadence = (poidsActuel − poidsDepart) × 7 / joursDepuisLeDepart      kg/semaine
+0 si joursDepuisLeDepart &lt;= 0 ; rien avant 7 jours de recul</code></pre>
+  <p><strong>La cadence sur un intervalle borné.</strong> Même formule ; le dénominateur est <code>joursEntre(début, fin)</code>, <strong>bornes non comprises</strong>.</p>
+  <pre><code>cadence = (dernièrePeséeDedans − premièrePeséeDedans) × 7 / joursEntre(début, fin)
+          arrondi au dixième
+null si moins de deux pesées dans l'intervalle
+null si joursEntre(début, fin) &lt; 7</code></pre>
+  <p>Les deux pesées retenues sont la première et la dernière <em>journée</em> de l'intervalle, chaque journée n'étant représentée que par sa dernière pesée. <span class="marque">arbitrage non validé</span> Ce dénominateur n'est pas la longueur de période définie plus bas (<code>joursEntre + 1</code>) : sur un intervalle de trente jours de calendrier, cette cadence divise par 29.</p>
+  <p><span class="marque">arbitrage non validé</span> <strong>Le seuil de sept jours n'est pas écrit de la même façon partout</strong>, et les trois écritures ne comptent pas les mêmes jours :</p>
+  <table>
+    <thead><tr><th>Grandeur</th><th>Comptage</th><th>Statut du seuil</th></tr></thead>
+    <tbody>
+      <tr><td>Cadence sur intervalle borné</td><td><code>joursEntre(début, fin)</code>, bornes non comprises</td><td>toujours appliqué</td></tr>
+      <tr><td>Moyennes hebdomadaires de journal (moments pour soi, effets)</td><td><code>joursEntre(première, aujourd'hui) + 1</code></td><td>toujours appliqué</td></tr>
+      <tr><td>Moyennes hebdomadaires d'activité</td><td><code>joursEntre(première, aujourd'hui) + 1</code></td><td><strong>paramètre</strong> : appliqué par défaut, désactivé pour le document de suivi, dont la fenêtre est annoncée</td></tr>
+    </tbody>
+  </table>
+  <p>Un intervalle du lundi au dimanche — sept jours de calendrier — est donc refusé par la première et accepté par les deux autres. La justification du seuil est commune : ramener un écart de trois jours à la semaine le multiplie par 2,3, alors que le bruit d'un jour à l'autre domine la mesure.</p>
+  <p><strong>La perte par tranche de sept jours.</strong> Un découpage en tranches consécutives de sept jours, ancrées soit sur la première pesée, soit sur le début de la période demandée. Deux règles portées par ce seul calcul : un jour ne compte que par sa dernière pesée ; le poids d'un jour sans pesée est <strong>interpolé linéairement</strong> entre les deux pesées qui l'encadrent, et vaut la pesée la plus proche au-delà des bornes. Chaque tranche rend son poids de fin et sa perte, définie comme poids de début moins poids de fin — donc positive quand on a perdu. <strong>Les deux sont arrondis au dixième</strong> à l'écriture de la tranche. Le nombre de tranches est le plafond entier du nombre de jours divisé par sept, au moins une.</p>
+  <p><strong>Le résumé d'une suite de tranches.</strong></p>
+  <pre><code>totalKg       = arrondi₁(Σ pertes des tranches)
+poidsEntrée   = poids de fin de la 1re tranche + sa perte
+pctDuDépart   = arrondi₁(totalKg / poidsEntrée × 100)     null si poidsEntrée &lt;= 0
+parSemaine    = arrondi₁(totalKg / nombre de tranches)
+pctParSemaine = arrondi₂(pctDuDépart / nombre de tranches)</code></pre>
+  <p>Le télescopage <code>totalKg = poids d'entrée − poids de sortie</code> n'est donc exact qu'à l'arrondi près, chaque tranche ayant déjà arrondi sa perte. La référence du pourcentage est le poids d'<em>entrée de période</em>, jamais le poids de départ de la cure. Conséquence assumée du découpage : une période de trente jours compte cinq tranches, dont une partielle, et la moyenne par semaine s'en trouve diluée.</p>
+  <p><strong>La variation en pourcentage du poids de départ</strong>, elle, est indépendante des tranches :</p>
+  <pre><code>pct = (poidsActuel − poidsDepart) / poidsDepart × 100     0 si poidsDepart &lt;= 0</code></pre>
+  <p>Enfin, l'<strong>interpolation lissée</strong> entre les pesées est une spline cubique monotone de Fritsch–Carlson : elle passe exactement par chaque pesée et ne dépasse jamais les deux qui l'encadrent — pas de rebond sous le poids plancher. Elle ne rend rien hors de l'intervalle [première pesée, dernière pesée] : elle ne s'invente aucun prolongement.</p>
+  <div class="exemple"><p>Camille est partie de 96,0 kg en mai 2026. Au 112ᵉ jour elle pèse 88,0 kg : la cadence depuis le départ vaut (88,0 − 96,0) × 7 / 112 = −0,5 kg par semaine, et la variation −8,3 % du poids de départ.</p></div>
+
+  <h3 id="derivations-les-deux-pertes">Les deux pertes et leurs durées</h3>
+  <p>Deux pertes sont dérivées du journal des pesées, sur des ancrages différents. Les pesées sont triées par date et heure décroissantes.</p>
+  <table>
+    <thead><tr><th>Grandeur</th><th>Formule</th><th>Ancrage de durée</th></tr></thead>
+    <tbody>
+      <tr><td>Perte totale</td><td><code>poidsDepart − poidsActuel</code></td><td>de la date de la pesée de départ à celle de la pesée la plus récente</td></tr>
+      <tr><td>Dernière perte</td><td><code>avantDernière.poids − dernière.poids</code>, 0 avec moins de deux pesées</td><td>de la date de l'avant-dernière pesée à celle de la dernière</td></tr>
+    </tbody>
+  </table>
+  <p>La durée de la dernière perte se compte entre les deux pesées qu'elle mesure, <strong>jamais jusqu'à aujourd'hui</strong> : une pesée d'il y a trois jours ne rallonge pas la perte qu'elle a constatée.</p>
+  <pre><code>duréeDePerte(début, fin) :
+  null si début manque, ou si début &gt; fin
+  jours = joursEntre(début, fin)
+  null si jours &lt; 1                    ← deux pesées le même jour
+  jours   en deçà de 7 jours
+  arrondi(jours / 7) semaines, au moins 1, au-delà</code></pre>
+
+  <h3 id="derivations-l-avancement-vers-la-cible">L'avancement vers la cible</h3>
+  <pre><code>écart = poidsDepart − poidsCible
+si écart &gt; 0 : avancement = borne(0, 100, (poidsDepart − poidsActuel) / écart × 100)
+sinon        : avancement = 100 si poidsActuel &lt;= poidsCible, 0 sinon</code></pre>
+  <p>Une cible incohérente — au-dessus du poids de départ — ne rend pas d'erreur : elle rend 0, sauf si la cible est déjà tenue. Le trajet départ → cible se décrit aussi par son écart signé, en kilogrammes et en pourcentage du poids de départ, indéfini si l'un des deux poids manque.</p>
+  <p>Deux autres formes d'avancement existent, sur la même idée et avec des comportements différents. <span class="marque">arbitrage non validé</span></p>
+  <table>
+    <thead><tr><th>Forme</th><th>Formule</th><th>Objectif nul ou négatif</th><th>Usage réel</th></tr></thead>
+    <tbody>
+      <tr><td>Avancement de poids</td><td>borne sans arrondir</td><td>voir ci-dessus</td><td>l'avancement vers le poids cible</td></tr>
+      <tr><td>Avancement générique</td><td><code>borne(0, 100, arrondi(valeur / objectif × 100))</code></td><td>0</td><td>deux appelants seulement, tous deux une largeur proportionnelle — il ne sert aucun des objectifs nutritionnels</td></tr>
+      <tr><td>Part d'objectif du document de suivi</td><td><code>arrondi(valeur / objectif × 100)</code>, sans borne</td><td>indéfinie</td><td>le document de suivi</td></tr>
+    </tbody>
+  </table>
+  <p>L'avancement des pas n'emploie aucune des trois : il est écrit à part, <code>min(100, arrondi(pas / (objectif ou 8 000) × 100))</code>, sans plancher à 0 et avec un repli sur 8 000 quand l'objectif est nul.</p>
+
+  <h3 id="derivations-la-concentration-sanguine">La concentration sanguine</h3>
+  <p>La quantité de principe actif présente à un instant se modélise par un compartiment unique et un modèle de Bateman, appliqué aux deux phases — montée et descente. Chaque traitement du catalogue porte trois paramètres : demi-vie d'élimination, demi-vie d'absorption, et une part de dose utile qui représente la biodisponibilité relative (1 par défaut).</p>
+  <pre><code>ke = ln2 / demiVieElimination
+ka = ln2 / demiVieAbsorption
+tMax = ln(ka/ke) / (ka − ke)
+normalisation = 1 / (e^(−ke·tMax) − e^(−ka·tMax))
+contribution(dose, h) = dose × partUtile × (e^(−ke·h) − e^(−ka·h)) × normalisation
+contribution = 0 si h &lt; 0
+concentration(t) = Σ contribution(dose_i, (t − instant_i)/3600000) pour instant_i &lt;= t</code></pre>
+  <p>La normalisation fait que le pic d'une prise isolée vaut exactement la dose utile ; l'unité est donc un milligramme-équivalent, pas une concentration plasmatique. Loin du pic le terme d'absorption devient négligeable et la concentration décroît exactement selon la demi-vie d'élimination. L'heure d'une prise absente vaut midi.</p>
+  <p><strong>Le cumul se fait par molécule, pas par marque ni par forme.</strong> Deux prises de la même molécule s'additionnent quels que soient leur nom commercial et leur forme ; chacune garde la cinétique de sa propre fiche, ce que la part de dose utile rend légitime. Un traitement de molécule inconnue ne s'additionne à rien et forme son propre groupe.</p>
+  <p><strong>La fenêtre de soixante jours ne sert qu'à former les groupes.</strong> On retient d'abord les prises des soixante derniers jours — ou tout l'historique si cette fenêtre est vide — et on en tire la liste des molécules. La concentration de chaque groupe est ensuite calculée sur l'<em>historique entier</em> de ses traitements : une prise d'il y a soixante-dix jours contribue encore au nombre rendu. On écarte enfin les groupes dont la concentration résiduelle est inférieure ou égale à 0,001 mg.</p>
+  <p><span class="marque">arbitrage non validé</span> La grandeur d'état courant ne rend pas une absence mais <strong>un couple (concentration, drapeau « plusieurs »)</strong> : zéro groupe actif rend (0, faux), un groupe rend (sa concentration, faux), plusieurs rendent (0, vrai). Zéro molécule active et deux molécules actives rendent donc le même nombre, ce que la règle du silence de ce chapitre interdirait.</p>
+  <p>Deux autres grandeurs sortent du même modèle :</p>
+  <table>
+    <thead><tr><th>Grandeur</th><th>Définition</th></tr></thead>
+    <tbody>
+      <tr><td>tMax</td><td>Le délai du pic après une prise isolée, en heures, propre à la cinétique de la fiche.</td></tr>
+      <tr><td>État du pic</td><td>Un sommet local de la trajectoire est un point strictement supérieur à son voisin de gauche et supérieur ou égal à celui de droite ; les extrémités ne comptent pas. L'état vaut « pic en cours » à l'intérieur d'une fenêtre autour du sommet, sinon « pic à venir » ou « pic passé » avec son délai en heures. <strong>La largeur de la fenêtre est décidée par la forme de la dernière prise <em>déjà faite</em></strong> : 12 heures pour une injection, 20 minutes pour un comprimé.</td></tr>
+      <tr><td>Rythme de prise usuel</td><td>Une dérivation de la fiche du traitement : la valeur qu'elle porte, sinon 1 jour pour un comprimé et 7 jours pour une injection. Saxenda et Victoza portent explicitement 1 jour malgré leur forme injectable.</td></tr>
+    </tbody>
+  </table>
+  <p>Le catalogue compte onze traitements plus un état « pas de traitement ». Les trois entrées sans molécule ne s'additionnent à rien.</p>
+  <table>
+    <thead><tr><th>Fiche</th><th>Molécule</th><th>Forme</th><th>Élimination</th><th>Absorption</th><th>Part de dose utile</th></tr></thead>
+    <tbody>
+      <tr><td>Ozempic, Wegovy injectable</td><td>sémaglutide</td><td>injection</td><td>168 h</td><td>15 h</td><td>1</td></tr>
+      <tr><td>Rybelsus, Wegovy oral</td><td>sémaglutide</td><td>oral</td><td>160 h</td><td>0,1 h</td><td>0,008</td></tr>
+      <tr><td>Mounjaro, Zepbound</td><td>tirzépatide</td><td>injection</td><td>120 h</td><td>12 h</td><td>1</td></tr>
+      <tr><td>Saxenda, Victoza</td><td>liraglutide</td><td>injection</td><td>13 h</td><td>2,5 h</td><td>1</td></tr>
+      <tr><td>Trulicity</td><td>dulaglutide</td><td>injection</td><td>113 h</td><td>14 h</td><td>1</td></tr>
+      <tr><td>Rétatrutide</td><td>rétatrutide</td><td>injection</td><td>144 h</td><td>12 h</td><td>1</td></tr>
+      <tr><td>Foundayo</td><td>orforglipron</td><td>oral</td><td>36 h</td><td>0,7 h</td><td>1</td></tr>
+      <tr><td>Autre traitement (comprimé)</td><td>—</td><td>oral</td><td>160 h</td><td>1,5 h</td><td>1</td></tr>
+      <tr><td>Autre traitement (injection)</td><td>—</td><td>injection</td><td>168 h</td><td>15 h</td><td>1</td></tr>
+      <tr><td>Pas de traitement</td><td>—</td><td>injection</td><td>168 h</td><td>15 h</td><td>1</td></tr>
+    </tbody>
+  </table>
+  <div class="exemple"><p>Camille est sous sémaglutide injectable : ke = 0,004126 h⁻¹, ka = 0,046210 h⁻¹, pic à 57,4 h — un peu moins de deux jours et demi après l'injection — et normalisation 1,391. Une dose de 1 mg atteint donc 1,00 mg-équivalent à son pic ; en rythme hebdomadaire, les doses successives s'accumulent vers un plateau d'environ le double d'une dose isolée.</p></div>
+
+  <h3 id="derivations-la-serie-du-traitement">La série du traitement</h3>
+  <p>Trois grandeurs répondent à la même question — quelles prises comptent aujourd'hui — et sortent donc d'un seul calcul. Deux règles, dans cet ordre :</p>
+  <ol>
+    <li>les prises non survenues sont écartées, date et heure comprises ;</li>
+    <li><strong>un changement de traitement est une coupure</strong> : en remontant depuis la fin, on garde les prises du traitement courant jusqu'à la première prise d'un autre traitement. Revenir à un traitement déjà pris ne rouvre pas son ancien épisode.</li>
+  </ol>
+  <p>Le filtre passe devant la coupure : sans cela, une prise future d'un autre traitement — un changement planifié — viderait la série entière. Une prise sans marque est réputée du traitement courant. Pour ce tri-là, une heure absente vaut minuit.</p>
+  <table>
+    <thead><tr><th>Grandeur</th><th>Définition</th><th>Absence</th></tr></thead>
+    <tbody>
+      <tr><td>compte</td><td>nombre de prises de la série</td><td>0</td></tr>
+      <tr><td>dose initiale</td><td>dose de la première prise de la série, en mg</td><td><code>null</code> si série vide</td></tr>
+      <tr><td>dose actuelle</td><td>dose de la dernière prise de la série, en mg</td><td><code>null</code> si série vide</td></tr>
+      <tr><td>cumul</td><td>somme des doses, figée au centième</td><td>0</td></tr>
+    </tbody>
+  </table>
+  <p>La <strong>fréquence de prise</strong> se mesure sur tout l'historique et non sur la seule série courante, en comptant des <em>journées</em> de prise et non des lignes :</p>
+  <pre><code>fréquence = joursEntre(1re journée, dernière journée) / (nombre de journées − 1)   jours
+null si moins de deux journées de prise survenues, ou si l'écart est nul</code></pre>
+  <p>Deux prises le même jour — une correction, un doublon, une dose scindée — ne font pas deux prises espacées de zéro jour. C'est la moyenne des écarts et non leur médiane : elle ne dépend que des deux extrémités, et n'efface donc pas les semaines sautées.</p>
+  <p>L'<strong>ancienneté</strong> se compte sur deux ancrages : la pesée de départ pour la cure, la première prise du traitement courant pour le traitement.</p>
+  <pre><code>joursTotal = arrondi((minuitLocal(aujourd'hui) − minuitLocal(ancrage)) / 86400000)
+semaine    = plancher(joursTotal / 7) + 1
+null si l'ancrage n'existe pas, est illisible, ou est daté du futur</code></pre>
+  <p>Le jour de l'ancrage se dit « semaine 1 » et vaut 0 jour écoulé.</p>
+  <p>Le délai depuis la dernière prise est un nombre entier de jours entre minuits ; il peut être négatif si la seule prise connue est datée dans l'avenir, et il est alors lu comme un délai <em>jusqu'à</em> la prochaine.</p>
+
+  <h3 id="derivations-les-tendances">Les tendances</h3>
+  <p>Sept séries journalières de quatorze jours, aujourd'hui compris, du plus ancien au plus récent. Elles ne réemploient aucun des calculs de fenêtre réglable : quatorze jours pleins, toujours les mêmes.</p>
+  <pre><code>TREND_DAYS = 14</code></pre>
+  <p>Le traitement du jour non renseigné dépend de la nature de la grandeur, et il a été tranché série par série :</p>
+  <table>
+    <thead><tr><th>Série</th><th>Nature</th><th>Jour non renseigné</th></tr></thead>
+    <tbody>
+      <tr><td>Poids</td><td>état</td><td>report de la dernière valeur connue ; avant la première pesée, la première valeur connue ; série vide sans aucune pesée</td></tr>
+      <tr><td>Concentration sanguine</td><td>état</td><td>recalculée à midi de chaque jour depuis toutes les prises ; ne se tait pas quand plusieurs molécules sont actives, contrairement à la grandeur d'état courant</td></tr>
+      <tr><td>Calories, sommeil, pas</td><td>cumul</td><td><code>null</code> — la série s'interrompt</td></tr>
+      <tr><td>Sport, temps pour soi</td><td>cumul</td><td>0 — ne rien trouver, c'est n'avoir pas bougé</td></tr>
+    </tbody>
+  </table>
+  <p>Grandeurs d'appoint du même module : la moyenne sur les seuls points renseignés d'une série trouée, le total d'une série, la dépense quotidienne moyenne de sport et de pas, le décalage entre deux périodes, le décalage de sévérité des effets, et un prédicat disant si une série a une forme — c'est-à-dire si elle n'est ni vide ni plate.</p>
+
+  <h3 id="derivations-les-fenetres-et-les-denominateurs">Les fenêtres et les dénominateurs</h3>
+  <p>Une moyenne n'a de sens que par son dénominateur, et le produit n'en emploie pas un seul. La règle générale : <strong>on divise par les journées renseignées quand le silence est un oubli, par les jours écoulés quand le silence est une information.</strong> Une journée sans repas saisi est une journée non tenue, pas un jeûne ; une semaine sans séance est une semaine sans séance.</p>
+  <table>
+    <thead><tr><th>Grandeur</th><th>Fenêtre</th><th>Dénominateur</th><th>Absence</th></tr></thead>
+    <tbody>
+      <tr><td>Repas, en-cas, kcal, protéines, fibres par jour</td><td>tout l'historique</td><td>journées portant au moins un repas — <strong>le dénominateur est rendu avec les moyennes</strong></td><td>null si aucune</td></tr>
+      <tr><td>kcal, protéines, fibres par jour, récent</td><td>de J−7 à J−1 (hier inclus, aujourd'hui exclu)</td><td>journées portant au moins un repas dans la fenêtre</td><td>null si aucune</td></tr>
+      <tr><td>Pas par jour</td><td>tout l'historique, ou J−6 à J</td><td>journées dont le total de pas est &gt; 0</td><td>null si aucune</td></tr>
+      <tr><td>Pas, distance, durée, kcal, avancement — depuis une date</td><td>de la date choisie à la fin</td><td>nombre de relevés retenus</td><td>zéros si aucun relevé</td></tr>
+      <tr><td>Minutes et séances d'activité par semaine</td><td>1re séance → aujourd'hui (bornes comprises), ou période choisie (au moins 1 jour)</td><td>jours de la fenêtre / 7</td><td>null si la fenêtre couvre moins de 7 jours <em>et</em> que le seuil est appliqué ; total exact dès la 1re séance</td></tr>
+      <tr><td>Durée de nuit moyenne</td><td>tout l'historique, ou J−6 à J</td><td>journées portant une nuit de durée <strong>strictement positive</strong></td><td>null si aucune</td></tr>
+      <tr><td>Sommeil moyen d'une journée</td><td>idem</td><td><strong>dates portant une entrée, quelle que soit sa durée</strong>, siestes comprises</td><td>null si aucune</td></tr>
+      <tr><td>Moments pour soi, effets secondaires par semaine</td><td>1re entrée → aujourd'hui, bornes comprises</td><td>jours / 7</td><td>null si journal vide ou recul &lt; 7 jours</td></tr>
+      <tr><td>Comptes à sept jours (séances, effets, moments)</td><td>J−6 à J, aujourd'hui compris</td><td>—</td><td>0</td></tr>
+    </tbody>
+  </table>
+  <p>Une journée à zéro pas est un podomètre éteint, pas une journée immobile : elle ne compte ni au numérateur ni au dénominateur. Une nuit de zéro minute n'est pas une nuit blanche : même traitement — <strong>mais seulement pour la durée de nuit moyenne</strong>. Le sommeil moyen d'une journée, lui, ne filtre rien : une entrée dégénérée de zéro minute y compte une journée entière au dénominateur. Deux relevés de pas le même jour s'additionnent sans compter deux journées ; deux nuits le même jour aussi. Les moments pour soi se comptent en <em>entrées</em> et non en journées : deux moments dans la même journée font deux.</p>
+  <p>Les fenêtres nommées valent 7, 14, 30 et 90 jours. Une paire de bornes complète a bien une longueur, <code>joursEntre(début, fin) + 1</code> ; seuls « depuis le début » et une paire dont une borne manque, ou dont la fin précède le début, n'ont pas de longueur connue. Ce calcul-là passe par deux instants pris à midi, pour ne pas être décalé par un changement d'heure au milieu de la période.</p>
+  <p><strong>Un seul total de pas fige la journée en cours</strong> : celui qui totalise les pas d'une période pour le document de suivi. Il ne relève pas lui-même le compte du jour — il le reçoit en paramètre, relevé une fois par son appelant. Un total qui bougerait entre deux lectures serait faux deux fois. Si la période ne contient pas aujourd'hui, la valeur figée n'entre pas dans le total. Aucun autre total de pas ne fige quoi que ce soit.</p>
+  <p>Une distance de marche connaît <strong>deux formules distinctes</strong> : les relevés de pas la calculent à 0,00076 km par pas, tandis que la dépense énergétique la recalcule depuis la taille. Elles ne coïncident pas.</p>
+  <p>Une vitesse de marche connaît elle aussi <strong>deux valeurs</strong> : les moyennes depuis une date rendent la constante de 4,2 km/h, tandis que le bilan cumulé divise sa distance totale par sa durée totale, soit 0,00076 × 95 × 60 ≈ 4,3 km/h ; la constante n'y sert que de repli quand la durée est nulle. La durée de marche vaut <code>arrondi(pas / 95)</code> minutes.</p>
+
+  <h3 id="derivations-les-objectifs-nutritionnels">Les objectifs nutritionnels</h3>
+  <p>Trois objectifs quotidiens, chacun remplaçable par une valeur du profil :</p>
+  <table>
+    <thead><tr><th>Objectif</th><th>Défaut</th><th>Réglage de profil</th><th>Unité</th></tr></thead>
+    <tbody>
+      <tr><td>Calories</td><td>1 400</td><td>oui</td><td>kcal</td></tr>
+      <tr><td>Protéines</td><td><code>arrondi(poidsActuel × 1,5)</code></td><td>oui</td><td>g</td></tr>
+      <tr><td>Fibres</td><td>25</td><td>oui</td><td>g</td></tr>
+    </tbody>
+  </table>
+  <p><span class="marque">arbitrage non validé</span> <strong>L'objectif de protéines des paliers de badge n'est pas celui-ci</strong>, malgré la formule identique. Ils diffèrent sur deux points : le réglage de profil écrase le calcul côté nutrition et pas côté badge, et le poids retenu n'est pas le même — la pesée la plus récente par date et heure d'un côté, la dernière ligne enregistrée du journal des pesées de l'autre. Une pesée antidatée saisie en dernier change donc l'un sans changer l'autre.</p>
+  <p>Les totaux d'une journée sont les sommes des calories, protéines et fibres des repas de cette date ; les fibres sont toujours du nombre. La part d'un objectif atteinte vaut <code>arrondi(valeur / objectif × 100)</code>, indéfinie si l'objectif n'est pas un nombre fini strictement positif.</p>
+
+  <h3 id="derivations-les-effets-et-leurs-paliers">Les effets et leurs paliers</h3>
+  <p>Un effet secondaire porte une sévérité entière <strong>de 0 à 5</strong> : six crans, dont le premier — « imperceptible » — est la valeur retenue à l'ouverture d'une saisie. Un effet à peine remarqué est une réponse, pas une absence de réponse. Les paliers sont uniques dans le produit et le zéro tombe dans « léger » avec le 1 :</p>
+  <pre><code>palier(sévérités) : max &gt; 3 → sévère ; max &gt; 1 → modéré ; sinon léger</code></pre>
+  <p>Le palier d'une <em>journée</em> se juge sur son pire effet. Le <em>décompte</em> par palier se juge effet par effet : une journée portant une nausée à 1 et un vertige à 5 vaut un léger et un sévère, là où la journée entière est dite sévère. La note d'une journée est la moyenne arithmétique des sévérités déclarées ce jour-là, sur cinq, à une décimale.</p>
+  <p>Le climat d'une journée se déduit des effets du jour :</p>
+  <pre><code>score = Σ sévérités du jour
+score = 0                          → serein
+score &gt; 8 ou une sévérité &gt;= 4     → difficile
+sinon                              → modéré</code></pre>
+
+  <h3 id="derivations-le-sommeil">Le sommeil</h3>
+  <p>Une entrée de sommeil est de type nuit ou sieste, porte un instant d'endormissement et un instant de réveil, et une note de qualité. Elle est datée du jour de son <strong>réveil</strong>.</p>
+  <pre><code>durée = réveil − endormissement, en minutes
+durée = 0 si le réveil ne suit pas l'endormissement, ou si une date est illisible</code></pre>
+  <p>Les instants se construisent depuis les nombres d'année, de mois, de jour, d'heure et de minute lus séparément, jamais par interprétation d'une chaîne, qui décalerait d'un jour selon le fuseau. La durée de nuit d'une journée est la somme de ses entrées de type nuit, indéfinie s'il n'y en a aucune ; la durée de sieste, la somme des siestes, nulle s'il n'y en a pas.</p>
+  <p>La qualité moyenne d'un ensemble d'entrées est <strong>pondérée par leur durée</strong>, arrondie au dixième : une sieste de vingt minutes ne pèse pas autant qu'une nuit de huit heures. Elle est indéfinie si la durée totale est nulle. Les entrées de durée nulle ou négative ne pèsent rien.</p>
+
+  <h3 id="derivations-la-correlation">La corrélation</h3>
+  <p>Le produit énonce des coïncidences entre deux séries journalières, jamais des causes, et sans appel à un service externe : c'est un moteur de règles sur des textes préparés.</p>
+  <pre><code>r = Σ(x−x̄)(y−ȳ) / √(Σ(x−x̄)² · Σ(y−ȳ)²)        coefficient de Pearson
+r indéfini si moins de 2 paires, ou si une des deux séries a une variance nulle</code></pre>
+  <table>
+    <thead><tr><th>Condition</th><th>Verdict</th></tr></thead>
+    <tbody>
+      <tr><td>moins de 7 paires complètes</td><td>trop peu — aucun verdict</td></tr>
+      <tr><td>variance nulle d'un côté</td><td>rien à mesurer</td></tr>
+      <tr><td>|r| &lt; 0,3</td><td>aucun lien</td></tr>
+      <tr><td>0,3 ≤ |r| &lt; 0,5</td><td>modéré</td></tr>
+      <tr><td>|r| ≥ 0,5</td><td>net</td></tr>
+    </tbody>
+  </table>
+  <p>Le garde-fou de sept paires est délibérément exigeant : à si peu de points, un coefficient élevé se produit couramment par hasard. Le sens du lien n'est rendu que lorsqu'il y en a un. Les journées datées après aujourd'hui sont retirées de l'analyse et leur nombre est rendu à part : sans quoi une fenêtre de quatorze jours pourrait annoncer seize journées renseignées.</p>
+  <p>Les statistiques d'appoint sont la moyenne arithmétique et l'écart-type de <em>population</em>, toutes deux nulles sur une liste vide.</p>
+
+  <h3 id="derivations-les-paliers-de-badge">Les paliers de badge</h3>
+  <p>Quatre distinctions, cinq paliers ordonnés — aucun, éveil, bronze, argent, or. L'ordre est unique et sert à comparer : une montée de palier est un rang strictement supérieur au dernier rang <strong>observé et enregistré</strong>. Un palier supérieur écrase les inférieurs ; l'évaluation rend toujours le plus haut palier atteint. Les entrées non survenues ne comptent jamais.</p>
+  <p>Le dernier rang observé est la seule mémoire persistée des paliers : un palier jamais observé n'est pas une progression mais une découverte, enregistrée en silence.</p>
+  <p>Le palier « éveil » est le critère du badge rempli sur <strong>une seule journée</strong>, la journée en cours ou la précédente — les deux seules journées que ce palier regarde.</p>
+  <table>
+    <thead><tr><th>Distinction</th><th>Journal</th><th>Éveil</th><th>Bronze</th><th>Argent</th><th>Or</th></tr></thead>
+    <tbody>
+      <tr><td>Activité physique</td><td>séances</td><td>une séance aujourd'hui ou hier</td><td>120 min modérées-équivalent / 10 j</td><td>180 min intensives-équivalent / 10 j</td><td>180 min intensives-équivalent / 7 j</td></tr>
+      <tr><td>Fibres</td><td>repas</td><td>25 g aujourd'hui ou hier</td><td>25 g atteints 4 j / 7</td><td>5 j / 7</td><td>7 j / 7</td></tr>
+      <tr><td>Protéines</td><td>repas</td><td>objectif atteint aujourd'hui ou hier</td><td>objectif atteint 4 j / 7</td><td>5 j / 7</td><td>7 j / 7</td></tr>
+      <tr><td>Pas</td><td>relevés de pas</td><td>8 000 pas aujourd'hui ou hier</td><td>8 000 pas 3 j / 7</td><td>4 j / 7</td><td>5 j / 7</td></tr>
+    </tbody>
+  </table>
+  <p>Les équivalences d'activité sont des coefficients appliqués à la durée : vers l'intensif, 1,0 / 0,67 / 0,33 pour intensive, modérée, douce ; vers le modéré, 1,5 / 1,0 / 0,5. Ce sont des coefficients propres aux paliers, distincts du facteur d'intensité des dépenses (0,8 / 1,0 / 1,3) et du score d'activité. La durée entre ici brute, sans conversion des étages.</p>
+  <p>L'objectif de protéines de ce palier est <code>arrondi(poidsActuel × 1,5)</code>, le poids actuel y étant pris comme la <em>dernière ligne</em> du journal des pesées, non la plus récente par date et heure ; le poids de départ, à défaut, et 70 kg en dernier ressort. Aucun réglage de profil ne l'écrase.</p>
+  <p>Une distinction dépend de l'activation de son domaine : l'activité et les pas sont réputés actifs sauf refus explicite, les repas sont réputés inactifs sauf accord explicite. Une distinction dont le domaine est éteint n'est pas évaluée.</p>
+  <div class="exemple"><p>Camille marche 8 200 pas hier et 6 000 aujourd'hui, et n'a pas d'autre relevé sur les sept derniers jours : la distinction des pas est au palier éveil — un jour sur sept, il en faut trois pour le bronze.</p></div>
+
+  <h3 id="derivations-les-equivalences-insolites">Les équivalences insolites</h3>
+  <p>Un poids en kilogrammes se traduit en une combinaison de <strong>un ou deux objets</strong> d'un catalogue de 222 entrées — 71 objets courants et 151 insolites — dont les masses vont de 1 g à 200 kg. Chaque entrée porte un nom au singulier avec son article, un pluriel, une masse en kilogrammes, une catégorie et un article. Le type prévoit aussi un drapeau « animal », mais <strong>aucune des 222 entrées ne le porte</strong> : le filtre correspondant ne rend jamais rien.</p>
+  <p>La recherche est exhaustive et déterministe : toutes les combinaisons d'un et de deux objets sont énumérées, et la meilleure est celle dont l'écart absolu au poids visé est le plus faible ; à égalité, la première du catalogue. Une combinaison est admissible si elle compte au plus deux objets, au plus deux insolites, et — dès qu'elle contient un insolite — au moins un insolite de moins d'un kilogramme.</p>
+  <p><strong>L'équivalence doit être vraie à 200 g près.</strong> C'est un écart absolu, le même à 0,8 kg qu'à 30 kg : au-delà, ce n'est plus une équivalence. Deux règles supplémentaires ne s'appliquent qu'à l'intérieur de cette tolérance :</p>
+  <ol>
+    <li><strong>exclusion</strong> — une combinaison ne reprend pas un objet déjà attribué à une autre équivalence attribuée en même temps ; si aucune autre combinaison vraie n'existe, la règle cède, et jamais au prix d'une équivalence fausse ;</li>
+    <li><strong>rotation</strong> — parmi les combinaisons vraies restantes, celle dont les objets ont été attribués le moins souvent gagne ; à usage égal, la plus juste ; à justesse égale, la première du catalogue.</li>
+  </ol>
+  <p>Un poids nul ou négatif ne rend aucune combinaison : rien plutôt que du faux. Un poids que le catalogue n'approche pas à 200 g près reçoit simplement la combinaison admissible la plus juste, répétition comprise — c'est la première passe qui le sert. <span class="marque">arbitrage non validé</span> Une seconde passe relâchant l'admissibilité existe dans le code, mais elle ne se déclenche que si aucune combinaison admissible n'a été trouvée, ce qui ne peut arriver pour un poids strictement positif : un objet courant seul est toujours admissible. Elle est donc morte.</p>
+  <p>Une <strong>attribution</strong> est rattachée à la pesée la plus récente par date et heure — heure absente valant minuit —, identifiée par cette pesée et par les deux poids qu'elle traduit, arrondis au dixième. La perte totale choisit ses objets en premier ; la dernière perte prend ce qui reste. L'attribution vaut jusqu'à la pesée suivante : chaque nouvelle pesée réattribue, même à poids identique.</p>
+  <p><strong>Le compteur d'usage n'avance qu'au changement de pesée</strong>, pas à chaque attribution. Corriger une pesée passée fait bouger les deux pertes sans changer la signature de la pesée la plus récente : l'attribution neuve est alors écrite, mais aucun compteur n'est incrémenté. Une attribution après une pesée compte pour un, et pour un seul.</p>
+  <p>Une attribution conservée dont la liste d'objets est vide alors que la perte correspondante est strictement positive est tenue pour périmée et recalculée.</p>
+  <div class="exemple"><p>Camille a perdu 8,0 kg. Le catalogue doit rendre une combinaison d'un ou deux objets pesant entre 7,8 et 8,2 kg ; si l'un d'eux sert déjà à dire sa dernière perte, la règle d'exclusion en choisit une autre du même intervalle.</p></div>
+
+  <details><summary>Cas limites</summary>
+    <p>Taille inconnue ou nulle : l'IMC vaut 0 ; le jeu de noms à rang le dit « inconnu », les deux autres jeux le nomment « Insuffisance pondérale ». Les points d'IMC et la date de franchissement ne se disent pas.</p>
+    <p>Journal de pesées vide : le poids actif retombe sur le poids de départ, puis sur le poids cible, puis sur 80 kg ; le poids actuel retombe sur le poids de départ. Ni l'un ni l'autre ne se tait.</p>
+    <p>Journal non vide mais aucune pesée avant le jour demandé : le poids actif prend le poids de départ, puis le poids cible, puis la pesée la plus ancienne, puis 80 kg.</p>
+    <p>Âge, taille ou genre absents du profil : le métabolisme de base emploie 42 ans, 170 cm et « femme » plutôt que de se taire.</p>
+    <p>Moins de sept jours de recul : aucune moyenne hebdomadaire n'est rendue, sauf pour l'activité du document de suivi, dont le seuil est désactivé ; les totaux le sont toujours.</p>
+    <p>Une seule pesée dans un intervalle : aucune cadence sur cet intervalle.</p>
+    <p>Aucune pesée dans un intervalle, mais des pesées avant et après : le découpage en tranches interpole et rend une variation, là où la cadence bornée se tait.</p>
+    <p>Deux pesées le même jour : la durée de la perte qu'elles bornent est indéfinie, l'écart valant zéro jour.</p>
+    <p>Course à pied ou rameur avec une distance : aucune allure ne fait coïncider le calcul par allure et le calcul par intensité modérée.</p>
+    <p>Plusieurs molécules actives simultanément : la grandeur d'état courant rend 0 avec un drapeau, pas une absence — le même 0 que zéro molécule active.</p>
+    <p>Toutes les prises datées de plus de soixante jours : la fenêtre de soixante jours cède et l'historique entier forme les groupes ; la concentration, elle, est de toute façon calculée sur l'historique entier.</p>
+    <p>Deux prises la même journée : elles comptent pour une journée dans la fréquence, pour deux dans le compte de la série.</p>
+    <p>Une seule journée de prise : aucune fréquence.</p>
+    <p>Prise ou pesée datée dans l'avenir : écartée des paliers, de la projection, de la série, de la fréquence et des analyses de coïncidence ; le délai depuis la dernière prise devient négatif et se lit comme un délai jusqu'à la prochaine.</p>
+    <p>Journal de repas vide sur la fenêtre : aucune moyenne, ni de calories, ni de protéines, ni de fibres.</p>
+    <p>Relevé de pas à zéro, nuit de durée nulle : exclus du numérateur et du dénominateur de leurs moyennes — mais une entrée de sommeil de durée nulle compte quand même une journée au dénominateur du sommeil moyen d'une journée.</p>
+    <p>Moins de sept paires complètes, ou une série constante : aucun verdict de corrélation.</p>
+    <p>Poids nul ou négatif : aucune équivalence insolite.</p>
+    <p>Objectif nul ou négatif : l'avancement vaut 0, ou n'est pas rendu, selon laquelle des trois formes est employée.</p>
+    <p>Cible au-dessus du poids de départ : l'avancement vaut 0, sauf si la cible est déjà tenue, auquel cas 100.</p>
+    <p>Sévérité d'effet à 0 : elle est enregistrable et tombe dans le palier « léger ».</p>
+  </details>
+</section>

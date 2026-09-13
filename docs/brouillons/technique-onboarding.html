@@ -1,0 +1,385 @@
+<section id="onboarding">
+  <h2>3. L'arrivée : l'onboarding <a class="retour" href="#sommaire">↑ sommaire</a></h2>
+  <p>Ce chapitre décrit l'objet que l'onboarding remplit, la liste d'étapes qui se recalcule à chaque réponse, et les règles de saisie des mesures : bornes, unités, arrondis, forme stockée. Tout ce qui suit est la <span class="marque v2">V2</span>, dans <code>GIT-APP-V2/src</code> ; la V1 n'a pas d'onboarding.</p>
+
+  <h3 id="onboarding-entites">Entités</h3>
+  <p>Un seul objet du domaine, <code>Reponses</code>, tenu en mémoire par <code>useParcours</code> et jamais écrit nulle part (voir <a href="#onboarding-rien-n-est-enregistre">Rien n'est enregistré</a>). Aucun champ n'est facultatif : chacun part d'une valeur, et <code>null</code> est réservé aux deux réponses du traitement, où il veut dire « pas encore répondu ».</p>
+  <table>
+    <thead><tr><th>Champ</th><th>Type</th><th>Unité</th><th>Départ</th></tr></thead>
+    <tbody>
+      <tr><td><code>langue</code></td><td><code>'fr' | 'en'</code></td><td>—</td><td><code>'fr'</code></td></tr>
+      <tr><td><code>theme</code></td><td><code>'ciel' | 'ciel-fonce'</code></td><td>—</td><td><code>'ciel'</code></td></tr>
+      <tr><td><code>systeme</code></td><td><code>'metrique' | 'imperial'</code></td><td>—</td><td><code>'metrique'</code></td></tr>
+      <tr><td><code>objectif</code></td><td><code>'perdre' | 'stabiliser'</code></td><td>—</td><td><code>'perdre'</code></td></tr>
+      <tr><td><code>poids</code></td><td><code>string</code></td><td>unité de saisie, non convertie</td><td><code>'95.0'</code></td></tr>
+      <tr><td><code>poidsCible</code></td><td><code>string</code></td><td>idem</td><td><code>'95.0'</code></td></tr>
+      <tr><td><code>traitementCommence</code></td><td><code>boolean</code></td><td>—</td><td><code>true</code></td></tr>
+      <tr><td><code>formeTraitement</code></td><td><code>'injection' | 'comprime' | null</code></td><td>—</td><td><code>null</code></td></tr>
+      <tr><td><code>traitement</code></td><td><code>string | null</code> — un <code>id</code> du catalogue</td><td>—</td><td><code>null</code></td></tr>
+      <tr><td><code>avatar</code></td><td><code>Avatar</code></td><td>—</td><td><code>AVATAR_INITIAL</code></td></tr>
+      <tr><td><code>anneeNaissance</code></td><td><code>number</code></td><td>année civile</td><td><code>1980</code></td></tr>
+      <tr><td><code>tailleCm</code></td><td><code>number</code></td><td>centimètre, toujours</td><td><code>165</code></td></tr>
+      <tr><td><code>prenom</code></td><td><code>string</code></td><td>—</td><td><code>''</code></td></tr>
+      <tr><td><code>email</code></td><td><code>string</code></td><td>—</td><td><code>''</code></td></tr>
+      <tr><td><code>motDePasse</code></td><td><code>string</code></td><td>—</td><td><code>''</code></td></tr>
+    </tbody>
+  </table>
+  <p class="ancre">src/screens/onboarding/reponses.ts</p>
+  <p><code>Avatar</code> est un objet plat de huit champs : <code>genre</code> (<code>'femme' | 'homme' | 'neutre'</code>), <code>formeVisage</code> (<code>'ovale' | 'rond' | 'carre' | 'coeur'</code>), <code>coiffure</code> (<code>'court' | 'long' | 'boucle' | 'frange' | 'brosse' | 'chauve'</code>), <code>expression</code> (<code>'joyeuse' | 'determinee' | 'fiere' | 'calme'</code>), <code>lunettes</code> (<code>boolean</code>) et trois couleurs — <code>couleurPeau</code>, <code>couleurYeux</code>, <code>couleurCheveux</code> — stockées comme code hexadécimal.</p>
+  <p class="ancre">src/domaine/avatar.ts</p>
+  <p>Dérivé, donc jamais stocké : la liste des étapes visibles et son cardinal, le rang borné, le décompte des billes, l'unité de saisie (tirée de <code>systeme</code>), la taille affichée en pouces, le séparateur décimal affiché, la liste des spécialités d'une forme, et le verdict de <code>peutValider</code>. La coiffure, elle, <em>est</em> stockée : le genre ne fait que lui donner une valeur de départ.</p>
+
+  <h3 id="onboarding-etapes-visibles-selon-les-reponses">Étapes visibles selon les réponses</h3>
+  <p><code>ETAPES</code> est une liste ordonnée de neuf entrées <code>{ id, montre? }</code>. <code>montre</code> absent vaut « toujours ». <code>etapesVisibles(reponses)</code> filtre puis projette les <code>id</code> ; l'ordre de la liste est l'ordre du parcours.</p>
+  <pre><code>ETAPES = [
+  theme, langue-unites, objectif, poids,
+  poids-cible      montre: reponses.objectif === 'perdre',
+  traitement,
+  quel-traitement  montre: reponses.traitementCommence,
+  avatar, profil,
+]
+etapesVisibles(r) = ETAPES.filter(e =&gt; e.montre?.(r) ?? true).map(e =&gt; e.id)</code></pre>
+  <p>Deux conditions indépendantes : 9 étapes si les deux sont vraies, 8 si une seule, 7 si aucune. Le rang est un compteur séparé, borné à chaque lecture : <code>rangBorne = Math.min(rang, visibles.length - 1)</code>, et <code>etape = visibles[rangBorne]</code>. La liste se recalcule à chaque rendu, donc à chaque réponse.</p>
+  <p class="ancre">src/screens/onboarding/parcours.ts · src/app/useParcours.ts</p>
+  <details><summary>Cas limites</summary>
+    <p>Liste qui raccourcit sous un rang déjà avancé : <code>rangBorne</code> retombe sur la dernière étape visible, jamais sur <code>undefined</code> ; <code>rang</code> lui-même n'est pas corrigé.</p>
+    <p><code>avancer</code> et <code>reculer</code> sont bornés (<code>Math.min(rangBorne + 1, visibles.length - 1)</code>, <code>Math.max(rangBorne - 1, 0)</code>) : le bouton du dernier écran ne fait rien, le bouton « retour » du premier est désactivé.</p>
+    <p>Le rang ne suit pas l'étape : reculer puis changer une réponse conditionnelle ne réinsère pas d'étape avant le rang courant, elle réapparaît à sa place dans l'ordre fixe.</p>
+  </details>
+  <div class="exemple"><p>Camille répond « perdre » puis <code>traitementCommence = true</code> : <code>etapesVisibles</code> rend les neuf <code>id</code>, et son écran « Dernière étape » est au rang 8.</p></div>
+  <p><a href="spec-fonctionnelle.html#onboarding-le-parcours">→ fonctionnelle</a></p>
+
+  <h3 id="onboarding-ce-qui-bloque-suivant">Ce qui bloque Suivant</h3>
+  <p><code>peutValider(etape, reponses)</code> vit dans le parcours et non dans un écran ; le bouton lit son résultat et se pose <code>disabled</code> et <code>aria-disabled</code>.</p>
+  <pre><code>peutValider(etape, r):
+  si etape === 'quel-traitement'
+     → r.formeTraitement !== null &amp;&amp; r.traitement !== null
+  si etape === 'profil'
+     → r.motDePasse.length === 0 || motDePasseValide(r.motDePasse)
+  sinon → true</code></pre>
+  <p>Sept des neuf étapes rendent <code>true</code> sans rien regarder : une question sans réponse se saute.</p>
+  <p class="ancre">src/screens/onboarding/parcours.ts · src/screens/Onboarding.tsx</p>
+  <details><summary>Cas limites</summary>
+    <p>Forme choisie, spécialité non : <code>false</code>. Les deux choisies : <code>true</code>. Aucune : <code>false</code>.</p>
+    <p>Mot de passe vide : <code>true</code>. De 1 à 7 signes : <code>false</code>. À 8 : <code>true</code>.</p>
+    <p><code>avancer</code> ne revérifie pas <code>peutValider</code> : seul l'attribut <code>disabled</code> du bouton empêche le geste. Le bouton « retour » de la barre du téléphone ne passe jamais par cette règle — il ne fait que reculer.</p>
+    <p>« Avez-vous commencé » ne bloque rien : <code>traitementCommence</code> est un booléen valant <code>true</code> au départ, il n'y a pas d'état « sans réponse ».</p>
+  </details>
+
+  <h3 id="onboarding-decompte-des-ecrans">Décompte des écrans <span class="marque">arbitrage non validé</span></h3>
+  <p>Trois nombres calculés à chaque rendu, à partir de la liste des étapes visibles et du rang borné.</p>
+  <pre><code>decompte = {
+  passees: rangBorne,
+  total:   visibles.length,
+  montrer: rangBorne &gt;= visibles.indexOf('traitement'),
+}
+bille n allumée ⟺ n &lt; passees        (n de 0 à total − 1)</code></pre>
+  <p><code>total</code> billes sont rendues, <code>passees</code> portent la classe <code>bille--allumee</code>. L'étape courante compte dans <code>total</code> mais pas dans <code>passees</code> : <code>passees</code> vaut au plus <code>total − 1</code>, la dernière bille ne s'allume donc jamais pendant le parcours. <code>ETAPE_DEBUT_DECOMPTE</code> vaut <code>'traitement'</code>, une étape sans <code>montre</code>, donc toujours présente dans <code>visibles</code>.</p>
+  <p class="ancre">src/app/useParcours.ts · src/screens/onboarding/Progression.tsx · src/screens/onboarding/parcours.ts</p>
+  <details><summary>Cas limites</summary>
+    <p>Parcours à 9 étapes, arrivée sur « traitement » : <code>indexOf('traitement') = 5</code>, donc 9 billes dont 5 allumées.</p>
+    <p>Parcours à 7 étapes (« stabiliser » + « non ») : <code>indexOf('traitement') = 4</code>, donc 7 billes dont 4 allumées au même écran.</p>
+    <p>Changer une réponse conditionnelle en arrière change <code>total</code> et donc le nombre de billes rendues, sans toucher <code>passees</code>.</p>
+  </details>
+  <div class="exemple"><p>Camille sur « Quel traitement » : <code>rangBorne = 6</code>, <code>total = 9</code> — six billes allumées sur neuf.</p></div>
+  <p><a href="spec-fonctionnelle.html#onboarding-le-parcours">→ fonctionnelle</a></p>
+
+  <h3 id="onboarding-le-decompte-se-dit-sans-s-ecrire">Le décompte se dit sans s'écrire</h3>
+  <p>Le conteneur des billes porte <code>role="progressbar"</code>, <code>aria-valuemin={0}</code>, <code>aria-valuemax={total}</code>, <code>aria-valuenow={passees}</code> et <code>aria-label={textes.progression}</code>. Chaque bille est un <code>&lt;span&gt;</code> vide en <code>aria-hidden="true"</code> : aucun caractère n'est rendu.</p>
+  <p><code>textes.progression</code> vaut « Avancement du questionnaire » en français, « Questionnaire progress » en anglais.</p>
+  <p class="ancre">src/screens/onboarding/Progression.tsx · src/i18n/textes.ts</p>
+  <details><summary>Cas limites</summary>
+    <p><code>aria-valuenow</code> vaut 0 au premier écran à décompte : la barre s'annonce à zéro sur neuf.</p>
+    <p><code>aria-valuemax</code> suit <code>total</code> et change donc si une réponse conditionnelle change.</p>
+  </details>
+
+  <h3 id="onboarding-zones-figees-et-zone-qui-defile">Zones figées et zone qui défile <span class="marque non">non implémenté</span></h3>
+  <p><code>.page</code> est en <code>display: flex; flex-direction: column; overflow: hidden</code>. Dans <code>.page__colonne</code>, l'entête, le portrait de l'avatar et la rangée des boutons sont des enfants directs ; seul <code>.page__defilant</code> porte <code>flex: 1; min-height: 0; overflow-y: auto</code>. <code>min-height: 0</code> est posé sur la colonne <em>et</em> sur la zone : sans lui, la colonne grandit avec son contenu et la rangée des boutons sort de l'écran.</p>
+  <p>L'exception est <code>EtapeLangueUnites</code> : dans <code>Onboarding</code>, il est rendu <strong>avant</strong> l'ouverture de <code>&lt;div className="page__defilant"&gt;</code>, au même niveau que le portrait de l'avatar. Son contenu est donc hors de la zone qui défile, et <code>overflow: hidden</code> de <code>.page</code> le coupe s'il dépasse. Les huit autres étapes sont rendues dans la zone.</p>
+  <p class="ancre">src/screens/Onboarding.tsx · src/themes/page.css</p>
+  <details><summary>Cas limites</summary>
+    <p>Changement d'étape : <code>useEffect</code> sur <code>etape</code> appelle <code>remonterEnHaut(defilant.current)</code>, qui pose <code>scrollTop = 0</code> — dans les deux sens, avancer comme reculer.</p>
+    <p>Le portrait de l'avatar n'est rendu que sur l'étape <code>avatar</code>, hors de la zone ; l'écran <code>EtapeAvatar</code> ne rend que les réglages.</p>
+  </details>
+
+  <h3 id="onboarding-langue-detectee">Langue détectée</h3>
+  <p>La langue affichée ne vient pas des réponses mais du lecteur.</p>
+  <pre><code>detecterLangue():
+  pour chaque demandee de navigator.languages:
+     base = demandee.toLowerCase().split('-')[0]
+     si base ∈ ['fr','en'] → la rendre
+  → 'fr'</code></pre>
+  <p><code>languesDuLecteur()</code> rend <code>navigator.languages ?? []</code>, et <code>[]</code> si <code>navigator</code> est absent — c'est le seul point du projet qui touche au navigateur pour cela. <code>useTextes()</code> appelle <code>detecterLangue()</code> et rend <code>TEXTES[langue]</code> ; il ne lit aucun état.</p>
+  <p class="ancre">src/i18n/useTextes.ts · src/plateforme/navigateur.ts · src/i18n/langues.ts</p>
+  <details><summary>Cas limites</summary>
+    <p><code>['fr-CA']</code> → <code>'fr'</code> : la comparaison porte sur la partie avant le tiret.</p>
+    <p><code>['de', 'en-GB']</code> → <code>'en'</code> : la première langue servie l'emporte, pas la première demandée.</p>
+    <p><code>[]</code> ou aucune langue servie → <code>'fr'</code> (<code>LANGUE_PAR_DEFAUT</code>).</p>
+    <p><code>useTextes</code> recalcule à chaque rendu ; il n'y a ni mémoïsation ni contexte.</p>
+  </details>
+
+  <h3 id="onboarding-rien-n-est-enregistre">Rien n'est enregistré <span class="marque non">non implémenté</span></h3>
+  <p><code>useParcours</code> tient <code>reponses</code> et <code>rang</code> dans deux <code>useState</code>, montés par <code>App</code>. Aucun appel à <code>localStorage</code>, <code>sessionStorage</code>, IndexedDB ni au réseau n'existe dans <code>src</code> : un rechargement rend <code>REPONSES_INITIALES</code> et <code>rang = 0</code>. Rien ne note que le parcours a été fait, et <code>App</code> ne rend que <code>Onboarding</code> — il n'y a pas d'autre écran vers lequel sortir.</p>
+  <p class="ancre">src/app/useParcours.ts · src/App.tsx</p>
+  <details><summary>Cas limites</summary>
+    <p>Bouton du dernier écran : <code>onClick={avancer}</code>, et <code>avancer</code> est borné à <code>visibles.length - 1</code> ; le clic ne change donc aucun état.</p>
+    <p>La V1 écrivait tout sous la clé <code>localStorage</code> <code>'glp1_app_companion_data'</code> ; la V2 n'a repris ni la clé ni le format.</p>
+  </details>
+
+  <h3 id="onboarding-theme-applique-a-la-page">Thème appliqué à la page</h3>
+  <p><code>classeDuTheme(id)</code> rend <code>`theme-${id}`</code>. <code>Onboarding</code> le pose sur son nœud racine : <code>className={`page ${classeDuTheme(reponses.theme)}`}</code>. Les feuilles <code>ciel.css</code> et <code>ciel-fonce.css</code> ne posent que des jetons sous cette classe ; <code>page.css</code> ne connaît aucune couleur.</p>
+  <p>Le contour du téléphone (<code>.phone-frame</code>) et sa barre du bas (<code>.phone-bar</code>) sont hors de <code>.page</code>, dans <code>App</code>, et leurs couleurs sont écrites en dur dans <code>index.css</code> : <code>#0f172a</code> pour la bordure, le fond du cadre et la barre, <code>#f1f5f9</code> pour la fenêtre autour.</p>
+  <p>Sur l'écran du thème, chaque cadre porte <em>en plus</em> sa propre classe : <code>`carte-theme ${classeDuTheme(id)}`</code>. Il montre donc son fond à lui même quand la page est habillée par l'autre thème.</p>
+  <p class="ancre">src/themes/themes.ts · src/screens/Onboarding.tsx · src/screens/onboarding/EtapeTheme.tsx · src/index.css</p>
+  <p><a href="spec-fonctionnelle.html#onboarding-theme">→ fonctionnelle</a></p>
+
+  <h3 id="onboarding-la-langue-repose-les-unites">La langue repose les unités</h3>
+  <p>Le choix de la langue passe par un geste dédié, <code>choisirLangue</code>, qui écrit deux champs dans une seule mise à jour d'état — jamais deux appels successifs, qui laisseraient un rendu où le système ne correspond pas à la langue.</p>
+  <pre><code>SYSTEME_PAR_LANGUE = { fr: 'metrique', en: 'imperial' }
+
+choisirLangue(langue):
+  reponses ← { ...reponses, langue, systeme: SYSTEME_PAR_LANGUE[langue] }</code></pre>
+  <p>Le choix du système, lui, passe par <code>repondre('systeme', …)</code> et ne touche pas à la langue. C'est un défaut, pas une contrainte : le dernier geste l'emporte.</p>
+  <p><code>UNITES_DU_SYSTEME</code> traduit ensuite le système en unités : <code>metrique → { poids: 'kg', taille: 'cm' }</code>, <code>imperial → { poids: 'lb', taille: 'in' }</code>. <code>textes.systemes</code> les affiche « cm · kg » et « inch · pound », identiques dans les deux dictionnaires.</p>
+  <p class="ancre">src/app/useParcours.ts · src/domaine/unites.ts</p>
+  <details><summary>Cas limites</summary>
+    <p>Régler « inch · pound » à la main puis retoucher « Français » : le système repasse à <code>'metrique'</code>.</p>
+    <p>Retoucher la langue déjà retenue réécrit quand même le système sur celui de cette langue.</p>
+  </details>
+  <p><a href="spec-fonctionnelle.html#onboarding-langue-unites">→ fonctionnelle</a></p>
+
+  <h3 id="onboarding-la-langue-est-une-maquette">La langue est une maquette <span class="marque non">non implémenté</span></h3>
+  <p><code>reponses.langue</code> est écrit et n'est lu par personne : <code>useTextes()</code> appelle <code>detecterLangue()</code> et ne reçoit aucun paramètre. Le dictionnaire anglais est pourtant complet — le type <code>Textes</code> exige les mêmes clés dans chaque langue, un oubli ne compilerait pas : questions des neuf étapes, libellés des groupes, unités, systèmes, noms de couleurs, coiffures, expressions, formes de visage, libellé du décompte, et <code>separateurDecimal</code> à <code>'.'</code>.</p>
+  <p>Le branchement tient en un point : faire lire <code>reponses.langue</code> par <code>useTextes</code>, avec repli sur <code>detecterLangue()</code>. Aucun écran n'écrit de texte en dur.</p>
+  <p class="ancre">src/i18n/useTextes.ts · src/i18n/textes.ts · src/screens/onboarding/EtapeLangueUnites.tsx</p>
+  <details><summary>Cas limites</summary>
+    <p>Les noms des langues (« Français », « English ») sont identiques dans les deux dictionnaires, par choix : une langue se nomme dans sa propre langue.</p>
+    <p>Les noms de spécialités ne sont pas dans le dictionnaire : ce sont des marques, elles vivent dans <code>domaine/traitements.ts</code>.</p>
+  </details>
+
+  <h3 id="onboarding-plafonds-du-poids-par-unite">Plafonds du poids par unité</h3>
+  <p><code>POIDS_MAX = { kg: 999, lb: 2000 }</code>. Ce ne sont pas deux écritures d'une même borne : 999 kg valent environ 2 202 lb.</p>
+  <p>Le plafond borne la liste des crans ; il n'y a plus de valeur à refuser puisqu'il n'y en a plus d'atteignable.</p>
+  <pre><code>max      = POIDS_MAX[unite]
+entieres = Array.from({ length: max }, (_, rang) =&gt; rang + 1)   // 1 … max</code></pre>
+  <p>La roue des entiers va donc de 1 à 999 en kilogrammes, de 1 à 2 000 en livres. La seconde roue a dix crans, 0 à 9, dans les deux unités.</p>
+  <p class="ancre">src/domaine/mesures.ts · src/screens/onboarding/SelecteurPoids.tsx</p>
+  <details><summary>Cas limites</summary>
+    <p>Zéro n'est pas un cran : la roue commence à 1.</p>
+    <p>Les mêmes bornes valent pour le poids actuel et le poids visé — un seul composant, un seul <code>POIDS_MAX</code>.</p>
+    <p>Une valeur hors bornes ne peut pas être produite par la roue, mais peut survivre à un changement d'unité (voir <a href="#onboarding-stockage-metrique-du-poids">Stockage métrique du poids</a>).</p>
+  </details>
+
+  <h3 id="onboarding-poids-garde-en-texte-avec-un-point">Poids gardé en texte avec un point</h3>
+  <p>Le poids est une chaîne, écrite avec un point, quelle que soit la langue. Le séparateur affiché vient du dictionnaire (<code>textes.separateurDecimal</code> : <code>','</code> en français, <code>'.'</code> en anglais) et n'entre jamais dans la valeur.</p>
+  <pre><code>SEPARATEUR_STOCKE = '.'
+poser(entiere, dixieme) → `${entiere}.${dixieme}`
+
+// relecture
+[entiereBrute = '', dixiemeBrut = '0'] = valeur.split(/[.,]/)
+entiere = Number(entiereBrute) || 1
+dixieme = Number(dixiemeBrut)  || 0</code></pre>
+  <p>Le second chiffre est toujours un dixième de l'unité. Ce qui est <em>affiché</em> à sa place dépend de l'unité : <code>PAS_AFFICHE = { kg: 100 }</code>, et 1 ailleurs — un cran s'écrit donc <code>dixieme × 100</code> en kilogrammes (0, 100 … 900) et <code>dixieme × 1</code> en livres (0 … 9). La valeur gardée, elle, ne change pas.</p>
+  <p class="ancre">src/screens/onboarding/SelecteurPoids.tsx · src/i18n/textes.ts</p>
+  <details><summary>Cas limites</summary>
+    <p><code>'96'</code> sans partie décimale : <code>dixiemeBrut</code> prend son défaut <code>'0'</code> → 96,0.</p>
+    <p><code>'96,3'</code> écrit avec une virgule est relu (le <code>split</code> accepte les deux signes), mais toute réécriture le rend avec un point.</p>
+    <p><code>'0.5'</code> : <code>Number('0') || 1</code> vaut 1 — l'entier zéro est remonté à 1, la roue n'ayant pas de cran zéro.</p>
+    <p>Une chaîne illisible donne 1,0 par le même repli, sans message.</p>
+  </details>
+  <div class="exemple"><p>Camille pose 96 et 0 : la valeur gardée est <code>'96.0'</code>, le champ affiche « 96 , 0 » et l'unité « kg » hors du champ. À 96,3, la valeur serait <code>'96.3'</code> — 96 kg et 300 g.</p></div>
+  <p><a href="spec-fonctionnelle.html#onboarding-poids">→ fonctionnelle</a></p>
+
+  <h3 id="onboarding-stockage-metrique-du-poids">Stockage métrique du poids <span class="marque non">non implémenté</span></h3>
+  <p>La règle du projet est le stockage métrique : le système ne décide que de l'unité d'affichage et de saisie. Elle est tenue pour la taille (<code>tailleAffichee</code> / <code>tailleEnCm</code>) et ne l'est pas pour le poids : <code>SelecteurPoids</code> écrit ce que la roue rend, sans conversion, et <code>reponses.poids</code> ne porte pas d'unité.</p>
+  <pre><code>onValeur(`${entiere}.${dixieme}`)   // aucune lecture de `unite`</code></pre>
+  <p>Conséquence : la valeur est dans l'unité qui était choisie au moment de la saisie, et changer de système après coup ne la touche pas — seule l'étiquette à côté du champ change.</p>
+  <p class="ancre">src/screens/onboarding/SelecteurPoids.tsx · src/domaine/unites.ts</p>
+  <details><summary>Cas limites</summary>
+    <p>212,0 lb saisis puis retour au métrique : le champ montre « 212,0 kg ».</p>
+    <p>1 500,0 lb saisis puis retour au métrique : la roue des kilos ne va qu'à 999, aucun cran ne correspond, la roue s'ouvre sans cran retenu ni centrage ; le champ continue d'afficher 1 500,0.</p>
+  </details>
+
+  <h3 id="onboarding-les-roues-se-nomment-a-qui-ecoute">Les roues se nomment à qui écoute</h3>
+  <p>Le champ fermé est un <code>&lt;button&gt;</code> portant <code>aria-haspopup="listbox"</code>, <code>aria-expanded={ouvert}</code> et <code>aria-label={question}</code>. Ouvert, chaque colonne est un <code>&lt;ul role="listbox"&gt;</code> et chaque cran un <code>&lt;button role="option" aria-selected&gt;</code>.</p>
+  <ul>
+    <li>Roue des entiers du poids : <code>aria-label</code> = la question de l'étape, « Quel est votre poids actuel ? » ou « Quel poids visez-vous ? ».</li>
+    <li>Seconde roue du poids : <code>aria-label={textes.fractions[unite]}</code> — « Centaines de grammes » pour <code>kg</code>, « Dixièmes de livre » pour <code>lb</code>.</li>
+    <li>Roue de <code>SelecteurNombre</code> : <code>aria-label</code> = la question passée, « Année de naissance » ou « Taille ».</li>
+  </ul>
+  <p><code>textes.fractions</code> porte aussi <code>cm</code> (« Millimètres ») et <code>in</code> (« Dixièmes de pouce »), non employés : la taille se choisit avec une seule roue.</p>
+  <p class="ancre">src/screens/onboarding/SelecteurPoids.tsx · src/screens/onboarding/SelecteurNombre.tsx · src/i18n/textes.ts</p>
+
+  <h3 id="onboarding-ouverture-et-fermeture-des-roues">Ouverture et fermeture des roues</h3>
+  <p><code>useSelecteurOuvert</code> tient l'état commun aux trois sélecteurs (poids, année de naissance, taille) : le booléen <code>ouvert</code>, la référence de l'enveloppe, et une référence par roue vers son cran retenu.</p>
+  <pre><code>clic sur le champ            → setOuvert(etait =&gt; !etait)
+à l'ouverture (useEffect)    → centrerDansSaListe(cran) pour chaque roue
+                               = cran.scrollIntoView({ block: 'center' })
+pendant l'ouverture          → surClicDehors(enveloppe, fermer) :
+                                 mousedown hors de l'enveloppe → fermer
+                                 keydown 'Escape'              → fermer
+clic sur un cran :
+  SelecteurNombre            → onValeur(cran) puis setOuvert(false)
+  SelecteurPoids, roue 1     → poser(cran, dixieme)        — ne ferme pas
+  SelecteurPoids, roue 2     → poser(entiere, cran) puis setOuvert(false)</code></pre>
+  <p>Les deux écouteurs sont posés sur <code>document</code> par <code>plateforme/navigateur</code> et retirés à la fermeture ou au démontage.</p>
+  <p class="ancre">src/screens/onboarding/useSelecteurOuvert.ts · src/plateforme/navigateur.ts · src/screens/onboarding/SelecteurPoids.tsx · src/screens/onboarding/SelecteurNombre.tsx</p>
+  <details><summary>Cas limites</summary>
+    <p>Clic sur le champ alors que le panneau est ouvert : le <code>mousedown</code> tombe dans l'enveloppe, donc <code>surClicDehors</code> ne ferme pas ; c'est le <code>onClick</code> du champ qui bascule à fermé.</p>
+    <p>Aucun cran ne correspond à la valeur : la référence reste nulle, <code>centrerDansSaListe</code> ne fait rien, la roue s'ouvre en haut.</p>
+    <p>Les flèches du clavier ne parcourent pas les crans : rien n'est branché dessus.</p>
+    <p><code>SelecteurNombre</code> affiche « — » quand sa valeur est <code>null</code> ; dans l'onboarding elle ne l'est jamais, l'année et la taille ayant un défaut.</p>
+  </details>
+
+  <h3 id="onboarding-poids-actuel-et-poids-vise-jamais-lies">Poids actuel et poids visé jamais liés</h3>
+  <p>Deux champs distincts de <code>Reponses</code>, <code>poids</code> et <code>poidsCible</code>, tous deux à <code>'95.0'</code> au départ. <code>EtapePoids</code> est le même composant pour les deux écrans, sans état propre : il reçoit une valeur et un <code>onPoids</code>, et le parcours les branche sur deux champs différents.</p>
+  <pre><code>etape 'poids'       → EtapePoids valeur={reponses.poids}      onPoids=repondre('poids', …)
+etape 'poids-cible' → EtapePoids valeur={reponses.poidsCible} onPoids=repondre('poidsCible', …)</code></pre>
+  <p>Mêmes bornes (<code>POIDS_MAX</code>), même unité (<code>UNITES_DU_SYSTEME[systeme].poids</code>), aucune borne tirée de l'autre : rien n'empêche un poids visé supérieur au poids actuel, et rien ne recopie l'un dans l'autre.</p>
+  <p class="ancre">src/screens/onboarding/reponses.ts · src/screens/onboarding/EtapePoids.tsx · src/screens/Onboarding.tsx</p>
+  <div class="exemple"><p>Camille pose 96,0 au poids actuel ; l'écran suivant s'ouvre sur 95,0, son défaut, et elle y pose 78,0. <code>poids = '96.0'</code>, <code>poidsCible = '78.0'</code>.</p></div>
+  <p><a href="spec-fonctionnelle.html#onboarding-poids-cible">→ fonctionnelle</a></p>
+
+  <h3 id="onboarding-les-reponses-du-traitement-se-defont-ensemble">Les réponses du traitement se défont ensemble</h3>
+  <p>Trois champs liés, deux gestes dédiés dans <code>useParcours</code>, chacun écrivant plusieurs champs en une seule mise à jour.</p>
+  <pre><code>repondreTraitementCommence(commence):
+  traitementCommence ← commence
+  formeTraitement    ← commence ? formeTraitement : null
+  traitement         ← commence ? traitement      : null
+
+repondreForme(forme):
+  formeTraitement ← forme
+  traitement      ← (forme === formeTraitement) ? traitement : null</code></pre>
+  <p>Sans cela, <code>peutValider('quel-traitement')</code> laisserait passer un couple incohérent : un comprimé retenu sous une forme passée à « injection ».</p>
+  <p class="ancre">src/app/useParcours.ts</p>
+  <details><summary>Cas limites</summary>
+    <p>Retoucher la forme déjà choisie : <code>forme === formeTraitement</code>, la spécialité est conservée.</p>
+    <p>Répondre « oui » après « non » ne restaure rien : les deux champs restent à <code>null</code>, et l'écran suivant redevient visible avec ses deux questions vides.</p>
+    <p>Répondre « non » retire aussi l'étape <code>quel-traitement</code> de <code>etapesVisibles</code> : le nettoyage et la disparition de l'écran sont deux mécanismes distincts.</p>
+  </details>
+
+  <h3 id="onboarding-catalogue-des-traitements">Catalogue des traitements</h3>
+  <p><code>TRAITEMENTS</code> est une liste ordonnée de <code>{ id, nom, forme }</code>, treize entrées : neuf en <code>injection</code>, quatre en <code>comprime</code>, chaque forme se terminant par « Autre ». <code>traitementsDeLaForme(forme)</code> filtre en conservant l'ordre de la liste.</p>
+  <table>
+    <thead><tr><th>Forme</th><th><code>id</code> → <code>nom</code>, dans l'ordre</th></tr></thead>
+    <tbody>
+      <tr><td><code>injection</code></td><td><code>ozempic</code> Ozempic · <code>wegovy-injection</code> Wegovy · <code>mounjaro</code> Mounjaro · <code>zepbound</code> Zepbound · <code>saxenda</code> Saxenda · <code>victoza</code> Victoza · <code>trulicity</code> Trulicity · <code>retatrutide</code> Rétatrutide · <code>autre-injection</code> Autre</td></tr>
+      <tr><td><code>comprime</code></td><td><code>rybelsus</code> Rybelsus · <code>wegovy-oral</code> Wegovy · <code>foundayo</code> Foundayo · <code>autre-comprime</code> Autre</td></tr>
+    </tbody>
+  </table>
+  <p>La réponse gardée est l'<code>id</code>, jamais le <code>nom</code> : deux entrées portent le nom « Wegovy » et ne se distinguent que par lui. Les noms ne passent pas par le dictionnaire — ce sont des marques — et <code>ChoixUnique</code> les affiche via <code>disponibles.find(c =&gt; c.id === id)?.nom ?? id</code>. Ni dose, ni date de début, ni posologie ne sont recueillies : <code>Reponses</code> n'a pas de champ pour cela.</p>
+  <p class="ancre">src/domaine/traitements.ts · src/screens/onboarding/EtapeQuelTraitement.tsx</p>
+  <details><summary>Cas limites</summary>
+    <p>Tant que <code>forme</code> est <code>null</code>, <code>disponibles</code> vaut <code>[]</code> et le groupe des spécialités n'est pas rendu du tout.</p>
+    <p>La V1 convertissait des libellés hérités en identifiants (« Wegovy (Comprimé) » → <code>wegovy-oral</code>) ; la V2 ne recueille que des identifiants et n'a pas de table de conversion.</p>
+  </details>
+  <div class="exemple"><p>Camille sous Ozempic : <code>formeTraitement = 'injection'</code>, <code>traitement = 'ozempic'</code>. Sa dose de 0,25 mg n'a nulle part où aller.</p></div>
+  <p><a href="spec-fonctionnelle.html#onboarding-quel-traitement">→ fonctionnelle</a></p>
+
+  <h3 id="onboarding-une-reponse-orpheline-prend-toute-la-largeur">Une réponse orpheline prend toute la largeur</h3>
+  <p><code>ChoixUnique</code> avec <code>enGrille</code> pose la classe <code>options--grille</code>. La règle est en CSS, sans compte dans le code.</p>
+  <pre><code>.options--grille { display: grid; grid-template-columns: 1fr 1fr; }
+.options--grille .option:last-child:nth-child(odd) { grid-column: span 2; }</code></pre>
+  <p>Le dernier bouton s'étend sur les deux colonnes s'il occupe un rang impair — c'est-à-dire si le compte est impair. Cinq groupes emploient <code>enGrille</code> : les spécialités (9 en injection, 4 en comprimé), les coiffures (6), les formes de visage (4) et les expressions (4). Seules les neuf injections déclenchent la règle, et « Autre » est le neuvième.</p>
+  <p class="ancre">src/themes/page.css · src/screens/onboarding/ChoixUnique.tsx</p>
+  <details><summary>Cas limites</summary>
+    <p>Quatre comprimés : le dernier est au rang 4, pair — deux colonnes pleines, pas d'étirement.</p>
+    <p>Un seul élément en grille s'étirerait sur les deux colonnes (rang 1, impair et dernier) ; aucun groupe n'est dans ce cas.</p>
+  </details>
+
+  <h3 id="onboarding-le-genre-amene-sa-coiffure">Le genre amène sa coiffure</h3>
+  <p><code>COIFFURE_DU_GENRE = { homme: 'court', femme: 'long', neutre: 'boucle' }</code>. Le choix du genre écrit deux champs de l'avatar dans un seul appel — deux écritures successives laisseraient un rendu intermédiaire.</p>
+  <pre><code>onChoix(genre) → onAvatar({ ...avatar, genre, coiffure: COIFFURE_DU_GENRE[genre] })</code></pre>
+  <p>Les sept autres réglages passent par <code>modifier(champ, valeur)</code>, qui n'écrit qu'un champ. Le groupe « Coiffure » est rendu deux réglages plus bas et écrase librement la valeur posée par le genre.</p>
+  <p class="ancre">src/domaine/avatar.ts · src/screens/onboarding/EtapeAvatar.tsx</p>
+  <details><summary>Cas limites</summary>
+    <p>Retoucher le genre déjà retenu repose quand même sa coiffure : une coiffure choisie à la main est perdue.</p>
+    <p>Le genre agit aussi sur le dessin, par la classe <code>avatar__vetement--{genre}</code> — bleu, rose ou violet ; ces couleurs sont du style, pas de la donnée.</p>
+  </details>
+  <div class="exemple"><p>Camille touche « Femme » : <code>genre = 'femme'</code> et <code>coiffure = 'long'</code> dans le même rendu.</p></div>
+  <p><a href="spec-fonctionnelle.html#onboarding-avatar">→ fonctionnelle</a></p>
+
+  <h3 id="onboarding-avatar-de-depart">Avatar de départ</h3>
+  <p><code>AVATAR_INITIAL</code> désigne ses couleurs par rang dans les tables, non par code écrit à la main.</p>
+  <pre><code>AVATAR_INITIAL = {
+  genre:          'neutre',
+  formeVisage:    'ovale',
+  couleurPeau:    COULEURS_PEAU[1]           // '#F7D1BA', « Beige »
+  couleurYeux:    COULEURS_YEUX[0]           // '#4682B4', « Bleu »
+  coiffure:       COIFFURE_DU_GENRE.neutre   // 'boucle'
+  couleurCheveux: COULEURS_CHEVEUX[1]        // '#4E3629', « Brun »
+  lunettes:       false,
+  expression:     'joyeuse',
+}</code></pre>
+  <p>Les trois tables, dans leur ordre d'affichage : peau, six teintes de <code>#FFE5D9</code> à <code>#43291F</code> ; yeux, cinq de <code>#4682B4</code> à <code>#708090</code> ; cheveux, six de <code>#E9C46A</code> à <code>#DFE2E6</code>. Chaque pastille porte <code>role="radio"</code> et <code>aria-label={textes.couleurs[couleur] ?? couleur}</code> : le nom vient du dictionnaire, indexé par le code hexadécimal.</p>
+  <p class="ancre">src/domaine/avatar.ts · src/screens/onboarding/EtapeAvatar.tsx · src/i18n/textes.ts</p>
+  <details><summary>Cas limites</summary>
+    <p>Une couleur absente du dictionnaire tomberait sur son code hexadécimal comme libellé parlé ; les dix-sept codes des trois tables y sont.</p>
+    <p><code>COIFFURE_DU_GENRE.neutre</code> et non <code>'boucle'</code> écrit en dur : changer la table change aussi l'avatar de départ.</p>
+  </details>
+
+  <h3 id="onboarding-les-couleurs-sont-des-donnees">Les couleurs sont des données</h3>
+  <p>Trois couleurs entrent dans <code>Reponses</code> : <code>couleurPeau</code>, <code>couleurYeux</code>, <code>couleurCheveux</code>, sous forme de codes hexadécimaux. Elles sont donc dans <code>domaine/avatar.ts</code>, en TypeScript, et non dans une feuille de style — c'est l'exception à la règle « aucune couleur en code ».</p>
+  <p>Les couleurs du dessin ne sont pas recueillies : elles vivent dans <code>themes/dessins.css</code> et ne dépendent que de la classe posée par le composant. <code>.avatar__pupille</code> à <code>#1a1a1a</code>, <code>.avatar__bouche</code> à <code>#d32f2f</code>, et le vêtement selon le genre — <code>--homme</code> <code>#3b82f6</code>, <code>--femme</code> <code>#ec4899</code>, <code>--neutre</code> <code>#8b5cf6</code>.</p>
+  <p class="ancre">src/domaine/avatar.ts · src/themes/dessins.css · src/components/Avatar.tsx</p>
+  <details><summary>Cas limites</summary>
+    <p>Le vêtement se dérive du genre à chaque rendu ; changer les trois codes de <code>dessins.css</code> ne changerait rien aux réponses.</p>
+    <p>La couleur des yeux stockée est celle de l'iris ; la pupille, elle, est fixe.</p>
+  </details>
+
+  <h3 id="onboarding-bornes-de-l-annee-de-naissance-et-de-la-taille">Bornes de l'année de naissance et de la taille</h3>
+  <p>Les bornes de l'année de naissance se déduisent de celles de l'âge, rapportées à une année passée par l'appelant : le fichier du domaine ne lit pas l'horloge.</p>
+  <pre><code>AGE_MIN = 1   AGE_MAX = 130
+bornesAnneeNaissance(anneeCourante) = {
+  min: anneeCourante − 130,
+  max: anneeCourante − 1,
+}
+TAILLE_BORNES = { cm: { min: 50, max: 300 }, in: { min: 20, max: 118 } }</code></pre>
+  <p><code>Onboarding</code> passe <code>new Date().getFullYear()</code> à <code>EtapeProfil</code>, qui passe les bornes à <code>SelecteurNombre</code>. Ce dernier construit ses crans par <code>Array.from({ length: max − min + 1 }, (_, rang) =&gt; min + rang)</code> : bornes incluses des deux côtés.</p>
+  <p>En 2026 : 1896 à 2025, soit 130 crans. Taille : 251 crans en centimètres, 99 en pouces. La fourchette en pouces est écrite en dur, elle n'est pas recalculée depuis celle en centimètres — 50 cm valent 20 in, 300 cm valent 118 in, aux arrondis près.</p>
+  <p class="ancre">src/domaine/mesures.ts · src/screens/onboarding/EtapeProfil.tsx · src/screens/onboarding/SelecteurNombre.tsx · src/screens/Onboarding.tsx</p>
+  <details><summary>Cas limites</summary>
+    <p>L'année en cours n'est pas un cran : le maximum est <code>anneeCourante − 1</code>.</p>
+    <p>Le défaut 1980 reste dans les bornes tant que l'année en cours est comprise entre 1981 et 2110.</p>
+    <p>La lecture de l'horloge se fait au rendu de <code>Onboarding</code>, pas au montage : un passage de minuit décalerait les bornes au rendu suivant.</p>
+  </details>
+
+  <h3 id="onboarding-taille-stockee-en-centimetres">Taille stockée en centimètres</h3>
+  <p><code>tailleCm</code> est toujours en centimètres. La conversion se fait aux deux bouts, à l'affichage et à la saisie, jamais au stockage ; ces deux fonctions sont les seuls endroits du projet où le pouce existe.</p>
+  <pre><code>CM_PAR_POUCE = 2.54
+
+tailleAffichee(cm, unite)  = unite === 'in' ? Math.round(cm / 2.54) : cm
+tailleEnCm(valeur, unite)  = unite === 'in' ? Math.round(valeur * 2.54) : valeur
+
+// dans EtapeProfil
+valeur   = tailleAffichee(tailleCm, uniteTaille)
+onValeur = (v) =&gt; onTailleCm(tailleEnCm(v, uniteTaille))</code></pre>
+  <p><code>Math.round</code> aux deux bouts : la roue n'affiche et n'accepte que des entiers.</p>
+  <p class="ancre">src/domaine/unites.ts · src/screens/onboarding/EtapeProfil.tsx</p>
+  <details><summary>Cas limites</summary>
+    <p>Aller-retour non idempotent : 166 cm s'affichent 65 in, et choisir ce cran de 65 in réécrit 165 cm. 165 et 168 cm, eux, reviennent inchangés.</p>
+    <p>Tant qu'aucun cran n'est touché, la valeur en centimètres ne bouge pas : ouvrir la roue en pouces ne réécrit rien.</p>
+    <p>La conversion est arithmétique, pas typée : rien n'empêche de passer une valeur hors bornes à <code>tailleEnCm</code>, seule la roue les impose.</p>
+  </details>
+  <div class="exemple"><p>Camille mesure 168 cm : en métrique la roue montre 168. En impérial elle montrerait <code>Math.round(168 / 2.54) = 66</code>, et choisir 66 réécrirait <code>Math.round(66 × 2.54) = 168</code>.</p></div>
+  <p><a href="spec-fonctionnelle.html#onboarding-profil">→ fonctionnelle</a></p>
+
+  <h3 id="onboarding-regle-du-mot-de-passe">Règle du mot de passe</h3>
+  <p>Une seule contrainte, la longueur, et elle vit dans le domaine.</p>
+  <pre><code>LONGUEUR_MOT_DE_PASSE = 8
+motDePasseValide(m) = m.length &gt;= 8</code></pre>
+  <p>Elle est lue à deux endroits, pour deux effets distincts :</p>
+  <ul>
+    <li><code>peutValider('profil', r)</code> = <code>r.motDePasse.length === 0 || motDePasseValide(r.motDePasse)</code> — le bouton d'entrée s'éteint, sauf sur un champ vide.</li>
+    <li><code>EtapeProfil</code> pose <code>regle--manquee</code> quand <code>motDePasse.length &gt; 0 &amp;&amp; motDePasse.length &lt; 8</code> — la ligne passe en italique et à <code>var(--accent)</code>.</li>
+  </ul>
+  <p>Le texte, « Huit caractères au moins. » (« At least eight characters. »), est rendu d'emblée sous le champ, à l'état ordinaire, et le champ le désigne par <code>aria-describedby="mot-de-passe-regle"</code>. Longueur en unités de code JavaScript : ni caractère, ni chiffre, ni casse imposés. Le prénom et l'adresse ne sont vérifiés nulle part ; le champ de l'adresse est un <code>type="email"</code> hors de tout <code>&lt;form&gt;</code>, donc jamais validé par le navigateur.</p>
+  <p class="ancre">src/domaine/compte.ts · src/screens/onboarding/parcours.ts · src/screens/onboarding/EtapeProfil.tsx · src/themes/page.css</p>
+  <details><summary>Cas limites</summary>
+    <p>0 signe : bouton allumé, règle à l'état ordinaire.</p>
+    <p>1 à 7 signes : bouton éteint, règle en italique à l'accent.</p>
+    <p>8 signes ou plus : bouton allumé, règle revenue à l'état ordinaire.</p>
+    <p>Effacer un mot de passe trop court jusqu'au vide rallume le bouton.</p>
+  </details>
+  <div class="exemple"><p>Camille tape neuf signes : <code>peutValider('profil')</code> rend <code>true</code>, la règle reste à l'état ordinaire, et le bouton au mot-symbole (nom parlé « Entre dans la galaxie GLP1LOW ») reste allumé — sans mener nulle part.</p></div>
+</section>

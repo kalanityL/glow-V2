@@ -1,0 +1,315 @@
+<section id="badges">
+  <h2>14. Les badges <a class="retour" href="#sommaire">↑ sommaire</a></h2>
+  <p>Ce chapitre donne les quatre évaluateurs de badge : les fenêtres de dates, les coefficients, les seuils et l'ordre dans lequel les paliers sont testés. Il donne aussi la mémoire des paliers observés qui décide d'une célébration, le tri des badges en trois sections, et la fabrique de la carte de partage.</p>
+
+  <h3 id="badges-entites">Entités</h3>
+  <p>Aucun badge n'est stocké. Les quatre définitions sont une constante du code, <code>ALL_BADGE_DEFINITIONS</code>, et le palier est recalculé à chaque lecture depuis les journaux. La seule chose persistée est le dernier palier observé de chaque badge, hors de la sauvegarde des données.</p>
+  <p><code>BadgeDefinition</code> — un objet du code, jamais sérialisé :</p>
+  <table>
+    <thead><tr><th>Champ</th><th>Type</th><th>Contenu</th></tr></thead>
+    <tbody>
+      <tr><td><code>id</code></td><td>string</td><td><code>athlete</code>, <code>lapin</code>, <code>kangourou</code>, <code>herisson</code> — clé du dessin et clé de la mémoire des paliers</td></tr>
+      <tr><td><code>title</code></td><td>string</td><td>Kangourou Musclé, Lapin des Fibres, Requin protéiné, Hérisson Marcheur</td></tr>
+      <tr><td><code>animalOrRole</code></td><td>string</td><td>égal à <code>title</code> pour les quatre badges</td></tr>
+      <tr><td><code>categoryName</code></td><td>string</td><td>Activité Physique, Repas et En-cas, Repas et En-cas, Nombre de Pas</td></tr>
+      <tr><td><code>categoryEnabled</code></td><td>(UserProfile) ⇒ boolean</td><td>prédicat d'activité du module</td></tr>
+      <tr><td><code>getTier</code></td><td>(AppData) ⇒ objet</td><td>l'évaluateur ; rend <code>tier</code>, <code>progressText</code>, <code>currentVal</code>, <code>targetVal</code>, <code>unit</code>, <code>description</code>, <code>nextTierDesc?</code></td></tr>
+      <tr><td><code>criteria</code></td><td>{ eveil, bronze, argent, or, notes? }</td><td>les quatre lignes de règles affichables, plus les notes de pied (le seul <code>athlete</code> en a deux)</td></tr>
+    </tbody>
+  </table>
+  <p>Les identifiants ne suivent pas les titres : <code>athlete</code> est le Kangourou Musclé, <code>kangourou</code> est le Requin protéiné. L'ordre du tableau — <code>athlete</code>, <code>lapin</code>, <code>kangourou</code>, <code>herisson</code> — est l'ordre d'affichage de toutes les listes de badges. Comme <code>animalOrRole</code> répète <code>title</code>, la seconde ligne des cartes, gardée par <code>title !== animalOrRole</code>, ne s'écrit pour aucun des quatre.</p>
+  <p>Les entités stockées que les évaluateurs lisent, et les seuls champs qu'ils lisent :</p>
+  <table>
+    <thead><tr><th>Entité</th><th>Champs lus</th><th>Unité canonique</th></tr></thead>
+    <tbody>
+      <tr><td><code>StepLog</code></td><td><code>date</code> (<code>YYYY-MM-DD</code>), <code>steps</code></td><td>pas ; total journalier, sans heure</td></tr>
+      <tr><td><code>SportLog</code></td><td><code>date</code>, <code>time</code> (<code>HH:MM</code>), <code>intensity</code> (<code>douce</code> | <code>moderee</code> | <code>intensive</code>), <code>duration</code></td><td>minutes ; <code>distance</code> et <code>sport</code> ne sont pas lus</td></tr>
+      <tr><td><code>SavedMealLog</code></td><td><code>date</code>, <code>time</code>, <code>protein</code>, <code>fiber</code></td><td>grammes</td></tr>
+      <tr><td><code>WeightLog</code></td><td><code>weight</code>, <code>isStartingWeight</code></td><td>kilogrammes</td></tr>
+      <tr><td><code>UserProfile</code></td><td><code>foodTrackingEnabled</code>, <code>stepsTrackingEnabled</code>, <code>sportTrackingEnabled</code> (obligatoires) ; <code>mysteryBadgeHidden</code>, <code>foodModuleHidden</code>, <code>stepsModuleHidden</code>, <code>sportModuleHidden</code> (facultatifs)</td><td>booléens</td></tr>
+    </tbody>
+  </table>
+  <p>Persisté : la clé <code>glp1_badge_tiers_connus</code> du stockage local, un objet JSON <code>{ identifiant de badge : palier }</code>, écrit et relu par <code>getItem</code> / <code>setItem</code>, distinct de la sauvegarde <code>glp1_app_companion_data</code>.</p>
+  <p>Dérivés, donc non stockés : le palier, le texte de progression, <code>currentVal</code> / <code>targetVal</code> / <code>unit</code>, l'objectif quotidien de protéines, et le classement en sections. Tout est recalculé à chaque rendu.</p>
+  <p class="ancre">src/utils/badgeSystem.ts, src/utils/badgeCelebration.ts, src/types.ts</p>
+
+  <h3 id="badges-ordre-des-paliers-de-badge">Ordre des paliers de badge</h3>
+  <p>Les cinq paliers sont une liste ordonnée unique ; le type <code>BadgeTier</code> en dérive et le rang est l'index dans cette liste. Aucun autre endroit du code ne réécrit cet ordre.</p>
+  <pre><code>BADGE_TIERS_ASC = ['aucun', 'eveil', 'bronze', 'argent', 'or']
+badgeTierRank(t) = BADGE_TIERS_ASC.indexOf(t)      // 0 … 4
+isBadgeTier(v)   = typeof v === 'string' && BADGE_TIERS_ASC.includes(v)
+BADGE_TIER_LABELS = { aucun:'Aucun', eveil:'Éveil', bronze:'Bronze',
+                      argent:'Argent', or:'Or' }</code></pre>
+  <p>Deux paliers se comparent par leurs rangs. Les libellés servent à tout affichage : la pastille de la page écrit <code>BADGE_TIER_LABELS[tier].toUpperCase()</code>, ce qui donne « ÉVEIL » accentué. La bannière du dessin écrit le même libellé, sauf au palier <code>aucun</code> où elle écrit « NIVEAU ».</p>
+  <p class="ancre">src/utils/badgeSystem.ts, src/versions/mixte/components/badge/BadgeFrame.tsx</p>
+  <details><summary>Cas limites</summary>
+    <p>Valeur relue du stockage hors liste (<code>"bronze "</code>, une version antérieure) : <code>isBadgeTier</code> est faux, l'entrée est écartée à la lecture, le badge redevient « jamais observé ».</p>
+    <p><code>badgeTierRank</code> d'une valeur hors liste rendrait −1 ; le filtre de lecture fait qu'aucun appel ne l'atteint.</p>
+    <p>Le palier <code>aucun</code> a un libellé (« Aucun ») mais aucun écran ne l'emploie : un badge à <code>aucun</code> porte la pastille « À débloquer » ou « Inactif ».</p>
+  </details>
+
+  <h3 id="badges-fenetres-et-donnees-comptees-par-les-badges">Fenêtres et données comptées par les badges</h3>
+  <p>Une fenêtre est une liste de N chaînes <code>YYYY-MM-DD</code> construite à partir de l'instant courant, aujourd'hui en tête, en heure locale de l'appareil. L'appartenance d'une entrée à la fenêtre est un test d'égalité de chaînes sur sa date.</p>
+  <pre><code>getPastDates(N) :
+  now = new Date()
+  pour i de 0 à N−1 :
+    d = copie de now ; d.setDate(now.getDate() − i)
+    dates[i] = getLocalDateStr(d)        // getFullYear/getMonth/getDate, pas UTC
+  → [aujourd'hui, hier, …, aujourd'hui − (N−1)]
+
+eveilDates() = getPastDates(2) = [aujourd'hui, hier]
+
+hasOccurred(date, time?, now = new Date()) :
+  today = getLocalDateStr(now)
+  date &lt; today → true
+  date &gt; today → false
+  pas de time  → true                    // StepLog : journée entière
+  sinon        → time &lt;= getLocalTimeStr(now)   // comparaison de chaînes HH:MM</code></pre>
+  <p>Trois largeurs sont employées : 7 jours par les quatre badges, 10 jours par le seul Kangourou Musclé, 2 jours pour l'éveil de chacun. Chaque évaluateur filtre d'abord son journal par <code>hasOccurred</code> — sur <code>date</code> et <code>time</code> pour les repas et les séances, sur <code>date</code> seule pour les pas —, puis somme par date. Les lignes supprimées ne sont pas à filtrer : la suppression est physique depuis la conversion <code>purgeDeleted</code>.</p>
+  <p class="ancre">src/utils/badgeSystem.ts, src/shared/date/date.local.ts, src/shared/model/purgeDeleted.ts</p>
+  <details><summary>Cas limites</summary>
+    <p>Repas daté d'aujourd'hui à 20:00, il est 14:00 : <code>hasOccurred</code> est faux, le repas ne compte ni dans la fenêtre de 7 jours ni dans l'éveil, et comptera à 20:00.</p>
+    <p>Pas datés d'aujourd'hui : <code>StepLog</code> n'a pas de champ <code>time</code>, la journée en cours compte en entier dès sa saisie.</p>
+    <p>Entrée datée d'un jour futur : hors de la fenêtre <em>et</em> écartée par <code>hasOccurred</code> — deux barrières indépendantes.</p>
+    <p>Plusieurs entrées la même date : additionnées avant la comparaison au seuil ; la journée compte une fois.</p>
+    <p>Fenêtre à cheval sur un mois ou une année : <code>setDate</code> avec un nombre négatif reporte sur le mois précédent.</p>
+    <p>Changement d'heure : les dates sont construites champ par champ en heure locale, jamais en UTC ; une saisie de 00 h 30 reste au jour local.</p>
+    <p>L'instant courant est relu à chaque appel : une page laissée ouverte au passage de minuit garde ses fenêtres jusqu'au prochain rendu.</p>
+  </details>
+  <div class="exemple"><p>Le 13 septembre 2026, la fenêtre de Camille sur 7 jours est [2026-09-13 … 2026-09-07], celle sur 10 jours [2026-09-13 … 2026-09-04], celle de l'éveil [2026-09-13, 2026-09-12].</p></div>
+
+  <h3 id="badges-badge-kangourou-muscle-activite-physique">Badge Kangourou Musclé (activité physique)</h3>
+  <p>Seul badge à cumuler un volume de minutes au lieu de compter des journées. Chaque séance est convertie en deux équivalents, l'un intensif, l'autre modéré, par un coefficient qui dépend de son intensité.</p>
+  <pre><code>séances = sportLogs filtrées par hasOccurred(date, time)
+past7 = getPastDates(7) ; past10 = getPastDates(10)
+
+pour chaque séance :
+  dur = duration || 0                                    // minutes
+  coeffIntensif = intensive ? 1.0 : moderee ? 0.67 : 0.33
+  coeffModere   = intensive ? 1.5 : moderee ? 1.0  : 0.5
+  si date ∈ past7  : intensif7  += dur × coeffIntensif
+  si date ∈ past10 : intensif10 += dur × coeffIntensif
+                     modere10   += dur × coeffModere
+
+ordre des tests, le premier vrai l'emporte :
+  intensif7  &gt;= 180                        → or
+  intensif10 &gt;= 180                        → argent
+  modere10   &gt;= 120                        → bronze
+  une séance dont la date ∈ eveilDates()   → eveil
+  sinon                                    → aucun</code></pre>
+  <p>Aucun palier n'exige un nombre de journées : une seule séance suffit si son volume atteint le seuil. L'éveil ne regarde ni la durée ni l'intensité, seulement l'existence d'une séance aujourd'hui ou hier. Le coefficient <code>0,33</code> / <code>0,5</code> est la branche par défaut : toute intensité qui n'est ni <code>intensive</code> ni <code>moderee</code> y tombe.</p>
+  <p>Textes de progression, par palier : or <code>{arrondi(intensif7/60)}h d'équivalent intensif/7j</code> ; argent <code>{arrondi(intensif10/60)}h intensif/10j</code> ; bronze <code>{arrondi(modere10)} min modérées/10j</code> ; éveil et aucun <code>{arrondi(modere10)} / 120 min modérées</code>. <code>unit</code> vaut <code>min</code> ; <code>targetVal</code> vaut 180 aux deux premiers paliers, 120 aux trois autres. <code>currentVal</code> vaut <code>arrondi(intensif7)</code> à l'or <em>et à l'argent</em>, alors que l'argent se décide sur <code>intensif10</code> : la valeur affichable est inférieure à sa cible au palier argent. <span class="marque">arbitrage non validé</span></p>
+  <p class="ancre">src/utils/badgeSystem.ts</p>
+  <details><summary>Cas limites</summary>
+    <p>Séance sans <code>duration</code> : <code>dur = 0</code>, elle n'ajoute aucun volume mais suffit à l'éveil si sa date est aujourd'hui ou hier.</p>
+    <p>Séance de 180 min intensive enregistrée aujourd'hui : <code>intensif7 = 180</code>, or immédiat, sans aucune autre séance.</p>
+    <p><code>distance</code> renseignée : sans effet ici ; seules <code>duration</code> et <code>intensity</code> sont lues.</p>
+    <p>Séance datée d'aujourd'hui à une heure future : écartée du volume et de l'éveil.</p>
+    <p>Le seuil est atteint exactement (180,00) : la comparaison est <code>&gt;=</code>, le palier tombe.</p>
+    <p>Une séance des jours 8 à 10 alimente <code>intensif10</code> et <code>modere10</code> mais jamais <code>intensif7</code>.</p>
+    <p>Les cumuls sont des flottants et ne sont jamais arrondis avant la comparaison ; l'arrondi n'intervient que dans le texte affiché.</p>
+  </details>
+  <div class="exemple"><p>Camille a trois séances dans ses dix derniers jours : 45 min douce, 60 min modérée, 30 min intensive. <code>modere10</code> = 45×0,5 + 60×1 + 30×1,5 = 22,5 + 60 + 45 = 127,5 ≥ 120 → bronze. <code>intensif10</code> = 45×0,33 + 60×0,67 + 30×1 = 14,85 + 40,2 + 30 = 85,05, loin des 180 de l'argent. Progression affichée : « 128 min modérées/10j ».</p></div>
+
+  <h3 id="badges-badge-lapin-des-fibres">Badge Lapin des Fibres</h3>
+  <p>Compte les journées réussies de la fenêtre de 7 jours. Une journée est réussie quand la somme des fibres des repas déjà survenus de cette date atteint 25 g.</p>
+  <pre><code>repas = savedMeals filtrés par hasOccurred(date, time)
+joursReussis = nombre de dates de getPastDates(7) telles que
+               Σ (fiber || 0) des repas de cette date &gt;= 25
+
+eveilAtteint = une des deux dates de eveilDates() vérifie le même total &gt;= 25
+
+joursReussis &gt;= 7 → or
+joursReussis &gt;= 5 → argent
+joursReussis &gt;= 4 → bronze
+eveilAtteint      → eveil
+sinon             → aucun</code></pre>
+  <p>Module requis : <code>foodTrackingEnabled === true</code>. Progression <code>{joursReussis}/7j à ≥ 25g de fibres</code> ; <code>currentVal = joursReussis</code>, <code>targetVal = 7</code>, <code>unit = 'jours'</code>.</p>
+  <p class="ancre">src/utils/badgeSystem.ts</p>
+  <details><summary>Cas limites</summary>
+    <p>6 journées réussies : le palier reste argent, il n'y a rien entre 5 et 7.</p>
+    <p>Repas sans <code>fiber</code> : compté pour 0 g, il ne fait pas échouer la somme.</p>
+    <p>L'éveil est recalculé indépendamment du compte ; comme aujourd'hui et hier appartiennent aussi à la fenêtre de 7 jours, <code>eveilAtteint</code> implique <code>joursReussis &gt;= 1</code>.</p>
+    <p>25,0 g exactement : seuil inclusif, la journée compte.</p>
+    <p>Aucun repas enregistré : 0/7 et pas d'éveil → <code>aucun</code>.</p>
+  </details>
+  <div class="exemple"><p>Camille atteint 25 g de fibres les 8, 9, 11 et 13 septembre : 4 journées sur 7 → bronze, « 4/7j à ≥ 25g de fibres ».</p></div>
+
+  <h3 id="badges-badge-requin-proteine">Badge Requin protéiné</h3>
+  <p>Même comptage de journées que le Lapin des Fibres, mais le seuil quotidien est calculé sur le poids et non écrit en dur.</p>
+  <pre><code>proteinDailyTarget(appData) :
+  historique = appData.weightHistory || []
+  poidsDepart = poids de la ligne portant isStartingWeight, sinon 70
+  poidsActuel = historique.length &gt; 0
+                ? historique[historique.length − 1].weight   // DERNIÈRE LIGNE DU TABLEAU
+                : poidsDepart
+  → Math.round(poidsActuel × 1.5)                            // grammes
+
+repas = savedMeals filtrés par hasOccurred(date, time)
+joursReussis = nombre de dates de getPastDates(7) telles que
+               Σ (protein || 0) des repas de cette date &gt;= objectif
+
+joursReussis &gt;= 7 → or ; &gt;= 5 → argent ; &gt;= 4 → bronze
+sinon éveil si une des deux dates de eveilDates() atteint l'objectif
+sinon aucun</code></pre>
+  <p>« Dernière ligne » est le dernier rang du tableau, pas la pesée la plus récente par date. <code>addWeighIn</code> retrie l'historique par date croissante à chaque ajout, et la conversion qui insère la pesée de départ le retrie par date et heure : les deux coïncident donc en régime courant. <code>updateWeighIn</code>, lui, ne retrie pas — une pesée déplacée dans le temps garde son rang, et le tableau cesse de suivre les dates. Les badges lisent <code>appData.weightHistory</code> brut, pas la version retriée pour l'affichage. Le repli 70 kg n'est atteignable que sur un historique vide — dans ce cas <code>getStartingWeight</code> ne trouve rien non plus et rend déjà 70.</p>
+  <p>Progression <code>{joursReussis}/7j à ≥ {objectif}g de protéines</code>, l'objectif passé par <code>formatNumber</code>, qui groupe les milliers par une espace insécable. La description écrit <code>Objectif personnalisé : {objectif}g/jour (poids {poidsActuel.toFixed(1)}kg × 1.5g).</code> La page des badges réécrit les quatre lignes de règles de ce badge avec le chiffre réel, à la place de la formule <a href="spec-fonctionnelle.html#badges-page-badges">→ fonctionnelle</a>.</p>
+  <p class="ancre">src/utils/badgeSystem.ts, src/shared/model/startingWeighIn.ts, src/versions/mixte/components/BadgesPage.tsx</p>
+  <details><summary>Cas limites</summary>
+    <p>Historique vide : objectif = arrondi(70 × 1,5) = 105 g.</p>
+    <p>Pesée modifiée pour une date antérieure : <code>updateWeighIn</code> ne retrie pas, la ligne garde son rang ; si c'était la dernière, c'est elle qui continue de fixer l'objectif malgré sa nouvelle date.</p>
+    <p>Un demi-gramme pile : <code>Math.round</code> arrondit vers le haut (85,0 kg → 127,5 → 128 g).</p>
+    <p>Une nouvelle pesée change l'objectif rétroactivement : les sept journées de la fenêtre sont réévaluées contre le nouveau seuil, et le palier peut baisser.</p>
+    <p>Repas sans <code>protein</code> : compté pour 0 g.</p>
+  </details>
+  <div class="exemple"><p>Dernière pesée de Camille : 85,9 kg. Objectif = arrondi(85,9 × 1,5) = arrondi(128,85) = 129 g/jour. Les règles affichées deviennent « 129g protéines atteint 4 fois /7j » pour le bronze.</p></div>
+
+  <h3 id="badges-badge-herisson-marcheur">Badge Hérisson Marcheur</h3>
+  <p>Compte les journées à 8 000 pas de la fenêtre de 7 jours, avec des seuils plus bas que les deux badges de repas.</p>
+  <pre><code>pas = stepLogs filtrés par hasOccurred(date)        // sans heure : journée entière
+joursReussis = nombre de dates de getPastDates(7) telles que
+               Σ (steps || 0) des lignes de cette date &gt;= 8000
+
+joursReussis &gt;= 5 → or
+joursReussis &gt;= 4 → argent
+joursReussis &gt;= 3 → bronze
+éveil si une des deux dates de eveilDates() atteint 8000
+sinon aucun</code></pre>
+  <p>Module requis : <code>stepsTrackingEnabled !== false</code>. Progression <code>{joursReussis}/7j à ≥ 8 000 pas</code>, l'espace des milliers étant une espace insécable dans le code. <code>currentVal = joursReussis</code>, <code>targetVal = 5</code> — la cible est ici le seuil de l'or, pas la largeur de la fenêtre comme pour les deux badges de repas. <code>unit = 'jours'</code>.</p>
+  <p class="ancre">src/utils/badgeSystem.ts</p>
+  <details><summary>Cas limites</summary>
+    <p>Plusieurs relevés de pas la même date : additionnés, la journée compte une fois.</p>
+    <p>Ligne marquée <code>isSimulated</code> : lue comme les autres, le champ n'est pas testé.</p>
+    <p>Relevé daté d'aujourd'hui : compté immédiatement, même à 8 h du matin — <code>StepLog</code> n'a pas d'heure.</p>
+    <p>Relevé daté de demain : écarté par <code>hasOccurred</code> et hors fenêtre.</p>
+    <p>7 journées réussies : le palier reste or, il n'y a rien au-dessus.</p>
+  </details>
+  <div class="exemple"><p>Camille dépasse 8 000 pas quatre jours sur les sept derniers : argent, « 4/7j à ≥ 8 000 pas », l'objectif suivant étant l'or à cinq journées.</p></div>
+
+  <h3 id="badges-sections-de-la-page-badges">Sections de la page Badges</h3>
+  <p>Les quatre définitions sont réparties en trois listes disjointes, calculées à chaque rendu de la page.</p>
+  <pre><code>actifs   = ALL_BADGE_DEFINITIONS filtrées par categoryEnabled(profile)
+debloques = actifs, évalués, dont tier !== 'aucun'
+aDebloquer = actifs, évalués, dont tier === 'aucun'
+aActiver  = ALL_BADGE_DEFINITIONS filtrées par
+            !categoryEnabled(profile) && !isModuleHidden(profile, onglet(def))
+
+onglet(def) : 'Nombre de Pas' → 'steps'
+              'Activité Physique' → 'sports'
+              'Repas et En-cas' → 'meals'
+
+categoryEnabled : sportTrackingEnabled !== false   (Kangourou Musclé)
+                  foodTrackingEnabled === true     (Lapin, Requin)
+                  stepsTrackingEnabled !== false   (Hérisson)
+
+isModuleHidden(profile, tab) = !isModuleOn(profile, tab) && Boolean(profile[drapeauMasquage])
+  drapeaux : steps → stepsModuleHidden, sports → sportModuleHidden, meals → foodModuleHidden
+  isModuleOn rend false pour ces trois onglets quand le drapeau d'activation est absent
+  (seuls 'injection' et 'symptoms' sont allumés par défaut)</code></pre>
+  <p>Les deux prédicats d'activité ne sont pas symétriques : les pas et l'activité physique sont actifs tant qu'ils ne valent pas exactement <code>false</code>, les repas exigent exactement <code>true</code>. Le profil par défaut écrit les trois à <code>false</code> ; l'écart ne joue donc que sur une sauvegarde où le champ manque.</p>
+  <p>Rendu : une section n'est écrite que si sa liste n'est pas vide ; son titre passe au singulier quand la liste compte un seul badge (<code>length &lt;= 1</code>), et porte toujours le compte entre parenthèses. L'ordre à l'intérieur d'une section est celui de <code>ALL_BADGE_DEFINITIONS</code>. Les deux badges de repas partagent un module : ils changent de section ensemble. <a href="spec-fonctionnelle.html#badges-page-badges">→ fonctionnelle</a></p>
+  <p>Deux états d'ouverture, chacun une chaîne portant l'identifiant du badge ouvert ou <code>null</code> : <code>openRules</code> et <code>openLarge</code>. Ouvrir l'un sur une carte referme celui d'une autre carte ; recliquer la même cible la referme.</p>
+  <p class="ancre">src/versions/mixte/components/BadgesPage.tsx, src/versions/mixte/app/navigation.ts</p>
+  <details><summary>Cas limites</summary>
+    <p><code>getTier</code> est appelé deux fois par badge actif à chaque rendu — une fois pour la liste des débloqués, une fois pour celle des à débloquer — sans mémorisation. La home, elle, mémorise sur <code>[appData, profile]</code>.</p>
+    <p>Module allumé et drapeau de masquage à <code>true</code> : <code>isModuleHidden</code> rend faux, le badge reste dans les deux premières sections.</p>
+    <p>Module éteint et masqué : le badge disparaît des trois sections.</p>
+    <p>Trois modules éteints et masqués : aucune section n'est écrite ; seule la carte du curseur du badge mystère subsiste.</p>
+    <p>La carte du curseur n'existe que si la page reçoit <code>onSaveProfile</code> ; sans elle, la page est en lecture seule.</p>
+  </details>
+  <div class="exemple"><p>Camille a ses trois modules allumés et un seul badge gagné : « Badge Débloqué (1) » au singulier, puis le curseur, puis « Badges à débloquer (3) » ; aucune section « à activer ».</p></div>
+
+  <h3 id="badges-badge-mystere">Badge mystère</h3>
+  <p>Le réglage vit dans le profil, sous un champ facultatif écrit au négatif ; l'affichage retourne la polarité en un seul endroit.</p>
+  <pre><code>// page Badges
+badgeMystereAffiche = !profile.mysteryBadgeHidden      // absent → affiché
+clic : onSaveProfile({ ...profile, mysteryBadgeHidden: badgeMystereAffiche })
+
+// bloc Salut
+badges débloqués &gt; 0        → le pavé des badges gagnés
+sinon profile.mysteryBadgeHidden → rien
+sinon                        → BadgeIcon id="placeholder" tier="argent"</code></pre>
+  <p>Le drapeau écrit au clic est l'état d'affichage <em>courant</em>, c'est-à-dire la négation du nouvel état : la double négation est écrite une fois. Le nom du champ est resté au négatif, son renommage étant différé. <span class="marque">arbitrage non validé</span></p>
+  <p>L'état est rendu trois fois sur la carte : la pastille (<code>bg-sky-500</code> ou <code>bg-slate-300</code>), le mot <code>Oui</code> ou <code>Non</code>, la position du bouton (<code>justify-end</code> ou <code>justify-start</code>), avec <code>role="switch"</code> et <code>aria-checked</code>. Le curseur ne concerne que le faux badge : les badges gagnés ne se masquent pas. <a href="spec-fonctionnelle.html#badges-pave-de-badges-du-bloc-salut">→ fonctionnelle</a></p>
+  <p class="ancre">src/versions/mixte/components/BadgesPage.tsx, src/versions/mixte/components/SalutBlock.tsx, src/types.ts</p>
+  <details><summary>Cas limites</summary>
+    <p>Profil sans le champ : <code>undefined</code> est faux, le badge « ? » s'affiche — le test ne doit jamais s'écrire <code>!== false</code>, qui masquerait par défaut.</p>
+    <p>Un badge débloqué : le « ? » disparaît quel que soit le drapeau, le pavé des gagnés prend sa place.</p>
+    <p>Le « ? » porte le palier <code>argent</code>, donc en couleurs pleines : la désaturation du palier <code>aucun</code> ne s'y applique pas.</p>
+  </details>
+
+  <h3 id="badges-tailles-des-dessins-de-badge">Tailles des dessins de badge</h3>
+  <p><code>BadgeIcon</code> résout une taille en pixels, la pose sur le conteneur et la passe au <code>&lt;svg&gt;</code>, dont le <code>viewBox</code> est fixe.</p>
+  <pre><code>pixelSizes = { xs: 28, sm: 36, md: 56, lg: 80, xl: 112 }   // size par défaut : 'md'
+px = sizePxOverride || pixelSizes[size]
+conteneur : width = height = px
+svg : width = height = px, viewBox = "0 0 120 120"
+classe du svg : tier === 'aucun' ? 'drop-shadow-md saturate-[.65]' : 'drop-shadow-md'</code></pre>
+  <p>La désaturation à 65 % du palier <code>aucun</code> est appliquée à un seul endroit, sur le <code>&lt;svg&gt;</code> ; le conteneur ne la reprend pas. Emplois : <code>lg</code> (80) sur les cartes des trois sections, <code>xl</code> (112) pour le badge en grand, <code>sm</code> (36) sur le pavé du bloc Salut. Deux surcharges par <code>sizePxOverride</code> : 52 px pour un badge seul sur la home standard et 36 px à partir de deux, 460 px pour le dessin sérialisé de la carte de partage. Sur la home compacte, la surcharge est nulle et la taille vient de classes utilitaires — <code>clamp(30px, 11.2cqw, 51px)</code> à un badge, <code>clamp(26px, 11cqw, 50px)</code> à deux, <code>clamp(20px, 7.5cqw, 34px)</code> au-delà, le <code>&lt;svg&gt;</code> étant forcé à 100 % du conteneur.</p>
+  <p>Le dessin est choisi sur l'identifiant : <code>lapin</code>, <code>athlete</code> (kangourou), <code>kangourou</code> et <code>requin</code> (requin), <code>herisson</code>, <code>placeholder</code> (cocarde au point d'interrogation) ; tout autre identifiant rend l'emoji 🏆.</p>
+  <p class="ancre">src/versions/mixte/components/BadgeIcon.tsx, src/versions/mixte/components/badge/BadgeFrame.tsx, src/versions/mixte/components/SalutBlock.tsx</p>
+  <details><summary>Cas limites</summary>
+    <p><code>sizePxOverride = 0</code> : l'opérateur est <code>||</code> et non <code>??</code>, la table reprend la main.</p>
+    <p>Les classes utilitaires de la home compacte s'appliquent par-dessus les attributs <code>width</code> / <code>height</code> du <code>&lt;svg&gt;</code> ; elles portent <code>!</code> pour l'emporter.</p>
+    <p>Le pavé n'est dimensionné que pour un à quatre badges : le catalogue n'en définit que quatre.</p>
+    <p>Le <code>&lt;svg&gt;</code> sérialisé pour la carte de partage sort du DOM : les classes de thème ne s'y appliquent pas, seules les couleurs écrites en attribut sont peintes.</p>
+  </details>
+
+  <h3 id="badges-celebration-d-un-badge">Célébration d'un badge</h3>
+  <p>Une passe pure compare les paliers du moment à ceux qui ont été observés, et rend à la fois ce qu'il y a à fêter et le nouvel état à retenir.</p>
+  <pre><code>evaluerCelebrations(appData, connus, definitions = ALL_BADGE_DEFINITIONS) :
+  suivants = { ...(connus ?? {}) }        // on PART de l'état connu
+  aFeter = []
+  pour chaque def :
+    si !def.categoryEnabled(appData.profile) : continuer   // ni évaluée ni réécrite
+    tier = def.getTier(appData).tier
+    connu = connus?.[def.id]
+    suivants[def.id] = tier
+    si connu === undefined : continuer                     // découverte, pas progression
+    si badgeTierRank(tier) &lt;= badgeTierRank(connu) : continuer
+    aFeter.push({ badge: def, tier, progressText, nextTierDesc })
+  → { connus: suivants, aFeter }</code></pre>
+  <p>Mémoire : clé <code>glp1_badge_tiers_connus</code> du stockage local, en JSON, distincte de la sauvegarde des données. <code>lireBadgeTiersConnus</code> rend <code>null</code> si la clé est absente, si la valeur n'est pas un objet ou si c'est un tableau ; sinon elle ne garde que les entrées dont la valeur passe <code>isBadgeTier</code>.</p>
+  <p>Câblage : un effet dépendant de <code>appData</code> lit l'état connu dans une <code>ref</code> de session, ou dans le stockage au premier passage ; il réécrit ensuite la <code>ref</code> et le stockage à chaque passe, et empile les montées dans la file du bloc de célébration au lieu de la remplacer. <a href="spec-fonctionnelle.html#badges-celebration-d-un-palier">→ fonctionnelle</a></p>
+  <p class="ancre">src/utils/badgeCelebration.ts, src/versions/mixte/App.tsx</p>
+  <details><summary>Cas limites</summary>
+    <p>Première ouverture, historique importé, jeu de démonstration : <code>connus</code> est <code>null</code>, chaque <code>connu</code> vaut <code>undefined</code>, rien n'est fêté et les paliers sont retenus.</p>
+    <p>Module allumé pour la première fois : ses badges sont découverts, donc silencieux.</p>
+    <p>Palier qui baisse (les journées sortent de la fenêtre) : <code>suivants</code> enregistre la baisse, <code>aFeter</code> reste vide ; le remonter dépasse alors le palier connu et se fête.</p>
+    <p>Module éteint : la définition est sautée, son entrée survit dans <code>suivants</code> parce que la passe part de <code>connus</code>. Rallumé au même palier, les rangs sont égaux, rien ne se fête ; rallumé plus haut, la montée se fête une fois.</p>
+    <p>Stockage effacé ou autre appareil : la lecture rend <code>null</code>, la passe suivante est muette et réinscrit les quatre paliers.</p>
+    <p>Valeur abîmée sous la clé : écartée à la lecture, le badge redevient « jamais observé » et sa prochaine passe est muette.</p>
+    <p><code>setItem</code> échoue silencieusement (navigation privée, quota) : la <code>ref</code> de session tient la comparaison jusqu'au rechargement, après quoi tout redevient découverte.</p>
+    <p>Plusieurs badges montent dans la même passe : tous sont empilés, le bloc les enchaîne.</p>
+    <p>La passe se relance à chaque écriture de <code>appData</code>, profil compris — allumer un module déclenche donc une passe.</p>
+  </details>
+  <div class="exemple"><p>Le Hérisson Marcheur de Camille est argent, et <code>{"herisson":"argent"}</code> est en mémoire. Elle éteint le module Nombre de Pas : la définition est sautée, l'entrée reste. Elle le rallume : rang 3 contre rang 3, <code>&lt;=</code>, rien n'est fêté.</p></div>
+
+  <h3 id="badges-partage-d-un-badge">Partage d'un badge</h3>
+  <p>Le partage décide du texte et du geste ; la carte est peinte à part et n'est jointe que si la plateforme l'accepte.</p>
+  <pre><code>texte = `🏆 J'ai débloqué le badge "{title}" Niveau {LIBELLÉ EN CAPITALES} sur G(lp1)LOW`
+
+carte = await renderBadgeCardFile(badge, tier, BadgeIcon)     // File JPEG ou null
+si carte && navigator.canShare({ files: [carte] }) : fichiers = [carte]
+
+si navigator.share :
+  données = { title: `Badge {title} - GLP1LOW`, text: texte,
+              url: window.location.href, files: fichiers si non vide }
+  si navigator.canShare(données) est faux et fichiers non vide : retirer files
+  await navigator.share(données)          // AbortError ignoré, autres erreurs journalisées
+sinon :
+  await navigator.clipboard.writeText(texte)      // le texte SEUL, pas l'url
+  onNotice?.('Lien et texte de partage copiés dans le presse-papier.')</code></pre>
+  <p>La carte : <code>&lt;canvas&gt;</code> de 600 × 600 points tracé à l'échelle 2, soit 1200 × 1200 pixels réels ; fond en dégradé <code>#f8fafc</code> → <code>#e2e8f0</code>, carte blanche <code>roundRect(50, 50, 500, 500, 32)</code> avec ombre ; pastille <code>roundRect(210, 75, 180, 34, 17)</code> et texte <code>★ NIVEAU {PALIER} ★</code> centré en (300, 97) ; couleurs en dur par palier — bronze <code>#d97706</code> sur <code>#fef3c7</code> (valeur par défaut), argent <code>#2563eb</code> sur <code>#eff6ff</code>, or <code>#ca8a04</code> sur <code>#fef9c3</code>, éveil <code>#075985</code> sur <code>#f0f9ff</code>. Le dessin du badge est produit par <code>renderToStaticMarkup</code> à <code>sizePxOverride: 460</code>, extrait par <code>/&lt;svg[\s\S]*&lt;\/svg&gt;/</code>, chargé en <code>Blob</code> <code>image/svg+xml</code> et dessiné en (185, 120, 230, 230). Puis le titre en (300, 375), la règle du palier en (300, 402) avec une largeur maximale de 420, un filet de (120, 428) à (480, 428), le logo en (215, 436, 170, 41) et « © Partagé depuis l'application officielle GLP1LOW » en (300, 492). Sortie : <code>canvas.toBlob('image/jpeg', 0.95)</code>, fichier nommé <code>badge-{id}-{palier}.jpg</code>. La règle affichée est <code>criteria[palier]</code>, le palier <code>aucun</code> retombant sur celle du bronze ; pour le seul <code>athlete</code> elle est remplacée par « Récompense votre régularité dans la pratique d'une activité physique ». <a href="spec-fonctionnelle.html#badges-partage-d-un-badge">→ fonctionnelle</a></p>
+  <p class="ancre">src/utils/badgeShare.ts, src/utils/badgeCardImage.ts</p>
+  <details><summary>Cas limites</summary>
+    <p><code>getContext('2d')</code> indisponible, exception de tracé, ou <code>toBlob</code> nul : la fonction rend <code>null</code> et le partage part sans fichier.</p>
+    <p>Le chargement du SVG échoue : l'erreur est journalisée, la promesse est résolue quand même et la carte est peinte sans le badge.</p>
+    <p><code>navigator.canShare</code> absent : le fichier n'est jamais joint, même s'il a été peint.</p>
+    <p><code>navigator.share</code> absent : seul le texte va au presse-papier ; l'adresse de la page n'y est pas, malgré le mot « Lien » du message.</p>
+    <p>Partage annulé par l'utilisatrice : <code>AbortError</code>, ignoré sans message.</p>
+    <p>Échec du presse-papier : journalisé, aucun message affiché.</p>
+    <p>Le bloc de célébration appelle le partage sans <code>onNotice</code> : le repli presse-papier y est silencieux.</p>
+  </details>
+  <div class="exemple"><p>Camille partage son Hérisson Marcheur argent : texte « 🏆 J'ai débloqué le badge "Hérisson Marcheur" Niveau ARGENT sur G(lp1)LOW », titre « Badge Hérisson Marcheur - GLP1LOW », fichier <code>badge-herisson-argent.jpg</code>, pastille « ★ NIVEAU ARGENT ★ » et règle « 8 000 pas par jour pendant 4 jours /7j ».</p></div>
+</section>

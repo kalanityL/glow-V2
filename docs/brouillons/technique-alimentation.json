@@ -1,0 +1,486 @@
+{
+ "inventions": [
+  {
+   "categorie": "chiffre",
+   "fonctionnalite": "Base alimentaire",
+   "texte": "« La table Ciqual compte 3 479 entrées » — le commentaire de src/data/mealConstants.ts et celui de food.resolve.ts l'affirment tous les deux, mais le fichier src/data/ciqual.json en contient 3 258. J'ai écrit 3 258 (+ 2 entrées manuelles = 3 260), qui est le compte réel et celui de la spec fonctionnelle ; les deux commentaires du dépôt sont périmés.",
+   "origine": "Écart entre les commentaires du code et le contenu du fichier de données."
+  },
+  {
+   "categorie": "valeur",
+   "fonctionnalite": "Exemple chiffré des fiches Ciqual",
+   "texte": "Les valeurs pour 100 g attribuées à « Lentille cuite à l'eau » (125 kcal, 10 g de protéines, 16 g de glucides, 0,5 g de lipides, 8,5 g de fibres), à « Tomate crue » (19 kcal) et à « Huile d'olive vierge extra » (900 kcal) sont reconstituées à rebours des totaux de la spec fonctionnelle, pas relevées dans ciqual.json.",
+   "origine": "Besoin d'un exemple chiffré cohérent avec Camille sans avoir relevé les lignes exactes de la table."
+  },
+  {
+   "categorie": "valeur",
+   "fonctionnalite": "Pourcentage d'objectif",
+   "texte": "Le total protéines non arrondi « 113,4 g » de l'exemple est choisi pour produire les 79 % de la spec fonctionnelle à partir de 113 g affichés ; la vraie valeur dépend des fiches réelles de Camille.",
+   "origine": "La fonctionnelle donne 113 g et 79 %, qui ne se déduisent pas l'un de l'autre ; l'écart s'explique par l'arrondi, la valeur intermédiaire est illustrative."
+  },
+  {
+   "categorie": "valeur",
+   "fonctionnalite": "Tendance des kcal",
+   "texte": "Les sommes de 8 200 / 8 600 / 8 700 kcal des deux moitiés de quatorzaine sont fabriquées pour illustrer le seuil de 5 % ; elles ne viennent pas d'un jeu de données.",
+   "origine": "Illustration du seuil relatif."
+  },
+  {
+   "categorie": "comportement",
+   "fonctionnalite": "Domaine alimentaire en V2",
+   "texte": "J'ai voulu décrire les entités et formules que la V2 retiendra (schéma des prises, calcul sans cache). Le dépôt V2 (/Users/beauty/Desktop/GLOW/GIT-APP-V2/src) n'a aucun code d'alimentation : seuls avatar, compte, mesures, traitements et unités existent. Les marques V2 du chapitre s'appuient uniquement sur GUIDELINES.md (stockage métrique, rien de dérivable stocké, valeur absente qui se tait, minutes rondes vers le bas, fibres jamais oubliées).",
+   "origine": "Aucun code V2 du domaine à lire."
+  },
+  {
+   "categorie": "comportement",
+   "fonctionnalite": "Rappel du mode modification",
+   "texte": "Je n'ai pas pu établir ce que le bandeau écrit exactement quand la prise rouverte n'a pas d'heure : le gabarit interpole editedMealTime sans repli, mais aucun code ne traite ce cas. La ligne « Cas limites » le signale sans affirmer le rendu.",
+   "origine": "Le composant EnteteRepas.tsx n'a pas de branche pour une heure vide."
+  },
+  {
+   "categorie": "chiffre",
+   "fonctionnalite": "Barre floutée du verrou de comparaison",
+   "texte": "Les parts 27 / 41 / 28 / 4 de la barre bidon sont reprises du commentaire de mealSurimpression.ts et de la spec fonctionnelle ; je n'ai pas ouvert le gabarit qui les dessine pour les vérifier ligne à ligne.",
+   "origine": "Valeurs citées dans un commentaire, non relues dans le JSX."
+  }
+ ],
+ "glossaire": [
+  {
+   "terme": "SavedMealLog",
+   "definition": "Ligne de journal d'une prise alimentaire : date locale, heure HH:MM, type, composition en items, cache des cinq valeurs nutritionnelles, faim avant et après."
+  },
+  {
+   "terme": "FoodQuantity",
+   "definition": "Quantité d'un aliment dans une composition : référence par identifiant (foodId + isCustomFood) et quantité en grammes ou millilitres."
+  },
+  {
+   "terme": "ResolvedFood",
+   "definition": "Fiche d'aliment normalisée, construite à la lecture depuis Ciqual ou la base personnelle ; jamais stockée."
+  },
+  {
+   "terme": "fullCiqualDb",
+   "definition": "Base alimentaire de référence : les 3 258 entrées de ciqual.json plus les 2 entrées écrites à la main, soit 3 260 aliments."
+  },
+  {
+   "terme": "nom affiché",
+   "definition": "Résultat de foodDisplayName : nom court de l'entrée, à défaut nom court de l'entrée dont le libellé officiel est identique, à défaut le libellé officiel."
+  },
+  {
+   "terme": "facteurs d'Atwater",
+   "definition": "4 kcal par gramme de protéines et de glucides, 9 pour les lipides, 2 pour les fibres ; base des parts caloriques du dépôt."
+  },
+  {
+   "terme": "part de masse",
+   "definition": "Part d'un nutriment dans la somme des quatre masses en grammes d'un créneau ; base de la composition par créneau, distincte de la part calorique."
+  },
+  {
+   "terme": "méthode des plus forts restes",
+   "definition": "Répartition d'un total de 100 en entiers : chaque part prend sa troncature, puis les points manquants vont aux plus grandes parties décimales."
+  },
+  {
+   "terme": "créneau",
+   "definition": "Tranche de trois heures indexée par floor(heure / 3) ; huit créneaux de 0-3h à 21-24h, toujours tous rendus."
+  },
+  {
+   "terme": "withoutTime",
+   "definition": "Nombre de prises écartées d'un bloc par créneau faute d'heure exploitable ; annoncé par une note quand il est non nul."
+  },
+  {
+   "terme": "journée renseignée",
+   "definition": "Journée portant au moins une prise ; dénominateur de toutes les moyennes par jour du domaine."
+  },
+  {
+   "terme": "moyenne par prise",
+   "definition": "Somme divisée par le nombre de prises, et non par le nombre de journées ; employée par la couche vitrée, les créneaux et « Repas vs en-cas »."
+  },
+  {
+   "terme": "fenêtre de période",
+   "definition": "Sélection 7 / 14 / 30 / 90 derniers jours (jour courant inclus), Depuis le début ou Choisir, retenue par bloc sous glp1_period_<bloc>."
+  },
+  {
+   "terme": "coupure",
+   "definition": "Date de début d'une fenêtre fixe : aujourd'hui moins (n − 1) jours, en chaîne AAAA-MM-JJ locale."
+  },
+  {
+   "terme": "plafond quotidien",
+   "definition": "Borne de création par jour local qui refuse sans jamais écraser : 30 prises par date, 50 favoris, 50 aliments, 20 recettes."
+  },
+  {
+   "terme": "createdAt",
+   "definition": "Instant de création en millisecondes, posé à la création seule ; sert aux plafonds quotidiens. Une entrée qui n'en porte pas n'est comptée dans aucun quota."
+  },
+  {
+   "terme": "palier nutritif",
+   "definition": "Franchissement d'une recommandation du jour en protéines ou en fibres, félicité une seule fois par jour et par nutriment."
+  },
+  {
+   "terme": "objectif du jour",
+   "definition": "Triplet calories / protéines / fibres, issu du profil ou de ses défauts : 1400 kcal, poids actuel × 1,5 g, 25 g."
+  },
+  {
+   "terme": "BarcodeLookupError",
+   "definition": "Erreur typée d'une recherche Open Food Facts, portant sa cause dans failure : injoignable (rien n'est revenu) ou service (réponse fautive)."
+  },
+  {
+   "terme": "modules EAN",
+   "definition": "Suite de 95 (EAN-13) ou 67 (EAN-8) caractères 0/1 décrivant les barres et les espaces d'un code, calculée localement depuis son numéro."
+  },
+  {
+   "terme": "recette",
+   "definition": "Aliment personnalisé marqué isRecipe, portant sa composition dans recipeIngredients et ses valeurs ramenées à 100 g."
+  },
+  {
+   "terme": "favori (menu)",
+   "definition": "Composition nommée, avec son type, sans date ni heure ni faim ; recopiée avec de nouveaux identifiants dans les deux sens."
+  }
+ ],
+ "index": [
+  {
+   "terme": "Anses / Ciqual (mention)",
+   "ancre": "alimentation-base-alimentaire-et-recherche"
+  },
+  {
+   "terme": "Apport d'une composition",
+   "ancre": "alimentation-apport-d-une-composition"
+  },
+  {
+   "terme": "Apport d'une quantité",
+   "ancre": "alimentation-apport-d-une-quantite"
+  },
+  {
+   "terme": "Arrondi de l'heure",
+   "ancre": "alimentation-heure-arrondie-vers-le-bas"
+  },
+  {
+   "terme": "Atwater (facteurs)",
+   "ancre": "alimentation-parts-caloriques-des-nutriments"
+  },
+  {
+   "terme": "Axe des grammes",
+   "ancre": "alimentation-graphe-des-apports-par-jour"
+  },
+  {
+   "terme": "Axe des kcal",
+   "ancre": "alimentation-graphe-des-apports-par-jour"
+  },
+  {
+   "terme": "Bandeau de confirmation",
+   "ancre": "alimentation-page-menus-repas-et-en-cas"
+  },
+  {
+   "terme": "Barres (parts entières)",
+   "ancre": "alimentation-parts-entieres-des-barres"
+  },
+  {
+   "terme": "Cellule de pourcentage",
+   "ancre": "alimentation-ecriture-d-une-cellule-de-pourcentage"
+  },
+  {
+   "terme": "Chargement de la sauvegarde",
+   "ancre": "alimentation-chargement-de-la-sauvegarde-des-repas"
+  },
+  {
+   "terme": "Chargement des favoris",
+   "ancre": "alimentation-chargement-des-favoris"
+  },
+  {
+   "terme": "Clé de contrôle EAN",
+   "ancre": "alimentation-dessin-du-code-barres"
+  },
+  {
+   "terme": "Code-barres (chemin)",
+   "ancre": "alimentation-recherche-par-code-barres-chemin"
+  },
+  {
+   "terme": "Code-barres (dessin)",
+   "ancre": "alimentation-dessin-du-code-barres"
+  },
+  {
+   "terme": "Code-barres (erreurs)",
+   "ancre": "alimentation-erreurs-de-recherche-par-code-barres"
+  },
+  {
+   "terme": "Comparaison (déblocage)",
+   "ancre": "alimentation-deblocage-de-la-comparaison"
+  },
+  {
+   "terme": "Composition par créneau",
+   "ancre": "alimentation-composition-par-creneau"
+  },
+  {
+   "terme": "Compteur de sélection",
+   "ancre": "alimentation-compteur-de-selection"
+  },
+  {
+   "terme": "Copie d'un favori",
+   "ancre": "alimentation-contenu-et-copie-d-un-favori"
+  },
+  {
+   "terme": "Correspondance repas / favori",
+   "ancre": "alimentation-correspondance-repas-favori"
+  },
+  {
+   "terme": "Créneaux hauts",
+   "ancre": "alimentation-creneaux-hauts-et-surlignage"
+  },
+  {
+   "terme": "Créneaux horaires",
+   "ancre": "alimentation-creneaux-horaires"
+  },
+  {
+   "terme": "Date et heure par défaut",
+   "ancre": "alimentation-date-et-heure-par-defaut-du-formulaire"
+  },
+  {
+   "terme": "Diaporama (ordre des vues)",
+   "ancre": "alimentation-ordre-des-vues-du-diaporama"
+  },
+  {
+   "terme": "Éditions en place du journal",
+   "ancre": "alimentation-editions-en-place-du-journal"
+  },
+  {
+   "terme": "Entités du domaine",
+   "ancre": "alimentation-entites"
+  },
+  {
+   "terme": "Faim (défauts 2 et 0)",
+   "ancre": "alimentation-faim-avant-apres"
+  },
+  {
+   "terme": "Faim par créneau",
+   "ancre": "alimentation-faim-par-creneau"
+  },
+  {
+   "terme": "Faim par jour",
+   "ancre": "alimentation-faim-par-jour-calculee-non-dessinee-en-mixte"
+  },
+  {
+   "terme": "Famille repas / en-cas",
+   "ancre": "alimentation-famille-repas-en-cas"
+  },
+  {
+   "terme": "Fenêtres de période",
+   "ancre": "alimentation-fenetres-de-periode"
+  },
+  {
+   "terme": "Ligne de saisie valide",
+   "ancre": "alimentation-ligne-de-saisie-valide"
+  },
+  {
+   "terme": "Mode modification (rappel)",
+   "ancre": "alimentation-rappel-du-mode-modification"
+  },
+  {
+   "terme": "Moyenne par prise",
+   "ancre": "alimentation-moyenne-par-prise-sur-une-periode"
+  },
+  {
+   "terme": "Moyennes depuis le début",
+   "ancre": "alimentation-moyennes-depuis-le-debut"
+  },
+  {
+   "terme": "Moyennes 7 derniers jours",
+   "ancre": "alimentation-moyennes-des-7-derniers-jours"
+  },
+  {
+   "terme": "Nom affiché d'un aliment",
+   "ancre": "alimentation-nom-affiche-d-un-aliment"
+  },
+  {
+   "terme": "Objectifs du jour",
+   "ancre": "alimentation-objectifs-nutritionnels-du-jour"
+  },
+  {
+   "terme": "Open Food Facts (vérification)",
+   "ancre": "alimentation-fiche-open-food-facts-verification"
+  },
+  {
+   "terme": "Ouverture de la couche Menus",
+   "ancre": "alimentation-ouverture-de-la-couche-menus-en-saisie-ou-en-lecture"
+  },
+  {
+   "terme": "Pagination du journal",
+   "ancre": "alimentation-tri-et-pagination-du-journal"
+  },
+  {
+   "terme": "Paliers protéines et fibres",
+   "ancre": "alimentation-paliers-proteines-et-fibres"
+  },
+  {
+   "terme": "Parts caloriques",
+   "ancre": "alimentation-parts-caloriques-des-nutriments"
+  },
+  {
+   "terme": "Phrase de moyenne",
+   "ancre": "alimentation-phrase-de-moyenne"
+  },
+  {
+   "terme": "Plafond de 30 prises par jour",
+   "ancre": "alimentation-plafond-de-30-repas-ou-en-cas-par-jour"
+  },
+  {
+   "terme": "Plafond de 50 favoris par jour",
+   "ancre": "alimentation-plafond-de-50-favoris-crees-par-jour"
+  },
+  {
+   "terme": "Plafonds de la bibliothèque",
+   "ancre": "alimentation-plafonds-de-creation-de-la-bibliotheque"
+  },
+  {
+   "terme": "Pourcentage d'objectif",
+   "ancre": "alimentation-pourcentage-d-objectif"
+  },
+  {
+   "terme": "Pourcentage de la recommandation",
+   "ancre": "alimentation-pourcentage-de-la-recommandation-accueil"
+  },
+  {
+   "terme": "Prises du jour (couche vitrée)",
+   "ancre": "alimentation-prises-du-jour-dans-la-couche-vitree"
+  },
+  {
+   "terme": "Quantité d'un item",
+   "ancre": "alimentation-quantite-d-un-item"
+  },
+  {
+   "terme": "Recette (valeurs pour 100 g)",
+   "ancre": "alimentation-valeurs-d-une-recette-pour-100-g"
+  },
+  {
+   "terme": "Recette (validation)",
+   "ancre": "alimentation-recette-validation-et-identite"
+  },
+  {
+   "terme": "Recherche d'aliments (score)",
+   "ancre": "alimentation-base-alimentaire-et-recherche"
+  },
+  {
+   "terme": "Refus du formulaire de repas",
+   "ancre": "alimentation-refus-de-validation-du-formulaire-de-repas"
+  },
+  {
+   "terme": "Repartition par créneau",
+   "ancre": "alimentation-repartition-par-creneau"
+  },
+  {
+   "terme": "Repas vs en-cas",
+   "ancre": "alimentation-composition-repas-vs-en-cas"
+  },
+  {
+   "terme": "Reprise d'un favori",
+   "ancre": "alimentation-reprise-d-un-favori-comme-base"
+  },
+  {
+   "terme": "Suppression d'un aliment",
+   "ancre": "alimentation-suppression-d-un-aliment-personnalise"
+  },
+  {
+   "terme": "Surlignage de colonne",
+   "ancre": "alimentation-ecriture-d-une-cellule-de-pourcentage"
+  },
+  {
+   "terme": "Tableau / barres (bascule)",
+   "ancre": "alimentation-presentation-tableau-barres"
+  },
+  {
+   "terme": "Tendance des kcal",
+   "ancre": "alimentation-tendance-des-kcal"
+  },
+  {
+   "terme": "Texte d'une composition",
+   "ancre": "alimentation-texte-d-une-composition"
+  },
+  {
+   "terme": "Titre d'un favori",
+   "ancre": "alimentation-titre-d-un-favori"
+  },
+  {
+   "terme": "Total kcal d'un jour",
+   "ancre": "alimentation-total-kcal-d-un-jour-calendrier-couche-tuiles"
+  },
+  {
+   "terme": "Totaux d'une journée (journal)",
+   "ancre": "alimentation-totaux-d-une-journee-dans-le-journal"
+  },
+  {
+   "terme": "Unités et conversions",
+   "ancre": "alimentation-unites-et-conversions"
+  },
+  {
+   "terme": "Valeurs d'un repas écrit",
+   "ancre": "alimentation-valeurs-nutritionnelles-d-un-repas-ecrit"
+  },
+  {
+   "terme": "Validation d'un aliment personnalisé",
+   "ancre": "alimentation-aliment-personnalise-validation-et-identite"
+  }
+ ],
+ "ancres_traitees": [
+  "alimentation-page-menus-repas-et-en-cas",
+  "alimentation-base-alimentaire-et-recherche",
+  "alimentation-chargement-de-la-sauvegarde-des-repas",
+  "alimentation-apport-d-une-quantite",
+  "alimentation-apport-d-une-composition",
+  "alimentation-ligne-de-saisie-valide",
+  "alimentation-refus-de-validation-du-formulaire-de-repas",
+  "alimentation-plafond-de-30-repas-ou-en-cas-par-jour",
+  "alimentation-heure-arrondie-vers-le-bas",
+  "alimentation-date-et-heure-par-defaut-du-formulaire",
+  "alimentation-faim-avant-apres",
+  "alimentation-valeurs-nutritionnelles-d-un-repas-ecrit",
+  "alimentation-famille-repas-en-cas",
+  "alimentation-quantite-d-un-item",
+  "alimentation-rappel-du-mode-modification",
+  "alimentation-nom-affiche-d-un-aliment",
+  "alimentation-compteur-de-selection",
+  "alimentation-tri-et-pagination-du-journal",
+  "alimentation-editions-en-place-du-journal",
+  "alimentation-totaux-d-une-journee-dans-le-journal",
+  "alimentation-correspondance-repas-favori",
+  "alimentation-texte-d-une-composition",
+  "alimentation-total-kcal-d-un-jour-calendrier-couche-tuiles",
+  "alimentation-parts-caloriques-des-nutriments",
+  "alimentation-compte-repas-snacks-d-un-jour",
+  "alimentation-titre-d-un-favori",
+  "alimentation-plafond-de-50-favoris-crees-par-jour",
+  "alimentation-contenu-et-copie-d-un-favori",
+  "alimentation-reprise-d-un-favori-comme-base",
+  "alimentation-chargement-des-favoris",
+  "alimentation-aliment-personnalise-validation-et-identite",
+  "alimentation-suppression-d-un-aliment-personnalise",
+  "alimentation-plafonds-de-creation-de-la-bibliotheque",
+  "alimentation-unites-et-conversions",
+  "alimentation-recherche-par-code-barres-chemin",
+  "alimentation-fiche-open-food-facts-verification",
+  "alimentation-erreurs-de-recherche-par-code-barres",
+  "alimentation-dessin-du-code-barres",
+  "alimentation-valeurs-d-une-recette-pour-100-g",
+  "alimentation-recette-validation-et-identite",
+  "alimentation-graphe-des-apports-par-jour",
+  "alimentation-ordre-des-vues-du-diaporama",
+  "alimentation-fenetres-de-periode",
+  "alimentation-creneaux-horaires",
+  "alimentation-faim-par-creneau",
+  "alimentation-faim-par-jour-calculee-non-dessinee-en-mixte",
+  "alimentation-composition-repas-vs-en-cas",
+  "alimentation-composition-par-creneau",
+  "alimentation-ecriture-d-une-cellule-de-pourcentage",
+  "alimentation-parts-entieres-des-barres",
+  "alimentation-presentation-tableau-barres",
+  "alimentation-repartition-par-creneau",
+  "alimentation-creneaux-hauts-et-surlignage",
+  "alimentation-objectifs-nutritionnels-du-jour",
+  "alimentation-pourcentage-d-objectif",
+  "alimentation-moyennes-depuis-le-debut",
+  "alimentation-moyennes-des-7-derniers-jours",
+  "alimentation-pourcentage-de-la-recommandation-accueil",
+  "alimentation-tendance-des-kcal",
+  "alimentation-ouverture-de-la-couche-menus-en-saisie-ou-en-lecture",
+  "alimentation-prises-du-jour-dans-la-couche-vitree",
+  "alimentation-moyenne-par-prise-sur-une-periode",
+  "alimentation-phrase-de-moyenne",
+  "alimentation-deblocage-de-la-comparaison",
+  "alimentation-paliers-proteines-et-fibres"
+ ],
+ "ancres_sans_matiere": []
+}

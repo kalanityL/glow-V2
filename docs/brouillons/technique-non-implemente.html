@@ -1,0 +1,360 @@
+<section id="non-implemente">
+  <h2>21. Décidé mais non implémenté, arbitrages non validés <a class="retour" href="#sommaire">↑ sommaire</a></h2>
+  <p>Ce chapitre donne les formules, les seuils et les ordres de calcul du code écrit, testé, mais qu'aucun écran ne monte : le questionnaire d'accueil de la V1, les moteurs d'analyse textuelle des graphes repas et sommeil, les cartes journalières des pas. Il donne aussi les onze conventions du modèle de données et l'état d'application de chacune.</p>
+
+  <h3 id="non-implemente-entites">Entités</h3>
+  <p>Aucun objet de ce chapitre n'entre dans <code>AppData</code>, la sauvegarde du domaine (clé <code>glp1_app_companion_data</code>). Deux catégories : des types déclarés dans <code>src/types.ts</code> qu'aucune table ne porte, et des objets dérivés recalculés à chaque rendu.</p>
+  <table>
+    <thead><tr><th>Objet</th><th>Champs</th><th>Stockage</th></tr></thead>
+    <tbody>
+      <tr><td><code>OnboardingAnswers</code> (V1)</td><td>27 champs, <strong>tous facultatifs</strong> : <code>theme</code>, <code>goal</code> (<code>'perdre' | 'stabiliser' | 'masse'</code>), <code>started</code> (booléen), <code>startedSince</code> (<code>{kind:'date',date}</code> ou <code>{kind:'environ',id}</code>), <code>startingWeight</code>/<code>currentWeight</code>/<code>targetWeight</code> en kg, <code>startingWeightDate</code>/<code>currentWeightDate</code> en <code>AAAA-MM-JJ</code>, <code>height</code> en cm, <code>age</code> en années, <code>dailyActivity</code>, <code>hasSessions</code>, <code>sessionsCount</code>, <code>sessionsRate</code> (<code>'semaine' | 'mois'</code>), <code>sessionKinds[]</code>, <code>dailyActivityWish</code>, <code>sessionsWish</code>, <code>foodDiary</code>, <code>foodDiaryHelp</code> (0–5), <code>trackNutrition</code>, <code>trackSteps</code>, <code>trackSport</code>, <code>meTimePrefs[]</code>, <code>trackMeTime</code>, <code>gender</code> (<code>'homme' | 'femme' | 'neutre'</code>), <code>firstName</code></td><td>hors <code>AppData</code> ; sérialisé dans <code>glow_onboarding_sim_mixte</code> avec l'étape courante et le drapeau <code>done</code> (<code>SavedSimulation</code>) <span class="marque non">non implémenté</span></td></tr>
+      <tr><td><code>OnboardingState</code></td><td><code>answers: OnboardingAnswers</code>, <code>skipped: string[]</code> — les étapes explicitement passées, distinguées de celles pas encore vues</td><td>même clé</td></tr>
+      <tr><td><code>OnboardingOutcome</code></td><td>4 booléens (<code>foodTrackingEnabled</code>, <code>stepsTrackingEnabled</code>, <code>sportTrackingEnabled</code>, <code>meTimeTrackingEnabled</code>), <code>meTimeActivities: string[]</code></td><td>dérivé, non stocké</td></tr>
+      <tr><td><code>Reponses</code> (V2)</td><td><code>langue</code>, <code>theme</code>, <code>systeme</code>, <code>objectif</code> (<code>'perdre' | 'stabiliser'</code>), <code>poids</code> et <code>poidsCible</code> <strong>en texte à point décimal</strong> (« 95.0 »), <code>traitementCommence</code> (booléen, jamais nul), <code>formeTraitement</code>, <code>traitement</code>, <code>avatar</code>, <code>anneeNaissance</code>, <code>tailleCm</code> (toujours en cm), <code>prenom</code>, <code>email</code>, <code>motDePasse</code></td><td>état React seul : un rechargement perd tout <span class="marque v2">V2</span> <span class="marque non">non implémenté</span></td></tr>
+      <tr><td><code>DailySwipeCard</code></td><td><code>dateStr</code> (<code>AAAA-MM-JJ</code>), <code>dateLabel</code> (<code>JJ/MM/AA</code>), <code>steps</code>, <code>calories</code>, <code>percentReached</code> (0–100)</td><td>dérivé, non stocké</td></tr>
+      <tr><td><code>SleepDayPoint</code></td><td><code>date</code>, <code>dateFormatted</code> (<code>JJ/MM</code>), <code>timestamp</code>, <code>Sommeil</code> (h), <code>Qualité</code>, <code>Nuit</code> (h ou <code>null</code>), <code>Qualité nuit</code>, <code>Éveil</code> (h ou <code>null</code>), <code>Kcal</code> (ou <code>null</code>), plus les grandeurs canoniques <code>minutes</code>, <code>nightMinutes</code>, <code>awakeMinutes</code></td><td>dérivé, non stocké</td></tr>
+      <tr><td><code>CorrelationReading</code></td><td><code>pairCount</code>, <code>r</code> (ou <code>null</code>), <code>verdict</code> (<code>'trop-peu' | 'variance-nulle' | 'aucun' | 'modere' | 'net'</code>), <code>positive</code></td><td>dérivé, non stocké</td></tr>
+      <tr><td><code>SideEffectType</code>, <code>SportType</code></td><td><code>id</code>, <code>label</code>, <code>createdAt</code>, <code>updatedAt</code> ; <code>SportType</code> ajoute <code>met</code> (nombre)</td><td>déclarés dans <code>src/types.ts</code> ; <code>AppData</code> ne porte ni <code>sideEffectTypes</code> ni <code>sportTypes</code> <span class="marque non">non implémenté</span></td></tr>
+      <tr><td><code>HungerLevel</code>, <code>SeverityLevel</code></td><td><code>0 | 1 | 2 | 3 | 4 | 5</code> et <code>1 | 2 | 3 | 4 | 5</code></td><td>déclarés, jamais employés : les champs correspondants valent <code>number</code> <span class="marque non">non implémenté</span></td></tr>
+    </tbody>
+  </table>
+  <p class="ancre">src/types.ts, src/features/onboarding/onboarding.model.ts, src/features/steps/steps.utils.ts, src/features/sleep/sleep.utils.ts, src/shared/analysis/analysis.ts, GIT-APP-V2/src/screens/onboarding/reponses.ts</p>
+
+  <h3 id="non-implemente-questionnaire-visibilite-et-effacement-des-etapes">Questionnaire : visibilité et effacement des étapes</h3>
+  <p><code>ONBOARDING_STEPS</code> est une table ordonnée de 24 étapes. <code>visibleSteps(answers)</code> la filtre par le prédicat <code>shows</code> de chaque étape ; six étapes en portent un. La règle de toutes : une branche ne se ferme que sur un booléen explicite, jamais sur une absence de réponse.</p>
+  <pre><code>visibleSteps(a) = ONBOARDING_STEPS.filter(e =&gt; !e.shows || e.shows(a)).map(e =&gt; e.id)
+
+depuis-quand        shows: a.started === true
+poids-depart        shows: a.started === true
+poids-actuel        shows: a.started !== true
+poids-cible         shows: a.goal !== 'stabiliser'
+familles-de-seances shows: a.hasSessions === true
+souhait-seances     shows: a.hasSessions === true
+cahier-utile        shows: a.foodDiary === true</code></pre>
+  <p>L'ordre de la table : bienvenue, theme, objectif, deja-commence, depuis-quand, poids-depart, poids-actuel, poids-cible, activite-quotidienne, seances, familles-de-seances, souhait-quotidien, souhait-seances, cahier-alimentaire, cahier-utile, suivi-nutrition, suivi-pas, suivi-sport, detente, suivi-temps-pour-soi, genre, prenom, taille, age.</p>
+  <p>Le compteur « Question <em>N</em> sur <em>M</em> » ne compte que les étapes <em>passables</em> : <code>bienvenue</code> porte <code>skippable: false</code> et en est exclue, elle seule.</p>
+  <pre><code>questionPosition(id, a):
+  questions = visibleSteps(a).filter(isSkippable)
+  index     = questions.indexOf(id)
+  rendu     = index === -1 ? null : { rank: index + 1, total: questions.length }</code></pre>
+  <p>Passer une étape efface les clés qu'elle porte, par la table <code>STEP_ANSWER_KEYS</code>, puis inscrit l'étape dans <code>skipped</code>. Répondre à nouveau la retire de <code>skipped</code>.</p>
+  <pre><code>clearStepAnswers(a, id) = { ...a } moins chaque clé de STEP_ANSWER_KEYS[id]
+
+poids-depart → startingWeight, startingWeightDate, currentWeight, currentWeightDate
+poids-actuel → currentWeight, currentWeightDate
+seances      → hasSessions, sessionsCount, sessionsRate
+deja-commence → started        poids-cible → targetWeight
+cahier-alimentaire → foodDiary  cahier-utile → foodDiaryHelp
+detente → meTimePrefs           bienvenue → (aucune)</code></pre>
+  <p>L'avance se calcule sur la liste recalculée avec les <em>nouvelles</em> réponses, pas sur celle affichée avant le geste : <code>advance(nextAnswers, from)</code> cherche <code>from</code> dans <code>visibleSteps(nextAnswers)</code> et prend le suivant ; index <code>-1</code> ou dernier rang terminent le parcours.</p>
+  <p class="ancre">src/features/onboarding/onboarding.steps.ts, src/versions/mixte/components/onboarding/OnboardingPage.tsx</p>
+  <p>La V2 a repris le parcours à neuf étapes et deux branches seulement : <code>poids-cible</code> si <code>objectif === 'perdre'</code>, <code>quel-traitement</code> si <code>traitementCommence</code>. Le décompte ne s'affiche qu'à partir de l'étape <code>traitement</code> (<code>ETAPE_DEBUT_DECOMPTE</code>). Une seule étape bloque le bouton Suivant — <code>quel-traitement</code>, qui exige forme <em>et</em> spécialité — et <code>profil</code> n'accepte qu'un mot de passe vide ou d'au moins huit signes. Le rang est borné à chaque lecture : <code>min(rang, visibles.length − 1)</code>. <span class="marque v2">V2</span></p>
+  <p class="ancre">GIT-APP-V2/src/screens/onboarding/parcours.ts, GIT-APP-V2/src/app/useParcours.ts</p>
+  <details><summary>Cas limites</summary>
+    <p><code>started === undefined</code> (étape jamais vue ou passée) : <code>poids-actuel</code> s'affiche, <code>depuis-quand</code> et <code>poids-depart</code> non — le prédicat en négatif est ce qui rend le poids d'aujourd'hui toujours demandé.</p>
+    <p><code>goal === undefined</code> : <code>poids-cible</code> s'affiche, <code>undefined !== 'stabiliser'</code>.</p>
+    <p>Passer <code>poids-depart</code> efface aussi <code>currentWeight</code> et <code>currentWeightDate</code>, donc ce que <code>poids-actuel</code> aurait porté.</p>
+    <p>Revenir sur <code>deja-commence</code> et le passer : <code>started</code> disparaît, les deux étapes qu'un oui avait ouvertes se referment, et <code>poids-actuel</code> réapparaît.</p>
+    <p>Étape courante devenue invisible après la réponse : <code>advance</code> ne la trouve plus (<code>index === -1</code>) et termine le parcours au lieu de chercher un successeur.</p>
+    <p><code>questionPosition('bienvenue', a)</code> rend <code>null</code> : l'écran muet n'a pas de rang.</p>
+    <p>V2 : changer d'objectif pour « stabiliser » alors qu'on est sur <code>poids-cible</code> raccourcit la liste sous les pieds du rang, qui retombe sur la dernière étape visible.</p>
+  </details>
+  <div class="exemple"><p>Camille répond oui à « déjà commencé », vise une perte, déclare des séances et un cahier alimentaire tenu : seule <code>poids-actuel</code> disparaît. 23 étapes visibles, 22 questions ; le dernier écran, l'âge, affiche « Question 22 sur 22 ». Si elle passe ensuite l'étape des séances, <code>hasSessions</code>, <code>sessionsCount</code> et <code>sessionsRate</code> sont effacés, deux étapes disparaissent, et l'âge affiche « Question 20 sur 20 ».</p></div>
+
+  <h3 id="non-implemente-questionnaire-ce-que-les-reponses-allumeraient">Questionnaire : ce que les réponses allumeraient</h3>
+  <p><code>outcomeFromAnswers</code> traduit les réponses en quatre drapeaux de module et une liste d'activités. Le test est l'égalité stricte à <code>true</code> : une réponse absente vaut <code>false</code>, comme le défaut d'<code>INITIAL_PROFILE</code>.</p>
+  <pre><code>foodTrackingEnabled   = answers.trackNutrition === true
+stepsTrackingEnabled  = answers.trackSteps     === true
+sportTrackingEnabled  = answers.trackSport     === true
+meTimeTrackingEnabled = answers.trackMeTime    === true
+meTimeActivities      = (answers.meTimePrefs ?? [])
+                          .map(id =&gt; meTimeMapping[id])
+                          .filter(Boolean)</code></pre>
+  <p><code>ME_TIME_MAPPING</code> est construite depuis <code>ONBOARDING_CONTENT.meTime</code> : <code>Object.fromEntries(options.map(o =&gt; [o.id, o.activity]))</code>. Quatorze propositions, neuf portent une activité de catalogue.</p>
+  <pre><code>cinema           → Sortie cinéma
+theatre          → Sortie théâtre
+masque-beaute    → Soin du visage
+beaute-des-pieds → Beauté des pieds
+manucure         → Manucure
+massage          → Spa
+jeu-societe      → Jeu de société
+cartes           → Partie de cartes
+sport-amis       → Regarder du sport entre amis
+
+lecture, bain, masque-cheveux, jeu-video, terrasse → aucune activité</code></pre>
+  <p>L'ordre de <code>meTimeActivities</code> est celui de <code>meTimePrefs</code>, donc celui des réponses, pas celui du catalogue. L'écran d'arrivée construit un profil de démonstration à partir d'<code>INITIAL_PROFILE</code>, y écrase six champs (<code>name</code>, <code>gender</code>, <code>targetWeight</code>, <code>height</code>, <code>age</code>, puis les quatre drapeaux) et force <code>quickAddEnabled: true</code>. Ce profil ne sert qu'à dessiner les deux rangées de pictos : rien n'est écrit dans <code>AppData</code>. <span class="marque non">non implémenté</span> <a href="spec-fonctionnelle.html#non-implemente-questionnaire-d-accueil-simulation">→ fonctionnelle</a></p>
+  <p class="ancre">src/features/onboarding/onboarding.outcome.ts, src/features/onboarding/onboarding.content.ts, src/versions/mixte/components/onboarding/OnboardingPage.tsx</p>
+  <details><summary>Cas limites</summary>
+    <p><code>meTimePrefs</code> absent : <code>?? []</code>, la liste est vide, aucune activité pré-cochée.</p>
+    <p>Réponse explicitement <code>false</code> et réponse absente donnent le même drapeau <code>false</code> : le récapitulatif ne les distingue pas.</p>
+    <p>Une préférence sans activité de catalogue (cinq des quatorze) est retirée par le <code>filter</code> : la personne l'a cochée, rien ne s'allume, et rien ne le dit.</p>
+    <p><code>targetWeight</code>, <code>height</code> et <code>age</code> absents retombent sur les valeurs d'<code>INITIAL_PROFILE</code>, pas sur zéro.</p>
+    <p>Le choix du thème est le seul geste qui touche l'application : <code>selectTheme</code> recharge la fenêtre, d'où l'écriture manuelle de l'état de simulation <em>avant</em> l'appel, avec <code>step: 'theme'</code> pour rouvrir sur le même écran.</p>
+  </details>
+  <div class="exemple"><p>Camille coche « suivi des repas » et « suivi des pas », laisse le sport et le temps pour soi sans réponse, et retient « un bon bain » puis « une manucure ». Résultat : <code>foodTrackingEnabled</code> et <code>stepsTrackingEnabled</code> vrais, les deux autres faux, et <code>meTimeActivities = ['Manucure']</code> — le bain n'a pas d'activité au catalogue. Son profil réel n'a pas bougé.</p></div>
+
+  <h3 id="non-implemente-conventions-du-modele-conventions-md">Conventions du modèle (CONVENTIONS.md)</h3>
+  <p>Onze règles arrêtées le 2026-08-04, en remplacement du schéma où un repas était une phrase. Le tableau donne la règle et son état réel dans le code.</p>
+  <table>
+    <thead><tr><th>#</th><th>Règle</th><th>État</th></tr></thead>
+    <tbody>
+      <tr><td>1</td><td>Rien de dérivable n'est stocké : les valeurs nutritionnelles se recalculent depuis la fiche de l'aliment.</td><td>en défaut : les cinq champs nutritionnels de <code>SavedMealLog</code> sont stockés <span class="marque non">non implémenté</span></td></tr>
+      <tr><td>2</td><td>Référence par identifiant, jamais par nom : <code>FoodQuantity.foodId</code>, <code>SideEffectLog.typeId</code>, <code>SportLog.sportId</code>.</td><td>en défaut : <code>SideEffectLog.type</code> et <code>SportLog.sport</code> restent des chaînes de libellé</td></tr>
+      <tr><td>3</td><td>Quantités canoniques : g pour un solide, ml pour un liquide. Litres et kilos n'existent qu'à la saisie et à l'affichage. Pas de notion de portion.</td><td>appliquée</td></tr>
+      <tr><td>4</td><td><code>isLiquid</code> décrit la nature d'un aliment, pas son unité : l'étiquette g/ml/oz/fl oz en est dérivée.</td><td>appliquée</td></tr>
+      <tr><td>5</td><td><code>localDateTime: '2026-08-04T14:30'</code> — heure murale locale, jamais de suffixe Z, sur les journaux événementiels.</td><td>décidée, non appliquée : les journaux portent <code>date</code> et <code>time</code> séparés <span class="marque non">non implémenté</span></td></tr>
+      <tr><td>6</td><td>Métadonnées par table : <code>createdAt</code>, <code>updatedAt</code>, en millisecondes depuis l'époque Unix.</td><td>partielle : présentes sur <code>Recipe</code>, <code>CustomFood</code>, <code>SideEffectType</code>, <code>SportType</code> ; absentes de tous les journaux</td></tr>
+      <tr><td>7</td><td>Supprimer supprime : la ligne quitte la sauvegarde. Décision du 2026-08-06, qui renverse le <code>deletedAt</code> de la veille.</td><td>appliquée ; <code>purgeDeleted</code> nettoie les sauvegardes anciennes au chargement</td></tr>
+      <tr><td>8</td><td>Un ingrédient de recette existe toujours : supprimer un aliment qu'une recette utilise est refusé, en nommant les recettes.</td><td>appliquée au geste de suppression ; le recalcul, lui, ignore silencieusement un ingrédient introuvable</td></tr>
+      <tr><td>9</td><td>Le poids de départ ne se supprime pas : pas d'entrée « supprimer », épargné par « supprimer tout l'historique », et viser sa date met à jour <em>sa</em> ligne.</td><td>appliquée</td></tr>
+      <tr><td>10</td><td>Identifiants UUIDv7, générés par <code>shared/platform/</code>.</td><td>partielle : <code>UserProfile</code> et <code>AvatarConfig</code> n'en portent pas</td></tr>
+      <tr><td>11</td><td>L'ordre qui compte est celui des dates, pas celui des saisies : aucun calcul ne se fie à la position d'une ligne dans un tableau de journal.</td><td>appliquée dans les calculs, qui trient eux-mêmes ; les sauvegardes existantes ne sont pas garanties triées</td></tr>
+    </tbody>
+  </table>
+  <p>Deux domaines sont supprimés et leurs traces écartées au chargement, sans migration : le suivi hydrique (2026-08-07) et les objectifs de poids à paliers (2026-08-09). Le chargement supprime <code>parsed.waterLogs</code>, <code>parsed.milestones</code>, <code>profile.hydrationTrackingEnabled</code>, <code>profile.dailyWaterGoalMl</code> et <code>profile.weightGoalsEnabled</code> avant toute autre opération. Sans cela, l'étalement <code>...parsed</code> les recopierait indéfiniment.</p>
+  <p>Restent à faire, en toutes lettres dans le fichier : retirer les cinq champs nutritionnels dérivables, convertir le stockage des aliments personnalisés qui garde la forme Ciqual (<code>alim_code</code>, <code>alim_nom_fr</code>, d'où l'adaptateur <code>toResolvedFoods</code>), implémenter <code>localDateTime</code>, créer les tables <code>sideEffectTypes</code> et <code>sportTypes</code>, employer <code>HungerLevel</code> et <code>SeverityLevel</code>, renommer <code>brand</code> et <code>glp1Brand</code> qui portent un identifiant sous un nom de marque. <span class="marque non">non implémenté</span> <a href="spec-fonctionnelle.html#non-implemente-modele-de-donnees">→ fonctionnelle</a></p>
+  <p class="ancre">CONVENTIONS.md, src/types.ts, src/app/useAppData.ts</p>
+  <details><summary>Cas limites</summary>
+    <p>Règle 2 contre règle 7 sur les sports : le nom d'un sport <em>est</em> sa clé, et le calcul de calories relit son MET dans le catalogue à partir de ce texte. D'où <code>mergeTableTennisSport</code>, qui convertit les anciens noms plutôt que de laisser les séances retomber sur le repli « Autre » (4,5 MET).</p>
+    <p>Règle 6 : les <code>createdAt</code>/<code>updatedAt</code> sont des instants absolus en millisecondes, à ne pas confondre avec l'heure murale locale de la règle 5.</p>
+    <p>Règle 8 : la garde protège le geste de suppression, pas le recalcul — rouvrir et ré-enregistrer une recette dont un ingrédient a disparu par un autre chemin abaisse ses valeurs sans le dire.</p>
+    <p>Les entrées <code>custom-whey-*</code> de <code>customFoods</code> ne sont pas des préréglages : ce sont des aliments ajoutés à la main, indexés avec Ciqual et portant <code>isCustomFood: false</code>. <code>isCustomFood</code> ne distingue que les aliments créés depuis l'application.</p>
+  </details>
+
+  <h3 id="non-implemente-chargement-de-la-sauvegarde-des-repas">Chargement de la sauvegarde des repas</h3>
+  <p>Le chargement enchaîne huit passes dans un ordre fixe. <code>dropPreMigrationMeals</code> s'applique à la construction de l'objet ; les sept autres l'enveloppent.</p>
+  <pre><code>parsed → delete waterLogs, milestones, profile.{hydrationTrackingEnabled,
+                dailyWaterGoalMl, weightGoalsEnabled}
+hydrated = { ...parsed,
+             profile: INITIAL_PROFILE ← parsed.profile ← avatar fusionné,
+             savedMeals: dropPreMigrationMeals(parsed.savedMeals),
+             stepLogs: parsed.stepLogs || [] }
+
+ensureStartingWeighIn(
+  fillMealHunger(
+    mergeTableTennisSport(
+      mergeSideEffectNotes(
+        purgeDeleted(
+          migrateTreatmentIds(
+            dropSeedData(hydrated)))))))</code></pre>
+  <p><code>dropPreMigrationMeals</code> écarte les repas d'avant la bascule vers <code>items</code>. Le critère est l'<em>absence</em> du tableau, jamais une liste vide : un repas enregistré depuis la bascule en porte toujours au moins un.</p>
+  <pre><code>dropPreMigrationMeals(m) = Array.isArray(m)
+                             ? m.filter(repas =&gt; Array.isArray(repas?.items))
+                             : []</code></pre>
+  <p><code>fillMealHunger</code> ne touche qu'un repas dont l'un des deux niveaux de faim n'est pas un <code>number</code>. Les deux valeurs se déduisent alors de la ligne seule, par <code>hungerOfSavedMeal</code>. Le résultat est déterministe : la même sauvegarde rejouée donne les mêmes valeurs.</p>
+  <pre><code>moment = 4 si type ∈ {lunch, dinner}
+         3 si type = breakfast
+         2 sinon
+kcal   = meal.calories || 0
+taille = +1 si kcal ≥ 700 ; −1 si kcal ≤ 200 ; 0 sinon
+ecart  = (somme des charCodeAt de meal.id) mod 2      // 0 ou 1
+
+avant  = borne0_5(moment + taille + ecart)
+chute  = 3 si kcal ≥ 700 ; 1 si kcal ≤ 200 ; 2 sinon
+apres  = borne0_5(min(avant − 1, avant − chute))
+
+borne0_5(v) = max(0, min(5, v))</code></pre>
+  <p class="ancre">src/shared/model/appData.ts, src/app/useAppData.ts</p>
+  <details><summary>Cas limites</summary>
+    <p><code>savedMeals</code> absent ou non-tableau : <code>dropPreMigrationMeals</code> rend <code>[]</code>, jamais <code>undefined</code>.</p>
+    <p>Repas avec <code>items: []</code> : conservé — le critère porte sur le type, pas sur la longueur.</p>
+    <p>Repas portant déjà ses deux niveaux : jamais retouché. Un <code>0</code> saisi reste un <code>0</code> saisi, et c'est la valeur d'ouverture du curseur d'après-repas.</p>
+    <p>Un seul des deux niveaux présent : les <em>deux</em> sont recalculés, celui qui existait est écrasé.</p>
+    <p><code>chute</code> vaut toujours au moins 1, donc <code>avant − chute ≤ avant − 1</code> : le <code>min</code> retient toujours <code>avant − chute</code>. La faim d'après est strictement inférieure à celle d'avant, sauf quand la borne basse écrase les deux à 0.</p>
+    <p>Repas ≤ 200 kcal au petit-déjeuner avec <code>ecart</code> 0 : avant = 3 − 1 + 0 = 2, chute = 1, après = 1.</p>
+    <p>Le calcul lit <code>meal.calories</code>, un champ stocké — donc contraire au point 1 des conventions. Recalculer depuis <code>items</code> changerait les valeurs déduites.</p>
+  </details>
+  <div class="exemple"><p>Un dîner de Camille à 800 kcal, sans niveau de faim, dont l'identifiant a une somme de codes paire : moment = 4, taille = +1, ecart = 0, donc avant = 5. Chute = 3, après = min(4, 2) = 2. Le graphe d'appétit place ce repas à 5 → 2.</p></div>
+
+  <h3 id="non-implemente-analyses-textuelles-des-graphes-moteur-non-branche">Analyses textuelles des graphes (moteur non branché)</h3>
+  <p>Quatre fonctions pures lisent les <em>points affichés</em> par leur graphe — jamais les repas bruts — et la fenêtre de son sélecteur, puis choisissent parmi des textes préparés. Aucun fichier hors leur test ne les importe. <span class="marque non">non implémenté</span> <a href="spec-fonctionnelle.html#non-implemente-analyses-textuelles-des-graphes-repas">→ fonctionnelle</a></p>
+  <p><strong><code>analyzeNutrition</code></strong> — apports par jour. Les journées datées après aujourd'hui sont d'abord retirées par <code>splitFutureDays</code>, et leur nombre est dit dans une note ajoutée à <em>toutes</em> les sorties, retours précoces compris.</p>
+  <pre><code>n = journées retenues
+n = 0, 1, 2 → textes d'attente ; l'analyse s'écrit à partir de 3
+
+couverture = periodDayCount(fenêtre) − n, quand la fenêtre a une longueur connue
+moyennes   = mean(kcal), mean(protein), mean(carbs), mean(fat), mean(fiber)
+
+cv    = standardDeviation(kcal) / mean(kcal)
+ratio = max(kcal) / min(kcal)          // Infinity si min = 0
+  cv &lt; 0,15 et ratio ≤ 1,5 → « très régulières »
+  cv &lt; 0,35 et ratio ≤ 2,5 → « assez régulières »
+  sinon                    → « varient nettement »
+
+note d'aberrante (branche « varient nettement » seule), si n ≥ 4 :
+  cv recalculé sans le min &lt; 0,15 → « une seule journée, plus légère »
+  sinon cv sans le max   &lt; 0,15 → « une seule journée, plus copieuse »
+
+tendance, si n ≥ 7 : half = ⌊n/2⌋
+  first = mean(kcal[0..half−1]), second = mean(kcal[n−half..n−1])
+  relative = (second − first) / first
+  ≥ +0,10 hausse ; ≤ −0,10 baisse ; sinon pas d'évolution marquée
+n &lt; 7 → « ces chiffres restent indicatifs »</code></pre>
+  <p><strong><code>analyzeHunger</code></strong> — appétit par créneau de 3 h. Les moyennes d'ensemble sont pondérées par le nombre de prises du créneau, jamais des moyennes de moyennes.</p>
+  <pre><code>avgBefore = Σ(faimAvant × beforeCount) / Σ beforeCount
+avgAfter  = Σ(faimApres × afterCount)  / Σ afterCount
+
+notesAvant = 0 et notesApres = 0 → rien à lire
+un seul côté renseigné           → « impossible de mesurer ce que le repas change »
+min(notesAvant, notesApres) &lt; 3  → pas de lecture par créneau, moyennes seules
+
+créneau de plus fort appétit : tri faimAvant décroissant, égalité → startHour croissant
+créneau qui rassasie le plus : tri (faimAvant − faimApres) décroissant,
+  sur les seuls créneaux portant LES DEUX notes
+
+delta = avgBefore − avgAfter
+  ≥ 1     → « l'écart est net »
+  ≥ 0,3   → « diminue modérément »
+  &gt; −0,3  → « change peu »
+  sinon   → plus haute après qu'avant, invite à vérifier le sens des curseurs
+
+min(notesAvant, notesApres) &lt; 7 → réserve d'échantillon</code></pre>
+  <p><strong><code>analyzeTimeSlotShare</code></strong> — part des créneaux, commune au graphe en barres et au tableau : les deux dessinent les mêmes lignes, l'analyse est donc la même fonction.</p>
+  <pre><code>totalPrises = Σ row.count
+  0            → rien à répartir
+  &lt; 5          → « pas encore significative » (chaque prise pèse ≥ 20 %)
+créneaux notés = ceux dont calories ≠ null et &gt; 0, triés décroissant,
+  égalité → startHour croissant ; aucun → « aucune ne porte de calories »
+
+bigSlots = nombre de créneaux à ≥ 10 % des calories
+  ≤ 2 → « apports concentrés » ; ≥ 5 → « étalés » ; sinon « principalement sur N créneaux »
+
+eveningShare = somme des parts des créneaux startHour ∈ {21, 0}
+  ≥ 15 % → constat chiffré « entre 21 h et 3 h », sans jugement
+
+totalPrises &lt; 15 → « ces parts restent sensibles »</code></pre>
+  <p><strong><code>analyzeTimeSlotComposition</code></strong> — composition selon l'heure. Les parts sont des <em>masses</em> de macronutriments en pourcentage, pas des calories.</p>
+  <pre><code>active = créneaux dont count &gt; 0 et protein ≠ null ; aucun → rien à calculer
+busiest = créneau au plus grand count (égalité → le plus tôt)
+dominant = macronutriment de plus grande part parmi protein, carbs, fat, fiber
+
+si active ≥ 2 :
+  écart = max(part de glucides) − min(part de glucides)
+  ≥ 20 points → « la composition change selon l'heure »
+  sinon       → « varie peu d'un créneau à l'autre »
+
+un créneau à count = 1 → « leur composition reflète ce seul repas »</code></pre>
+  <p>Les prises sans heure ne sont jamais silencieuses : les trois fonctions par créneau ajoutent une note qui les compte, mot pour mot la même.</p>
+  <p class="ancre">src/features/meal-charts/chartAnalysis.ts, src/shared/analysis/analysis.ts</p>
+  <details><summary>Cas limites</summary>
+    <p><code>mean([])</code> rend 0 et <code>standardDeviation([])</code> rend 0 : l'écart-type est celui de la <em>population</em>, pas celui d'un échantillon.</p>
+    <p><code>avgCal = 0</code> : la phrase de régularité est entièrement sautée, aucune division par zéro.</p>
+    <p><code>min(kcal) = 0</code> : le ratio vaut <code>Infinity</code>, donc « varient nettement » quel que soit le CV.</p>
+    <p>Fenêtre sans longueur connue (« Depuis le début », bornes incomplètes) : <code>periodDayCount</code> rend <code>null</code> et la phrase de couverture disparaît, plutôt que d'inventer un nombre de jours manquants.</p>
+    <p>Tendance à <em>n</em> impair : les deux moitiés de <code>⌊n/2⌋</code> points sautent le point médian, qui n'entre dans aucune.</p>
+    <p>Un seul créneau porte des notes d'avant : la comparaison entre moments de la journée est déclarée impossible au lieu d'être écrite.</p>
+    <p>Écart avant/après négatif sur un créneau : la phrase inverse le sens plutôt que d'afficher un écart négatif.</p>
+    <p>La note du futur n'existe que pour <code>analyzeNutrition</code> : les trois autres fonctions fondent les dates dans les créneaux, il n'y a plus de journée à écarter.</p>
+  </details>
+  <div class="exemple"><p>Camille, sept journées à 1 480, 1 620, 1 390, 1 550, 1 700, 1 460 et 1 520 kcal. Moyenne 1 531 kcal, écart-type 96, CV = 0,063, ratio = 1 700 / 1 390 = 1,22 : « très régulières, de 1 390 à 1 700 kcal ». Tendance : half = 3, first = 1 497, second = 1 560, relative = +0,042 — sous le seuil de 10 %, donc « pas d'évolution marquée ». Aucun accordéon ne montre ce texte.</p></div>
+
+  <h3 id="non-implemente-cartes-journalieres-defilables">Cartes journalières défilables</h3>
+  <p><code>computeDailySwipeList</code> produit une carte par journée, d'aujourd'hui vers le passé, sans trou. Le nombre de cartes est le maximum entre quatorze et la profondeur de l'historique.</p>
+  <pre><code>oldestDate = min(new Date(log.date)) sur stepHistory, sinon maintenant
+diffDays   = ceil(|maintenant − oldestDate| / 86 400 000)
+n          = max(14, diffDays + 1)
+
+pour i de 0 à n − 1 :
+  d       = aujourd'hui − i jours
+  dateStr = getLocalDateStr(d)                       // AAAA-MM-JJ
+  log     = stepHistory.find(l =&gt; l.date === dateStr)
+  steps   = log ? log.steps : 0
+  calories       = getStepsCaloriesForLog(steps, dateStr, weightHistory, profile)
+  percentReached = min(100, round(steps / dailyGoalSteps × 100))
+  dateLabel      = JJ/MM/AA, chacun rempli à gauche par un zéro,
+                   l'année sur ses deux derniers chiffres</code></pre>
+  <p>Les calories reprennent la formule des pas du site : poids à la date de la journée, taille du profil ou 170 cm à défaut, résultat plancher à 0.</p>
+  <pre><code>strideKm      = taille_cm × 0,414 / 100 000
+distanceKm    = pas × strideKm
+durationHours = distanceKm / 4,2
+kcal          = max(0, round(3,5 × poids_kg × durationHours))</code></pre>
+  <p><code>useStepsStats</code> mémorise la liste et la rend sous <code>dailySwipeList</code>, recalculée dès que l'historique, l'objectif, l'historique de poids ou le profil changent. Aucun composant de la Mixte ne lit cette clé : la page Pas n'y prend que <code>sortedHistory</code>, <code>todayTotalSteps</code>, <code>todayCalories</code>, <code>percentReached</code> et <code>lastMonthStats</code>. <span class="marque non">non implémenté</span> <a href="spec-fonctionnelle.html#non-implemente-cartes-journalieres-defilables-des-pas">→ fonctionnelle</a></p>
+  <p class="ancre">src/features/steps/steps.utils.ts, src/features/steps/useStepsStats.ts</p>
+  <details><summary>Cas limites</summary>
+    <p>Historique vide : <code>oldestDate</code> reste l'instant courant, <code>diffDays</code> vaut 0, la liste fait exactement 14 cartes, toutes à zéro pas.</p>
+    <p>Journée sans relevé : la carte existe, à 0 pas, 0 calorie, 0 %. Les trous ne sont pas sautés.</p>
+    <p><code>dailyGoalSteps = 0</code> : <code>percentReached</code> vaut <code>NaN</code> à 0 pas et 100 au-delà. Le repli <code>|| DEFAULT_DAILY_GOAL_STEPS</code> (8 000) qui protège <code>computeStepsStatsSince</code> n'existe pas ici.</p>
+    <p><code>percentReached</code> est plafonné à 100 : dépasser l'objectif ne se voit pas sur la carte.</p>
+    <p><code>new Date(log.date)</code> lit « AAAA-MM-JJ » comme minuit UTC, quand <code>new Date()</code> est local : le compte de jours peut différer d'une unité selon le fuseau et l'heure d'ouverture. Le <code>ceil</code> et le <code>+ 1</code> jouent dans le sens d'une carte de trop, jamais d'une de moins.</p>
+    <p>Un relevé daté dans le futur devient le <code>oldestDate</code> seulement s'il est antérieur à maintenant — sinon il n'agrandit pas la liste, et sa carte n'apparaît pas.</p>
+  </details>
+  <div class="exemple"><p>Camille marche depuis le 1<sup>er</sup> mai 2026. Au 13 septembre 2026, <code>diffDays</code> vaut 135, la liste compte 136 cartes. Celle du jour, à 8 200 pas, 84 kg, 168 cm : strideKm = 0,00069552, distance 5,70 km, durée 1,358 h, calories = round(3,5 × 84 × 1,358) = 399 kcal ; percentReached = min(100, round(8 200 / 8 000 × 100)) = 100. Aucune de ces 136 cartes n'atteint un écran.</p></div>
+
+  <h3 id="non-implemente-analyse-duree-et-qualite-code-mis-de-cote">Analyse « Durée et qualité » (code mis de côté)</h3>
+  <p><code>analyzeSleepEvolution</code> lit les points affichés par le graphe et ne retient que les journées où <code>minutes &gt; 0</code> : <code>computeSleepDays</code> produit un point pour chaque jour de la fenêtre, à zéro quand rien n'est saisi. Le composant calcule l'analyse à chaque rendu, puis la monte sous <code>{false &amp;&amp; …}</code>. <span class="marque non">non implémenté</span> <a href="spec-fonctionnelle.html#non-implemente-graphes-croises-sommeil-nutrition-sleepnutritionchart-mis-de">→ fonctionnelle</a></p>
+  <pre><code>slept = points.filter(p =&gt; p.minutes &gt; 0) ; n = slept.length
+
+n = 0 → « aucun sommeil enregistré » + « dès trois journées saisies »
+n = 1 → la durée de cette nuit, « à partir de trois journées saisies »
+n = 2 → les deux durées, même renvoi à trois
+
+n ≥ 3 :
+  moyenne = mean(minutes), amplitude = min(minutes) … max(minutes), siestes comprises
+  spread = standardDeviation(minutes)          // écart-type de population, en minutes
+    &lt; 45  → « régulières »
+    &lt; 90  → « assez régulières »
+    sinon → « varient sensiblement »
+  qualité = mean(Qualité) sur les seules journées notées, en /5
+            aucune notée → « aucune note de qualité n'est renseignée »
+  tendance, si n ≥ 7 : half = ⌊n/2⌋
+    first = mean(minutes[0..half−1]), second = mean(minutes[n−half..n−1])
+    second − first ≥ 30 min → nuits plus longues en fin de période
+    first − second ≥ 30 min → nuits plus courtes
+    sinon                   → « Pas d'évolution marquée »
+  n &lt; 7 → « ces chiffres restent indicatifs »</code></pre>
+  <p class="ancre">src/features/sleep/sleepAnalysis.ts, src/versions/mixte/features/sleep/SleepChart.tsx</p>
+  <details><summary>Cas limites</summary>
+    <p>Une journée saisie à 0 minute n'est pas une nuit : elle sort du filtre, et ne compte ni au numérateur ni au dénominateur.</p>
+    <p><code>Sommeil</code> agrège nuit et siestes ; l'amplitude annoncée le dit explicitement.</p>
+    <p><code>Qualité</code> à <code>null</code> sur une journée dormie : la journée compte pour la durée, pas pour la qualité — les deux dénominateurs diffèrent.</p>
+    <p>Le seuil de régularité porte sur des minutes, jamais sur un coefficient de variation : deux nuits de 4 h et 5 h 30 sont « régulières » au même titre que deux nuits de 7 h et 8 h 30.</p>
+    <p>Fenêtre longue : <code>computeSleepDays</code> plafonne à 60 points et échantillonne un jour sur <code>⌊(diffDays + 1) / 60⌋</code> — au-delà de deux mois, l'analyse ne lit plus toutes les journées.</p>
+  </details>
+  <div class="exemple"><p>Camille sur cinq nuits : 6 h 50, 7 h 10, 8 h 05, 6 h 30, 7 h 20 — soit 410, 430, 485, 390 et 440 min. Moyenne 431 min (7 h 11), amplitude 6 h 30 à 8 h 05, écart-type 32 min : « régulières ». n = 5, sous sept : « ces chiffres restent indicatifs ». Le texte est calculé, l'accordéon ne s'affiche pas.</p></div>
+
+  <h3 id="non-implemente-analyse-croisee-sommeil-nutrition-code-mis-de-cote">Analyse croisée sommeil × nutrition (code mis de côté)</h3>
+  <p><code>analyzeSleepNutrition</code> croise une des trois séries de sommeil avec les calories des mêmes journées. Les trois graphes qui la portent sont montés sous <code>{false &amp;&amp; croiseAlimentation &amp;&amp; …}</code> ; <code>croiseAlimentation</code> vaut <code>profile.foodTrackingEnabled ?? false</code>. <span class="marque non">non implémenté</span> <a href="spec-fonctionnelle.html#non-implemente-graphes-croises-sommeil-nutrition-sleepnutritionchart-mis-de">→ fonctionnelle</a></p>
+  <pre><code>séries lisibles : 'Éveil' (heures), 'Nuit' (heures), 'Qualité nuit' (0–5)
+Kcal = round(nutritionTotalsOn(repas, jour).calories), ou null si aucun repas ce jour
+
+paires = points où série ≠ null ET Kcal ≠ null
+
+aucune des deux séries renseignée → « rien à croiser »
+aucun repas                       → l'analyse a besoin des deux
+aucun sommeil                     → l'analyse a besoin des deux</code></pre>
+  <p>Le verdict vient de <code>readCorrelation</code>, le seul juge de paix des deux moteurs.</p>
+  <pre><code>readCorrelation(paires) :
+  pairCount &lt; CORRELATION_MIN_PAIRS (= 7) → 'trop-peu'
+  r = pearson(paires)
+      = Σ(x−x̄)(y−ȳ) / √( Σ(x−x̄)² · Σ(y−ȳ)² )
+      null si moins de 2 paires, ou si une des deux sommes de carrés est nulle
+  r = null                                → 'variance-nulle'
+  |r| &lt; CORRELATION_MODERATE (= 0,3)      → 'aucun'
+  |r| ≥ CORRELATION_STRONG  (= 0,5)       → 'net'
+  sinon                                   → 'modere'
+  positive = r &gt; 0</code></pre>
+  <pre><code>'trop-peu'       → « il en faut au moins 7 pour oser un constat »
+'variance-nulle' → dit LAQUELLE des deux séries ne varie pas
+'aucun'          → « les deux évoluent indépendamment »
+'modere' / 'net' → la phrase de sens de la série, PUIS toujours la réserve :
+                   « pas une cause à effet »
+pairCount &lt; 14   → « L'échantillon reste modeste », y compris après « aucun lien »</code></pre>
+  <p>Les trois séries n'ont pas la même journée de référence. <code>Nuit</code> et <code>Qualité nuit</code> sont celles de la nuit <em>datée</em> du jour J — une entrée de sommeil porte la date du réveil — croisées avec les calories de ce même jour J. <code>Éveil</code> est le temps du jour J lui-même : du réveil du matin à l'endormissement du soir, siestes déduites.</p>
+  <pre><code>awakeMinutesOn(logs, J) :
+  nuitsJ = nuits datées de J ; nuitsJ+1 = nuits datées du lendemain
+  aucune des deux → null
+  reveil  = max(heure de réveil des nuitsJ)
+  coucher = min(heure de coucher des nuitsJ+1)
+  brut    = coucher &gt; reveil ? coucher − reveil : coucher + 1440 − reveil
+  eveil   = brut − siestes du jour J ; rendu seulement si &gt; 0</code></pre>
+  <p class="ancre">src/features/sleep/sleepAnalysis.ts, src/shared/analysis/analysis.ts, src/features/sleep/sleep.utils.ts, src/versions/mixte/features/sleep/SleepTracker.tsx</p>
+  <details><summary>Cas limites</summary>
+    <p>Six paires complètes : verdict <code>'trop-peu'</code>, aucun coefficient n'est calculé ni affiché — à sept points, un |r| de 0,5 se produit couramment sur des données sans lien.</p>
+    <p>Une série constante sur toutes les paires : Pearson rend <code>null</code>, et le texte nomme laquelle en comparant les valeurs de la série de sommeil entre elles.</p>
+    <p><code>Éveil</code> exige une nuit datée du jour <em>et</em> une nuit datée du lendemain : la dernière journée de l'historique n'a jamais de temps d'éveil.</p>
+    <p>Un éveil calculé à zéro ou négatif (siestes plus longues que l'intervalle) rend <code>null</code> plutôt que zéro.</p>
+    <p>Le graphe « Éveil et nutrition » retire la journée en cours par <code>dropCurrentDay</code> : l'éveil et les kcal du jour sont incomplets jusqu'au soir. Les deux autres ne la retirent pas, la nuit précédant le jour J étant terminée dès le réveil.</p>
+    <p>Un jour sans repas donne <code>Kcal = null</code>, pas 0 : il ne fait pas paire, et n'entre pas au dénominateur.</p>
+  </details>
+  <div class="exemple"><p>Camille a saisi ses nuits et ses repas sur douze journées, dont neuf portent les deux. <code>pairCount</code> = 9, au-dessus du garde-fou de 7. Un <code>r</code> de −0,62 dépasse 0,5 en valeur absolue : verdict <code>'net'</code>, sens négatif, donc « vos nuits les plus courtes précèdent des journées plus caloriques », suivi de la réserve de non-causalité, puis de « L'échantillon reste modeste (9 journées complètes) » puisque 9 &lt; 14. Le graphe et son accordéon restent éteints.</p></div>
+</section>

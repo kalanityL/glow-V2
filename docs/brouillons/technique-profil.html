@@ -1,0 +1,807 @@
+<section id="profil">
+  <h2>19. Profil, avatar, compte, avis, sondage, FAQ, légal <a class="retour" href="#sommaire">↑ sommaire</a></h2>
+  <p>Ce chapitre donne les règles de calcul et de décision du profil, de l'avatar, des modules, des rappels, du compte, des envois d'avis et de sondage, de la FAQ et de l'acceptation légale. Il dit les bornes, les messages exacts, les défauts, l'ordre des opérations et ce qui part en base.</p>
+
+  <h3 id="profil-entites">Entités</h3>
+  <p>Le profil est un objet unique, enregistré avec les journaux sous une seule clé. Les grandeurs sont en unités canoniques : années, centimètres, kilogrammes, <code>HH:MM</code> et <code>AAAA-MM-JJ</code> en heure locale. Aucune unité n'est stockée à côté de la valeur.</p>
+  <table>
+    <thead><tr><th>Champ de <code>UserProfile</code></th><th>Type</th><th>Note</th></tr></thead>
+    <tbody>
+      <tr><td><code>name</code></td><td>string</td><td>prénom ou pseudo</td></tr>
+      <tr><td><code>gender</code></td><td>'homme' | 'femme' | 'neutre'</td><td>recopié du genre de l'avatar</td></tr>
+      <tr><td><code>age</code></td><td>number (années)</td><td></td></tr>
+      <tr><td><code>height</code></td><td>number (cm)</td><td></td></tr>
+      <tr><td><code>targetWeight</code></td><td>number (kg)</td><td>arrondi à 0,1 à l'enregistrement</td></tr>
+      <tr><td><code>glp1Brand</code></td><td>string</td><td>identifiant de catalogue, jamais un nom</td></tr>
+      <tr><td><code>avatar</code></td><td>AvatarConfig</td><td></td></tr>
+      <tr><td><code>silhouetteType</code></td><td>SilhouetteType</td><td>aucune interface de réglage</td></tr>
+      <tr><td><code>reminderEnabled</code></td><td>boolean</td><td></td></tr>
+      <tr><td><code>reminderDay</code></td><td>number 0–6</td><td>0 = dimanche</td></tr>
+      <tr><td><code>reminderTime</code></td><td>string HH:MM</td><td>ramené aux minutes rondes</td></tr>
+      <tr><td><code>injectionReminderType</code></td><td>'weekly' | 'custom' (facultatif)</td><td>absent = 'weekly'</td></tr>
+      <tr><td><code>injectionReminderDaysInterval</code></td><td>number (jours, facultatif)</td><td>absent = 7</td></tr>
+      <tr><td><code>injectionReminderStartDate</code></td><td>string AAAA-MM-JJ (facultatif)</td><td>absent = aujourd'hui local</td></tr>
+      <tr><td><code>medicalReminderEnabled</code></td><td>boolean</td><td></td></tr>
+      <tr><td><code>medicalReminderDoctor</code>, <code>medicalReminderDate</code>, <code>medicalReminderTime</code>, <code>medicalReminderNotifyBefore</code></td><td>string (facultatifs)</td><td>défauts '', '', '10:00', '1d'</td></tr>
+      <tr><td><code>treatmentTrackingEnabled</code>, <code>sideEffectsTrackingEnabled</code></td><td>boolean (facultatifs)</td><td>absent = activé</td></tr>
+      <tr><td><code>foodTrackingEnabled</code>, <code>stepsTrackingEnabled</code>, <code>sportTrackingEnabled</code>, <code>meTimeTrackingEnabled</code>, <code>sleepTrackingEnabled</code></td><td>boolean (facultatifs)</td><td>absent = désactivé</td></tr>
+      <tr><td><code>treatmentModuleHidden</code>, <code>sideEffectsModuleHidden</code>, <code>foodModuleHidden</code>, <code>stepsModuleHidden</code>, <code>sportModuleHidden</code>, <code>meTimeModuleHidden</code>, <code>sleepModuleHidden</code></td><td>boolean (facultatifs)</td><td>absent = non masqué</td></tr>
+      <tr><td><code>measurementSystem</code></td><td>'metric' | 'imperial' (facultatif)</td><td>aucune interface de réglage</td></tr>
+    </tbody>
+  </table>
+  <p><code>AvatarConfig</code> : <code>gender</code>, <code>faceShape</code> ('oval' | 'round' | 'square' | 'heart'), <code>skinColor</code> (hex), <code>eyeColor</code> (hex), <code>hairStyle</code> ('court' | 'long' | 'boucle' | 'chauve' | 'frange' | 'brosse'), <code>hairColor</code> (hex), <code>hasGlasses</code> (booléen), <code>expression</code> ('happy' | 'determined' | 'proud' | 'calm'), <code>customPhotoUrl</code> (facultatif, <code>data:image/jpeg</code>). <code>faceShape</code>, <code>eyeColor</code>, <code>hasGlasses</code> et <code>expression</code> sont enregistrés sans influer sur le glyphe rendu.</p>
+  <p><code>WeightLog</code> porteur du départ : <code>id</code> ('starting-weight-log' pour celle que le profil crée), <code>date</code> AAAA-MM-JJ, <code>time</code> HH:MM facultatif, <code>weight</code> en kg, mensurations facultatives en cm, <code>isStartingWeight</code> booléen — une seule ligne le porte.</p>
+  <p><code>FeedbackItem</code> (clé <code>glp1_user_feedbacks</code>) : <code>id</code>, <code>type</code> ('avis' | 'feature' | 'bug'), <code>sentiment</code>, <code>category</code> facultative, <code>message</code>, <code>date</code> (libellé fr-FR), <code>sentAt</code> en millisecondes (facultatif), <code>acceptsContact</code> facultatif. <code>StoredSurvey</code> (clé <code>glp1_user_survey_v2</code>) : <code>ratings</code> (sept entiers 0–5), <code>otherSuggestion</code>, <code>sendLog</code> (instants en ms). <code>AuthUser</code> : <code>id</code> (uid), <code>email</code>, <code>name</code>.</p>
+  <p>Dérivé, donc NON stocké : le poids de départ (lu dans la pesée marquée), la perte de poids, le nom et la forme du traitement (lus au catalogue par identifiant), l'état effectif d'un module et son masquage (calculés du drapeau et de son défaut), le glyphe de l'avatar.</p>
+  <p class="ancre">src/types.ts · src/app/useAppData.ts</p>
+
+  <h3 id="profil-connexion-champs-requis">Connexion : champs requis</h3>
+  <p>Au submit, <code>email.trim()</code> vide ou <code>password</code> vide pose « Renseignez l'e-mail et le mot de passe. » et sort avant tout appel réseau. Les deux boutons portent <code>disabled={isBusy}</code> pendant la tentative ; l'e-mail est trimé une seconde fois dans <code>signInWithPassword</code>, le mot de passe jamais.</p>
+  <pre><code>if (!email.trim() || !password) { setMessage('Renseignez l’e-mail et le mot de passe.'); return; }
+signInWithEmailAndPassword(auth, email.trim(), password)</code></pre>
+  <p class="ancre">src/features/auth/LoginPage.tsx · src/shared/platform/auth.ts</p>
+  <details><summary>Cas limites</summary>
+    <p>E-mail « &nbsp;&nbsp; » (espaces seuls) : refusé localement, aucun appel. Mot de passe fait d'espaces : accepté et envoyé tel quel — seul l'e-mail est trimé.</p>
+  </details>
+
+  <h3 id="profil-messages-d-echec-de-connexion">Messages d'échec de connexion</h3>
+  <p><code>authErrorMessage(code)</code> traduit le code Firebase ; un code non prévu tombe sur le message générique.</p>
+  <pre><code>auth/invalid-email          → "L'adresse e-mail n'est pas valide."
+auth/invalid-credential     ┐
+auth/user-not-found         ├→ "E-mail ou mot de passe incorrect."
+auth/wrong-password         ┘
+auth/user-disabled          → "Ce compte a été désactivé."
+auth/too-many-requests      → "Trop de tentatives. Réessayez dans quelques minutes."
+auth/network-request-failed → "Connexion impossible. Vérifiez votre accès à Internet."
+auth/popup-closed-by-user   ┐
+auth/cancelled-popup-request┘→ "La fenêtre Google a été refermée avant la fin."
+auth/popup-blocked          → "Le navigateur a bloqué la fenêtre Google. Autorisez les pop-ups puis réessayez."
+auth/unauthorized-domain    → "Ce domaine n'est pas autorisé dans la console Firebase."
+défaut                      → "La connexion a échoué. Réessayez."</code></pre>
+  <p>Confondre compte inconnu, mot de passe faux et identifiant invalide est délibéré : la réponse ne dit pas si l'adresse existe.</p>
+  <p class="ancre">src/shared/platform/auth.errors.ts</p>
+
+  <h3 id="profil-verrou-actif">Verrou actif</h3>
+  <p><code>isAuthConfigured = FIREBASE_CONFIG.apiKey !== ''</code>, et <code>isDatabaseConfigured</code> reprend la même valeur. Faux, le garde-barrière laisse passer sans connexion, <code>currentAuthUser()</code> rend <code>null</code>, aucun envoi en base n'est tenté et la suppression de compte n'appelle pas Firebase.</p>
+  <p class="ancre">src/shared/platform/firebase.config.ts · src/shared/platform/firestore.ts</p>
+
+  <h3 id="profil-apercu-profil-du-plusmenu">Aperçu profil du PlusMenu</h3>
+  <p>Deux chiffres, calculés au rendu de la carte. <a href="spec-fonctionnelle.html#profil-configuration-plus">→ fonctionnelle</a></p>
+  <pre><code>startingWeight = getStartingWeight(weightHistory)            // 0 si aucune pesée marquée départ
+currentWeight  = weightHistory.length &gt; 0
+                 ? weightHistory[weightHistory.length - 1].weight
+                 : startingWeight
+weightLost     = startingWeight - currentWeight
+affichage      = '-' + parseFloat(weightLost.toFixed(1)) + ' kg'
+lastInjection  = getMostRecentPastInjection(injectionHistory)
+                 // la plus récente d'instant ≤ maintenant ; à défaut, la plus récente de toutes
+affichage      = lastInjection ? lastInjection.dose + ' mg' : 'N/A'</code></pre>
+  <p>La « dernière pesée » est la dernière entrée du tableau, tenu trié par date croissante à l'écriture — pas un maximum recalculé.</p>
+  <p class="ancre">src/versions/mixte/components/PlusMenu.tsx · src/utils/pharmacokinetics.ts</p>
+  <details><summary>Cas limites</summary>
+    <p>Historique vide : <code>current = starting = 0</code>, perte 0, rendu « -0 kg ». Poids repris depuis le départ : <code>weightLost</code> négatif, et le tiret est un préfixe littéral — 95 puis 96,2 rend « --1.2 kg ». Aucune injection : « N/A ». Injections toutes futures : la plus récente de toutes est affichée.</p>
+  </details>
+  <div class="exemple"><p>Camille : départ 96, dernière pesée 91,4 → <code>parseFloat((4.6).toFixed(1))</code> = 4.6, la carte écrit « -4.6 kg » ; dernière injection à 1 mg → « 1 mg ».</p></div>
+
+  <h3 id="profil-poids-de-depart-affiche">Poids de départ affiché</h3>
+  <p>La page Mon Profil et le formulaire complet reçoivent <code>getStartingWeight(weightHistory, INITIAL_STARTING_WEIGHT)</code> : le poids de la pesée qui porte <code>isStartingWeight</code>, sinon 95. La constante <code>INITIAL_STARTING_WEIGHT = 95.0</code> sert aussi à semer la pesée de départ sur une installation neuve. Le repli à 95 n'est pas celui du PlusMenu, qui prend 0.</p>
+  <p class="ancre">src/versions/mixte/App.tsx · src/shared/model/startingWeighIn.ts · src/app/useAppData.ts</p>
+
+  <h3 id="profil-navigation-vers-mon-profil">Navigation vers Mon Profil</h3>
+  <p><code>handleNavigate('settings')</code> écrit <code>previousTab = activeTab</code> seulement si l'onglet courant n'est pas déjà <code>settings</code> ; <code>previousTab</code> vaut <code>'maison'</code> au démarrage. L'onglet surligné du menu du bas pour <code>settings</code> est <code>plus</code>. Le titre de page est lu dans <code>PAGE_TITLES</code>.</p>
+  <pre><code>plus → « Configuration &amp; Plus »   settings → « Mon Profil »
+compte → « Mon compte »           modules → « Modules »
+notifications → « Notifications » feedback → « Avis et Feedback »
+sondage → « Sondage »             faq → « FAQ »</code></pre>
+  <p><code>injection</code> fait exception : son titre est « Comprimés » si le traitement est oral, « Injections » sinon.</p>
+  <p class="ancre">src/versions/mixte/App.tsx</p>
+
+  <h3 id="profil-nom-ou-pseudo">Nom ou pseudo</h3>
+  <p><code>sanitizeName(raw) = raw.trim() || null</code>. La chaîne trimée est enregistrée ; vide, la valeur est refusée avec <code>REFUSAL_NAME</code> = « Un prénom ou un pseudo est attendu. » Aucune longueur maximale, aucun caractère interdit.</p>
+  <p class="ancre">src/versions/mixte/components/profile.fields.ts</p>
+  <details><summary>Cas limites</summary>
+    <p>«&nbsp;&nbsp;Sophie&nbsp;&nbsp;» → « Sophie ». «&nbsp;&nbsp;&nbsp;» → refus. « 0 » → accepté, la chaîne n'est jamais convertie en nombre.</p>
+  </details>
+
+  <h3 id="profil-age">Âge</h3>
+  <p>Entier en années, borné à [1, 130] inclus.</p>
+  <pre><code>sanitizeInteger(raw, 1, 130) :
+  n = Math.round(Number(raw.replace(/,/g, '.').trim()))
+  si !Number.isFinite(n) ou n &lt; 1 ou n &gt; 130 → null
+  sinon String(n)</code></pre>
+  <p>Refus : « Un âge entre 1 et 130 ans est attendu. » <code>RULE_AGE</code> porte les mêmes bornes, l'unité « ans » et ce message ; sans <code>decimals</code>, elle vaut 0 décimale.</p>
+  <p class="ancre">src/versions/mixte/components/profile.fields.ts · src/versions/mixte/app/form.rules.ts</p>
+  <details><summary>Cas limites</summary>
+    <p>« 42,6 » → arrondi à 43 par <code>sanitizeAge</code>, mais le champ n'a jamais laissé taper la décimale : <code>cleanNumericInput(raw, 0)</code> tronque à « 42 » à la frappe. « 0 » → refus. « 131 » → refus. Champ vidé : <code>Number('')</code> vaut 0, arrondi 0, hors bornes → refus.</p>
+  </details>
+
+  <h3 id="profil-taille">Taille</h3>
+  <p>Même fonction que l'âge, bornes [50, 300] en centimètres : <code>sanitizeHeight = sanitizeInteger(raw, 50, 300)</code>. Refus : « Une taille entre 50 et 300 cm est attendue. » <code>RULE_HEIGHT</code> reprend ces bornes, l'unité « cm » et ce message.</p>
+  <p class="ancre">src/versions/mixte/components/profile.fields.ts · src/versions/mixte/app/form.rules.ts</p>
+  <details><summary>Cas limites</summary>
+    <p>« 49 » → refus. « 300 » → accepté (borne incluse). « 168.7 » → tronqué à « 168 » à la frappe, puis accepté.</p>
+  </details>
+
+  <h3 id="profil-poids-depart-et-objectif">Poids de départ et objectif</h3>
+  <p>Un poids est une chaîne à une décimale, strictement positive et au plus 1000 kg.</p>
+  <pre><code>sanitizeWeight(raw) :
+  cleaned = cleanDecimalInput(raw)
+  n = Number(cleaned)
+  si cleaned === '' ou !Number.isFinite(n) ou n &lt;= 0 ou n &gt; 1000 → null
+  sinon cleaned            // la chaîne nettoyée, jamais reformatée</code></pre>
+  <p>Refus : « Un poids entre 0,1 et 1000 kg est attendu. » <code>RULE_WEIGHT</code> : <code>min 0.1</code>, <code>max 1000</code>, <code>decimals 1</code>, <code>step 0.1</code>, unité « kg », même message. La borne basse de la règle (0,1) et celle du sanitize (&gt; 0) diffèrent : « 0.05 » passe la règle du champ et est refusé par le sanitize.</p>
+  <p class="ancre">src/versions/mixte/components/profile.fields.ts · src/versions/mixte/app/form.rules.ts</p>
+  <details><summary>Cas limites</summary>
+    <p>« 95,55 » → « 95.5 » (tronqué, pas arrondi). « 0 » → refus. « 1000.5 » → 1000.5 &gt; 1000 → refus. « 70. » → <code>Number('70.')</code> = 70 → accepté, la chaîne « 70. » est enregistrée telle quelle par cette fonction.</p>
+  </details>
+  <div class="exemple"><p>Camille tape « 96,35 » : le champ écrit « 96.3 », le sanitize le retient, <code>Number('96.3')</code> = 96,3 part à l'enregistrement.</p></div>
+
+  <h3 id="profil-nettoyage-decimal">Nettoyage décimal</h3>
+  <p><code>cleanDecimalInput</code> est le nettoyage propre aux poids du profil, appliqué à chaque frappe. Il ne borne rien et n'arrondit rien.</p>
+  <pre><code>1. toutes les virgules deviennent des points
+2. tout ce qui n'est ni chiffre ni point est retiré (le signe moins compris)
+3. s'il reste plus d'un point, seul le premier survit :
+   parts[0] + '.' + parts.slice(1).join('')
+4. la partie décimale est tronquée à 1 chiffre</code></pre>
+  <p class="ancre">src/versions/mixte/components/profile.fields.ts</p>
+  <details><summary>Cas limites</summary>
+    <p>« 1.2.3 » → « 1.23 » puis « 1.2 ». « 70kg » → « 70 ». « -5 » → « 5 ». « . » → « . », que <code>sanitizeWeight</code> refuse (<code>Number('.')</code> = NaN).</p>
+  </details>
+
+  <h3 id="profil-moment-du-jugement-et-retour-arriere-numberfield">Moment du jugement et retour arrière (NumberField)</h3>
+  <p>Le champ numérique ne juge qu'à la sortie : perte du focus, ou touche Entrée. Pendant la frappe, seul <code>cleanNumericInput</code> s'applique. Le champ retient dans une ref la dernière valeur VALABLE traversée, initialisée à la valeur d'ouverture si elle est acceptable et à la chaîne vide sinon.</p>
+  <pre><code>commit() :
+  retained = sanitizeNumber(value, rule)
+  si retained === null :
+     si validateOnSubmit : onCommit(value) ; fin       // ni message ni retour
+     announce(boundsMessage(rule))
+     initial = lastValid.current
+     onValueChange(initial) ; onCommit(initial)
+  sinon :
+     announce(null) ; lastValid = retained
+     si retained !== value : onValueChange(retained)
+     onCommit(retained)</code></pre>
+  <p>Le message part dès qu'une frappe redevient acceptable, sans attendre une nouvelle sortie. En mode <code>validateOnSubmit</code> — celui des quatre champs chiffrés du formulaire complet — le champ ne dit rien, ne revient pas, et la saisie refusable reste sous les yeux jusqu'au clic sur Valider.</p>
+  <p class="ancre">src/shared/ui/NumberField.tsx</p>
+  <details><summary>Cas limites</summary>
+    <p>Champ ouvert sur une valeur déjà hors bornes : <code>lastValid</code> vaut '' et un refus y ramène le champ vide. Le retour arrière remonte à l'appelant par <code>onCommit</code> : une saisie refusée peut donc déclencher un enregistrement, si la dernière valeur valable diffère de la valeur du profil.</p>
+  </details>
+
+  <h3 id="profil-fleches-clavier-sur-un-champ-numerique">Flèches clavier sur un champ numérique</h3>
+  <p>Les flèches Haut et Bas sont reprises à la main : le champ est un <code>type="text"</code>, sans compteur natif. L'événement est arrêté (<code>preventDefault</code>) et le refus en cours est effacé.</p>
+  <pre><code>stepNumber(raw, rule, direction) :
+  decimals = rule.decimals ?? 0
+  step     = rule.step ?? 10 ** -decimals
+  cleaned  = cleanNumericInput(raw, decimals)
+  si vide ou '.' → String(Math.max(rule.min, 0))
+  next    = current + step * direction
+  bounded = min(rule.max, max(rule.min, next))       // max ignoré s'il est absent
+  rendu   = String(Math.round(bounded * 10**decimals) / 10**decimals)</code></pre>
+  <p>Pas effectif : 1 pour l'âge et la taille (aucun <code>step</code>, 0 décimale), 0,1 pour les deux poids.</p>
+  <p class="ancre">src/shared/ui/numberRules.ts</p>
+  <details><summary>Cas limites</summary>
+    <p>Champ de poids vide + Haut → « 0.1 ». « 300 » (taille) + Haut → « 300 », borné. « 1 » (âge) + Bas → « 1 ». Une flèche ne produit jamais une valeur refusable.</p>
+  </details>
+
+  <h3 id="profil-edition-en-place-d-une-case-du-profil">Édition en place d'une case du profil</h3>
+  <p>Une case du récapitulatif tient son brouillon ; ouvrir efface le message. Deux chemins selon qu'une règle numérique est fournie.</p>
+  <pre><code>case de TEXTE (prénom) — commit() du composant :
+  retained = sanitize(draft)
+  si null : draft ← valeur enregistrée ; message ← refusal ; rien n'est écrit
+  sinon   : message ← '' ; si retained !== value → onCommit(retained)
+  la frappe efface le message dès que sanitize(next) !== null
+
+case CHIFFRÉE (âge, taille, poids de départ, objectif) :
+  NumberField juge seul (showMessage=false) ; onRefusal alimente le message
+  onCommit(retained) → si retained !== value, la case enregistre</code></pre>
+  <p>Dans les deux cas, rien n'est écrit quand la valeur retenue est égale à la valeur enregistrée. Les six gestes d'enregistrement sont mémoïsés dans la page ; le poids de départ passe par <code>onSaveStartingWeight</code>, les cinq autres par <code>onSaveProfile</code>.</p>
+  <p class="ancre">src/versions/mixte/components/ProfileInlineField.tsx · src/versions/mixte/components/ProfileSettings.tsx</p>
+  <details><summary>Cas limites</summary>
+    <p>Âge absent du profil : la case affiche <code>String(profile.age ?? 42)</code>. Valeur refusée dans une case chiffrée : la case reçoit la dernière valeur valable et l'enregistre si elle diffère — le refus produit une écriture.</p>
+  </details>
+  <div class="exemple"><p>Camille (48 ans) ouvre Taille, tape « 0 », sort : message « Une taille entre 50 et 300 cm est attendue. », la case revient à 168 et rien n'est enregistré, 168 étant déjà la valeur du profil.</p></div>
+
+  <h3 id="profil-poids-de-depart-depuis-le-profil">Poids de départ depuis le profil</h3>
+  <p>Le poids de départ n'est pas un champ du profil : c'est la pesée qui porte <code>isStartingWeight</code>. <code>handleSaveStartingWeight(kg)</code> appelle <code>setStartingWeight(history, roundWeight(kg))</code>.</p>
+  <pre><code>setStartingWeight(history, kg, now) :
+  depart = history.find(w =&gt; w.isStartingWeight)
+  si depart : history.map(w =&gt; w.id === depart.id ? { ...w, weight: kg } : w)
+              // date, heure et mensurations intactes
+  sinon     : nouvelle = { id: 'starting-weight-log',
+                           date: veille de la plus ancienne pesée si l'historique
+                                 existe, sinon veille d'aujourd'hui,
+                           time: '08:00', weight: kg, isStartingWeight: true }
+              [...history, nouvelle].sort(byDateTimeAsc)</code></pre>
+  <p>La date par défaut de la pesée créée est <span class="marque">arbitrage non validé</span> : elle repose sur l'hypothèse que les écrans d'accueil demanderont le poids de départ, pas sa date.</p>
+  <p class="ancre">src/shared/model/startingWeighIn.ts · src/app/useAppData.ts</p>
+  <details><summary>Cas limites</summary>
+    <p>Historique vide le 2026-09-12, 95,04 kg → pesée 2026-09-11 08:00, 95 kg. La clé de tri est <code>date + 'T' + (time || '12:00')</code>. Plusieurs lignes marquées départ : seule la première trouvée est modifiée.</p>
+  </details>
+  <div class="exemple"><p>Camille corrige son poids de départ en 96,3 : la pesée de mai 2026 change de <code>weight</code> seulement, sa date et ses mensurations restent.</p></div>
+
+  <h3 id="profil-enregistrement-du-profil">Enregistrement du profil</h3>
+  <p>Tout enregistrement du profil passe par un seul geste, qui normalise trois champs avant d'écrire.</p>
+  <pre><code>handleSaveProfile(updatedProfile) :
+  targetWeight        = roundWeight(kg) = Math.round(kg * 10) / 10
+  reminderTime        = snapToRoundedMinutes(reminderTime)
+  medicalReminderTime = renseignée ? snapToRoundedMinutes(...) : inchangée
+  puis setItem('glp1_app_companion_data', appData)  // effet de persistance</code></pre>
+  <p class="ancre">src/app/useAppData.ts · src/features/weight/weight.utils.ts</p>
+  <details><summary>Cas limites</summary>
+    <p>72,06 → 72,1. Heure « 20:37 » → « 20:30 ». <code>medicalReminderTime</code> vide ou absente : laissée telle quelle, jamais remplacée par un défaut. La persistance est suspendue si le chargement initial a échoué.</p>
+  </details>
+
+  <h3 id="profil-traitement-par-identifiant">Traitement par identifiant</h3>
+  <p>Le profil enregistre <code>glp1Brand</code>, un identifiant de catalogue. <code>getTreatment(id)</code> rend la fiche : identifiant absent ou inconnu retombe sur <code>DEFAULT_TREATMENT_ID = 'aucun'</code>, la fiche « Pas de traitement » (<code>name</code> « Pas de traitement », <code>label</code> « Pas de traitement / Aucun », <code>form</code> 'injection', <code>molecule</code> null). Aucun nom de médicament n'est jamais écrit dans le profil.</p>
+  <p class="ancre">src/shared/medication/treatment.catalog.ts</p>
+
+  <h3 id="profil-selecteur-de-traitement">Sélecteur de traitement</h3>
+  <p>Choisir une option vaut validation : le clic referme la liste puis appelle <code>onChange(id)</code>. Exception : si <code>id !== value</code> et que la fiche porte <code>requiresTrialCertification</code> (rétatrutide), un panneau de certification prend la suite et Valider reste inactif tant que la case n'est pas cochée.</p>
+  <pre><code>ordre des options : groupe « Stylos Injectables », groupe « Comprimés Oraux »,
+                    puis « Pas de traitement » — les intitulés de groupe ne se choisissent pas
+libellé affiché   : label.replace(/\s+-\s+[^)]*\)/, ')')
+                    « Ozempic (Sémaglutide - Injection) » → « Ozempic (Sémaglutide) »
+Échap, clic à côté, défilement (hors mode inséré) → onDismiss(), sans changement</code></pre>
+  <p>Le clavier navigue par flèches, Début et Fin, et par saisie du nom.</p>
+  <p class="ancre">src/versions/mixte/components/TreatmentSelect.tsx</p>
+
+  <h3 id="profil-profil-d-usine">Profil d'usine</h3>
+  <p><code>INITIAL_PROFILE</code>, écrit à l'installation quand le stockage est vierge : <code>name</code> « Chloé », <code>gender</code> 'femme', <code>age</code> 42, <code>height</code> 168, <code>targetWeight</code> 72.0, <code>silhouetteType</code> 'sablier', <code>glp1Brand</code> 'aucun', <code>reminderDay</code> 0, <code>reminderTime</code> « 20:00 », <code>reminderEnabled</code> false, <code>medicalReminderEnabled</code> false, les cinq modules de suivi à false, <code>quickAddEnabled</code> false, <code>insoliteLibraryEnabled</code> false, <code>countdownTargetDate</code> '2026-11-15'. Avatar d'usine : femme, oval, peau #FFE5D9, yeux #2E8B57, coupe 'long', cheveux #4E3629, sans lunettes, 'happy'. La même installation sème la pesée de départ à 95,0 kg.</p>
+  <p>Au chargement d'une sauvegarde, le profil enregistré est fusionné par-dessus <code>INITIAL_PROFILE</code>, et son avatar par-dessus l'avatar d'usine : un champ ajouté depuis prend sa valeur d'usine.</p>
+  <p class="ancre">src/app/useAppData.ts</p>
+
+  <h3 id="profil-stockage-local">Stockage local</h3>
+  <p>Le profil vit dans <code>AppData</code>, écrit en JSON sous la clé unique <code>glp1_app_companion_data</code> avec tous les journaux, par un effet qui suit chaque changement d'état.</p>
+  <pre><code>getItem(key)  : JSON.parse, null si absent OU illisible
+setItem(key,v): JSON.stringify, échec silencieux (mode privé, quota)
+getString/setString : chaîne nue — drapeaux 'true', marqueurs
+clearAll()    : localStorage.clear() — emporte la session Firebase</code></pre>
+  <p>Clés du domaine : <code>glp1_app_companion_data</code> (profil et journaux), <code>glp1_user_feedbacks</code>, <code>glp1_user_survey_v2</code>, <code>glp1_user_survey</code> (lecture seule), <code>glp1_send_cap_alert</code>, <code>hasAcceptedMedicalDisclaimer_v1</code>.</p>
+  <p class="ancre">src/shared/platform/storage.ts · src/app/useAppData.ts</p>
+  <details><summary>Cas limites</summary>
+    <p>Sauvegarde illisible : elle est recopiée une seule fois sous une clé de secours, la session repart de journaux vides et plus rien n'est écrit de la session.</p>
+  </details>
+
+  <h3 id="profil-validation-du-formulaire-complet">Validation du formulaire complet</h3>
+  <p>Au submit, les cinq sanitize sont calculés d'un bloc ; si l'un rend <code>null</code>, les refus correspondants sont posés et rien n'est enregistré.</p>
+  <pre><code>cleanName     = sanitizeName(name)
+cleanAge      = sanitizeAge(age)
+cleanHeight   = sanitizeHeight(height)
+cleanStarting = sanitizeWeight(startingWeightInput)
+cleanTarget   = sanitizeWeight(targetWeightInput)
+si l'un est null → setRefusals({ … }) ; return
+sinon onSubmit({ name, age: Number(...), height: Number(...),
+                 targetWeight: Number(...), glp1Brand,
+                 startingWeight: Number(...) })</code></pre>
+  <p>Le traitement n'est pas jugé : il vient d'une liste. <code>FormRefusals</code> dédoublonne par <code>Set</code> et n'affiche rien si la liste est vide ; la frappe dans un champ vide son refus sans attendre qu'il redevienne acceptable, et le prochain clic le recalcule. La règle de disparition des refus est <span class="marque">arbitrage non validé</span>.</p>
+  <p class="ancre">src/versions/mixte/components/ProfileForm.tsx · src/versions/mixte/app/FormRefusals.tsx</p>
+  <details><summary>Cas limites</summary>
+    <p>Les deux poids refusés : une seule ligne, les deux messages étant la même chaîne. Le formulaire enregistre le profil puis le poids de départ par deux gestes distincts.</p>
+  </details>
+  <div class="exemple"><p>Camille vide le prénom et met 0 aux deux poids : deux lignes, « Un prénom ou un pseudo est attendu. » et « Un poids entre 0,1 et 1000 kg est attendu. »</p></div>
+
+  <h3 id="profil-fermeture-d-un-formulaire-par-appui-a-cote">Fermeture d'un formulaire par appui à côté</h3>
+  <p><code>useFormPressOutside(close)</code> écoute le <code>pressStart</code> — pas le clic complet — et ferme sans rien enregistrer.</p>
+  <pre><code>isInside(target) :
+  target n'est pas un Element        → true  (ne ferme pas)
+  la carte du formulaire le contient → true
+  target.closest('.glow-sel')        → true  (listes et calendriers portés hors carte)
+  sinon                              → false → close()</code></pre>
+  <p>Écouter l'appui et non le clic permet à un même geste de fermer ce formulaire et d'agir ailleurs.</p>
+  <p class="ancre">src/versions/mixte/app/useFormPressOutside.ts</p>
+
+  <h3 id="profil-nettoyage-numerique-generique">Nettoyage numérique générique</h3>
+  <p><code>cleanNumericInput(raw, decimals = 0)</code> est le nettoyage de frappe commun à tous les champs numériques du site. Il ne borne pas : taper « 1 » en route vers « 168 » reste possible sous un minimum de 50.</p>
+  <pre><code>1. virgules → points ; tout sauf chiffres et points retiré (moins compris)
+2. plus d'un point → parts[0] + '.' + parts.slice(1).join('')
+3. decimals === 0 → seule la partie entière est gardée
+4. sinon la fraction est tronquée à `decimals` chiffres</code></pre>
+  <p class="ancre">src/shared/ui/numberRules.ts</p>
+  <details><summary>Cas limites</summary>
+    <p><code>cleanNumericInput('70,55', 1)</code> → '70.5'. <code>cleanNumericInput('1.9', 0)</code> → '1'. <code>cleanNumericInput('.', 1)</code> → '.', que <code>sanitizeNumber</code> traite comme un champ vide.</p>
+  </details>
+
+  <h3 id="profil-message-par-defaut-d-une-regle">Message par défaut d'une règle</h3>
+  <p><code>boundsMessage(rule)</code> rend <code>rule.message</code> s'il existe. Sinon il compose à partir des bornes, en écrivant les nombres avec <code>formatNumber(valeur, decimals)</code>.</p>
+  <pre><code>sans max : « Une valeur d'au moins {min}{ unité} est attendue. »
+avec max : « Une valeur entre {min} et {max}{ unité} est attendue. »</code></pre>
+  <p>Les trois règles du profil portent leur propre message : les phrases génériques ne sont pas genrées.</p>
+  <p class="ancre">src/shared/ui/numberRules.ts</p>
+
+  <h3 id="profil-genre-du-profil-genre-de-l-avatar">Genre du profil = genre de l'avatar</h3>
+  <p>Chaque retouche de l'avatar enregistre le profil entier :</p>
+  <pre><code>handleAvatarChange(newAvatar) :
+  setAvatar(newAvatar)
+  onSaveProfile({ ...profile, gender: newAvatar.gender, avatar: newAvatar })</code></pre>
+  <p>C'est le seul écrit de <code>profile.gender</code> du domaine ; il sert au métabolisme de base et à l'état civil du rapport médical.</p>
+  <p class="ancre">src/versions/mixte/components/ProfileSettings.tsx</p>
+
+  <h3 id="profil-changement-de-genre-de-l-avatar">Changement de genre de l'avatar</h3>
+  <p>Changer le genre repose la coupe et efface la photo.</p>
+  <pre><code>handleGenderChange(gender) :
+  hairStyle = gender === 'femme' ? 'long' : gender === 'neutre' ? 'boucle' : 'court'
+  customPhotoUrl = undefined</code></pre>
+  <p>Toute autre retouche passe par <code>updateProp(key, value)</code>, qui écrit la clé et met aussi <code>customPhotoUrl</code> à <code>undefined</code> : composer un avatar renonce à la photo.</p>
+  <p class="ancre">src/versions/mixte/components/AvatarCreator.tsx</p>
+  <details><summary>Cas limites</summary>
+    <p>Choisir « homme » écrit <code>hairStyle: 'court'</code>, une valeur que le sélecteur ne propose plus : elle se relit comme la coupe Classique.</p>
+  </details>
+
+  <h3 id="profil-avatar-aleatoire">Avatar aléatoire</h3>
+  <p>« Aléatoire » tire six champs, en réaffirme un et en efface un.</p>
+  <pre><code>faceShape  ← uniforme dans {oval, round, square, heart}
+hairStyle  ← uniforme dans {court, long, boucle, chauve, frange, brosse}   // 6 valeurs
+skinColor  ← uniforme dans SKIN_COLORS (6)
+eyeColor   ← uniforme dans EYE_COLORS (5)
+hairColor  ← uniforme dans HAIR_COLORS (6)
+hasGlasses = Math.random() &gt; 0.7            // vrai ≈ 30 % du temps
+expression = 'happy'
+customPhotoUrl = undefined</code></pre>
+  <p>Le genre n'est pas tiré. Trois des champs tirés — <code>faceShape</code>, <code>eyeColor</code>, <code>hasGlasses</code> — ne changent pas le glyphe affiché.</p>
+  <p class="ancre">src/versions/mixte/components/AvatarCreator.tsx</p>
+
+  <h3 id="profil-expression-toujours-happy">Expression toujours « happy »</h3>
+  <p>Le champ <code>expression</code> reste au modèle, mais aucun geste ne l'écrit d'une autre valeur : le profil d'usine pose 'happy', « Aléatoire » la réaffirme, et rien ne la lit à l'affichage. Une sauvegarde ancienne portant 'determined', 'proud' ou 'calm' garde sa valeur jusqu'au premier tirage aléatoire, sans effet visible.</p>
+  <p class="ancre">src/versions/mixte/components/AvatarCreator.tsx · src/app/useAppData.ts</p>
+
+  <h3 id="profil-coupes-proposees">Coupes proposées</h3>
+  <p>Le sélecteur ne propose que les trois coupes que l'émoji sait dessiner : <code>long</code> (« 💇 Classique »), <code>boucle</code> (« 🌀 Bouclé »), <code>chauve</code> (« 🥚 Chauve »). Les valeurs <code>court</code>, <code>frange</code> et <code>brosse</code> restent enregistrables et se lisent comme la coupe classique — aucune branche du glyphe ne les distingue. Le nuancier de cheveux n'est rendu que si <code>hairStyle !== 'chauve'</code>.</p>
+  <p class="ancre">src/versions/mixte/components/AvatarCreator.tsx</p>
+
+  <h3 id="profil-composition-du-glyphe-emoji">Composition du glyphe émoji</h3>
+  <p>Le visage est un émoji composé à partir du genre, du teint et de la chevelure.</p>
+  <pre><code>tone = EMOJI_TONES[skinColor.toUpperCase()] ?? U+1F3FC
+  #FFE5D9 → 1F3FB   #F7D1BA → 1F3FB   #E8AC80 → 1F3FC
+  #B57E58 → 1F3FD   #724A30 → 1F3FE   #43291F → 1F3FF
+
+si hairColor = #E9C46A (blond) ET hairStyle ∉ {chauve, boucle} :
+    U+1F471 + tone + (femme ? ZWJ ♀ VS16 : homme ? ZWJ ♂ VS16 : rien)
+
+sinon base = femme 1F469 | homme 1F468 | neutre 1F9D1
+     + tone
+     + ZWJ 1F9B2 si chauve
+     sinon ZWJ 1F9B1 si boucle
+     sinon ZWJ 1F9B0 si hairColor = #E76F51 (roux)
+     sinon ZWJ 1F9B3 si hairColor = #DFE2E6 (gris)
+     sinon rien</code></pre>
+  <p>Brun, châtain et noir ne posent aucune liaison : la chevelure sombre est celle de l'émoji de base. <code>faceShape</code>, <code>eyeColor</code> et <code>hasGlasses</code> n'entrent pas dans le calcul.</p>
+  <p class="ancre">src/versions/mixte/components/AvatarCreator.tsx</p>
+  <details><summary>Cas limites</summary>
+    <p>Couleur de peau hors nuancier : teint 1F3FC par défaut. Blond + bouclé : la branche blonde est écartée, le glyphe prend la liaison « bouclé ». Blond + chauve : liaison « chauve ».</p>
+  </details>
+
+  <h3 id="profil-photo-utilisable">Photo utilisable</h3>
+  <p><code>isUsablePhotoUrl(url) = typeof url === 'string' &amp;&amp; url.startsWith('data:image/')</code>. Une adresse <code>blob:</code> héritée d'une ancienne version est donc écartée avant d'être tentée, et l'avatar dessiné reprend la main. L'échec de chargement d'une photo affichable est retenu PAR ADRESSE (<code>brokenPhoto === photoUrl</code>) : remplacer la photo change l'adresse, et la nouvelle est retentée.</p>
+  <p class="ancre">src/shared/avatarPhoto.ts · src/versions/mixte/components/AvatarCreator.tsx</p>
+  <details><summary>Cas limites</summary>
+    <p><code>data:text/plain;base64,…</code> → non affichable. La confirmation « Photo de visage activée avec succès ! » ne s'écrit que si <code>isUsablePhotoUrl</code> est vrai et qu'aucun refus n'est en cours.</p>
+  </details>
+
+  <h3 id="profil-refus-d-une-photo-avant-lecture">Refus d'une photo avant lecture</h3>
+  <p><code>photoRefusal(file)</code> juge le type puis le poids, dans cet ordre, avant tout décodage.</p>
+  <pre><code>ACCEPTED_PHOTO_TYPES = [image/jpeg, image/png, image/webp, image/gif, image/avif]
+si type ∉ liste → FORMAT_REFUSAL   // cite le HEIC des iPhone
+si size &gt; MAX_SOURCE_BYTES (12 × 1024 × 1024 = 12 582 912) → tooLargeRefusal(size)
+sinon null</code></pre>
+  <p>Le plafond est exclusif : un fichier de 12 582 912 octets exactement est accepté. Le sélecteur de fichiers propose la même liste (<code>PHOTO_ACCEPT_ATTRIBUTE</code>), ce qui écarte le HEIC en amont.</p>
+  <p class="ancre">src/shared/avatarPhoto.ts</p>
+  <details><summary>Cas limites</summary>
+    <p>Un HEIC de 40 Mo : refusé pour son format, pas pour son poids — le format passe en premier. <code>tooLargeRefusal(19 300 000)</code> → « Cette photo pèse 18.4 Mo, au-delà des 12 Mo acceptés. Choisissez une photo plus légère. »</p>
+  </details>
+
+  <h3 id="profil-ecriture-des-octets">Écriture des octets</h3>
+  <p><code>formatBytes</code> écrit un poids de fichier.</p>
+  <pre><code>si bytes &gt;= 1 048 576 : formatNumber(bytes / 1 048 576, 1) + ' Mo'
+sinon                  : Math.max(1, Math.round(bytes / 1024)) + ' Ko'</code></pre>
+  <p><code>formatNumber</code> arrondit à la décimale demandée, sépare les milliers par une insécable, pose un POINT décimal et laisse tomber les zéros de queue : le plafond de 12 582 912 octets s'écrit « 12 Mo » et non « 12.0 Mo ».</p>
+  <p class="ancre">src/shared/avatarPhoto.ts · src/shared/number/number.format.ts</p>
+  <details><summary>Cas limites</summary>
+    <p>24 576 octets → « 24 Ko ». 12 octets → « 1 Ko » (plancher). 0 octet → « 1 Ko ».</p>
+  </details>
+
+  <h3 id="profil-recadrage-carre">Recadrage carré</h3>
+  <p>Le carré est pris au centre de l'image, et la cible ne dépasse jamais la source.</p>
+  <pre><code>squareCrop(width, height) :
+  side   = Math.min(width, height)
+  sx     = Math.round((width  - side) / 2)
+  sy     = Math.round((height - side) / 2)
+  target = Math.min(AVATAR_PHOTO_SIDE = 256, side)</code></pre>
+  <p class="ancre">src/shared/avatarPhoto.ts</p>
+  <details><summary>Cas limites</summary>
+    <p>(1200, 800) → sx 200, sy 0, side 800, target 256. (120, 180) → sx 0, sy 30, side 120, target 120 : jamais d'agrandissement. Largeur ou hauteur nulle : l'image est refusée en amont par <code>UNREADABLE_REFUSAL</code>.</p>
+  </details>
+
+  <h3 id="profil-reencodage-et-plafond-enregistre">Réencodage et plafond enregistré</h3>
+  <p>Le chemin complet d'un import, une fois le refus préalable passé :</p>
+  <pre><code>image = await decodeImageFile(file)
+si !image ou !image.width ou !image.height → UNREADABLE_REFUSAL
+crop = squareCrop(image.width, image.height)
+pour quality dans [0.82, 0.7, 0.55] :
+    dataUrl = cropToJpegDataUrl(image, crop, quality)
+    si dataUrl === null → UNREADABLE_REFUSAL
+    bytes = dataUrlBytes(dataUrl)
+    si bytes &lt;= MAX_STORED_BYTES (300 × 1024 = 307 200) → { ok, dataUrl, bytes }
+après les trois → TOO_HEAVY_REFUSAL</code></pre>
+  <p>La première qualité qui passe est gardée ; le plafond est inclusif. Le bouton affiche « Préparation… » pendant le décodage (<code>photoBusy</code>).</p>
+  <p class="ancre">src/shared/avatarPhoto.ts</p>
+
+  <h3 id="profil-poids-d-une-data-url">Poids d'une data URL</h3>
+  <p>Le poids réel est calculé sur la charge base64, après la première virgule.</p>
+  <pre><code>dataUrlBytes(dataUrl) :
+  comma = indexOf(',') ; si &lt; 0 → 0
+  payload = slice(comma + 1)
+  padding = payload finit par '==' ? 2 : finit par '=' ? 1 : 0
+  Math.max(0, Math.floor(payload.length * 3 / 4) - padding)</code></pre>
+  <p class="ancre">src/shared/avatarPhoto.ts</p>
+  <details><summary>Cas limites</summary>
+    <p><code>data:image/jpeg;base64,aGVsbG8=</code> → 5. <code>…aGVsbG8gdw==</code> → 7. Chaîne sans virgule → 0, donc réputée sous le plafond.</p>
+  </details>
+
+  <h3 id="profil-champ-fichier-vide">Champ fichier vidé</h3>
+  <p>Après chaque tentative — réussie ou refusée — <code>input.value = ''</code>. Sans cela, rechoisir le même fichier n'émettrait aucun <code>change</code>, le navigateur ne signalant qu'un changement de valeur. Le vidage a lieu après <code>readAvatarPhoto</code> et avant l'examen du résultat.</p>
+  <p class="ancre">src/versions/mixte/components/AvatarCreator.tsx</p>
+
+  <h3 id="profil-defauts-des-modules">Défauts des modules</h3>
+  <p>Sept onglets sont commandés par un drapeau ; l'état effectif se lit toujours par <code>isModuleOn</code>, jamais par le drapeau nu.</p>
+  <pre><code>MODULE_FLAGS : injection → treatmentTrackingEnabled
+               symptoms  → sideEffectsTrackingEnabled
+               meals     → foodTrackingEnabled
+               steps     → stepsTrackingEnabled
+               sports    → sportTrackingEnabled
+               metime    → meTimeTrackingEnabled
+               sleep     → sleepTrackingEnabled
+
+isModuleOn(profile, tabId) :
+  flag absent de la table            → true  (l'onglet n'est pas un module)
+  valeur undefined ou null           → MODULES_ALLUMES_PAR_DEFAUT.has(tabId)
+                                       // { injection, symptoms }
+  sinon                              → Boolean(valeur)</code></pre>
+  <p>Traitement et effets secondaires valent donc activés en l'absence de drapeau ; repas, pas, activité, temps pour soi et sommeil valent désactivés.</p>
+  <p class="ancre">src/versions/mixte/app/navigation.ts · src/versions/mixte/components/NotificationsSettings.tsx</p>
+
+  <h3 id="profil-bascule-d-un-module">Bascule d'un module</h3>
+  <p>Chaque bascule enregistre l'inverse de l'état effectif, et rallumer efface le masquage.</p>
+  <pre><code>handleToggleX() :
+  onSaveProfile({ ...profile,
+                  xTrackingEnabled: !isXEnabled,
+                  ...(isXEnabled ? {} : { xModuleHidden: false }) })</code></pre>
+  <p>Le champ de masquage n'est réécrit que dans le sens éteint → allumé : éteindre un module laisse le masquage tel qu'il était.</p>
+  <p class="ancre">src/versions/mixte/components/NotificationsSettings.tsx</p>
+
+  <h3 id="profil-masquage-complet">Masquage complet</h3>
+  <p>La case « Masquer dans l'application. » n'est rendue que sous un module éteint et écrit l'inverse de <code>Boolean(profile[field])</code>. La lecture combine les deux drapeaux :</p>
+  <pre><code>isModuleHidden(profile, tabId) = !isModuleOn(profile, tabId)
+                                 &amp;&amp; Boolean(profile[MODULE_HIDDEN_FLAGS[tabId]])</code></pre>
+  <p>Un module allumé n'est jamais masqué, quel que soit son drapeau de masquage. Un onglet hors table n'est jamais masqué.</p>
+  <p class="ancre">src/versions/mixte/app/navigation.ts · src/versions/mixte/components/NotificationsSettings.tsx</p>
+
+  <h3 id="profil-libelle-et-picto-selon-la-forme">Libellé et picto selon la forme</h3>
+  <p>Le premier module suit la forme du traitement courant.</p>
+  <pre><code>isOralMedication(id)          = getTreatment(id).form === 'oral'
+treatmentSectionLabel(id)     = oral ? 'Comprimé' : 'Injections'   // pluriel
+treatmentActionLabel(id)      = oral ? 'Comprimé' : 'Injection'    // singulier
+treatmentIcon(id)             = oral ? RoundPillIcon : Syringe</code></pre>
+  <p>« Pas de traitement » a <code>form: 'injection'</code> : sans traitement déclaré, le module s'appelle « Injections » et porte la seringue.</p>
+  <p class="ancre">src/shared/medication/medication.labels.tsx · src/shared/medication/medication.utils.ts</p>
+
+  <h3 id="profil-defauts-du-rappel-d-injections">Défauts du rappel d'injections</h3>
+  <p>Les valeurs lues par la page quand le champ est absent du profil :</p>
+  <pre><code>injectionReminderType         ?? 'weekly'
+reminderDay                   ?? 0                  // dimanche
+reminderTime                  ?? '20:00'
+injectionReminderDaysInterval ?? 7
+injectionReminderStartDate    ?? getLocalDateStr()  // aujourd'hui, heure locale</code></pre>
+  <p>Le profil d'usine pose <code>reminderEnabled: false</code>, <code>reminderDay: 0</code> et <code>reminderTime: '20:00'</code> ; les trois champs personnalisés n'y figurent pas et ne s'écrivent qu'au premier réglage. Ces réglages sont enregistrés et rien de plus : aucun appel à une interface de notification n'existe dans le code lu.</p>
+  <p class="ancre">src/versions/mixte/components/NotificationsSettings.tsx · src/app/useAppData.ts</p>
+
+  <h3 id="profil-jours-et-frequences-proposes">Jours et fréquences proposés</h3>
+  <p>Le jour est enregistré en nombre ; la liste l'affiche de lundi à dimanche, dimanche fermant la liste tout en valant 0.</p>
+  <pre><code>Lundi 1 · Mardi 2 · Mercredi 3 · Jeudi 4 · Vendredi 5 · Samedi 6 · Dimanche 0
+conversion aux deux bouts : value={String(reminderDay)}, onChange → Number(v)
+fréquence : 1 à 30 — « Tous les N jour(s) », enregistrée en nombre</code></pre>
+  <p class="ancre">src/versions/mixte/components/NotificationsSettings.tsx</p>
+
+  <h3 id="profil-recapitulatif-du-rappel-personnalise">Récapitulatif du rappel personnalisé</h3>
+  <p>En mode personnalisé, une phrase suit les trois réglages :</p>
+  <pre><code>« Vos rappels d'injections seront planifiés automatiquement tous les
+  {intervalDays} jours à compter du
+  {new Date(startDate).toLocaleDateString('fr-FR')} à {reminderTime}. »</code></pre>
+  <p>Elle est toujours affichée en mode personnalisé, la date de départ ayant un défaut. <code>new Date('AAAA-MM-JJ')</code> interprète la chaîne en UTC : le comportement dans un fuseau négatif n'a pas été vérifié.</p>
+  <p class="ancre">src/versions/mixte/components/NotificationsSettings.tsx</p>
+
+  <h3 id="profil-defauts-du-rappel-medical">Défauts du rappel médical</h3>
+  <pre><code>medicalReminderEnabled      ?? false
+medicalReminderDoctor       ?? ''
+medicalReminderDate         ?? ''
+medicalReminderTime         ?? '10:00'
+medicalReminderNotifyBefore ?? '1d'
+options du délai : 1h, 2h, 1d, 2d, 3d, 7d</code></pre>
+  <p>Le récapitulatif n'est rendu que si <code>medicalDate</code> est non vide, et écrit « le médecin » quand le nom est vide : « Rappel programmé pour votre rdv avec {nom | le médecin} le {date fr-FR} à {heure}. »</p>
+  <p class="ancre">src/versions/mixte/components/NotificationsSettings.tsx</p>
+
+  <h3 id="profil-minutes-rondes">Minutes rondes</h3>
+  <p>Toute heure retenue par l'application est ramenée à la minute ronde inférieure.</p>
+  <pre><code>ROUNDED_MINUTES = [0, 10, 15, 20, 30, 40, 45, 50]
+snapToRoundedMinutes(time) :
+  si time ne correspond pas à /^(\d{2}):(\d{2})$/ → time, tel quel
+  minutes = Number(mm) ; si minutes &gt; 59 → time, tel quel
+  rounded = la plus grande valeur de ROUNDED_MINUTES ≤ minutes, sinon 0
+  → `${hh}:${String(rounded).padStart(2, '0')}`</code></pre>
+  <p>L'arrondi est vers le bas pour ne jamais produire une heure future. La règle s'applique à l'enregistrement, pas dans le champ.</p>
+  <p class="ancre">src/shared/date/date.local.ts</p>
+  <details><summary>Cas limites</summary>
+    <p>14:37 → 14:30 · 14:47 → 14:45 · 14:58 → 14:50 · 14:07 → 14:00 · « 9:05 » (une seule chiffre d'heure) → rendu tel quel.</p>
+  </details>
+  <div class="exemple"><p>Camille règle son rappel sur 14:37 : le profil retient « 14:30 ».</p></div>
+
+  <h3 id="profil-ordre-de-la-suppression-de-compte">Ordre de la suppression de compte</h3>
+  <p>Trois états — <code>idle</code>, <code>confirming</code>, <code>working</code> — et un ordre strict : le compte d'abord, les données ensuite. <a href="spec-fonctionnelle.html#profil-supprimer-mon-compte">→ fonctionnelle</a></p>
+  <pre><code>confirm() :
+  step = 'working'
+  try { si isAuthConfigured → await deleteCurrentUser() }
+  catch (e) :
+      message        = accountDeletionErrorMessage(e.code ?? '')
+      needsFreshLogin = (e.code === 'auth/requires-recent-login')
+      step           = 'confirming'
+      return                      // RIEN n'est effacé
+  clearAll()      // localStorage.clear()
+  reloadApp()     // location.reload()</code></pre>
+  <p>Sans configuration Firebase, il n'y a pas de compte à supprimer : le geste saute l'appel et efface seulement les données. « Se reconnecter » appelle <code>signOutUser()</code> puis <code>reloadApp()</code>, sans toucher aux données même si la déconnexion échoue.</p>
+  <p class="ancre">src/versions/mixte/components/DeleteAccountBlock.tsx · src/shared/platform/storage.ts</p>
+
+  <h3 id="profil-messages-d-echec-de-suppression">Messages d'échec de suppression</h3>
+  <p><code>accountDeletionErrorMessage(code)</code> est une fonction distincte de celle de la connexion : tous ses messages affirment que rien n'a été effacé.</p>
+  <pre><code>auth/requires-recent-login  → « Par sécurité, cette suppression demande une connexion récente.
+                                Reconnectez-vous, puis recommencez — rien n'a été effacé. »
+auth/no-current-user        → « Personne n'est connecté. Rien n'a été effacé. »
+auth/network-request-failed → « Connexion impossible. Vérifiez votre accès à Internet — rien n'a été effacé. »
+auth/too-many-requests      → « Trop de tentatives. Réessayez dans quelques minutes — rien n'a été effacé. »
+auth/user-token-expired     ┐
+auth/user-disabled          ┘→ « Votre session n'est plus valable. Reconnectez-vous, puis recommencez — rien n'a été effacé. »
+défaut                      → « La suppression a échoué. Rien n'a été effacé — réessayez. »</code></pre>
+  <p>Seul <code>auth/requires-recent-login</code> arme le bouton « Se reconnecter ».</p>
+  <p class="ancre">src/shared/platform/auth.errors.ts</p>
+  <div class="exemple"><p>Camille confirme avec une session jugée trop ancienne : le message de reconnexion s'affiche, l'écran revient à la mise en garde, et ses journaux sont intacts.</p></div>
+
+  <h3 id="profil-suppression-du-compte-firebase">Suppression du compte Firebase</h3>
+  <pre><code>deleteCurrentUser() :
+  user = getFirebaseAuth().currentUser
+  si !user → throw { code: 'auth/no-current-user' }   // code maison
+  await deleteUser(user)                               // le SDK déconnecte ensuite</code></pre>
+  <p>Le code maison retombe donc sur « Personne n'est connecté. Rien n'a été effacé. » et l'effacement local n'a pas lieu.</p>
+  <p class="ancre">src/shared/platform/auth.ts</p>
+
+  <h3 id="profil-refus-d-un-message-vide">Refus d'un message vide</h3>
+  <p>Au clic, si <code>message.trim()</code> est vide, le refus dépend du type et l'envoi s'arrête.</p>
+  <pre><code>'feature' → « Décrivez votre idée avant de l'envoyer. »
+'bug'     → « Décrivez le problème avant de l'envoyer. »
+'avis'    → « Écrivez votre message avant de l'envoyer. »</code></pre>
+  <p>Le refus s'efface à la première frappe dans la zone de message, sans attendre qu'elle redevienne acceptable. Les deux refus de la page — message vide et plafond — se remplacent l'un l'autre : un seul <code>refusal</code>. Le bouton d'envoi n'est jamais désactivé.</p>
+  <p class="ancre">src/versions/mixte/components/FeedbackSettings.tsx</p>
+
+  <h3 id="profil-plafond-quotidien-des-envois">Plafond quotidien des envois</h3>
+  <p>Un même plafond sert aux avis et au sondage, sur des instants d'envoi et une journée LOCALE.</p>
+  <pre><code>DAILY_SEND_CAP = 10
+countSendsOn(sentAt[], day) =
+  sentAt.filter(at =&gt; at !== undefined &amp;&amp; getLocalDateStr(new Date(at)) === day).length
+canSendToday(sentAt[], day) = countSendsOn(sentAt, day) &lt; 10
+sendCapRefusal() = « Limite atteinte : pas plus de 10 envois par jour. L'envoi reprend demain. »</code></pre>
+  <p>Les avis comptent sur <code>feedbacksHistory.map(f =&gt; f.sentAt)</code> : supprimer un message envoyé aujourd'hui rend sa place. Le sondage compte sur son journal d'envois. Un message sans <code>sentAt</code> — antérieur au plafond — ne consomme rien.</p>
+  <p class="ancre">src/features/feedback/sendDailyCap.ts</p>
+  <details><summary>Cas limites</summary>
+    <p>Dix envois hier : autorisé aujourd'hui. Dix envois aujourd'hui puis une suppression : autorisé. Le refus est posé avant tout enregistrement, rien n'est écrasé.</p>
+  </details>
+
+  <h3 id="profil-composition-d-un-message-de-retour">Composition d'un message de retour</h3>
+  <pre><code>now = Date.now()
+id       = String(now)
+type     = 'avis' | 'feature' | 'bug'
+sentiment= 'content' | 'neutre' | 'pas_content'
+category = (type !== 'avis' &amp;&amp; category !== '') ? category : undefined
+message  = message.trim()
+date     = new Date(now).toLocaleDateString('fr-FR',
+             { day:'numeric', month:'short', year:'numeric',
+               hour:'2-digit', minute:'2-digit' })
+sentAt   = now
+acceptsContact</code></pre>
+  <p>Le message est inséré EN TÊTE de l'historique (<code>[newFeedback, ...history]</code>), écrit sous <code>glp1_user_feedbacks</code>. Puis : bannière de succès pendant 4000 ms, zone de message vidée, case de consentement remise à <code>false</code>. La catégorie est enregistrée par sa valeur d'option (« Poids &amp; Graphiques »), non par son libellé (« Suivi de Poids &amp; Courbes »).</p>
+  <p class="ancre">src/versions/mixte/components/FeedbackSettings.tsx</p>
+
+  <h3 id="profil-envoi-en-base-apres-le-local">Envoi en base après le local</h3>
+  <p>L'écriture locale précède, la base suit et n'est jamais attendue : <code>void recordFeedbackSubmission({...})</code> après <code>setItem</code>. Toutes les fonctions d'envoi sont enveloppées dans <code>quietly</code>.</p>
+  <pre><code>quietly(run) : try { await run() } catch { /* rien */ }
+writableAuthor() :
+  si !isDatabaseConfigured → null
+  user = currentAuthUser() ; user ? { id, email, name } : null
+  null → la fonction rend la main sans rien tenter</code></pre>
+  <p>Aucune erreur n'est levée, aucune trace n'est écrite en console, rien ne s'affiche à l'écran. <code>sendsToday</code> joint au document est <code>countSendsOn([...sentAtList, now], today)</code> — l'envoi en cours compris.</p>
+  <p class="ancre">src/features/feedback/remoteSubmit.ts · src/versions/mixte/components/FeedbackSettings.tsx</p>
+
+  <h3 id="profil-document-de-retour-en-base">Document de retour en base</h3>
+  <p>Un document par message, sous le compte.</p>
+  <pre><code>addDocument(`feedbacks/${uid}/messages`, {
+  uid, email, displayName,
+  kind: 'feedback',
+  type, sentiment: sentiment ?? null, category: category ?? null,
+  message,
+  acceptsContact: acceptsContact === true,
+  localId,            // l'id du message sur l'appareil
+  sendsToday,
+  sentAt: serverTime(),
+  ...context })
+puis queueMail(author, 'feedback', feedbackMailContent({...}))</code></pre>
+  <p>Le chemin porte le propriétaire : aucune requête ne peut ratisser la branche d'un autre compte. Aucune donnée de santé n'entre dans ce document.</p>
+  <p class="ancre">src/features/feedback/remoteSubmit.ts</p>
+
+  <h3 id="profil-courrier-boite-et-reponse">Courrier : boîte et réponse</h3>
+  <pre><code>addDocument('mail', {
+  uid, kind,                       // 'feedback' | 'sondage' | 'alerte-plafond' |
+                                   // 'alerte-sondage-mises-a-jour' | 'alerte-echec-export-rapport'
+  to: 'glp1low@gmail.com',
+  ...(author.email ? { replyTo: author.email } : {}),
+  message: { subject, html, text },
+  createdAt: serverTime() })</code></pre>
+  <p>La collection est lue par une extension d'expédition ; le client n'y écrit que des créations et ne les relit jamais. <code>queueMail</code> porte son propre <code>quietly</code> : un courrier perdu n'emporte pas l'écriture qui vient d'aboutir. Tout contenu d'utilisatrice est échappé en HTML (<code>&amp;</code>, <code>&lt;</code>, <code>&gt;</code>, <code>"</code>, <code>'</code>) et une version texte accompagne chaque courrier.</p>
+  <p class="ancre">src/features/feedback/remoteSubmit.ts · src/features/feedback/submissionMail.ts</p>
+
+  <h3 id="profil-alerte-plafond-une-par-compte-et-par-jour">Alerte plafond : une par compte et par jour</h3>
+  <pre><code>reportSendCapReached({ context, sendsToday, cap }) :
+  author = writableAuthor() ; si null → rien
+  marker = `${author.id}:${context.sentAtLocalDay}`
+  si getString('glp1_send_cap_alert') === marker → rien
+  setString('glp1_send_cap_alert', marker)      // AVANT l'envoi
+  await queueMail(author, 'alerte-plafond', sendCapAlertMailContent({...}))</code></pre>
+  <p>La marque est posée avant l'envoi : un réseau coupé fait au pire manquer l'alerte du jour, jamais partir dix alertes identiques. L'alerte est déclenchée après que le refus est affiché et n'est pas attendue ; hors connexion elle est perdue, aucune file de reprise n'est écrite. <span class="marque">arbitrage non validé</span></p>
+  <p class="ancre">src/features/feedback/remoteSubmit.ts</p>
+
+  <h3 id="profil-sujets-des-courriers">Sujets des courriers</h3>
+  <p>Tous les sujets s'ouvrent par <code>MARK = '[GLP1LOW]'</code> ; l'auteur est son e-mail, ou son uid à défaut.</p>
+  <pre><code>[GLP1LOW] Sondage — {email|uid} — {sentAtLocal}
+[GLP1LOW] {Avis|Idée|Bug} — {email|uid} — {sentAtLocal}
+[GLP1LOW] ALERTE plafond — {cap} envois atteints — {email|uid}
+[GLP1LOW] ALERTE sondage — {n} mises à jour — {email|uid}
+[GLP1LOW] ÉCHEC export rapport — {étape} — {email|uid}</code></pre>
+  <p><code>FEEDBACK_TYPE_LABELS</code> : avis → « Avis », feature → « Idée », bug → « Bug » ; un type inconnu est rendu tel quel. <code>sentAtLocal</code> est l'heure locale lisible, pas l'horodatage serveur.</p>
+  <p class="ancre">src/features/feedback/submissionMail.ts</p>
+  <div class="exemple"><p>Camille envoie une idée le 12 septembre 2026 à 10:42:07 : « [GLP1LOW] Idée — camille@example.com — 12 septembre 2026 à 10:42:07 ».</p></div>
+
+  <h3 id="profil-lignes-de-contexte-d-un-courrier">Lignes de contexte d'un courrier</h3>
+  <p><code>contextRows(context)</code> est commune aux cinq courriers.</p>
+  <pre><code>Date locale     : {sentAtLocal} ({timeZone}, UTC{±}{|round(offsetMinutes / 60)|})
+Page d'origine  : {originPageLabel}
+Version du site : {version}
+Thème           : {theme}
+Home / Menu / Polices : seulement si le champ est renseigné
+Cadre           : {frame.width} × {frame.height} (×{frame.pixelRatio})
+Langue          : {browserLanguage} si égale à appLanguage,
+                  sinon « navigateur {X} — application {fr} »</code></pre>
+  <p>Le courrier de retour ajoute Ressenti (libellé : Content, Neutre, Pas content), Catégorie si elle existe, et « Accepte d'être recontactée : oui | non », puis le message en bloc de texte à retours conservés. Le courrier de sondage ajoute « Mises à jour : Nᵉ envoi de cette réponse » et une ligne « {libellé} : {note} / 5 » par proposition.</p>
+  <p class="ancre">src/features/feedback/submissionMail.ts</p>
+
+  <h3 id="profil-contexte-d-envoi">Contexte d'envoi</h3>
+  <p><code>buildSubmissionContext(page, settings, origin, now)</code> assemble ce qui accompagne tout envoi. Il ne lit que des réglages d'affichage et l'état du navigateur : aucune donnée de santé.</p>
+  <pre><code>version, page, pageLabel, originPage, originPageLabel
+theme = getSelectedTheme(version) ; home / menu / fontSet ?? null
+frame  = { window.innerWidth, window.innerHeight, window.devicePixelRatio ?? 1 }
+screen = { window.screen?.width ?? 0, window.screen?.height ?? 0 }
+browserLanguage  = navigator.language ?? ''
+browserLanguages = (navigator.languages ?? []).join(', ')
+appLanguage      = 'fr'                      // en dur, le site n'est pas traduit
+sentAtMs    = now.getTime()
+sentAtIso   = now.toISOString()
+sentAtLocal = fr-FR, jj mois-long aaaa hh:mm:ss
+sentAtLocalDay = getLocalDateStr(now)
+timeZone    = Intl.DateTimeFormat().resolvedOptions().timeZone, sinon '(inconnu)'
+timeZoneOffsetMinutes = -now.getTimezoneOffset()   // positif à l'est
+userAgent, buildMode = import.meta.env.MODE</code></pre>
+  <p>Deux heures sont jointes : l'horodatage serveur fait foi pour trier, l'heure locale dit quand la personne a vécu l'envoi.</p>
+  <p class="ancre">src/features/feedback/submissionContext.ts · src/versions/mixte/app/formContext.ts</p>
+
+  <h3 id="profil-page-d-origine">Page d'origine</h3>
+  <p>Deux variables de module, remises à zéro au rechargement ; rien n'est écrit dans le stockage.</p>
+  <pre><code>notePageVisit(page) : si page === currentPage → rien
+                      previousPage = currentPage ; currentPage = page
+originOfPage(page)  : currentPage === page ? previousPage : currentPage</code></pre>
+  <p>L'App annonce la visite dans un effet sur <code>activeTab</code> ; les deux formulaires lisent l'origine AU PREMIER RENDU, dans un <code>useRef</code>, et la passent à <code>buildSubmissionContext</code>. La forme de <code>originOfPage</code> répond juste dans les deux ordres d'exécution : les effets d'un enfant se jouent avant ceux du parent.</p>
+  <p class="ancre">src/features/feedback/pageOrigin.ts · src/versions/mixte/App.tsx</p>
+  <details><summary>Cas limites</summary>
+    <p>Au démarrage : <code>null</code>, libellé « (aucune) ». Visites maison → sondage : <code>originOfPage('sondage')</code> = 'maison'. Rechargement sur la page du formulaire : origine nulle.</p>
+  </details>
+  <div class="exemple"><p>Camille vient de la Balance et ouvre Avis et Feedback : la ligne du courrier dit « Page d'origine : Balance ».</p></div>
+
+  <h3 id="profil-sondage-notes-et-defauts">Sondage : notes et défauts</h3>
+  <p>Sept notes entières, saisies par un curseur <code>min="0" max="5" step="1"</code> et lues par <code>parseInt(value, 10)</code>. Toutes valent 0 (« Pas intéressé ») avant toute réponse. Les clés sont <code>albumPhotos</code>, <code>mealPhotos</code>, <code>wallet</code>, <code>journal</code>, <code>hydration</code>, <code>onlineSharing</code>, <code>printableBook</code> ; une clé absente d'une réponse enregistrée est relue à 0 (<code>saved.ratings.x ?? 0</code>). Les réponses étant rangées par clé, l'ajout d'une proposition ne décale aucune réponse donnée.</p>
+  <pre><code>libellés de la pastille : 0 Pas intéressé · 1 Peu d'intérêt · 2 Pourquoi pas
+                          3 Intéressé · 4 Très utile · 5 Indispensable !</code></pre>
+  <p class="ancre">src/versions/mixte/components/Sondage.tsx</p>
+
+  <h3 id="profil-sondage-stockage-local-et-repli">Sondage : stockage local et repli</h3>
+  <pre><code>lecture : getItem('glp1_user_survey_v2') → { ratings, otherSuggestion, sendLog }
+          si absent, getItem('glp1_user_survey') → notes à la racine (ancien format)
+          l'une ou l'autre présente → isSubmitted = true, isEditing = false
+écriture : toujours setItem('glp1_user_survey_v2', { ratings, otherSuggestion, sendLog })</code></pre>
+  <p>L'ancienne clé n'est jamais réécrite ni effacée ; le repli ne lit ni suggestion ni journal d'envois, une réponse ancienne repart donc d'un quota entier. <code>isSubmitted</code> commande l'écran de remerciement et le libellé du bouton (« Mettre à jour mes réponses »).</p>
+  <p class="ancre">src/versions/mixte/components/Sondage.tsx</p>
+
+  <h3 id="profil-sondage-journal-des-envois">Sondage : journal des envois</h3>
+  <p>Le sondage ne garde qu'une réponse : sans journal, rien ne dirait combien de fois elle a été envoyée.</p>
+  <pre><code>KEPT_SEND_DAYS = 2
+floor   = now - KEPT_SEND_DAYS * 86 400 000      // 48 h en millisecondes
+nextLog = [...sendLog.filter(at =&gt; at &gt;= floor), now]</code></pre>
+  <p>La fenêtre est glissante et comptée en millisecondes, tandis que le plafond, lui, compte des journées locales (<code>getLocalDateStr</code>) : les deux unités ne coïncident pas, et la veille est gardée pour qu'un changement d'heure ne fasse pas disparaître un décompte en cours. Le taillage a lieu à l'écriture, après que <code>canSendToday</code> a jugé.</p>
+  <p class="ancre">src/versions/mixte/components/Sondage.tsx · src/features/feedback/sendDailyCap.ts</p>
+
+  <h3 id="profil-sondage-en-base-un-document-fusionne">Sondage en base : un document fusionné</h3>
+  <p>Un seul document par compte, fusionné dans une transaction qui a lu l'état précédent.</p>
+  <pre><code>mergeDocumentOnce(`surveys/${uid}`, current =&gt; {
+  updateCount = Number(current?.updateCount ?? 0) + 1
+  crossing    = updateCount &gt; SURVEY_UPDATES_ALERT_THRESHOLD (10)
+                &amp;&amp; current?.updatesAlertSent !== true
+  fields = { uid, email, displayName, kind: 'sondage',
+             ratings, otherSuggestion,
+             updateCount: countUp(1),            // incrément côté serveur
+             firstSentAt:    current?.firstSentAt    ?? serverTime(),
+             firstSentAtLocal: current?.firstSentAtLocal ?? context.sentAtLocal,
+             firstSentAtMs:  current?.firstSentAtMs  ?? context.sentAtMs,
+             lastSentAt:     serverTime(),
+             ...context,
+             ...(crossing ? { updatesAlertSent: true,
+                              updatesAlertAtCount: updateCount,
+                              updatesAlertAt: serverTime() } : {}) } })
+puis courrier 'sondage' ; si crossing, courrier 'alerte-sondage-mises-a-jour'</code></pre>
+  <p><code>updateCount</code> est un cumul sur toute la vie du compte : il ne redescend jamais et n'a aucun rapport avec la journée locale. Le franchissement se produit au onzième envoi et une seule fois, le drapeau vivant dans le document — donc vrai d'un appareil à l'autre.</p>
+  <p class="ancre">src/features/feedback/remoteSubmit.ts</p>
+  <div class="exemple"><p>Camille valide, revient le lendemain et remonte une note : <code>updateCount</code> passe à 2, et le courrier écrit « Mises à jour : 2ᵉ envoi de cette réponse ».</p></div>
+
+  <h3 id="profil-faq-ouverture-exclusive">FAQ : ouverture exclusive</h3>
+  <p>Un seul état, <code>openIndex: number | null</code>, initialisé à <code>null</code> — tout est refermé à l'arrivée, et rien n'est mémorisé d'une visite à l'autre. Le clic écrit <code>setOpenIndex(isOpen ? null : index)</code> : recliquer une question ouverte la referme, cliquer une autre la remplace. Le contenu des six réponses est un premier jet. <span class="marque">arbitrage non validé</span></p>
+  <p class="ancre">src/versions/mixte/components/Faq.tsx</p>
+
+  <h3 id="profil-acceptation-legale">Acceptation légale</h3>
+  <p>Un drapeau en chaîne nue, sous <code>hasAcceptedMedicalDisclaimer_v1</code>.</p>
+  <pre><code>isLegalModalOpen  = getString(clé) !== 'true'    // à l'initialisation
+isFirstLaunchLegal = getString(clé) !== 'true'   // même test, état séparé
+handleAcceptLegalFirstTime() :
+  setString(clé, 'true') ; isFirstLaunchLegal = false ; isLegalModalOpen = false
+openLegalModal() :
+  isFirstLaunchLegal = (getString(clé) !== 'true') ; isLegalModalOpen = true
+rendu : si (isLegalModalOpen || isFirstLaunchLegal) la page REMPLACE tout le contenu</code></pre>
+  <p>Tant que le drapeau n'est pas posé, la page s'impose au démarrage et rien d'autre n'est atteignable. Le drapeau part avec <code>clearAll()</code> à la suppression du compte : la page se réimpose au rechargement suivant.</p>
+  <p class="ancre">src/versions/mixte/App.tsx · src/shared/platform/storage.ts</p>
+
+  <h3 id="profil-premier-lancement-legal">Premier lancement légal</h3>
+  <p>Le composant reçoit <code>isFirstLaunch</code> et change trois choses : pas de croix de fermeture, titre « Information Médicale » au lieu de « Avertissement Médical », et un pied fait d'une case à cocher et d'un bouton lié.</p>
+  <pre><code>hasCheckedNotice : état local, faux à chaque montage
+bouton « J'accepte et j'accède » : disabled={!hasCheckedNotice}
+handleAccept() : si isFirstLaunch → onAcceptFirstTime() ; puis onClose()
+hors premier lancement : « Fermer » et la croix appellent onClose()
+onglet initial : 'disclaimer' (Cadre)</code></pre>
+  <p class="ancre">src/versions/mixte/components/LegalPrivacyPage.tsx</p>
+
+  <h3 id="profil-validation-numerique-a-la-sortie">Validation numérique à la sortie</h3>
+  <p><code>sanitizeNumber(raw, rule)</code> rend la chaîne retenue, ou <code>null</code>. Elle rend une CHAÎNE et non un nombre : c'est elle qui sera réaffichée.</p>
+  <pre><code>decimals = rule.decimals ?? 0
+cleaned  = cleanNumericInput(raw, decimals)
+si cleaned === '' ou '.'          → rule.allowEmpty ? '' : null
+si !Number.isFinite(Number(cleaned)) → null
+si valeur &lt; rule.min                 → null
+si rule.max défini et valeur &gt; max   → null
+sinon cleaned, moins un point final orphelin</code></pre>
+  <p>La chaîne n'est jamais reformatée : « 70 » reste « 70 » et ne devient pas « 70.0 ». <code>isAcceptable(raw, rule)</code> est <code>sanitizeNumber(raw, rule) !== null</code>.</p>
+  <p class="ancre">src/shared/ui/numberRules.ts</p>
+  <details><summary>Cas limites</summary>
+    <p>'70.' → '70'. '' avec <code>allowEmpty</code> → '' (accepté) ; sans → <code>null</code>. Les bornes sont inclusives des deux côtés.</p>
+  </details>
+
+  <h3 id="profil-libelles-de-page">Libellés de page</h3>
+  <p><code>pageLabel(page)</code> traduit un identifiant d'onglet pour un courrier qu'on dépouille à l'œil : <code>null</code> devient « (aucune) », un identifiant absent de la table est rendu tel quel.</p>
+  <pre><code>maison Accueil · injection Traitement · history Balance
+symptoms Effets secondaires · steps Marche · sports Activité physique
+meals Repas et en-cas · sleep Sommeil · metime Un temps pour soi
+report Export · plus Configuration &amp; Plus · settings Mon Profil
+modules Modules · notifications Notifications · theme Apparence · polices Polices
+feedback Avis et Feedback · sondage Sondage · faq FAQ · badges Badges
+metabolism Métabolisme · mon-ciel Mon ciel · insolites-list Objets Insolites · admin Admin</code></pre>
+  <p>Cette table est celle des courriers, distincte de <code>PAGE_TITLES</code>, qui donne les titres affichés en tête de page ; les deux diffèrent notamment sur <code>injection</code>, dont le titre suit la forme du traitement alors que le libellé de courrier vaut toujours « Traitement ». La page <code>compte</code> n'a pas d'entrée ici : son identifiant partirait tel quel.</p>
+  <p class="ancre">src/features/feedback/pageOrigin.ts · src/versions/mixte/App.tsx</p>
+</section>

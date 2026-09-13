@@ -1,0 +1,401 @@
+<section id="temps-pour-soi">
+  <h2>12. Un temps pour soi <a class="retour" href="#sommaire">↑ sommaire</a></h2>
+  <p>Ce chapitre décrit le journal <code>MeTimeLog</code> : ses champs, les gestes qui l'écrivent (plafond quotidien, arrondi des heures, fusion d'une modification) et les calculs qui en dérivent (durée d'un jour, score quotidien, totaux de période, comptages, moyennes de l'accueil, série de tendance). Toutes les durées sont des minutes entières, toutes les dates des chaînes locales <code>YYYY-MM-DD</code>, toutes les heures des chaînes <code>HH:MM</code>.</p>
+
+  <h3 id="temps-pour-soi-entites">Entités</h3>
+  <p>Un seul objet du domaine est stocké : <code>MeTimeLog</code>, rangé dans <code>appData.meTimeLogs</code>.</p>
+  <table>
+    <thead><tr><th>Champ</th><th>Type</th><th>Unité / format</th><th>Statut</th></tr></thead>
+    <tbody>
+      <tr><td><code>id</code></td><td>string</td><td><code>metime-&lt;Date.now()&gt;</code></td><td>posé à l'ajout</td></tr>
+      <tr><td><code>date</code></td><td>string</td><td><code>YYYY-MM-DD</code>, date locale</td><td>obligatoire</td></tr>
+      <tr><td><code>time</code></td><td>string</td><td><code>HH:MM</code>, minute ronde</td><td>obligatoire ; lu <code>'12:00'</code> s'il manque</td></tr>
+      <tr><td><code>activity</code></td><td>string</td><td>= <code>MeTimePreset.value</code>, ex. « Spa »</td><td>obligatoire</td></tr>
+      <tr><td><code>duration</code></td><td>number</td><td>minutes entières</td><td>obligatoire</td></tr>
+      <tr><td><code>notes</code></td><td>string</td><td>texte libre</td><td>facultatif ; <code>undefined</code> si vide après <code>trim()</code></td></tr>
+    </tbody>
+  </table>
+  <p><code>MeTimePreset</code> : <code>{ value, label }</code>, sans valeur MET — aucune calorie ne se calcule sur ces moments. Champs du profil qui commandent le domaine : <code>meTimeTrackingEnabled?: boolean</code> (absent = éteint), <code>meTimeModuleHidden?: boolean</code>, <code>deleteAllButtonsEnabled?: boolean</code>.</p>
+  <p>Stockage : le journal vit dans la sauvegarde unique <code>glp1_app_companion_data</code>. Quatre clés locales portent des préférences d'affichage, jamais des données : <code>glp1_active_me_time</code> (activités actives), <code>glp1_me_time_history_view</code> (calendrier ou journal), <code>glp1_period_me_time_journal</code> et <code>glp1_period_me_time_chart</code> (fenêtres de période).</p>
+  <p>Rien d'autre n'est stocké. Sont <strong>dérivés</strong> à chaque rendu : minutes d'un jour, score quotidien, total et nombre de journées d'une période, comptage par activité, largeur d'une barre, moments par semaine, série de tendance sur 14 jours.</p>
+  <p class="ancre">src/types.ts · src/app/useAppData.ts · src/features/me-time/meTime.constants.ts</p>
+
+  <h3 id="temps-pour-soi-etat-d-un-module-defaut-compris">État d'un module, défaut compris</h3>
+  <p><code>isModuleOn(profile, tabId)</code> donne l'état réel. Le drapeau nu ne suffit pas : absent, il vaut allumé pour le traitement et les effets secondaires, éteint pour les cinq suivis, dont le temps pour soi.</p>
+  <pre><code>MODULE_FLAGS.metime = 'meTimeTrackingEnabled'
+MODULES_ALLUMES_PAR_DEFAUT = { 'injection', 'symptoms' }
+
+isModuleOn(profile, tabId) :
+  flag = MODULE_FLAGS[tabId]
+  si pas de flag           -> true          (page hors module)
+  valeur = profile[flag]
+  si valeur == undefined|null -> tabId ∈ MODULES_ALLUMES_PAR_DEFAUT
+  sinon                    -> Boolean(valeur)
+
+isModuleHidden(profile, tabId) = !isModuleOn(profile, tabId) &amp;&amp; Boolean(profile[HIDDEN_FLAGS[tabId]])</code></pre>
+  <p>Le profil d'usine écrit explicitement <code>meTimeTrackingEnabled: false</code> — le défaut n'est pas laissé à l'absence. La bascule de la page Modules inverse le drapeau et, quand elle allume, remet <code>meTimeModuleHidden: false</code> dans la même écriture. Le masquage ne mord que module éteint. <a href="spec-fonctionnelle.html#temps-pour-soi-carte-du-module-page-modules">→ fonctionnelle</a></p>
+  <p class="ancre">src/versions/mixte/app/navigation.ts · src/app/useAppData.ts · src/versions/mixte/components/NotificationsSettings.tsx</p>
+  <details><summary>Cas limites</summary>
+    <p>Sauvegarde ancienne sans le champ : <code>undefined</code> → éteint, aucune réécriture.</p>
+    <p>La page vitrée et la home lisent <code>Boolean(profile.meTimeTrackingEnabled)</code> et <code>profile.meTimeTrackingEnabled ?? false</code> plutôt que <code>isModuleOn</code> : même résultat pour ce module, dont le défaut est faux.</p>
+    <p>Module allumé puis masqué : <code>isModuleHidden</code> rend faux, le masquage est ignoré tant que le module est allumé.</p>
+    <p>Le questionnaire d'accueil calcule <code>meTimeTrackingEnabled = (answers.trackMeTime === true)</code> dans un profil de simulation ; il n'écrit ni le profil réel ni <code>glp1_active_me_time</code>. <span class="marque non">non implémenté</span></p>
+  </details>
+  <div class="exemple"><p>Camille installe l'application : <code>meTimeTrackingEnabled = false</code>, la carte du module est grise, l'onglet « Un temps pour soi » est absent du menu bas.</p></div>
+
+  <h3 id="temps-pour-soi-activation-automatique-des-modules-pas-et-sport">Activation automatique des modules pas et sport</h3>
+  <p><code>handleNavigate(tab)</code> et <code>handleQuickAddNavigate(tab)</code> portent la même liste de trois pages : elles allument le module de la page visée et sauvent le profil, pour <code>'meals'</code>, <code>'steps'</code> et <code>'sports'</code> seulement.</p>
+  <pre><code>updatedProfile = { ...profile } ; hasChanges = false
+si tab == 'meals'  et !foodTrackingEnabled   -> foodTrackingEnabled  = true ; hasChanges = true
+si tab == 'steps'  et !stepsTrackingEnabled  -> stepsTrackingEnabled = true ; hasChanges = true
+si tab == 'sports' et !sportTrackingEnabled  -> sportTrackingEnabled = true ; hasChanges = true
+si hasChanges -> handleSaveProfile(updatedProfile)
+setActiveTab(tab)</code></pre>
+  <p>Aucune branche ne vise <code>'metime'</code> ni <code>'sleep'</code> : arriver sur la page « Un temps pour soi » n'allume rien. <code>naviguerVersPageEteinte(tab)</code> ne touche pas au profil du tout — c'est le chemin des tiroirs vers une page vitrée. <a href="spec-fonctionnelle.html#temps-pour-soi-page-vitree-d-un-module-eteint">→ fonctionnelle</a></p>
+  <p class="ancre">src/versions/mixte/App.tsx</p>
+  <details><summary>Cas limites</summary>
+    <p>Module déjà allumé : <code>hasChanges</code> reste faux, aucune écriture du profil.</p>
+    <p>Ajout rapide vers <code>'metime'</code> : <code>handleQuickAddNavigate</code> pose <code>autoOpenTab</code> (formulaire ouvert au premier rendu) sans allumer le module ; la page reste vitrée si le module est éteint.</p>
+  </details>
+
+  <h3 id="temps-pour-soi-plafond-quotidien-sport-et-temps-pour-soi">Plafond quotidien (sport et temps pour soi)</h3>
+  <p>L'ajout passe par <code>addLogWithinDailyCap</code>, plafond 15, identifiant <code>metime-&lt;Date.now()&gt;</code>. Le décompte porte sur les lignes réellement présentes ce jour-là.</p>
+  <pre><code>addLogWithinDailyCap(logs, log, cap=15, newId, onCapReached) :
+  duJour = logs.filter(item =&gt; item.date === log.date)
+  si duJour.length &lt; 15
+     -&gt; logs + [ snapLogTime({ ...log, id: newId }) ]
+  sinon
+     onCapReached()                      // « Limite atteinte pour aujourd'hui : cette saisie remplace la dernière. »
+     index = dernier indice de logs dont date === log.date
+     logs[index] = snapLogTime({ ...logs[index], ...log })
+     -&gt; logs</code></pre>
+  <p>« La dernière du jour » est la dernière dans l'<strong>ordre du tableau</strong>, c'est-à-dire la dernière saisie, pas la plus tardive dans la journée. L'écrasement fusionne : la ligne garde son <code>id</code>, et un champ absent de la nouvelle saisie serait conservé.</p>
+  <p class="ancre">src/shared/model/logbook.ts · src/app/useAppData.ts</p>
+  <details><summary>Cas limites</summary>
+    <p>Le plafond est par <strong>date de la saisie</strong>, pas par jour courant : 15 moments datés du 09/09 bloquent le 09/09, même saisis le 12/09.</p>
+    <p>La ligne écrasée garde ses <code>notes</code> si la nouvelle saisie n'en porte pas — <code>notes: undefined</code> n'est pas transmis quand le champ est vide.</p>
+    <p>Journal absent (<code>meTimeLogs</code> non défini) : le défaut <code>logs = []</code> s'applique, l'ajout réussit.</p>
+  </details>
+  <div class="exemple"><p>Camille a déjà 15 moments datés du 12/09. Le seizième affiche l'avis et remplace la ligne la plus récemment saisie de ce jour ; le journal compte toujours 15 lignes au 12/09.</p></div>
+
+  <h3 id="temps-pour-soi-curseur-calendrier-journal">Curseur Calendrier / Journal</h3>
+  <p><code>useHistoryView(clé)</code> tient l'état de la vue et le persiste. Le calendrier est le défaut, et il l'est par exclusion : seule la chaîne <code>'journal'</code> donne la vue journal.</p>
+  <pre><code>useHistoryView(storageKey) :
+  état initial = (getItem&lt;string&gt;(storageKey) === 'journal') ? 'journal' : 'calendrier'
+  switchView(next) -&gt; setView(next) ; setItem(storageKey, next)
+
+clé de cette page : 'glp1_me_time_history_view'</code></pre>
+  <p>Une clé par page — <code>glp1_steps_history_view</code>, <code>glp1_sport_history_view</code>, <code>glp1_sleep_history_view</code>, <code>glp1_me_time_history_view</code> : basculer ici ne bascule aucune autre page. Le « + ajouter » de la ligne d'outils n'est dessiné que si la prop <code>onAdd</code> est fournie ; la page temps pour soi la fournit. La ligne d'outils porte aussi la poignée <code>bandRef</code> qui arme le « + » flottant à sa sortie d'écran, dans les deux vues. <a href="spec-fonctionnelle.html#temps-pour-soi-page-un-temps-pour-soi-metimetracker">→ fonctionnelle</a></p>
+  <p class="ancre">src/versions/mixte/components/HistoryToolbar.tsx</p>
+  <details><summary>Cas limites</summary>
+    <p>Valeur stockée inconnue ou illisible : vue calendrier.</p>
+    <p>Le journal et le calendrier ne coexistent jamais : le composant non retenu est démonté, pas caché.</p>
+  </details>
+
+  <h3 id="temps-pour-soi-minutes-rondes">Minutes rondes</h3>
+  <p>Toute heure écrite est ramenée à la minute ronde inférieure. L'ensemble des minutes rondes est irrégulier, la règle s'applique donc au moment d'écrire dans le modèle, pas dans le champ.</p>
+  <pre><code>ROUNDED_MINUTES = [0, 10, 15, 20, 30, 40, 45, 50]
+
+snapToRoundedMinutes(time) :
+  si time ne vaut pas /^(\d{2}):(\d{2})$/  -&gt; time inchangé
+  si minutes &gt; 59                          -&gt; time inchangé
+  rounded = plus grande valeur de ROUNDED_MINUTES ≤ minutes  (sinon 0)
+  -&gt; `HH:${pad2(rounded)}`
+
+snapLogTime(log) = typeof log.time === 'string' ? { ...log, time: snapToRoundedMinutes(log.time) } : log</code></pre>
+  <p><code>snapLogTime</code> est appliqué par <code>addLogWithinDailyCap</code> (ajout et écrasement) et par <code>applyLogUpdate</code> (modification) : les deux portes d'écriture. L'heure pré-remplie du formulaire vient de <code>getRoundedLocalTimeStr()</code>, qui est le même arrondi appliqué à l'heure locale courante. L'arrondi est toujours vers le bas, pour ne jamais produire une heure future ni franchir minuit. <a href="spec-fonctionnelle.html#temps-pour-soi-formulaire-nouveau-moment-pour-soi-modifier-le-moment-pour-s">→ fonctionnelle</a></p>
+  <p class="ancre">src/shared/date/date.local.ts · src/shared/model/logbook.ts</p>
+  <details><summary>Cas limites</summary>
+    <p>19:07 → 19:00 ; 19:17 → 19:15 ; 19:47 → 19:45 ; 19:58 → 19:50.</p>
+    <p>Chaîne hors format (<code>'9:05'</code>, <code>''</code>) : rendue telle quelle, aucun refus ici.</p>
+    <p>Ligne sans <code>time</code> : <code>snapLogTime</code> la rend intacte.</p>
+    <p>L'édition en place d'une ligne passe par <code>applyLogUpdate</code> : une heure saisie à 19:07 est donc réécrite 19:00 après validation.</p>
+  </details>
+  <div class="exemple"><p>Camille ouvre le formulaire à 19:14 : l'heure proposée est 19:10. Elle la corrige à 19:17 ; la ligne enregistrée porte 19:15.</p></div>
+
+  <h3 id="temps-pour-soi-bornes-numeriques-du-sport-et-du-temps-pour-soi">Bornes numériques du sport et du temps pour soi</h3>
+  <p>Une seule règle sert la durée des séances et celle des moments.</p>
+  <pre><code>RULE_DURATION = { min: 1, max: 480, step: 5, unit: 'min',
+                  message: 'Une durée entre 1 et 480 minutes est attendue.' }
+
+sanitizeNumber(raw, rule) :
+  decimals = rule.decimals ?? 0                       // 0 pour la durée
+  cleaned  = cleanNumericInput(raw, decimals)         // virgule -&gt; point, lettres et signe - retirés,
+                                                      // un seul point, décimales tronquées
+  si cleaned est '' ou '.'      -&gt; rule.allowEmpty ? '' : null   // allowEmpty absent -&gt; null
+  si !Number.isFinite(valeur)   -&gt; null
+  si valeur &lt; 1                 -&gt; null
+  si valeur &gt; 480               -&gt; null
+  -&gt; cleaned (sans point final orphelin)
+
+isAcceptable(raw, rule) = sanitizeNumber(raw, rule) !== null
+boundsMessage(rule)     = rule.message</code></pre>
+  <p>Bornes incluses : 1 et 480 sont acceptés. <code>decimals</code> valant 0, « 45.7 » est tronqué en « 45 » à la frappe, pas refusé. <code>step: 5</code> ne sert qu'aux flèches haut/bas du clavier (<code>stepNumber</code>), qui bornent la valeur au lieu de la refuser ; il n'impose pas un multiple de 5 à la saisie.</p>
+  <p class="ancre">src/versions/mixte/app/form.rules.ts · src/shared/ui/numberRules.ts</p>
+  <details><summary>Cas limites</summary>
+    <p>« 0 » → refusé (&lt; 1). « 481 » → refusé. « 480 » → accepté.</p>
+    <p>Champ vide → refusé : <code>allowEmpty</code> n'est pas posé sur <code>RULE_DURATION</code>.</p>
+    <p>« -30 » → le signe est retiré au nettoyage, la valeur devient 30 et passe.</p>
+    <p>La même règle borne l'édition en place de la durée au journal et dans la bulle du calendrier (<code>NumberField rule={RULE_DURATION}</code>), avec le message affiché sous la ligne.</p>
+  </details>
+
+  <h3 id="temps-pour-soi-refus-de-la-duree-autre-d-un-moment">Refus de la durée « Autre » d'un moment</h3>
+  <p>Deux gardes se succèdent : le refus visible, jugé au clic sur Valider dans la page Mixte, puis la garde silencieuse du hook partagé.</p>
+  <pre><code>// 1. MeTimeTracker.handleSubmit, avant le hook
+si showCustomDuration et !isAcceptable(customDuration, RULE_DURATION) :
+     e.preventDefault()
+     durationRefusal = boundsMessage(RULE_DURATION)   // affiché avant le bouton
+     return                                            // le formulaire reste ouvert, la saisie reste
+sinon durationRefusal = '' ; form.handleSubmit(e)
+
+// 2. useMeTimeForm.handleSubmit, garde silencieuse
+parsedDuration = parseInt(showCustomDuration ? customDuration : duration, 10)
+si isNaN(parsedDuration) ou parsedDuration &lt;= 0 -&gt; return   // rien n'est écrit, aucun message</code></pre>
+  <p>Le refus n'est jugé que si « Autre » est ouvert : les préréglages 15, 30, 45 et 60 ne peuvent pas le déclencher. Il s'efface à quatre gestes : retoucher la durée personnalisée, choisir une autre durée, ouvrir le formulaire, le fermer, et au démarrage d'une modification. <a href="spec-fonctionnelle.html#temps-pour-soi-formulaire-nouveau-moment-pour-soi-modifier-le-moment-pour-s">→ fonctionnelle</a></p>
+  <p class="ancre">src/versions/mixte/features/me-time/MeTimeTracker.tsx · src/features/me-time/useMeTimeForm.ts</p>
+  <details><summary>Cas limites</summary>
+    <p>« 500 » : refus affiché, champ conservé à 500, formulaire ouvert.</p>
+    <p>Champ « Autre » vide : refusé de la même façon (<code>allowEmpty</code> absent).</p>
+    <p>« 45.9 » : tronqué à « 45 » par le nettoyage du champ, accepté.</p>
+    <p>Le refus effacé revient au clic suivant s'il tient toujours ; il n'est pas recalculé pendant la frappe.</p>
+  </details>
+  <div class="exemple"><p>Camille tape 500 : « Une durée entre 1 et 480 minutes est attendue. » s'inscrit avant le bouton. Elle corrige à 45 — le message disparaît à la frappe — et Valider enregistre.</p></div>
+
+  <h3 id="temps-pour-soi-catalogue-et-defauts-du-temps-pour-soi">Catalogue et défauts du temps pour soi</h3>
+  <p>Neuf activités au catalogue, dans l'ordre alphabétique ; six actives tant que rien n'est personnalisé.</p>
+  <pre><code>ALL_ME_TIME_ACTIVITIES = [ 'Beauté des pieds', 'Jeu de société', 'Manucure',
+  'Partie de cartes', 'Regarder du sport entre amis', 'Soin du visage',
+  'Sortie cinéma', 'Sortie théâtre', 'Spa' ]
+
+DEFAULT_ACTIVE_ME_TIME = [ 'Spa', 'Manucure', 'Beauté des pieds',
+  'Soin du visage', 'Sortie cinéma', 'Sortie théâtre' ]
+
+ACTIVE_ME_TIME_STORAGE_KEY = 'glp1_active_me_time'
+
+liste active à l'initialisation :
+  saved = getItem&lt;string[]&gt;('glp1_active_me_time')
+  si saved et saved.length &gt; 0 -&gt; ALL_ME_TIME_ACTIVITIES.filter(a =&gt; saved.includes(a.value))
+  sinon                        -&gt; ALL_ME_TIME_ACTIVITIES.filter(a =&gt; DEFAULT_ACTIVE_ME_TIME.includes(a.value))</code></pre>
+  <p>Le filtrage se fait sur le catalogue : la liste active est donc <strong>toujours</strong> dans l'ordre du catalogue, jamais dans l'ordre de sélection. Défauts du formulaire : activité <code>'Spa'</code>, durée <code>'30'</code>, préréglages <code>15 / 30 / 45 / 60 / Autre</code>, date <code>getLocalDateStr()</code>, heure <code>getRoundedLocalTimeStr()</code>. La recherche du panneau compare en minuscules sur le <code>label</code>. <code>saveSelection()</code> refuse une sélection vide (« Au moins une activité doit être sélectionnée ») et rend <code>null</code> ; sinon elle écrit les valeurs cochées et rend la nouvelle liste. Si l'activité choisie dans le formulaire n'y figure plus, le formulaire prend <code>selected[0].value</code>, c'est-à-dire la première du catalogue parmi les actives. <a href="spec-fonctionnelle.html#temps-pour-soi-panneau-moments-pour-soi-disponibles-managemetimeblock">→ fonctionnelle</a></p>
+  <p class="ancre">src/features/me-time/meTime.constants.ts · src/features/me-time/useActiveMeTimeActivities.ts · src/features/me-time/useMeTimeForm.ts</p>
+  <details><summary>Cas limites</summary>
+    <p>Clé stockée vide (<code>[]</code>) : les six défauts reviennent — un tableau vide est traité comme « rien de personnalisé ».</p>
+    <p>Valeur stockée absente du catalogue : ignorée par le filtre, aucune ligne fantôme.</p>
+    <p>La liste active vit sur l'appareil, pas dans la sauvegarde : elle ne suit pas une restauration de données.</p>
+    <p>Un moment déjà enregistré garde son <code>activity</code> même désactivée ; les sélecteurs en place l'ajoutent à leurs options pour ne pas l'écraser à l'édition.</p>
+    <p>« Tout cocher » / « Tout décocher » n'agissent que sur <code>filteredOptions</code>, donc sur les lignes visibles après recherche.</p>
+    <p>Réouvrir le panneau réinitialise les cases sur les activités actives, vide la recherche et efface l'erreur.</p>
+  </details>
+
+  <h3 id="temps-pour-soi-selecteur-de-periode-commun">Sélecteur de période commun</h3>
+  <p>Un seul assortiment de fenêtres pour tout le site, un état persisté par bloc.</p>
+  <pre><code>PERIOD_OPTIONS = 7days « 7 derniers jours » | 14days | 30days | 90days
+                 | all « Depuis le début » | custom « Choisir »
+DEFAULT_PERIOD = '30days'
+WINDOW_DAYS = { 7days: 7, 14days: 14, 30days: 30, 90days: 90 }
+
+getCutoffDateStr(window, customRange) :
+  'all'    -&gt; null
+  'custom' -&gt; customRange.startDate ou null si vide/invalide
+  sinon    -&gt; getLocalDateStr(aujourd'hui − (WINDOW_DAYS[window] − 1))
+
+filterByTimeWindow(items, window, getDate, customRange) :
+  'all'    -&gt; items
+  'custom' -&gt; items où (!startDate ou d ≥ startDate) et (!endDate ou d ≤ endDate)
+  sinon    -&gt; items où getDate(item) ≥ getCutoffDateStr(window)</code></pre>
+  <p>La comparaison porte sur des <strong>chaînes</strong> <code>YYYY-MM-DD</code> locales, jamais sur des instants : aucun fuseau n'intervient. La fenêtre est inclusive et compte le jour en cours, d'où le décalage de <em>n − 1</em>. <code>usePeriodWindow(clé)</code> persiste <code>{ window, customRange }</code> sous <code>glp1_period_&lt;clé&gt;</code> ; le journal utilise <code>me_time_journal</code>, le graphe <code>me_time_chart</code> — les deux sont indépendants. <code>setCustomWindow(range)</code> bascule en <code>custom</code> avec ses bornes en une seule écriture. Hors mode Choisir, les bornes affichées valent <code>{ startDate: getCutoffDateStr(window) ?? '', endDate: '' }</code>, avec pour replis le plus ancien moment et aujourd'hui ; modifier une borne appelle <code>setCustomWindow</code> et bascule donc en Choisir. <a href="spec-fonctionnelle.html#temps-pour-soi-journal-un-temps-pour-soi-et-sa-ligne-journalentrycard-me-ti">→ fonctionnelle</a></p>
+  <p class="ancre">src/shared/time-window/timeWindow.utils.ts · src/shared/time-window/periodOptions.ts · src/shared/time-window/usePeriodWindow.ts · src/versions/mixte/features/me-time/MeTimeTracker.tsx</p>
+  <details><summary>Cas limites</summary>
+    <p>Fenêtre stockée inconnue : <code>isPeriodWindow</code> la rejette, le défaut 30 jours s'applique.</p>
+    <p>Mode Choisir avec les deux bornes vides : aucun filtre, tout le journal passe.</p>
+    <p>Un moment daté du futur passe toutes les fenêtres bornées par le bas (<code>d ≥ cutoff</code>) : il est compté au journal et aux totaux.</p>
+    <p>Le plus ancien moment sert de repli de borne basse ; sur un journal vide, ce repli vaut la date du jour.</p>
+  </details>
+  <div class="exemple"><p>Au 12/09/2026, « 7 derniers jours » coupe au 06/09 : le spa du 06/09 est dedans, celui du 05/09 non.</p></div>
+
+  <h3 id="temps-pour-soi-modification-et-suppression-d-une-ligne">Modification et suppression d'une ligne</h3>
+  <p>Trois gestes purs sur le tableau, partagés par tous les journaux.</p>
+  <pre><code>applyLogUpdate(logs = [], update) =
+  logs.map(log =&gt; log.id === update.id ? snapLogTime({ ...log, ...update }) : log)
+
+removeLogById(logs = [], id) = logs.filter(log =&gt; log.id !== id)
+
+handleClearMeTimeHistory() -&gt; { ...appData, meTimeLogs: [] }</code></pre>
+  <p>La fusion conserve les champs absents de la charge et arrondit l'heure. La suppression est franche : la ligne quitte la sauvegarde, aucune marque logique n'est posée — c'est ce qui rend le décompte du plafond exact. L'édition en place envoie toujours la ligne entière (<code>{ ...log, duration, activity, date, time, notes }</code>) et n'appelle rien si la valeur est inchangée, si la durée est illisible ou ≤ 0, ou si la date ou l'activité sont vides. La corbeille « Tout supprimer » n'est dessinée que si les trois conditions tiennent : journal non vide, geste <code>onClearMeTimeHistory</code> fourni, et <code>profile.deleteAllButtonsEnabled !== false</code>. <a href="spec-fonctionnelle.html#temps-pour-soi-journal-un-temps-pour-soi-et-sa-ligne-journalentrycard-me-ti">→ fonctionnelle</a></p>
+  <p class="ancre">src/shared/model/logbook.ts · src/app/useAppData.ts · src/versions/mixte/features/me-time/JournalEntryCard.tsx</p>
+  <details><summary>Cas limites</summary>
+    <p>Identifiant inconnu : <code>applyLogUpdate</code> et <code>removeLogById</code> rendent la liste inchangée.</p>
+    <p>Journal absent : le défaut <code>logs = []</code> évite l'erreur.</p>
+    <p>Notes vidées : <code>notes: undefined</code> est transmis explicitement par la ligne du journal, la note disparaît. Une charge qui ne porterait pas le champ le conserverait.</p>
+    <p>Ligne sans <code>time</code> : l'édition en place travaille sur <code>'12:00'</code> et écrit cette valeur.</p>
+    <p>« Tout supprimer » vide le tableau, pas les préférences : fenêtres, vue et activités actives restent.</p>
+  </details>
+
+  <h3 id="temps-pour-soi-duree-d-un-jour-calendrier-temps-pour-soi">Durée d'un jour (calendrier temps pour soi)</h3>
+  <p>Deux fonctions pures : le rangement par jour, puis la somme.</p>
+  <pre><code>meTimeByDate(history) :
+  Map&lt;date, MeTimeLog[]&gt; par log.date
+  chaque liste triée par (a.time ?? '').localeCompare(b.time ?? '')   // heure croissante
+
+meTimeDayMinutes(logs) =
+  Σ ( Number.isFinite(log.duration) &amp;&amp; log.duration &gt; 0 ? log.duration : 0 )
+
+tuile = formatCalendarDuration(minutes) :
+  total = Math.max(0, Math.round(minutes))
+  total &lt; 60 -&gt; `${total}min`
+  sinon      -&gt; `${Math.floor(total/60)}h${pad2(total % 60)}`</code></pre>
+  <p>Une durée illisible ou négative compte pour zéro : la tuile ne propage pas ce que le formulaire aurait dû refuser. Le calendrier ne passe pas <code>unitLabel</code> : aucune unité n'est écrite sous le mois. <a href="spec-fonctionnelle.html#temps-pour-soi-calendrier-un-temps-pour-soi-metimecalendar-et-bulle-daymeti">→ fonctionnelle</a></p>
+  <p class="ancre">src/features/me-time/meTimeCalendar.ts · src/shared/calendar.ts</p>
+  <details><summary>Cas limites</summary>
+    <p>45 → « 45min » ; 60 → « 1h00 » ; 75 → « 1h15 » ; 120 → « 2h00 » ; 0 → « 0min », mais un jour sans moment n'a pas de tuile de valeur.</p>
+    <p>Deux moments à la même heure : l'ordre entre eux est celui du tableau, <code>localeCompare</code> rendant 0.</p>
+    <p>Ligne sans <code>time</code> : traitée comme <code>''</code>, donc placée en tête du jour.</p>
+  </details>
+  <div class="exemple"><p>Le 12/09, Camille a Manucure 30 min à 18:30 et Beauté des pieds 45 min à 19:10 : la bulle les liste dans cet ordre, la tuile porte « 1h15 ».</p></div>
+
+  <h3 id="temps-pour-soi-coquille-commune-des-calendriers">Coquille commune des calendriers</h3>
+  <p><code>CalendarBlock</code> porte la grille, la navigation et la bulle ; le domaine ne fournit que la carte des entrées par jour, la valeur d'une tuile et le contenu de la bulle. Les quatre pages de ce domaine — pas, activité physique, sommeil, temps pour soi — l'emploient, comme les calendriers des pesées, des prises, des repas et des effets secondaires.</p>
+  <pre><code>grille : monthGrid(année, mois) — semaines complètes lundi→dimanche,
+         première et dernière complétées par les jours voisins (inMonth: false)
+
+bornes : minKey = min( monthKey(mois courant),
+                       monthKey(mois de la plus ancienne date de entriesByDate) )
+         maxKey = monthKey(mois courant)
+         canPrev = shownKey &gt; minKey ; canNext = shownKey &lt; maxKey
+
+glissé  : |dx| ≥ 48 px ET |dx| &gt; |dy| ; dx &lt; 0 -&gt; mois suivant, sinon précédent
+
+clic    : jour avec données   -&gt; ouvre / referme sa bulle
+          jour sans données   -&gt; onAddAt(date) si la prop existe
+          ailleurs            -&gt; écouteur document, referme la bulle</code></pre>
+  <p>Le bloc passe en <code>z-40</code> tant qu'une bulle est ouverte. À l'ouverture, un <code>requestAnimationFrame</code> mesure le débord de la bulle sous le haut du menu bas moins 8 px et fait défiler le conteneur d'exactement ce débord. L'invite « Cliquez sur la date choisie pour saisir … » n'apparaît que si l'appelant passe <code>premiereSaisie</code> ; ici, <code>history.length === 0 ? 'votre premier moment à soi' : undefined</code>. Les jours de complétion des semaines de bord sont cliquables comme les autres.</p>
+  <p class="ancre">src/versions/mixte/components/CalendarBlock.tsx · src/shared/calendar.ts · src/versions/mixte/features/me-time/MeTimeCalendar.tsx</p>
+  <details><summary>Cas limites</summary>
+    <p>Journal vide : <code>firstDate</code> est <code>undefined</code>, <code>minKey = maxKey</code> — les deux chevrons sont inertes et voilés.</p>
+    <p>Moment daté du futur : <code>maxKey</code> reste le mois courant, sa tuile n'est atteignable qu'à l'arrivée de ce mois.</p>
+    <p>Glissé au-delà d'une borne : sans effet, comme le chevron voilé.</p>
+    <p>Supprimer le dernier moment d'un jour depuis la bulle la referme.</p>
+  </details>
+
+  <h3 id="temps-pour-soi-score-quotidien-du-temps-pour-soi">Score quotidien du temps pour soi</h3>
+  <p>Un point par jour parcouru, score de 0 à 10 : les minutes du jour rapportées à une heure, plafonnées.</p>
+  <pre><code>FULL_SCORE_MINUTES = 60
+
+bornes de la fenêtre (computeRangeBounds) :
+  dayStartMs = today.setHours(0,0,0,0) ; dayEndMs = dayStartMs + 86 400 000 − 1
+  '7days'|'14days'|'30days'|'90days' -&gt; startMs = dayStartMs − (n − 1) jours ; endMs = dayEndMs
+  'all'    -&gt; startMs = min( new Date(`${log.date}T12:00:00`) ) ; dayStartMs − 6 j si journal vide
+  'custom' -&gt; startMs = `${customStart}T00:00:00` ou dayStartMs − 6 j si vide
+              endMs   = `${customEnd}T23:59:59`   ou dayEndMs      si vide
+
+échantillonnage :
+  diffDays  = Math.round((endMs − startMs) / 86 400 000)
+  maxPoints = diffDays &gt; 60 ? 60 : Math.max(diffDays + 1, 1)
+  step      = Math.max(1, Math.floor((diffDays + 1) / maxPoints))
+
+pour t = startMs ; t ≤ endMs ; t += 86 400 000 × step :
+  dateStr      = getLocalDateStr(t)
+  dailyMinutes = Σ duration des logs dont log.date === dateStr
+  score        = Math.min(dailyMinutes / 60 × 10, 10)
+  point = { dateFormatted: 'JJ/MM', timestamp: t, 'Score Temps pour soi': Math.round(score × 10) / 10 }</code></pre>
+  <p>Le pas vaut 1 tant que <code>diffDays ≤ 118</code>, 2 à partir de 119 jours de fenêtre, 3 à partir de 179. Les jours sautés n'ont pas de point : ils ne sont ni tracés ni comptés dans le graphe, et leurs minutes n'apparaissent nulle part sur la courbe. L'axe des ordonnées est figé sur <code>[0, 10]</code>. L'infobulle affiche <code>dateFormatted</code> puis « Score Temps pour soi : <em>score</em> / 10 ». <a href="spec-fonctionnelle.html#temps-pour-soi-graphe-suivi-du-temps-pour-soi-metimechart">→ fonctionnelle</a></p>
+  <p class="ancre">src/features/me-time/meTime.utils.ts · src/versions/mixte/features/me-time/MeTimeChart.tsx</p>
+  <details><summary>Cas limites</summary>
+    <p>60 min → 10 ; 30 → 5 ; 45 → 7,5 ; 240 → 10 ; 20 + 40 → 10 ; 0 → 0 (barre à zéro, le point existe).</p>
+    <p>Le score est calculé sur <strong>tout</strong> le journal filtré par la date du point, jamais sur <code>filteredLogs</code> : le graphe et le total ne partagent pas leur source.</p>
+    <p>Mode Choisir sans date de début : le graphe part d'aujourd'hui − 6 jours alors que le total, lui, ne filtre rien — les deux chiffres peuvent couvrir des périodes différentes. <span class="marque">arbitrage non validé</span></p>
+    <p>90 jours : <code>diffDays = 90</code>, <code>maxPoints = 60</code>, <code>step = 1</code> — aucun jour n'est sauté malgré le plafond de 60 points.</p>
+    <p>Moment daté du futur : jamais tracé, <code>endMs</code> s'arrêtant à la fin d'aujourd'hui.</p>
+  </details>
+  <div class="exemple"><p>Le 12/09, Camille cumule 30 + 45 = 75 min : <code>min(75/60 × 10, 10) = 10</code>. Le 06/09, 45 min donnent 7,5. Le 09/09, 120 min donnent 10.</p></div>
+
+  <h3 id="temps-pour-soi-total-et-journees-du-graphe-temps-pour-soi">Total et journées du graphe</h3>
+  <p>Les deux chiffres de la ligne sous le titre viennent du même ensemble, <code>filteredLogs</code>.</p>
+  <pre><code>filteredLogs = filterByTimeWindow(meTimeHistory, period.window, l =&gt; l.date, period.rangeForFilter)
+totalMinutes = Σ filteredLogs.duration
+dayCount     = new Set(filteredLogs.map(l =&gt; l.date)).size
+
+formatTotal(minutes) :
+  h = Math.floor(minutes / 60) ; m = minutes % 60
+  h === 0 -&gt; `${m} min`
+  m === 0 -&gt; `${h}h`
+  sinon   -&gt; `${h}h${pad2(m)}`
+
+phrase : « Total : {formatTotal(totalMinutes)} de temps pour soi sur {dayCount} jour(s) »</code></pre>
+  <p><code>formatTotal</code> n'est pas <code>formatCalendarDuration</code> : « 45 min » avec espace sous l'heure, « 2h » sans minutes quand elles sont nulles. La phrase n'est rendue que si <code>filteredLogs.length &gt; 0</code> ; sinon la page écrit « Aucun moment enregistré sur cette période. ». Le « s » de « jours » tombe à <code>dayCount === 1</code>. <a href="spec-fonctionnelle.html#temps-pour-soi-graphe-suivi-du-temps-pour-soi-metimechart">→ fonctionnelle</a></p>
+  <p class="ancre">src/features/me-time/useMeTimeChart.ts · src/versions/mixte/features/me-time/MeTimeChart.tsx</p>
+  <details><summary>Cas limites</summary>
+    <p>390 min → « 6h30 » ; 90 → « 1h30 » ; 120 → « 2h » ; 45 → « 45 min ».</p>
+    <p><code>dayCount</code> compte des <strong>dates distinctes</strong> : deux moments le 12/09 font un jour.</p>
+    <p>Une durée négative en base serait comptée telle quelle ici, contrairement à la tuile du calendrier qui l'ignore.</p>
+  </details>
+  <div class="exemple"><p>Sur 30 jours, Camille a 390 minutes réparties sur six dates : « Total : 6h30 de temps pour soi sur 6 jours ».</p></div>
+
+  <h3 id="temps-pour-soi-comptage-mes-moments">Comptage « Mes moments »</h3>
+  <p>Deux séries à fenêtres figées, chacune avec sa propre échelle.</p>
+  <pre><code>momentsParActivite(meTimeHistory, fenetre)  // fenetre ∈ { '7days', 'all' }
+  filtres = filterByTimeWindow(meTimeHistory, fenetre, l =&gt; l.date)
+  parNom  = Map&lt;activity, nombre d'ENTRÉES&gt;
+  -&gt; [...parNom].map(([nom, fois]) =&gt; ({ nom, fois }))
+                .sort((a,b) =&gt; (b.fois − a.fois) || a.nom.localeCompare(b.nom, 'fr'))
+
+largeur d'une barre (par série) :
+  maxFois = max(ligne.fois)
+  part    = maxFois &gt; 0 ? (ligne.fois / maxFois) × 100 : 0
+  largeur = Math.max(6, Math.round(part × 10) / 10)   // en % de la piste</code></pre>
+  <p>Ce sont des entrées, jamais des journées : deux moments le même jour font deux. Le tri secondaire alphabétique français fige l'ordre à fréquence égale. Le plancher de 6 % garde visible une activité vue une seule fois. Les deux séries sont indépendantes du sélecteur de période de la page. La couche vitrée de l'accueil affiche le même bloc, sur le journal entier. <a href="spec-fonctionnelle.html#temps-pour-soi-bloc-mes-moments-blocmesmoments">→ fonctionnelle</a></p>
+  <p class="ancre">src/versions/mixte/features/me-time/mesMoments.calculs.ts · src/versions/mixte/features/me-time/BlocMesMoments.tsx</p>
+  <details><summary>Cas limites</summary>
+    <p>Série vide : la phrase de la fenêtre s'affiche sous son libellé, l'autre série garde la sienne.</p>
+    <p>Une seule activité : sa barre vaut 100 %.</p>
+    <p>Une activité désactivée depuis reste comptée : le comptage porte sur <code>log.activity</code>, pas sur la liste active.</p>
+    <p>Rapport 1 sur 20 : <code>part = 5</code>, <code>largeur = 6</code> — le plancher mord.</p>
+  </details>
+  <div class="exemple"><p>Depuis le début, Camille a Spa ×3, Manucure ×2, Beauté des pieds ×1, Sortie cinéma ×1 : barres à 100 %, 66,7 %, 33,3 % et 33,3 %, les deux dernières départagées par l'alphabet. Sur 7 jours, quatre activités à 1 fois : quatre barres à 100 %.</p></div>
+
+  <h3 id="temps-pour-soi-moments-pour-soi-sur-la-home">Moments pour soi sur la home</h3>
+  <p>Deux valeurs indépendantes, toutes deux en <strong>entrées</strong>.</p>
+  <pre><code>meTimeCountLast7Days(logs, now = new Date()) :
+  sevenDaysAgoStr = getLocalDateStr(now − 6 × 86 400 000)
+  -&gt; logs.filter(l =&gt; l.date ≥ sevenDaysAgoStr).length
+
+meTimeWeeklyAverage(logs, now) = entriesWeeklyAverageSinceFirst(logs, now) :
+  si journal vide                              -&gt; null
+  premiere = min(l.date)
+  jours    = daysBetween(premiere, getLocalDateStr(now)) + 1     // bornes comprises
+  si jours &lt; 7                                 -&gt; null
+  -&gt; logs.length / (jours / 7)
+
+affichage : format1Dec(valeur) + pluriel(valeur, 'moment')       // 's' dès que valeur ≥ 2
+garde de la rangée : meTimeTrackingEnabled &amp;&amp; (moyenne !== null || compte &gt; 0)</code></pre>
+  <p><code>format1Dec</code> arrondit à une décimale au plus et laisse tomber les zéros de queue : 2,04 s'écrit « 2 », 2,33 s'écrit « 2.3 ». La tuile de gauche est absente tant que la moyenne vaut <code>null</code> ; celle de droite est toujours rendue quand la rangée l'est. <code>meTimeMinutesLast7Days</code> existe encore dans le domaine mais n'a plus d'appelant. <span class="marque non">non implémenté</span> <a href="spec-fonctionnelle.html#temps-pour-soi-tuiles-home-du-domaine-temps-pour-soi">→ fonctionnelle</a></p>
+  <p class="ancre">src/features/home/homeOverview.ts · src/versions/mixte/homes/sections/MaisonSections.tsx</p>
+  <details><summary>Cas limites</summary>
+    <p>Première entrée il y a moins de sept jours (bornes comprises) : moyenne <code>null</code>, seule la tuile des 7 jours paraît.</p>
+    <p>Le diviseur est le temps écoulé depuis la première entrée, pas le nombre de journées renseignées : une semaine sans moment tire la moyenne vers le bas.</p>
+    <p>Un moment daté du futur passe le filtre <code>date ≥ aujourd'hui − 6</code> et gonfle le compte à sept jours.</p>
+    <p>Module éteint : la rangée n'est pas montée, même avec un journal plein.</p>
+  </details>
+  <div class="exemple"><p>Première entrée le 20/08, sept moments au 12/09 : <code>daysBetween = 23</code>, <code>jours = 24</code>, <code>7 / (24/7) = 2,0416…</code> → « 2 moments ». Quatre entrées du 06 au 12/09 → « 4 moments ».</p></div>
+
+  <h3 id="temps-pour-soi-tendance-du-temps-pour-soi-tiroir">Tendance du temps pour soi (tiroir)</h3>
+  <p>Une valeur par jour sur quatorze jours, sans échelle ni date : la carte ne montre qu'une silhouette et un total.</p>
+  <pre><code>TREND_DAYS = 14
+trendDates(days, today) = [ getLocalDateStr(today − i × 86 400 000) pour i = days−1 … 0 ]
+
+meTimeTrend(meTimeLogs, days = 14, today = new Date()) :
+  si journal absent ou vide -&gt; []                       // la carte n'a rien à dessiner
+  -&gt; trendDates(days, today).map(date =&gt;
+        Σ duration des logs dont log.date === date )     // 0 les jours sans moment
+
+trendTotal(series) : series.length === 0 ? null : Σ (v ?? 0)
+libellé de la carte : « total : » + formatCalendarDuration(trendTotal(series))</code></pre>
+  <p>Le zéro est un arbitrage du domaine : un moment se note quand il a lieu, ne rien trouver c'est ne s'être rien accordé — à la différence des calories, du sommeil et des pas, qui posent <code>null</code>. La carte n'est montée que si <code>meTimeTrackingEnabled</code> ; le format est celui des tuiles de calendrier, donc « 5h00 » et « 45min ». <a href="spec-fonctionnelle.html#temps-pour-soi-tiroirs-journal-et-tendances">→ fonctionnelle</a></p>
+  <p class="ancre">src/features/trends/trends.ts · src/versions/mixte/components/TrendDrawer.tsx</p>
+  <details><summary>Cas limites</summary>
+    <p>Journal vide : série <code>[]</code>, <code>trendTotal</code> rend <code>null</code>, la carte n'affiche pas de total.</p>
+    <p>Série entière à zéro : total 0 → « total : 0min ».</p>
+    <p>La fenêtre est fixe : les moments plus anciens que quatorze jours et ceux datés du futur n'entrent pas dans la série ni dans le total.</p>
+  </details>
+  <div class="exemple"><p>Au 12/09, Camille a 300 minutes sur les quatorze derniers jours : la carte porte « total : 5h00 ».</p></div>
+</section>

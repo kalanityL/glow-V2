@@ -1,0 +1,341 @@
+{
+ "inventions": [
+  {
+   "categorie": "cas limite non vérifié",
+   "fonctionnalite": "Score quotidien du temps pour soi",
+   "texte": "Aux changements d'heure (passage à l'heure d'été ou d'hiver), la boucle du graphe avance par pas de 86 400 000 ms depuis un instant fixe : deux points pourraient tomber sur la même date locale, ou une date être sautée.",
+   "origine": "Déduction sur computeMeTimeChartData (src/features/me-time/meTime.utils.ts) ; aucun test ni garde dans le code ne traite ce cas, je ne l'ai pas exécuté."
+  },
+  {
+   "categorie": "comportement non lu",
+   "fonctionnalite": "« + » flottant de la page",
+   "texte": "« Une fois apparu, le « + » flottant reste, même si la ligne d'outils revient à l'écran. »",
+   "origine": "La page ne fait que signaler la sortie d'écran (onAddButtonOffScreenChange) ; la persistance est décidée par armFloatingAdd dans src/versions/mixte/App.tsx, que je n'ai pas lu. Hors des 17 ancres, donc écarté du chapitre."
+  },
+  {
+   "categorie": "surface hors périmètre du chapitre",
+   "fonctionnalite": "Tiroir Journal, trois dernières entrées",
+   "texte": "Ordre et fenêtre des trois lignes « JJ/MM · activité » du tiroir Journal.",
+   "origine": "Aucune ancre imposée ne le couvre et je n'ai pas lu le composant du tiroir Journal ; rien n'est affirmé à son sujet."
+  },
+  {
+   "categorie": "absence de code V2",
+   "fonctionnalite": "Domaine entier en V2",
+   "texte": "Décisions V2 propres au temps pour soi.",
+   "origine": "Aucune occurrence de « meTime » ni « temps pour soi » dans /Users/beauty/Desktop/GLOW/GIT-APP-V2/src ni dans GUIDELINES.md : tout le chapitre est fondé sur la V1."
+  }
+ ],
+ "glossaire": [
+  {
+   "terme": "MeTimeLog",
+   "definition": "Une ligne du journal « Un temps pour soi » : id, date (YYYY-MM-DD), time (HH:MM), activity, duration (minutes), notes facultatives. Rangée dans appData.meTimeLogs."
+  },
+  {
+   "terme": "MeTimePreset",
+   "definition": "Une activité du catalogue : { value, label }. La value est ce qui est stocké dans log.activity ; il n'y a pas de valeur MET, donc aucune calorie."
+  },
+  {
+   "terme": "Minute ronde",
+   "definition": "Minute appartenant à ROUNDED_MINUTES = [0, 10, 15, 20, 30, 40, 45, 50]. Toute heure écrite est ramenée à la valeur inférieure de cet ensemble par snapToRoundedMinutes."
+  },
+  {
+   "terme": "Plafond quotidien",
+   "definition": "Nombre maximal de lignes acceptées pour une même date : 15 ici. Au-delà, addLogWithinDailyCap prévient et fusionne la nouvelle saisie dans la dernière ligne du jour, qui garde son id."
+  },
+  {
+   "terme": "Fenêtre inclusive",
+   "definition": "Fenêtre de n jours qui compte le jour en cours : la date de coupure vaut aujourd'hui − (n − 1). Le filtrage compare des chaînes YYYY-MM-DD locales."
+  },
+  {
+   "terme": "Fenêtre fixe",
+   "definition": "Fenêtre non paramétrable, écrite dans le composant : le bloc des moments n'a que « 7 derniers jours » et « Depuis le début », indépendantes du sélecteur de période de la page."
+  },
+  {
+   "terme": "Score Temps pour soi",
+   "definition": "min(minutes du jour ÷ 60 × 10, 10), arrondi au dixième. FULL_SCORE_MINUTES = 60 : une heure ou plus vaut 10."
+  },
+  {
+   "terme": "Échantillonnage du graphe",
+   "definition": "step = max(1, floor((diffDays + 1) / maxPoints)) avec maxPoints plafonné à 60. Le graphe ne trace qu'un jour sur step ; les jours sautés n'ont pas de point."
+  },
+  {
+   "terme": "dayCount",
+   "definition": "Nombre de dates distinctes portant au moins un moment dans la période filtrée — des journées, pas des entrées."
+  },
+  {
+   "terme": "Entrée (par opposition à journée)",
+   "definition": "Une ligne du journal. Les comptages du bloc des moments et des tuiles de l'accueil comptent des entrées : deux moments le même jour font deux."
+  },
+  {
+   "terme": "formatCalendarDuration",
+   "definition": "Écriture serrée d'une durée pour les tuiles et les cartes : « 45min » sous l'heure, « 1h15 » au-delà, minutes toujours sur deux chiffres."
+  },
+  {
+   "terme": "formatTotal",
+   "definition": "Écriture du total du graphe : « 45 min » sous l'heure (avec espace), « 2h » quand les minutes sont nulles, « 1h30 » sinon. Distinct de formatCalendarDuration."
+  },
+  {
+   "terme": "isModuleOn",
+   "definition": "État réel d'un module, défaut compris : drapeau absent = éteint pour les cinq suivis (dont le temps pour soi), allumé pour le traitement et les effets secondaires."
+  },
+  {
+   "terme": "Masquage d'un module",
+   "definition": "meTimeModuleHidden : retire le domaine des menus et des tiroirs, mais seulement tant que le module est éteint. Rallumer le module remet le drapeau à faux."
+  },
+  {
+   "terme": "Plancher de barre",
+   "definition": "LARGEUR_MIN_PCT = 6 : largeur minimale d'une barre du bloc des moments, pour qu'une activité rare reste visible."
+  },
+  {
+   "terme": "NumberRule",
+   "definition": "Bornes d'un champ numérique : min, max, step, decimals, allowEmpty, unit, message. RULE_DURATION vaut 1 à 480 minutes, pas de vide permis."
+  },
+  {
+   "terme": "applyLogUpdate",
+   "definition": "Fusionne une modification dans la ligne désignée (les champs absents sont conservés) et arrondit l'heure."
+  },
+  {
+   "terme": "removeLogById",
+   "definition": "Suppression franche : la ligne quitte la sauvegarde, sans marque logique — c'est ce qui rend exact le décompte du plafond quotidien."
+  },
+  {
+   "terme": "meTimeTrend",
+   "definition": "Série des minutes par jour sur 14 jours, aujourd'hui compris, avec 0 les jours sans moment ; tableau vide si le journal est vide."
+  }
+ ],
+ "index": [
+  {
+   "terme": "MeTimeLog",
+   "ancre": "temps-pour-soi-entites"
+  },
+  {
+   "terme": "meTimeLogs (stockage)",
+   "ancre": "temps-pour-soi-entites"
+  },
+  {
+   "terme": "glp1_active_me_time",
+   "ancre": "temps-pour-soi-catalogue-et-defauts-du-temps-pour-soi"
+  },
+  {
+   "terme": "glp1_me_time_history_view",
+   "ancre": "temps-pour-soi-curseur-calendrier-journal"
+  },
+  {
+   "terme": "glp1_period_me_time_journal",
+   "ancre": "temps-pour-soi-selecteur-de-periode-commun"
+  },
+  {
+   "terme": "glp1_period_me_time_chart",
+   "ancre": "temps-pour-soi-selecteur-de-periode-commun"
+  },
+  {
+   "terme": "meTimeTrackingEnabled",
+   "ancre": "temps-pour-soi-etat-d-un-module-defaut-compris"
+  },
+  {
+   "terme": "isModuleOn",
+   "ancre": "temps-pour-soi-etat-d-un-module-defaut-compris"
+  },
+  {
+   "terme": "isModuleHidden",
+   "ancre": "temps-pour-soi-etat-d-un-module-defaut-compris"
+  },
+  {
+   "terme": "handleNavigate",
+   "ancre": "temps-pour-soi-activation-automatique-des-modules-pas-et-sport"
+  },
+  {
+   "terme": "naviguerVersPageEteinte",
+   "ancre": "temps-pour-soi-activation-automatique-des-modules-pas-et-sport"
+  },
+  {
+   "terme": "addLogWithinDailyCap",
+   "ancre": "temps-pour-soi-plafond-quotidien-sport-et-temps-pour-soi"
+  },
+  {
+   "terme": "Plafond de 15 par jour",
+   "ancre": "temps-pour-soi-plafond-quotidien-sport-et-temps-pour-soi"
+  },
+  {
+   "terme": "useHistoryView",
+   "ancre": "temps-pour-soi-curseur-calendrier-journal"
+  },
+  {
+   "terme": "ROUNDED_MINUTES",
+   "ancre": "temps-pour-soi-minutes-rondes"
+  },
+  {
+   "terme": "snapToRoundedMinutes",
+   "ancre": "temps-pour-soi-minutes-rondes"
+  },
+  {
+   "terme": "getRoundedLocalTimeStr",
+   "ancre": "temps-pour-soi-minutes-rondes"
+  },
+  {
+   "terme": "RULE_DURATION",
+   "ancre": "temps-pour-soi-bornes-numeriques-du-sport-et-du-temps-pour-soi"
+  },
+  {
+   "terme": "sanitizeNumber",
+   "ancre": "temps-pour-soi-bornes-numeriques-du-sport-et-du-temps-pour-soi"
+  },
+  {
+   "terme": "isAcceptable",
+   "ancre": "temps-pour-soi-refus-de-la-duree-autre-d-un-moment"
+  },
+  {
+   "terme": "boundsMessage",
+   "ancre": "temps-pour-soi-refus-de-la-duree-autre-d-un-moment"
+  },
+  {
+   "terme": "ALL_ME_TIME_ACTIVITIES",
+   "ancre": "temps-pour-soi-catalogue-et-defauts-du-temps-pour-soi"
+  },
+  {
+   "terme": "DEFAULT_ACTIVE_ME_TIME",
+   "ancre": "temps-pour-soi-catalogue-et-defauts-du-temps-pour-soi"
+  },
+  {
+   "terme": "saveSelection",
+   "ancre": "temps-pour-soi-catalogue-et-defauts-du-temps-pour-soi"
+  },
+  {
+   "terme": "PERIOD_OPTIONS",
+   "ancre": "temps-pour-soi-selecteur-de-periode-commun"
+  },
+  {
+   "terme": "DEFAULT_PERIOD",
+   "ancre": "temps-pour-soi-selecteur-de-periode-commun"
+  },
+  {
+   "terme": "getCutoffDateStr",
+   "ancre": "temps-pour-soi-selecteur-de-periode-commun"
+  },
+  {
+   "terme": "filterByTimeWindow",
+   "ancre": "temps-pour-soi-selecteur-de-periode-commun"
+  },
+  {
+   "terme": "usePeriodWindow",
+   "ancre": "temps-pour-soi-selecteur-de-periode-commun"
+  },
+  {
+   "terme": "applyLogUpdate",
+   "ancre": "temps-pour-soi-modification-et-suppression-d-une-ligne"
+  },
+  {
+   "terme": "removeLogById",
+   "ancre": "temps-pour-soi-modification-et-suppression-d-une-ligne"
+  },
+  {
+   "terme": "deleteAllButtonsEnabled",
+   "ancre": "temps-pour-soi-modification-et-suppression-d-une-ligne"
+  },
+  {
+   "terme": "meTimeByDate",
+   "ancre": "temps-pour-soi-duree-d-un-jour-calendrier-temps-pour-soi"
+  },
+  {
+   "terme": "meTimeDayMinutes",
+   "ancre": "temps-pour-soi-duree-d-un-jour-calendrier-temps-pour-soi"
+  },
+  {
+   "terme": "formatCalendarDuration",
+   "ancre": "temps-pour-soi-duree-d-un-jour-calendrier-temps-pour-soi"
+  },
+  {
+   "terme": "CalendarBlock",
+   "ancre": "temps-pour-soi-coquille-commune-des-calendriers"
+  },
+  {
+   "terme": "monthGrid",
+   "ancre": "temps-pour-soi-coquille-commune-des-calendriers"
+  },
+  {
+   "terme": "monthKey (bornes de navigation)",
+   "ancre": "temps-pour-soi-coquille-commune-des-calendriers"
+  },
+  {
+   "terme": "computeMeTimeChartData",
+   "ancre": "temps-pour-soi-score-quotidien-du-temps-pour-soi"
+  },
+  {
+   "terme": "FULL_SCORE_MINUTES",
+   "ancre": "temps-pour-soi-score-quotidien-du-temps-pour-soi"
+  },
+  {
+   "terme": "Échantillonnage (step, maxPoints)",
+   "ancre": "temps-pour-soi-score-quotidien-du-temps-pour-soi"
+  },
+  {
+   "terme": "totalMinutes",
+   "ancre": "temps-pour-soi-total-et-journees-du-graphe-temps-pour-soi"
+  },
+  {
+   "terme": "dayCount",
+   "ancre": "temps-pour-soi-total-et-journees-du-graphe-temps-pour-soi"
+  },
+  {
+   "terme": "formatTotal",
+   "ancre": "temps-pour-soi-total-et-journees-du-graphe-temps-pour-soi"
+  },
+  {
+   "terme": "momentsParActivite",
+   "ancre": "temps-pour-soi-comptage-mes-moments"
+  },
+  {
+   "terme": "LARGEUR_MIN_PCT",
+   "ancre": "temps-pour-soi-comptage-mes-moments"
+  },
+  {
+   "terme": "meTimeCountLast7Days",
+   "ancre": "temps-pour-soi-moments-pour-soi-sur-la-home"
+  },
+  {
+   "terme": "meTimeWeeklyAverage",
+   "ancre": "temps-pour-soi-moments-pour-soi-sur-la-home"
+  },
+  {
+   "terme": "entriesWeeklyAverageSinceFirst",
+   "ancre": "temps-pour-soi-moments-pour-soi-sur-la-home"
+  },
+  {
+   "terme": "format1Dec",
+   "ancre": "temps-pour-soi-moments-pour-soi-sur-la-home"
+  },
+  {
+   "terme": "meTimeTrend",
+   "ancre": "temps-pour-soi-tendance-du-temps-pour-soi-tiroir"
+  },
+  {
+   "terme": "TREND_DAYS",
+   "ancre": "temps-pour-soi-tendance-du-temps-pour-soi-tiroir"
+  },
+  {
+   "terme": "trendTotal",
+   "ancre": "temps-pour-soi-tendance-du-temps-pour-soi-tiroir"
+  }
+ ],
+ "ancres_traitees": [
+  "temps-pour-soi-entites",
+  "temps-pour-soi-etat-d-un-module-defaut-compris",
+  "temps-pour-soi-activation-automatique-des-modules-pas-et-sport",
+  "temps-pour-soi-plafond-quotidien-sport-et-temps-pour-soi",
+  "temps-pour-soi-curseur-calendrier-journal",
+  "temps-pour-soi-minutes-rondes",
+  "temps-pour-soi-bornes-numeriques-du-sport-et-du-temps-pour-soi",
+  "temps-pour-soi-refus-de-la-duree-autre-d-un-moment",
+  "temps-pour-soi-catalogue-et-defauts-du-temps-pour-soi",
+  "temps-pour-soi-selecteur-de-periode-commun",
+  "temps-pour-soi-modification-et-suppression-d-une-ligne",
+  "temps-pour-soi-duree-d-un-jour-calendrier-temps-pour-soi",
+  "temps-pour-soi-coquille-commune-des-calendriers",
+  "temps-pour-soi-score-quotidien-du-temps-pour-soi",
+  "temps-pour-soi-total-et-journees-du-graphe-temps-pour-soi",
+  "temps-pour-soi-comptage-mes-moments",
+  "temps-pour-soi-moments-pour-soi-sur-la-home",
+  "temps-pour-soi-tendance-du-temps-pour-soi-tiroir"
+ ],
+ "ancres_sans_matiere": []
+}

@@ -1,0 +1,254 @@
+{
+ "inventions": [
+  {
+   "categorie": "Modèle de données",
+   "fonctionnalite": "Migration des noms vers des tables de référence",
+   "texte": "Convertir SideEffectLog.type, SportLog.sport et MeTimeLog.activity en typeId : créer une entrée de table par nom distinct rencontré dans l'historique — identifiant en forme de slug pour les entrées livrées, identifiant fabriqué pour celles créées par la personne —, puis réécrire chaque ligne à un chargement, comme la fusion de deux noms de sport le fait déjà pour un cas unique.",
+   "origine": "Les interfaces SideEffectType et SportType sont déclarées, la règle « on référence par identifiant, jamais par nom » est écrite, et AppData ne porte aucune des deux collections. Le chemin de conversion n'existe nulle part dans le dépôt ; la généralisation de la conversion existante est de moi seul."
+  },
+  {
+   "categorie": "Rappels",
+   "fonctionnalite": "Émission réelle des rappels",
+   "texte": "Faire d'un rappel un événement plutôt qu'une préférence : matérialiser les occurrences depuis reminderDay/reminderTime ou depuis l'intervalle en jours et sa date de départ, marquer chacune faite, manquée ou reportée, et n'en émettre qu'une à la fois.",
+   "origine": "Le code conserve neuf propriétés de rappel sur le profil et n'appelle aucune interface de notification, ce qui est vérifiable. Ce qu'une occurrence porterait — identité, état, date d'émission — n'est écrit nulle part ; la forme proposée est de moi seul."
+  },
+  {
+   "categorie": "Stockage",
+   "fonctionnalite": "Reprise d'un carnet sur un autre appareil",
+   "texte": "Un transfert explicite de l'agrégat entier : une sortie relisible, une empreinte de version pour refuser une reprise incompatible, et un refus de reprise sur un carnet non vide — sans base distante ni synchronisation continue, que la spécification pose en non-but.",
+   "origine": "Le code n'a que deux sorties non relisibles (un document PDF, une image) et aucune capacité d'importation ; les copies de secours existantes restent dans le même stockage local. Un transfert manuel n'est ni écrit ni écarté : sa forme est de moi seul."
+  },
+  {
+   "categorie": "Profil",
+   "fonctionnalite": "Historique des changements de profil",
+   "texte": "Dater les changements du profil — poids visé, taille, traitement — pour qu'un bilan sur trois mois sache quel objectif valait à quelle date, plutôt que de comparer tout l'historique à la valeur d'aujourd'hui.",
+   "origine": "UserProfile est un enregistrement unique et muable, sans createdAt, updatedAt ni version : c'est vérifié. Le besoin se déduit des lectures qui comparent au poids visé et au traitement courant ; aucune demande ni aucun commentaire ne le formule."
+  },
+  {
+   "categorie": "Pas",
+   "fonctionnalite": "Objectif de pas réglable",
+   "texte": "Faire de l'objectif quotidien de pas une propriété facultative du profil, sur le modèle de dailyCaloriesGoal, dailyProteinGoal et dailyFiberGoal, avec 8 000 pour valeur d'absence.",
+   "origine": "Le code ne porte que la constante DEFAULT_DAILY_GOAL_STEPS = 8000, lue directement par les calculs : vérifié. L'analogie avec les trois objectifs nutritionnels est de moi seul ; aucune demande d'un objectif de pas réglable n'a été trouvée."
+  },
+  {
+   "categorie": "Modèle de données",
+   "fonctionnalite": "Sort de l'entité de journée",
+   "texte": "Retirer DailyLog, ou lui redonner un contenu : elle est requise dans l'agrégat, vidée de ses trois contenus successifs, écrite par la seule génération de démonstration, et ses deux lectures ne lui demandent qu'une date la plus ancienne que les autres journaux fournissent déjà.",
+   "origine": "Le vidage successif et les deux lectures sont documentés dans le code et vérifiés. La conclusion « on peut la retirer » n'y est écrite nulle part : c'est mon inférence, et elle suppose de vérifier qu'aucune sauvegarde existante ne porte une date plus ancienne dans cette seule collection."
+  },
+  {
+   "categorie": "Écarté du chapitre (règle de rendu)",
+   "fonctionnalite": "Plafonnement du pourcentage d'objectif de pas",
+   "texte": "Le pourcentage de pas atteint est borné à 100 avant d'être rendu, et un plancher à 0 a été ajouté au pourcentage d'objectif partagé ; ce sont des règles de rendu, pas des règles de données, et elles ne figurent pas dans le chapitre.",
+   "origine": "Relevé dans le code, écarté parce qu'il ne concerne que la présentation d'une valeur dérivée."
+  },
+  {
+   "categorie": "Écarté du chapitre (règle de rendu)",
+   "fonctionnalite": "Initiales de site sur deux lettres",
+   "texte": "Le site d'une prise est réduit à deux lettres pour tenir sur une ligne courte, et rendu vide pour une prise orale ; règle de rendu, écartée du chapitre.",
+   "origine": "Relevé dans le code, écarté parce qu'il ne concerne que la présentation d'une valeur déjà stockée en clair."
+  },
+  {
+   "categorie": "Écarté du chapitre (règle de rendu)",
+   "fonctionnalite": "Ordres de tri des journaux",
+   "texte": "Les journaux se lisent par date et heure décroissantes, les pesées suivant un ordre à elles ; règle de rendu, écartée du chapitre.",
+   "origine": "Relevé dans le code, écarté parce que l'ordre des lignes ne fait pas partie des données conservées."
+  }
+ ],
+ "glossaire": [
+  {
+   "terme": "Agrégat de sauvegarde",
+   "definition": "L'unique objet conservé par installation : un profil et neuf collections datées, dont six facultatives. Il n'a ni identifiant, ni version, ni propriétaire."
+  },
+  {
+   "terme": "Heure murale locale",
+   "definition": "Une date AAAA-MM-JJ et une heure HH:MM sans fuseau ni décalage — l'heure vécue, telle qu'elle a été notée. À distinguer d'un instant absolu, en millisecondes depuis l'époque Unix, réservé aux métadonnées d'écriture."
+  },
+  {
+   "terme": "Unité canonique",
+   "definition": "L'unité dans laquelle une grandeur est conservée : kilogramme, centimètre, minute, mètre, gramme ou millilitre, milligramme, année. Aucune étiquette d'unité n'est conservée à côté de la valeur."
+  },
+  {
+   "terme": "Pesée de départ",
+   "definition": "La pesée qui porte isStartingWeight à vrai — toujours la plus ancienne. Elle sert de référence à la perte totale, aux badges et au document médical, tient lieu de date de début de cure, et n'a aucun chemin de suppression."
+  },
+  {
+   "terme": "Série du traitement courant",
+   "definition": "Les prises retenues quand on remonte le journal de la plus récente à la plus ancienne et qu'on s'arrête au premier identifiant de traitement différent. Elle n'est pas conservée : elle se recalcule à chaque lecture."
+  },
+  {
+   "terme": "Plafond quotidien",
+   "definition": "Le nombre maximal de lignes qu'une journée accepte dans un journal. Selon le journal, le dépassement remplace la dernière ligne du jour ou refuse la nouvelle."
+  },
+  {
+   "terme": "Métadonnées d'écriture",
+   "definition": "createdAt et updatedAt, instants absolus en millisecondes depuis l'époque Unix. Elles n'existent que sur Recipe, CustomFood, SideEffectType et SportType, et sur aucun journal."
+  },
+  {
+   "terme": "MET",
+   "definition": "Équivalent métabolique d'une activité, servant au calcul des calories dépensées. Il est relu dans un catalogue constant à partir du nom du sport, faute de table de sports."
+  },
+  {
+   "terme": "Non implémenté",
+   "definition": "Décision prise, ou déclaration écrite dans les types, dont le code ne porte pas la mise en œuvre — ou dont il porte tout sauf le chemin qui y mène."
+  },
+  {
+   "terme": "Arbitrage non validé",
+   "definition": "Choix retenu faute d'instruction, consigné pour être discuté. Il tient jusqu'à décision contraire."
+  },
+  {
+   "terme": "V2",
+   "definition": "La réécriture en cours, dans son propre dépôt. Sur un point qu'elle a tranché, elle prime sur la V1 décrite ici."
+  }
+ ],
+ "index": [
+  {
+   "terme": "AppData",
+   "ancre": "hors-modele-la-forme-de-la-sauvegarde"
+  },
+  {
+   "terme": "Badge, absence d'entité",
+   "ancre": "hors-modele-ce-qu-aucune-entite-ne-porte"
+  },
+  {
+   "terme": "BodyMeasurements",
+   "ancre": "hors-modele-ce-qu-aucune-entite-ne-porte"
+  },
+  {
+   "terme": "Code-barres",
+   "ancre": "hors-modele-ce-qu-aucune-capacite-n-ecrit"
+  },
+  {
+   "terme": "createdAt / updatedAt",
+   "ancre": "hors-modele-declare-sans-etre-employe"
+  },
+  {
+   "terme": "cureWeek",
+   "ancre": "hors-modele-ce-qu-aucune-entite-ne-porte"
+  },
+  {
+   "terme": "customPhotoUrl",
+   "ancre": "hors-modele-ce-qu-aucune-entite-ne-porte"
+  },
+  {
+   "terme": "DailyLog",
+   "ancre": "hors-modele-une-entite-que-rien-ne-cree"
+  },
+  {
+   "terme": "DEFAULT_DAILY_GOAL_STEPS",
+   "ancre": "hors-modele-ce-qu-aucune-entite-ne-porte"
+  },
+  {
+   "terme": "deletedAt",
+   "ancre": "hors-modele-ce-qu-aucune-capacite-n-ecrit"
+  },
+  {
+   "terme": "easyReadingMode",
+   "ancre": "hors-modele-declare-sans-etre-employe"
+  },
+  {
+   "terme": "Épisode de traitement",
+   "ancre": "hors-modele-ce-qu-aucune-entite-ne-porte"
+  },
+  {
+   "terme": "Fuseau horaire",
+   "ancre": "hors-modele-ce-qu-aucune-entite-ne-porte"
+  },
+  {
+   "terme": "glp1Brand",
+   "ancre": "hors-modele-des-noms-la-ou-la-regle-veut-des-identifiants"
+  },
+  {
+   "terme": "HungerLevel",
+   "ancre": "hors-modele-declare-sans-etre-employe"
+  },
+  {
+   "terme": "InjectionLog.brand",
+   "ancre": "hors-modele-ce-qu-aucune-entite-ne-porte"
+  },
+  {
+   "terme": "isSimulated",
+   "ancre": "hors-modele-ce-qu-aucune-entite-ne-porte"
+  },
+  {
+   "terme": "isStartingWeight",
+   "ancre": "hors-modele-ce-qu-aucune-entite-ne-porte"
+  },
+  {
+   "terme": "JournalViewMode",
+   "ancre": "hors-modele-declare-sans-etre-employe"
+  },
+  {
+   "terme": "localDateTime",
+   "ancre": "hors-modele-ce-qui-demanderait-une-migration"
+  },
+  {
+   "terme": "measurementSystem",
+   "ancre": "hors-modele-ce-qu-aucune-capacite-n-ecrit"
+  },
+  {
+   "terme": "medicalReminderDoctor",
+   "ancre": "hors-modele-ce-qu-aucune-entite-ne-porte"
+  },
+  {
+   "terme": "MeTimeLog.activity",
+   "ancre": "hors-modele-des-noms-la-ou-la-regle-veut-des-identifiants"
+  },
+  {
+   "terme": "mysteryBadgeHidden",
+   "ancre": "hors-modele-ce-qui-demanderait-une-migration"
+  },
+  {
+   "terme": "Plafond quotidien",
+   "ancre": "hors-modele-ce-qu-aucune-capacite-n-ecrit"
+  },
+  {
+   "terme": "Rappel",
+   "ancre": "hors-modele-ce-qu-aucune-capacite-n-ecrit"
+  },
+  {
+   "terme": "Recipe et CustomFood",
+   "ancre": "hors-modele-declare-sans-etre-employe"
+  },
+  {
+   "terme": "SeverityLevel",
+   "ancre": "hors-modele-declare-sans-etre-employe"
+  },
+  {
+   "terme": "SideEffectType",
+   "ancre": "hors-modele-declare-sans-etre-employe"
+  },
+  {
+   "terme": "silhouetteType",
+   "ancre": "hors-modele-declare-sans-etre-employe"
+  },
+  {
+   "terme": "SportLog.sport",
+   "ancre": "hors-modele-des-noms-la-ou-la-regle-veut-des-identifiants"
+  },
+  {
+   "terme": "SportType",
+   "ancre": "hors-modele-declare-sans-etre-employe"
+  },
+  {
+   "terme": "StepLog",
+   "ancre": "hors-modele-ce-qu-aucune-entite-ne-porte"
+  },
+  {
+   "terme": "Synchronisation",
+   "ancre": "hors-modele-ce-qu-aucune-capacite-n-ecrit"
+  },
+  {
+   "terme": "typeLabel",
+   "ancre": "hors-modele-des-noms-la-ou-la-regle-veut-des-identifiants"
+  },
+  {
+   "terme": "UUIDv7",
+   "ancre": "hors-modele-ce-qui-demanderait-une-migration"
+  },
+  {
+   "terme": "Zones corporelles",
+   "ancre": "hors-modele-declare-sans-etre-employe"
+  }
+ ]
+}

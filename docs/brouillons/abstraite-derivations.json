@@ -1,0 +1,708 @@
+{
+ "inventions": [
+  {
+   "categorie": "règle d'affichage écartée",
+   "fonctionnalite": "Écriture des nombres dérivés",
+   "texte": "Le signe « environ » devant toute moyenne, le signe explicite + ou − devant toute variation de poids (y compris « −0 » quand rien n'a bougé), le vrai moins typographique U+2212 sur les étiquettes d'arc, l'espace insécable des milliers, le point ou la virgule décimale selon la langue, et l'arrondi à une décimale au moment d'écrire. Ce sont des règles de rendu ; les grandeurs elles-mêmes restent non arrondies sauf mention contraire dans le chapitre.",
+   "origine": "V1 — src/features/home/homeOverview.ts (signedKg, format1Dec), src/versions/mixte/features/report/reportSummary.ts (APPROX, approx, frDecimal), src/shared/number"
+  },
+  {
+   "categorie": "règle d'affichage écartée",
+   "fonctionnalite": "Habillage du sens de la balance énergétique",
+   "texte": "Chaque bande de la balance porte, en plus de son sens et de son degré, un libellé rédigé (« Stable », « Légère perte de poids », « Prise de poids marquée »…), un jeu de classes de couleur et un signe de tendance (moins, flèche descendante, flèche montante). Le chapitre ne garde que le sens et le degré ; le reste est du texte et de la robe.",
+   "origine": "V1 — src/features/metabolism/metabolism.utils.ts (EnergyTrend, lignes 109-120)"
+  },
+  {
+   "categorie": "règle d'affichage écartée",
+   "fonctionnalite": "Axe de l'histogramme de cadence",
+   "texte": "Graduations entières ancrées sur zéro, marge d'un kilogramme de part et d'autre, pas égal au plafond du quart de l'amplitude, et point de bascule du dégradé entre pertes et reprises. Calculs de tracé, sans effet sur les grandeurs.",
+   "origine": "V1 — src/features/weight/weight.utils.ts (computeLossAxis)"
+  },
+  {
+   "categorie": "règle d'affichage écartée",
+   "fonctionnalite": "Tracé de la trajectoire de concentration",
+   "texte": "Échantillonnage toutes les 3 heures en heures locales (jamais en millisecondes absolues, qui dérivent aux changements d'heure), départ à minuit la veille de la première prise, fin au plus tard de « dernière prise + N jours » et d'aujourd'hui (N vaut 7 par défaut, 10 chez certains appelants), garde-fou de 30 000 points, concentrations arrondies à 1e-4, et rattachement de chaque prise au point le plus proche. Paramètres de rendu, pas du modèle — mais c'est cette suite de points, et non la formule ponctuelle, que lit la détection de sommet local du « pic en cours ».",
+   "origine": "V1 — src/utils/pharmacokinetics.ts (generatePKChartData), src/features/blood-level/peakStatus.ts (localMaxima)"
+  },
+  {
+   "categorie": "règle d'affichage écartée",
+   "fonctionnalite": "Fenêtre du tracé de poids",
+   "texte": "« Depuis le début » ajoute deux jours d'air avant les données, sans jamais dépasser aujourd'hui à droite ; les fenêtres bornées comptent en arrière depuis aujourd'hui, alors que l'histogramme de cadence compte depuis la dernière semaine connue. Deux conventions de bornage qui n'existent que pour le tracé.",
+   "origine": "V1 — src/features/weight/weight.utils.ts (computeChartWindow, filterWeeklyLoss)"
+  },
+  {
+   "categorie": "règle d'affichage écartée",
+   "fonctionnalite": "Mise en forme des dates dérivées",
+   "texte": "La date de franchissement d'un rang d'IMC est rendue directement en JJ/MM/AAAA, et la chaîne vide y tient lieu d'absence. La dérivation est la date de la première pesée franchissant le rang ; sa forme et son absence typée appartiennent au rendu.",
+   "origine": "V1 — src/features/home/homeOverview.ts (bmiTransitionDate)"
+  },
+  {
+   "categorie": "règle d'affichage écartée",
+   "fonctionnalite": "Dessins et pictogrammes des objets insolites",
+   "texte": "Chaque entrée du catalogue porte un pictogramme, et se rattache à l'une de 70 clés de dessin par correspondance sur son nom, retombant sur son pictogramme quand aucune clé ne correspond. Le pictogramme a donc été retiré de la liste des attributs du chapitre : c'est un choix de représentation, hors du calcul de l'équivalence.",
+   "origine": "V1 — src/utils/ludicWeight.ts (LudicItem.emoji, LudicIllustrationKey, getLudicIllustrationKey)"
+  },
+  {
+   "categorie": "règle d'affichage écartée",
+   "fonctionnalite": "Mot de sévérité d'une journée d'effets",
+   "texte": "Les six crans de l'échelle de sévérité portent chacun un mot — « Imperceptible », « Léger », « Modéré », « Marqué », « Fort », « Élevé » — et c'est la longueur de cette liste qui fait l'échelle : les bornes de saisie s'en déduisent. Les mots sont du rendu ; l'échelle 0-5 qu'ils dessinent est la donnée, et c'est elle que le chapitre retient.",
+   "origine": "V1 — src/versions/mixte/features/side-effects/SideEffectForm.tsx (SEVERITY_LABELS)"
+  },
+  {
+   "categorie": "écart de code non arbitré",
+   "fonctionnalite": "Distance de marche",
+   "texte": "Deux formules coexistent et ne coïncident pas : les relevés de pas convertissent à 0,00076 km par pas, tandis que la dépense énergétique reconstruit la distance depuis la taille (0,414 × taille en cm). Pour Camille à 168 cm, 7 000 pas valent 5,3 km d'un côté et 4,9 km de l'autre. Aucun arbitrage n'est consigné.",
+   "origine": "V1 — src/features/steps/steps.constants.ts (KM_PER_STEP) contre src/shared/body-metrics/bodyMetrics.utils.ts (calculateStepCalories)"
+  },
+  {
+   "categorie": "écart de code non arbitré",
+   "fonctionnalite": "Vitesse de marche",
+   "texte": "Deux vitesses coexistent, et le chapitre les signale désormais toutes les deux : les moyennes depuis une date rendent la constante 4,2 km/h ; le bilan cumulé divise sa distance totale par sa durée totale, ce qui donne 0,00076 × 95 × 60 ≈ 4,3 km/h, la constante n'y servant que de repli sur une durée nulle. La réfutation était juste et la phrase du chapitre a été corrigée.",
+   "origine": "V1 — src/features/steps/steps.utils.ts (computeCumulativeStepsStats : avgSpeed = totalKm / (totalMinutes/60)) contre computeStepsStatsSince (avgSpeed: WALKING_SPEED_KMH)"
+  },
+  {
+   "categorie": "écart de code non arbitré",
+   "fonctionnalite": "Poids actuel du palier de protéines",
+   "texte": "Le palier de protéines lit le poids actuel comme la DERNIÈRE LIGNE du journal des pesées, alors que partout ailleurs le poids actuel est la pesée la plus récente par date et heure ; et le réglage de profil dailyProteinGoal écrase l'objectif nutritionnel sans toucher celui du palier. Ce sont donc deux objectifs distincts, malgré une formule identique. La phrase du chapitre qui les disait égaux a été corrigée.",
+   "origine": "V1 — src/utils/badgeSystem.ts (proteinDailyTarget) contre src/features/home/homeOverview.ts (dailyNutritionGoals, weightOverview/byDateTimeDesc)"
+  },
+  {
+   "categorie": "écart de code non arbitré",
+   "fonctionnalite": "Les replis contredisent la règle du silence",
+   "texte": "Le poids actif finit par 80 kg au bout d'une chaîne de quatre crans, le métabolisme de base emploie 42 ans, 170 cm et « femme » quand le profil est muet, le poids actuel d'un journal vide retombe sur le poids de départ, la cadence depuis le départ et la variation en pourcentage rendent 0, l'avancement vers la cible rend 0, la concentration sanguine rend 0 avec un drapeau, la moyenne et l'écart-type d'appoint rendent 0 sur une liste vide. Ces replis produisent des valeurs plausibles à partir de rien, là où la règle du projet veut qu'une valeur absente se taise. Le chapitre les énumère maintenant tous ; ils restent à trancher.",
+   "origine": "V1 — src/shared/body-metrics/bodyMetrics.utils.ts (getWeightAtDate), src/features/metabolism/metabolism.utils.ts, src/features/home/homeOverview.ts (weightOverview, goalProgressPercent), src/versions/mixte/homes/sections/MaisonSections.tsx:1083-1091 (weeklyRate, pctOfStart), src/features/blood-level/bloodLevel.utils.ts, src/shared/analysis/analysis.ts (mean, standardDeviation)"
+  },
+  {
+   "categorie": "écart de code non arbitré",
+   "fonctionnalite": "Trois formes d'avancement vers un objectif, dont une inemployée",
+   "texte": "L'avancement de poids borne sans arrondir ; l'avancement générique borne et arrondit, mais n'a que deux appelants, tous deux une largeur proportionnelle — il ne sert aucun des quatre objectifs chiffrés ; la part d'objectif du document de suivi arrondit sans borner et se tait sur un objectif nul ; et l'avancement des pas est écrit à part, sans plancher à 0, avec un repli sur 8 000. Quatre écritures pour une même idée. La réfutation était juste et le chapitre a été corrigé.",
+   "origine": "V1 — src/features/home/homeOverview.ts (goalProgressPercent), src/shared/goals/goals.utils.ts (getGoalProgressPercent, appelé seulement en versions/cartes/components/Maison.tsx:331 et versions/mixte/homes/sections/MaisonSections.tsx:1987), src/versions/mixte/features/report/reportSummary.ts (goalPercent), src/features/steps/steps.utils.ts"
+  },
+  {
+   "categorie": "écart de code non arbitré",
+   "fonctionnalite": "Trois jeux de noms pour les catégories d'IMC",
+   "texte": "Les bornes sont identiques mais trois tables de libellés coexistent — « Obésité I », « Obésité modérée (Classe I) », « Obésité • Classe I » —, et seule celle du milieu connaît un rang « inconnu » pour un IMC nul ou négatif ; c'est aussi la seule dont le rang sert à comparer deux catégories. Les deux autres nomment un IMC de 0 « Insuffisance pondérale », sans garde en amont. La réfutation était juste sur les deux points et le chapitre a été corrigé.",
+   "origine": "V1 — src/utils/bmiHelpers.ts (getBmiTierInfo) contre src/features/home/homeOverview.ts:141-148 (bmiCategoryLabel) et src/versions/initiale/components/DashboardOverview.tsx:391 (repris dans themes/test et themes/sideral)"
+  },
+  {
+   "categorie": "écart de code non arbitré",
+   "fonctionnalite": "Trois conventions pour l'heure absente",
+   "texte": "Le prédicat « a eu lieu » ne substitue rien et compte la journée en cours en entier ; l'ordre général des entrées, la dernière pesée d'une journée et l'instant d'une prise valent midi ; la coupure de traitement et la signature de pesée valent minuit. Le chapitre énonçait une règle unique (« minuit »), doublement fausse ; il énumère maintenant les trois.",
+   "origine": "V1 — src/shared/date/date.local.ts (hasOccurred), src/shared/model/logOrder.ts (orderKey), src/features/weight/weight.utils.ts (lastWeighInPerDay), src/shared/medication/molecule.ts (intakeMs), src/utils/pharmacokinetics.ts (safeParseDate) contre src/features/home/homeOverview.ts (currentTreatmentInjections), src/utils/ludicUsage.ts (latestWeighInSignature)"
+  },
+  {
+   "categorie": "écart de code non arbitré",
+   "fonctionnalite": "Trois comptages pour un seul seuil de sept jours",
+   "texte": "La cadence bornée compare joursEntre(début, fin), bornes non comprises ; les moyennes hebdomadaires de journal et d'activité comparent joursEntre(...) + 1. Un intervalle du lundi au dimanche est refusé par la première et accepté par les deux autres. Le seuil est en outre un paramètre pour l'activité : le document de suivi ne l'applique pas, sa fenêtre étant annoncée. La réfutation était juste sur les deux points.",
+   "origine": "V1 — src/features/weight/weight.utils.ts (averageWeeklyChange, MIN_DAYS_FOR_WEEKLY_RATE), src/features/home/homeOverview.ts:730-736 (entriesWeeklyAverageSinceFirst), src/features/sport/sportAverages.ts (taireSousUneSemaine)"
+  },
+  {
+   "categorie": "écart de code non arbitré",
+   "fonctionnalite": "Deux longueurs de période",
+   "texte": "La cadence bornée divise par joursEntre(début, fin) tandis que la longueur de période officielle vaut joursEntre(début, fin) + 1. Sur trente jours de calendrier, la première divise par 29. Aucun arbitrage n'est consigné ; le chapitre décrit désormais les deux au lieu de les confondre.",
+   "origine": "V1 — src/features/weight/weight.utils.ts (averageWeeklyChange) contre src/shared/analysis/analysis.ts (periodDayCount)"
+  },
+  {
+   "categorie": "écart de code non arbitré",
+   "fonctionnalite": "Le drapeau « animal » du catalogue insolite",
+   "texte": "Le champ isAnimal est déclaré optionnel sur le type LudicItem mais n'est posé sur aucune des 222 entrées ; le filtre « animal » de la revue du catalogue ne rend donc jamais rien. Le chapitre a retiré ce drapeau de la liste des attributs et le signale.",
+   "origine": "V1 — src/utils/ludicWeight.ts:8 (isAnimal?: boolean, zéro occurrence dans LUDIC_ITEMS) contre src/versions/initiale/components/InsoliteLibraryModal.tsx:204"
+  },
+  {
+   "categorie": "écart de code non arbitré",
+   "fonctionnalite": "Deux dénominateurs pour deux moyennes de sommeil voisines",
+   "texte": "La durée de nuit moyenne écarte les nuits de durée nulle du numérateur et du dénominateur ; le sommeil moyen d'une journée compte les DATES portant une entrée, sans regarder la durée — une entrée dégénérée y vaut une journée pleine. Le chapitre affirmait la garde pour les deux ; il distingue maintenant.",
+   "origine": "V1 — src/features/sleep/sleep.utils.ts (nightMinutesDailyAverage : if (minutes !== null && minutes > 0)) contre sleepDailyAverage / sleepDailyAverageLast7Days (new Set(retenus.map(l => l.date)).size)"
+  },
+  {
+   "categorie": "écart de code non arbitré",
+   "fonctionnalite": "Deux sports dont l'allure ne rejoint jamais l'intensité",
+   "texte": "Six des huit tables d'ancrages contiennent un ancrage dont le MET vaut exactement le MET du catalogue. La course à pied (catalogue 8,0 ; ancrages 6,4 km/h → 6,0 et 8,0 km/h → 8,3) et le rameur (catalogue 6,0 ; ancrages 9 km/h → 4,8 et 12 km/h → 7,0) n'en ont pas, et le code le documente. Le chapitre affirmait la propriété pour toutes les tables ; la réfutation était juste. Conséquence non arbitrée : le facteur du score d'activité, censé valoir 1 à l'allure de référence, n'a pas de point fixe sur ces deux sports.",
+   "origine": "V1 — src/shared/body-metrics/sportCalories.ts:102-114 et 142-152, contre src/shared/body-metrics/sportPresets.constants.ts:54 et 81, et le commentaire de src/shared/body-metrics/sportScore.ts"
+  },
+  {
+   "categorie": "écart de code non arbitré",
+   "fonctionnalite": "Le gel de la journée en cours n'existe qu'à un endroit",
+   "texte": "Seul le total de pas d'une période destiné au document de suivi fige la journée en cours, et il ne relève pas la valeur lui-même : il la reçoit en paramètre, relevée une fois par son appelant. Les deux autres totaux de pas somment sans rien figer. Le chapitre généralisait la règle et masquait le moment du relevé ; les deux ont été corrigés.",
+   "origine": "V1 — src/features/report/periodSteps.ts (todayStepsSnapshot, periodStepsTotal) contre src/features/steps/steps.utils.ts (computeCumulativeStepsStats, computeStepsStatsSince)"
+  },
+  {
+   "categorie": "écart de code non arbitré",
+   "fonctionnalite": "L'arrondi de distance n'est posé que sur la moyenne",
+   "texte": "La distance moyenne est arrondie au dixième dans le calcul (« Arrondi ICI, dans le calcul »), mais la distance totale du bilan cumulé sort brute. La règle « une décimale au plus, valable partout » n'est donc pas tenue partout. Le chapitre l'annonçait comme générale ; il la restreint maintenant à la moyenne.",
+   "origine": "V1 — src/features/steps/steps.utils.ts (computeStepsStatsSince : avgDistance = parseFloat((avgSteps * KM_PER_STEP).toFixed(1))) contre computeCumulativeStepsStats (totalKm = totalSteps * KM_PER_STEP)"
+  },
+  {
+   "categorie": "écart de code non arbitré",
+   "fonctionnalite": "Deux grandeurs dérivées sont pourtant persistées",
+   "texte": "L'attribution d'équivalences insolites (compteurs d'usage par objet, attribution en cours, signature de la pesée) et le dernier palier de badge observé sont écrits dans le stockage local. « Rien de dérivable n'est stocké » et « aucune migration n'est due lorsqu'une formule change » sont donc faux pour ces deux-là ; le chapitre les nomme désormais comme exceptions. Corollaire non arbitré : le compteur d'usage n'avance qu'au changement de signature de pesée, si bien qu'une correction d'une pesée passée réattribue sans rien compter.",
+   "origine": "V1 — src/utils/ludicUsage.ts (LUDIC_USAGE_STORAGE_KEY = 'glow_ludic_usage', commitLudicAssignment, sameWeighIn), src/utils/badgeCelebration.ts (BADGE_TIERS_CONNUS_KEY = 'glp1_badge_tiers_connus', evaluerCelebrations)"
+  },
+  {
+   "categorie": "écart de code non arbitré",
+   "fonctionnalite": "L'échelle de sévérité, et son commentaire périmé",
+   "texte": "L'échelle réelle va de 0 (« imperceptible ») à 5, la valeur par défaut d'une saisie est 0, et le zéro tombe dans le palier « léger » avec le 1 — ce que la formule max > 1 → modéré suppose. Le chapitre annonçait 1 à 5. La déclaration de type porte encore un commentaire « 1 to 5 » qui contredit le domaine et devrait être corrigé.",
+   "origine": "V1 — src/features/side-effects/sideEffectCalendar.ts:37, src/features/side-effects/useSideEffectForm.ts:28 (DEFAULT_SEVERITY = 0), src/versions/mixte/features/side-effects/SideEffectForm.tsx:41-48 ; commentaire périmé src/types.ts:437"
+  },
+  {
+   "categorie": "code mort",
+   "fonctionnalite": "La seconde passe de la recherche d'équivalence",
+   "texte": "La passe qui relâche l'admissibilité ne se déclenche que si aucune combinaison admissible n'a été trouvée (bestCombo.length === 0). Pour un poids strictement positif ce cas est impossible : tout objet courant seul est admissible, et le catalogue en compte 71. La passe est donc inatteignable. Le chapitre la décrivait comme le chemin d'un poids hors tolérance, ce qui est faux — c'est la première passe qui le sert.",
+   "origine": "V1 — src/utils/ludicWeight.ts (getBestLudicCombination, isValidCombo, « Fallback Pass 2 »)"
+  },
+  {
+   "categorie": "constante posée, non justifiée",
+   "fonctionnalite": "8 000 kcal pour un kilogramme",
+   "texte": "Le taux de conversion de la projection de poids est une consigne littérale de l'utilisatrice, consignée comme telle dans le code. La valeur physiologique usuelle est d'environ 7 700 kcal ; l'écart est d'environ 4 %.",
+   "origine": "V1 — src/features/divination/divination.ts (KCAL_PER_KILO), commentaire citant la demande"
+  },
+  {
+   "categorie": "constante posée, non justifiée",
+   "fonctionnalite": "Le plein du score d'activité",
+   "texte": "78 minutes pondérées valent le score maximal de 10 sur une journée. La constante est nommée et testée, mais aucune source ni raison n'est consignée pour ce nombre-là.",
+   "origine": "V1 — src/shared/body-metrics/sportScore.ts (SPORT_SCORE_WEIGHTED_MINUTES_FOR_MAX)"
+  },
+  {
+   "categorie": "constante posée, non justifiée",
+   "fonctionnalite": "Les deux largeurs de la fenêtre du pic",
+   "texte": "Douze heures pour une injection, vingt minutes pour un comprimé — les deux valeurs viennent de l'utilisatrice, la seconde en réponse à une question. Leur justification est écrite (la pente de la trajectoire autour du sommet), leur valeur exacte ne l'est pas.",
+   "origine": "V1 — src/features/blood-level/peakStatus.ts (PEAK_WINDOW_INJECTION_HOURS, PEAK_WINDOW_ORAL_HOURS)"
+  },
+  {
+   "categorie": "arbitrage de Claude consigné",
+   "fonctionnalite": "Bande « légère » de la projection de poids",
+   "texte": "La consigne d'origine donnait stable à ±300 g, « légère » à ±700 g et « assez marquée » à ±1 kg, sans nommer la bande de 700 g à 1 kg. Le code étend « légère » jusqu'à 1 kg exclu et le dit en tête de fichier.",
+   "origine": "V1 — src/features/divination/divination.ts, note d'interprétation"
+  },
+  {
+   "categorie": "arbitrage de Claude consigné",
+   "fonctionnalite": "Critère « éveil » de la distinction activité",
+   "texte": "Les paliers de cette distinction se comptent en heures d'équivalent intensif sur 7 ou 10 jours ; ramené à une journée, le critère retenu est la séance elle-même, quelle que soit sa durée ou son intensité. L'alternative envisagée — une heure d'équivalent modéré sur la journée — a été écartée le 2026-08-27.",
+   "origine": "V1 — src/utils/badgeSystem.ts (evaluateAthleteBadge), commentaire d'entête"
+  },
+  {
+   "categorie": "code sans usage",
+   "fonctionnalite": "Deux moyennes conservées sans appelant",
+   "texte": "Les minutes de « temps pour soi » sur sept jours et le partage repas / en-cas sur sept jours n'ont plus d'appelant depuis le 2026-08-19 : la première a cédé la place à un compte d'occurrences, la seconde à une moyenne de calories. Les deux fonctions et leurs tests subsistent. Ne pas les réimplémenter sans besoin.",
+   "origine": "V1 — src/features/home/homeOverview.ts (meTimeMinutesLast7Days, mealCountsLast7Days), commentaires « SANS APPELANT »"
+  },
+  {
+   "categorie": "hors dérivation",
+   "fonctionnalite": "Conversions d'unité",
+   "texte": "La taille se stocke en centimètres et se convertit à 2,54 cm par pouce, arrondie à l'entier aux deux bouts. C'est une conversion de saisie et de lecture, pas une dérivation : sa place est au chapitre des données. La V2 n'a encore aucune conversion de poids entre kilogrammes et livres, seulement deux plafonds indépendants (999 kg, 2 000 lb).",
+   "origine": "V2 — src/domaine/unites.ts (tailleAffichee, tailleEnCm), src/domaine/mesures.ts (POIDS_MAX)"
+  },
+  {
+   "categorie": "hors dérivation",
+   "fonctionnalite": "Revue locale du catalogue des objets insolites",
+   "texte": "Le catalogue peut être parcouru, filtré, renommé, repesé, marqué et copié, mais ces modifications ne touchent que la vue locale : le catalogue lui-même est une constante du code, et aucune dérivation ne lit les modifications. C'est un outil de relecture, pas une donnée.",
+   "origine": "V1 — src/versions/mixte/components/InsolitesPage.tsx (DisplayInsolite, Modif, ReviewValue)"
+  },
+  {
+   "categorie": "non implémenté",
+   "fonctionnalite": "La V2 ne calcule encore aucune de ces grandeurs",
+   "texte": "Au 2026-09-13, la V2 ne contient ni journal, ni pesée enregistrée, ni aucune des dérivations décrites ici : son domaine se limite aux bornes de mesure, aux unités, au catalogue des traitements et à l'avatar. Tout ce chapitre décrit donc l'état de la V1, à l'exception de la substitution de l'année de naissance à l'âge (AGE_MIN = 1, AGE_MAX = 130, bornes d'année dérivées de l'année courante), qui est une décision V2 sans code qui la consomme.",
+   "origine": "V2 — src/domaine/mesures.ts:31-48, GUIDELINES.md § 5 « Non traité »"
+  }
+ ],
+ "glossaire": [
+  {
+   "terme": "Poids actif",
+   "definition": "Le poids retenu pour un jour donné : la dernière pesée dont la date est inférieure ou égale à ce jour, avec une chaîne de quatre replis (poids de départ, poids cible, pesée la plus ancienne, 80 kg) qui fait que cette dérivation ne rend jamais d'absence."
+  },
+  {
+   "terme": "Poids actuel",
+   "definition": "La pesée la plus récente par date et heure, et non la dernière ligne enregistrée. Sur un journal vide, il vaut le poids de départ. Les paliers de badge emploient une autre définition — la dernière ligne du journal."
+  },
+  {
+   "terme": "Poids de départ",
+   "definition": "Le poids de la pesée portant le drapeau de départ, pas la pesée la plus ancienne. Repli à 70 kg pour les paliers de badge."
+  },
+  {
+   "terme": "Survenue",
+   "definition": "Propriété d'une entrée dont la date est antérieure à aujourd'hui, ou d'aujourd'hui avec une heure passée. Une entrée d'aujourd'hui sans heure est survenue : la journée en cours compte en entier."
+  },
+  {
+   "terme": "joursEntre",
+   "definition": "Écart de jours entre deux dates locales : les nombres d'année, de mois et de jour sont lus séparément, reportés sur des instants UTC, soustraits, puis divisés par 86 400 000 et arrondis. Rend 0 sur une date illisible. Bornes non comprises."
+  },
+  {
+   "terme": "Longueur de période",
+   "definition": "joursEntre(début, fin) + 1, bornes comprises, calculé sur deux instants pris à midi. Indéfinie pour « depuis le début » et pour une paire de bornes incomplète ou inversée. La cadence bornée n'emploie pas cette longueur mais joursEntre nu."
+  },
+  {
+   "terme": "Points d'IMC",
+   "definition": "(poidsActuel − poidsDepart) divisé par le carré de la taille en mètres, arrondi au dixième. Calculé sur la différence de poids, jamais en retranchant deux IMC déjà arrondis. Signe de la variation : négatif quand on perd."
+  },
+  {
+   "terme": "Rang d'IMC",
+   "definition": "Entier de 0 à 5 ordonnant les six catégories, plus 99 pour un IMC nul ou négatif. Seul le jeu de noms « à rang » porte ce 99 ; les deux autres jeux nomment un IMC de 0 « Insuffisance pondérale »."
+  },
+  {
+   "terme": "Métabolisme de base",
+   "definition": "Mifflin-St Jeor, en kcal/jour, sur le poids actif du jour. Trois genres : homme, femme, et neutre égal à la moyenne des deux. Replis : 42 ans, 170 cm, « femme »."
+  },
+  {
+   "terme": "Facteur d'intensité",
+   "definition": "Coefficient de l'intensité ressentie dans le calcul des dépenses : 0,8 douce, 1,0 modérée, 1,3 intensive. Distinct des coefficients d'équivalence des paliers de badge."
+  },
+  {
+   "terme": "Allure",
+   "definition": "Dérivation d'une séance : (distance en mètres / 1000) divisée par (durée en minutes / 60), en km/h. Elle remplace l'intensité ressentie sur les huit sports à distance."
+  },
+  {
+   "terme": "MET d'allure",
+   "definition": "MET lu par interpolation linéaire sur une table d'ancrages allure → MET propre au sport, bloquée aux extrémités. Six tables sur huit contiennent un ancrage égal au MET du catalogue ; la course à pied et le rameur n'en ont pas."
+  },
+  {
+   "terme": "Minutes pondérées",
+   "definition": "Durée d'une séance multipliée par son facteur — tiré de l'allure quand il y en a une, borné à [0,8 ; 1,3], sinon du ressenti. Un étage de montée d'escaliers vaut une demi-minute."
+  },
+  {
+   "terme": "Score d'activité",
+   "definition": "min(10 ; somme des minutes pondérées du jour × 10 / 78). Ignore volontairement le MET du sport. Rend 0 sur une journée sans séance."
+  },
+  {
+   "terme": "Balance énergétique",
+   "definition": "Somme des calories ingérées moins la dépense totale arrondie, sur sept jours aujourd'hui compris. Positive = surplus, négative = déficit."
+  },
+  {
+   "terme": "Projection de poids",
+   "definition": "Le différentiel énergétique de sept jours converti en grammes au taux de 8 000 kcal par kilogramme, les trois dépenses étant arrondies avant d'être sommées. Écarte les saisies non survenues."
+  },
+  {
+   "terme": "Cadence de perte",
+   "definition": "Variation de poids ramenée à sept jours. Quatre formes, sur trois dénominateurs : jours depuis la pesée de départ, joursEntre(début, fin) d'un intervalle, et le découpage en tranches de sept jours."
+  },
+  {
+   "terme": "Tranche de sept jours",
+   "definition": "Découpage consécutif ancré sur la première pesée ou le début de période. Une journée n'y compte que par sa dernière pesée ; un jour sans pesée est interpolé linéairement. Poids de fin et perte arrondis au dixième."
+  },
+  {
+   "terme": "Perte totale",
+   "definition": "poidsDepart − poidsActuel, positive quand on a perdu. Sa durée se compte de la pesée de départ à la pesée la plus récente."
+  },
+  {
+   "terme": "Dernière perte",
+   "definition": "Poids de l'avant-dernière pesée moins poids de la dernière, 0 avec moins de deux pesées. Sa durée se compte entre ces deux pesées, jamais jusqu'à aujourd'hui."
+  },
+  {
+   "terme": "Avancement vers la cible",
+   "definition": "Part du trajet départ → cible parcourue, bornée à [0, 100] sans arrondi. Une cible au-dessus du poids de départ rend 0, ou 100 si la cible est déjà tenue."
+  },
+  {
+   "terme": "Contribution d'une dose",
+   "definition": "Modèle de Bateman à un compartiment, normalisé pour que le pic d'une prise isolée vaille exactement la dose utile. Unité : milligramme-équivalent."
+  },
+  {
+   "terme": "Part de dose utile",
+   "definition": "Facteur de biodisponibilité relative porté par la fiche du traitement, 1 par défaut, 0,008 pour le sémaglutide oral. C'est ce qui rend légitime le cumul de deux formes d'une même molécule."
+  },
+  {
+   "terme": "tMax",
+   "definition": "ln(ka/ke) / (ka − ke), le délai en heures entre une prise et son pic. 57,4 h pour le sémaglutide injectable."
+  },
+  {
+   "terme": "Groupe de molécule",
+   "definition": "Unité de cumul de la concentration : les prises se regroupent par molécule, jamais par marque ni par forme. La fenêtre de soixante jours ne sert qu'à former les groupes ; la concentration se calcule sur l'historique entier."
+  },
+  {
+   "terme": "Fenêtre du pic",
+   "definition": "Largeur de l'intervalle autour d'un sommet local dans lequel l'état vaut « pic en cours » : 12 heures pour une injection, 20 minutes pour un comprimé, décidée par la forme de la dernière prise déjà faite."
+  },
+  {
+   "terme": "Rythme de prise usuel",
+   "definition": "Dérivation de la fiche du traitement : la valeur qu'elle porte, sinon 1 jour pour un comprimé et 7 jours pour une injection. Saxenda et Victoza portent 1 jour malgré leur forme injectable."
+  },
+  {
+   "terme": "Série du traitement",
+   "definition": "Les prises survenues du traitement courant, remontées depuis la fin jusqu'à la première prise d'un autre traitement. Le filtre des non survenues passe devant la coupure."
+  },
+  {
+   "terme": "Fréquence de prise",
+   "definition": "Écart moyen entre journées de prise sur tout l'historique : joursEntre(première, dernière) divisé par (nombre de journées − 1). Deux prises le même jour ne font qu'une journée."
+  },
+  {
+   "terme": "Ancienneté",
+   "definition": "Jours écoulés depuis un ancrage — la pesée de départ pour la cure, la première prise du traitement courant pour le traitement — et rang de semaine égal à plancher(jours / 7) + 1."
+  },
+  {
+   "terme": "Tendance",
+   "definition": "Série journalière de quatorze jours, aujourd'hui compris. Les états (poids, concentration) se reportent ; les cumuls se taisent (calories, sommeil, pas) ou valent zéro (sport, temps pour soi)."
+  },
+  {
+   "terme": "Journée renseignée",
+   "definition": "Dénominateur des moyennes dont le silence est un oubli : une date portant au moins une entrée de la nature considérée. Un relevé de pas à zéro et une nuit de durée nulle n'en font pas une — sauf pour le sommeil moyen d'une journée, qui ne filtre rien."
+  },
+  {
+   "terme": "Objectif de protéines",
+   "definition": "arrondi(poidsActuel × 1,5) g par jour. Deux objectifs distincts portent cette formule : celui de la nutrition, écrasable par un réglage de profil et calculé sur la pesée la plus récente ; celui du palier de badge, non écrasable et calculé sur la dernière ligne du journal."
+  },
+  {
+   "terme": "Palier d'effet",
+   "definition": "Trois crans sur le maximum des sévérités : sévère au-dessus de 3, modéré au-dessus de 1, léger sinon. Le palier d'une journée se juge sur son pire effet, le décompte se juge effet par effet."
+  },
+  {
+   "terme": "Sévérité",
+   "definition": "Entier de 0 à 5 porté par un effet secondaire. 0 signifie « imperceptible » et est la valeur retenue à l'ouverture d'une saisie ; il tombe dans le palier « léger »."
+  },
+  {
+   "terme": "Climat d'une journée",
+   "definition": "Serein si la somme des sévérités du jour est nulle, difficile si elle dépasse 8 ou qu'une sévérité atteint 4, modéré sinon."
+  },
+  {
+   "terme": "Qualité de sommeil moyenne",
+   "definition": "Moyenne des notes pondérée par la durée des entrées, arrondie au dixième. Indéfinie si la durée totale est nulle."
+  },
+  {
+   "terme": "Coefficient de Pearson",
+   "definition": "Corrélation linéaire entre deux séries journalières, indéfinie sous 2 paires ou sur une variance nulle. Aucun verdict n'est rendu sous 7 paires complètes."
+  },
+  {
+   "terme": "Palier de badge",
+   "definition": "Cinq rangs ordonnés — aucun, éveil, bronze, argent, or. « Éveil » est le critère du badge rempli sur la journée en cours ou la précédente. Une montée se juge contre le dernier rang observé, qui est persisté."
+  },
+  {
+   "terme": "Équivalence insolite",
+   "definition": "Combinaison d'un ou deux objets d'un catalogue de 222 entrées dont la masse totale approche un poids visé à 200 g près. Exclusion et rotation ne s'appliquent qu'à l'intérieur de cette tolérance."
+  },
+  {
+   "terme": "Attribution",
+   "definition": "Le couple d'équivalences rattaché à la pesée la plus récente et aux deux poids qu'il traduit, arrondis au dixième. Elle est persistée et vaut jusqu'à la pesée suivante."
+  },
+  {
+   "terme": "Compteur d'usage",
+   "definition": "Nombre d'attributions comptées par objet du catalogue, persisté et lu par la règle de rotation. Il n'avance qu'au changement de signature de pesée, jamais sur une réattribution due à la correction d'une pesée passée."
+  }
+ ],
+ "index": [
+  {
+   "terme": "Règle du silence",
+   "ancre": "derivations-la-regle-du-silence"
+  },
+  {
+   "terme": "Grandeurs persistées",
+   "ancre": "derivations-la-regle-du-silence"
+  },
+  {
+   "terme": "Heure absente (trois conventions)",
+   "ancre": "derivations-la-regle-du-silence"
+  },
+  {
+   "terme": "joursEntre",
+   "ancre": "derivations-la-regle-du-silence"
+  },
+  {
+   "terme": "Survenue (entrée)",
+   "ancre": "derivations-la-regle-du-silence"
+  },
+  {
+   "terme": "Ordre des entrées datées",
+   "ancre": "derivations-la-regle-du-silence"
+  },
+  {
+   "terme": "Unités canoniques",
+   "ancre": "derivations-la-regle-du-silence"
+  },
+  {
+   "terme": "Poids actif",
+   "ancre": "derivations-le-poids-actif-a-une-date"
+  },
+  {
+   "terme": "Poids actuel",
+   "ancre": "derivations-le-poids-actif-a-une-date"
+  },
+  {
+   "terme": "Poids de départ",
+   "ancre": "derivations-le-poids-actif-a-une-date"
+  },
+  {
+   "terme": "IMC",
+   "ancre": "derivations-imc-et-categories"
+  },
+  {
+   "terme": "Catégorie d'IMC",
+   "ancre": "derivations-imc-et-categories"
+  },
+  {
+   "terme": "Rang d'IMC",
+   "ancre": "derivations-imc-et-categories"
+  },
+  {
+   "terme": "Points d'IMC",
+   "ancre": "derivations-imc-et-categories"
+  },
+  {
+   "terme": "Date de franchissement",
+   "ancre": "derivations-imc-et-categories"
+  },
+  {
+   "terme": "Métabolisme de base",
+   "ancre": "derivations-le-metabolisme-de-base"
+  },
+  {
+   "terme": "Mifflin-St Jeor",
+   "ancre": "derivations-le-metabolisme-de-base"
+  },
+  {
+   "terme": "Année de naissance",
+   "ancre": "derivations-le-metabolisme-de-base"
+  },
+  {
+   "terme": "Dépense des pas",
+   "ancre": "derivations-les-depenses-actives"
+  },
+  {
+   "terme": "Foulée",
+   "ancre": "derivations-les-depenses-actives"
+  },
+  {
+   "terme": "Dépense d'une séance",
+   "ancre": "derivations-les-depenses-actives"
+  },
+  {
+   "terme": "Facteur d'intensité",
+   "ancre": "derivations-les-depenses-actives"
+  },
+  {
+   "terme": "Allure",
+   "ancre": "derivations-les-depenses-actives"
+  },
+  {
+   "terme": "MET d'allure",
+   "ancre": "derivations-les-depenses-actives"
+  },
+  {
+   "terme": "Catalogue des sports",
+   "ancre": "derivations-les-depenses-actives"
+  },
+  {
+   "terme": "Montée d'escaliers",
+   "ancre": "derivations-les-depenses-actives"
+  },
+  {
+   "terme": "Score d'activité",
+   "ancre": "derivations-le-score-d-activite"
+  },
+  {
+   "terme": "Minutes pondérées",
+   "ancre": "derivations-le-score-d-activite"
+  },
+  {
+   "terme": "Balance énergétique",
+   "ancre": "derivations-la-balance-energetique"
+  },
+  {
+   "terme": "Dépense totale",
+   "ancre": "derivations-la-balance-energetique"
+  },
+  {
+   "terme": "Projection de poids",
+   "ancre": "derivations-la-projection-de-poids"
+  },
+  {
+   "terme": "8 000 kcal par kilogramme",
+   "ancre": "derivations-la-projection-de-poids"
+  },
+  {
+   "terme": "Cadence de perte",
+   "ancre": "derivations-la-cadence-de-perte"
+  },
+  {
+   "terme": "Seuil de sept jours",
+   "ancre": "derivations-la-cadence-de-perte"
+  },
+  {
+   "terme": "Tranche de sept jours",
+   "ancre": "derivations-la-cadence-de-perte"
+  },
+  {
+   "terme": "Interpolation lissée (Fritsch–Carlson)",
+   "ancre": "derivations-la-cadence-de-perte"
+  },
+  {
+   "terme": "Variation en % du poids de départ",
+   "ancre": "derivations-la-cadence-de-perte"
+  },
+  {
+   "terme": "Perte totale",
+   "ancre": "derivations-les-deux-pertes"
+  },
+  {
+   "terme": "Dernière perte",
+   "ancre": "derivations-les-deux-pertes"
+  },
+  {
+   "terme": "Durée d'une perte",
+   "ancre": "derivations-les-deux-pertes"
+  },
+  {
+   "terme": "Avancement vers la cible",
+   "ancre": "derivations-l-avancement-vers-la-cible"
+  },
+  {
+   "terme": "Avancement générique",
+   "ancre": "derivations-l-avancement-vers-la-cible"
+  },
+  {
+   "terme": "Concentration sanguine",
+   "ancre": "derivations-la-concentration-sanguine"
+  },
+  {
+   "terme": "Modèle de Bateman",
+   "ancre": "derivations-la-concentration-sanguine"
+  },
+  {
+   "terme": "Part de dose utile",
+   "ancre": "derivations-la-concentration-sanguine"
+  },
+  {
+   "terme": "tMax",
+   "ancre": "derivations-la-concentration-sanguine"
+  },
+  {
+   "terme": "Groupe de molécule",
+   "ancre": "derivations-la-concentration-sanguine"
+  },
+  {
+   "terme": "Fenêtre du pic",
+   "ancre": "derivations-la-concentration-sanguine"
+  },
+  {
+   "terme": "Rythme de prise usuel",
+   "ancre": "derivations-la-concentration-sanguine"
+  },
+  {
+   "terme": "Catalogue des traitements",
+   "ancre": "derivations-la-concentration-sanguine"
+  },
+  {
+   "terme": "Série du traitement",
+   "ancre": "derivations-la-serie-du-traitement"
+  },
+  {
+   "terme": "Coupure de traitement",
+   "ancre": "derivations-la-serie-du-traitement"
+  },
+  {
+   "terme": "Dose initiale, dose actuelle, cumul",
+   "ancre": "derivations-la-serie-du-traitement"
+  },
+  {
+   "terme": "Fréquence de prise",
+   "ancre": "derivations-la-serie-du-traitement"
+  },
+  {
+   "terme": "Ancienneté de cure",
+   "ancre": "derivations-la-serie-du-traitement"
+  },
+  {
+   "terme": "Tendance",
+   "ancre": "derivations-les-tendances"
+  },
+  {
+   "terme": "TREND_DAYS",
+   "ancre": "derivations-les-tendances"
+  },
+  {
+   "terme": "Dénominateur d'une moyenne",
+   "ancre": "derivations-les-fenetres-et-les-denominateurs"
+  },
+  {
+   "terme": "Journée renseignée",
+   "ancre": "derivations-les-fenetres-et-les-denominateurs"
+  },
+  {
+   "terme": "Longueur de période",
+   "ancre": "derivations-les-fenetres-et-les-denominateurs"
+  },
+  {
+   "terme": "Gel de la journée en cours",
+   "ancre": "derivations-les-fenetres-et-les-denominateurs"
+  },
+  {
+   "terme": "Distance de marche",
+   "ancre": "derivations-les-fenetres-et-les-denominateurs"
+  },
+  {
+   "terme": "Vitesse de marche",
+   "ancre": "derivations-les-fenetres-et-les-denominateurs"
+  },
+  {
+   "terme": "Objectifs nutritionnels",
+   "ancre": "derivations-les-objectifs-nutritionnels"
+  },
+  {
+   "terme": "Objectif de protéines",
+   "ancre": "derivations-les-objectifs-nutritionnels"
+  },
+  {
+   "terme": "Sévérité",
+   "ancre": "derivations-les-effets-et-leurs-paliers"
+  },
+  {
+   "terme": "Palier d'effet",
+   "ancre": "derivations-les-effets-et-leurs-paliers"
+  },
+  {
+   "terme": "Climat d'une journée",
+   "ancre": "derivations-les-effets-et-leurs-paliers"
+  },
+  {
+   "terme": "Durée de nuit",
+   "ancre": "derivations-le-sommeil"
+  },
+  {
+   "terme": "Sieste",
+   "ancre": "derivations-le-sommeil"
+  },
+  {
+   "terme": "Qualité de sommeil moyenne",
+   "ancre": "derivations-le-sommeil"
+  },
+  {
+   "terme": "Coefficient de Pearson",
+   "ancre": "derivations-la-correlation"
+  },
+  {
+   "terme": "Seuil de sept paires",
+   "ancre": "derivations-la-correlation"
+  },
+  {
+   "terme": "Écart-type de population",
+   "ancre": "derivations-la-correlation"
+  },
+  {
+   "terme": "Palier de badge",
+   "ancre": "derivations-les-paliers-de-badge"
+  },
+  {
+   "terme": "Palier éveil",
+   "ancre": "derivations-les-paliers-de-badge"
+  },
+  {
+   "terme": "Équivalences d'activité",
+   "ancre": "derivations-les-paliers-de-badge"
+  },
+  {
+   "terme": "Équivalence insolite",
+   "ancre": "derivations-les-equivalences-insolites"
+  },
+  {
+   "terme": "Tolérance de 200 g",
+   "ancre": "derivations-les-equivalences-insolites"
+  },
+  {
+   "terme": "Exclusion et rotation",
+   "ancre": "derivations-les-equivalences-insolites"
+  },
+  {
+   "terme": "Attribution",
+   "ancre": "derivations-les-equivalences-insolites"
+  },
+  {
+   "terme": "Compteur d'usage",
+   "ancre": "derivations-les-equivalences-insolites"
+  }
+ ]
+}

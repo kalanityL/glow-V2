@@ -1,0 +1,231 @@
+{
+ "inventions": [
+  {
+   "categorie": "Rappels",
+   "fonctionnalite": "Émission d'un rappel",
+   "texte": "Le rappel se déclenche à l'heure enregistrée, la veille du rendez-vous pour un délai « 1 jour avant », etc.",
+   "origine": "Aucun code ne lit reminderEnabled, reminderTime, injectionReminderStartDate ni medicalReminderNotifyBefore pour planifier ou émettre quoi que ce soit : ces champs ne sont relus que par leurs propres sélecteurs, par les deux récapitulatifs et par la mention « Rappels : … » de l'accueil. Le chapitre le marque « non implémenté » et ne décrit aucune planification."
+  },
+  {
+   "categorie": "Modules",
+   "fonctionnalite": "Chemins qui allument meals, steps ou sports",
+   "texte": "La liste des écrans depuis lesquels un appui allume l'un de ces trois modules.",
+   "origine": "handleNavigate est appelé depuis des dizaines d'endroits d'App.tsx et des blocs de la maison ; je n'ai vérifié à la ligne que la règle (le geste écrit le drapeau) et le seul chemin qui l'évite (le tiroir Journal, par naviguerVersPageEteinte). Énumérer les appelants qui atteignent réellement une page éteinte demanderait de parcourir chaque bloc appelant."
+  },
+  {
+   "categorie": "Rappels",
+   "fonctionnalite": "Cohérence du rappel d'injections avec les prises réelles",
+   "texte": "Le jour ou la fréquence choisis sont confrontés à la cure en cours (intervalle du traitement, dernière prise).",
+   "origine": "NotificationsSettings n'ouvre ni injectionHistory ni le catalogue de traitements ; aucune comparaison n'existe entre injectionReminderDaysInterval et doseIntervalDaysOf(traitement)."
+  },
+  {
+   "categorie": "Modules",
+   "fonctionnalite": "Migration des drapeaux de masquage",
+   "texte": "Une conversion au chargement nettoie les drapeaux <module>ModuleHidden restés vrais sur un module rallumé.",
+   "origine": "La chaîne de conversion de useAppData.ts (dropSeedData, migrateTreatmentIds, purgeDeleted, mergeSideEffectNotes, mergeTableTennisSport, fillMealHunger, ensureStartingWeighIn) ne touche aucun drapeau de module ; seuls hydrationTrackingEnabled, dailyWaterGoalMl et weightGoalsEnabled sont supprimés du profil."
+  }
+ ],
+ "glossaire": [
+  {
+   "terme": "Module",
+   "definition": "Suivi activable, commandé par un drapeau booléen du profil et rattaché à un identifiant de page. Sept modules : injection, symptoms, meals, steps, sports, metime, sleep. La pesée (history) n'en est pas un."
+  },
+  {
+   "terme": "Drapeau d'activation",
+   "definition": "Champ <module>TrackingEnabled du profil. Absent, il vaut allumé pour le traitement et les effets secondaires, éteint pour les cinq autres."
+  },
+  {
+   "terme": "Drapeau de masquage",
+   "definition": "Champ <module>ModuleHidden du profil. Il ne mord que module éteint ; rallumer le module l'écrit à false."
+  },
+  {
+   "terme": "isModuleOn(profile, tabId)",
+   "definition": "État réel d'un module, défaut compris. Rend true pour tout identifiant absent de MODULE_FLAGS."
+  },
+  {
+   "terme": "isModuleHidden(profile, tabId)",
+   "definition": "Conjonction !isModuleOn(profile, tabId) ET Boolean(profile[<module>ModuleHidden])."
+  },
+  {
+   "terme": "MODULE_FLAGS",
+   "definition": "Table identifiant de page → drapeau d'activation, propre à la version Mixte."
+  },
+  {
+   "terme": "Page vitrée",
+   "definition": "Rendu d'une page dont le module est éteint : voile de verre (top-0 bottom-16, 64 px, z-30) portant la seule phrase d'activation, dont le clic ouvre la page Modules ancrée sur la carte du module."
+  },
+  {
+   "terme": "drawerItems",
+   "definition": "Constructeur commun aux tiroirs Ajouter et Journal : liste bâtie sur un profil aux cinq drapeaux facultatifs forcés à true, filtrée des masqués, chaque entrée portant son état réel dans enabled."
+  },
+  {
+   "terme": "snapToRoundedMinutes",
+   "definition": "Ramène une heure HH:MM à la plus grande valeur de ROUNDED_MINUTES ([0,10,15,20,30,40,45,50]) inférieure ou égale aux minutes ; chaîne non conforme rendue telle quelle."
+  },
+  {
+   "terme": "handleSaveProfile",
+   "definition": "Unique porte d'écriture du profil : arrondit targetWeight au dixième de kilogramme et applique snapToRoundedMinutes à reminderTime et, si présente, à medicalReminderTime."
+  },
+  {
+   "terme": "Planification hebdomadaire / personnalisée",
+   "definition": "injectionReminderType : 'weekly' (reminderDay + reminderTime) ou 'custom' (injectionReminderDaysInterval + injectionReminderStartDate + reminderTime). L'heure est le même champ dans les deux."
+  },
+  {
+   "terme": "MODULES_TENDANCE",
+   "definition": "Les cinq cartes du tiroir Tendances qui suivent l'état de leur module, avec le nom, l'ancre de carte et le complément employés par la phrase d'activation."
+  }
+ ],
+ "index": [
+  {
+   "terme": "Défauts des modules",
+   "ancre": "modules-defauts-des-modules"
+  },
+  {
+   "terme": "INITIAL_PROFILE (drapeaux de module)",
+   "ancre": "modules-defauts-des-modules"
+  },
+  {
+   "terme": "isModuleOn",
+   "ancre": "modules-defauts-des-modules"
+  },
+  {
+   "terme": "Bascule d'un module",
+   "ancre": "modules-bascule-d-un-module"
+  },
+  {
+   "terme": "Masquer dans l'application (case)",
+   "ancre": "modules-bascule-d-un-module"
+  },
+  {
+   "terme": "isModuleHidden",
+   "ancre": "modules-masquage-complet"
+  },
+  {
+   "terme": "MODULE_HIDDEN_FLAGS",
+   "ancre": "modules-masquage-complet"
+  },
+  {
+   "terme": "Menu du bas (filtrage des modules)",
+   "ancre": "modules-masquage-complet-d-un-module"
+  },
+  {
+   "terme": "Tiroir Ajouter",
+   "ancre": "modules-masquage-complet-d-un-module"
+  },
+  {
+   "terme": "Tiroir Journal",
+   "ancre": "modules-masquage-complet-d-un-module"
+  },
+  {
+   "terme": "Badge « à activer »",
+   "ancre": "modules-masquage-complet-d-un-module"
+  },
+  {
+   "terme": "MODULE_FLAGS",
+   "ancre": "modules-etat-d-un-module-defaut-compris"
+  },
+  {
+   "terme": "Tiroir Tendances (état des cartes)",
+   "ancre": "modules-etat-d-un-module-defaut-compris"
+  },
+  {
+   "terme": "Actif sanguin (carte)",
+   "ancre": "modules-etat-d-un-module-defaut-compris"
+  },
+  {
+   "terme": "Phrase d'activation",
+   "ancre": "modules-etat-d-un-module-defaut-compris"
+  },
+  {
+   "terme": "handleNavigate",
+   "ancre": "modules-navigation-vers-meals-steps-sports-allume-le-module"
+  },
+  {
+   "terme": "handleQuickAddNavigate",
+   "ancre": "modules-navigation-vers-meals-steps-sports-allume-le-module"
+  },
+  {
+   "terme": "naviguerVersPageEteinte",
+   "ancre": "modules-navigation-vers-meals-steps-sports-allume-le-module"
+  },
+  {
+   "terme": "PAGES_MODULE",
+   "ancre": "modules-navigation-vers-meals-steps-sports-allume-le-module"
+  },
+  {
+   "terme": "Page vitrée",
+   "ancre": "modules-navigation-vers-meals-steps-sports-allume-le-module"
+  },
+  {
+   "terme": "reminderEnabled",
+   "ancre": "modules-defauts-du-rappel-d-injections"
+  },
+  {
+   "terme": "injectionReminderType",
+   "ancre": "modules-defauts-du-rappel-d-injections"
+  },
+  {
+   "terme": "reminderTime",
+   "ancre": "modules-defauts-du-rappel-d-injections"
+  },
+  {
+   "terme": "injectionReminderStartDate",
+   "ancre": "modules-defauts-du-rappel-d-injections"
+  },
+  {
+   "terme": "reminderDay",
+   "ancre": "modules-jours-et-frequences-proposes"
+  },
+  {
+   "terme": "injectionReminderDaysInterval",
+   "ancre": "modules-jours-et-frequences-proposes"
+  },
+  {
+   "terme": "medicalReminderEnabled",
+   "ancre": "modules-defauts-du-rappel-medical"
+  },
+  {
+   "terme": "medicalReminderNotifyBefore",
+   "ancre": "modules-defauts-du-rappel-medical"
+  },
+  {
+   "terme": "medicalReminderDoctor",
+   "ancre": "modules-defauts-du-rappel-medical"
+  },
+  {
+   "terme": "ROUNDED_MINUTES",
+   "ancre": "modules-minutes-rondes"
+  },
+  {
+   "terme": "snapToRoundedMinutes",
+   "ancre": "modules-minutes-rondes"
+  },
+  {
+   "terme": "handleSaveProfile",
+   "ancre": "modules-minutes-rondes"
+  },
+  {
+   "terme": "Récapitulatif du rappel personnalisé",
+   "ancre": "modules-recapitulatif-du-rappel-personnalise"
+  },
+  {
+   "terme": "toLocaleDateString('fr-FR')",
+   "ancre": "modules-recapitulatif-du-rappel-personnalise"
+  }
+ ],
+ "ancres_traitees": [
+  "modules-entites",
+  "modules-defauts-des-modules",
+  "modules-bascule-d-un-module",
+  "modules-masquage-complet",
+  "modules-masquage-complet-d-un-module",
+  "modules-etat-d-un-module-defaut-compris",
+  "modules-navigation-vers-meals-steps-sports-allume-le-module",
+  "modules-defauts-du-rappel-d-injections",
+  "modules-jours-et-frequences-proposes",
+  "modules-defauts-du-rappel-medical",
+  "modules-minutes-rondes",
+  "modules-recapitulatif-du-rappel-personnalise"
+ ],
+ "ancres_sans_matiere": []
+}

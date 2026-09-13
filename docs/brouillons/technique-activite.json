@@ -1,0 +1,353 @@
+{
+ "inventions": [
+  {
+   "categorie": "Ordre d'affichage",
+   "fonctionnalite": "Jugement des refus au clic Valider",
+   "texte": "« Les messages s'affichent empilés juste avant le bouton, durée d'abord, distance ensuite. »",
+   "origine": "L'ordre vient de la construction du tableau passé à SportForm (`[submitRefusals.duration, submitRefusals.distance].filter(...)`) ; le rendu de ce tableau dans SportForm n'a pas été lu ligne à ligne, et rien n'interdit qu'il le réordonne."
+  },
+  {
+   "categorie": "Comportement d'écran",
+   "fonctionnalite": "Panneau « Activités physiques disponibles »",
+   "texte": "J'ai voulu écrire la règle du soulignement de « Tout cocher | Tout décocher » (souligné tant que la commande a encore un effet sur les activités affichées), promise par la fonctionnelle.",
+   "origine": "`useActiveSports` n'expose aucun indicateur de ce genre ; la condition vit dans ManageSportsBlock.tsx, qui n'a pas été lu. Non écrit plutôt que deviné."
+  },
+  {
+   "categorie": "Formule",
+   "fonctionnalite": "Score d'activité quotidien",
+   "texte": "J'ai voulu écrire que 78 = 60 min × 1,3 est la définition et non une coïncidence numérique.",
+   "origine": "Le code déclare `SPORT_SCORE_WEIGHTED_MINUTES_FOR_MAX = 78` en dur ; le produit 60 × 1,3 n'est écrit nulle part comme calcul. La phrase reste dans le pseudo-code en commentaire, à titre indicatif."
+  },
+  {
+   "categorie": "Seuils",
+   "fonctionnalite": "Répartition et échantillonnage du graphe",
+   "texte": "J'ai voulu justifier les seuils 4 lignes détaillées, plancher 6 %, 60 points maximum.",
+   "origine": "Aucun de ces trois nombres n'est adossé à une demande de l'utilisatrice dans le code lu ; ils sont marqués « arbitrage non validé » plutôt qu'expliqués."
+  },
+  {
+   "categorie": "Cohérence",
+   "fonctionnalite": "Tuiles côte à côte de la home",
+   "texte": "J'ai voulu écrire que la divergence entre `sportMinutesLast7Days` (étage = 1 min) et `sportWeeklyAverages` (étage = 0,5 min) est un défaut.",
+   "origine": "Le code ne la qualifie pas ; elle est signalée dans les doutes de l'inventaire. Elle est décrite comme un fait, sans jugement."
+  },
+  {
+   "categorie": "Partage",
+   "fonctionnalite": "Contenu de partage d'une séance",
+   "texte": "J'ai voulu documenter `buildSportShareConfig` (légende, statistiques, mot-clic).",
+   "origine": "Aucun import de `useShareSport` ni de `buildSportShareConfig` n'a été trouvé dans la version Mixte : la fonctionnalité semble non montée, et aucune ancre du chapitre ne la vise."
+  }
+ ],
+ "glossaire": [
+  {
+   "terme": "MET",
+   "definition": "Équivalent métabolique, sans dimension : le coût énergétique d'une activité rapporté au repos. Le catalogue en donne un par activité ; les huit sports à distance en ont en plus une courbe indexée sur l'allure."
+  },
+  {
+   "terme": "Multiplicateur d'effort",
+   "definition": "Facteur tiré de l'intensité ressentie : douce 0,8 ; modérée 1,0 ; intensive 1,3. Il multiplie le MET dans le calcul des calories sans distance, et la durée dans les minutes pondérées."
+  },
+  {
+   "terme": "Facteur d'allure",
+   "definition": "MET lu sur la courbe du sport divisé par le MET du catalogue, borné à [0,8 ; 1,3]. Il remplace le multiplicateur d'effort dès qu'une distance exploitable est enregistrée."
+  },
+  {
+   "terme": "Minutes pondérées",
+   "definition": "Durée d'une séance en équivalent-minutes (un étage = 0,5 min) multipliée par son facteur d'intensité. Unité du score d'activité."
+  },
+  {
+   "terme": "Score d'activité quotidien",
+   "definition": "min(10, somme des minutes pondérées du jour / 78 × 10). Le plafond porte sur la journée entière."
+  },
+  {
+   "terme": "Sport à distance",
+   "definition": "Une des huit activités qui possèdent une courbe allure → MET dans SPEED_CURVES : Marche, Randonnée, Course à pied, Vélo, Natation, Rameur / Aviron, Ski de fond, Patinage / Roller. Seules celles-là affichent un champ distance."
+  },
+  {
+   "terme": "Étage",
+   "definition": "Unité du champ duration pour « Montée escaliers ». Vaut 0,5 minute partout où des minutes se cumulent (calendrier, répartition, moyennes hebdomadaires), 1 minute dans les séries brutes (tuile 7 derniers jours, tendance du tiroir)."
+  },
+  {
+   "terme": "Fenêtre temporelle (PeriodWindow)",
+   "definition": "7days, 14days, 30days, 90days, all ou custom. Inclusive, jour en cours compris ; coupure = aujourd'hui − (n − 1) jours."
+  },
+  {
+   "terme": "Coupure (cutoff)",
+   "definition": "Première date retenue par une fenêtre, en chaîne AAAA-MM-JJ. null pour « Depuis le début » et pour « Choisir » sans début."
+  },
+  {
+   "terme": "Jours couverts",
+   "definition": "Dans la répartition par activité, nombre de jours réellement vécus par la série : du plus tardif entre la coupure et la première séance du journal entier jusqu'à aujourd'hui, bornes comprises, plafonné à 7 sur la série « 7 derniers jours »."
+  },
+  {
+   "terme": "Poids à une date",
+   "definition": "Dernière pesée datée du jour de la séance ou avant ; à défaut poids de départ, puis poids visé du profil, puis première pesée, puis 80 kg."
+  },
+  {
+   "terme": "Plafond quotidien",
+   "definition": "15 lignes par journée sur les journaux sport et temps pour soi. Au-delà, la nouvelle saisie écrase la dernière ligne du jour au lieu d'être refusée."
+  },
+  {
+   "terme": "Minute ronde",
+   "definition": "Une des valeurs {0, 10, 15, 20, 30, 40, 45, 50}. Toute heure enregistrée y est ramenée vers le bas au moment de l'écriture."
+  },
+  {
+   "terme": "NumberRule",
+   "definition": "Description d'un champ numérique : min, max, decimals, step, allowEmpty, unit, message. Quatre concernent ce domaine : RULE_DURATION, RULE_FLOORS, RULE_DISTANCE_KM, RULE_DISTANCE_M."
+  },
+  {
+   "terme": "validateOnSubmit",
+   "definition": "Mode d'un champ numérique où la saisie fautive est conservée sans message : le jugement et l'affichage du refus appartiennent au formulaire, au clic sur Valider."
+  },
+  {
+   "terme": "periodShift",
+   "definition": "Comparaison des deux moitiés d'une série de 14 jours ; sous 5 % d'écart relatif la tuile dit « stable », une moitié à zéro se tranche par comparaison directe."
+  },
+  {
+   "terme": "informedTrendMean / trendTotal",
+   "definition": "Deux lectures d'une série de tendance : la moyenne des seules journées renseignées, ou la somme où l'absence vaut zéro. Le sport utilise la seconde."
+  }
+ ],
+ "index": [
+  {
+   "terme": "MET",
+   "ancre": "activite-catalogue-des-activites-physiques"
+  },
+  {
+   "terme": "Courbe allure → MET",
+   "ancre": "activite-calories-d-une-seance-avec-distance"
+  },
+  {
+   "terme": "Multiplicateur d'effort",
+   "ancre": "activite-calories-d-une-seance-sans-distance"
+  },
+  {
+   "terme": "Facteur d'allure",
+   "ancre": "activite-score-d-activite-quotidien"
+  },
+  {
+   "terme": "Minutes pondérées",
+   "ancre": "activite-score-d-activite-quotidien"
+  },
+  {
+   "terme": "Score d'activité",
+   "ancre": "activite-score-d-activite-quotidien"
+  },
+  {
+   "terme": "Montée escaliers (étages)",
+   "ancre": "activite-duree-et-calories-d-un-jour-calendrier-sport"
+  },
+  {
+   "terme": "STAIRS_MINUTES_PER_FLOOR",
+   "ancre": "activite-duree-et-calories-d-un-jour-calendrier-sport"
+  },
+  {
+   "terme": "Sport à distance",
+   "ancre": "activite-unite-et-stockage-de-la-distance"
+  },
+  {
+   "terme": "parseDistanceInput",
+   "ancre": "activite-unite-et-stockage-de-la-distance"
+  },
+  {
+   "terme": "formatDistanceLabel",
+   "ancre": "activite-affichage-d-une-distance"
+  },
+  {
+   "terme": "Distance ou effort",
+   "ancre": "activite-distance-ou-effort-jamais-les-deux"
+  },
+  {
+   "terme": "RULE_DURATION",
+   "ancre": "activite-bornes-numeriques-du-sport-et-du-temps-pour-soi"
+  },
+  {
+   "terme": "RULE_FLOORS",
+   "ancre": "activite-bornes-numeriques-du-sport-et-du-temps-pour-soi"
+  },
+  {
+   "terme": "RULE_DISTANCE_KM",
+   "ancre": "activite-bornes-numeriques-du-sport-et-du-temps-pour-soi"
+  },
+  {
+   "terme": "RULE_DISTANCE_M",
+   "ancre": "activite-bornes-numeriques-du-sport-et-du-temps-pour-soi"
+  },
+  {
+   "terme": "refusSaisieSport",
+   "ancre": "activite-jugement-des-refus-au-clic-valider"
+  },
+  {
+   "terme": "Plafond quotidien (15)",
+   "ancre": "activite-plafond-quotidien-sport-et-temps-pour-soi"
+  },
+  {
+   "terme": "addLogWithinDailyCap",
+   "ancre": "activite-plafond-quotidien-sport-et-temps-pour-soi"
+  },
+  {
+   "terme": "Minute ronde",
+   "ancre": "activite-valeurs-par-defaut-du-formulaire-d-activite"
+  },
+  {
+   "terme": "Félicitation (huit phrases)",
+   "ancre": "activite-encouragement-apres-une-activite"
+  },
+  {
+   "terme": "ALL_SPORTS",
+   "ancre": "activite-catalogue-des-activites-physiques"
+  },
+  {
+   "terme": "Ping-pong/Tennis de table",
+   "ancre": "activite-catalogue-des-activites-physiques"
+  },
+  {
+   "terme": "DEFAULT_ACTIVE_SPORTS",
+   "ancre": "activite-activites-actives-par-defaut-et-persistance"
+  },
+  {
+   "terme": "glp1_active_sports",
+   "ancre": "activite-activites-actives-par-defaut-et-persistance"
+  },
+  {
+   "terme": "glp1_sport_history_view",
+   "ancre": "activite-curseur-calendrier-journal"
+  },
+  {
+   "terme": "PeriodWindow",
+   "ancre": "activite-selecteur-de-periode-commun"
+  },
+  {
+   "terme": "getCutoffDateStr",
+   "ancre": "activite-selecteur-de-periode-commun"
+  },
+  {
+   "terme": "filterByTimeWindow",
+   "ancre": "activite-selecteur-de-periode-commun"
+  },
+  {
+   "terme": "Bornes « du … au … »",
+   "ancre": "activite-bornes-du-au-d-un-journal"
+  },
+  {
+   "terme": "Tri du journal",
+   "ancre": "activite-tri-du-journal-d-activite"
+  },
+  {
+   "terme": "applyLogUpdate",
+   "ancre": "activite-modification-et-suppression-d-une-ligne"
+  },
+  {
+   "terme": "removeLogById",
+   "ancre": "activite-modification-et-suppression-d-une-ligne"
+  },
+  {
+   "terme": "formatCalendarDuration",
+   "ancre": "activite-duree-et-calories-d-un-jour-calendrier-sport"
+  },
+  {
+   "terme": "CalendarBlock",
+   "ancre": "activite-coquille-commune-des-calendriers"
+  },
+  {
+   "terme": "getWeightAtDate",
+   "ancre": "activite-poids-a-une-date"
+  },
+  {
+   "terme": "getSportCalories",
+   "ancre": "activite-calories-d-une-seance-avec-distance"
+  },
+  {
+   "terme": "calculateSportCaloriesMET",
+   "ancre": "activite-calories-d-une-seance-sans-distance"
+  },
+  {
+   "terme": "computeSportChartData",
+   "ancre": "activite-points-du-graphe-suivi-sport-et-repartition"
+  },
+  {
+   "terme": "IntensityBreakdown",
+   "ancre": "activite-points-du-graphe-suivi-sport-et-repartition"
+  },
+  {
+   "terme": "repartitionParActivite",
+   "ancre": "activite-repartition-de-quoi-c-est-fait"
+  },
+  {
+   "terme": "Jours couverts",
+   "ancre": "activite-repartition-de-quoi-c-est-fait"
+  },
+  {
+   "terme": "Plancher de barre (6 %)",
+   "ancre": "activite-repartition-de-quoi-c-est-fait"
+  },
+  {
+   "terme": "periodShift",
+   "ancre": "activite-sens-hausse-baisse-stable-tuiles-dynamique"
+  },
+  {
+   "terme": "sportWeeklyAverages",
+   "ancre": "activite-moyennes-hebdomadaires-de-l-activite-home"
+  },
+  {
+   "terme": "sportMinutesLast7Days",
+   "ancre": "activite-7-derniers-jours-de-l-activite-home"
+  },
+  {
+   "terme": "sportTrend",
+   "ancre": "activite-tendance-de-l-activite-tiroir"
+  },
+  {
+   "terme": "sportTrendKcalPerDay",
+   "ancre": "activite-tendance-de-l-activite-tiroir"
+  },
+  {
+   "terme": "sportTrackingEnabled",
+   "ancre": "activite-activation-automatique-des-modules-pas-et-sport"
+  },
+  {
+   "terme": "« + » flottant",
+   "ancre": "activite-flottant-et-ouverture-automatique"
+  },
+  {
+   "terme": "deleteAllButtonsEnabled",
+   "ancre": "activite-bouton-tout-supprimer"
+  },
+  {
+   "terme": "SportLog",
+   "ancre": "activite-entites"
+  }
+ ],
+ "ancres_traitees": [
+  "activite-activation-automatique-des-modules-pas-et-sport",
+  "activite-curseur-calendrier-journal",
+  "activite-flottant-et-ouverture-automatique",
+  "activite-valeurs-par-defaut-du-formulaire-d-activite",
+  "activite-distance-ou-effort-jamais-les-deux",
+  "activite-jugement-des-refus-au-clic-valider",
+  "activite-unite-et-stockage-de-la-distance",
+  "activite-plafond-quotidien-sport-et-temps-pour-soi",
+  "activite-encouragement-apres-une-activite",
+  "activite-catalogue-des-activites-physiques",
+  "activite-activites-actives-par-defaut-et-persistance",
+  "activite-tri-du-journal-d-activite",
+  "activite-selecteur-de-periode-commun",
+  "activite-bornes-du-au-d-un-journal",
+  "activite-affichage-d-une-distance",
+  "activite-modification-et-suppression-d-une-ligne",
+  "activite-duree-et-calories-d-un-jour-calendrier-sport",
+  "activite-coquille-commune-des-calendriers",
+  "activite-calories-d-une-seance-sans-distance",
+  "activite-calories-d-une-seance-avec-distance",
+  "activite-poids-a-une-date",
+  "activite-score-d-activite-quotidien",
+  "activite-points-du-graphe-suivi-sport-et-repartition",
+  "activite-repartition-de-quoi-c-est-fait",
+  "activite-sens-hausse-baisse-stable-tuiles-dynamique",
+  "activite-moyennes-hebdomadaires-de-l-activite-home",
+  "activite-7-derniers-jours-de-l-activite-home",
+  "activite-tendance-de-l-activite-tiroir",
+  "activite-bornes-numeriques-du-sport-et-du-temps-pour-soi",
+  "activite-bouton-tout-supprimer"
+ ],
+ "ancres_sans_matiere": []
+}

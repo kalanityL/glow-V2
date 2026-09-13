@@ -1,0 +1,281 @@
+{
+ "inventions": [
+  {
+   "categorie": "conversion",
+   "fonctionnalite": "Stockage métrique du poids",
+   "texte": "Le facteur livre → kilogramme (0,45359237) et la règle d'arrondi à appliquer le jour où le poids sera ramené en métrique, sur le modèle de CM_PAR_POUCE.",
+   "origine": "Aucune constante de masse n'existe dans src/domaine/unites.ts ni ailleurs : seul CM_PAR_POUCE = 2.54 y figure. Le facteur et l'arrondi seraient de mon cru."
+  },
+  {
+   "categorie": "format",
+   "fonctionnalite": "Rien n'est enregistré",
+   "texte": "La forme sous laquelle Reponses sera écrite le jour de la persistance : clé, schéma JSON, conversion des poids en nombre, version du format.",
+   "origine": "reponses.ts dit seulement « la conversion en nombre se fera là où on les enregistrera ». Aucun code d'écriture n'existe en V2, et la clé de la V1 ('glp1_app_companion_data') porte un autre objet, AppData."
+  },
+  {
+   "categorie": "validation",
+   "fonctionnalite": "Règle du mot de passe",
+   "texte": "Une règle de forme de l'adresse e-mail (arobase, domaine) vérifiée au moment de l'entrée.",
+   "origine": "peutValider ne lit que motDePasse ; le champ est un input type=email hors de tout <form>, donc sans validation native. Rien dans le code ne vérifie l'adresse."
+  },
+  {
+   "categorie": "interaction",
+   "fonctionnalite": "Ouverture et fermeture des roues",
+   "texte": "Un magnétisme au cran (scroll-snap) ou un parcours des crans aux flèches du clavier.",
+   "origine": "useSelecteurOuvert n'appelle que scrollIntoView({ block: 'center' }) à l'ouverture ; aucun écouteur de touche autre qu'Échap, et page.css ne pose pas de scroll-snap sur .roue. GUIDELINES § 5 le liste comme non traité."
+  },
+  {
+   "categorie": "coherence",
+   "fonctionnalite": "Poids actuel et poids visé",
+   "texte": "Un contrôle interdisant ou signalant un poids visé supérieur au poids actuel.",
+   "origine": "Les deux champs n'ont aucune relation dans le code, et reponses.ts interdit explicitement de les lier ou de faire partir l'un de l'autre. Un tel contrôle contredirait une décision consignée."
+  },
+  {
+   "categorie": "sortie",
+   "fonctionnalite": "Dernière étape",
+   "texte": "Ce que le bouton final déclenche : création du compte, écriture d'une pesée de départ, ouverture d'une page d'accueil.",
+   "origine": "onClick={avancer}, borné à la dernière étape visible : le clic ne change aucun état. App ne rend que Onboarding. La V1 semait une pesée de départ (setStartingWeight), la V2 n'en a rien repris."
+  }
+ ],
+ "glossaire": [
+  {
+   "terme": "Étape visible",
+   "definition": "Entrée de ETAPES dont la fonction montre rend true pour les réponses courantes, ou qui n'en a pas. etapesVisibles en rend la liste ordonnée : 7, 8 ou 9 identifiants."
+  },
+  {
+   "terme": "Rang borné",
+   "definition": "Math.min(rang, visibles.length − 1), recalculé à chaque lecture. Il désigne l'étape courante dans la liste des étapes visibles et évite qu'une liste raccourcie laisse le rang dans le vide."
+  },
+  {
+   "terme": "Décompte",
+   "definition": "Objet dérivé { passees, total, montrer } : le rang borné, le nombre d'étapes visibles, et le fait que le rang ait atteint ETAPE_DEBUT_DECOMPTE ('traitement')."
+  },
+  {
+   "terme": "Cran",
+   "definition": "Une valeur d'une roue, rendue comme <button role=\"option\">. La roue est le <ul role=\"listbox\"> qui les contient."
+  },
+  {
+   "terme": "Séparateur stocké",
+   "definition": "Le point, employé dans la valeur gardée d'un poids ('96.0'), par opposition au séparateur affiché (textes.separateurDecimal), qui suit la langue."
+  },
+  {
+   "terme": "Système d'unités",
+   "definition": "'metrique' ou 'imperial'. Il ne décide que de l'unité d'affichage et de saisie ; UNITES_DU_SYSTEME en tire l'unité de poids et l'unité de taille."
+  },
+  {
+   "terme": "Unité canonique",
+   "definition": "L'unité de stockage, indépendante du système : le centimètre pour la taille (tailleCm). Le poids n'en a pas encore — il est gardé dans l'unité de saisie."
+  },
+  {
+   "terme": "Identifiant du catalogue",
+   "definition": "La chaîne id d'une entrée de TRAITEMENTS ('ozempic', 'wegovy-oral'), seule forme sous laquelle un traitement est recueilli ; le nom n'est qu'un affichage."
+  },
+  {
+   "terme": "peutValider",
+   "definition": "Fonction du parcours qui dit si l'étape courante laisse passer. Elle décide de l'état disabled du bouton « Suivant » et ne vit dans aucun écran."
+  },
+  {
+   "terme": "Geste dédié",
+   "definition": "Fonction qui écrit plusieurs champs liés dans une seule mise à jour d'état : choisirLangue, repondreTraitementCommence, repondreForme, et le choix du genre dans EtapeAvatar."
+  },
+  {
+   "terme": "Zone qui défile",
+   "definition": ".page__defilant, seul élément en overflow-y: auto. L'entête, le portrait de l'avatar et la rangée des boutons sont hors d'elle et restent en place."
+  }
+ ],
+ "index": [
+  {
+   "terme": "AVATAR_INITIAL",
+   "ancre": "onboarding-avatar-de-depart"
+  },
+  {
+   "terme": "aria-describedby",
+   "ancre": "onboarding-regle-du-mot-de-passe"
+  },
+  {
+   "terme": "bornesAnneeNaissance",
+   "ancre": "onboarding-bornes-de-l-annee-de-naissance-et-de-la-taille"
+  },
+  {
+   "terme": "centrerDansSaListe",
+   "ancre": "onboarding-ouverture-et-fermeture-des-roues"
+  },
+  {
+   "terme": "ChoixUnique (enGrille)",
+   "ancre": "onboarding-une-reponse-orpheline-prend-toute-la-largeur"
+  },
+  {
+   "terme": "classeDuTheme",
+   "ancre": "onboarding-theme-applique-a-la-page"
+  },
+  {
+   "terme": "CM_PAR_POUCE",
+   "ancre": "onboarding-taille-stockee-en-centimetres"
+  },
+  {
+   "terme": "COIFFURE_DU_GENRE",
+   "ancre": "onboarding-le-genre-amene-sa-coiffure"
+  },
+  {
+   "terme": "COULEURS_PEAU / YEUX / CHEVEUX",
+   "ancre": "onboarding-les-couleurs-sont-des-donnees"
+  },
+  {
+   "terme": "decompte",
+   "ancre": "onboarding-decompte-des-ecrans"
+  },
+  {
+   "terme": "detecterLangue",
+   "ancre": "onboarding-langue-detectee"
+  },
+  {
+   "terme": "ETAPE_DEBUT_DECOMPTE",
+   "ancre": "onboarding-decompte-des-ecrans"
+  },
+  {
+   "terme": "ETAPES",
+   "ancre": "onboarding-etapes-visibles-selon-les-reponses"
+  },
+  {
+   "terme": "etapesVisibles",
+   "ancre": "onboarding-etapes-visibles-selon-les-reponses"
+  },
+  {
+   "terme": "LONGUEUR_MOT_DE_PASSE",
+   "ancre": "onboarding-regle-du-mot-de-passe"
+  },
+  {
+   "terme": "motDePasseValide",
+   "ancre": "onboarding-regle-du-mot-de-passe"
+  },
+  {
+   "terme": "page__defilant",
+   "ancre": "onboarding-zones-figees-et-zone-qui-defile"
+  },
+  {
+   "terme": "PAS_AFFICHE",
+   "ancre": "onboarding-poids-garde-en-texte-avec-un-point"
+  },
+  {
+   "terme": "peutValider",
+   "ancre": "onboarding-ce-qui-bloque-suivant"
+  },
+  {
+   "terme": "POIDS_MAX",
+   "ancre": "onboarding-plafonds-du-poids-par-unite"
+  },
+  {
+   "terme": "progressbar",
+   "ancre": "onboarding-le-decompte-se-dit-sans-s-ecrire"
+  },
+  {
+   "terme": "rangBorne",
+   "ancre": "onboarding-etapes-visibles-selon-les-reponses"
+  },
+  {
+   "terme": "repondreForme",
+   "ancre": "onboarding-les-reponses-du-traitement-se-defont-ensemble"
+  },
+  {
+   "terme": "repondreTraitementCommence",
+   "ancre": "onboarding-les-reponses-du-traitement-se-defont-ensemble"
+  },
+  {
+   "terme": "Reponses",
+   "ancre": "onboarding-entites"
+  },
+  {
+   "terme": "REPONSES_INITIALES",
+   "ancre": "onboarding-rien-n-est-enregistre"
+  },
+  {
+   "terme": "SEPARATEUR_STOCKE",
+   "ancre": "onboarding-poids-garde-en-texte-avec-un-point"
+  },
+  {
+   "terme": "separateurDecimal",
+   "ancre": "onboarding-poids-garde-en-texte-avec-un-point"
+  },
+  {
+   "terme": "SelecteurNombre",
+   "ancre": "onboarding-ouverture-et-fermeture-des-roues"
+  },
+  {
+   "terme": "SelecteurPoids",
+   "ancre": "onboarding-plafonds-du-poids-par-unite"
+  },
+  {
+   "terme": "surClicDehors",
+   "ancre": "onboarding-ouverture-et-fermeture-des-roues"
+  },
+  {
+   "terme": "SYSTEME_PAR_LANGUE",
+   "ancre": "onboarding-la-langue-repose-les-unites"
+  },
+  {
+   "terme": "TAILLE_BORNES",
+   "ancre": "onboarding-bornes-de-l-annee-de-naissance-et-de-la-taille"
+  },
+  {
+   "terme": "tailleAffichee / tailleEnCm",
+   "ancre": "onboarding-taille-stockee-en-centimetres"
+  },
+  {
+   "terme": "textes.fractions",
+   "ancre": "onboarding-les-roues-se-nomment-a-qui-ecoute"
+  },
+  {
+   "terme": "TRAITEMENTS",
+   "ancre": "onboarding-catalogue-des-traitements"
+  },
+  {
+   "terme": "traitementsDeLaForme",
+   "ancre": "onboarding-catalogue-des-traitements"
+  },
+  {
+   "terme": "UNITES_DU_SYSTEME",
+   "ancre": "onboarding-la-langue-repose-les-unites"
+  },
+  {
+   "terme": "useParcours",
+   "ancre": "onboarding-etapes-visibles-selon-les-reponses"
+  },
+  {
+   "terme": "useSelecteurOuvert",
+   "ancre": "onboarding-ouverture-et-fermeture-des-roues"
+  },
+  {
+   "terme": "useTextes",
+   "ancre": "onboarding-la-langue-est-une-maquette"
+  }
+ ],
+ "ancres_traitees": [
+  "onboarding-entites",
+  "onboarding-etapes-visibles-selon-les-reponses",
+  "onboarding-ce-qui-bloque-suivant",
+  "onboarding-decompte-des-ecrans",
+  "onboarding-le-decompte-se-dit-sans-s-ecrire",
+  "onboarding-zones-figees-et-zone-qui-defile",
+  "onboarding-langue-detectee",
+  "onboarding-rien-n-est-enregistre",
+  "onboarding-theme-applique-a-la-page",
+  "onboarding-la-langue-repose-les-unites",
+  "onboarding-la-langue-est-une-maquette",
+  "onboarding-plafonds-du-poids-par-unite",
+  "onboarding-poids-garde-en-texte-avec-un-point",
+  "onboarding-stockage-metrique-du-poids",
+  "onboarding-les-roues-se-nomment-a-qui-ecoute",
+  "onboarding-ouverture-et-fermeture-des-roues",
+  "onboarding-poids-actuel-et-poids-vise-jamais-lies",
+  "onboarding-les-reponses-du-traitement-se-defont-ensemble",
+  "onboarding-catalogue-des-traitements",
+  "onboarding-une-reponse-orpheline-prend-toute-la-largeur",
+  "onboarding-le-genre-amene-sa-coiffure",
+  "onboarding-avatar-de-depart",
+  "onboarding-les-couleurs-sont-des-donnees",
+  "onboarding-bornes-de-l-annee-de-naissance-et-de-la-taille",
+  "onboarding-taille-stockee-en-centimetres",
+  "onboarding-regle-du-mot-de-passe"
+ ],
+ "ancres_sans_matiere": []
+}

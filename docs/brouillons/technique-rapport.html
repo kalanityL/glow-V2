@@ -1,0 +1,893 @@
+<section id="rapport">
+  <h2>17. Le rapport médical <a class="retour" href="#sommaire">↑ sommaire</a></h2>
+  <p>Ce chapitre décrit comment le PDF de bilan se calcule : bornes de période, masques de sections, formules des cartouches, échelles des deux graphiques, découpage des grilles de calendrier et regroupement du carnet. Il couvre aussi la fiche d’échec d’export, seule chose que la génération envoie à distance.</p>
+
+  <h3 id="rapport-entites">Entités</h3>
+  <p>Le rapport ne stocke rien : il lit les journaux du domaine, filtrés sur la période, et produit un fichier. Trois choses seulement sont persistées, dans le stockage local, par la page d’export.</p>
+  <table>
+    <thead><tr><th>Clé de stockage</th><th>Type</th><th>Contenu</th></tr></thead>
+    <tbody>
+      <tr><td><code>glp1_period_report</code></td><td><code>{ window, customRange }</code></td><td>La fenêtre choisie (<code>7days</code>, <code>14days</code>, <code>30days</code>, <code>90days</code>, <code>all</code>, <code>custom</code>) et les deux bornes saisies. Défaut <code>30days</code>, bornes vides.</td></tr>
+      <tr><td><code>glow_report_include_v2</code></td><td><code>Partial&lt;MedicalReportSelection&gt;</code></td><td>Les huit bascules du sur-mesure, réécrites à chaque clic.</td></tr>
+      <tr><td><code>glow_report_meal_detail</code></td><td>—</td><td>Clé morte : ni lue ni écrite depuis que le niveau de détail alimentaire est fixé. <span class="marque non">non implémenté</span></td></tr>
+    </tbody>
+  </table>
+  <p>Les journaux lus, tous datés en chaînes locales <code>YYYY-MM-DD</code> et horodatés en <code>HH:MM</code> :</p>
+  <table>
+    <thead><tr><th>Entité</th><th>Champs employés par le rapport</th><th>Unité canonique</th></tr></thead>
+    <tbody>
+      <tr><td><code>WeightLog</code></td><td><code>date</code>, <code>time?</code>, <code>weight</code>, <code>isStartingWeight</code>, et neuf mensurations facultatives : <code>chest</code>, <code>waist</code>, <code>hips</code>, <code>arm</code>, <code>underbust</code>, <code>buttocks</code>, <code>thigh</code>, <code>knee</code>, <code>calf</code></td><td>kg ; cm</td></tr>
+      <tr><td><code>InjectionLog</code></td><td><code>date</code>, <code>time</code>, <code>dose</code>, <code>site</code>, <code>notes?</code>, <code>brand?</code></td><td>mg</td></tr>
+      <tr><td><code>SavedMealLog</code></td><td><code>date</code>, <code>time</code>, <code>type</code>, <code>items</code>, <code>calories</code>, <code>protein</code>, <code>carbs</code>, <code>fat</code>, <code>fiber</code></td><td>kcal ; g</td></tr>
+      <tr><td><code>SideEffectLog</code></td><td><code>date</code>, <code>time</code>, <code>type</code>, <code>severity</code> (1 à 5), <code>notes?</code></td><td>—</td></tr>
+      <tr><td><code>StepLog</code></td><td><code>date</code>, <code>steps</code></td><td>pas</td></tr>
+      <tr><td><code>SportLog</code></td><td><code>date</code>, <code>time</code>, <code>sport</code>, <code>intensity</code>, <code>duration</code>, <code>distance?</code>, <code>notes?</code></td><td>minutes — <em>étages</em> pour « Montée escaliers »</td></tr>
+      <tr><td><code>SleepLog</code></td><td><code>bedDate</code>, <code>bedTime</code>, <code>date</code> (réveil), <code>time</code>, <code>kind</code> (<code>nuit</code> | <code>sieste</code>), <code>quality</code> (0 à 5), <code>notes?</code></td><td>—</td></tr>
+      <tr><td><code>MeTimeLog</code></td><td><code>date</code>, <code>time</code>, <code>activity</code>, <code>duration</code>, <code>notes?</code></td><td>minutes</td></tr>
+    </tbody>
+  </table>
+  <p>Dérivé et donc jamais stocké : la durée d’une entrée de sommeil (déduite de <code>bedDate</code>+<code>bedTime</code> et <code>date</code>+<code>time</code> par <code>sleepLogMinutes</code>), les calories d’une séance, les totaux d’une journée, toute moyenne, l’IMC, le nombre de journées documentées, les bornes effectives de la période.</p>
+  <p>Structures du seul document, montées à la volée : <code>MedicalReportSelection</code> (huit booléens : <code>weights</code>, <code>meals</code>, <code>sideEffects</code>, <code>steps</code>, <code>sport</code>, <code>sleep</code>, <code>meTime</code>, <code>insolites</code>) ; <code>ReportPalette</code> (une trentaine de couleurs RVB plus le drapeau <code>patterned</code>) ; <code>ReportDay</code> (une date, les lignes de chaque journal, le total de pas) ; <code>MergedCalendarGrid</code> (une carte d’annexe, ses mois et leurs semaines) ; <code>ReportExportFailure</code> (la fiche d’échec).</p>
+  <p class="ancre">src/versions/mixte/components/MedicalReportExport.tsx, src/versions/mixte/features/report/medicalReportPdf.ts, src/types.ts</p>
+
+  <h3 id="rapport-periode-du-rapport-et-bornes-effectives">Période du rapport et bornes effectives</h3>
+  <p>La page appelle <code>usePeriodWindow('report')</code>, qui lit et écrit <code>glp1_period_report</code> ; une valeur relue qui n’est plus une fenêtre connue retombe sur <code>30days</code>. Deux chaînes en sortent, qui commandent le titre du document, le nom du fichier et l’axe des abscisses.</p>
+  <pre><code>periodStart = getCutoffDateStr(window, rangeForFilter) ?? oldestEntryDate
+periodEnd   = (window === 'custom' &amp;&amp; customRange.endDate) || getLocalDateStr()
+
+getCutoffDateStr :
+  'all'    → null
+  'custom' → customRange.startDate si non vide et analysable, sinon null
+  sinon    → getLocalDateStr(aujourd'hui − (N − 1))     N ∈ {7, 14, 30, 90}
+
+oldestEntryDate = min(aujourd'hui, toutes les dates de
+  weightHistory, dailyLogs, injectionHistory, savedMeals,
+  sideEffectHistory, stepLogs, sportLogs)</code></pre>
+  <p>Le sommeil et le temps pour soi ne sont pas scannés par <code>oldestEntryDate</code>. Le filtrage des journaux passe par <code>filterByTimeWindow</code>, qui compare des chaînes ISO, jamais des instants : <code>all</code> ne filtre rien, <code>custom</code> écarte <code>d &lt; startDate</code> et <code>d &gt; endDate</code> en traitant une borne vide comme illimitée, une fenêtre fixe ne garde que <code>d &gt;= cutoff</code> et n’a pas de borne haute.</p>
+  <p class="ancre">src/versions/mixte/components/MedicalReportExport.tsx, src/shared/time-window/timeWindow.utils.ts, src/shared/time-window/usePeriodWindow.ts</p>
+  <details><summary>Cas limites</summary>
+    <ul>
+      <li>Aucune entrée nulle part : <code>oldestEntryDate</code> vaut aujourd’hui, donc « Depuis le début » couvre la seule journée courante.</li>
+      <li>Fenêtre fixe et entrée datée dans le futur : elle passe le filtre (pas de borne haute) alors que <code>periodEnd</code> vaut aujourd’hui — le graphique la rabat sur le bord droit du cadre.</li>
+      <li>Mode Choisir, borne de début vide : la coupure vaut <code>null</code>, <code>periodStart</code> se replie sur la plus ancienne entrée, et le filtre ne coupe pas en bas.</li>
+      <li>Mode Choisir, borne de début non analysable par <code>new Date</code> : coupure <code>null</code>, même repli.</li>
+    </ul>
+  </details>
+  <div class="exemple"><p>Camille, le 12/09/2026, sur « 30 derniers jours » : <code>periodStart</code> = 2026‑08‑14 (12 − 29 jours), <code>periodEnd</code> = 2026‑09‑12. Sur « Depuis le début », <code>periodStart</code> = 2026‑05‑04, sa première pesée.</p></div>
+
+  <h3 id="rapport-refus-de-periode-invalide">Refus de période invalide</h3>
+  <p>Le contrôle porte sur les bornes <em>effectives</em> — la valeur saisie, sinon son repli — et non sur les seules valeurs saisies. <a href="spec-fonctionnelle.html#rapport-bloc-rapport-medical">→ fonctionnelle</a></p>
+  <pre><code>effectiveStart = range.startDate || fallbackStart   // fallbackStart = oldestEntryDate
+effectiveEnd   = range.endDate   || fallbackEnd     // fallbackEnd   = aujourd'hui
+invalide = effectiveStart ≠ '' et effectiveEnd ≠ '' et effectiveStart &gt; effectiveEnd</code></pre>
+  <p>La comparaison est lexicographique sur des chaînes <code>YYYY-MM-DD</code>, ce qui est l’ordre chronologique. Le message « Choisissez une période valide » s’écrit sous la ligne, dans la classe commune des refus du site (<code>FORM_MESSAGE</code>, l’accent, jamais le rouge). Rien n’est bloqué ni corrigé : les bornes restent éditables et l’export reste cliquable.</p>
+  <p class="ancre">src/versions/mixte/components/InlineCustomDateRange.tsx, src/versions/mixte/components/PeriodBounds.tsx</p>
+  <details><summary>Cas limites</summary>
+    <ul>
+      <li>Fenêtre fixe : <code>PeriodBounds</code> passe <code>{ startDate: coupure, endDate: '' }</code>, la fin se replie sur aujourd’hui — l’inversion est impossible.</li>
+      <li>Bornes égales : <code>&gt;</code> est strict, la période d’un jour est valide.</li>
+      <li>Export lancé malgré le refus : <code>filterByTimeWindow</code> ne retient aucune ligne (aucune date n’est à la fois <code>&gt;= startDate</code> et <code>&lt;= endDate</code>), et <code>joursCouverts</code> devient nul ou négatif.</li>
+    </ul>
+  </details>
+
+  <h3 id="rapport-bascules-proposees-masque-des-donnees-disponibles">Bascules proposées (masque des données disponibles)</h3>
+  <p>Cinq drapeaux décident si un carreau est rendu ; ils croisent l’activation du module et la présence de données sur la période filtrée.</p>
+  <pre><code>hasMealsData  = profile.foodTrackingEnabled   et filteredSavedMeals.length &gt; 0
+hasStepsData  = profile.stepsTrackingEnabled  et ∃ ligne de pas avec steps &gt; 0
+hasSportData  = profile.sportTrackingEnabled  et filteredSport.length &gt; 0
+hasSleepData  = profile.sleepTrackingEnabled  et filteredSleep.length &gt; 0
+hasMeTimeData = profile.meTimeTrackingEnabled et filteredMeTime.length &gt; 0
+hasSideEffectsData = isModuleOn(profile, 'symptoms') et filteredSideEffects.length &gt; 0</code></pre>
+  <p>La grille rend inconditionnellement les carreaux <code>weights</code>, <code>sideEffects</code> et <code>insolites</code> ; les cinq autres sont conditionnés par leur drapeau. <code>hasSideEffectsData</code> ne commande donc pas l’affichage du carreau des effets, seulement le masque. <code>isModuleOn</code> et non le drapeau nu : un drapeau absent vaut allumé.</p>
+  <p class="ancre">src/versions/mixte/components/MedicalReportExport.tsx, src/versions/mixte/app/navigation.ts</p>
+  <details><summary>Cas limites</summary>
+    <ul>
+      <li>Module des pas allumé mais tous les relevés à 0 : aucun carreau — le seuil est <code>&gt; 0</code>, pas la présence d’une ligne.</li>
+      <li>Un carreau qui disparaît ne décoche rien : la valeur reste dans <code>glow_report_include_v2</code> et reviendra sur une période où le module reparle.</li>
+    </ul>
+  </details>
+
+  <h3 id="rapport-masque-des-sections-dessinees">Masque des sections dessinées</h3>
+  <p>Une table <code>effective</code> est montée avant l’appel au constructeur, hors du <code>try</code> : la fiche d’échec doit pouvoir dire ce que le document tentait de dessiner. Elle croise la case cochée et la disponibilité.</p>
+  <pre><code>available = { weights: filteredWeights.length &gt; 0,
+              meals: hasMealsData, sideEffects: hasSideEffectsData,
+              steps: hasStepsData, sport: hasSportData, sleep: hasSleepData,
+              meTime: false, insolites: false }
+
+effective.weights     = selection.weights     et available.weights
+effective.meals       = selection.meals       et available.meals
+effective.sideEffects = selection.sideEffects et available.sideEffects
+effective.steps       = selection.steps       et available.steps
+effective.sport       = selection.sport       et available.sport
+effective.sleep       = selection.sleep       et hasSleepData
+effective.meTime      = selection.meTime      et hasMeTimeData
+effective.insolites   = selection.insolites</code></pre>
+  <p><code>available.meTime</code> vaut toujours faux : c’est ce qui écartait le temps pour soi du chemin d’export court, supprimé depuis. Le masque du sur-mesure passe donc par <code>hasMeTimeData</code>. Les équivalences insolites n’ont pas de masque : la case seule décide.</p>
+  <p class="ancre">src/versions/mixte/components/MedicalReportExport.tsx</p>
+  <details><summary>Cas limites</summary>
+    <ul>
+      <li>Module « symptômes » éteint : le carreau se coche, <code>effective.sideEffects</code> reste faux, la section III n’est jamais dessinée et l’annexe C non plus.</li>
+      <li>Le journal des prises n’est pas dans la table : il est toujours dessiné, quelles que soient les cases.</li>
+      <li>Une section dont le masque est vrai mais la liste vide se dessine tout de même avec sa phrase de repli (section II sans pesée, section III sans effet) — la section n’existe que si <code>include</code> le dit.</li>
+    </ul>
+  </details>
+
+  <h3 id="rapport-defauts-et-memorisation-des-choix-du-sur-mesure">Défauts et mémorisation des choix du sur-mesure</h3>
+  <p>L’état initial fusionne les défauts et ce qui est stocké, dans cet ordre, pour qu’un champ ajouté plus tard ne manque jamais d’une valeur déjà enregistrée.</p>
+  <pre><code>DEFAULT_INCLUDE = { weights: true, meals: true, sideEffects: true,
+                    steps: true, sport: true, sleep: true,
+                    meTime: false, insolites: true }
+
+include(initial) = { ...DEFAULT_INCLUDE, ...getItem(REPORT_INCLUDE_KEY) ?? {} }
+toggle(champ)    = next = { ...include, [champ]: !include[champ] }
+                   setInclude(next) ; setItem(REPORT_INCLUDE_KEY, next)</code></pre>
+  <p>L’écriture est dans le geste et non dans la fonction de mise à jour de l’état : sous <code>StrictMode</code>, celle-ci peut être appelée deux fois par rendu. La clé porte le suffixe <code>_v2</code> parce que les défauts ont changé le 2026‑08‑25 et qu’une valeur en base l’emporte toujours sur un défaut ; l’ancienne clé n’est ni lue ni effacée. Le niveau de détail alimentaire est la constante <code>DEFAULT_MEAL_DETAIL = 'repas'</code>, passée telle quelle à chaque export. <a href="spec-fonctionnelle.html#rapport-export-detaille-sur-mesure">→ fonctionnelle</a></p>
+  <p class="ancre">src/versions/mixte/components/MedicalReportExport.tsx</p>
+  <details><summary>Cas limites</summary>
+    <ul>
+      <li>Le type <code>MealDetailLevel</code> connaît trois niveaux (<code>jour</code>, <code>repas</code>, <code>aliment</code>) et le constructeur les traite tous les trois ; seul <code>repas</code> est atteignable depuis l’écran. <span class="marque non">non implémenté</span></li>
+      <li>Stockage illisible ou absent : les défauts s’appliquent entiers.</li>
+    </ul>
+  </details>
+
+  <h3 id="rapport-tirage-trois-palettes">Tirage : trois palettes</h3>
+  <p>Deux cases d’état local, jamais persistées : <code>customBW</code> à faux et <code>customThemeColors</code> à vrai au montage. Cocher l’une décoche l’autre ; les décocher toutes deux donne le neutre.</p>
+  <pre><code>palette = blackAndWhite ? BW_PALETTE
+        : themeColors   ? themeColorsPalette()
+        :                 NEUTRAL_PALETTE
+
+themeColorsPalette() =
+  getSelectedTheme('mixte') === 'coucher-de-soleil'
+    ? SUNSET_PALETTE
+    : buildThemeReportPalette(readThemeCssVars(#report-block ?? documentElement))</code></pre>
+  <p><code>BW_PALETTE</code> porte <code>patterned: true</code> : les barres du graphique de sommeil sortent alors hachurées de traits horizontaux au pas de 0,7 mm, contour compris, et les cinq encres nutritionnelles reviennent toutes au gris. Le choix du tirage est aussi la seule étape qui lise le DOM ; elle a son propre nom d’étape dans la fiche d’échec.</p>
+  <p class="ancre">src/versions/mixte/components/MedicalReportExport.tsx, src/versions/mixte/features/report/medicalReportPdf.ts, src/versions/mixte/features/report/themeReportPalette.ts</p>
+
+  <h3 id="rapport-nom-du-fichier">Nom du fichier</h3>
+  <pre><code>medicalReportFileName(periodStart, periodEnd) = `Bilan_GLP1_${periodStart}_${periodEnd}.pdf`</code></pre>
+  <p>Les deux bornes sont les chaînes <code>YYYY-MM-DD</code> effectives, sans reformatage : deux périodes différentes ne produisent jamais le même nom. L’appel est <code>doc.save(...)</code>, dans l’étape « enregistrement ».</p>
+  <p class="ancre">src/versions/mixte/features/report/medicalReportPdf.ts</p>
+  <div class="exemple"><p><code>Bilan_GLP1_2026-08-14_2026-09-12.pdf</code></p></div>
+
+  <h3 id="rapport-poids-de-repere-et-de-depart-du-document">Poids de repère et de départ du document</h3>
+  <p>Les deux poids de l’encart d’identité se lisent sur l’historique <em>complet</em>, pas sur la période : un bilan de sept jours doit dire où en est la patiente aujourd’hui, et la pesée de départ est presque toujours antérieure à la fenêtre choisie.</p>
+  <pre><code>latestWeight = weightHistory vide
+             ? getStartingWeight(weightHistory)                       // 0 par défaut
+             : [...weightHistory].sort(par date croissante) dernier élément → weight
+
+startingWeight = findStartingWeighIn(weightHistory)?.weight ?? 0
+startingDate   = findStartingWeighIn(weightHistory ?? weights)?.date, formatée JJ/MM/AAAA</code></pre>
+  <p>La pesée de départ se reconnaît au drapeau <code>isStartingWeight</code> et jamais à sa valeur : repasser par son poids de départ ne fait pas d’une pesée ordinaire un départ.</p>
+  <p class="ancre">src/versions/mixte/components/MedicalReportExport.tsx, src/shared/model/startingWeighIn.ts, src/versions/mixte/features/report/medicalReportPdf.ts</p>
+  <details><summary>Cas limites</summary>
+    <ul>
+      <li>Aucune pesée : <code>latestWeight</code> et <code>startingWeight</code> valent 0, l’encart imprime « 0 kg » et l’IMC devient 0 donc « Non calculable ».</li>
+      <li>Aucune pesée marquée départ : pas de date, donc « Poids de départ 96 kg » sans « le … », et le cartouche « Depuis le … » de la synthèse n’existe pas.</li>
+      <li>Tri par <code>localeCompare</code> sur la date seule : deux pesées du même jour se départagent par leur ordre dans le tableau, pas par l’heure.</li>
+    </ul>
+  </details>
+
+  <h3 id="rapport-succes-et-echec-d-export">Succès et échec d’export</h3>
+  <p>Le geste est asynchrone et enveloppé d’un <code>try / catch / finally</code>. Une variable <code>stage</code> avance au fil du travail : <code>preparation</code> (avant la première peinture), <code>palette</code>, <code>construction</code>, <code>enregistrement</code>.</p>
+  <pre><code>setGenerating(origin) ; setFailed(null) ; debut = Date.now()
+try   attendreUnePeinture() → stage='palette' → palette
+      stage='construction'  → doc = buildMedicalReportPdf(...)
+      terminerAttenteSommaire(panneau, Date.now() − debut)
+      stage='enregistrement' → doc.save(nom)
+      setDone(origin) ; setTimeout(() =&gt; setDone(null), 4000)
+catch console.error(e) ; setDone(null) ; setFailed(origin)
+      void recordReportExportFailure({ context, failure })
+finally reste = 450 − (Date.now() − debut) ; si reste &gt; 0 attendre ; setGenerating(null)</code></pre>
+  <p>Le message de réussite s’efface au bout de 4 s ; celui d’échec n’a pas de minuterie et ne part qu’au clic suivant, qui remet <code>failed</code> à <code>null</code>. Les deux ne cohabitent jamais : poser l’échec efface la réussite. La trace console reste et double le journal distant, seul témoin quand personne n’est connecté. <a href="spec-fonctionnelle.html#rapport-export-detaille-sur-mesure">→ fonctionnelle</a></p>
+  <p class="ancre">src/versions/mixte/components/MedicalReportExport.tsx, src/features/report/exportFailure.ts</p>
+  <details><summary>Cas limites</summary>
+    <ul>
+      <li>Un échec libère le bouton comme une réussite : le <code>finally</code> tient toujours le plancher de 450 ms.</li>
+      <li><code>stage</code> vaut <code>preparation</code> dans une fiche : la panne est dans l’attente de peinture elle-même.</li>
+      <li>L’envoi de la fiche n’est pas attendu (<code>void</code>) et ne peut pas lever : tout est avalé côté envoi.</li>
+    </ul>
+  </details>
+
+  <h3 id="rapport-fiche-d-echec-d-export">Fiche d’échec d’export</h3>
+  <p><code>buildReportExportFailure</code> est pure. Elle ne porte que des comptes et des bornes : aucun poids, aucune dose, aucun contenu de repas, aucune note, aucune date d’entrée de journal.</p>
+  <table>
+    <thead><tr><th>Champ</th><th>Règle</th></tr></thead>
+    <tbody>
+      <tr><td><code>kind</code></td><td>La constante <code>'echec-export-rapport'</code>.</td></tr>
+      <tr><td><code>errorName</code>, <code>errorMessage</code>, <code>errorStack</code></td><td><code>describeError</code> : une <code>Error</code> donne ses trois champs ; un objet qui lui ressemble donne les siens ou sa sérialisation sûre ; autre chose donne son <code>typeof</code> et son <code>String(...)</code>. Message tronqué à 1 000 caractères, pile à 4 000, suffixe « … (N caractères en tout) ». Replis « (sans message) », « (sans pile) ».</td></tr>
+      <tr><td><code>stage</code>, <code>stageLabel</code></td><td>L’étape et son nom lisible (<code>STAGE_LABEL</code>).</td></tr>
+      <tr><td><code>periodWindow</code>, <code>periodStart</code>, <code>periodEnd</code></td><td>La fenêtre et ses deux bornes effectives.</td></tr>
+      <tr><td><code>periodDays</code></td><td><code>daysBetween(start, end) + 1</code>, ou <code>null</code> si une borne ne respecte pas <code>^\d{4}-\d{2}-\d{2}$</code>.</td></tr>
+      <tr><td><code>selection</code>, <code>selected</code></td><td>Les huit cases telles que cochées, et la liste de celles à vrai dans l’ordre de déclaration.</td></tr>
+      <tr><td><code>effective</code>, <code>drawn</code></td><td>Idem après masquage.</td></tr>
+      <tr><td><code>volumes</code>, <code>volumesTotal</code></td><td>Onze comptes : <code>pesees</code>, <code>injections</code>, <code>repas</code>, <code>effetsSecondaires</code>, <code>journeesDePas</code>, <code>activites</code>, <code>nuitsEtSiestes</code>, <code>tempsPourSoi</code>, <code>alimentsPersonnalises</code>, <code>historiquePeseesComplet</code>, <code>historiquePrisesCompletes</code>, et leur somme.</td></tr>
+      <tr><td><code>palette</code></td><td><code>noir-et-blanc</code>, <code>couleurs-du-theme</code> ou <code>neutre</code>.</td></tr>
+      <tr><td><code>mealDetail</code></td><td>Toujours <code>repas</code> aujourd’hui.</td></tr>
+      <tr><td><code>elapsedMs</code></td><td><code>max(0, round(Date.now() − debut))</code>.</td></tr>
+    </tbody>
+  </table>
+  <p>La fiche est écrite sous <code>reportErrors/{uid}/failures</code> avec le contexte d’envoi partagé (version, page, thème, home, menu, jeu de polices, cadre et écran, langue du navigateur, fuseau, date locale, mode de compilation), puis un courrier est déposé au sujet « [GLP1LOW] ÉCHEC export rapport — {étape} — {email ou uid} ». Sans compte connecté, rien ne part. L’écriture et le courrier sont indépendants : une règle Firestore non déployée fait tomber la première sans emporter le second.</p>
+  <p class="ancre">src/features/report/exportFailure.ts, src/features/feedback/remoteSubmit.ts, src/features/feedback/submissionMail.ts, src/features/feedback/submissionContext.ts</p>
+  <div class="exemple"><p>Camille perd son export à la construction : <code>volumes</code> = {pesees 9, injections 4, repas 98, effetsSecondaires 6, journeesDePas 27, activites 6, nuitsEtSiestes 26, tempsPourSoi 3, …}, <code>volumesTotal</code> = leur somme, <code>periodDays</code> = 30, <code>palette</code> = <code>couleurs-du-theme</code>.</p></div>
+
+  <h3 id="rapport-attente-et-plancher-d-affichage">Attente et plancher d’affichage</h3>
+  <p>Le document se construit d’un bloc et prend le fil d’exécution : rien ne peut être peint pendant ce temps. Deux mécaniques encadrent donc le travail.</p>
+  <pre><code>attendreUnePeinture() = Promise résolue par
+    requestAnimationFrame(→ requestAnimationFrame(resolve))
+    ou setTimeout(resolve, 60)          // onglet caché : rAF ne se déclenche pas
+
+PLANCHER_MESSAGE_MS  = 450   // durée minimale de « Génération… », en sortie
+SEUIL_PANNEAU_MS     = 250   // délai d'apparition du panneau, en CSS
+ATTENTE_ACCELERATION = 6     // playbackRate quand le document est prêt en avance
+ATTENTE_MAX_MS       = 5000  // plafond de l'attente des animations
+SORTIE_MAX_MS        = 1200  // plafond de l'animation de sortie</code></pre>
+  <p><code>terminerAttenteSommaire(panneau, ecoule)</code>, appelée une fois le document construit et le fil rendu, tranche trois cas : <code>ecoule &lt; 250</code> — le panneau prend la classe <code>rme-som--muet</code> (<code>display:none</code>) et on rend la main ; mouvement réduit ou absence de <code>getAnimations</code> — on rend la main ; sinon on porte <code>playbackRate</code> à 6 sur les seules animations <code>rme-som-coche</code>, <code>rme-som-fenetre</code> et <code>rme-som-reste</code>, on attend leur fin au plus 5 000 ms, on pose <code>rme-som--fin</code>, puis on attend l’événement <code>animationend</code> de <code>rme-som-sortie</code> sur l’élément <code>.rme-som-liste</code> lui-même, au plus 1 200 ms. Le battement du curseur est infini et n’est jamais attendu. La fonction ne lève jamais : le document est construit, aucune raison d’affichage ne doit le perdre. Le panneau n’est monté que si au moins une ligne de sommaire existe. <a href="spec-fonctionnelle.html#rapport-panneau-d-attente">→ fonctionnelle</a></p>
+  <p class="ancre">src/versions/mixte/components/MedicalReportExport.tsx, src/index.css (jeu de règles <code>.rme-som-*</code>)</p>
+  <details><summary>Cas limites</summary>
+    <ul>
+      <li>Génération plus longue que l’animation : la coche de la dernière ligne n’a pas d’animation de départ (<code>rme-som-coche--dernier { animation:none; opacity:0 }</code>), elle ne vient pas, et son curseur bat indéfiniment ; les promesses attendues sont déjà résolues, on enchaîne sur la sortie.</li>
+      <li>Le filtre sur <code>e.target</code> et <code>e.animationName</code> est nécessaire : <code>animationend</code> remonte, et la première coche déclencherait le téléchargement au milieu de la sortie.</li>
+      <li>Le plancher de 450 ms retarde la remise à zéro du bouton, jamais le fichier : celui-ci est déjà enregistré.</li>
+      <li>La valeur 250 ms est écrite deux fois, ici et dans <code>--rme-som-seuil</code> : le CSS ne peut pas la lire du JS, et l’inverse coûterait un <code>getComputedStyle</code> au pire moment.</li>
+    </ul>
+  </details>
+
+  <h3 id="rapport-panneau-d-attente-en-mouvement-reduit">Panneau d’attente en mouvement réduit</h3>
+  <p>Deux volets, l’un en JavaScript, l’autre en CSS.</p>
+  <pre><code>mouvementReduit() = window.matchMedia('(prefers-reduced-motion: reduce)').matches
+  → terminerAttenteSommaire rend la main immédiatement, avant toute attente
+
+@media (prefers-reduced-motion: reduce) {
+  .rme-som, .rme-som *      { animation: none !important }
+  .rme-som-coche            { opacity: 1; transform: none }
+  .rme-som-coche--dernier   { opacity: 0 }
+  .rme-som-cur              { opacity: 0 }
+  .rme-som-cur--dernier     { opacity: 1 }
+}</code></pre>
+  <p>Le sommaire est donc posé coché d’emblée, la dernière coche absente, le curseur visible et immobile sur la dernière ligne. Le fichier part sans attendre ; seul le plancher de 450 ms du bouton subsiste, puisqu’il vit dans le <code>finally</code>.</p>
+  <p class="ancre">src/versions/mixte/components/MedicalReportExport.tsx, src/index.css</p>
+
+  <h3 id="rapport-pas-de-la-periode-avec-journee-en-cours-figee">Pas de la période, avec journée en cours figée</h3>
+  <p>Deux fonctions pures, et un <code>useState</code> dont l’initialiseur ne s’exécute qu’au premier rendu.</p>
+  <pre><code>todayStepsSnapshot(steps, today) = Σ steps des lignes dont date === today
+frozenTodaySteps = useState(() =&gt; todayStepsSnapshot(stepLogs, getLocalDateStr()))
+
+periodStepsTotal(lignesDeLaPeriode, today, frozenToday) :
+  total = Σ steps des lignes dont date ≠ today
+  hasToday = ∃ ligne dont date === today
+  → hasToday ? total + frozenToday : total
+
+distance_km = total × KM_PER_STEP        KM_PER_STEP = 0.00076</code></pre>
+  <p>Le carreau écrit le total par <code>formatNumber(total)</code> et la distance par <code>formatNumber(km, 1)</code> suivie de « km ». Changer de période recalcule le total sans jamais rafraîchir la journée en cours ; revenir sur la page en relève une neuve, la page étant montée à la demande. <a href="spec-fonctionnelle.html#rapport-sur-cette-periode">→ fonctionnelle</a></p>
+  <p class="ancre">src/features/report/periodSteps.ts, src/versions/mixte/components/MedicalReportExport.tsx, src/features/steps/steps.constants.ts</p>
+  <details><summary>Cas limites</summary>
+    <ul>
+      <li>Deux lignes à la même date : la photographie est une somme, pas la première valeur trouvée.</li>
+      <li>Période sans aujourd’hui : la valeur figée n’entre pas dans le total.</li>
+      <li>La journée en cours gagne des pas pendant la visite : le carreau ne bouge pas, mais la section IV du PDF, elle, moyenne les lignes filtrées à l’instant du clic.</li>
+    </ul>
+  </details>
+  <div class="exemple"><p>Camille arrive sur la page à 3 000 pas du jour. Total de la période : 191 520, distance <code>191520 × 0,00076 = 145,6</code> km. Elle marche encore 2 000 pas sans quitter la page : le carreau affiche toujours 191 520.</p></div>
+
+  <h3 id="rapport-journees-documentees-page-et-pdf">Journées documentées, page et PDF</h3>
+  <p>Deux comptes, même définition, dénominateurs différents. Sur la page, un <code>Set</code> de dates alimenté par les huit journaux filtrés, sans condition d’inclusion :</p>
+  <pre><code>dates ← injections, pesées, repas, effets, sport, sommeil (date de réveil), temps pour soi
+dates ← pas, seulement si steps &gt; 0
+daysCovered = dates.size</code></pre>
+  <p>Dans le PDF, le même <code>Set</code> mais filtré par <code>include</code> : les injections entrent toujours, chacun des sept autres journaux seulement si sa section est retenue. Le cartouche « jours documentés » de la synthèse en porte la taille. La date d’une nuit est celle du réveil, comme partout dans le domaine.</p>
+  <p class="ancre">src/versions/mixte/components/MedicalReportExport.tsx, src/versions/mixte/features/report/medicalReportPdf.ts</p>
+  <details><summary>Cas limites</summary>
+    <ul>
+      <li>Le compte de la page et celui du document divergent dès qu’une case est décochée — c’est voulu, ils ne répondent pas à la même question.</li>
+      <li>Un relevé de pas à 0 n’est pas une donnée : c’est ce que dit un podomètre éteint.</li>
+    </ul>
+  </details>
+
+  <h3 id="rapport-variation-de-poids-signee">Variation de poids signée</h3>
+  <p>Deux écritures, deux fichiers, une même règle d’arrondi et de signe.</p>
+  <pre><code>// page — src/features/home/homeOverview.ts
+signedKg(delta) = arrondi = parseFloat(delta.toFixed(1))
+                  arrondi &gt; 0 ? `+${arrondi}` : `-${|arrondi|}`
+
+// page — la valeur affichée
+perte    = première pesée − dernière pesée de la période (tri par date)
+affichage = signedKg(−perte) + ' kg'
+
+// PDF — src/versions/mixte/features/report/medicalReportPdf.ts
+signedKg(delta) = `${delta &lt;= 0 ? '−' : '+'}${|round1(delta)|} kg`
+periodDelta = dernière pesée − première pesée de la période (tri date puis heure)</code></pre>
+  <p>La version du document écrit le moins typographique U+2212, qui s’aligne sur le « + », et porte l’unité ; celle de la page écrit le trait d’union ASCII et l’unité est ajoutée par le gabarit. Dans les deux, zéro donne « -0 kg » ou « −0 kg » : le signe est toujours écrit, ce qui garde la colonne alignée avec les périodes où l’on a perdu.</p>
+  <p class="ancre">src/features/home/homeOverview.ts, src/versions/mixte/components/MedicalReportExport.tsx, src/versions/mixte/features/report/medicalReportPdf.ts</p>
+  <details><summary>Cas limites</summary>
+    <ul>
+      <li>Aucune pesée sur la période : le carreau « Sur la période » n’existe pas ; le cartouche « Variation période » de la synthèse s’imprime avec un tiret.</li>
+      <li>Une seule pesée : première et dernière sont la même, la variation vaut « −0 kg ».</li>
+      <li>Le tri de la page est <code>date.localeCompare</code> seul ; celui du PDF est <code>byDateTimeAsc</code>, date puis heure.</li>
+    </ul>
+  </details>
+  <div class="exemple"><p>Camille : première pesée 87,4 kg le 14/08, dernière 85,6 kg le 12/09. Page : <code>perte = 1,8</code>, affichage <code>signedKg(−1,8) = « -1.8 » + « kg »</code>. PDF : <code>periodDelta = −1,8</code>, « −1.8 kg ».</p></div>
+
+  <h3 id="rapport-imc-et-reste-a-l-objectif">IMC et reste à l’objectif</h3>
+  <pre><code>bmi = profile.height &gt; 0 ? latestWeight / (profile.height / 100)² : 0
+IMC affiché = bmi &gt; 0 ? `${round1(bmi)} kg/m²` : 'Non calculable'
+
+totalLoss        = startingWeight − latestWeight
+Variation totale = signedKg(−totalLoss)                     // U+2212, unité comprise
+Reste à l'objectif = `${max(0, round1(latestWeight − profile.targetWeight))} kg`
+
+round1(n) = Math.round(n × 10) / 10</code></pre>
+  <p>Les quatre valeurs lisent <code>latestWeight</code>, donc l’historique complet, jamais la période. La taille est en centimètres en base et divisée par 100 à l’usage. Le cartouche « Depuis le {date} » de la synthèse réutilise exactement <code>signedKg(−totalLoss)</code> : deux tuiles voisines ne peuvent pas se contredire d’un dixième. <a href="spec-fonctionnelle.html#rapport-pdf-bandeau-et-identite">→ fonctionnelle</a></p>
+  <p class="ancre">src/versions/mixte/features/report/medicalReportPdf.ts</p>
+  <details><summary>Cas limites</summary>
+    <ul>
+      <li>Taille nulle ou absente : <code>bmi = 0</code>, « Non calculable ».</li>
+      <li>Objectif dépassé : <code>max(0, …)</code> écrit « 0 kg », jamais un reste négatif.</li>
+      <li>Le genre écrit « Féminin » pour <code>femme</code>, « Non précisé » pour <code>neutre</code>, « Masculin » pour toute autre valeur, y compris absente.</li>
+    </ul>
+  </details>
+  <div class="exemple"><p>Camille, 85,6 kg, 168 cm : <code>85,6 / 1,68² = 30,33…</code> → « 30.3 kg/m² ». Départ 96 kg : <code>totalLoss = 10,4</code>, « −10.4 kg ». Objectif 72 kg : <code>max(0, 13,6)</code> → « 13.6 kg ».</p></div>
+
+  <h3 id="rapport-forme-du-traitement-et-premiere-prise">Forme du traitement et première prise</h3>
+  <pre><code>treatment = getTreatment(profile.glp1Brand)      // catalogue ; repli sur le traitement par défaut
+oral      = treatment.form === 'oral'
+libellé   = `${treatment.name} (${oral ? 'comprimé' : 'injection'})`
+
+série     = currentTreatmentSeries(injectionHistory ?? injections, profile.glp1Brand)
+première  = série.injections[0]
+sous-ligne = première ? `1re ${oral ? 'prise' : 'injection'} le ${JJ/MM/AAAA}` : absente</code></pre>
+  <p>La forme se lit dans le catalogue, jamais par correspondance de sous-chaîne sur le nom. <code>currentTreatmentSeries</code> écarte d’abord les prises non survenues (<code>hasOccurred</code> : date antérieure à aujourd’hui, ou aujourd’hui avec une heure déjà passée), trie par <code>date + 'T' + time</code>, puis remonte depuis la fin tant que le traitement de la ligne est celui du profil — un changement de traitement est une coupure, donc « si interruption, date de reprise ». Une ligne sans marque de traitement est réputée du traitement courant. Le même mot commande les libellés « Injections » / « Prises », « Entre 2 injections » / « Entre 2 prises », le titre de l’annexe A et la rubrique du carnet.</p>
+  <p class="ancre">src/versions/mixte/features/report/medicalReportPdf.ts, src/features/home/homeOverview.ts, src/shared/medication/treatment.catalog.ts</p>
+  <details><summary>Cas limites</summary>
+    <ul>
+      <li>Dernière ligne d’un autre traitement : la série est vide, pas de sous-ligne.</li>
+      <li>Prise saisie en avance : écartée par <code>hasOccurred</code>, elle ne peut pas devenir la première prise.</li>
+      <li>Le titre de l’annexe A suit la cure <em>actuelle</em> ; le journal, lui, garde les prises passées quelle qu’ait été leur forme.</li>
+    </ul>
+  </details>
+  <div class="exemple"><p>Camille : « Ozempic (injection) », sous-ligne « 1re injection le 05/05/2026 », prise lue sur l’historique complet bien que la période commence le 14/08.</p></div>
+
+  <h3 id="rapport-formats-de-nombres-du-document">Formats de nombres du document</h3>
+  <p>Un seul formateur commun, et des chaînes composées en direct qui ne passent pas par lui.</p>
+  <pre><code>frNumber(n)  = formatNumber(n)      // milliers séparés par U+00A0, décimale au POINT,
+                                    // zéros de queue supprimés, '' si non fini
+frDecimal(n) = formatNumber(n, 1)
+round1(n)    = Math.round(n × 10) / 10
+approx(v)    = `≈ ${v}`             // ≈ = U+2248
+cleanType(t) = t.replace(/^[^a-zA-ZÀ-ÿ]+/, '').trim()   // retire l'emoji de tête</code></pre>
+  <p>Passent par <code>frNumber</code> : les pas de la section IV et de l’annexe E, les kcal d’une case de calendrier, les kcal d’une séance dans le carnet, les pas d’une journée du carnet, les moyennes de la synthèse. N’y passent pas, et n’ont donc pas de séparateur de milliers : « Durée totale » de la section IV (<code>`${totalMin} min`</code>), la taille (<code>`${profile.height} cm`</code>) et les trois poids de l’encart d’identité (<code>`${latestWeight} kg`</code> et ses jumeaux). Le garde-fou <code>reportFontMissingChars</code> vérifie que tout caractère imprimé appartient au répertoire embarqué.</p>
+  <p class="ancre">src/shared/number/number.format.ts, src/versions/mixte/features/report/reportCalendar.ts, src/versions/mixte/features/report/reportSummary.ts, src/versions/mixte/features/report/medicalReportPdf.ts</p>
+  <details><summary>Cas limites</summary>
+    <ul>
+      <li>L’espace fine insécable U+202F, employée par <code>toLocaleString('fr-FR')</code>, n’est pas dans la police embarquée : le site entier écrit U+00A0, que la police dessine.</li>
+      <li>Un poids stocké à 85,55 s’imprime « 85.55 kg » dans l’encart d’identité — <code>latestWeight</code> n’y est pas arrondi — mais « 85.6 » dans une case de calendrier, qui passe par <code>round1</code>.</li>
+      <li><code>frNumber</code> d’un nombre non fini rend une chaîne vide.</li>
+    </ul>
+  </details>
+
+  <h3 id="rapport-police-embarquee-en-sous-ensemble">Police embarquée en sous-ensemble</h3>
+  <p>Plus Jakarta Sans (SIL OFL 1.1), la <code>--font-sans</code> du site, sous le nom <code>REPORT_FONT = 'PlusJakartaSans'</code>. <code>registerReportFont(doc)</code> verse trois graisses — normal, gras, italique — dans le système de fichiers virtuel de l’instance (<code>addFileToVFS</code> puis <code>addFont</code>), une fois, juste après <code>new jsPDF()</code> et avant le premier <code>setFont</code>.</p>
+  <pre><code>coupe du dépôt : 349 points de code, 3 graisses,
+                 71 392 octets de TTF, 95 192 caractères de base64
+                 (scripts/build-report-font.mjs → reportFont.data.ts)
+seconde coupe  : jsPDF n'embarque dans le fichier que les glyphes employés
+reportFontCovers(cp)        = ∃ [from, to] ∈ REPORT_FONT_RANGES : from ≤ cp ≤ to
+reportFontMissingChars(txt) = les points de code de txt non couverts, sans doublon</code></pre>
+  <p>La police est un module du dépôt : la génération n’ouvre aucune connexion. L’embarquement fait passer l’écriture en Identity‑H / CIDFontType2 et lève la limite WinAnsi des polices standard : le « ≈ » (U+2248), le moins typographique (U+2212), le demi-cadratin des calendriers (U+2013) et la flèche des nuits s’impriment. La lecture se fait par point de code (<code>for…of</code>) : une paire de substitution compte pour un caractère manquant. Le document est ouvert avec <code>{ compress: true }</code>.</p>
+  <p class="ancre">src/versions/mixte/features/report/reportFont.ts, src/versions/mixte/features/report/reportFont.data.ts</p>
+
+  <h3 id="rapport-sauts-de-page">Sauts de page</h3>
+  <p>Un seul curseur vertical <code>y</code>, et une seule primitive : <code>ensure(h)</code> ouvre une page si <code>y + h &gt; BOTTOM</code>.</p>
+  <pre><code>PAGE_W 210   PAGE_H 297   M 16   CONTENT_W 178
+BANNER_H 36  TOP_FIRST 48 (= 36 + 12)  TOP_NEXT 26  BOTTOM 272
+
+réservations : titre de section 34 · titre d'annexe 26 · chapitre 30
+               date de journée 20 · intitulé de rubrique 9
+               paragraphe 5 par ligne · rangée de cartouches 20 (16 + 4)
+               encart d'identité hauteur + 2 · tableau 6 + 2 × 5,2
+ouverture d'une page neuve : chapitre « Annexes » si BOTTOM − y &lt; 70
+                             « Détails des journées » si BOTTOM − y &lt; 60</code></pre>
+  <p>Une rangée de cartouches et une rangée de cartes de calendrier sont réservées d’un bloc : ni l’une ni l’autre n’est jamais coupée. <code>newPage</code> redessine l’en-tête courant à <code>y = 16</code>, un filet à 18,5 mm, et repart à <code>TOP_NEXT</code>. L’en-tête d’un tableau se redessine à chaque page ; le pied de page et la pagination sont posés en dernière passe, une fois <code>doc.getNumberOfPages()</code> connu.</p>
+  <p class="ancre">src/versions/mixte/features/report/medicalReportPdf.ts</p>
+
+  <h3 id="rapport-jours-couverts">Jours couverts</h3>
+  <pre><code>DAY_MS = 86 400 000
+daysBetween(from, to) = Math.round((Date.parse(to) − Date.parse(from)) / DAY_MS)
+joursCouverts = daysBetween(periodStart, periodEnd) + 1
+accord : joursCouverts &gt; 1 → pluriel</code></pre>
+  <p>Les bornes sont comprises : du 12 au 12 fait un jour. La valeur sert au titre de la section I, au cartouche « jours couverts », au diviseur de l’activité hebdomadaire et au champ <code>periodDays</code> de la fiche d’échec. <code>Date.parse</code> lit ces chaînes en UTC, ce qui rend la soustraction indifférente au fuseau ; l’arrondi absorbe les changements d’heure. <a href="spec-fonctionnelle.html#rapport-pdf-i-synthese">→ fonctionnelle</a></p>
+  <p class="ancre">src/versions/mixte/features/report/medicalReportPdf.ts, src/features/report/exportFailure.ts</p>
+  <div class="exemple"><p>Camille : du 2026‑08‑14 au 2026‑09‑12, <code>daysBetween = 29</code>, donc « 30 jours ».</p></div>
+
+  <h3 id="rapport-rangees-de-cartouches-de-la-synthese">Rangées de cartouches de la synthèse</h3>
+  <p>Les cartouches sont montés par groupes thématiques — suivi, poids, alimentation, tolérance, sommeil, activité — et poussés entiers dans une liste de rangées.</p>
+  <pre><code>LIGNE_MAX = 5
+pousser(groupe, fermee = false) :
+  si groupe vide → rien
+  pour chaque morceau de 5 cases du groupe :
+    derniere = rangées[dernier]
+    si derniere existe et non fermée et derniere.cells.length + morceau.length ≤ 5
+       → derniere.cells.push(...morceau)
+    sinon → rangées.push({ cells: morceau, fermee })</code></pre>
+  <p>Seul le groupe poids est poussé avec <code>fermee = true</code> : sa légende la plus longue, « PERDUS / SEM. (POIDS D’ENTRÉE) », mesure 38,3 mm à 6,5 pt, ce qui tient dans une case de quatre par rangée (39,3 mm) et pas dans une case de cinq (30,2 mm) — <code>fit</code> la couperait par des points de suite. Une grandeur nulle ne produit pas de case. Chaque case fait 16 mm de haut, la gouttière 3 mm, la largeur se répartit également.</p>
+  <p class="ancre">src/versions/mixte/features/report/medicalReportPdf.ts</p>
+  <details><summary>Cas limites</summary>
+    <ul>
+      <li>Un groupe de plus de cinq cases se coupe en morceaux de cinq ; le cas ne se présente pas avec les groupes actuels.</li>
+      <li>Une case peut porter deux valeurs empilées (« Par jour », « Fibres / jour », « Protéines / jour ») : la hauteur ne change pas, les deux valeurs sont écrites à 9 pt au lieu de 13.</li>
+    </ul>
+  </details>
+
+  <h3 id="rapport-intervalle-entre-deux-prises">Intervalle entre deux prises</h3>
+  <pre><code>injectionIntervalDays(history) :
+  dates = Set des dates des prises SURVENUES (hasOccurred), triées
+  si dates.length &lt; 2 → null
+  ecart = daysBetween(dates[0], dates[dernier])
+  si ecart ≤ 0 → null
+  → ecart / (dates.length − 1)
+
+affichage : approx(`${frDecimal(valeur)} j`)   → « ≈ 7 j »</code></pre>
+  <p>L’entrée est <code>opts.injections</code>, donc les prises de la période et non l’historique complet. Ce sont des <em>journées</em> de prise qui comptent : deux prises le même jour ne font qu’un point. Le libellé suit la forme du traitement.</p>
+  <p class="ancre">src/features/injections/injections.utils.ts, src/versions/mixte/features/report/medicalReportPdf.ts</p>
+  <details><summary>Cas limites</summary>
+    <ul>
+      <li>Une seule journée de prise : pas de cartouche.</li>
+      <li>Deux prises le même jour et rien d’autre : <code>dates.length = 1</code>, pas de cartouche.</li>
+      <li>Prises futures dans la période : écartées, elles n’allongent pas l’intervalle.</li>
+    </ul>
+  </details>
+  <div class="exemple"><p>Camille, injections des 16, 23, 30/08 et 06/09 : <code>daysBetween(16/08, 06/09) = 21</code>, <code>21 / 3 = 7</code> → « ≈ 7 j ».</p></div>
+
+  <h3 id="rapport-pourcentage-de-poids-perdu-par-semaine">Pourcentage de poids perdu par semaine <span class="marque">arbitrage non validé</span></h3>
+  <p>La seule grandeur propre au document, empilée sur deux briques du domaine.</p>
+  <pre><code>weeklyLossPercent(weights, periodStart, periodEnd) :
+  points = computeWeeklyLoss(weights, { startDate: periodStart, endDate: periodEnd })
+  resume = periodLossSummary(points)
+  si resume absent ou resume.pctOfStart null ou points vide → null
+  → Math.round((resume.pctOfStart / points.length) × 100) / 100
+
+computeWeeklyLoss : une pesée par jour (la dernière), semaines de 7 jours ancrées
+  sur periodStart, poids d'un jour sans pesée obtenu par interpolation linéaire
+  entre les deux pesées qui l'encadrent, plat avant la première et après la dernière ;
+  totalWeeks = max(1, ceil(totalDays / 7))
+periodLossSummary : totalKg = Σ des pertes hebdomadaires
+  startWeight = points[0]['Poids moyen (kg)'] + points[0]['Perte moyenne (kg)']
+  pctOfStart  = startWeight &gt; 0 ? (totalKg / startWeight) × 100 à 0,1 : null</code></pre>
+  <p>La référence est le poids d’<em>entrée de période</em>, pas le poids de départ de la cure : c’est celle qu’emploie déjà le bandeau de l’histogramme de perte, et la section s’intitule « Synthèse du … au … ». Le libellé du cartouche le dit. Conséquence assumée du découpage : une période de 30 jours compte cinq semaines dont une partielle, et le diviseur est ce nombre de semaines affichées.</p>
+  <p class="ancre">src/versions/mixte/features/report/reportSummary.ts, src/features/weight/weight.utils.ts</p>
+  <details><summary>Cas limites</summary>
+    <ul>
+      <li>Aucune pesée : <code>computeWeeklyLoss</code> rend une liste vide, donc <code>null</code>, donc pas de cartouche.</li>
+      <li>Poids d’entrée nul ou négatif : <code>pctOfStart</code> vaut <code>null</code>, pas de cartouche.</li>
+      <li>Le découpage change avec la période : deux périodes différentes ne découpent pas les mêmes semaines.</li>
+    </ul>
+  </details>
+  <div class="exemple"><p>Camille : 1,8 kg perdus sur un poids d’entrée de 87,4 kg → <code>pctOfStart ≈ 2,1</code> ; cinq semaines affichées → <code>round(2,1 / 5 × 100) / 100 = 0,42</code> → « ≈ 0.4 % ».</p></div>
+
+  <h3 id="rapport-moyennes-alimentaires-et-part-de-la-recommandation">Moyennes alimentaires et part de la recommandation</h3>
+  <pre><code>mealDailyAverages(meals) :
+  parJour = mealsByDate(meals) ; jours = parJour.size ; si 0 → null
+  pour chaque journée : repas += dayMealCounts.repas ; encas += dayMealCounts.snacks
+                        calories, protein, fiber += nutritionTotalsOn(lignes, date)
+  → { jours, repas/jours, encas/jours, calories/jours, protein/jours, fiber/jours }
+
+dailyNutritionGoals(profile, latestWeight) :
+  calories = profile.dailyCaloriesGoal ?? 1400
+  protein  = profile.dailyProteinGoal  ?? Math.round(latestWeight × 1.5)
+  fiber    = profile.dailyFiberGoal    ?? 25
+
+goalPercent(valeur, objectif) = objectif fini et &gt; 0 ? Math.round(valeur / objectif × 100) : null</code></pre>
+  <p>Le dénominateur est le nombre de <em>journées renseignées</em>, jamais les jours de la période : une journée non saisie est une donnée manquante, pas un zéro. Est un en-cas toute ligne que <code>mealTypeLabel</code> nomme « En-cas » — <code>snack</code>, <code>snacks</code> et les types inconnus des anciennes sauvegardes ; tout le reste est un repas. Le poids de référence des protéines est <code>latestWeight</code>, celui de l’encart d’identité. Les quatre cartouches s’écrivent <code>approx(...)</code> ; les parts de recommandation vont en seconde valeur de tuile, « N % de la reco ».</p>
+  <p class="ancre">src/features/meal-journal/mealAverages.ts, src/features/meal-journal/mealCalendar.ts, src/features/home/homeOverview.ts, src/versions/mixte/features/report/medicalReportPdf.ts</p>
+  <details><summary>Cas limites</summary>
+    <ul>
+      <li>Objectif nul ou non fini : pas de seconde ligne, la tuile n’écrit que la valeur.</li>
+      <li>Aucun repas sur la période : <code>mealDailyAverages</code> rend <code>null</code>, le groupe alimentation est vide et ne pousse aucune rangée.</li>
+      <li>Les kcal passent par <code>frNumber</code>, les grammes par <code>Math.round</code> nu.</li>
+    </ul>
+  </details>
+  <div class="exemple"><p>Camille, 85,6 kg, sans objectif protéique au profil : <code>round(85,6 × 1,5) = 128 g</code>. Moyenne 92 g → <code>round(92 / 128 × 100) = 72</code> → « 72 % de la reco ».</p></div>
+
+  <h3 id="rapport-paliers-de-severite-d-un-effet">Paliers de sévérité d’un effet <span class="marque">arbitrage non validé</span></h3>
+  <pre><code>daySeverityTier(logs) : max = plus grande severity de la liste
+                        → max &gt; 3 ? 'severe' : max &gt; 1 ? 'modere' : 'leger'
+
+severityTierCounts(history) : compteurs { leger, modere, severe }
+                              pour chaque effet : counts[daySeverityTier([effet])] += 1
+
+daySeverityWord(logs) = mot du palier du jour, au pluriel si logs.length &gt; 1</code></pre>
+  <p>Deux échelles de lecture cohabitent et ne se confondent pas : le cartouche de la synthèse compte <em>chaque effet</em> (<code>severityTierCounts</code> passe une liste d’un élément), tandis que la case du calendrier de l’annexe C peint la <em>journée</em> par son pire effet. Une journée portant une nausée à 1 et un vertige à 5 vaut un léger et un sévère dans la synthèse, et s’écrit « sévères » dans la case. La troisième tuile de la synthèse est celle des légers : la demande nommait deux fois « modérés » pour trois tuiles, et le domaine ne connaît que trois paliers.</p>
+  <p class="ancre">src/features/side-effects/sideEffectCalendar.ts, src/versions/mixte/features/report/medicalReportPdf.ts</p>
+  <details><summary>Cas limites</summary>
+    <ul>
+      <li>Une sévérité de 0 tombe dans « léger » avec le 1 : l’échelle réelle part de 0.</li>
+      <li>Le groupe tolérance n’est poussé que si <code>include.sideEffects</code> et au moins un effet.</li>
+      <li>Le pluriel du mot dit le nombre d’effets, pas leur intensité : deux effets légers donnent « légers ».</li>
+    </ul>
+  </details>
+  <div class="exemple"><p>Camille, 6 déclarations : quatre nausées (1, 2, 3, 3) et deux fatigues (2, 2) → 1 léger, 5 modérés, 0 sévère.</p></div>
+
+  <h3 id="rapport-sommeil-moyennes-et-graphe">Sommeil : moyennes et graphe</h3>
+  <p>Trois lectures distinctes, toutes tirées des briques du domaine : la durée d’une entrée n’est jamais stockée, elle se déduit de <code>bedDate</code>+<code>bedTime</code> et <code>date</code>+<code>time</code>.</p>
+  <pre><code>// cartouche « Nuit / jour » de la synthèse — nuits seules
+nightMinutesDailyAverage(logs) :
+  dates = Set des dates des entrées kind === 'nuit'
+  durees = pour chaque date, nightMinutesOn(logs, date), gardée si &gt; 0
+  → durees vide ? null : moyenne(durees)
+
+// cartouches de la section V — nuits ET siestes
+sleepSummary(logs) :
+  parJour = logs groupés par date
+  durees  = sleepDayMinutes(liste) par date, gardée si &gt; 0
+  days = durees.length ; totalMinutes = Σ durees
+  meanMinutes = durees vide ? 0 : Math.round(total / durees.length)
+  nights / naps = nombre d'entrées du genre dont sleepLogMinutes &gt; 0
+  quality = weightedQuality(logs)
+  longestMinutes / shortestMinutes = max / min des durees, 0 si vide
+
+weightedQuality(logs) = Σ(durée × quality) / Σ(durée), arrondi à 0,1 ; null si Σdurée = 0
+
+// points du graphe
+sleepChartPoints(days) : pour chaque journée du carnet portant au moins une entrée
+  minutes = sleepDayMinutes ; si ≤ 0 → écartée
+  hours   = Math.round(minutes / 60 × 10) / 10
+  quality = weightedQuality(entrées du jour)     // null possible
+  tri par date croissante
+
+// échelles du graphe
+yMaxH = Math.max(5, Math.ceil(maxHours / 5) × 5)   // 5 intervalles
+QUALITY_MAX = 5                                    // fixe, jamais ajustée
+barW = Math.max(1.2, Math.min(5, plotW / (spanDays + 1)))</code></pre>
+  <p>La moyenne se fait sur les journées dormies, jamais sur les jours de la période. La courbe de qualité se coupe sur un point à <code>quality</code> nulle plutôt que d’enjamber : relier ses deux voisines dessinerait une note qui n’a pas été donnée. Les points viennent des journées déjà rangées par <code>groupReportDays</code> : le graphe, l’annexe F et le carnet lisent les mêmes nuits. <a href="spec-fonctionnelle.html#rapport-pdf-v-sommeil-et-temps-pour-soi">→ fonctionnelle</a></p>
+  <p class="ancre">src/features/sleep/sleep.utils.ts, src/features/sleep/sleepCalendar.ts, src/versions/mixte/features/report/reportWellbeing.ts, src/versions/mixte/features/report/medicalReportPdf.ts</p>
+  <details><summary>Cas limites</summary>
+    <ul>
+      <li>Que des siestes sur la période : « Nuit / jour » est <code>null</code> et le cartouche n’existe pas, mais la section V garde ses quatre cartouches.</li>
+      <li>Qualité indéfinie sur toute la période : « Qualité moyenne » s’imprime « - ».</li>
+      <li>Une nuit de 20 h de sommeil : <code>yMaxH = 20</code>, l’échelle reste sur des heures entières ; deux courtes nuits ne montent pas en montagnes, le plancher est 5 h.</li>
+      <li>Le centre d’une barre est rabattu dans <code>[plotX + barW/2, plotX + plotW − barW/2]</code> : une nuit au premier ou au dernier jour ne recouvre pas les graduations.</li>
+    </ul>
+  </details>
+  <div class="exemple"><p>Camille, nuit de 8 h notée 5 et sieste d’1 h notée 1 le même jour : <code>sleepDayMinutes = 540</code> → 9 h, <code>weightedQuality = (480×5 + 60×1) / 540 = 4,55…</code> → 4,6.</p></div>
+
+  <h3 id="rapport-activite-par-semaine-dans-le-document">Activité par semaine dans le document <span class="marque">arbitrage non validé</span></h3>
+  <pre><code>sportWeeklyAverages(sports, { fenetre: joursCouverts, taireSousUneSemaine: false }) :
+  parJour = sportsByDate(logs) ; si vide → null
+  jours   = Math.max(1, fenetre)
+  minutes = Σ sportDayMinutes(journée)     // les étages de « Montée escaliers » convertis
+  total   = nombre de séances
+  semaines = jours / 7
+  → { minutes: minutes / semaines, seances: total / semaines, total, jours }
+
+cartouches : approx(`${Math.round(minutes)} min`) et chiffre(total, "séance d'activité")</code></pre>
+  <p>Le diviseur est la période, pas les journées de sport : la question posée est combien de minutes une semaine ordinaire a portées, semaines sans séance comprises. C’est la seule moyenne du document dont le dénominateur n’est pas le nombre de journées renseignées. Le seuil habituel des sept jours est explicitement désactivé : la période est écrite dans le titre de la section, et une ligne qui disparaîtrait sans explication d’un rapport médical serait pire qu’une moyenne courte. Le total de séances n’est pas une moyenne et ne porte donc pas le « ≈ ».</p>
+  <p class="ancre">src/features/sport/sportAverages.ts, src/versions/mixte/features/report/medicalReportPdf.ts</p>
+  <details><summary>Cas limites</summary>
+    <ul>
+      <li>Aucune séance : <code>null</code>, ni cartouche de minutes ni cartouche de séances.</li>
+      <li>Période d’un jour : <code>semaines = 1/7</code>, les minutes sont multipliées par sept.</li>
+      <li><code>seances</code> est calculé mais n’est pas imprimé ; le document écrit <code>total</code>.</li>
+    </ul>
+  </details>
+
+  <h3 id="rapport-decoupage-d-une-valeur-de-mini-tuile">Découpage d’une valeur de mini-tuile</h3>
+  <p>Le document fabrique ses valeurs en chaînes complètes bien avant de savoir comment elles seront dessinées ; le découpage se fait donc à l’affichage.</p>
+  <pre><code>FIGURE_RE = /^\s*(≈\s*)?([+−\-]?\d[\d\s.,]*(?:h\d{1,2})?)\s*(.*)$/u
+
+splitFigureValue(raw) :
+  pas de correspondance → { prefixe: '', valeur: raw.trim(), unite: '' }
+  sinon → { prefixe: m[1] ? '≈' : '', valeur: m[2].trim(), unite: m[3].trim() }
+
+dessin : nombre en gras à `size`, préfixe et unité à 0,7 × size, même ligne de base,
+         l'ensemble centré ; espace avant l'unité SAUF si elle commence par '/'
+         le nombre se coupe par `fit`, jamais l'unité</code></pre>
+  <p>Font partie du nombre : un signe éventuel, les chiffres, l’espace des milliers, la virgule ou le point décimal, et le <code>h</code> des durées, qui est un séparateur et non une unité. Le « ≈ » n’est posé que par les cartouches de la section I : les sections IV et V écrivent leurs moyennes nues.</p>
+  <p class="ancre">src/versions/mixte/features/report/medicalReportPdf.ts</p>
+  <details><summary>Cas limites</summary>
+    <ul>
+      <li>« ≈ 8h05 » → prefixe « ≈ », valeur « 8h05 », unité vide.</li>
+      <li>« 55 % de la reco » → valeur « 55 », unité « % de la reco ».</li>
+      <li>« 3/5 » → valeur « 3 », unité « /5 », collée sans espace.</li>
+      <li>« - » (valeur absente) ne commence pas par un chiffre : il reste entier dans <code>valeur</code>, en gros, plutôt que d’être coupé en deux.</li>
+    </ul>
+  </details>
+
+  <h3 id="rapport-graphique-poids-doses">Graphique poids / doses</h3>
+  <pre><code>chartH 46   gutter 13   4 intervalles de grille
+spanDays = Math.max(1, daysBetween(periodStart, periodEnd))
+xForDate(d) = plotX + clamp(daysBetween(periodStart, d) / spanDays, 0, 1) × plotW
+
+// échelle des poids
+minW, maxW sur les pesées de la période (à défaut startingWeight)
+wDiff = maxW − minW
+yMinW = Math.max(0, minW − (wDiff &gt; 0 ? wDiff × 0.3 : 3))
+yMaxW = maxW + (wDiff &gt; 0 ? wDiff × 0.3 : 3)
+
+// échelle des doses
+yMaxDose = (doses non vides ? max(doses) : 1) × 1.3
+
+// anneaux de pesée, dix au plus
+clesTemps = pesées triées → daysBetween(periodStart, date) + rang × 1e-6
+reperes   = selectionnerReperesPesee(clesTemps)     // dix instants équirépartis,
+                                                    // la pesée réelle la plus proche
+// palier de dose
+prises triées par date ; pour chaque paire : segment horizontal jusqu'à la prise
+suivante, puis segment vertical si la dose change ; dernier palier tenu jusqu'à
+plotX + plotW ; rien avant la première prise
+// repères de dates
+tickCount = Math.min(6, spanDays + 1) ; offset_i = round(spanDays × i / (tickCount − 1))</code></pre>
+  <p>L’aire sous la courbe est un chemin fermé unique — deux formes adjacentes laisseraient un liseré clair à l’anticrénelage — et se dessine avant le palier de dose, qu’un aplat opaque effacerait sinon. L’anneau « Jour » n’entre dans la légende que si le nombre de pesées est strictement inférieur à dix ; la pastille « Jour de prise » seulement s’il y a au moins une prise. <a href="spec-fonctionnelle.html#rapport-pdf-ii-poids-et-doses">→ fonctionnelle</a></p>
+  <p class="ancre">src/versions/mixte/features/report/medicalReportPdf.ts, src/shared/charts/weighInMarkers.ts</p>
+  <details><summary>Cas limites</summary>
+    <ul>
+      <li>Une seule pesée, ou toutes au même poids : <code>wDiff = 0</code>, l’échelle vaut ±3 kg autour de la valeur, plancher 0.</li>
+      <li>Aucune prise : <code>yMaxDose = 1,3</code>, aucun pointillé, aucune pastille, la légende garde l’entrée « Dose GLP-1 (mg) ».</li>
+      <li>Deux pesées le même jour : le millionième ajouté par rang les départage, sans quoi <code>selectionnerReperesPesee</code> les confondrait.</li>
+      <li>Plus de dix pesées : exactement dix anneaux, extrémités comprises ; le tracé, lui, passe toujours par toutes les pesées.</li>
+      <li>Une date hors bornes est rabattue à 0 ou 1 par le <code>clamp</code>.</li>
+    </ul>
+  </details>
+
+  <h3 id="rapport-equivalence-insolite-dans-le-pdf">Équivalence insolite dans le PDF</h3>
+  <pre><code>si include.insolites et delta &lt; 0 :
+   paragraphe italique gris : `Soit l’équivalent de : ${getLudicEquivalence(−delta)}.`
+   delta = periodDelta ?? 0 = dernière pesée − première pesée de la période</code></pre>
+  <p>L’appel se fait sans options : ni compteurs d’usage, ni exclusion d’objets déjà tirés, contrairement aux blocs insolites de l’écran. <code>getLudicEquivalence</code> rend une chaîne vide pour un poids nul ou négatif — d’où la garde <code>delta &lt; 0</code>, qui évite la phrase creuse. Le paragraphe est dans la section II et n’existe donc que si le poids est inclus et la période porte au moins une pesée.</p>
+  <p class="ancre">src/versions/mixte/features/report/medicalReportPdf.ts, src/utils/ludicWeight.ts</p>
+  <div class="exemple"><p>Camille, <code>delta = −1,8</code> : l’équivalence est calculée sur 1,8 kg, pas sur ses 10,4 kg perdus depuis mai.</p></div>
+
+  <h3 id="rapport-section-iii-statistiques-par-type-d-effet">Section III — statistiques par type d’effet</h3>
+  <pre><code>map : clé = cleanType(se.type)          // emoji de tête retiré
+      sum += severity ; count += 1 ; max = Math.max(max, severity)
+liste = [...map] → { type, avg: sum / count, count, max }
+        triée par count décroissant
+
+phrase : `${N} déclaration(s) sur ${M} type(s) d’effet, intensité déclarée
+          de 1 (léger) à 5 (sévère).`
+par type : jauge remplie à clamp(avg / 5, 0, 1), note écrite `${round1(avg)}/5`,
+           légende `${count}×  •  max ${max}/5`</code></pre>
+  <p>La jauge est la barre de progression du site : un rail en pilule avec un retrait de 0,45 mm, rempli d’un dégradé aux deux bouts arrondis. Le rail fait 60 mm de large et 3,4 mm de haut ; un remplissage inférieur à 0,2 mm n’est pas peint. La note se dessine par <code>figureValue</code>, donc nombre en gras et « /5 » collé en petit. <a href="spec-fonctionnelle.html#rapport-pdf-iii-tolerance">→ fonctionnelle</a></p>
+  <p class="ancre">src/versions/mixte/features/report/medicalReportPdf.ts</p>
+  <details><summary>Cas limites</summary>
+    <ul>
+      <li>Section incluse mais aucun effet : la phrase de repli « Aucun effet secondaire déclaré sur cette période. » remplace les jauges.</li>
+      <li>Deux types à même nombre : l’ordre est celui de première rencontre dans la <code>Map</code>, le tri étant stable.</li>
+      <li>Un type entièrement composé de caractères non alphabétiques devient une chaîne vide après <code>cleanType</code>.</li>
+    </ul>
+  </details>
+
+  <h3 id="rapport-section-iv-moyennes">Section IV — moyennes</h3>
+  <pre><code>stepsWithData = pas de la période dont steps &gt; 0
+showSteps = include.steps et stepsWithData.length &gt; 0
+showSport = include.sport et sports.length &gt; 0
+showMeals = include.meals et meals.length &gt; 0
+section dessinée si showSteps ou showSport ou showMeals
+
+cartouches (les quatre premiers seulement) :
+  Pas / jour   = frNumber(moyenne des steps de stepsWithData)   // par LIGNE, non par date
+  Séances      = sports.length
+  Durée totale = `${Σ duration} min`                            // sans séparateur
+  kcal / jour  = Math.round(moyenne des totaux de calories par date)
+
+ligne secondaire :
+  `meilleure journée ${frNumber(max steps)} pas`
+  `${stepsWithData.length} jours relevés`
+  `${Math.round(Σ duration / sports.length)} min par séance en moyenne`
+  `protéines ${Math.round(Σ protein / D)} g/j`, glucides, lipides
+     avec D = nombre de dates distinctes portant un repas, ou 1 si zéro</code></pre>
+  <p>La moyenne des pas de cette section porte sur les <em>relevés</em> filtrés à zéro près, là où <code>stepsDailyAverage</code> de la synthèse cumule d’abord par journée : deux saisies le même jour comptent deux fois ici et une seule là. Les macros ne passent pas par <code>mealDailyAverages</code> : elles divisent la somme brute par le nombre de dates distinctes. <a href="spec-fonctionnelle.html#rapport-pdf-iv-activite-et-nutrition">→ fonctionnelle</a></p>
+  <p class="ancre">src/versions/mixte/features/report/medicalReportPdf.ts</p>
+  <details><summary>Cas limites</summary>
+    <ul>
+      <li>Trois cartouches au plus sont visibles si un seul domaine est actif ; au-delà de quatre, <code>cells.slice(0, 4)</code> tranche.</li>
+      <li>« Durée totale » additionne des minutes et des <em>étages</em> pour « Montée escaliers », dont le champ <code>duration</code> compte des étages.</li>
+      <li>Les fibres n’ont pas de cartouche ici ; elles sont dans la synthèse et dans les lignes nutritionnelles des annexes.</li>
+    </ul>
+  </details>
+
+  <h3 id="rapport-teinte-des-barres-de-sommeil">Teinte des barres de sommeil</h3>
+  <pre><code>sleepBarTier(valeur, max) :
+  si max ≤ 0 ou valeur ≤ 0 → 1
+  tier = Math.ceil(5 × valeur / max)
+  → Math.min(5, Math.max(1, tier))
+
+encre = palette.sleepTiers[sleepBarTier(point.hours, maxHours) − 1]
+maxHours = plus grande durée en heures parmi les points du graphe
+rayon des coins hauts = Math.min(0.6, barW / 2, h / 2), la moitié basse recouverte</code></pre>
+  <p>Le palier est un <em>rapport</em> à la plus longue journée affichée, donc indifférent à l’unité ; il est calculé sur les heures parce que <code>SleepChartPoint</code> en porte. La plus longue nuit tombe toujours dans le palier 5, le plus foncé. En palette noir et blanc (<code>patterned</code>), le calcul est court-circuité : la barre est peinte par <code>makeBarPainter</code> dans <code>series1</code>, contour plus traits horizontaux tous les 0,7 mm — cinq gris ne survivraient pas à une photocopie, une texture si.</p>
+  <p class="ancre">src/features/sleep/sleep.utils.ts, src/versions/mixte/features/report/medicalReportPdf.ts</p>
+  <details><summary>Cas limites</summary>
+    <ul>
+      <li>Toutes les nuits de même durée : toutes au palier 5.</li>
+      <li>Une durée nulle n’a pas de barre du tout — elle est écartée en amont par <code>sleepChartPoints</code>.</li>
+    </ul>
+  </details>
+
+  <h3 id="rapport-temps-pour-soi-synthese">Temps pour soi : synthèse</h3>
+  <pre><code>meTimeSummary(logs) :
+  retenus = logs dont Number.isFinite(duration) et duration &gt; 0
+  total   = meTimeDayMinutes(retenus)
+  comptes = Map nom → nombre, nom = (activity ?? '').trim() || 'Sans nom'
+  → count       = retenus.length
+    days        = Set(retenus.map(date)).size
+    totalMinutes = total
+    meanMinutes = retenus vide ? 0 : Math.round(total / retenus.length)
+    activities  = [...comptes] triées par count décroissant, puis par nom (localeCompare)
+
+affichage : cartouches moment(s), Durée totale, Durée moyenne, journée(s) ;
+            ligne des 5 premières activités, `${nom} ${count}×`</code></pre>
+  <p>La moyenne est <em>par moment</em>, pas par journée : c’est la question qu’on se pose d’un temps pour soi. Le second critère de tri, alphabétique, garantit que deux exports des mêmes données écrivent la même ligne. Les durées passent par <code>formatCalendarDuration</code> : « 45min » sous une heure, « 1h15 » au-delà.</p>
+  <p class="ancre">src/versions/mixte/features/report/reportWellbeing.ts, src/features/me-time/meTimeCalendar.ts, src/shared/calendar.ts</p>
+  <details><summary>Cas limites</summary>
+    <ul>
+      <li>Durée nulle, négative ou non finie : le moment est écarté du compte, du total et des activités.</li>
+      <li>Activité vide ou blanche : elle est comptée sous « Sans nom ».</li>
+      <li>Plus de cinq activités distinctes : les suivantes ne sont pas écrites ; le déroulé complet est dans le carnet.</li>
+    </ul>
+  </details>
+  <div class="exemple"><p>Camille : Spa 90 min, Manucure 30 min le même jour, Spa 60 min un autre jour → 3 moments, 2 journées, 180 min au total, 60 min de moyenne, « Spa 2× · Manucure 1× ».</p></div>
+
+  <h3 id="rapport-mois-dessines-par-une-annexe">Mois dessinés par une annexe</h3>
+  <pre><code>monthsSpanning(dates) :
+  valides = dates qui vérifient /^\d{4}-\d{2}-\d{2}$/ ; si aucune → []
+  première = min(valides) ; dernière = max(valides)     // comparaison de chaînes
+  courant = mois de la première
+  tant que monthKey(courant) ≤ monthKey(mois de la dernière) et mois.length &lt; 120 :
+      pousser courant ; courant = shiftMonth(courant, +1)</code></pre>
+  <p>Ce sont les dates des <em>données</em> qui bornent, pas celles de la période : les clés passées sont celles de la <code>Map</code> des valeurs de cases, et une journée sans valeur n’y figure pas. Une période de trois mois dont les injections tiennent sur deux ne dessine donc pas de grille vide. Les mois intermédiaires sans donnée, eux, sont dessinés : les sauter ferait croire à une continuité qui n’existe pas.</p>
+  <p class="ancre">src/versions/mixte/features/report/reportCalendar.ts, src/shared/calendar.ts</p>
+  <details><summary>Cas limites</summary>
+    <ul>
+      <li>Une date mal formée est ignorée plutôt que de produire un « NaN 2026 ».</li>
+      <li>Le plafond de 120 mois est un garde-fou contre une donnée datée de 1970 : au-delà, la suite s’arrête et les mois suivants ne sont pas dessinés.</li>
+      <li>Aucune donnée : aucune grille — l’annexe A écrit alors sa phrase de repli, les autres annexes ne sont pas ouvertes du tout.</li>
+    </ul>
+  </details>
+
+  <h3 id="rapport-fusion-des-grilles-mensuelles">Fusion des grilles mensuelles <span class="marque">arbitrage non validé</span></h3>
+  <pre><code>monthsShareWeek(a, b) :
+  si monthKey(b) − monthKey(a) ≠ 1 → faux
+  dernière semaine de monthGrid(a) === première semaine de monthGrid(b), date par date
+
+mergedCalendarGrids(months, maxMonths = 3) :
+  moisDeLAnnexe = Set des clés de tous les mois dessinés
+  pour chaque mois i :
+      partage = i &gt; 0 et monthsShareWeek(months[i−1], months[i])
+      si carte courante non vide et (non partage ou carte courante pleine) → fermer
+      pousser partOf(mois, partage, moisDeLAnnexe)
+
+partOf : grille = monthGrid(mois), chaque jour recevant
+         inMonth = moisDeLAnnexe contient le mois de sa date
+         weeks   = partage ? grille.slice(1) : grille
+closeGrid : rows = max des longueurs de colonnes ; titleParts ; label</code></pre>
+  <p>Les grilles restent côte à côte : une carte fusionnée occupe la place horizontale de deux ou trois calendriers et la hauteur d’un seul. La semaine partagée reste au mois précédent, où elle est complète de son côté gauche ; le mois suivant démarre au lundi d’après. Un mois qui commence un lundi ne partage aucune semaine et ouvre donc sa propre carte : la fusion est le remède d’un doublon, et il n’y a alors pas de doublon. Une coupure de fin de rangée ne rouvre pas le doublon — <code>sharesWeekWithPrevious</code> se lit sur la suite complète des mois, jamais sur le découpage en cartes.</p>
+  <pre><code>mergedGridTitleParts(months) :
+  pour chaque mois : dernierDeSonAnnee = dernier de la liste ou l'année change après lui
+                     → monthLabel complet si dernierDeSonAnnee, sinon nom seul
+                     capitale initiale
+mergedGridLabel = titleParts joints par ' / '</code></pre>
+  <p>La règle du grisé suit : est plein tout jour dont le mois est l’un des mois dessinés par l’annexe, ce qui rend leur pastille et leur valeur au 1er et au 2 août imprimés au bas de juillet. Restent gris les jours de complétion antérieurs au premier mois et postérieurs au dernier. Le grisé des jours <em>hors période demandée</em> est indépendant : le dessin compare la date à <code>periodStart</code> et <code>periodEnd</code>. <a href="spec-fonctionnelle.html#rapport-pdf-annexes-a-a-g">→ fonctionnelle</a></p>
+  <p class="ancre">src/versions/mixte/features/report/reportCalendar.ts</p>
+  <details><summary>Cas limites</summary>
+    <ul>
+      <li>Février 2027 commence un lundi : une annexe de janvier à mars 2027 sort « Janvier 2027 » seul, puis « Février / Mars 2027 ».</li>
+      <li>Changement d’année dans une carte : « Décembre 2026 / Janvier 2027 » — l’année suit le dernier mois de son année.</li>
+      <li>Une carte d’un seul mois garde exactement le bandeau d’avant, « Août 2026 ».</li>
+    </ul>
+  </details>
+  <div class="exemple"><p>Camille, annexe A sur août et septembre 2026 : le 1er septembre tombe un mardi, la dernière ligne d’août et la première de septembre sont la même semaine — une carte « Août / Septembre 2026 », septembre commençant au 7.</p></div>
+
+  <h3 id="rapport-valeur-d-une-case-de-calendrier">Valeur d’une case de calendrier</h3>
+  <p>Une fonction pure par domaine ; une liste vide signifie « pas de donnée », et la tuile porte alors le demi-cadratin pâle.</p>
+  <table>
+    <thead><tr><th>Annexe</th><th>Valeur</th></tr></thead>
+    <tbody>
+      <tr><td>A — prises</td><td>Une seule prise : <code>formatCalendarDose(dose)</code> — 2 décimales sous 10, 1 sous 100, l’entier au-delà, zéros de queue supprimés. Plusieurs : <code>×N</code>.</td></tr>
+      <tr><td>B — pesées</td><td><code>round1</code> du poids de la <em>dernière</em> ligne du jour, sans unité.</td></tr>
+      <tr><td>C — effets</td><td><code>daySeverityWord</code> : le mot du pire effet, au pluriel dès deux effets.</td></tr>
+      <tr><td>D — repas</td><td><code>frNumber(dayCalories(lignes, date))</code>, rien si le total est ≤ 0.</td></tr>
+      <tr><td>E — activité</td><td>Deux valeurs : <code>formatCalendarDuration(sportDayMinutes)</code>, puis <code>frNumber(kcal)</code> avec l’unité « kcal » si <code>kcal &gt; 0</code>.</td></tr>
+      <tr><td>F — sommeil</td><td><code>formatCalendarDuration(sleepDayMinutes)</code>, rien si ≤ 0.</td></tr>
+      <tr><td>G — temps pour soi</td><td><code>formatCalendarDuration(meTimeDayMinutes)</code>, rien si ≤ 0.</td></tr>
+    </tbody>
+  </table>
+  <pre><code>formatCalendarDuration(minutes) :
+  total = Math.max(0, Math.round(minutes))
+  total &lt; 60 ? `${total}min` : `${floor(total/60)}h${String(total % 60).padStart(2,'0')}`</code></pre>
+  <p>Le dessin écrit une valeur seule à 5,6 pt sur la ligne <code>ty + 6</code>, deux valeurs à 4,9 pt sur <code>ty + 5,2</code> et <code>ty + 7,2</code>, l’unité à 4,2 pt. Le numéro du jour est à 5 pt sur <code>ty + 2,7</code>, en gras et à l’encre « aujourd’hui » quand la date est celle du jour, à l’encre pâle hors du mois ou hors des bornes de la période. Les calories d’une séance se calculent au poids qu’avait la patiente à la date de la séance, d’où l’historique complet des pesées passé au constructeur.</p>
+  <p class="ancre">src/versions/mixte/features/report/reportCalendar.ts, src/shared/calendar.ts, src/features/injections/injectionCalendar.ts, src/features/sport/sportCalendar.ts, src/features/meal-journal/mealCalendar.ts</p>
+  <details><summary>Cas limites</summary>
+    <ul>
+      <li>Deux pesées le même jour : la dernière compte, les listes reçues étant déjà triées par heure croissante.</li>
+      <li><code>sportDayMinutes</code> convertit les étages de « Montée escaliers » en minutes : les additionner tels quels afficherait « 12min » pour douze étages.</li>
+      <li>Une journée de repas dont le total tombe à 0 kcal n’a pas de valeur : la case porte le tiret comme une journée sans repas.</li>
+    </ul>
+  </details>
+
+  <h3 id="rapport-aiguillage-de-l-annexe-b">Aiguillage de l’annexe B</h3>
+  <pre><code>hasMeasurements(weights) = ∃ pesée portant l'une des neuf mesures :
+    chest, waist, hips, arm, underbust, buttocks, thigh, knee, calf
+si hasMeasurements(sortedWeights) → tableau ; sinon → vue calendrier</code></pre>
+  <p>Les neuf mesures comptent, pas seulement les trois qui ont leur colonne : une période où l’on n’aurait relevé que ses cuisses garde son tableau, sans quoi la mesure disparaîtrait du document. Le test est une véracité JavaScript, donc une mesure à 0 ne compte pas. Le tableau a six colonnes de largeurs fixes (24, 20, 20, 20, 20, 74 mm, somme 178) : Date, Poids, Poitrine, Taille, Hanches, Autres mesures (cm) — les six mesures restantes y sont écrites « bras 32, sous-poitrine 84, fesses 102, cuisses 58, genoux 38, mollets 36 », dans cet ordre, chacune par <code>round1</code>. Une colonne vide s’écrit « - ». L’annexe n’existe que si <code>include.weights</code> et au moins une pesée.</p>
+  <p class="ancre">src/versions/mixte/features/report/reportCalendar.ts, src/versions/mixte/features/report/medicalReportPdf.ts</p>
+  <div class="exemple"><p>Camille : sa pesée du 01/09 porte un tour de taille, l’annexe B sort donc en tableau et non en calendrier.</p></div>
+
+  <h3 id="rapport-ordre-des-repas-et-libelles">Ordre des repas et libellés</h3>
+  <pre><code>MEAL_ORDER = { breakfast: 0, lunch: 1, repas: 1, snacks: 2, snack: 2, dinner: 3 }
+tri : (MEAL_ORDER[a.type] ?? 9) − (MEAL_ORDER[b.type] ?? 9) || a.time.localeCompare(b.time)
+
+mealFamilyLabel(type) = mealTypeLabel(type) === 'En-cas' ? 'En-cas' : 'Repas'</code></pre>
+  <p>Le libellé enregistré avec la ligne (<code>typeLabel</code>, « Petit-déjeuner »…) reste en base et ne s’imprime plus nulle part. Le même tri et le même libellé servent au déroulé de l’annexe D et à la rubrique « Repas » du carnet : les deux vues du même jour ne peuvent pas diverger. Les journées de l’annexe D sont triées par <code>[...byDay.keys()].sort()</code>, l’ordre lexicographique des chaînes ISO.</p>
+  <p class="ancre">src/versions/mixte/features/report/medicalReportPdf.ts, src/features/meal-journal/mealCalendar.ts</p>
+  <details><summary>Cas limites</summary>
+    <ul>
+      <li>Un type inconnu prend le rang 9 et le libellé « En-cas » : <code>mealTypeLabel</code> nomme ainsi les types inconnus des anciennes sauvegardes.</li>
+      <li>Un en-cas de 22 h passe avant un dîner de 19 h : la famille l’emporte sur l’heure.</li>
+      <li>Le niveau <code>aliment</code> ajoute une ligne par item, quantité convertie par <code>toDisplayQuantity</code> et valeurs recalculées par <code>computeQuantityNutrition</code> ; un aliment supprimé de la base s’écrit « aliment supprimé » avec des valeurs à « - ». <span class="marque non">non implémenté</span> — le niveau n’est pas atteignable depuis l’écran.</li>
+    </ul>
+  </details>
+
+  <h3 id="rapport-encres-nutritionnelles-du-pdf">Encres nutritionnelles du PDF</h3>
+  <p>Les cinq teintes du contrat nutritionnel de l’écran sont fixes sur tous les thèmes ; le document les reprend descendues jusqu’à 4,5:1 de contraste sur blanc, la norme du texte, ces chiffres faisant 7 pt.</p>
+  <pre><code>NUTRI_INKS  écran → papier                contraste sur blanc
+  kcal  #8b5cf6 → #8256e7  (130, 86, 231)   4,23 → 4,74
+  prot  #009de3 → #0079b0  (0, 121, 176)    3,03 → 4,81
+  gluc  #fa55af → #c14087  (193, 64, 135)   3,01 → 4,83
+  lip   #f7e64a → #817824  (129, 120, 36)   1,28 → 4,52
+  fibr  #69d1a0 → #3d7c5f  (61, 124, 95)    1,87 → 4,94
+
+ligne écrite : `${round(kcal)} kcal` • `P ${round(prot)} g` • `G ${round(carb)} g`
+               • `L ${round(fat)} g` • `F ${round(fibr)} g`, à 7 pt, depuis NUT_X
+encre du point de séparation : palette.inkFaint
+si palette.patterned → toutes les valeurs en palette.inkSoft</code></pre>
+  <p>Les valeurs sont écrites en dur et non calculées : <code>darkenUntilReadable</code> vit dans <code>themeReportPalette</code>, qui importe déjà ce fichier — l’appeler d’ici ferait un cycle d’imports pour cinq constantes fixes. Les cinq nutriments sont écrits partout où une composition s’imprime, fibres comprises : totaux d’une journée, d’un repas, d’un aliment, ligne du carnet. <code>NUT_X = M + CONTENT_W / 2 = 105 mm</code> : toutes les colonnes nutritionnelles partent du même x, ce qui donne la verticale que l’œil suit.</p>
+  <p class="ancre">src/versions/mixte/features/report/medicalReportPdf.ts</p>
+
+  <h3 id="rapport-regroupement-des-journees-du-carnet">Regroupement des journées du carnet</h3>
+  <p>Une seule lecture des journaux sert aux cinq annexes calendrier, au graphe du sommeil et au carnet : deux vues du même jour ne peuvent donc se contredire ni sur ce qu’elles montrent, ni sur l’ordre.</p>
+  <pre><code>groupReportDays(input) :
+  injections  = injectionsByDate(...)   // chaque Map trie sa journée par heure croissante
+  weights     = weighInsByDate(...)
+  sideEffects = sideEffectsByDate(...)
+  meals       = mealsByDate(...)
+  sports      = sportsByDate(...)
+  sleeps      = sleepsByDate(...)       // rangés par date de RÉVEIL
+  meTimes     = meTimeByDate(...)
+  steps : Map date → Σ steps, une date n'entre que si son cumul est &gt; 0
+
+  dates = union des clés des sept Map et de celles des pas
+  → [...dates].sort(localeCompare).map(date =&gt; { date, …listes ?? [], steps ?? 0 })
+
+entrée : l'appelant a déjà retiré ce que l'export n'emporte pas —
+  injections toujours, chacun des sept autres remplacé par [] si include est faux</code></pre>
+  <p>Une journée n’existe donc que si elle porte au moins une donnée. Le tri des dates est lexicographique sur des chaînes <code>YYYY-MM-DD</code>, qui est l’ordre chronologique ; aucune <code>Date</code> n’est construite. Les lignes d’une journée sont triées par heure à l’intérieur de chaque journal, sauf les repas, que le carnet retrie par <code>MEAL_ORDER</code> puis heure au moment du dessin. Les pas sont additionnés par date : une seule ligne « N pas » par journée. Un journal non inclus est une liste vide, donc aucune rubrique sur aucune journée. <a href="spec-fonctionnelle.html#rapport-pdf-details-des-journees">→ fonctionnelle</a></p>
+  <p class="ancre">src/versions/mixte/features/report/reportDays.ts</p>
+  <details><summary>Cas limites</summary>
+    <ul>
+      <li>Un relevé de pas à 0 seul sur sa date : la journée n’existe pas.</li>
+      <li>Une journée qui ne porte qu’une nuit existe : le chapitre la déroule et le compteur de jours documentés la compte.</li>
+      <li>Aucune journée : le chapitre « Détails des journées » n’est pas ouvert du tout.</li>
+      <li>La rubrique des pesées s’intitule « Pesée » au singulier et « Pesées » dès deux lignes.</li>
+    </ul>
+  </details>
+
+  <h3 id="rapport-nommage-des-nuits-dans-le-pdf">Nommage des nuits dans le PDF</h3>
+  <pre><code>sleepSpansTwoDays(log) = Boolean(log.bedDate) et log.bedDate ≠ log.date
+
+nom = sleepSpansTwoDays(log)
+    ? formatSleepSpanWithWord(SLEEP_KIND_LABELS[log.kind], log)   // `${mot} du ${plage}`
+    : SLEEP_KIND_LABELS[log.kind]                                 // « Nuit » ou « Sieste »
+
+formatDayRangeStr(debut, fin) :
+  memeMois = debut.slice(0,7) === fin.slice(0,7)
+  gauche   = memeMois ? debut.slice(8,10) : formatDayMonthStr(debut)
+  → `${gauche} au ${formatDayMonthStr(fin)}`</code></pre>
+  <p>Le critère est <code>bedDate</code>, pas <code>kind</code> : une sieste qui enjamberait minuit prendrait la même écriture. Le mois n’est porté que par la seconde date quand les deux le partagent ; à cheval sur deux mois ou deux années, les deux dates s’écrivent en entier — sans quoi « 31 au 01/08 » daterait la nuit d’un 31 août qui n’a pas eu lieu. La ligne du carnet écrit l’heure « <code>bedTime → time</code> », la durée en valeur de tête, ce nom, et « qualité N/5 » à droite. Elle est ainsi autonome, quel que soit le titre de journée au-dessus — un lecteur médical rangerait sinon un endormissement à 22:30 dans la journée du réveil.</p>
+  <p class="ancre">src/features/sleep/sleepLabel.ts, src/features/sleep/sleep.constants.ts, src/shared/date/date.utils.ts, src/versions/mixte/features/report/medicalReportPdf.ts</p>
+  <details><summary>Cas limites</summary>
+    <ul>
+      <li><code>bedDate</code> vide : la nuit est réputée tenir dans la journée, le mot seul s’écrit.</li>
+      <li>Nuit du 31/07 au 01/08 : « Nuit du 31/07 au 01/08 », les deux dates entières.</li>
+    </ul>
+  </details>
+  <div class="exemple"><p>Camille, endormie le 05/09 à 23:05, réveillée le 06/09 à 06:50 : « 23:05 → 06:50 · 7h45 · Nuit du 05 au 06/09 · qualité 4/5 » — le jour de gauche garde son zéro de tête, <code>slice(8, 10)</code> ne le retire pas.</p></div>
+</section>

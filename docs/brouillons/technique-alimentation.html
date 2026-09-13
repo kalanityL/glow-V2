@@ -1,0 +1,993 @@
+<section id="alimentation">
+  <h2>8. L'alimentation <a class="retour" href="#sommaire">↑ sommaire</a></h2>
+  <p>Ce chapitre donne les objets stockés du domaine et les calculs qui en tirent les cinq valeurs — kcal, protéines, glucides, lipides, fibres — puis les totaux, parts, moyennes et seuils que les écrans affichent. Chaque règle est celle du code de la V1 (version Mixte) ; les écarts décidés pour la V2 sont marqués.</p>
+
+  <h3 id="alimentation-entites">Entités</h3>
+  <p>Une prise (repas ou en-cas) est une ligne <code>SavedMealLog</code> ; sa composition est une liste de <code>FoodQuantity</code>, qui référencent des fiches d'aliments par identifiant. Les cinq valeurs de la prise sont un cache recalculé à chaque écriture depuis la composition : elles sont dérivables et ne devraient donc pas être stockées <span class="marque v2">V2</span>.</p>
+  <table>
+    <thead><tr><th>Entité</th><th>Champs</th><th>Unité / type</th></tr></thead>
+    <tbody>
+      <tr><td><code>SavedMealLog</code><br><span class="ancre">src/types.ts</span></td><td>id ; date ; time ; type ; typeLabel ; items ; calories, protein, carbs, fat, fiber ; hungerBefore?, hungerAfter?</td><td>date <code>AAAA-MM-JJ</code> local ; time <code>HH:MM</code> ; type parmi <code>breakfast | lunch | dinner | snacks | repas | snack</code> ; typeLabel dérivé du type ; items source de vérité ; kcal et g <strong>dérivés</strong> ; faim entier 0–5, facultatifs</td></tr>
+      <tr><td><code>FoodQuantity</code><br><span class="ancre">src/types.ts</span></td><td>id ; foodId ; isCustomFood ; qty</td><td>foodId = <code>alim_code</code> Ciqual ou id d'aliment personnel ; qty toujours en g (solide) ou ml (liquide)</td></tr>
+      <tr><td><code>CiqualFood</code> / <code>UserCustomFood</code><br><span class="ancre">src/data/mealConstants.ts</span></td><td>alim_code ; alim_nom_fr ; nom_court? ; nom_generique? ; calories, protein, carbs, fat, fiber ; unit? ; isLiquid? ; valide? ; isUserCustom? ; isRecipe? ; recipeIngredients? ; barcode? ; createdAt?</td><td>valeurs pour 100 g ou 100 ml ; unit <code>'g' | 'ml'</code> ; createdAt en millisecondes, posé à la création seule ; id personnel <code>user-custom-&lt;ts&gt;</code> ou <code>user-custom-recipe-&lt;ts&gt;</code></td></tr>
+      <tr><td><code>FavoriteMealItem</code><br><span class="ancre">src/data/mealConstants.ts</span></td><td>id ; title ; type ; items ; createdAt?</td><td>type <code>'repas' | 'snack'</code> ; aucune date, aucune heure, aucune faim</td></tr>
+      <tr><td><code>ResolvedFood</code><br><span class="ancre">src/shared/food/food.resolve.ts</span></td><td>id ; name ; calories, protein, carbs, fat, fiber ; isLiquid</td><td>fiche normalisée, <strong>non stockée</strong> : construite à la lecture depuis Ciqual ou la base personnelle</td></tr>
+      <tr><td><code>DraftItem</code><br><span class="ancre">src/shared/food/food.composition.ts</span></td><td>id ; foodId ; isCustomFood ; name ; qty</td><td>ligne de saisie, jamais stockée ; qty est une chaîne, défaut <code>'100'</code> ; name sert à l'affichage pendant la frappe</td></tr>
+    </tbody>
+  </table>
+  <p>Les prises vivent dans la sauvegarde principale (<code>glp1_app_companion_data</code>, champ <code>savedMeals</code>). Le reste du domaine a ses propres clés : <code>glp1_user_custom_foods</code>, <code>glp1_favorite_meals</code>, <code>glp1_food_selection_counts</code>, <code>glp1_meal_edit_notice_dismissed</code>, <code>glp1_paliers_nutritifs_fetes</code>, <code>glp1_view_&lt;bloc&gt;</code>, <code>glp1_period_&lt;bloc&gt;</code>, <code>glp1_meals_history_view</code>.</p>
+  <p class="ancre">src/types.ts · src/data/mealConstants.ts · src/shared/food/ · src/app/useAppData.ts</p>
+
+  <h3 id="alimentation-page-menus-repas-et-en-cas">Bandeau de confirmation de la page Menus</h3>
+  <p>L'enregistrement rend <code>MealSaveOutcome { action: 'added' | 'updated', addedToFavorites }</code>. La page en tire une phrase, croisée avec la famille courante du formulaire : « Le repas / L'en-cas a bien été ajouté à votre journal. » ou « … mis à jour. », plus, si <code>addedToFavorites</code>, la ligne « Le repas / L'en-cas a bien été ajouté comme menu à vos favoris. ».</p>
+  <p>Le bandeau ne s'efface pas sur minuterie mais sur défilement, à trois conditions cumulatives : il a été <em>lisible</em> au moins 800 ms cumulées (visible dans le cadre défilant <em>et</em> non recouvert, mesuré toutes les 250 ms par <code>elementFromPoint</code> en son centre) ; le défilement vient d'un geste (molette ou doigt dans les 200 ms précédentes) ; le bandeau est entièrement sorti du cadre.</p>
+  <pre><code>lisible ≥ 800 ms cumulées  ET  geste &lt; 200 ms  ET  hors du cadre  →  effacement</code></pre>
+  <p class="ancre">src/features/meal-form/useMealForm.ts · src/versions/mixte/components/MealTracker.tsx · src/shared/ui/useDismissWhenHidden.ts</p>
+  <details><summary>Cas limites</summary>
+    <p>Formulaire jamais monté dans un ancêtre défilant : aucun cadre trouvé, le bandeau ne s'efface que par sa croix.</p>
+    <p>Défilement animé après validation (remontée en haut de page) : pas de geste, le bandeau reste.</p>
+    <p>La famille lue est celle de l'état du formulaire après remise à zéro, qui ne réinitialise pas <code>mealType</code> : le bandeau parle donc de la famille de la prise qui vient d'être écrite.</p>
+  </details>
+  <p><a href="spec-fonctionnelle.html#alimentation-page-menus-repas-et-en-cas">→ fonctionnelle</a></p>
+
+  <h3 id="alimentation-base-alimentaire-et-recherche">Base alimentaire et recherche</h3>
+  <p><code>fullCiqualDb</code> = 2 entrées écrites à la main (<code>custom-whey-20</code>, <code>custom-whey-25</code>) + <code>ciqual.json</code>, qui compte 3 258 entrées — soit 3 260 aliments de référence. 2 425 d'entre elles portent un <code>nom_court</code>, les 3 258 un <code>nom_generique</code> (jamais affiché), 510 sont <code>isLiquid</code>.</p>
+  <p>La recherche interroge trois bases empilées dans cet ordre : aliments personnels, entrées écrites à la main, table Ciqual. Requête et noms sont normalisés (minuscules, <code>NFD</code> puis suppression des diacritiques). Une entrée est retenue si le nom affiché <em>ou</em> le libellé officiel contient la requête normalisée. Le score porte sur le nom affiché :</p>
+  <pre><code>nom affiché == requête            → 1000
+nom affiché commence par requête  → 500
+un mot du nom == requête          → 400   (mots coupés sur [\s\-,'"]+)
+un mot commence par requête       → 300
+sinon, position dans le nom       → 100 − index
+sinon, trouvé par le seul libellé → 50 − min(49, index)
+aliment personnel                 → score + 2000
+
+tri : score décroissant, puis compteur[alim_nom_fr] décroissant, puis nom affiché le plus court
+20 résultats au plus ; requête vide → aucune suggestion</code></pre>
+  <p>La mention « Anses. 2025. Table de composition nutritionnelle des aliments Ciqual » est écrite en pied du formulaire de repas et en pied de la carte du journal ; la vue calendrier ne la porte pas.</p>
+  <p class="ancre">src/data/mealConstants.ts · src/versions/mixte/features/meal-form/MealForm.tsx · src/versions/mixte/features/meal-journal/MealJournal.tsx</p>
+  <details><summary>Cas limites</summary>
+    <p>Deux entrées de même score et même compteur : la plus courte passe devant ; à longueur égale, l'ordre des bases (personnels d'abord) tranche.</p>
+    <p>Un score peut être négatif quand la requête apparaît au-delà du 100<sup>e</sup> caractère du nom affiché : l'entrée reste proposée, en fin de liste.</p>
+    <p>Le compteur est lu sous la clé <code>alim_nom_fr</code>, alors qu'il est écrit sous le nom affiché — voir « Compteur de sélection ».</p>
+  </details>
+  <div class="exemple"><p>Camille tape « tom » : « Tomate crue » (nom affiché commençant par la requête, 500) passe avant « Sauce tomate » (mot commençant par la requête, 300), qui passe avant « Jus de tomate » (300, mais nom plus long).</p></div>
+  <p><a href="spec-fonctionnelle.html#alimentation-liste-de-suggestions-d-aliments">→ fonctionnelle</a></p>
+
+  <h3 id="alimentation-chargement-de-la-sauvegarde-des-repas">Chargement de la sauvegarde des repas</h3>
+  <p>Au chargement, la sauvegarde traverse une chaîne de conversions dans cet ordre : <code>dropPreMigrationMeals</code> à l'hydratation, puis <code>dropSeedData</code>, <code>migrateTreatmentIds</code>, <code>purgeDeleted</code>, <code>mergeSideEffectNotes</code>, <code>mergeTableTennisSport</code>, <code>fillMealHunger</code>, <code>ensureStartingWeighIn</code>.</p>
+  <p><code>dropPreMigrationMeals</code> ne garde que les lignes dont <code>items</code> est un tableau : le critère est l'absence du champ, jamais une liste vide. <code>fillMealHunger</code> ne touche qu'aux lignes dont <code>hungerBefore</code> ou <code>hungerAfter</code> n'est pas un nombre, et calcule alors :</p>
+  <pre><code>moment  = 4 si type ∈ {lunch, dinner} ; 3 si breakfast ; 2 sinon
+taille  = +1 si calories ≥ 700 ; −1 si calories ≤ 200 ; 0 sinon
+écart   = (somme des codes de caractères de l'id) mod 2
+avant   = borne0-5(moment + taille + écart)
+chute   = 3 si calories ≥ 700 ; 1 si ≤ 200 ; 2 sinon
+après   = borne0-5(min(avant − 1, avant − chute))   // chute ≥ 1, donc = borne0-5(avant − chute)</code></pre>
+  <p><span class="marque">arbitrage non validé</span> La V2 ne remplace jamais une valeur absente par une valeur calculée : une valeur absente se tait <span class="marque v2">V2</span>.</p>
+  <p class="ancre">src/shared/model/appData.ts · src/app/useAppData.ts</p>
+  <details><summary>Cas limites</summary>
+    <p>Une ligne portant l'un des deux curseurs seulement est recalculée entièrement : la valeur saisie est écrasée.</p>
+    <p>Un <code>0</code> réellement saisi des deux côtés n'est jamais retouché — les deux champs sont des nombres.</p>
+    <p>La fonction est idempotente : rejouer la même sauvegarde donne les mêmes valeurs, l'écart venant de l'identifiant et non d'un tirage.</p>
+  </details>
+  <div class="exemple"><p>Un dîner de 800 kcal d'identifiant à somme paire : moment 4, taille +1, écart 0 → avant 5 ; chute 3 → après 2.</p></div>
+
+  <h3 id="alimentation-apport-d-une-quantite">Apport d'une quantité</h3>
+  <p>Une seule formule, sans branche : la quantité est canonique (g pour un solide, ml pour un liquide) et la fiche donne ses valeurs pour 100 de la même unité. La nature de l'aliment n'entre pas dans le calcul, elle ne sert qu'à l'étiquette.</p>
+  <pre><code>facteur = qty / 100
+apport(n) = fiche.n × facteur     pour n ∈ {calories, protein, carbs, fat, fiber}</code></pre>
+  <p class="ancre">src/shared/food/food.nutrition.ts</p>
+  <details><summary>Cas limites</summary>
+    <p>qty = 0 : apport nul, la ligne reste enregistrée.</p>
+    <p>Aucun arrondi n'est fait ici : l'arrondi appartient à l'affichage.</p>
+  </details>
+  <div class="exemple"><p>200 g de « Lentille cuite à l'eau » (125 kcal, 10 g de protéines, 16 g de glucides, 0,5 g de lipides, 8,5 g de fibres pour 100 g) : facteur 2 → 250 kcal, 20 g, 32 g, 1 g, 17 g.</p></div>
+
+  <h3 id="alimentation-apport-d-une-composition">Apport d'une composition</h3>
+  <p>Somme des apports de chaque quantité résolue. La résolution passe par <code>resolveFood</code> : un item personnalisé cherche son id dans la base personnelle, un item non personnalisé dans l'index de <code>fullCiqualDb</code>. Une quantité dont l'aliment ne se résout pas est <strong>ignorée</strong>, pas comptée zéro : le total reste juste pour ce qui est connu.</p>
+  <pre><code>total = Σ computeQuantityNutrition(item.qty, resolveFood(item)) pour les items résolus</code></pre>
+  <p class="ancre">src/shared/food/food.nutrition.ts · src/shared/food/food.resolve.ts</p>
+  <details><summary>Cas limites</summary>
+    <p>Aliment personnel supprimé : ses items disparaissent du total sans avertissement. Un repas garde ses valeurs déjà écrites ; une <strong>recette</strong> rouverte puis ré-enregistrée voit ses valeurs baisser sans le dire. <span class="marque">arbitrage non validé</span></p>
+    <p>Un item dont <code>isCustomFood</code> est faux mais dont le <code>foodId</code> désigne un aliment personnel ne se résout pas : l'index Ciqual ne le contient pas.</p>
+  </details>
+  <p><a href="spec-fonctionnelle.html#alimentation-formulaire-de-recette">→ fonctionnelle</a></p>
+
+  <h3 id="alimentation-ligne-de-saisie-valide">Ligne de saisie valide</h3>
+  <p>Une ligne est enregistrable si et seulement si <code>foodId !== ''</code>. Le <code>foodId</code> n'est posé que par <code>draftItemFromFood</code>, c'est-à-dire par le choix d'une suggestion ; toute frappe dans le champ nom le remet à <code>''</code> et <code>isCustomFood</code> à faux. La conversion en composition écarte les lignes sans référence.</p>
+  <pre><code>draftToItems(lignes) = lignes.filter(foodId ≠ '').map({ id: newId(), foodId, isCustomFood, qty: parseFloat(qty) || 0 })</code></pre>
+  <p>Une ligne neuve naît avec <code>qty: '100'</code>. Choisir un aliment conserve la quantité déjà saisie si elle est non vide, et met « 100 » sinon.</p>
+  <p class="ancre">src/shared/food/food.composition.ts · src/features/meal-form/useMealForm.ts</p>
+  <details><summary>Cas limites</summary>
+    <p>Quantité illisible (champ vidé, texte) : <code>parseFloat(...) || 0</code> donne 0 — la ligne est enregistrée à zéro.</p>
+    <p>La dernière ligne, laissée vierge en permanence par le formulaire, est écartée par le même filtre.</p>
+    <p>Le nom n'est jamais stocké : il est résolu depuis <code>foodId</code> à chaque lecture, donc renommer un aliment se répercute partout sans propagation.</p>
+  </details>
+
+  <h3 id="alimentation-refus-de-validation-du-formulaire-de-repas">Refus de validation du formulaire de repas</h3>
+  <p>Les refus sont jugés au clic sur « Valider » et empilés pleine ligne au-dessus du bouton ; chacun s'éteint dès que sa cause cesse. Deux drapeaux de tentative les arment (<code>unresolvedAttempted</code>, <code>favoriteTitleAttempted</code>).</p>
+  <pre><code>foodItems.length === 0            → « Ajoutez au moins un aliment avant de valider votre repas. »
+lignes nommées sans foodId        → « « x » n'est pas reconnu. »   (pluriel : « « x », « y » ne sont pas reconnus. »)
+favori coché et titre vide        → « Un titre est requis pour enregistrer le favori. »
+favori coché et titre en doublon  → « Ce titre existe déjà dans vos favoris. »
+favori coché et 50 favoris du jour→ « Limite atteinte : pas plus de 50 menus créés par jour. La création reprend demain. »</code></pre>
+  <p>Le même message « n'est pas reconnu » se pose aussi sous la ligne concernée, à la sortie du champ et jamais pendant la frappe. L'ordre d'évaluation dans <code>submit</code> est : composition vide (sort), lignes non résolues (sort en silence, le message étant rendu par le formulaire), incrément des compteurs, doublon de titre, plafond des favoris, puis écriture.</p>
+  <p class="ancre">src/versions/mixte/features/meal-form/MealForm.tsx · src/features/meal-form/useMealForm.ts</p>
+  <details><summary>Cas limites</summary>
+    <p>Les compteurs de sélection sont incrémentés <em>avant</em> les refus de favori : un refus de titre laisse les compteurs augmentés.</p>
+    <p>Le doublon de titre se juge sur le titre <em>final</em> — celui saisi, ou à défaut les noms d'aliments tronqués à 30 caractères.</p>
+  </details>
+
+  <h3 id="alimentation-plafond-de-30-repas-ou-en-cas-par-jour">Plafond de 30 repas ou en-cas par jour</h3>
+  <p><code>DAILY_MEAL_CAP = 30</code>, compté sur la <strong>date visée</strong> et non sur le jour courant. Le plafond refuse, il n'écrase jamais.</p>
+  <pre><code>countMealsOn(meals, jour) = meals.filter(m =&gt; m.date === jour).length
+canAddMealOn(meals, jour) = countMealsOn(meals, jour) &lt; 30
+
+ajout   : !canAddMealOn(date) → refus, rien n'est écrit
+          « Cette journée est complète : 30 repas ou en-cas y sont déjà enregistrés. Choisissez une autre date pour continuer. »
+mise à jour changeant de date : !canAddMealOn(date visée) → refus, le repas reste à sa date
+          « Impossible de déplacer ce repas : la date visée contient déjà 30 repas ou en-cas. Choisissez une autre date. »</code></pre>
+  <p>Le bouton « Valider » est le seul bouton désactivé du site : <code>disabled = !isEditing &amp;&amp; !canAddMealOn(savedMeals, date)</code>. En modification il reste actif, même sur une journée pleine.</p>
+  <p class="ancre">src/features/meal-form/mealDailyCap.ts · src/app/useAppData.ts · src/versions/mixte/components/MealTracker.tsx</p>
+  <details><summary>Cas limites</summary>
+    <p>Une mise à jour qui garde la date ne consulte pas le plafond : une journée déjà à 30 reste modifiable.</p>
+    <p>Le repas déplacé n'est pas retiré du compte de son ancienne date avant l'épreuve, mais il ne compte pas non plus dans la date visée : le test porte sur les 30 lignes déjà présentes à la date d'arrivée.</p>
+  </details>
+
+  <h3 id="alimentation-heure-arrondie-vers-le-bas">Heure arrondie vers le bas</h3>
+  <p>Minutes rondes : <code>[0, 10, 15, 20, 30, 40, 45, 50]</code>. <code>snapToRoundedMinutes</code> retient la plus grande minute ronde inférieure ou égale. L'arrondi est appliqué au <strong>modèle</strong>, pas au champ : <code>handleAddSavedMeal</code> et <code>handleUpdateSavedMeal</code> le passent sur l'heure reçue.</p>
+  <pre><code>si la chaîne n'est pas /^(\d{2}):(\d{2})$/ ou si minutes &gt; 59 → rendue telle quelle
+sinon minutes ← max{ m ∈ ROUNDED_MINUTES : m ≤ minutes }  (0 par défaut)</code></pre>
+  <p>Jamais vers le haut : une heure arrondie au plus proche pourrait tomber dans le futur et ne serait pas comptée par <code>hasOccurred</code>. La règle est reconduite en V2 <span class="marque v2">V2</span>.</p>
+  <p class="ancre">src/shared/date/date.local.ts · src/app/useAppData.ts</p>
+  <details><summary>Cas limites</summary>
+    <p>14:37 → 14:30 · 14:47 → 14:45 · 14:58 → 14:50 · 14:07 → 14:00.</p>
+    <p>L'heure n'étant jamais arrondie vers le haut, le passage à l'heure suivante n'a pas lieu et minuit n'est jamais franchi.</p>
+    <p>L'édition en place du journal enregistre par <code>handleUpdateSavedMeal</code> : son heure est arrondie elle aussi.</p>
+  </details>
+  <div class="exemple"><p>Camille ouvre le formulaire à 12:37 : l'heure proposée est 12:30.</p></div>
+
+  <h3 id="alimentation-date-et-heure-par-defaut-du-formulaire">Date et heure par défaut du formulaire</h3>
+  <p>À l'ouverture d'un ajout, <code>openAddForm</code> repose <code>date = getLocalDateStr()</code> et <code>time = getRoundedLocalTimeStr()</code> : les deux valeurs ne restent pas figées à l'initialisation du composant, qui a lieu à l'arrivée sur l'onglet. En modification, <code>startEditing</code> reprend la date et l'heure du repas rouvert et n'appelle pas <code>openAddForm</code>. Depuis le calendrier, la date cliquée remplace la date du jour après ouverture.</p>
+  <p class="ancre">src/features/meal-form/useMealForm.ts · src/versions/mixte/components/MealTracker.tsx</p>
+  <details><summary>Cas limites</summary>
+    <p><code>resetForm</code> repose l'heure arrondie mais pas la date : c'est <code>openAddForm</code> qui la pose.</p>
+    <p>L'ajout rapide d'un favori a ses propres champs, initialisés de la même façon (date du jour, heure arrondie).</p>
+  </details>
+  <p><a href="spec-fonctionnelle.html#alimentation-formulaire-repas-en-cas-ajout-et-modification">→ fonctionnelle</a></p>
+
+  <h3 id="alimentation-faim-avant-apres">Faim avant / après</h3>
+  <p><code>HungerLevel</code> : entiers 0 à 5, avec leurs mots — 0 Pas faim, 1 Très légère, 2 Légère, 3 Normale, 4 Importante, 5 Faim de loup. Défaut 2 avant, 0 après, dans les trois points de saisie : formulaire (<code>useState(2)</code> / <code>useState(0)</code> et <code>resetForm</code>), ajout rapide d'un favori, édition en place du journal. En modification, les valeurs du repas ; si l'une est <code>undefined</code>, le défaut correspondant la remplace.</p>
+  <pre><code>hungerBefore = meal.hungerBefore !== undefined ? meal.hungerBefore : 2
+hungerAfter  = meal.hungerAfter  !== undefined ? meal.hungerAfter  : 0</code></pre>
+  <p class="ancre">src/types.ts · src/features/meal-form/useMealForm.ts · src/features/meal-journal/useMealJournal.ts · src/versions/mixte/components/HungerSlider.tsx</p>
+  <details><summary>Cas limites</summary>
+    <p>Le test porte sur <code>undefined</code>, jamais sur la fausseté : une faim notée 0 est une note.</p>
+    <p>Rouvrir un repas dont la faim d'après vaut 0 et le revalider réécrit 0 : indiscernable d'une valeur par défaut.</p>
+  </details>
+
+  <h3 id="alimentation-valeurs-nutritionnelles-d-un-repas-ecrit">Valeurs nutritionnelles d'un repas écrit</h3>
+  <p>À l'ajout comme à la mise à jour, les cinq champs sont recalculés depuis la composition, jamais repris de l'appelant :</p>
+  <pre><code>{ calories, protein, carbs, fat, fiber } = computeItemsNutrition(items, aliments personnels résolus)
+typeLabel = MEAL_TYPE_LABELS[type]  (type inconnu → « En-cas »)
+un ajout dont items.length === 0 est ignoré sans message</code></pre>
+  <p>Ce cache est intégralement dérivable de <code>items</code> : la V2 ne le stocke pas <span class="marque v2">V2</span>.</p>
+  <p class="ancre">src/app/useAppData.ts · src/shared/food/food.mealType.ts</p>
+  <details><summary>Cas limites</summary>
+    <p>Modifier la fiche d'un aliment personnel ne réécrit pas les repas déjà enregistrés : leurs valeurs restent celles du dernier enregistrement, alors que le journal affiche les macronutriments recalculés du jour — les deux peuvent diverger.</p>
+    <p>Un item non résolu au moment de l'écriture est ignoré : le repas est enregistré avec un total amputé.</p>
+  </details>
+
+  <h3 id="alimentation-famille-repas-en-cas">Famille repas / en-cas</h3>
+  <p>Une seule autorité, <code>mealTypeLabel</code>, et une seule règle dérivée, <code>mealFamilyLabel</code> :</p>
+  <pre><code>MEAL_TYPE_LABELS = { breakfast: 'Petit-déjeuner', lunch: 'Déjeuner', dinner: 'Dîner',
+                     snacks: 'En-cas', repas: 'Repas', snack: 'En-cas' }
+mealTypeLabel(type)   = MEAL_TYPE_LABELS[type] ?? 'En-cas'
+mealFamilyLabel(type) = mealTypeLabel(type) === 'En-cas' ? 'En-cas' : 'Repas'</code></pre>
+  <p>Est donc un en-cas : <code>snack</code>, <code>snacks</code> et tout type inconnu. Est un repas : <code>breakfast</code>, <code>lunch</code>, <code>dinner</code>, <code>repas</code>. Les trois libellés de moment restent dans le modèle (<code>typeLabel</code>) et ne s'affichent plus. Le formulaire n'écrit que <code>'repas'</code> ou <code>'snack'</code>, y compris en modification : la bascule peut faire d'un repas un en-cas.</p>
+  <p class="ancre">src/shared/food/food.mealType.ts · src/features/meal-journal/mealCalendar.ts · src/features/meal-charts/mealVsSnack.ts</p>
+  <details><summary>Cas limites</summary>
+    <p>Une vieille sauvegarde portant <code>type: 'goûter'</code> compte comme en-cas partout : journal, calendrier, graphes, rapport.</p>
+    <p><code>startEditing</code> ramène tout type non <code>'snack'</code> à <code>'repas'</code> : rouvrir un ancien <code>dinner</code> et valider le convertit définitivement.</p>
+  </details>
+
+  <h3 id="alimentation-quantite-d-un-item">Quantité d'un item</h3>
+  <p>Deux régimes selon le point de saisie.</p>
+  <p>Formulaires de repas, de favori et de recette : champ texte libre, la virgule est convertie en point à la saisie, la valeur est lue par <code>parseFloat(qty) || 0</code> à l'enregistrement — aucune borne.</p>
+  <p>Édition en place d'un item du journal : <code>NumberField</code> réglé par <code>RULE_QUANTITY</code> — <code>min 1</code>, <code>max 10000</code>, une décimale, pas de 10, message « Une quantité entre 1 et 10000 est attendue. » ; une valeur hors bornes est ramenée à la valeur précédente.</p>
+  <p class="ancre">src/versions/mixte/app/form.rules.ts · src/versions/mixte/features/meal-journal/MealItemEditor.tsx · src/versions/mixte/features/meal-form/MealForm.tsx</p>
+  <details><summary>Cas limites</summary>
+    <p>Une quantité de 0,5 g passe par le formulaire de repas, mais l'édition en place la refusera ensuite.</p>
+    <p>Le texte d'une composition arrondit la quantité à l'entier à l'affichage seulement : la valeur stockée garde ses décimales.</p>
+  </details>
+
+  <h3 id="alimentation-rappel-du-mode-modification">Rappel du mode modification</h3>
+  <p>Le bloc « Mode Modification active — Vous modifiez le repas enregistré à HH:MM. Vos changements remplaceront l'ancienne entrée. » s'affiche en édition tant que le drapeau <code>glp1_meal_edit_notice_dismissed</code> ne vaut pas la chaîne <code>'true'</code>. La croix ferme le bloc pour cette édition seulement ; « Ne plus afficher » écrit le drapeau, définitivement et pour tous les écrans (page Menus comme couche vitrée).</p>
+  <p>Stockage par <code>getString</code>/<code>setString</code>, chaîne nue et non JSON — le motif des drapeaux booléens du dépôt.</p>
+  <p class="ancre">src/features/meal-form/mealFormStores.ts · src/versions/mixte/features/meal-form/EnteteRepas.tsx</p>
+  <details><summary>Cas limites</summary>
+    <p>L'heure affichée est <code>savedMeals.find(m =&gt; m.id === editingMealId)?.time</code> : une prise sans heure laisse la phrase incomplète.</p>
+  </details>
+
+  <h3 id="alimentation-nom-affiche-d-un-aliment">Nom affiché d'un aliment</h3>
+  <p><code>foodDisplayName</code> est seul juge, pour toute la lecture d'un nom d'aliment — suggestions, journal, cartes, tableaux, PDF.</p>
+  <pre><code>foodDisplayName(f) = f.nom_court?.trim()
+                  || nomCourtDuLibelle(f.alim_nom_fr)   // index libellé officiel → nom court, construit une fois
+                  || f.alim_nom_fr</code></pre>
+  <p>Le deuxième recours sert les aliments personnels enregistrés sous un ancien libellé Ciqual : un nom qui est mot pour mot le libellé officiel d'une entrée curée prend le nom court de cette entrée, sans rien réécrire dans le stockage.</p>
+  <p class="ancre">src/data/mealConstants.ts</p>
+  <details><summary>Cas limites</summary>
+    <p>Un aliment vraiment personnel (« Le beurre Gastronomique ») ne correspond à aucun libellé officiel : il garde son nom.</p>
+    <p>Un nouveau lot de noms courts change l'affichage des aliments personnels concernés sans migration.</p>
+  </details>
+  <div class="exemple"><p>« Huile d'olive vierge extra » n'a pas de nom court : son libellé officiel s'affiche.</p></div>
+
+  <h3 id="alimentation-compteur-de-selection">Compteur de sélection</h3>
+  <p>Table <code>Record&lt;nom, nombre&gt;</code> sous <code>glp1_food_selection_counts</code>. <code>bumpSelectionCount</code> relit le stockage avant chaque écriture — jamais un état React : l'enregistrement d'un repas l'appelle une fois par aliment dans la même passe.</p>
+  <pre><code>counts[nom] = (counts[nom] || 0) + 1  puis écriture immédiate</code></pre>
+  <p>Trois chemins l'appellent : validation d'un repas (une fois par ligne résolue), enregistrement d'un favori depuis son formulaire, validation d'un item du journal. La clé passée est <code>item.name.trim()</code>, c'est-à-dire le <strong>nom affiché</strong>.</p>
+  <p class="ancre">src/features/meal-form/mealFormStores.ts · src/features/meal-form/useMealForm.ts · src/features/meal-journal/useMealJournal.ts · src/versions/mixte/components/MealFavoritesBlock.tsx</p>
+  <details><summary>Cas limites</summary>
+    <p>Le tri des suggestions lit <code>counts[food.alim_nom_fr]</code>, le libellé officiel, tandis que l'écriture emploie le nom affiché : pour les 2 425 entrées portant un <code>nom_court</code>, le compteur incrémenté n'est jamais celui qui départage le tri. La coche « N fois sélectionné et validé » de la liste lit elle aussi le libellé officiel, donc reste à zéro pour ces entrées. <span class="marque">arbitrage non validé</span></p>
+    <p>Le même aliment saisi deux fois dans un repas incrémente deux fois.</p>
+  </details>
+
+  <h3 id="alimentation-tri-et-pagination-du-journal">Tri et pagination du journal</h3>
+  <p>Tri : jours du plus récent au plus ancien (<code>b.date.localeCompare(a.date)</code>), puis heures croissantes à l'intérieur d'un jour (<code>a.time.localeCompare(b.time)</code>). Le filtrage de période s'applique après le tri.</p>
+  <p>Pagination : cible de 10 repas par page, une journée n'est jamais coupée.</p>
+  <pre><code>pour chaque date, du plus récent au plus ancien :
+  si la page courante n'est pas vide ET (repas de la page + repas du jour) &gt; 10
+    → on ferme la page et le jour ouvre la suivante
+  sinon → le jour rejoint la page courante</code></pre>
+  <p>La première journée d'une page y entre toujours : une journée de quinze repas occupe sa page seule. <code>totalPages = max(1, dayPages.length)</code> ; changer de fenêtre ou basculer en « Choisir » ramène à la page 1 ; une page devenue hors bornes est ramenée à <code>totalPages</code>.</p>
+  <p>En-tête d'une journée : « Aujourd'hui (…) », « Hier (…) » ou la date longue française, première lettre capitalisée.</p>
+  <p class="ancre">src/features/meal-journal/mealJournal.utils.ts · src/features/meal-journal/useMealJournal.ts</p>
+  <details><summary>Cas limites</summary>
+    <p>Le compte « Journal (N) » du bandeau vaut <code>savedMeals.length</code> — tout le journal, pas la période affichée.</p>
+    <p>Une prise sans heure trie avant toutes les autres du jour (<code>''</code> est plus petit que <code>'00:00'</code>) dans le journal, à l'inverse de la couche vitrée qui la place en dernier.</p>
+  </details>
+
+  <h3 id="alimentation-editions-en-place-du-journal">Éditions en place du journal</h3>
+  <p>Trois éditions, trois règles d'enregistrement.</p>
+  <p><strong>Date et heure</strong> : <code>saveDateTime</code> sort sans rien écrire si l'une des deux valeurs est vide ; sinon <code>onUpdateSavedMeal({...meal, date, time})</code>, qui repasse par le plafond de déplacement et l'arrondi de l'heure.</p>
+  <p><strong>Faim</strong> : aucun bouton de validation. Un écouteur <code>onPressOutside</code> en <code>pressStart</code> — l'appui, pas le clic complet — écrit les deux valeurs et referme, la fermeture précédant donc ce que le clic irait faire ailleurs. L'intérieur est délimité par <code>.hunger-edit-popover</code>.</p>
+  <p><strong>Item</strong> : <code>saveItem</code> sort si <code>foodId === ''</code>. L'index <code>−1</code> signifie un ajout : l'item reçoit un nouvel identifiant et rejoint la fin de la liste ; sinon il remplace celui de l'index, en conservant son identifiant. La quantité est lue par <code>parseFloat(qty) || 0</code>. Le compteur de sélection est incrémenté avant l'écriture.</p>
+  <pre><code>deleteItem : si meal.items.length ≤ 1 → onDeleteSavedMeal(meal.id)
+             sinon → items privés de l'index</code></pre>
+  <p class="ancre">src/features/meal-journal/useMealJournal.ts</p>
+  <details><summary>Cas limites</summary>
+    <p>Supprimer le dernier item supprime le repas sans confirmation supplémentaire.</p>
+    <p>Une édition de date refusée par le plafond laisse le bloc d'édition fermé alors que le repas n'a pas bougé.</p>
+    <p>L'ajout d'item ouvre sur la quantité « 100 », comme une ligne neuve du formulaire.</p>
+  </details>
+
+  <h3 id="alimentation-totaux-d-une-journee-dans-le-journal">Totaux d'une journée dans le journal</h3>
+  <p>Le groupe de journée n'emploie pas la même source pour les kcal et pour les masses :</p>
+  <pre><code>calories = Σ round(meal.calories || 0)                       // champ stocké, arrondi PRISE PAR PRISE
+protein, carbs, fat, fiber = Σ computeItemsNutrition(meal.items).n   // RECALCULÉS depuis les compositions</code></pre>
+  <p>La barre du jour répartit les <strong>masses</strong> en grammes : <code>total = prot + gluc + lip + fib</code>, largeur d'un segment = <code>masse / total × 100</code> (part exacte, non arrondie). Si <code>total ≤ 0</code>, la barre n'est pas dessinée et seules les kcal restent. <span class="marque">arbitrage non validé</span> — la bulle du calendrier, elle, répartit des calories.</p>
+  <p class="ancre">src/versions/mixte/features/meal-journal/MealDayGroup.tsx</p>
+  <details><summary>Cas limites</summary>
+    <p>Le journal arrondit chaque prise puis somme ; le calendrier somme puis arrondit : les deux totaux peuvent différer d'une unité.</p>
+    <p>Un aliment personnel supprimé fait baisser les masses recalculées sans faire baisser les kcal, qui viennent du champ stocké.</p>
+  </details>
+  <div class="exemple"><p>Le 12 mai, Camille a 113 g de protéines, 135 g de glucides, 38 g de lipides et 39 g de fibres : la barre du journal est proportionnelle à ces masses, pendant que la bulle du calendrier dit 32 % / 38 % / 24 % / 6 % — des parts caloriques.</p></div>
+
+  <h3 id="alimentation-correspondance-repas-favori">Correspondance repas ↔ favori</h3>
+  <p>Deux compositions sont identiques si elles ont la même longueur et si, à chaque rang, <code>foodId</code>, <code>isCustomFood</code> et <code>qty</code> coïncident. L'ordre compte ; le type (repas / en-cas) n'entre pas dans la comparaison.</p>
+  <pre><code>isSameComposition(a, b) = a.length === b.length
+  ET ∀i : a[i].foodId === b[i].foodId ET a[i].isCustomFood === b[i].isCustomFood ET a[i].qty === b[i].qty
+
+findMatchingFavorite(items, favoris) = premier favori tel que isSameComposition(fav.items, items), sinon null</code></pre>
+  <p>Le journal affiche alors le titre de ce favori. En modification, ce favori devient la base de la saisie et l'interrupteur « favori » se tait tant que la composition n'en dévie pas (<code>canSaveAsFavorite = !selectedBaseFav || !isSameAsFavorite</code>).</p>
+  <p class="ancre">src/shared/food/food.composition.ts · src/features/meal-form/favoriteMatch.ts · src/features/meal-form/useMealForm.ts</p>
+  <details><summary>Cas limites</summary>
+    <p>Deux favoris de même composition : le premier de la liste l'emporte, quel que soit son titre.</p>
+    <p>Les mêmes aliments dans un autre ordre ne correspondent pas.</p>
+    <p>Les quantités se comparent en nombres : 100 et 100,0 sont égales, 100 et 100,1 non.</p>
+  </details>
+
+  <h3 id="alimentation-texte-d-une-composition">Texte d'une composition</h3>
+  <p>Destiné à un lecteur humain seulement (partage, export PDF, résumé d'un favori) : cette chaîne n'est jamais stockée ni redécoupée.</p>
+  <pre><code>formatItemsAsText(items) = items.map(item =&gt;
+    resolveFood(item) ? `${round(toDisplayQuantity(qty))}${getUnitLabel(isLiquid)} ${nom}` : 'aliment supprimé'
+  ).join(', ')
+
+formatItemNames(items)  = items.map(item =&gt; resolveFood(item)?.name ?? 'aliment supprimé').join(', ')
+capitalizeFirst(nom)    = nom.charAt(0).toLocaleUpperCase('fr-FR') + nom.slice(1)</code></pre>
+  <p><code>formatItemNames</code> sert de titre à une ligne de journal sans favori correspondant, et de titre par défaut d'un favori (tronqué à 30 caractères).</p>
+  <p class="ancre">src/shared/food/food.format.ts</p>
+  <details><summary>Cas limites</summary>
+    <p>Un aliment supprimé est écrit, pas passé sous silence : sur un document médical, une ligne manquante serait plus trompeuse.</p>
+    <p><code>capitalizeFirst</code> laisse inchangé un nom déjà capitalisé ou ouvrant sur un chiffre ; « été » devient « Été », pas « éTé ».</p>
+  </details>
+  <div class="exemple"><p>« 50g Pain pita, 250ml Jus d'orange ».</p></div>
+
+  <h3 id="alimentation-total-kcal-d-un-jour-calendrier-couche-tuiles">Total kcal d'un jour (calendrier, couche, tuiles)</h3>
+  <p>Une seule fonction commune, <code>nutritionTotalsOn</code>, sert le calendrier, la couche vitrée, les tuiles de l'accueil et les moyennes : deux blocs qui disent le même total ne peuvent pas se contredire.</p>
+  <pre><code>nutritionTotalsOn(meals, date) = meals.filter(m =&gt; m.date === date)
+  .reduce((acc, m) =&gt; ({ calories: acc.calories + (m.calories || 0),
+                         protein:  acc.protein  + (m.protein  || 0),
+                         fiber:    acc.fiber    + (m.fiber    || 0) }), { 0, 0, 0 })
+
+dayCalories(logs, date) = round(nutritionTotalsOn(logs, date).calories)</code></pre>
+  <p>Seules trois grandeurs sortent d'ici : calories, protéines, fibres — les glucides et les lipides ne sont pas des objectifs du jour.</p>
+  <p class="ancre">src/features/home/homeOverview.ts · src/features/meal-journal/mealCalendar.ts</p>
+  <details><summary>Cas limites</summary>
+    <p>Somme puis arrondi : différence possible d'une unité avec le journal, qui arrondit chaque prise.</p>
+    <p>Un champ absent vaut zéro dans ce cumul — c'est l'un des rares endroits où l'absence vaut zéro.</p>
+  </details>
+  <div class="exemple"><p>310 + 481 + 238 + 387 = 1 416 kcal sous le 12 mai.</p></div>
+
+  <h3 id="alimentation-parts-caloriques-des-nutriments">Parts caloriques des nutriments</h3>
+  <p>Facteurs d'Atwater, fibres séparées des glucides (Ciqual donne les glucides <em>disponibles</em>) : protéines 4, glucides 4, lipides 9, fibres 2 kcal/g. Les masses viennent des champs enregistrés des prises, sans recalcul depuis les compositions.</p>
+  <pre><code>prot = Σ protein × 4 ; gluc = Σ carbs × 4 ; lip = Σ fat × 9 ; fib = Σ fiber × 2
+total = prot + gluc + lip + fib
+si total ≤ 0 → null
+
+exacts  = [prot, gluc, lip, fib] / total × 100
+planchers = floor(exacts)
+restant = 100 − Σ planchers
+les « restant » plus fortes parties décimales reçoivent +1  (plus fort reste)</code></pre>
+  <p>La fonction prend une liste de lignes : une prise seule, une journée, une période entière — la même règle sert au récapitulatif et à la moyenne.</p>
+  <p class="ancre">src/features/meal-journal/mealCalendar.ts</p>
+  <details><summary>Cas limites</summary>
+    <p><code>null</code> quand la période n'a aucune masse : la ligne se tait, jamais quatre zéros.</p>
+    <p>Une prise portant des kcal sans aucune masse (un verre d'alcool) rend <code>null</code> : les kcal restent affichées, pas la barre.</p>
+  </details>
+  <div class="exemple"><p>Le 12 mai : 113 × 4 = 452, 135 × 4 = 540, 38 × 9 = 342, 39 × 2 = 78, total 1 412 → 32,01 / 38,24 / 24,22 / 5,52 → planchers 32 / 38 / 24 / 5 = 99 → le point restant va à la plus forte décimale (fibres) → 32 % / 38 % / 24 % / 6 %.</p></div>
+
+  <h3 id="alimentation-compte-repas-snacks-d-un-jour">Compte repas / snacks d'un jour</h3>
+  <pre><code>snacks = logs.filter(m =&gt; mealTypeLabel(m.type) === 'En-cas').length
+repas  = logs.length − snacks
+
+libellé : parties = []
+  si repas  &gt; 0 → « N repas »                 (« repas » invariable)
+  si snacks &gt; 0 → « N snack » + (N &gt; 1 ? 's' : '')
+  jointes par « · » ; une famille à zéro est omise</code></pre>
+  <p class="ancre">src/features/meal-journal/mealCalendar.ts</p>
+  <details><summary>Cas limites</summary>
+    <p>Journée sans repas : « 2 snacks » tout court, jamais « 0 repas · 2 snacks ».</p>
+    <p>Journée vide : chaîne vide.</p>
+  </details>
+
+  <h3 id="alimentation-titre-d-un-favori">Titre d'un favori</h3>
+  <p>Trois points de création, un même contrôle de doublon.</p>
+  <table>
+    <thead><tr><th>Point</th><th>Titre retenu</th><th>Refus</th></tr></thead>
+    <tbody>
+      <tr><td>Formulaire de repas (interrupteur « favori »)</td><td><code>favoriteTitle.trim()</code>, sinon <code>formatItemNames(...).slice(0, 30)</code></td><td>titre vide → « Un titre est requis pour enregistrer le favori. » ; doublon ; plafond</td></tr>
+      <tr><td>Menu « … » du journal</td><td><code>capitalizeFirst(saisi || noms tronqués à 30 || 'En-cas' / 'Repas')</code></td><td>doublon ; plafond</td></tr>
+      <tr><td>Formulaire du bloc des favoris</td><td><code>capitalizeFirst(saisi)</code>, obligatoire</td><td>« Ajoutez au moins un aliment avant d'enregistrer votre menu favori. » ; « Un titre est requis pour enregistrer. » ; doublon ; plafond</td></tr>
+    </tbody>
+  </table>
+  <pre><code>doublon = favoris.some(f =&gt; f.title.trim().toLowerCase() === titreFinal.trim().toLowerCase())
+en modification, le favori édité est exclu (f.id !== editingFavoriteId)
+→ « Ce titre existe déjà dans vos favoris. »</code></pre>
+  <p>Les refus sont jugés au clic sur « Enregistrer » et s'effacent dès que le titre est retouché (<code>changeFavoriteTitle</code> vide l'erreur à chaque frappe).</p>
+  <p class="ancre">src/features/meal-form/useMealForm.ts · src/versions/mixte/components/MealTracker.tsx · src/versions/mixte/components/MealFavoritesBlock.tsx</p>
+  <details><summary>Cas limites</summary>
+    <p>La comparaison ignore la casse et les espaces de bord, mais pas les accents : « Petit-déj » et « Petit-dej » coexistent.</p>
+    <p>Le doublon est jugé sur le titre final, majuscule initiale posée : saisir « petit-déj avoine » se heurte à « Petit-déj avoine ».</p>
+  </details>
+
+  <h3 id="alimentation-plafond-de-50-favoris-crees-par-jour">Plafond de 50 favoris créés par jour</h3>
+  <pre><code>DAILY_FAVORITE_MEAL_CAP = 50
+countFavoritesCreatedOn(favoris, jour) = favoris.filter(f =&gt;
+    f.createdAt !== undefined ET getLocalDateStr(new Date(f.createdAt)) === jour).length
+canCreateFavoriteMeal(...) = count &lt; 50
+refus : « Limite atteinte : pas plus de 50 menus créés par jour. La création reprend demain. »</code></pre>
+  <p>Le décompte porte sur les favoris <strong>présents</strong> : supprimer un menu créé le jour même rend sa place. Un favori sans <code>createdAt</code> — créé avant l'arrivée du champ — n'est compté nulle part. La modification d'un favori existant ne consomme aucun quota, elle ne passe pas par ce contrôle.</p>
+  <p class="ancre">src/features/meal-favorites/favoriteDailyCap.ts</p>
+  <details><summary>Cas limites</summary>
+    <p>Le jour compté est le jour local de <code>createdAt</code>, pas la date du repas d'origine.</p>
+    <p>Le plafond refuse : rien n'est écrasé, le formulaire reste ouvert sur son refus.</p>
+  </details>
+
+  <h3 id="alimentation-contenu-et-copie-d-un-favori">Contenu et copie d'un favori</h3>
+  <p>Un favori ne porte que <code>title</code>, <code>type</code>, <code>items</code> et <code>createdAt</code> : ni date, ni heure, ni faim, ni valeurs nutritionnelles — celles-ci se recalculent à la lecture depuis la composition.</p>
+  <pre><code>copyItems(items) = items.map(item =&gt; ({ ...item, id: newId() }))</code></pre>
+  <p>La copie a lieu dans les deux sens : un repas enregistré comme favori donne au favori sa propre copie ; l'ajout rapide d'un favori au journal passe <code>copyItems(fav.items)</code>. Les deux entités évoluent ensuite séparément.</p>
+  <p class="ancre">src/shared/food/food.composition.ts · src/features/meal-form/useMealForm.ts · src/versions/mixte/components/MealTracker.tsx</p>
+  <details><summary>Cas limites</summary>
+    <p>La modification d'un favori depuis son bloc remplace ses items par ceux du brouillon, eux aussi porteurs d'identifiants neufs.</p>
+    <p>Seuls les identifiants changent : <code>foodId</code>, <code>isCustomFood</code> et <code>qty</code> sont repris tels quels, ce qui laisse la correspondance repas ↔ favori vraie après copie.</p>
+  </details>
+
+  <h3 id="alimentation-reprise-d-un-favori-comme-base">Reprise d'un favori comme base</h3>
+  <pre><code>useFavoriteAsBase(fav) :
+  si le formulaire est FERMÉ → resetForm() puis openAddForm()   // date du jour, heure arrondie, faim 2 / 0
+  selectedBaseFav ← fav
+  mealType ← fav.type
+  items ← itemsToDraft(fav.items)  (ou une ligne vierge si le favori est vide)</code></pre>
+  <p>Formulaire déjà ouvert : la date, l'heure et les deux faims réglées sont conservées ; seuls les aliments et le type sont remplacés. Le repas créé n'est pas lié au favori : <code>selectedBaseFav</code> ne sert qu'à taire l'interrupteur « favori » tant que la composition n'en dévie pas.</p>
+  <p class="ancre">src/features/meal-form/useMealForm.ts</p>
+  <details><summary>Cas limites</summary>
+    <p>Reprendre un favori depuis le bloc des favoris ferme ce bloc.</p>
+    <p>Un favori dont tous les aliments ont été supprimés donne des lignes au nom vide et au <code>foodId</code> pourtant renseigné : elles restent enregistrables mais n'apportent rien.</p>
+  </details>
+
+  <h3 id="alimentation-chargement-des-favoris">Chargement des favoris</h3>
+  <pre><code>loadFavoriteMeals() :
+  brut = getItem(glp1_favorite_meals)
+  si ce n'est pas un tableau → []
+  garder les entrées dont items est un TABLEAU (l'absence du champ est le critère, pas la liste vide)
+  écarter les identifiants fav-1 … fav-6 (six préréglages d'exemple)</code></pre>
+  <p>Deux lecteurs partagent cette fonction : la page Menus, qui en fait son état et le persiste par un effet, et la couche vitrée de l'accueil, qui écrit directement dans la réserve. Les deux ne sont jamais montés en même temps — la page vit sur l'onglet <code>meals</code>, la couche sur l'accueil.</p>
+  <p class="ancre">src/features/meal-form/mealFormStores.ts · src/versions/mixte/components/MealTracker.tsx</p>
+  <details><summary>Cas limites</summary>
+    <p>Un favori d'avant la bascule, dont la composition était une phrase, est écarté définitivement : il n'est pas reconverti.</p>
+    <p>Un favori recréé avec l'identifiant <code>fav-3</code> serait écarté lui aussi.</p>
+  </details>
+
+  <h3 id="alimentation-aliment-personnalise-validation-et-identite">Aliment personnalisé : validation et identité</h3>
+  <p>Normalisation des noms, commune à l'unicité et à la recherche :</p>
+  <pre><code>normalizeFoodName(n) = n.trim().toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '')
+
+isFoodNameTaken(nom, personnels, excludeCode) =
+  fullCiqualDb.some(f =&gt; normalizeFoodName(f.alim_nom_fr) === cherche)
+  OU personnels.some(f =&gt; f.alim_code !== excludeCode ET normalizeFoodName(f.alim_nom_fr) === cherche)
+  (un nom vide n'est jamais pris)</code></pre>
+  <p>Construction de la fiche :</p>
+  <pre><code>alim_code   = editing ? editing.alim_code : `user-custom-${now}`
+alim_nom_fr = capitalizeFirst(nom.trim())
+5 valeurs   = parseFloat(champ) || 0        // un champ vide ou illisible vaut 0
+unit        = draft.unit === '100ml' ? 'ml' : 'g'
+isUserCustom = true
+barcode     = code saisi (trim) || barcode d'origine || undefined
+createdAt   = editing ? editing.createdAt : now
+placement   : upsert → remplacement sur place en modification, sinon EN TÊTE de la liste</code></pre>
+  <p>Bornes des cinq champs : <code>RULE_NUTRIENT</code> — 0 à 10000, une décimale, vide permis, message « Une valeur entre 0 et 10000 est attendue, ou rien. ». <span class="marque">arbitrage non validé</span> (borne haute 10000). La recherche du bloc de gestion passe par la même normalisation et est séparée par mode : <code>isRecipe</code> vrai côté recettes, faux côté aliments.</p>
+  <p class="ancre">src/features/custom-food/customFood.utils.ts · src/versions/mixte/app/form.rules.ts · src/versions/mixte/components/MealTracker.tsx</p>
+  <details><summary>Cas limites</summary>
+    <p>Ordre des refus : nom vide, puis nom pris, puis bornes des cinq valeurs, puis plafond du jour.</p>
+    <p>Un aliment sans protéines déclarées est enregistré à 0 g : la distinction « absent / zéro » n'est pas conservée dans le stockage, contrairement à ce que la fiche Open Food Facts en dit.</p>
+    <p>L'unicité se juge sans accents : « Crème brûlée » et « creme brulee » sont le même nom.</p>
+  </details>
+
+  <h3 id="alimentation-suppression-d-un-aliment-personnalise">Suppression d'un aliment personnalisé</h3>
+  <pre><code>recipesUsingFood(code, foods) = foods.filter(f =&gt;
+    f.isRecipe ET (f.recipeIngredients || []).some(i =&gt; i.isCustomFood ET i.foodId === code))
+
+si la liste n'est pas vide → refus :
+« Cet aliment est un ingrédient de la recette « A ». Retirez-l'en avant de le supprimer. »
+plusieurs recettes : « des recettes « A », « B » et « C ». » (virgules, « et » avant la dernière)</code></pre>
+  <p>L'invariant tenu est : un ingrédient de recette existe toujours. Sans lui, <code>computeItemsNutrition</code> ignorerait l'ingrédient introuvable et abaisserait les valeurs de la recette au ré-enregistrement, sans rien dire. Les aliments Ciqual ne se suppriment pas : seule la liste personnelle est modifiable.</p>
+  <p class="ancre">src/features/custom-food/customFood.utils.ts</p>
+  <details><summary>Cas limites</summary>
+    <p>Un aliment employé dans des repas ou des favoris — et non dans une recette — se supprime : ses items affichent alors « aliment supprimé » et sortent des recalculs.</p>
+    <p>Une recette d'avant la bascule, sans <code>recipeIngredients</code>, ne protège aucun aliment.</p>
+  </details>
+
+  <h3 id="alimentation-plafonds-de-creation-de-la-bibliotheque">Plafonds de création de la bibliothèque</h3>
+  <pre><code>DAILY_CUSTOM_FOOD_CAP = 50   (kind = 'aliment')
+DAILY_RECIPE_CAP      = 20   (kind = 'recette')
+customFoodKind(f)     = f.isRecipe ? 'recette' : 'aliment'
+
+countCustomFoodsCreatedOn(foods, kind, jour) = foods.filter(f =&gt;
+    f.createdAt !== undefined ET customFoodKind(f) === kind
+    ET getLocalDateStr(new Date(f.createdAt)) === jour).length
+
+upsertCustomFoodWithinDailyCap : si editing → aucun contrôle ; sinon si le quota est atteint,
+  la liste ressort INCHANGÉE avec son refus, rien n'est écrasé.</code></pre>
+  <p>Refus : « Limite atteinte : pas plus de 50 aliments créés par jour. La création reprend demain. » / « … 20 recettes créées par jour … ». Les trois chemins de création — saisie manuelle, code-barres, recette — convergent ici, le contrôle n'est donc écrit qu'une fois. Les quotas sont indépendants.</p>
+  <p class="ancre">src/features/custom-food/customFoodDailyCap.ts</p>
+  <details><summary>Cas limites</summary>
+    <p>Supprimer une entrée créée le jour même rend sa place.</p>
+    <p>Une entrée sans <code>createdAt</code> ne compte dans aucun quota.</p>
+    <p>Modifier une recette ne déplace pas son <code>createdAt</code>, donc ne déplace pas le quota qu'elle a consommé.</p>
+  </details>
+
+  <h3 id="alimentation-unites-et-conversions">Unités et conversions</h3>
+  <p>Les quantités sont <strong>toujours</strong> stockées en grammes (solide) ou millilitres (liquide) ; la conversion n'existe qu'aux deux extrémités, à la saisie et au rendu. L'étiquette n'est jamais stockée : elle se recalcule à chaque affichage, si bien que reclasser un aliment de solide à liquide met à jour tous les repas qui le référencent.</p>
+  <pre><code>getUnitLabel(isLiquid, système) : imperial → 'fl oz' / 'oz' ; sinon → 'ml' / 'g'
+toDisplayQuantity(qty, isLiquid, système) : métrique → qty ; imperial → qty / (29,5735295625 | 28,349523125)
+toBaseQuantity  : réciproque exacte
+fromLargeUnit(q) = q × 1000        // kg, L
+système absent → 'metric'</code></pre>
+  <p>Aucun appelant du dépôt ne passe <code>'imperial'</code> : les composants appellent <code>getUnitLabel(isLiquid)</code> sans second argument, l'export PDF passe explicitement <code>'metric'</code>, et <code>toBaseQuantity</code> comme <code>fromLargeUnit</code> n'ont aucun appelant. Le stockage métrique est reconduit en V2 <span class="marque v2">V2</span>.</p>
+  <p class="ancre">src/shared/food/food.units.ts · src/shared/food/food.format.ts</p>
+  <details><summary>Cas limites</summary>
+    <p><code>isLiquid</code> est renseigné sur les 3 258 entrées Ciqual ; sur un aliment personnel, il se déduit de <code>unit === 'ml'</code>.</p>
+    <p>Le poids total d'une recette additionne des grammes et des millilitres sans conversion — voir « Valeurs d'une recette pour 100 g ».</p>
+  </details>
+
+  <h3 id="alimentation-recherche-par-code-barres-chemin">Recherche par code-barres : le chemin</h3>
+  <pre><code>code = saisie.trim()
+1. code vide                                   → « Un numéro de code-barres est attendu. »
+2. findUserFoodByBarcode(code, personnels)     → fiche ouverte en MODIFICATION
+3. findFoodByBarcode(code, personnels)         → création PRÉREMPLIE depuis la fiche de la base
+4. fetchProductByBarcode(code) :
+     produit  → création préremplie, mention « Valeurs préremplies via code-barres (Open Food Facts) »
+     null     → formulaire VIERGE nommé « Produit &lt;code&gt; », sans mention de préremplissage
+     exception→ message selon la cause, le formulaire ne s'ouvre pas
+
+normalizeBarcode(c) = c.trim().toLowerCase()</code></pre>
+  <p>L'étape 3 est une garde théorique : aucune entrée de <code>fullCiqualDb</code> ne porte de <code>barcode</code> aujourd'hui, et une telle fiche ne serait pas modifiable.</p>
+  <p class="ancre">src/features/custom-food/barcode.utils.ts · src/versions/mixte/components/MealTracker.tsx</p>
+  <details><summary>Cas limites</summary>
+    <p>Un aliment personnel dont le code-barres est une chaîne vide n'est jamais retrouvé (<code>!!f.barcode</code>).</p>
+    <p>Le code est passé par <code>encodeURIComponent</code> dans l'URL de la requête.</p>
+    <p>La lecture par l'appareil photo n'existe pas dans le code. <span class="marque non">non implémenté</span></p>
+  </details>
+
+  <h3 id="alimentation-fiche-open-food-facts-verification">Fiche Open Food Facts : vérification</h3>
+  <p>Requête <code>GET https://world.openfoodfacts.org/api/v0/product/&lt;code&gt;.json</code>, en-tête <code>User-Agent: MealTrackerApp - Web - Version 1.0</code>, <code>AbortController</code> armé à 10 000 ms pour tout l'échange, corps compris.</p>
+  <pre><code>si data.status !== 1 ou data.product n'est pas un objet → null
+nutriments = objet product.nutriments, ou {} s'il manque
+
+toNutrient(v, max) :
+  v n'est ni un nombre ni une chaîne        → null
+  chaîne vide (après trim)                  → null
+  Number(v) non fini, &lt; 0 ou &gt; max          → null   (JAMAIS rabattu sur la borne)
+  sinon → Number(v)
+
+calories = toNutrient(nutriments['energy-kcal_100g'], 900) ?? toNutrient(nutriments['energy-kcal'], 900)
+protein / carbs / fat / fiber = toNutrient(nutriments['&lt;champ&gt;_100g'], 100)
+
+nom : balises &lt;…&gt; et \p{C} remplacés par une espace, blancs recollés, trim,
+      tronqué à 120 caractères ; vide après nettoyage → absent
+fiche sans nom ET sans un seul nutriment retenu → null
+nom absent mais un nutriment retenu → « Produit &lt;code&gt; »</code></pre>
+  <p>Dans le formulaire, chaque valeur est écrite <code>String(Math.round(v))</code> ; <code>null</code> laisse le champ <strong>vide</strong> — un aliment sans protéines déclarées n'est pas un aliment à 0 g. L'unité proposée est <code>100g</code>.</p>
+  <p class="ancre">src/shared/food/food.barcode.ts · src/features/custom-food/barcode.utils.ts</p>
+  <details><summary>Cas limites</summary>
+    <p>Une énergie donnée en kilojoules dans le champ kcal dépasse 900 : elle est écartée, pas convertie.</p>
+    <p>Une valeur négative est écartée, pas ramenée à 0.</p>
+    <p>Un champ vide dans le formulaire est ensuite enregistré à 0 par <code>buildCustomFood</code> : la distinction « absent / zéro » ne survit pas à l'enregistrement.</p>
+  </details>
+
+  <h3 id="alimentation-erreurs-de-recherche-par-code-barres">Erreurs de recherche par code-barres</h3>
+  <p>La cause est qualifiée à la source par <code>BarcodeLookupError.failure</code>, jamais devinée depuis un texte ; <code>barcodeErrorMessage</code> en tire la phrase.</p>
+  <table>
+    <thead><tr><th>Cause</th><th>Déclencheur</th><th>Message</th></tr></thead>
+    <tbody>
+      <tr><td><code>injoignable</code></td><td><code>fetch</code> rejeté (réseau coupé, hôte introuvable), délai de 10 s dépassé, corps interrompu en cours de lecture</td><td>« La recherche n'a pas abouti. Vérifiez votre connexion et réessayez. »</td></tr>
+      <tr><td><code>service</code></td><td>HTTP non <code>ok</code> (404, 429, 500, 503…), corps qui n'est pas du JSON (<code>SyntaxError</code>)</td><td>« Open Food Facts ne répond pas correctement en ce moment. Ce n'est pas votre connexion : réessayez plus tard, ou saisissez les valeurs à la main. »</td></tr>
+      <tr><td>autre erreur</td><td>toute exception qui n'est pas un <code>BarcodeLookupError</code> — remplissage du formulaire compris, l'écran englobant les deux dans le même <code>try</code></td><td>« La recherche n'a pas abouti. Réessayez, ou saisissez les valeurs à la main. »</td></tr>
+    </tbody>
+  </table>
+  <p>Un code inconnu n'est pas une erreur : la fonction rend <code>null</code> et le formulaire s'ouvre vierge. Une fiche trop abîmée pour qu'on en tire quoi que ce soit se comporte comme un code inconnu.</p>
+  <p class="ancre">src/shared/food/food.barcode.ts</p>
+  <details><summary>Cas limites</summary>
+    <p>La minuterie est toujours annulée en <code>finally</code>, y compris sur succès.</p>
+    <p>Aucune valeur n'est inventée en cas d'échec : le formulaire ne s'ouvre pas.</p>
+  </details>
+
+  <h3 id="alimentation-dessin-du-code-barres">Dessin du code-barres</h3>
+  <p><code>eanModules</code> rend la suite des modules (<code>'1'</code> barre, <code>'0'</code> espace) ; le dessin SVG appartient au composant. Aucune image téléchargée, aucune bibliothèque.</p>
+  <pre><code>chiffres = code.trim() ; si /^\d+$/ échoue → null
+longueur 12 (UPC-A) → un « 0 » est ajouté devant
+clé de contrôle : depuis la droite, poids alternés 1 et 3, total ≡ 0 (mod 10) ; sinon null
+
+EAN-13 : 101 + 6 chiffres gauche (jeux L/G selon EAN13_PARITIES[premier chiffre])
+         + 01010 + 6 chiffres droite (jeu R) + 101   → 95 modules
+EAN-8  : 101 + 4 chiffres (L) + 01010 + 4 chiffres (R) + 101  → 67 modules
+toute autre longueur → null</code></pre>
+  <p>Le jeu R est le complément bit à bit du jeu L ; le jeu G est le R lu à l'envers. Le premier chiffre d'un EAN-13 ne se dessine pas : il se lit dans l'alternance L/G des six chiffres de gauche.</p>
+  <p class="ancre">src/features/custom-food/barcode.utils.ts</p>
+  <details><summary>Cas limites</summary>
+    <p>Clé fausse, longueur inattendue ou caractère non numérique : aucune image, plutôt qu'une image qui ne correspond à rien.</p>
+    <p>3017620422003 : 3 + 0×3 + 1 + 7×3 + 6 + 2×3 + 0 + 4×3 + 2 + 2×3 + 0 + 0×3 + 3 = 60 → valide.</p>
+  </details>
+
+  <h3 id="alimentation-valeurs-d-une-recette-pour-100-g">Valeurs d'une recette pour 100 g</h3>
+  <pre><code>totalWeight = Σ ingredient.qty
+total       = computeItemsNutrition(ingredients)
+si totalWeight ≤ 0 → { toutes valeurs 0, totalWeight: 0 }
+sinon facteur = 100 / totalWeight, chaque valeur = total.n × facteur
+
+à l'affichage et à l'enregistrement : Math.round(...) sur les cinq valeurs</code></pre>
+  <p>Les cinq valeurs arrondies sont inscrites sur l'aliment produit ; <code>unit: 'g'</code>, quelles que soient les natures des ingrédients.</p>
+  <p class="ancre">src/shared/food/food.nutrition.ts · src/features/custom-food/useRecipeForm.ts</p>
+  <details><summary>Cas limites</summary>
+    <p><code>totalWeight</code> additionne des grammes et des millilitres sans conversion : une recette contenant 20 ml d'huile compte 20 « g » de poids total.</p>
+    <p>Le dénominateur est le poids <strong>saisi</strong>, pas le poids après cuisson : l'évaporation n'est pas modélisée.</p>
+    <p>Un ingrédient non résolu est ignoré dans le numérateur mais compté dans <code>totalWeight</code> : les valeurs pour 100 g baissent.</p>
+  </details>
+  <div class="exemple"><p>Dahl : 300 g de lentille cuite (125 kcal/100 g), 200 g de tomate crue (19 kcal/100 g), 20 ml d'huile d'olive (900 kcal/100 ml) → 375 + 38 + 180 = 593 kcal pour 520 g → 593 × 100 / 520 = 114,0 → 114 kcal pour 100 g.</p></div>
+
+  <h3 id="alimentation-recette-validation-et-identite">Recette : validation et identité</h3>
+  <p>Refus dans cet ordre, un seul message à la fois :</p>
+  <pre><code>1. nom vide                              → « Veuillez indiquer le nom du plat/dessert. »
+2. aucun ingrédient résolu               → « Veuillez ajouter au moins un aliment à la recette. »
+3. une ligne nommée sans foodId          → « Chaque aliment de la recette doit être choisi dans la liste. »
+4. isFoodNameTaken(nom, …, son propre code) → « Un aliment ou un plat avec ce nom existe déjà dans vos aliments. »
+5. plafond du jour                       → « Limite atteinte : pas plus de 20 recettes créées par jour. La création reprend demain. »</code></pre>
+  <p>Fiche produite :</p>
+  <pre><code>alim_code = editing ? editing.alim_code : `user-custom-recipe-${now}`
+alim_nom_fr = capitalizeFirst(nom.trim())
+5 valeurs = nutrients.per100 (arrondies) ; unit = 'g'
+isUserCustom = true ; isRecipe = true ; recipeIngredients = composition
+createdAt = editing ? editing.createdAt : now</code></pre>
+  <p>Renommer une recette ne demande aucune réécriture : repas et favoris la référencent par identifiant. Une recette d'avant la bascule, dont les ingrédients étaient textuels, se rouvre avec une composition vide, à ressaisir.</p>
+  <p class="ancre">src/features/custom-food/useRecipeForm.ts · src/data/mealConstants.ts</p>
+  <details><summary>Cas limites</summary>
+    <p>Rouvrir une recette d'avant la bascule et l'enregistrer telle quelle est refusé à l'étape 2 : la composition est vide.</p>
+    <p>Une recette peut elle-même être ingrédient d'un repas ; elle ne peut pas être ingrédient d'une autre recette sans que la suppression de l'aliment sous-jacent soit bloquée.</p>
+  </details>
+
+  <h3 id="alimentation-graphe-des-apports-par-jour">Graphe des apports par jour</h3>
+  <pre><code>points = cumul par date des 5 champs (absent = 0), triés par date croissante
+         un jour sans repas ne produit PAS de point
+étiquette d'abscisse : JJ/MM (extraite de la chaîne, sans passer par Date)
+
+moyennes = Σ des points / nombre de points   (0 partout si aucun point)
+
+maxCalDomain = kcalAxisDomain(max des calories) = ceil(max(maxKcal, 100) × 1,15 / 100) × 100
+maxMacroDomain = ceil(max(max des cumuls prot+gluc+lip+fib, 20) × 1,15 / 10) × 10
+sans aucun point : 2000 kcal et 200 g</code></pre>
+  <p>L'axe des grammes se mesure sur la <strong>somme empilée</strong>, pas sur le plus haut nutriment isolé : c'est cette somme qui est dessinée. En vue mono-nutriment, <code>nutritionViewMacroDomain</code> applique la même règle aux seules séries de la vue.</p>
+  <p>Conséquence assumée : chaque axe suivant ses propres données, le rapport kcal / gramme varie d'un graphe et d'une période à l'autre.</p>
+  <p class="ancre">src/features/meal-charts/mealCharts.utils.ts · src/features/meal-charts/nutritionViews.ts</p>
+  <details><summary>Cas limites</summary>
+    <p>Une journée renseignée à 0 kcal produit un point : c'est l'existence d'une prise qui compte, pas sa valeur.</p>
+    <p>La moyenne divise par les journées renseignées, jamais par les jours de la période.</p>
+  </details>
+  <div class="exemple"><p>Le jour le plus haut de Camille fait 1 840 kcal : 1 840 × 1,15 = 2 116 → axe 2 200 kcal. Ses 372 g empilés ce jour-là : 372 × 1,15 = 427,8 → axe 430 g.</p></div>
+
+  <h3 id="alimentation-ordre-des-vues-du-diaporama">Ordre des vues du diaporama</h3>
+  <pre><code>NUTRITION_VIEWS = [
+  { calories : ['calories'] },
+  { protein  : ['protein']  },
+  { fat      : ['fat']      },
+  { carbs    : ['carbs']    },
+  { fiber    : ['fiber']    },
+  { all      : ['calories','protein','carbs','fat','fiber'] },
+]
+NUTRITION_VIEW_ALL_INDEX = NUTRITION_VIEWS.length − 1</code></pre>
+  <p>Calories, Protéines, Lipides, Glucides, Fibres, Tout. La dernière est la vue de la page, inchangée. Les libellés (« Calories seules »…) ne servent qu'à l'accessibilité : la navigation est graphique.</p>
+  <p class="ancre">src/features/meal-charts/nutritionViews.ts</p>
+  <details><summary>Cas limites</summary>
+    <p>Pour la vue « Tout », <code>nutritionViewMacroDomain</code> rend exactement <code>computeNutritionYDomains(points).maxMacroDomain</code> : un seul arrondi, pas deux règles.</p>
+  </details>
+
+  <h3 id="alimentation-fenetres-de-periode">Fenêtres de période</h3>
+  <pre><code>PERIOD_OPTIONS = 7days · 14days · 30days · 90days · all · custom
+coupure(n jours) = getLocalDateStr(aujourd'hui − (n − 1))     // le jour courant est INCLUS
+all    → pas de coupure
+custom → borne vide = illimitée dans cette direction
+filtrage : comparaison de chaînes AAAA-MM-JJ, jamais d'objet Date</code></pre>
+  <p>Chaque bloc a sa clé <code>glp1_period_&lt;bloc&gt;</code> et son défaut ; une valeur relue inconnue retombe sur le défaut du bloc.</p>
+  <table>
+    <thead><tr><th>Clé</th><th>Bloc</th><th>Défaut</th></tr></thead>
+    <tbody>
+      <tr><td><code>meals_journal</code></td><td>Journal</td><td>30 jours</td></tr>
+      <tr><td><code>meals_nutrition_chart</code></td><td>Moyenne / j</td><td>30 jours</td></tr>
+      <tr><td><code>meals_hunger_chart</code></td><td>Appétit</td><td>30 jours</td></tr>
+      <tr><td><code>meals_time_of_day_chart</code></td><td>Histogramme par créneau (non monté)</td><td>30 jours</td></tr>
+      <tr><td><code>meals_time_slot_table</code></td><td>Composition moy. / h <em>et</em> Répartition</td><td>7 jours</td></tr>
+      <tr><td><code>meals_vs_snack</code></td><td>Repas vs en-cas</td><td>30 jours</td></tr>
+      <tr><td><code>home_repas_comparaison</code></td><td>Comparaison de la couche vitrée</td><td>7 jours</td></tr>
+    </tbody>
+  </table>
+  <p class="ancre">src/shared/time-window/timeWindow.utils.ts · periodOptions.ts · usePeriodWindow.ts · src/features/meal-charts/useTimeSlotTable.ts · useMealVsSnack.ts · src/versions/mixte/components/SurimpressionRepas.tsx</p>
+  <details><summary>Cas limites</summary>
+    <p>« Composition moy. / h » et « Répartition » partagent une clé : les deux tableaux décrivent les mêmes prises et ne peuvent pas se contredire.</p>
+    <p><code>setCustomWindow</code> écrit fenêtre et bornes en une seule fois : enchaîner <code>setWindow('custom')</code> puis <code>setCustomRange</code> dans le même rendu perdrait la première écriture.</p>
+  </details>
+
+  <h3 id="alimentation-creneaux-horaires">Créneaux horaires</h3>
+  <pre><code>TIME_SLOT_HOURS = 3 ; TIME_SLOT_COUNT = 24 / 3 = 8
+heure  = Number.parseInt(time.split(':')[0], 10)
+si l'heure n'est pas un entier, ou &lt; 0, ou &gt; 23 → null (prise écartée, comptée dans withoutTime)
+sinon index = floor(heure / 3)
+étiquette = `${startHour}-${startHour + 3}h`   → « 0-3h » … « 21-24h »</code></pre>
+  <p>Quatre fonctions partagent ce placement — apports moyens, répartition, composition, appétit — pour que deux blocs de la même page ne rangent jamais une prise dans deux créneaux différents. Les huit créneaux sont toujours rendus, vides compris.</p>
+  <p class="ancre">src/features/meal-charts/mealCharts.utils.ts</p>
+  <details><summary>Cas limites</summary>
+    <p>« 12:45 » → créneau 12-15h. Chaîne vide → sans heure.</p>
+    <p><code>parseInt</code> tolère un préfixe : « 7h30 » donne 7 et tombe dans 6-9h.</p>
+    <p>Les prises écartées sont annoncées par une note quand <code>withoutTime</code> est non nul, jamais silencieusement.</p>
+  </details>
+
+  <h3 id="alimentation-faim-par-creneau">Faim par créneau</h3>
+  <pre><code>pour chaque prise placée :
+  count += 1
+  si hungerBefore n'est ni undefined ni null → beforeSum += valeur ; beforeCount += 1
+  si hungerAfter  n'est ni undefined ni null → afterSum  += valeur ; afterCount  += 1
+
+faimAvant = beforeCount &gt; 0 ? Number((beforeSum / beforeCount).toFixed(1)) : null
+faimApres = afterCount  &gt; 0 ? Number((afterSum  / afterCount ).toFixed(1)) : null
+calories  = computeTimeSlotComposition(meals).rows[index].calories   // moyenne par prise, null sans prise
+
+axe kcal = kcalAxisDomain(max des calories non nulles, 0 sinon)</code></pre>
+  <p>Le test porte sur l'absence, jamais sur la fausseté : une faim notée 0 compte dans la moyenne. Une moyenne sans aucune note vaut <code>null</code>, jamais 0 — sur une échelle où 0 signifie « aucune faim », un zéro d'absence se lirait comme une mesure. Les kcal ne sont pas recalculées ici : la même fonction alimente la colonne kcal du tableau « Composition moy. / h ».</p>
+  <p class="ancre">src/features/meal-charts/mealCharts.utils.ts</p>
+  <details><summary>Cas limites</summary>
+    <p>Les deux dénominateurs diffèrent : une prise notée avant et pas après pèse sur une seule courbe. <code>beforeCount</code> et <code>afterCount</code> sortent pour que l'infobulle le dise.</p>
+    <p>Un créneau sans prise a ses trois valeurs à <code>null</code> : les trois courbes s'y interrompent ensemble.</p>
+  </details>
+  <div class="exemple"><p>Créneau 12-15h, 21 prises toutes notées : faim avant 3,8 / 5 (21), faim après 0,9 / 5 (21), kcal moyens ≈ 468 (21).</p></div>
+
+  <h3 id="alimentation-faim-par-jour-calculee-non-dessinee-en-mixte">Faim par jour (calculée, non dessinée)</h3>
+  <p><code>computeHungerChartData</code> moyenne les deux faims par <strong>jour</strong>, arrondies au dixième, et rend <code>0</code> — non <code>null</code> — quand aucune note n'existe d'un côté ce jour-là. C'est la seule différence de fond avec la version par créneau : un histogramme n'a pas de valeur d'absence, et une barre nulle s'y lit comme « aucune faim » (approximation connue).</p>
+  <p>Aucun écran de la version Mixte ne monte cette série : le graphe « Appétit » lit <code>computeHungerByTimeSlot</code>. <span class="marque non">non implémenté</span></p>
+  <p class="ancre">src/features/meal-charts/mealCharts.utils.ts</p>
+
+  <h3 id="alimentation-composition-repas-vs-en-cas">Composition repas vs en-cas</h3>
+  <p>Partage des familles par <code>mealTypeLabel</code>, puis, pour chaque famille non vide :</p>
+  <pre><code>prises        = lines.length
+kcalParPrise  = Σ (calories || 0) / prises        // le champ stocké, pas les nutriments
+fibresParPrise= Σ (fiber || 0) / prises
+
+kcal des nutriments : protein × 4, carbs × 4, fat × 9, fiber × 2
+totalKcal = somme des quatre ; si totalKcal ≤ 0 → parts = null
+
+brut = chaque kcal de nutriment / totalKcal × 100
+le plus GRAND brut est mis de côté (premier maximum en cas d'égalité)
+les trois autres sont arrondis (Math.round) et sommés
+le plus grand reçoit 100 − somme des trois</code></pre>
+  <p>Les parts se calculent sur les calories des nutriments et non sur le champ <code>calories</code> : une composition doit sommer à 100 %, et le total saisi peut diverger de la somme (arrondis des fiches, alcool, saisies manuelles). Le champ <code>calories</code> reste ce qu'affiche la moyenne par prise — le nombre que le journal montre déjà. Une famille sans prise rend <code>null</code> : pas de barre à zéro. <span class="marque">arbitrage non validé</span></p>
+  <p class="ancre">src/features/meal-charts/mealVsSnack.ts</p>
+  <details><summary>Cas limites</summary>
+    <p>Une famille présente mais sans un gramme de nutriment garde sa moyenne kcal et perd sa barre.</p>
+    <p>Le plus grand segment peut absorber jusqu'à 1,5 point d'écart avec sa valeur exacte.</p>
+  </details>
+  <div class="exemple"><p>Sur 30 jours, les repas de Camille font ≈ 402 kcal par prise (33 / 36 / 26 / 5 %), ses en-cas ≈ 214 kcal (17 / 22 / 57 / 4 %).</p></div>
+
+  <h3 id="alimentation-composition-par-creneau">Composition par créneau</h3>
+  <pre><code>par créneau : count, Σ calories, Σ protein, Σ carbs, Σ fat, Σ fiber
+total = protein + carbs + fat + fiber        // des MASSES, en grammes
+part(n) = total &gt; 0 ? n / total × 100 : null
+calories = count &gt; 0 ? Σ calories / count : null      // moyenne PAR PRISE</code></pre>
+  <p>Chaque ligne somme à 100 %. Moyenner ne change rien aux parts : diviser les quatre masses par le nombre de prises divise numérateur et dénominateur — la composition d'une prise moyenne est celle du cumul du créneau. Une seule barre par créneau, repas et en-cas confondus : la fonction cumule sans regarder le type. <span class="marque">arbitrage non validé</span> — la base est la masse et non l'énergie, contrairement à « Repas vs en-cas ».</p>
+  <p class="ancre">src/features/meal-charts/mealCharts.utils.ts</p>
+  <details><summary>Cas limites</summary>
+    <p>Un créneau ayant des prises mais aucune masse : <code>calories</code> renseigné, les quatre parts à <code>null</code>.</p>
+    <p>La même prise vaut donc une part de masse ici et une part calorique dans « Repas vs en-cas » : les deux blocs ne se comparent pas chiffre à chiffre.</p>
+  </details>
+
+  <h3 id="alimentation-ecriture-d-une-cellule-de-pourcentage">Écriture d'une cellule de pourcentage</h3>
+  <pre><code>value === null → « — »   (grisé)
+value === 0    → « 0 % » (grisé)
+value &lt; 0,5    → « &lt;1 % »
+sinon          → `${Math.round(value)} %`</code></pre>
+  <p>Même fonction dans les deux tableaux, « Répartition » et « Composition moy. / h ». Surlignage d'une colonne :</p>
+  <pre><code>columnTopThreshold(valeurs) :
+  positives = valeurs non nulles ET &gt; 0, triées décroissant
+  aucune → null ; une seule → cette valeur ; sinon → la DEUXIÈME
+cellule surlignée ⟺ threshold !== null ET value !== null ET value &gt; 0 ET value ≥ threshold</code></pre>
+  <p>Une égalité au second rang surligne donc plus de deux cellules : départager deux valeurs identiques serait arbitraire.</p>
+  <p>La cellule Total vaut « 100 % » par construction, ou « — » quand la colonne n'a aucune valeur.</p>
+  <p class="ancre">src/versions/mixte/features/meal-charts/TimeSlotTable.tsx · TimeSlotCompositionTable.tsx · src/features/meal-charts/mealCharts.utils.ts</p>
+  <details><summary>Cas limites</summary>
+    <p>Une valeur exactement 0,5 s'écrit « 1 % » (arrondi de <code>Math.round</code>).</p>
+    <p>Une colonne à une seule valeur non nulle surligne cette valeur contre elle-même — c'est le repli assumé de <code>positives.length === 1</code>.</p>
+  </details>
+
+  <h3 id="alimentation-parts-entieres-des-barres">Parts entières des barres</h3>
+  <p>Les barres de composition et de répartition écrivent des entiers sommant à 100 par la méthode des plus forts restes ; la géométrie, elle, n'est jamais arrondie — la largeur d'un segment est sa part exacte, donc la barre est toujours pleine à ras.</p>
+  <pre><code>partsEntieres(valeurs) :
+  sols  = valeurs.map(floor)
+  reste = round(Σ valeurs) − Σ sols
+  ordre = index triés par partie décimale décroissante, puis index croissant
+  les « reste » premiers reçoivent +1
+
+texteDePart(exacte, entiere) = exacte === 0 ? '0 %' : entiere === 0 ? '&lt;1 %' : `${entiere} %`</code></pre>
+  <p>La cellule du tableau arrondit chaque valeur isolément : une part affichée dans une barre peut s'écarter d'un point de la cellule correspondante. <span class="marque">arbitrage non validé</span> Ce qui ne peut pas diverger, ce sont les données : les deux vues lisent le même objet <code>rows</code>.</p>
+  <p class="ancre">src/versions/mixte/features/meal-charts/TimeSlotCompositionBars.tsx · TimeSlotRepartitionBars.tsx</p>
+  <details><summary>Cas limites</summary>
+    <p>« Repas vs en-cas » n'emploie pas cette méthode : le plus grand segment y absorbe seul le reliquat.</p>
+    <p>Un créneau sans prise n'a pas de barre du tout, seulement la mention « aucune prise » ; un nutriment sans apport sur la période garde sa ligne et perd sa barre.</p>
+  </details>
+
+  <h3 id="alimentation-presentation-tableau-barres">Présentation tableau / barres</h3>
+  <pre><code>useChartViewMode(clé, defaut = 'tableau') :
+  lecture de glp1_view_&lt;clé&gt; ; valeur ≠ 'tableau' et ≠ 'barres' → defaut
+  le choix est écrit à chaque bascule
+
+clés employées : meals_time_slot_composition · meals_time_slot_repartition</code></pre>
+  <p>Une clé par bloc, comme les périodes : on peut laisser l'un en tableau et l'autre en barres. Le défaut est le tableau — la présentation qui existait avant la bascule.</p>
+  <p class="ancre">src/features/meal-charts/useChartViewMode.ts · src/versions/mixte/features/meal-charts/TimeSlotTable.tsx · TimeSlotCompositionTable.tsx</p>
+
+  <h3 id="alimentation-repartition-par-creneau">Répartition par créneau</h3>
+  <pre><code>par créneau : count et les 5 cumuls (valeur absente = 0)
+totaux de la période = Σ des huit créneaux, colonne par colonne
+part(cumul, total) = total &gt; 0 ? cumul / total × 100 : null</code></pre>
+  <p>Chaque colonne somme à 100 % : la question est « quelle part de mes apports je prends à cette heure-là ». Elle se lit perpendiculairement à la composition, qui somme à 100 par ligne. Un total de période nul donne <code>null</code> — rien à répartir, ce qui n'est pas un 0 %.</p>
+  <p class="ancre">src/features/meal-charts/mealCharts.utils.ts</p>
+  <details><summary>Cas limites</summary>
+    <p>Les prises sans heure exploitable sont écartées du numérateur <em>et</em> du dénominateur, et comptées dans <code>withoutTime</code>.</p>
+    <p>Un créneau sans apport rend 0, pas <code>null</code>, dès que la période a un total : la distinction est visible dans la cellule (« 0 % » contre « — »).</p>
+  </details>
+
+  <h3 id="alimentation-creneaux-hauts-et-surlignage">Créneaux hauts et surlignage</h3>
+  <p>Trois lignes de tête, une par grandeur : <code>calories</code>, <code>carbs</code>, <code>fat</code>.</p>
+  <pre><code>topOf(clé) :
+  scored = lignes dont la valeur n'est pas null ET &gt; 0
+           triées par valeur décroissante, puis startHour croissant
+  aucune  → []            (l'affichage tait la ligne, sans « aucun » ni tiret)
+  ≤ 2     → toutes
+  sinon   → seuil = scored[1].value ; toutes celles dont la valeur ≥ seuil</code></pre>
+  <p>Un créneau à zéro n'est jamais un créneau haut. Une égalité au second rang sort plus de deux créneaux — la même règle que le surlignage des cellules, pour qu'un créneau ne soit jamais surligné dans le tableau sans être nommé au-dessus, ni l'inverse. Les étiquettes sont reprises des lignes déjà produites, jamais recalculées.</p>
+  <p class="ancre">src/features/meal-charts/mealCharts.utils.ts</p>
+  <details><summary>Cas limites</summary>
+    <p>Une seule grandeur servie : un seul créneau nommé, sans « et ».</p>
+    <p>Deux créneaux de même valeur sortent dans l'ordre de la journée.</p>
+  </details>
+
+  <h3 id="alimentation-objectifs-nutritionnels-du-jour">Objectifs nutritionnels du jour</h3>
+  <pre><code>dailyNutritionGoals(profil, poidsActuelKg) = {
+  calories: profil.dailyCaloriesGoal ?? 1400,
+  protein:  profil.dailyProteinGoal  ?? Math.round(poidsActuelKg × 1,5),
+  fiber:    profil.dailyFiberGoal    ?? 25,
+}</code></pre>
+  <p>Une seule fonction pour toute la page : barres de l'accueil, paliers, pourcentages de la recommandation, rapport médical. Un second jeu de valeurs de référence ferait dire deux choses à la même page.</p>
+  <p class="ancre">src/features/home/homeOverview.ts</p>
+  <details><summary>Cas limites</summary>
+    <p>Le test est <code>??</code> : un objectif saisi à 0 est retenu tel quel et n'est pas remplacé par le défaut — un objectif nul ne se franchit jamais (voir « Paliers ») et rend le pourcentage nul.</p>
+    <p>La cible protéines suit le poids <em>actuel</em> : elle change à chaque pesée.</p>
+  </details>
+  <div class="exemple"><p>Camille pèse 96 kg et n'a saisi aucun objectif : 1 400 kcal, round(96 × 1,5) = 144 g de protéines, 25 g de fibres.</p></div>
+
+  <h3 id="alimentation-pourcentage-d-objectif">Pourcentage d'objectif</h3>
+  <pre><code>carré « Aujourd'hui » (DailyNutritionSummary) :
+  pct = objectif &gt; 0 ? Math.min(100, Math.round(valeur / objectif × 100)) : 0
+  la valeur passée est le total NON ARRONDI de nutritionTotalsOn
+
+bloc « En direct » de MaisonSections :
+  realPercent = objectif &gt; 0 ? Math.round(valeur / objectif × 100) : 0   // NON borné
+  la largeur de la barre, elle, est bornée à 100</code></pre>
+  <p>L'infobulle du carré écrit le total arrondi à côté du pourcentage calculé sur le total non arrondi : les deux nombres peuvent sembler ne pas se correspondre.</p>
+  <p class="ancre">src/versions/mixte/components/DailyNutritionSummary.tsx · src/versions/mixte/homes/sections/MaisonSections.tsx</p>
+  <details><summary>Cas limites</summary>
+    <p>Objectif à 0 : 0 %, jamais une division par zéro.</p>
+    <p>Le carré plafonne le chiffre à 100 %, l'autre accueil ne le plafonne pas : 156 % s'y écrit.</p>
+  </details>
+  <div class="exemple"><p>Total protéines non arrondi 113,4 g sur 144 g → 78,75 → 79 %, alors que le chiffre affiché à côté est « 113 g ». Fibres 39 g sur 25 → 156 %, borné à 100 % dans le carré, écrit 156 % sur l'autre accueil ; la barre est pleine dans les deux cas.</p></div>
+
+  <h3 id="alimentation-moyennes-depuis-le-debut">Moyennes depuis le début</h3>
+  <pre><code>parJour = mealsByDate(meals)          // Map date → lignes, triées par heure
+jours   = parJour.size
+si jours === 0 → null                 // la tuile ne s'affiche pas
+
+pour chaque journée : dayMealCounts pour repas/en-cas, nutritionTotalsOn pour kcal/prot/fibres
+repas = Σ repas / jours ; encas = Σ snacks / jours
+calories, protein, fiber = Σ / jours</code></pre>
+  <p>Le dénominateur est le nombre de <strong>journées renseignées</strong>, jamais les jours écoulés depuis le début de la cure : diviser par les jours écoulés ferait dire au chiffre la tenue du journal et non ce qu'on mange. <code>null</code> sans journée : zéro se lirait comme un jeûne. Le rapport médical lit la même fonction.</p>
+  <p class="ancre">src/features/meal-journal/mealAverages.ts</p>
+  <details><summary>Cas limites</summary>
+    <p>Une journée à une seule prise pèse autant qu'une journée à quatre.</p>
+    <p>Les journées futures ne sont pas écartées : une prise antidatée au mois prochain compte comme une journée renseignée.</p>
+  </details>
+  <div class="exemple"><p>Trois journées renseignées totalisant 3 600 kcal donnent 1 200 kcal/j, même si la cure dure 30 jours.</p></div>
+
+  <h3 id="alimentation-moyennes-des-7-derniers-jours">Moyennes des 7 derniers jours</h3>
+  <pre><code>hier  = getLocalDateStr(maintenant − 1 × 86 400 000)
+debut = getLocalDateStr(maintenant − 7 × 86 400 000)
+retenus = meals.filter(m =&gt; m.date ≥ debut ET m.date ≤ hier)
+journees = taille de l'ensemble des dates distinctes de « retenus »
+si journees === 0 → null
+kcal / protéines / fibres = Σ des champs / journees</code></pre>
+  <p>Le jour courant est écarté : la journée n'est pas finie, la compter tirerait la moyenne vers le bas d'autant plus qu'il est tôt — le chiffre dirait l'heure qu'il est. Même fenêtre et même dénominateur pour les trois grandeurs, afin que les trois tuiles de la rangée se lisent ensemble.</p>
+  <p class="ancre">src/features/home/homeOverview.ts</p>
+  <details><summary>Cas limites</summary>
+    <p>La fenêtre couvre sept jours : de J−7 à J−1, bornes comprises.</p>
+    <p>Le décalage se calcule en millisecondes puis est ramené au jour local : un changement d'heure d'été peut décaler la borne d'un jour.</p>
+  </details>
+
+  <h3 id="alimentation-pourcentage-de-la-recommandation-accueil">Pourcentage de la recommandation (accueil)</h3>
+  <pre><code>pct = objectif &gt; 0 ? Math.round(moyenne / objectif × 100) : null</code></pre>
+  <p>Quatre pourcentages, deux par colonne : protéines et fibres, « Depuis le début » (moyennes de <code>mealDailyAverages</code>) et « 7 derniers jours » (<code>mealMacrosDailyAverageLast7Days</code>). Les deux colonnes emploient le <strong>même</strong> objectif du jour, celui des barres du carré plus haut sur la page. Ils ne paraissent que dans les infobulles.</p>
+  <p class="ancre">src/versions/mixte/homes/sections/MaisonSections.tsx</p>
+  <details><summary>Cas limites</summary>
+    <p><code>null</code> quand la moyenne est absente (aucune journée renseignée) ou l'objectif nul : le pourcentage disparaît de l'infobulle, le reste de la phrase demeure.</p>
+    <p>La cible protéines suivant le poids actuel, le pourcentage « depuis le début » compare une moyenne ancienne à un objectif d'aujourd'hui.</p>
+  </details>
+
+  <h3 id="alimentation-tendance-des-kcal">Tendance des kcal</h3>
+  <pre><code>TREND_DAYS = 14
+trendDates : les 14 jours locaux du plus ancien au plus récent, aujourd'hui compris
+caloriesTrend(meals) :
+  aucun repas dans TOUT le journal → série vide []
+  sinon, par date : le jour porte-t-il une prise ? oui → nutritionTotalsOn(date).calories ; non → 0
+
+periodShift(série, seuil = 0,05) :
+  série.length &lt; 2 → null
+  moitié = floor(length / 2)  ; avant = Σ série[0…moitié[ ; apres = Σ série[moitié…]
+  si avant ≤ 0 OU apres ≤ 0 :
+      les deux ≤ 0 → 'stable'
+      sinon        → apres &gt; avant ? 'hausse' : 'baisse'      // comparaison directe, hors seuil
+  écart = (apres − avant) / avant
+  |écart| &lt; 0,05 → 'stable' ; sinon écart &gt; 0 → 'hausse', sinon 'baisse'
+
+la tuile écrit : periodShift(caloriesTrend(savedMeals)) ?? 'stable'</code></pre>
+  <p>La somme et la moyenne donnent le même rapport, les deux moitiés ayant exactement sept jours : la somme est prise parce qu'elle se lit sans diviseur. Le seuil de 5 % est l'ordre de grandeur du bruit — une journée de repas pèse un septième d'une semaine, soit 14 %.</p>
+  <p class="ancre">src/features/trends/trends.ts · src/versions/mixte/homes/sections/MaisonSections.tsx</p>
+  <details><summary>Cas limites</summary>
+    <p>Journal entièrement vide : série vide, <code>periodShift</code> rend <code>null</code>, la tuile écrit « stable ».</p>
+    <p>Une journée renseignée à 0 kcal et une journée sans repas comptent toutes deux 0 dans la série : la distinction se perd ici, elle vit dans le journal.</p>
+  </details>
+  <div class="exemple"><p>Camille : 8 200 kcal sur J−14…J−8, 8 600 sur J−7…aujourd'hui → écart (8 600 − 8 200) / 8 200 = 4,9 % → stable. À 8 700, l'écart passe à 6,1 % → hausse.</p></div>
+
+  <h3 id="alimentation-ouverture-de-la-couche-menus-en-saisie-ou-en-lecture">Ouverture de la couche Menus, en saisie ou en lecture</h3>
+  <pre><code>état initial, posé au montage de la couche (rejoué à chaque ouverture) :
+enSaisie = ouverture.vue === 'jour'
+        ET ( ouverture.saisie === true
+             OU Math.round(nutritionTotalsOn(savedMeals, aujourd'hui).calories) === 0 )</code></pre>
+  <p>« Si 0 kcal » au sens exact de la tuile, arrondi compris. Arriver d'une colonne de moyennes (<code>vue: 'moyenne'</code>) n'ouvre jamais le formulaire : tomber sur une saisie parce que le jour même est vide n'aurait aucun rapport avec ce qu'on est allé chercher. Après une saisie réussie, la couche revient en lecture avec le message en tête. Créer un aliment absent depuis la couche renvoie vers la page Menus, formulaire ouvert, et perd la saisie en cours. <span class="marque">arbitrage non validé</span></p>
+  <p>Un second état, <code>idEnEdition</code>, dit <em>quoi</em> l'on saisit : <code>null</code> pour un ajout, l'identifiant de la prise pour une mise à jour. L'ajout repose explicitement <code>null</code>, sinon un identifiant resté d'un geste précédent rouvrirait la prise d'avant.</p>
+  <p class="ancre">src/versions/mixte/components/SurimpressionRepas.tsx · src/versions/mixte/homes/sections/MaisonSections.tsx</p>
+
+  <h3 id="alimentation-prises-du-jour-dans-la-couche-vitree">Prises du jour dans la couche vitrée</h3>
+  <pre><code>prisesDuJour(meals, date) = meals.filter(m =&gt; m.date === date)
+  triées : heures croissantes ; une prise SANS heure passe en DERNIER
+  → { id, famille: mealFamilyLabel(type), heure: time || '', calories: calories || 0,
+      repartition: dayMacroPercents([prise]) }</code></pre>
+  <p>La répartition d'une prise emploie la même fonction que la journée et que la période : parts caloriques entières sommant à 100, <code>null</code> sans masse — la ligne écrit alors « Aucun macronutriment renseigné sur cette prise. ».</p>
+  <pre><code>libelleOptions(prise)          = `Options du repas de HH:MM` / `Options de l'en-cas de HH:MM`
+                                 sans heure : la phrase s'arrête à la famille
+confirmationSuppression(prise) = titre   « Supprimer le repas ? » / « Supprimer l'en-cas ? »
+                                 message « Voulez-vous vraiment supprimer le repas de HH:MM ? »
+                                 sans heure : « Voulez-vous vraiment supprimer le repas ? »</code></pre>
+  <p>L'article s'élide devant « en-cas » : « de l'en-cas », jamais « du en-cas ». La confirmation se fait dans la page, à la place de la ligne visée — jamais un <code>confirm()</code>.</p>
+  <p class="ancre">src/features/meal-journal/mealSurimpression.ts</p>
+  <details><summary>Cas limites</summary>
+    <p>Le journal, lui, place les prises sans heure en <em>tête</em> de journée : les deux écrans ne les rangent pas au même endroit.</p>
+    <p>Deux prises de même heure gardent leur ordre d'origine (comparateur rendant 0).</p>
+  </details>
+
+  <h3 id="alimentation-moyenne-par-prise-sur-une-periode">Moyenne par prise sur une période</h3>
+  <pre><code>prisesDeLaPeriode(meals, debut, fin) = meals.filter(m =&gt; m.date ET m.date ≥ debut ET m.date ≤ fin)
+                                       // bornes COMPRISES, comparaison de chaînes AAAA-MM-JJ
+si aucune prise → null
+
+calories    = Σ (calories || 0) / nombre de prises        // par PRISE, jamais par journée
+repas, encas= dayMealCounts(retenues)
+repartition = dayMacroPercents(retenues)                  // null sans masse sur toute la période</code></pre>
+  <p>Bornes effectives calculées par la couche :</p>
+  <pre><code>plusAncienne = min des dates du journal, aujourd'hui à défaut
+debut = custom ? (borne de début saisie || plusAncienne) : (getCutoffDateStr(fenêtre) ?? plusAncienne)
+fin   = custom ? (borne de fin saisie || aujourd'hui)    : aujourd'hui</code></pre>
+  <p>La moyenne est par prise et non par journée : ce qu'on compare, ce sont les lignes du récapitulatif — un repas, un en-cas — à ce que vaut un repas ou un en-cas ordinaire.</p>
+  <p class="ancre">src/features/meal-journal/mealSurimpression.ts · src/versions/mixte/components/SurimpressionRepas.tsx</p>
+  <details><summary>Cas limites</summary>
+    <p>« Depuis le début » (<code>getCutoffDateStr</code> rend <code>null</code>) retombe sur la plus ancienne prise du journal.</p>
+    <p>Une prise antidatée au-delà d'aujourd'hui sort de la fenêtre : la borne haute est le jour même.</p>
+  </details>
+
+  <h3 id="alimentation-phrase-de-moyenne">Phrase de moyenne</h3>
+  <pre><code>parties = []
+si repas &gt; 0 → « N repas » ; si encas &gt; 0 → « N en-cas »   // invariables, jamais d's
+aucune partie → null
+
+borne(d) = d === aujourd'hui ? « aujourd'hui » : `le ${formatDateShort(d)}`
+quand = debut === fin ? borne(fin) : `entre ${borne(debut)} et ${borne(fin)}`
+phrase = `Moyenne sur ${parties.join(' et ')} ${quand}.`</code></pre>
+  <p>Les bornes écrites sont celles du <strong>calcul</strong>, replis compris, jamais la valeur brute du sélecteur : la phrase ne peut pas mentir à côté du chiffre qu'elle explique. Une borne écrite en mot ne prend pas d'article — « aujourd'hui », jamais « le aujourd'hui ». Une période d'un seul jour ne s'écrit pas « entre le X et le X ».</p>
+  <p class="ancre">src/features/meal-journal/mealSurimpression.ts</p>
+  <details><summary>Cas limites</summary>
+    <p>Une famille à zéro se tait : jamais « Moyenne sur 3 repas et 0 en-cas ».</p>
+    <p>Aucune famille (cas que <code>moyenneNutritionnelle</code> écarte déjà) : <code>null</code>, et l'écran écrit qu'aucune prise n'a été enregistrée.</p>
+  </details>
+  <div class="exemple"><p>« Moyenne sur 11 repas et 2 en-cas entre le 06/05/2026 et aujourd'hui. »</p></div>
+
+  <h3 id="alimentation-deblocage-de-la-comparaison">Déblocage de la comparaison</h3>
+  <pre><code>comparaisonDebloquee(meals) = (meals || []).length ≥ 2</code></pre>
+  <p>Le compte porte sur <strong>tout</strong> le journal, pas sur la période regardée : une moyenne prise sur l'unique ligne du journal serait la ligne elle-même. Sous ce seuil, la couche montre une barre bidon floutée (27 / 41 / 28 / 4) et l'invitation « Enregistrez un nouveau repas ou en-cas pour débloquer la comparaison nutritionnelle ». Le verrou saute pour de bon dès la deuxième prise, repas ou en-cas.</p>
+  <p class="ancre">src/features/meal-journal/mealSurimpression.ts · src/versions/mixte/components/SurimpressionRepas.tsx</p>
+
+  <h3 id="alimentation-paliers-proteines-et-fibres">Paliers protéines et fibres</h3>
+  <pre><code>atteint(total, reco) = reco &gt; 0 ET total ≥ reco
+
+evaluerPaliersNutritifs(totaux, recommandations, date, fetes) :
+  dejaFetes = (fetes !== null ET fetes.date === date) ? fetes.nutriments : []
+  aFeter = []
+  si atteint(protein) ET 'proteines' ∉ dejaFetes → aFeter.push('proteines')
+  si atteint(fiber)   ET 'fibres'    ∉ dejaFetes → aFeter.push('fibres')
+  rend { fetes: { date, nutriments: [...dejaFetes, ...aFeter] }, aFeter }</code></pre>
+  <p>Fonction pure : l'état connu lui est donné. La mémoire <code>{ date, nutriments }</code> vit sous <code>glp1_paliers_nutritifs_fetes</code> ; un changement de date périme l'état entier d'un seul test d'égalité. Les deux nutriments sont évalués et retenus séparément — le même jour peut n'en fêter aucun, un seul, ou les deux.</p>
+  <p>La passe est jouée dans un effet, à l'ouverture de la couche vitrée <em>et</em> après chaque saisie : une prise écrite depuis la page Menus franchit un palier tout aussi bien, et la félicitation l'attend au retour. Rien n'est écrit ni retenu quand <code>aFeter</code> est vide.</p>
+  <pre><code>« Bravo ! Vos protéines du jour atteignent la recommandation : 150 g sur 144 g. »
+« Bravo ! Vos fibres du jour atteignent la recommandation : 39 g sur 25 g. »
+les deux : « Bravo ! Vos protéines et vos fibres du jour atteignent toutes deux la recommandation. »
+           + « Protéines : … . Fibres : … . »        (grammes entiers)</code></pre>
+  <p class="ancre">src/features/meal-form/paliersNutritifs.ts · src/versions/mixte/features/meal-form/MessagePaliersNutritifs.tsx · src/versions/mixte/components/SurimpressionRepas.tsx</p>
+  <details><summary>Cas limites</summary>
+    <p>Une recommandation nulle ou négative ne se franchit jamais : une journée sans repas « atteindrait » un objectif de 0 g.</p>
+    <p>Une entrée abîmée dans la mémoire est écartée à la lecture, valeur par valeur ; une clé illisible vaut <code>null</code>.</p>
+    <p>Supprimer une prise après la félicitation ne la reprend pas : la mémoire du jour reste posée.</p>
+  </details>
+  <div class="exemple"><p>Le 12 mai, après le dîner, Camille passe 25 g de fibres : la couche la félicite une fois. Ses 113 g de protéines restent sous 144 g, aucun message. Le 13 mai, la mémoire porte une autre date et repart de zéro.</p></div>
+  <p><a href="spec-fonctionnelle.html#alimentation-couche-vitree-menus-de-l-accueil">→ fonctionnelle</a></p>
+</section>

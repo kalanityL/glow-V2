@@ -1,0 +1,565 @@
+<section id="activite">
+  <h2>10. L'activité physique <a class="retour" href="#sommaire">↑ sommaire</a></h2>
+  <p>Ce chapitre donne les entités du journal d'activité physique, les formules de calories et de score, les bornes de saisie et les fenêtres de calcul. Il dit comment chaque chiffre affiché par les écrans du chapitre fonctionnel <a href="spec-fonctionnelle.html#activite">→ fonctionnelle</a> est produit, dans quelles unités et dans quel ordre.</p>
+
+  <h3 id="activite-entites">Entités</h3>
+  <p><strong>SportLog</strong> — une séance. Une ligne du tableau <code>appData.sportLogs</code>.</p>
+  <table>
+    <thead><tr><th>Champ</th><th>Type</th><th>Unité canonique</th><th>Remarque</th></tr></thead>
+    <tbody>
+      <tr><td><code>id</code></td><td>string</td><td>—</td><td>Écrit à l'ajout : <code>sport-${Date.now()}</code>.</td></tr>
+      <tr><td><code>date</code></td><td>string</td><td>AAAA-MM-JJ, local</td><td>Jamais un instant sérialisé.</td></tr>
+      <tr><td><code>time</code></td><td>string</td><td>HH:MM, local</td><td>Minutes rondes ∈ {0,10,15,20,30,40,45,50}, imposées à l'écriture.</td></tr>
+      <tr><td><code>sport</code></td><td>string</td><td>—</td><td>Le <code>value</code> d'un <code>SportPreset</code> (« Marche »). Une valeur hors catalogue est acceptée par les calculs.</td></tr>
+      <tr><td><code>intensity</code></td><td>'douce' | 'moderee' | 'intensive'</td><td>—</td><td>Toujours écrit, même quand une distance le rend inopérant.</td></tr>
+      <tr><td><code>duration</code></td><td>number</td><td>minutes</td><td><strong>Étages</strong> et non minutes quand <code>sport === 'Montée escaliers'</code>.</td></tr>
+      <tr><td><code>distance</code></td><td>number, facultatif</td><td>mètres</td><td>Uniquement sur les huit activités à courbe d'allure. Absente = <code>undefined</code>, jamais 0.</td></tr>
+      <tr><td><code>notes</code></td><td>string, facultatif</td><td>—</td><td><code>undefined</code> si la saisie détourée est vide.</td></tr>
+    </tbody>
+  </table>
+  <p><strong>SportPreset</strong> (catalogue, en dur) : <code>value</code>, <code>label</code>, <code>met</code>. <strong>UserProfile</strong>, champs qui commandent ce domaine : <code>sportTrackingEnabled: boolean</code>, <code>sportModuleHidden?: boolean</code>, <code>deleteAllButtonsEnabled?: boolean</code>, <code>targetWeight: number</code> (kg, repli du poids). <strong>AppData</strong> : <code>sportLogs?: SportLog[]</code> et <code>weightHistory: WeightLog[]</code>, lu pour le poids du jour.</p>
+  <p>Quatre valeurs vivent hors de la sauvegarde, dans le stockage local de l'appareil : <code>glp1_active_sports</code> (les activités cochées), <code>glp1_sport_history_view</code> (calendrier ou journal), <code>glp1_period_sport_journal</code> et <code>glp1_period_sport_chart</code> (<code>{window, customRange}</code>).</p>
+  <p><strong>Rien de dérivé n'est stocké.</strong> Sont recalculés à chaque rendu : les calories d'une séance, les calories d'un jour, la durée d'un jour (étages convertis), les minutes pondérées, le score quotidien, les totaux et moyennes de la répartition, les points du graphe. Aucun champ <code>calories</code> n'existe sur une ligne.</p>
+
+  <h3 id="activite-activation-automatique-des-modules-pas-et-sport">Activation automatique des modules pas et sport</h3>
+  <p><code>handleNavigate(tab)</code> et <code>handleQuickAddNavigate(tab)</code> copient le profil, et si <code>tab === 'sports'</code> et que <code>sportTrackingEnabled</code> est faux, le passent à <code>true</code> puis appellent <code>handleSaveProfile</code> avant <code>setActiveTab</code>. Trois onglets seulement sont concernés : <code>'meals'</code> (<code>foodTrackingEnabled</code>), <code>'steps'</code> (<code>stepsTrackingEnabled</code>), <code>'sports'</code>. Rien de tel pour <code>'metime'</code> ni <code>'sleep'</code>.</p>
+  <p><code>naviguerVersPageEteinte(tab)</code> ne fait que <code>setActiveTab(tab)</code> : c'est le chemin des tuiles et tiroirs vers une page dont le module est éteint, et c'est ce qui rend la page vitrée possible. La page n'est montée que si <code>activeTab === 'sports' &amp;&amp; profile.sportTrackingEnabled</code> ; sinon c'est la couche d'activation qui s'affiche, avec le nom « Activité Physique » et la cible <code>module-sport-tracking</code>.</p>
+  <p><code>handleQuickAddNavigate</code> pose en plus <code>setAutoOpenTab(tab)</code>, qui devient le <code>autoOpenAdd</code> du tracker.</p>
+  <p class="ancre">src/versions/mixte/App.tsx</p>
+  <details><summary>Cas limites</summary>
+    <p>Module déjà allumé : <code>hasChanges</code> reste faux, aucune écriture de profil.</p>
+    <p>Module <em>masqué</em> (<code>sportModuleHidden</code>) : la navigation ne le lit pas ; c'est l'affichage des tuiles et des cartes qui l'écarte.</p>
+    <p>Arrivée par <code>naviguerVersPageEteinte</code> puis clic sur la vitre : le passage par <code>handleNavigate('modules')</code> n'allume rien non plus.</p>
+  </details>
+
+  <h3 id="activite-curseur-calendrier-journal">Curseur calendrier / journal</h3>
+  <p><code>useHistoryView('glp1_sport_history_view')</code> : l'état initial vaut <code>'journal'</code> si et seulement si la valeur relue du stockage est exactement la chaîne <code>'journal'</code> ; toute autre valeur — absente, inconnue, corrompue — donne <code>'calendrier'</code>. Chaque bascule écrit la nouvelle valeur sous la même clé.</p>
+  <p>Le « + ajouter » de la barre n'est dessiné que si la prop <code>onAdd</code> est fournie ; sur la page Activité physique elle l'est toujours.</p>
+  <p class="ancre">src/versions/mixte/components/HistoryToolbar.tsx</p>
+  <details><summary>Cas limites</summary>
+    <p>Stockage indisponible : <code>getItem</code> rend <code>null</code> → calendrier.</p>
+    <p>La clé est propre à la page : les sept pages à historique ont chacune la sienne, aucune ne suit l'autre.</p>
+  </details>
+
+  <h3 id="activite-flottant-et-ouverture-automatique">« + » flottant et ouverture automatique</h3>
+  <p>La barre d'outils porte la poignée <code>useOnScreen</code> ; à chaque changement de visibilité elle appelle <code>onAddButtonOffScreenChange(!visible)</code>, que l'App relaie vers <code>armFloatingAdd('sports', offScreen)</code>. Cette fonction <strong>n'arme que sur <code>true</code></strong> et n'efface jamais : à l'intérieur d'une page, une fois apparu, le « + » ne repart plus. Un effet sur <code>activeTab</code> remet <code>floatingAddArmedTabs</code> à <code>{}</code> à chaque changement d'onglet — revenir sur la page repart désarmé.</p>
+  <p>Chaque appui sur le « + » incrémente <code>floatingAddRequest</code>. Le tracker mémorise dans une <code>ref</code> la valeur trouvée au montage et n'ouvre le formulaire que sur un écart :</p>
+  <pre><code>const request = openAddRequest ?? 0;
+if (request === lastAddRequest.current) return;
+lastAddRequest.current = request;
+openAddForm();   // date = getLocalDateStr(), time = getRoundedLocalTimeStr(), scrollToTop(true)</code></pre>
+  <p><code>autoOpenAdd</code> (arrivée par l'ajout rapide) initialise <code>showAddForm</code> à <code>true</code> dès le premier rendu, et un effet rappelle <code>openAddForm()</code> après le montage pour reposer date et heure.</p>
+  <p class="ancre">src/versions/mixte/App.tsx · src/versions/mixte/features/sport/SportTracker.tsx · src/features/sport/useSportForm.ts</p>
+  <details><summary>Cas limites</summary>
+    <p>Page plus courte que l'écran : la barre ne sort jamais, le « + » n'apparaît pas.</p>
+    <p>Formulaire déjà ouvert : un nouvel incrément rappelle <code>openAddForm()</code>, ce qui remet date et heure à l'instant sans effacer les autres champs.</p>
+    <p>Le compteur est global aux pages ; c'est la comparaison à la valeur du montage qui empêche une page fraîchement ouverte de réagir aux appuis d'une autre.</p>
+  </details>
+
+  <h3 id="activite-valeurs-par-defaut-du-formulaire-d-activite">Valeurs par défaut du formulaire d'activité</h3>
+  <table>
+    <thead><tr><th>Champ</th><th>Défaut</th></tr></thead>
+    <tbody>
+      <tr><td>sport</td><td><code>'Marche'</code></td></tr>
+      <tr><td>intensity</td><td><code>'douce'</code></td></tr>
+      <tr><td>duration</td><td><code>'30'</code> — <code>'5'</code> dès que « Montée escaliers » est choisie</td></tr>
+      <tr><td>customDuration / showCustomDuration</td><td><code>''</code> / <code>false</code></td></tr>
+      <tr><td>distance</td><td><code>''</code></td></tr>
+      <tr><td>date</td><td><code>getLocalDateStr()</code></td></tr>
+      <tr><td>time</td><td><code>getRoundedLocalTimeStr()</code></td></tr>
+      <tr><td>notes</td><td><code>''</code>, champ replié</td></tr>
+    </tbody>
+  </table>
+  <p>Préréglages de durée : <code>['15','30','45','60']</code> plus « Autre » ; pour la montée d'escaliers, <code>1…20</code> plus « Autre ».</p>
+  <p><code>handleSportSelect(value)</code> : si <code>value === 'ajouter-gerer'</code>, ouvre le panneau de gestion et sort sans rien changer. Sinon, dans cet ordre — <code>setSport</code>, <code>setDuration(value === 'Montée escaliers' ? '5' : '30')</code>, <code>setShowCustomDuration(false)</code>, <code>setCustomDuration('')</code>, <code>setDistance('')</code>. L'intensité n'est pas touchée. Le tracker y ajoute <code>setSubmitRefusals({})</code>.</p>
+  <p>L'heure proposée est arrondie <strong>vers le bas</strong> à la minute ronde inférieure : <code>ROUNDED_MINUTES.filter(m =&gt; m &lt;= minutes).pop() ?? 0</code>.</p>
+  <p class="ancre">src/features/sport/useSportForm.ts · src/shared/date/date.local.ts</p>
+  <details><summary>Cas limites</summary>
+    <p>Ouverture à 07:38 → 07:30 ; 14:58 → 14:50 ; 14:07 → 14:00. Jamais d'arrondi vers le haut : l'heure proposée est toujours déjà passée.</p>
+    <p><code>startEdit(log)</code> recharge tous les champs ; une durée absente des préréglages bascule sur « Autre » avec sa valeur ; <code>time</code> vide devient <code>'12:00'</code>.</p>
+    <p>Le formulaire monté sous la couche vitrée a exactement ces défauts : c'est le même crochet.</p>
+  </details>
+  <div class="exemple"><p>Camille ouvre le formulaire le 12/09/2026 à 23:20 : Marche, doux, 30 minutes, distance vide, 12/09/2026, 23:20. Elle choisit Montée escaliers : la durée passe à 5 étages, l'effort reste « doux ».</p></div>
+
+  <h3 id="activite-distance-ou-effort-jamais-les-deux">Distance ou effort, jamais les deux</h3>
+  <p>Le juge unique est <code>parseDistanceInput(distance, sport)</code>. S'il rend une valeur, la distance « compte » :</p>
+  <pre><code>hasDistanceField = !!onDistanceChange &amp;&amp; isDistanceSport(sport)
+distanceCounts   = parseDistanceInput(distance, sport) !== undefined
+// distanceCounts → les trois crans d'effort sont disabled et à opacity-40</code></pre>
+  <p>L'effacement passe par <code>changeDistance</code> : <code>setDistance(value)</code>, puis <code>if (!value.trim()) setIntensity('douce')</code>. Le retour à « doux » n'a donc lieu que sur un champ vide ou blanc, pas sur une saisie devenue illisible.</p>
+  <p>Au journal, <code>formatDistanceLabel(parseDistanceInput(brouillon, sport), sport)</code> décide de la seconde ligne : non nul → la distance s'affiche à la place de l'intensité ; nul → l'intensité. Une ligne sans distance n'expose donc aucun champ distance : elle ne s'ajoute que par « Modifier ».</p>
+  <p>L'intensité reste écrite dans la ligne dans tous les cas : elle alimente encore la répartition par intensité du bloc de suivi et le partage.</p>
+  <p class="ancre">src/versions/mixte/features/sport/SportForm.tsx · src/features/sport/useSportForm.ts · src/versions/mixte/features/sport/JournalEntryCard.tsx</p>
+  <details><summary>Cas limites</summary>
+    <p>Distance tapée sur un sport sans courbe : <code>parseDistanceInput</code> rend <code>undefined</code>, l'effort reste actif — mais le champ n'est pas dessiné pour ces sports.</p>
+    <p>Saisie illisible (« 0 », « abc ») : l'effort se rallume, sans revenir à « doux ».</p>
+    <p>Édition en place où le sport change dans le même geste : le champ distance n'est pas relu — la valeur en mètres est conservée si le nouveau sport accepte une distance, supprimée sinon.</p>
+  </details>
+
+  <h3 id="activite-jugement-des-refus-au-clic-valider">Jugement des refus au clic Valider</h3>
+  <p><code>refusSaisieSport</code> est pure et prend <code>{sport, showCustomDuration, customDuration, distance}</code>. Elle choisit d'abord les deux règles, puis juge :</p>
+  <pre><code>durationRule = sport === 'Montée escaliers' ? RULE_FLOORS : RULE_DURATION
+distanceRule = getDistanceUnit(sport) === 'km' ? RULE_DISTANCE_KM : RULE_DISTANCE_M
+
+if (showCustomDuration &amp;&amp; !isAcceptable(customDuration, durationRule))
+    refus.duration = boundsMessage(durationRule)
+if (isDistanceSport(sport) &amp;&amp; !isAcceptable(distance, distanceRule))
+    refus.distance = boundsMessage(distanceRule)</code></pre>
+  <p>Le tracker appelle cette fonction avant tout : si l'un des deux refus existe, il fait <code>e.preventDefault()</code>, mémorise les messages et sort — rien n'est enregistré, aucune félicitation n'est tirée. Sinon il vide les refus, tire la félicitation si ce n'est pas une correction, puis passe la main à <code>form.handleSubmit</code>.</p>
+  <p>Les messages s'affichent empilés juste avant le bouton, durée d'abord, distance ensuite. Effacement : retoucher la durée « Autre » efface <code>duration</code>, retoucher la distance efface <code>distance</code>, changer de sport ou de durée préréglée efface les deux, fermer ou rouvrir le formulaire aussi.</p>
+  <p>Une durée <em>préréglée</em> n'est jamais jugée : seule la branche « Autre » l'est. En aval, <code>useSportForm.handleSubmit</code> refuse encore en silence si <code>parseInt</code> de la durée retenue est <code>NaN</code> ou ≤ 0.</p>
+  <p class="ancre">src/versions/mixte/features/sport/refusSaisieSport.ts · src/versions/mixte/features/sport/SportTracker.tsx</p>
+  <details><summary>Cas limites</summary>
+    <p>Distance vide : <code>allowEmpty</code> est vrai sur les deux règles de distance, donc acceptée.</p>
+    <p>Distance illisible sur un sport à distance : refusée et dite, au lieu d'être enregistrée en silence comme « pas de distance ».</p>
+    <p>Les deux refus en même temps : les deux phrases s'empilent, l'enregistrement n'a pas lieu.</p>
+    <p>Le même jugement est monté par la couche vitrée de la home : une seule écriture, deux écrans.</p>
+  </details>
+  <div class="exemple"><p>Camille tape 500 dans « Autre » et clique sur Valider : « Une durée entre 1 et 480 minutes est attendue. », rien n'est écrit. Elle corrige à 50 : le message disparaît à la frappe.</p></div>
+
+  <h3 id="activite-unite-et-stockage-de-la-distance">Unité et stockage de la distance</h3>
+  <p><code>getDistanceUnit(sport)</code> rend <code>'m'</code> pour « Natation » et « Rameur / Aviron », <code>'km'</code> partout ailleurs. La valeur enregistrée est toujours en mètres ; aucune étiquette d'unité n'est stockée.</p>
+  <pre><code>parseDistanceInput(input, sport):
+  si !isDistanceSport(sport)            → undefined
+  trimmed = input.trim().replace(',', '.')
+  si trimmed === ''                     → undefined
+  value = parseFloat(trimmed)
+  si !isFinite(value) || value &lt;= 0     → undefined
+  meters = unité === 'km' ? value * 1000 : value
+  rounded = Math.round(meters)
+  → rounded &gt; 0 ? rounded : undefined</code></pre>
+  <p>Les huit sports à distance, dans l'ordre du catalogue : Marche, Randonnée, Course à pied, Vélo, Natation, Rameur / Aviron, Ski de fond, Patinage / Roller. Ce sont exactement les clés de <code>SPEED_CURVES</code>.</p>
+  <p class="ancre">src/features/sport/sport.distance.ts · src/shared/body-metrics/sportCalories.ts</p>
+  <details><summary>Cas limites</summary>
+    <p>« 5,2 » à Vélo → 5200. « 1500 » en Natation → 1500. « 0.0001 » en Marche → 0,1 m arrondi à 0 → <code>undefined</code>. « 5 » en Yoga → <code>undefined</code>.</p>
+    <p>Le champ lui-même tronque déjà les décimales : la règle kilomètres n'en autorise qu'une, « 5,25 » devient « 5.2 » à la frappe.</p>
+    <p><code>undefined</code> à la validation d'une modification écrase une distance précédente : effacer le champ efface bien la distance.</p>
+  </details>
+
+  <h3 id="activite-plafond-quotidien-sport-et-temps-pour-soi">Plafond quotidien (sport et temps pour soi)</h3>
+  <p>L'ajout passe par <code>addLogWithinDailyCap(sportLogs, log, 15, 'sport-'+Date.now(), onCapReached)</code>. Le décompte porte sur les lignes réellement présentes ce jour-là.</p>
+  <pre><code>duJour = logs.filter(l =&gt; l.date === log.date)
+si duJour.length &lt; 15 → [...logs, snapLogTime({...log, id: newId})]
+sinon:
+  onCapReached()                      // « Limite atteinte pour aujourd'hui : cette saisie remplace la dernière. »
+  index = dernière position du tableau où item.date === log.date
+  logs[index] = snapLogTime({ ...logs[index], ...log })</code></pre>
+  <p>L'écrasement vise la dernière ligne de la journée <strong>dans l'ordre du tableau</strong>, c'est-à-dire la dernière saisie, pas la plus tardive à l'horloge. La fusion conserve l'<code>id</code> de la ligne écrasée. Le message s'écrit dans un <code>NoticeBlock</code> en tête de la page en cours, titre « Limite atteinte », jamais dans une fenêtre du navigateur ; il informe après coup : la saisie a bien eu lieu.</p>
+  <p><code>snapLogTime</code> ramène <code>time</code> sur la minute ronde inférieure, à l'ajout comme à l'écrasement.</p>
+  <p class="ancre">src/shared/model/logbook.ts · src/app/useAppData.ts · src/versions/mixte/App.tsx</p>
+  <details><summary>Cas limites</summary>
+    <p>Séance antidatée : le plafond porte sur la date de la ligne, pas sur le jour courant.</p>
+    <p>Une ligne supprimée libère une place : le décompte ne connaît que les lignes présentes.</p>
+    <p>Le journal « Un temps pour soi » applique le même plafond et le même message ; le sommeil, lui, refuse au lieu d'écraser.</p>
+  </details>
+
+  <h3 id="activite-encouragement-apres-une-activite">Encouragement après une activité</h3>
+  <p><code>SPORT_ENCOURAGEMENTS</code> compte huit phrases. Le tirage est pur :</p>
+  <pre><code>candidates = SPORT_ENCOURAGEMENTS.filter(m =&gt; m !== previous)   // 7 si previous en fait partie
+pool       = candidates.length &gt; 0 ? candidates : SPORT_ENCOURAGEMENTS
+index      = Math.min(pool.length - 1, Math.floor(draw * pool.length))
+→ pool[Math.max(0, index)]</code></pre>
+  <p>Il est appelé <strong>à la validation</strong>, et seulement si <code>!form.editingLogId</code> : une correction n'est jamais félicitée. Le tirage précède <code>form.handleSubmit</code>, qui allume le bandeau. La phrase est conservée dans l'état et repassée comme <code>previous</code> au tirage suivant.</p>
+  <p>Sur la page, le bandeau porte deux lignes — la confirmation, puis la félicitation — et se ferme de trois façons : sa croix, un <code>setTimeout</code> de 3000 ms, ou la sortie d'écran (<code>useDismissWhenHidden</code>). Sous la couche vitrée, <code>MessageActiviteEnregistree</code> ne porte que sa croix : ni minuterie, ni poignée de sortie d'écran. La couche n'ayant pas de geste de modification, son message est toujours celui d'un ajout.</p>
+  <p class="ancre">src/features/sport/sportEncouragements.ts · src/versions/mixte/features/sport/SportTracker.tsx · src/versions/mixte/components/SurimpressionSport.tsx</p>
+  <details><summary>Cas limites</summary>
+    <p>Premier ajout : <code>previous</code> vaut <code>''</code>, le pool est de huit.</p>
+    <p><code>draw</code> exactement égal à 1 : <code>Math.min</code> garde l'index dans le tableau.</p>
+    <p>Une correction laisse la phrase précédente en mémoire sans l'afficher ; le prochain ajout l'évitera encore.</p>
+    <p>Sous la couche, une durée illisible passée au crochet arrête la bascule en lecture : la confirmation n'est pas posée.</p>
+  </details>
+
+  <h3 id="activite-catalogue-des-activites-physiques">Catalogue des activités physiques</h3>
+  <p><code>ALL_SPORTS</code> : 54 entrées <code>{value, label, met}</code>, écrites en dur, en ordre alphabétique accents ignorés (« Équitation » se range à E). <code>value</code> est la clé enregistrée dans chaque séance : la renommer couperait les séances de leur MET.</p>
+  <p>MET de repère : Marche 3,5 ; Yoga 2,5 ; Pétanque 2,5 et Stretching / Étirements 2,5 (les plus bas) ; Vélo 6 ; Montée escaliers 6 ; Natation 7 ; Course à pied 8 ; Corde à sauter 11 ; Squash 12 (le plus haut).</p>
+  <p>« Ping-pong » et « Tennis de table » ont fusionné en <code>MERGED_TABLE_TENNIS = 'Ping-pong/Tennis de table'</code>, 4,0 MET. Deux conversions : la sauvegarde par <code>mergeTableTennisSport</code> au chargement, et la liste des activités actives par <code>migrateSportNames</code>, qui remplace les anciens noms et écrase les doublons via un <code>Set</code>.</p>
+  <p>Une activité ne déclare rien d'autre : ni icône, ni courbe — seuls les huit sports de <code>SPEED_CURVES</code> acceptent une distance.</p>
+  <p class="ancre">src/shared/body-metrics/sportPresets.constants.ts</p>
+  <details><summary>Cas limites</summary>
+    <p><code>['Ping-pong','Tennis de table','Marche']</code> → <code>['Ping-pong/Tennis de table','Marche']</code>.</p>
+    <p>Une séance portant un <code>sport</code> hors catalogue reste lisible : les calories retombent sur MET 4,5, le score se passe de MET.</p>
+  </details>
+
+  <h3 id="activite-activites-actives-par-defaut-et-persistance">Activités actives par défaut et persistance</h3>
+  <p><code>DEFAULT_ACTIVE_SPORTS = ['Marche','Course à pied','Vélo','Natation','Fitness / Cardio','Yoga','Montée escaliers']</code>. À l'initialisation :</p>
+  <pre><code>saved = migrateSportNames(getItem('glp1_active_sports') ?? [])
+activeSports = saved.length &gt; 0
+  ? ALL_SPORTS.filter(s =&gt; saved.includes(s.value))
+  : ALL_SPORTS.filter(s =&gt; DEFAULT_ACTIVE_SPORTS.includes(s.value))</code></pre>
+  <p>La liste garde donc toujours l'ordre alphabétique du catalogue, quel que soit l'ordre de cochage. L'ouverture du panneau recopie la sélection courante dans les cases, efface le message et vide la recherche. La recherche filtre <code>label</code> sur une comparaison en minuscules, sans dépliage d'accents. « Tout cocher » et « Tout décocher » n'agissent que sur les activités <em>visibles</em>.</p>
+  <p><code>saveSelection()</code> : si aucune case n'est cochée, pose « Au moins une activité doit être sélectionnée » et rend <code>null</code> sans rien écrire ; sinon écrit la sélection sous <code>glp1_active_sports</code>, ferme le panneau et rend la nouvelle liste. Le tracker vérifie alors que le sport du formulaire y figure encore, et le remplace sinon par <code>selected[0].value</code>, c'est-à-dire la première active dans l'ordre du catalogue.</p>
+  <p class="ancre">src/features/sport/useActiveSports.ts · src/features/sport/sport.constants.ts</p>
+  <details><summary>Cas limites</summary>
+    <p>Une valeur enregistrée qui n'est plus au catalogue disparaît silencieusement du filtre.</p>
+    <p>La sélection vit sur l'appareil, hors de la sauvegarde : elle ne suit pas le compte et ne passe pas par les migrations de <code>appData</code> — d'où <code>migrateSportNames</code> à la lecture.</p>
+    <p>Le panneau ne touche jamais aux séances déjà enregistrées : décocher une activité ne retire aucune ligne.</p>
+  </details>
+
+  <h3 id="activite-tri-du-journal-d-activite">Tri du journal d'activité</h3>
+  <p>Le tri précède le filtre :</p>
+  <pre><code>sorted = [...sportHistory].sort((a, b) =&gt;
+  new Date(`${b.date}T${b.time || '00:00'}`) - new Date(`${a.date}T${a.time || '00:00'}`))
+listHistory = filterByTimeWindow(sorted, period.window, log =&gt; log.date, period.rangeForFilter)</code></pre>
+  <p>Décroissant : la plus récente en tête. Une heure absente est lue <code>00:00</code>, ce qui range la ligne en fin de sa journée. Le compteur du bandeau « Journal (N) » compte les lignes après filtre.</p>
+  <p class="ancre">src/features/sport/useSportJournal.ts</p>
+  <details><summary>Cas limites</summary>
+    <p>Deux séances de même date et même heure : l'ordre relatif est celui du tableau (tri stable).</p>
+    <p>La construction <code>new Date('AAAA-MM-JJTHH:MM')</code> est locale, sans décalage de fuseau.</p>
+  </details>
+
+  <h3 id="activite-selecteur-de-periode-commun">Sélecteur de période commun</h3>
+  <p><code>PERIOD_OPTIONS</code>, dans cet ordre : <code>7days</code> « 7 derniers jours », <code>14days</code>, <code>30days</code>, <code>90days</code>, <code>all</code> « Depuis le début », <code>custom</code> « Choisir ». <code>DEFAULT_PERIOD = '30days'</code>.</p>
+  <pre><code>getCutoffDateStr(window):
+  'all'                    → null
+  'custom'                 → customRange.startDate, ou null si vide / illisible
+  sinon                    → getLocalDateStr(aujourd'hui − (n − 1) jours)</code></pre>
+  <p>La fenêtre est inclusive et compte le jour en cours : « 7 derniers jours » couvre aujourd'hui et les six précédents. <code>filterByTimeWindow</code> compare des <strong>chaînes</strong> <code>AAAA-MM-JJ</code>, jamais des instants ; en mode <code>custom</code>, une borne vide est illimitée de son côté.</p>
+  <p><code>usePeriodWindow(clé)</code> persiste <code>{window, customRange}</code> sous <code>glp1_period_&lt;clé&gt;</code>. Deux blocs de ce domaine, deux clés : <code>sport_journal</code> et <code>sport_chart</code>. <code>setCustomWindow(range)</code> bascule en <code>custom</code> et écrit les bornes en une seule opération.</p>
+  <p class="ancre">src/shared/time-window/timeWindow.utils.ts · src/shared/time-window/periodOptions.ts · src/shared/time-window/usePeriodWindow.ts</p>
+  <details><summary>Cas limites</summary>
+    <p>Valeur relue inconnue : <code>isPeriodWindow</code> la rejette, le défaut du bloc s'applique.</p>
+    <p>Changer la période du journal ne bouge pas celle du graphe, et inversement.</p>
+    <p>Le bloc de répartition n'a pas de sélecteur : ses deux fenêtres sont figées.</p>
+  </details>
+  <div class="exemple"><p>Le 12/09/2026, la fenêtre par défaut du journal de Camille coupe au 14/08/2026 (12/09 moins 29 jours) et retient toutes les séances de date ≥ « 2026-08-14 ».</p></div>
+
+  <h3 id="activite-bornes-du-au-d-un-journal">Bornes « du … au … » d'un journal</h3>
+  <p>Hors mode Choisir, le composant reçoit une plage fabriquée à la volée et l'écriture bascule la fenêtre :</p>
+  <pre><code>range    = window === 'custom' ? period.customRange
+                               : { startDate: getCutoffDateStr(window) ?? '', endDate: '' }
+onChange = window === 'custom' ? period.setCustomRange : period.setCustomWindow
+fallbackStart = oldestSportDate      // la plus ancienne séance, ou aujourd'hui si le journal est vide
+fallbackEnd   = getLocalDateStr()</code></pre>
+  <p>L'étiquette d'une borne suit <code>boundLabel</code> : la valeur si elle existe, sinon le repli ; et si la valeur affichée <strong>égale</strong> le repli, le mot remplace la date — « début » à gauche, « aujourd'hui » à droite. La borne de fin étant toujours vide hors mode Choisir, elle s'écrit donc « aujourd'hui ». Sinon la date s'écrit JJ/MM/AAAA.</p>
+  <p>Modifier une borne appelle <code>setCustomWindow</code> : la fenêtre passe en « Choisir » avec les deux bornes en une écriture. Un clic hors du champ referme la borne ; ce qui a été écrit par le calendrier maison est déjà acquis.</p>
+  <p class="ancre">src/versions/mixte/components/InlineCustomDateRange.tsx · src/versions/mixte/features/sport/SportTracker.tsx</p>
+  <details><summary>Cas limites</summary>
+    <p>Fenêtre « Depuis le début » : <code>getCutoffDateStr</code> rend <code>null</code> → borne vide → repli = première séance → le mot « début » s'affiche, pas la date.</p>
+    <p>Une coupure préréglée qui tombe exactement sur la première séance s'écrit aussi « début ».</p>
+    <p>Journal vide : le repli de début vaut aujourd'hui, les deux bornes tombent sur le même jour.</p>
+  </details>
+
+  <h3 id="activite-affichage-d-une-distance">Affichage d'une distance</h3>
+  <p>Deux formateurs, une seule source en mètres.</p>
+  <pre><code>formatDistanceLabel(m, sport)   // le journal, la bulle
+  m absent / non fini / ≤ 0     → null
+  !isDistanceSport(sport)       → null
+  unité === 'm' || m &lt; 1000     → `${Math.round(m)} m`
+  sinon                         → `${parseFloat((m/1000).toFixed(1))} km`
+
+formatDistanceInput(m, sport)   // le champ de saisie
+  unité === 'm'                 → Math.round(m)
+  sinon                         → parseFloat((m/1000).toFixed(3))   // zéros de fin élagués</code></pre>
+  <p>Le séparateur décimal affiché est le point, partout. L'arrondi du journal est d'affichage seul : la valeur enregistrée garde son mètre.</p>
+  <p class="ancre">src/features/sport/sport.distance.ts</p>
+  <details><summary>Cas limites</summary>
+    <p>42195 m en Course à pied → « 42.2 km » au journal, « 42.195 » dans le champ.</p>
+    <p>400 m en Marche → « 400 m », jamais « 0.4 km ».</p>
+    <p>1500 m en Natation → « 1500 m » : l'unité du sport l'emporte sur le seuil du kilomètre.</p>
+    <p>5000 m → le champ affiche « 5 », pas « 5.000 ».</p>
+  </details>
+
+  <h3 id="activite-modification-et-suppression-d-une-ligne">Modification et suppression d'une ligne</h3>
+  <p>Trois gestes purs, communs à tous les journaux :</p>
+  <pre><code>applyLogUpdate(logs, update) = logs.map(l =&gt; l.id === update.id ? snapLogTime({...l, ...update}) : l)
+removeLogById(logs, id)      = logs.filter(l =&gt; l.id !== id)
+handleClearSportHistory()    → sportLogs = []</code></pre>
+  <p>La fusion conserve les champs absents de la charge ; l'heure est ramenée à la minute ronde inférieure. La suppression est franche : aucune marque, aucune corbeille. « Tout supprimer » remplace le tableau, après confirmation par <code>ConfirmDeleteAllBlock</code> avec l'étiquette « tout l'historique d'activité physique ».</p>
+  <p>Le formulaire complet (« Mettre à jour l'activité ») envoie tous les champs, <code>distance</code> comprise : effacer le champ écrit <code>undefined</code> et retire la distance. L'édition en place, elle, n'écrit rien si le brouillon est identique à la ligne, et refuse en silence une durée <code>NaN</code> ou ≤ 0, une date vide, un sport vide.</p>
+  <p class="ancre">src/shared/model/logbook.ts · src/app/useAppData.ts · src/versions/mixte/features/sport/JournalEntryCard.tsx</p>
+  <details><summary>Cas limites</summary>
+    <p>Heure vide au brouillon : elle est écrite <code>'12:00'</code>.</p>
+    <p>Changement de sport et de distance dans le même geste en place : la distance n'est pas relue, elle est conservée telle quelle si le nouveau sport en accepte une, supprimée sinon.</p>
+    <p>Un identifiant introuvable : <code>applyLogUpdate</code> et <code>removeLogById</code> laissent le journal inchangé.</p>
+  </details>
+
+  <h3 id="activite-duree-et-calories-d-un-jour-calendrier-sport">Durée et calories d'un jour (calendrier)</h3>
+  <p><code>sportsByDate(history)</code> range les séances dans une <code>Map</code> par date et trie chaque jour par <code>time</code> croissant (<code>localeCompare</code>, heure absente lue <code>''</code>, donc en tête).</p>
+  <pre><code>STAIRS_MINUTES_PER_FLOOR = 0.5
+
+sportDayMinutes(logs)  = Σ  ( durée non finie ou ≤ 0 → 0 ;
+                              sport === 'Montée escaliers' → duration × 0,5 ;
+                              sinon → duration )
+sportDayCalories(logs, weightHistory, profile) = Σ getCaloriesForLog(log, …)</code></pre>
+  <p>La tuile écrit <code>formatCalendarDuration(sportDayMinutes(logs))</code> — « 45min » sous l'heure, « 1h05 » au-delà — puis retire le suffixe par <code>.replace(/min$/, '')</code> : l'unité est écrite une fois sous le nom du mois. Les minutes sont arrondies à l'entier par le formateur.</p>
+  <p>Les calories de la bulle ne sont pas saisissables : elles se recalculent depuis les champs édités et le poids du jour.</p>
+  <p class="ancre">src/features/sport/sportCalendar.ts · src/shared/calendar.ts · src/versions/mixte/features/sport/SportCalendar.tsx</p>
+  <details><summary>Cas limites</summary>
+    <p>30 min + 45 min → 75 → « 1h15 ». 12 étages → 6 min → « 6 ». 30 min + 20 étages → 40 min → « 40 ».</p>
+    <p>Une demi-minute résiduelle disparaît à l'arrondi de la tuile : 3 étages → 1,5 → « 2 ».</p>
+    <p>La bulle n'affiche pas les notes, et son sélecteur d'activité n'offre pas « Ajouter/Gérer » <span class="marque">arbitrage non validé</span>.</p>
+  </details>
+
+  <h3 id="activite-coquille-commune-des-calendriers">Coquille commune des calendriers</h3>
+  <p><code>CalendarBlock</code> porte la grille et la navigation ; le domaine ne fournit que la valeur d'une tuile, le contenu d'une bulle et les libellés.</p>
+  <p>Grille : <code>monthGrid(year, month)</code> rend des semaines complètes du lundi au dimanche, la première et la dernière complétées par les jours voisins marqués <code>inMonth: false</code>. Bornes de navigation :</p>
+  <pre><code>minKey = min( monthKey(aujourd'hui), monthKey(première entrée) )
+maxKey = monthKey(aujourd'hui)
+canPrev = shownKey &gt; minKey ; canNext = shownKey &lt; maxKey</code></pre>
+  <p>Le glissé horizontal change de mois s'il dépasse 48 px et l'emporte sur le déplacement vertical. Un jour à donnée ouvre ou referme sa bulle ; un jour sans donnée appelle <code>onAddAt(date)</code> quand ce geste existe. Un clic ailleurs dans le document ferme la bulle ; si elle déborde sous le menu, la page défile pour la montrer. L'invite « Cliquez sur la date choisie pour saisir votre première activité physique » n'apparaît que si l'appelant juge l'historique vide.</p>
+  <p class="ancre">src/versions/mixte/components/CalendarBlock.tsx · src/shared/calendar.ts</p>
+  <details><summary>Cas limites</summary>
+    <p>Journal vide : <code>minKey</code> et <code>maxKey</code> valent le mois courant, les deux chevrons sont éteints.</p>
+    <p>Séance antidatée d'un an : le chevron gauche redevient actif jusqu'à ce mois.</p>
+    <p>Séance future : elle n'ouvre pas la navigation au-delà du mois courant.</p>
+  </details>
+
+  <h3 id="activite-calories-d-une-seance-sans-distance">Calories d'une séance sans distance</h3>
+  <pre><code>getIntensityMultiplier: 'douce' → 0,8 ; 'moderee' → 1,0 ; 'intensive' → 1,3
+
+calculateSportCaloriesMET(sport, intensity, durationMinutes, weight):
+  multiplier = getIntensityMultiplier(intensity)
+  si sport === 'Montée escaliers'
+      → Math.round(0,05 × multiplier × weight × durationMinutes)   // durationMinutes = ÉTAGES
+  met = ALL_SPORTS.find(p =&gt; p.value === sport)?.met ?? 4,5
+  → Math.round(met × multiplier × weight × durationMinutes / 60)</code></pre>
+  <p>Unités : MET sans dimension, poids en kilogrammes, durée en heures pour la formule générale, en étages pour l'escalier. Le résultat est un entier de kilocalories. Une activité absente du catalogue prend un MET de repli de 4,5.</p>
+  <p class="ancre">src/shared/body-metrics/bodyMetrics.utils.ts</p>
+  <details><summary>Cas limites</summary>
+    <p>Course à pied intensive, 45 min, 80 kg : 8 × 1,3 × 80 × 0,75 = 624.</p>
+    <p>Montée escaliers, 10 étages, modéré, 80 kg : 0,05 × 1 × 80 × 10 = 40.</p>
+    <p>La fonction ne borne rien : c'est la saisie qui écarte l'absurde.</p>
+  </details>
+  <div class="exemple"><p>Camille, 90 kg le 12/09/2026, marche 45 min sans distance, effort modéré : 3,5 × 1,0 × 90 × 0,75 = 236,25 → <strong>236 kcal</strong>. Dix étages en effort modéré le même jour : 0,05 × 1,0 × 90 × 10 = <strong>45 kcal</strong>.</p></div>
+
+  <h3 id="activite-calories-d-une-seance-avec-distance">Calories d'une séance avec distance</h3>
+  <p>Point d'entrée unique, <code>getSportCalories(log, weight)</code>. La branche distance ne s'ouvre que si les cinq conditions sont réunies : <code>distance !== undefined</code>, finie, &gt; 0, <code>duration</code> finie et &gt; 0, <code>isDistanceSport(log.sport)</code>.</p>
+  <pre><code>hours    = duration / 60
+speedKmh = distance / 1000 / hours
+met      = getMetForSpeed(sport, speedKmh)     // null si pas de courbe ou allure ≤ 0
+si met !== null → Math.round(met × weight × hours)
+sinon           → calculateSportCaloriesMET(…)</code></pre>
+  <p><code>getMetForSpeed</code> interpole linéairement entre les deux ancrages qui encadrent l'allure, et <strong>bloque</strong> aux extrémités : sous le premier ancrage, le MET du premier ; au-dessus du dernier, le MET du dernier. L'intensité ressentie n'entre pas dans le calcul ; elle reste enregistrée.</p>
+  <p>Les courbes (allure km/h → MET), issues du Compendium of Physical Activities 2011 ; l'ancrage souligné vaut exactement le MET du catalogue.</p>
+  <table>
+    <thead><tr><th>Activité</th><th>Ancrages km/h → MET</th></tr></thead>
+    <tbody>
+      <tr><td>Marche</td><td>3,2→2,8 · 4,0→3,0 · <strong>4,8→3,5</strong> · 5,6→4,3 · 6,4→5,0 · 7,2→7,0 · 8,0→8,3</td></tr>
+      <tr><td>Randonnée</td><td>3,2→5,3 · 4,0→5,5 · <strong>4,8→6,0</strong> · 5,6→6,8 · 6,4→7,5 · 7,2→9,5</td></tr>
+      <tr><td>Course à pied</td><td>6,4→6,0 · 8,0→8,3 · 9,7→9,8 · 11,3→11,0 · 12,9→11,8 · 14,5→12,8 · 16,1→14,5 · 17,7→16,0 · 19,3→19,0</td></tr>
+      <tr><td>Vélo</td><td>7,0→3,5 · 13,0→4,0 · <strong>17,6→6,0</strong> · 20,9→8,0 · 24,1→10,0 · 28,2→12,0 · 33,0→15,8</td></tr>
+      <tr><td>Natation</td><td>2,0→5,8 · <strong>2,5→7,0</strong> · 3,0→9,8 · 3,6→11,8</td></tr>
+      <tr><td>Rameur / Aviron</td><td>9,0→4,8 · 12,0→7,0 · 13,6→8,5 · 15,0→12,0</td></tr>
+      <tr><td>Ski de fond</td><td>4,0→6,8 · <strong>7,0→9,0</strong> · 10,0→12,5 · 14,0→15,0</td></tr>
+      <tr><td>Patinage / Roller</td><td><strong>10,0→5,5</strong> · 14,4→7,5 · 21,0→9,8 · 24,0→14,0</td></tr>
+    </tbody>
+  </table>
+  <p class="ancre">src/shared/body-metrics/sportCalories.ts</p>
+  <details><summary>Cas limites</summary>
+    <p>Allure absurde : 1 000 000 m en 30 min en Marche → blocage au dernier ancrage, 8,3 MET.</p>
+    <p>Distance sur un sport sans courbe : la branche ne s'ouvre pas, le calcul par intensité s'applique.</p>
+    <p>Le MET du catalogue de Course à pied (8,0) ne correspond à aucun ancrage : sa courbe part de 6,0 à 6,4 km/h.</p>
+  </details>
+  <div class="exemple"><p>Camille, 90 kg, marche 45 min sur 4 km : allure 4 / 0,75 = 5,33 km/h ; interpolation entre 4,8→3,5 et 5,6→4,3 avec un rapport de 0,667, soit MET 4,03 ; 4,03 × 90 × 0,75 = 272,25 → <strong>272 kcal</strong>.</p></div>
+
+  <h3 id="activite-poids-a-une-date">Poids à une date</h3>
+  <pre><code>getWeightAtDate(dateStr, weightHistory, profile):
+  depart = getStartingWeight(weightHistory)
+  si weightHistory vide → depart || profile?.targetWeight || 80
+  trié = weightHistory trié par date croissante
+  active = depart || profile?.targetWeight || trié[0]?.weight || 80
+  pour w de trié : si w.date &lt;= dateStr → active = w.weight ; sinon arrêt
+  → active</code></pre>
+  <p>La comparaison est faite sur des chaînes <code>AAAA-MM-JJ</code> : une pesée du jour même de la séance compte. La boucle s'arrête à la première pesée postérieure, ce qui suppose le tri chronologique fait juste avant.</p>
+  <p>Chaque séance est valorisée au poids de <em>sa</em> date : ajouter une pesée aujourd'hui ne change pas les calories des séances antérieures.</p>
+  <p class="ancre">src/shared/body-metrics/bodyMetrics.utils.ts</p>
+  <details><summary>Cas limites</summary>
+    <p>Séance antérieure à toute pesée : le poids de départ ; à défaut le poids visé du profil ; à défaut la première pesée du tableau ; à défaut 80 kg.</p>
+    <p>Deux pesées le même jour : la dernière du tableau trié l'emporte.</p>
+  </details>
+  <div class="exemple"><p>Camille : 96 kg le 03/05/2026, 90 kg le 01/09/2026. Une séance du 20/08/2026 est calculée à 96 kg ; une séance du 12/09/2026 à 90 kg.</p></div>
+
+  <h3 id="activite-score-d-activite-quotidien">Score d'activité quotidien</h3>
+  <p>Le score ne regarde pas le MET du sport : seulement la durée et l'intensité — ressentie, ou déduite de l'allure sur la même échelle.</p>
+  <pre><code>FACTOR_MIN = 0,8   FACTOR_MAX = 1,3
+SPORT_SCORE_WEIGHTED_MINUTES_FOR_MAX = 78     // 60 min × 1,3
+SPORT_SCORE_MAX = 10
+
+getSessionIntensity(log):
+  si distance valide et duration &gt; 0 et isDistanceSport(sport):
+      met       = getMetForSpeed(sport, distance/1000 / (duration/60))
+      reference = MET catalogue du sport
+      si met et reference &gt; 0 →
+         { factor: clamp(met / reference, 0,8, 1,3), fromPace: true }
+  → { factor: getIntensityMultiplier(intensity), fromPace: false }
+
+getWeightedMinutes(log):
+  si duration non finie ou ≤ 0 → 0
+  minutes = sport === 'Montée escaliers' ? duration × 0,5 : duration
+  → minutes × factor
+
+getDailyActivityScore(logsDuJour) = min( Σ getWeightedMinutes / 78 × 10 , 10 )</code></pre>
+  <p>Le graphe arrondit ensuite à 0,1. Le plafond porte sur la journée entière, pas sur une séance : trois heures d'affilée ne valent pas trois journées.</p>
+  <p class="ancre">src/shared/body-metrics/sportScore.ts</p>
+  <details><summary>Cas limites</summary>
+    <p>60 min en effort doux → 48 minutes pondérées → 6,2. 78 min en modéré → 10. 180 min → plafonné à 10.</p>
+    <p>40 étages → 20 minutes pondérées avant facteur.</p>
+    <p>Sport hors catalogue : pas de MET de référence, donc jamais de facteur d'allure ; le ressenti s'applique.</p>
+    <p>Une allure très vive rend exactement 1,3 : la valeur d'« intensive ». C'est pourquoi <code>fromPace</code> est rendu à part — le nombre seul ne dit pas d'où il vient.</p>
+  </details>
+  <div class="exemple"><p>Camille, marche 45 min sur 4 km : MET d'allure 4,03, MET catalogue 3,5 → facteur 4,03 / 3,5 = 1,15 ; 45 × 1,15 = 51,9 minutes pondérées ; 51,9 / 78 × 10 = <strong>6,6</strong>. La même marche sans distance en modéré : 45 minutes pondérées → <strong>5,8</strong>. Dix étages en modéré : 5 minutes pondérées → <strong>0,6</strong>.</p></div>
+
+  <h3 id="activite-points-du-graphe-suivi-sport-et-repartition">Points du graphe « Suivi » et répartition par intensité</h3>
+  <p>Les bornes, en millisecondes, avec <code>dayStartMs</code> à 00:00 et <code>dayEndMs</code> à la dernière milliseconde du jour :</p>
+  <pre><code>7/14/30/90 jours : startMs = dayStartMs − (n − 1) jours ; endMs = dayEndMs
+'all'            : startMs = min des `${date}T12:00:00` du journal (à défaut dayStartMs − 6 j)
+'custom'         : startMs = `${début}T00:00:00` ou dayStartMs − 6 j si vide
+                   endMs   = `${fin}T23:59:59`   ou dayEndMs        si vide</code></pre>
+  <p>Puis l'échantillonnage :</p>
+  <pre><code>diffDays  = Math.round((endMs − startMs) / 86400000)
+maxPoints = diffDays &gt; 60 ? 60 : Math.max(diffDays + 1, 1)
+step      = Math.max(1, Math.floor((diffDays + 1) / maxPoints))
+pour t de startMs à endMs par pas de step jours : un point</code></pre>
+  <p>À 60 jours d'écart, <code>maxPoints</code> vaut 61 et le pas reste 1 ; le pas ne passe à 2 qu'à partir de <code>diffDays + 1 ≥ 120</code>, soit environ quatre mois — donc jamais avec les fenêtres préréglées, qui s'arrêtent à 90 jours. <span class="marque">arbitrage non validé</span></p>
+  <p>Chaque point porte <code>dateFormatted</code> « JJ/MM », <code>timestamp</code>, <code>'Score Activité'</code> arrondi à 0,1 et <code>'Calories'</code> arrondi à l'entier. Les deux valeurs sont calculées sur <code>sportHistory.filter(log =&gt; log.date === dateStr)</code> — le journal entier, pas la liste filtrée.</p>
+  <p>Le total affiché au-dessus du graphe vient d'ailleurs : <code>computeIntensityBreakdown(filteredSportLogs, …).totalCalories</code>, où <code>filterSportLogsByTimeRange</code> compare <code>new Date(`${log.date}T12:00:00`)</code> aux mêmes bornes. La répartition calcule aussi <code>count</code>, <code>minutes</code> (somme brute de <code>duration</code>) et <code>calories</code> pour chacun des trois niveaux d'intensité ; seul <code>totalCalories</code> est affiché depuis le retrait des trois tuiles.</p>
+  <p class="ancre">src/features/sport/sport.utils.ts · src/features/sport/useSportChart.ts</p>
+  <details><summary>Cas limites</summary>
+    <p>« Depuis le début » sur un journal vide : les bornes retombent sur les sept derniers jours.</p>
+    <p>Poids absent (<code>weightHistory</code> par défaut vide) : la série de calories reste à zéro plutôt que d'inventer un poids.</p>
+    <p>Les minutes de la répartition par intensité additionnent <code>duration</code> sans convertir les étages : elles ne servent à aucun affichage.</p>
+    <p>Un pas &gt; 1 saute des journées : les calories des jours sautés n'apparaissent dans aucun point, mais restent dans le total.</p>
+  </details>
+
+  <h3 id="activite-repartition-de-quoi-c-est-fait">Répartition par activité (« de quoi c'est fait »)</h3>
+  <p>Deux séries à fenêtres figées, <code>'7days'</code> puis <code>'all'</code>, chacune calculée par <code>repartitionParActivite(sportHistory, fenetre, calories, aujourdhui)</code>. Le calcul des calories est injecté.</p>
+  <pre><code>minutesDeSeance(log) = sport === 'Montée escaliers' ? duration × 0,5 : duration
+
+filtres  = filterByTimeWindow(sportHistory, fenetre, log =&gt; log.date)
+groupe   = Map par log.sport → { nom, minutes, seances, calories }
+classees = tri sur minutes décroissant
+tete     = classees.slice(0, 4)          // LIGNES_DETAILLEES = 4
+reste    = classees.slice(4)
+si reste.length &gt; 0 → ligne « ${reste.length} autres », sommes des trois grandeurs
+
+totalSeances  = filtres.length
+totalMinutes  = Σ minutesDeSeance(filtres)
+totalCalories = Σ calories(filtres)
+semaines      = joursCouverts(fenetre, premiereSeance, aujourdhui) / 7</code></pre>
+  <p><code>premiereSeance</code> est la plus petite date du journal <strong>entier</strong>, pas de la fenêtre (repli : aujourd'hui). Les jours couverts :</p>
+  <pre><code>joursCouverts(fenetre, premiereSeance, aujourdhui):
+  coupure  = getCutoffDateStr(fenetre)                       // null pour 'all'
+  debut    = (coupure &amp;&amp; coupure &gt; premiereSeance) ? coupure : premiereSeance
+  couverts = max(1, daysBetween(debut, aujourdhui) + 1)      // bornes comprises
+  → fenetre === '7days' ? min(couverts, 7) : couverts</code></pre>
+  <p>À l'affichage, chaque série a sa propre échelle : <code>part = minutes / max(minutes de la série) × 100</code>, puis <code>largeur = max(6, round(part × 10) / 10)</code> — plancher de 6 % pour qu'une ligne marginale garde une barre visible. Toutes les barres portent la même teinte, celle de l'accent du thème ; le classement se lit dans la longueur et dans l'ordre. <span class="marque">arbitrage non validé</span></p>
+  <p>La ligne « Par semaine » — <code>totalSeances / semaines</code>, <code>totalMinutes / semaines</code>, <code>round(totalCalories / semaines)</code> — n'est affichée que sur la série « Depuis le début » : sur une fenêtre d'une semaine elle répéterait le total.</p>
+  <p class="ancre">src/versions/mixte/features/sport/deQuoiCestFait.calculs.ts · src/versions/mixte/features/sport/BlocDeQuoiCestFait.tsx</p>
+  <details><summary>Cas limites</summary>
+    <p>Séances le 11/09 et le 16/08, jour courant 12/09 : « 7 derniers jours » couvre 7 jours (1 semaine), « Depuis le début » 28 jours (4 semaines).</p>
+    <p>Six activités distinctes : quatre lignes détaillées puis « 2 autres ».</p>
+    <p>Égalité de minutes : l'ordre relatif est celui du parcours du journal.</p>
+    <p>Série vide : la phrase d'absence nomme sa fenêtre ; les deux séries peuvent être vides en même temps, chacune sous son titre.</p>
+  </details>
+  <div class="exemple"><p>Camille sur les 7 derniers jours : Marche 90 min / 2 séances / 508 kcal, Vélo 60 min / 1 séance / 432 kcal. Le maximum est 90 : la barre du Vélo vaut 60 / 90 = 66,7 %. Pied : « Total 3 séances · 2h30 ».</p></div>
+
+  <h3 id="activite-sens-hausse-baisse-stable-tuiles-dynamique">Sens hausse / baisse / stable (tuiles Dynamique)</h3>
+  <p>La tuile lit <code>periodShift(sportTrend(sportLogs)) ?? 'stable'</code>. La série est celle du tiroir Tendances : 14 jours, somme brute des <code>duration</code>, zéro les jours sans séance, tableau vide si le journal est vide.</p>
+  <pre><code>periodShift(series, seuil = 0,05):
+  si series.length &lt; 2 → null
+  moitie = floor(series.length / 2)
+  avant  = Σ series[0 … moitie[      // les 7 jours anciens
+  apres  = Σ series[moitie … fin]    // les 7 jours récents
+  si avant ≤ 0 || apres ≤ 0:
+      les deux ≤ 0 → 'stable' ; sinon → apres &gt; avant ? 'hausse' : 'baisse'
+  ecart = (apres − avant) / avant
+  |ecart| &lt; 0,05 → 'stable' ; ecart &gt; 0 → 'hausse' ; sinon 'baisse'</code></pre>
+  <p>Le seuil de 5 % est un arbitrage de code, retenu comme l'ordre de grandeur du bruit sur ces grandeurs. <span class="marque">arbitrage non validé</span> Le <code>?? 'stable'</code> de la home fait qu'un journal vide affiche la double flèche au lieu de retirer la tuile.</p>
+  <p>Les étages comptent ici pour des minutes : <code>sportTrend</code> additionne <code>duration</code> sans conversion.</p>
+  <p class="ancre">src/features/trends/trends.ts · src/versions/mixte/homes/sections/MaisonSections.tsx</p>
+  <details><summary>Cas limites</summary>
+    <p>90 min puis 150 min : écart +66,7 % → hausse.</p>
+    <p>Semaine ancienne à zéro, semaine récente à 30 min : comparaison directe → hausse.</p>
+    <p>Deux semaines à zéro : stable.</p>
+    <p>7 000 puis 7 300 (même règle sur les pas) : 4,3 % → stable.</p>
+  </details>
+
+  <h3 id="activite-moyennes-hebdomadaires-de-l-activite-home">Moyennes hebdomadaires de l'activité (home)</h3>
+  <p><code>sportWeeklyAverages(logs, options)</code>, appelée par la home sans option : <code>fenetre = 'depuis-la-premiere-seance'</code>, <code>taireSousUneSemaine = true</code>, <code>now = new Date()</code>.</p>
+  <pre><code>parJour = sportsByDate(logs)
+si parJour.size === 0 → null
+
+jours = typeof fenetre === 'number'
+        ? max(1, fenetre)
+        : daysBetween(plus ancienne date, getLocalDateStr(now)) + 1     // bornes comprises
+
+minutes = Σ sportDayMinutes(jour)      // étages convertis à 0,5
+total   = Σ nombre de lignes du jour
+
+si taireSousUneSemaine et jours &lt; 7 → { minutes: null, seances: null, total, jours }
+semaines = jours / 7
+→ { minutes: minutes / semaines, seances: total / semaines, total, jours }</code></pre>
+  <p>Le diviseur est le nombre de semaines <strong>écoulées</strong>, pas le nombre de semaines actives : une semaine sans séance est une semaine sans séance, pas une donnée manquante. C'est l'exception assumée à la convention « on divise par les journées renseignées ». <span class="marque">arbitrage non validé</span></p>
+  <p>La tuile de gauche affiche <code>Math.round(minutes)</code> et <code>seances</code> à une décimale ; elle disparaît quand la valeur est <code>null</code>. Le rapport médical appelle la même fonction avec une fenêtre en jours et <code>taireSousUneSemaine: false</code>.</p>
+  <p class="ancre">src/features/sport/sportAverages.ts · src/versions/mixte/homes/sections/MaisonSections.tsx</p>
+  <details><summary>Cas limites</summary>
+    <p>Une seule séance de 70 min il y a 6 jours : 7 jours de recul → les moyennes sortent.</p>
+    <p>Trois séances faites aujourd'hui : <code>jours = 1</code>, les deux moyennes sont <code>null</code>, le total reste exact.</p>
+    <p>Journal entièrement vide : <code>null</code>, la rangée entière disparaît.</p>
+  </details>
+  <div class="exemple"><p>Camille : première séance le 20/08/2026, 8 séances, 6 h cumulées au 12/09/2026. <code>daysBetween</code> = 23, plus 1 → 24 jours, soit 3,43 semaines. 360 / 3,43 = <strong>105 min/semaine</strong> ; 8 / 3,43 = <strong>2,3 séances/semaine</strong>.</p></div>
+
+  <h3 id="activite-7-derniers-jours-de-l-activite-home">7 derniers jours de l'activité (home)</h3>
+  <pre><code>sevenDaysAgoStr = getLocalDateStr(now − 6 × 86400000)
+sportMinutesLast7Days  = Σ duration des logs de date ≥ sevenDaysAgoStr
+sportSessionsLast7Days = nombre de ces logs</code></pre>
+  <p>Somme brute : les étages de la montée d'escaliers comptent ici pour des minutes, alors que la tuile de gauche de la même rangée les convertit à 0,5. Une séance = une ligne, comme dans <code>sportWeeklyAverages</code>. La borne est une chaîne de date locale, aujourd'hui compris.</p>
+  <p class="ancre">src/features/home/homeOverview.ts</p>
+  <details><summary>Cas limites</summary>
+    <p>Séance datée d'aujourd'hui : comptée.</p>
+    <p>Séance datée dans le futur : comptée aussi, la comparaison n'a pas de borne haute.</p>
+    <p>Séance du huitième jour : exclue.</p>
+  </details>
+
+  <h3 id="activite-tendance-de-l-activite-tiroir">Tendance de l'activité (tiroir)</h3>
+  <pre><code>trendDates(14, today) = les 14 dates locales de today − 13 à today
+sportTrend(logs)      = [] si le journal est vide,
+                        sinon par date : Σ duration des logs de cette date (0 sans séance)
+trendTotal(serie)     = Σ des valeurs (null compté 0), null si la série est vide
+
+sportTrendKcalPerDay  = ( Σ sur les 14 dates de sportDayCalories(logs du jour, weightHistory, profile) ) / 14</code></pre>
+  <p>La carte écrit <code>formatCalendarDuration(trendTotal)</code> — la durée totale de la quinzaine — puis, séparé par deux espaces insécables, « −N kcal/j » avec <code>Math.round</code>, uniquement si la valeur est non nulle et <strong>≥ 1</strong>. Le diviseur est la fenêtre entière, comme toutes les moyennes de ce domaine.</p>
+  <p>Les minutes de la silhouette sont brutes : un étage y vaut une minute. Les calories, elles, passent par <code>sportDayCalories</code>, qui connaît le poids du jour et la formule des escaliers.</p>
+  <p class="ancre">src/features/trends/trends.ts · src/versions/mixte/components/TrendDrawer.tsx</p>
+  <details><summary>Cas limites</summary>
+    <p>Journal vide : <code>sportTrend</code> rend <code>[]</code>, <code>trendTotal</code> rend <code>null</code>, la carte n'affiche pas de valeurs et la zone de courbe cède la place à l'invite d'ajout.</p>
+    <p>Dépense sous 1 kcal/j sur la quinzaine : la mention « kcal/j » est omise, la durée reste.</p>
+    <p>Une série entièrement plate ne se dessine pas : <code>hasShape</code> exige deux valeurs connues et différentes.</p>
+  </details>
+
+  <h3 id="activite-bornes-numeriques-du-sport-et-du-temps-pour-soi">Bornes numériques du sport et du temps pour soi</h3>
+  <table>
+    <thead><tr><th>Règle</th><th>min</th><th>max</th><th>décimales</th><th>pas</th><th>vide</th><th>message</th></tr></thead>
+    <tbody>
+      <tr><td><code>RULE_DURATION</code></td><td>1</td><td>480</td><td>0</td><td>5</td><td>non</td><td>« Une durée entre 1 et 480 minutes est attendue. »</td></tr>
+      <tr><td><code>RULE_FLOORS</code></td><td>1</td><td>480</td><td>0</td><td>1</td><td>non</td><td>« Un nombre d'étages entre 1 et 480 est attendu. »</td></tr>
+      <tr><td><code>RULE_DISTANCE_KM</code></td><td>0,1</td><td>1000</td><td>1</td><td>0,1</td><td>oui</td><td>« Une distance entre 0,1 et 1000 km est attendue, ou rien. »</td></tr>
+      <tr><td><code>RULE_DISTANCE_M</code></td><td>10</td><td>100000</td><td>0</td><td>10</td><td>oui</td><td>« Une distance entre 10 et 100000 m est attendue, ou rien. »</td></tr>
+    </tbody>
+  </table>
+  <p>La mécanique est commune. <code>cleanNumericInput</code> s'applique à chaque frappe : virgule → point, lettres et signe moins retirés, un seul point conservé, décimales tronquées au nombre autorisé. <code>sanitizeNumber</code> juge ensuite : vide accepté si <code>allowEmpty</code>, sinon refusé ; non fini refusé ; <code>&lt; min</code> ou <code>&gt; max</code> refusés ; la chaîne est rendue telle que nettoyée, sans reformatage, un point final orphelin retiré. <code>isAcceptable</code> est <code>sanitizeNumber(...) !== null</code>.</p>
+  <p>Le <code>step</code> ne sert qu'aux flèches du clavier : il n'est pas vérifié à la validation. Les bornes hautes de distance et le plancher relevé à 0,1 km sont des propositions du code. <span class="marque">arbitrage non validé</span></p>
+  <p>Sur les champs de ce domaine, <code>validateOnSubmit</code> est posé : le champ garde la saisie fautive et ne dit rien lui-même — c'est le formulaire qui affiche le message. Dans une ligne de journal, le champ passe le message à la ligne par <code>onRefusal</code>.</p>
+  <p class="ancre">src/versions/mixte/app/form.rules.ts · src/shared/ui/numberRules.ts · src/shared/ui/NumberField.tsx</p>
+  <details><summary>Cas limites</summary>
+    <p>47 minutes : accepté malgré le pas de 5.</p>
+    <p>1505 m : accepté malgré le pas de 10.</p>
+    <p>« 5,25 » en kilomètres : tronqué à « 5.2 » à la frappe, donc accepté.</p>
+    <p>« 70. » en cours de frappe : le point final est retiré, la valeur retenue est « 70 ».</p>
+  </details>
+
+  <h3 id="activite-bouton-tout-supprimer">Bouton « Tout supprimer »</h3>
+  <p>La corbeille du bandeau du journal n'est dessinée que si les trois conditions sont vraies :</p>
+  <pre><code>sportHistory.length &gt; 0
+&amp;&amp; onClearSportHistory fourni
+&amp;&amp; profile?.deleteAllButtonsEnabled !== false</code></pre>
+  <p>Le test est <code>!== false</code> : un profil qui ne porte pas le champ affiche le bouton. Le clic ouvre <code>ConfirmDeleteAllBlock</code> avec l'étiquette « tout l'historique d'activité physique » ; la confirmation appelle <code>onClearSportHistory</code>, qui remplace <code>sportLogs</code> par <code>[]</code>. Le bloc de confirmation s'écrit dans la page, jamais par-dessus.</p>
+  <p>La condition porte sur <code>sportHistory</code> entier, pas sur la liste filtrée : le bouton reste visible sur une période sans séance, et il vide alors tout le journal.</p>
+  <p class="ancre">src/versions/mixte/features/sport/SportTracker.tsx · src/app/useAppData.ts</p>
+  <details><summary>Cas limites</summary>
+    <p><code>deleteAllButtonsEnabled === false</code> : la corbeille disparaît, les « Supprimer » de ligne restent.</p>
+    <p>Journal vidé : la suppression est franche, aucune reprise possible.</p>
+  </details>
+
+  <p><span class="marque v2">V2</span> Aucun de ces calculs n'existe dans <code>GIT-APP-V2/src</code> : le domaine n'a pas de code en V2. <span class="marque non">non implémenté</span> Son onboarding a supprimé les questions de niveau et de souhait d'activité (GUIDELINES § 4), et son principe « finir l'onboarding par un premier enregistrement — une séance, par exemple » n'a pas d'implémentation.</p>
+</section>

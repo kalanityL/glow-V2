@@ -1,0 +1,906 @@
+<section id="maison">
+  <h2>4. La Maison <a class="retour" href="#sommaire">↑ sommaire</a></h2>
+  <p>Ce chapitre donne les formules, seuils, ordres de tri et cas limites des trois templates d'accueil de la version Mixte, de leurs blocs et de leurs trois tiroirs. Il couvre les briques partagées qu'ils appellent : fenêtres temporelles, état des modules, mise en forme des nombres et des variations de poids.</p>
+  <h3 id="maison-entites">Entités</h3>
+  <p>La home ne stocke rien : elle lit AppData — un profil et neuf journaux — et dérive tout à chaque rendu. Grandeurs canoniques : kg, cm, mg, minutes, kcal, pas ; dates locales AAAA-MM-JJ, heures HH:MM.</p>
+  <table>
+  <thead><tr><th>Journal</th><th>Champs lus par la home</th><th>Notes</th></tr></thead>
+  <tbody>
+  <tr><td>weightHistory</td><td>date, time?, weight (kg), isStartingWeight (obligatoire)</td><td>Mensurations non lues ici.</td></tr>
+  <tr><td>injectionHistory</td><td>date, time, dose (mg), site, brand?</td><td>brand absent = traitement du profil.</td></tr>
+  <tr><td>savedMeals?</td><td>date, time, type, typeLabel, calories, protein, carbs, fat, fiber, hungerBefore?, hungerAfter?</td><td>Macros = cache de saisie, pris tel quel.</td></tr>
+  <tr><td>stepLogs?</td><td>date, steps</td><td>Une ligne par journée, pas d'heure.</td></tr>
+  <tr><td>sportLogs?</td><td>date, time, sport, intensity, duration</td><td>duration = ÉTAGES si sport === 'Montée escaliers'.</td></tr>
+  <tr><td>meTimeLogs?</td><td>date, time, activity, duration (min)</td><td></td></tr>
+  <tr><td>sleepLogs?</td><td>date/time du RÉVEIL, bedDate/bedTime, kind, quality (0-5)</td><td>Durée non stockée, déduite par sleepLogMinutes. <span class="marque">arbitrage non validé</span></td></tr>
+  <tr><td>sideEffectHistory?</td><td>date, time, type (nom libre), severity (1-5)</td><td></td></tr>
+  <tr><td>dailyLogs</td><td>date</td><td>Lu par le seul déblocage de la Dynamique.</td></tr>
+  </tbody>
+  </table>
+  <p>Du profil : name, height (cm), targetWeight (kg), avatar, glp1Brand, reminderEnabled, reminderDay (0-6), injectionReminderType?, injectionReminderDaysInterval?, sept drapeaux de module et sept de masquage, homeCornerButtonsEnabled? (absent = désactivé), mysteryBadgeHidden?, dailyCaloriesGoal?, dailyProteinGoal?, dailyFiberGoal?.</p>
+  <p>DÉRIVÉS, donc non stockés : WeightOverview, TreatmentSeries, ActiveConcentration, DayMood, CureWeek, DailyNutritionGoals, RecentJournalEntry, RecentStepEntry, les sept séries de tendance, DivinationResult, SideEffectShift, l'IMC et ses paliers, toutes les moyennes.</p>
+  <p>Quatre clés locales : glow_home_&lt;versionId&gt; (JSON), glp1_first_open_date, glp1_dynamique_celebrated ('true'), glp1_period_&lt;clé&gt;.</p>
+  <p class="ancre">src/types.ts</p>
+  <h3 id="maison-vue-des-poids-weightoverview">Vue des poids (weightOverview)</h3>
+  <pre><code>startingWeight = getStartingWeight(weightHistory)  // pesée marquée isStartingWeight, sinon 0
+sorted  = [...weightHistory].sort(byDateTimeDesc)
+currentWeight  = sorted[0]?.weight ?? startingWeight
+totalLoss  = startingWeight − currentWeight  // positif = perte
+lastLoss  = sorted.length ≥ 2 ? sorted[1].weight − sorted[0].weight : 0
+hasOnlyStartingWeight = weightHistory.length === 0
+  || (weightHistory.length === 1 &amp;&amp; weightHistory[0].isStartingWeight === true)
+  || totalLoss ≤ 0</code></pre>
+  <p>byDateTimeDesc compare `${date}T${time || '12:00'}` : heure absente = MIDI ; à clé égale, l'ordre du tableau subsiste. L'ordre qui compte est celui des dates portées, jamais le rang dans le tableau.</p>
+  <p class="ancre">src/features/home/homeOverview.ts · src/shared/model/logOrder.ts</p>
+  <details><summary>Cas limites</summary><p>Journal vide : tout à 0, hasOnlyStartingWeight vrai, aucune tuile de perte. Pesée antidatée : rangée à sa date, elle ne devient pas le poids actuel.</p></details>
+  <div class="exemple"><p>Camille : départ 96 kg, 88.9 le 5 septembre, 88.4 le 12 → actuel 88.4, totalLoss 7.6, lastLoss 0.5. <a href="spec-fonctionnelle.html#maison-home-standard-maison-page">→ fonctionnelle</a></p></div>
+  <h3 id="maison-affichage-des-tuiles-de-perte">Affichage des tuiles de perte</h3>
+  <pre><code>isBmiLow  = bmiOf(currentWeight, profile.height) &lt; 19
+showLastLoss  = !isBmiLow &amp;&amp; lastLoss  &gt; 0 &amp;&amp; !hasOnlyStartingWeight
+showTotalLoss = !isBmiLow &amp;&amp; totalLoss &gt; 0 &amp;&amp; !hasOnlyStartingWeight
+lossesEqual  = showLastLoss &amp;&amp; showTotalLoss  // home STANDARD seulement
+                &amp;&amp; lastLoss.toFixed(1) === totalLoss.toFixed(1)</code></pre>
+  <p>lossesEqual vrai : « Depuis le début » est rendue À LA PLACE de la tuile « dernière perte », donc en premier, et la seconde n'est pas rendue. La home sections ne fusionne pas : ses deux tuiles sont deux candidates de la rangée « Progrès ».</p>
+  <p class="ancre">src/versions/mixte/components/Maison.tsx · src/versions/mixte/homes/sections/MaisonSections.tsx</p>
+  <details><summary>Cas limites</summary><p>Taille absente : bmiOf rend 0, isBmiLow vrai, AUCUNE tuile. Comparaison sur toFixed(1) : 7.60 et 7.64 fusionnent, 7.64 et 7.66 non.</p></details>
+  <h3 id="maison-signe-d-une-variation-de-poids-signedkg">Signe d'une variation de poids (signedKg)</h3>
+  <pre><code>arrondi = parseFloat(deltaKg.toFixed(1))
+return arrondi &gt; 0 ? `+${arrondi}` : `-${Math.abs(arrondi)}`</code></pre>
+  <p>L'argument est un ÉCART, négatif quand le poids descend ; une valeur orientée perte (totalLoss, lastLoss) se passe niée.</p>
+  <p class="ancre">src/features/home/homeOverview.ts</p>
+  <details><summary>Cas limites</summary><p>signedKg(0) = « -0 » : zéro n'est jamais écrit nu. signedKg(0.04) = « -0 » : l'arrondi tombe à 0. signedKg(-2.35) = « -2.4 » ; signedKg(3) = « +3 ».</p></details>
+  <h3 id="maison-format1dec">format1Dec</h3>
+  <p>Nom local de formatNumber1Dec : une décimale au plus, zéros de queue supprimés, point décimal, milliers séparés d'une espace INSÉCABLE (U+00A0), chaîne vide pour un non-nombre fini.</p>
+  <pre><code>format1Dec(2.35) = '2.4'  format1Dec(3) = '3'  format1Dec(1234.5) = '1 234.5'  format1Dec(NaN) = ''</code></pre>
+  <p class="ancre">src/features/home/homeOverview.ts · src/shared/number/number.format.ts</p>
+  <p><span class="marque v2">V2</span> La V2 pose le séparateur décimal selon la langue — virgule en français — et garde le point au stockage.</p>
+  <h3 id="maison-choix-de-la-home-homechoice">Choix de la home (homeChoice)</h3>
+  <pre><code>stored = getItem(`glow_home_${versionId}`)
+if (stored === 'carre' || stored === 'fines-lignes') return 'sections'
+return stored ∈ {'standard','sections','blocs'} ? stored : 'standard'</code></pre>
+  <p>setSelectedHome n'écrit que le choix : ni rechargement ni feuille à injecter. Home et thème sont orthogonaux, deux clés distinctes. La traduction se fait en LECTURE : la valeur ancienne reste écrite jusqu'au prochain choix.</p>
+  <p class="ancre">src/versions/mixte/homes/homeChoice.ts</p>
+  <details><summary>Cas limites</summary><p>Rien d'enregistré, valeur inconnue ou d'un autre type : standard.</p></details>
+  <h3 id="maison-etat-d-un-module-ismoduleon-ismodulehidden">État d'un module (isModuleOn / isModuleHidden)</h3>
+  <pre><code>MODULE_FLAGS = { injection: treatmentTrackingEnabled, symptoms: sideEffectsTrackingEnabled,
+                 meals: foodTrackingEnabled, steps: stepsTrackingEnabled, sports: sportTrackingEnabled,
+                 metime: meTimeTrackingEnabled, sleep: sleepTrackingEnabled }
+MODULES_ALLUMES_PAR_DEFAUT = { injection, symptoms }
+
+isModuleOn(profile, tabId) {
+  flag = MODULE_FLAGS[tabId] ; if (!flag) return true  // onglet sans module (pesée)
+  v = profile[flag]
+  if (v === undefined || v === null) return MODULES_ALLUMES_PAR_DEFAUT.has(tabId)
+  return Boolean(v) }
+isModuleHidden = !isModuleOn(profile, tabId) &amp;&amp; Boolean(profile[MODULE_HIDDEN_FLAGS[tabId]])</code></pre>
+  <p>Le masquage ne mord que module éteint. Trois lecteurs de la home n'appellent PAS isModuleOn : le carré traitement et le smiley passent par isModuleOn('injection' | 'symptoms') (absent = allumé) ; le bloc « Aujourd'hui » et la bande kcal lisent profile.foodTrackingEnabled nu (absent = éteint) ; le bloc « Mes pas » et la tuile des pas lisent stepsTrackingEnabled !== false (absent = allumé). Les cartes du tiroir Tendance lisent aussi les drapeaux nus ; le sanguin et la balance y sont enabled: true en dur.</p>
+  <p class="ancre">src/versions/mixte/app/navigation.ts</p>
+  <h3 id="maison-reste-a-perdre-bloc-salut">Reste à perdre (bloc Salut)</h3>
+  <pre><code>resteAPerdre = parseFloat((currentWeight − profile.targetWeight).toFixed(1))
+affichage  = resteAPerdre &gt; 0 ? `-${resteAPerdre} kg` : '0 kg'</code></pre>
+  <p>L'édition sur place n'enregistre que si parseFloat rend un nombre strictement positif ; sinon le profil reste inchangé.</p>
+  <p class="ancre">src/versions/mixte/components/SalutBlock.tsx</p>
+  <details><summary>Cas limites</summary><p>Cible atteinte ou dépassée : « 0 kg », jamais « -0 kg ». Cible non renseignée (0) : le reste vaut le poids actuel.</p></details>
+  <div class="exemple"><p>Camille : 88.4 − 75 = 13.4 → « -13.4 kg ». <a href="spec-fonctionnelle.html#maison-bloc-salut-partage-par-les-trois-homes">→ fonctionnelle</a></p></div>
+  <h3 id="maison-avancement-vers-la-cible-goalprogresspercent">Avancement vers la cible (goalProgressPercent)</h3>
+  <pre><code>diff = startingWeight − targetWeight
+if (diff &gt; 0) return min(100, max(0, ((startingWeight − currentWeight) / diff) × 100))
+return currentWeight ≤ targetWeight ? 100 : 0</code></pre>
+  <p>Valeur non arrondie : largeur CSS et libellé la reçoivent telle quelle. La barre est animée de 0 vers cette valeur 100 ms après le montage.</p>
+  <p class="ancre">src/features/home/homeOverview.ts · src/versions/mixte/components/Maison.tsx</p>
+  <details><summary>Cas limites</summary><p>Cible ≥ départ : 100 si le poids est descendu à la cible, 0 sinon — jamais d'intermédiaire. Poids repris au-delà du départ : 0. Cible dépassée vers le bas : 100.</p></details>
+  <div class="exemple"><p>Camille : (96 − 88.4)/(96 − 75) × 100 = 36.19… → « 36% ».</p></div>
+  <h3 id="maison-ligne-rappels-du-bloc-salut">Ligne « Rappels » du bloc Salut</h3>
+  <pre><code>reminderEnabled
+  ? (injectionReminderType === 'custom' ? `${injectionReminderDaysInterval ?? 7}j`
+     : ['Dim','Lun','Mar','Mer','Jeu','Ven','Sam'][reminderDay ?? 0])
+  : 'Non'</code></pre>
+  <p>La ligne entière n'est rendue que si un traitement est déclaré (!hasNoTreatment).</p>
+  <p class="ancre">src/versions/mixte/components/SalutBlock.tsx</p>
+  <details><summary>Cas limites</summary><p>Rappel personnalisé sans intervalle : « 7j ». reminderDay absent : « Dim ». « Pas de traitement » : ni ligne de rappels, ni picto de forme à côté de « Cure : ».</p></details>
+  <h3 id="maison-badges-du-bloc-salut">Badges du bloc Salut</h3>
+  <pre><code>evalues  = ALL_BADGE_DEFINITIONS.map(def =&gt; ({ def, enabled: def.categoryEnabled(profile),
+             tier: def.categoryEnabled(profile) ? def.getTier(appData).tier : 'aucun' }))
+unlocked = evalues.filter(b =&gt; b.enabled &amp;&amp; b.tier !== 'aucun')</code></pre>
+  <p>Aucun plafond de nombre n'est écrit : la grille passe à deux colonnes dès le deuxième badge et rend tout ce qu'elle reçoit. Le catalogue n'en définit que QUATRE — c'est lui, pas le bloc, qui borne l'affichage. Tailles fluides en compact : clamp(30px,11.2cqw,51px) à un, clamp(26px,11cqw,50px) à deux, clamp(20px,7.5cqw,34px) à trois ou quatre ; hors compact, 52 px pour un badge seul, 36 px sinon. Liste vide : badge « ? » argent, sauf si mysteryBadgeHidden. Une catégorie désactivée n'est jamais évaluée — getTier n'est pas appelé.</p>
+  <p class="ancre">src/versions/mixte/components/SalutBlock.tsx · src/utils/badgeSystem.ts</p>
+  <h3 id="maison-totaux-nutritionnels-du-jour-nutritiontotalson">Totaux nutritionnels du jour (nutritionTotalsOn)</h3>
+  <pre><code>meals.filter(m =&gt; m.date === dateStr).reduce((acc, m) =&gt; ({
+  calories: acc.calories + (m.calories||0), protein: acc.protein + (m.protein||0),
+  fiber: acc.fiber + (m.fiber||0) }), { calories: 0, protein: 0, fiber: 0 })</code></pre>
+  <p>L'heure n'entre pas dans le filtre : un repas noté à 23 h compte, un repas noté à l'avance pour aujourd'hui aussi. La home standard n'appelle pas cette fonction — DailyNutritionSummary reçoit les repas du jour déjà filtrés et somme CINQ grandeurs ; les trois communes sont identiques.</p>
+  <p class="ancre">src/features/home/homeOverview.ts · src/versions/mixte/components/DailyNutritionSummary.tsx</p>
+  <details><summary>Cas limites</summary><p>Aucun repas : totaux à 0, jamais null. Macro absente sur une ligne ancienne : comptée 0.</p></details>
+  <div class="exemple"><p>Camille le 12 septembre : 1 120 kcal, 82 g de protéines, 12 g de fibres. <a href="spec-fonctionnelle.html#maison-carre-aujourd-hui-de-l-accueil-standard">→ fonctionnelle</a></p></div>
+  <h3 id="maison-objectifs-nutritionnels-du-jour-dailynutritiongoals">Objectifs nutritionnels du jour (dailyNutritionGoals)</h3>
+  <pre><code>calories = profile.dailyCaloriesGoal ?? 1400
+protein  = profile.dailyProteinGoal  ?? Math.round(currentWeightKg × 1.5)
+fiber  = profile.dailyFiberGoal  ?? 25</code></pre>
+  <p>Le poids passé est weights.currentWeight : l'objectif protéines suit la dernière pesée.</p>
+  <p class="ancre">src/features/home/homeOverview.ts</p>
+  <details><summary>Cas limites</summary><p>Objectif enregistré à 0 : ?? ne se déclenche que sur undefined/null, donc 0 est retenu et tous les pourcentages tombent à 0. Aucune pesée : poids actuel 0, objectif protéines 0.</p></details>
+  <div class="exemple"><p>Camille à 88.4 kg : round(132.6) = 133 g de protéines ; 25 g de fibres ; 1 400 kcal. <a href="spec-fonctionnelle.html#maison-section-en-direct-home-sections">→ fonctionnelle</a></p></div>
+  <h3 id="maison-pourcentage-d-une-barre-d-objectif-blockcal">Pourcentage d'une barre d'objectif (blocKcal)</h3>
+  <pre><code>// home sections — deux nombres distincts
+realPercent  = goal &gt; 0 ? Math.round((value / goal) × 100) : 0  // affiché, peut dépasser 100
+largeurBarre = getGoalProgressPercent(value, goal)
+             = goal &gt; 0 ? max(0, min(100, round((value/goal) × 100))) : 0
+trophée  = realPercent ≥ 100
+noMealsToday = Math.round(nutritionTotals.calories) === 0
+// home standard — un seul nombre, borné
+pct = goal &gt; 0 ? min(100, round((value / goal) × 100)) : 0  // affiché ET largeur</code></pre>
+  <p>Un dépassement se lit donc « 100 % » sur la home standard, et au-delà sur la home sections. La bande kcal n'est pas rendue quand profile.foodTrackingEnabled est faux ou absent ; noMealsToday vrai remplace les deux barres par l'invitation.</p>
+  <p class="ancre">src/versions/mixte/homes/sections/MaisonSections.tsx · src/shared/goals/goals.utils.ts</p>
+  <details><summary>Cas limites</summary><p>Objectif 0 : 0 % et rail vide, jamais de division par zéro. Repas sans aliment : calories 0, noMealsToday reste vrai.</p></details>
+  <div class="exemple"><p>Camille : 82 g / 133 → 62 % ; 12 g / 25 → 48 %.</p></div>
+  <h3 id="maison-semaine-de-cure-cureweek-weekssincedate">Semaine de cure (cureWeek / weeksSinceDate)</h3>
+  <pre><code>[annee, mois, jour] = dateStr.split('-').map(Number) ; si l'un est faux → null
+minuitDebut  = new Date(annee, mois−1, jour).getTime()  // minuit LOCAL
+minuitAujourdhui = new Date(y, m, d de today).getTime()  // minuit LOCAL
+totalDays = Math.round((minuitAujourdhui − minuitDebut) / 86 400 000)
+si totalDays &lt; 0 → null
+{ weekNumber: Math.floor(totalDays / 7) + 1, totalDays }</code></pre>
+  <p>cureWeek part de la pesée de DÉPART — celle que son drapeau désigne, pas la plus ancienne. weeksSinceDate est la même mécanique ouverte à une autre origine : le carré traitement l'appelle sur la première prise de la série. L'arrondi absorbe l'heure que le changement d'heure ajoute ou retire.</p>
+  <p class="ancre">src/features/home/homeOverview.ts</p>
+  <details><summary>Cas limites</summary><p>Pas de pesée de départ, ou pesée datée du futur : null, pas de bandeau. Jour du départ : 0 jour, semaine 1, écrit « 1 jour ». Sixième jour : semaine 1. Septième : semaine 2.</p></details>
+  <div class="exemple"><p>Camille, départ le 4 mai 2026, lue le 12 septembre : 131 jours, floor(131/7)+1 = 19 → « Semaine n° 19 (131 jours) ». <a href="spec-fonctionnelle.html#maison-carre-poids-evolution-home-standard">→ fonctionnelle</a></p></div>
+  <h3 id="maison-compte-de-jours-daycountlabel">Compte de jours (dayCountLabel)</h3>
+  <pre><code>jours = Math.max(1, totalDays) ; `${jours} ${jours &gt; 1 ? 'jours' : 'jour'}`</code></pre>
+  <p>Employé par les deux bandeaux et par la durée d'une perte sous sept jours. dayCountLabel(0) = « 1 jour » : « 0 jour » ne s'écrit nulle part.</p>
+  <p class="ancre">src/features/home/homeOverview.ts</p>
+  <h3 id="maison-perte-moyenne-par-semaine-weeklyrate">Perte moyenne par semaine (weeklyRate)</h3>
+  <pre><code>weeklyRate = (cure &amp;&amp; cure.totalDays &gt; 0)
+  ? ((currentWeight − startingWeight) × 7) / cure.totalDays : 0
+affichée si cure.totalDays ≥ 7 : `≈ ${signedKg(weeklyRate)} kg / semaine`</code></pre>
+  <p>La moyenne porte sur TOUT l'historique depuis la pesée de départ, jamais sur une période choisie ; écrite à l'identique dans les deux homes. La tuile de « Progrès » n'a plus de garde showTotalLoss : une reprise l'affiche avec son « + ».</p>
+  <p class="ancre">src/versions/mixte/components/Maison.tsx · src/versions/mixte/homes/sections/MaisonSections.tsx</p>
+  <details><summary>Cas limites</summary><p>Moins de sept jours : la valeur existe, rien n'est rendu. Pas de pesée de départ : cure vaut null, la valeur 0.</p></details>
+  <div class="exemple"><p>Camille : (88.4 − 96) × 7 / 131 = −0.406 → « ≈ -0.4 kg / semaine ».</p></div>
+  <h3 id="maison-arc-depart-objectif">Arc départ → objectif</h3>
+  <pre><code>arcDeltaKg  = (startingWeight &gt; 0 &amp;&amp; targetWeight &gt; 0) ? targetWeight − startingWeight : null
+arcKgLabel  = signedKg(arcDeltaKg).replace('-', '−')
+arcPctLabel = signedKg((arcDeltaKg / startingWeight) × 100).replace('-', '−')</code></pre>
+  <p>C'est l'écart À PARCOURIR, négatif quand il reste à perdre. Le tiret ASCII est remplacé par U+2212 pour ces deux labels seulement. Le bloc est aria-hidden et pointer-events-none : le label redit départ et objectif, déjà lus dessous.</p>
+  <p class="ancre">src/versions/mixte/components/Maison.tsx</p>
+  <details><summary>Cas limites</summary><p>Départ ou objectif à zéro : null, aucun arc. Objectif au-dessus du départ : les labels portent un « + », le dessin ne change pas.</p></details>
+  <div class="exemple"><p>Camille : 75 − 96 = −21 kg ; −21/96 × 100 = −21.875 → « −21 kg / −21.9 % ».</p></div>
+  <h3 id="maison-variation-en-du-poids-de-depart-pctofstart">Variation en % du poids de départ (pctOfStart)</h3>
+  <pre><code>pctOfStart = startingWeight &gt; 0 ? ((currentWeight − startingWeight) / startingWeight) × 100 : 0
+affichage  = `${pctOfStart &gt; 0 ? '+' : ''}${format1Dec(pctOfStart)}%`</code></pre>
+  <p>Le « + » est posé par le gabarit, pas par signedKg : une variation négative garde le tiret de format1Dec, et zéro s'écrit « 0% » sans signe. Le pied n'est rendu que si startingWeight &gt; 0.</p>
+  <p class="ancre">src/versions/mixte/components/Maison.tsx</p>
+  <div class="exemple"><p>Camille : (88.4 − 96)/96 × 100 = −7.916… → « -7.9% ».</p></div>
+  <h3 id="maison-imc-bmiof">IMC (bmiOf)</h3>
+  <pre><code>heightM = heightCm / 100
+return heightM &gt; 0 ? Math.round((weightKg / heightM²) × 10) / 10 : 0</code></pre>
+  <p>Taille absente : 0 — qui vaut « palier inconnu » (index 99) pour getBmiTierInfo, mais « IMC bas » (&lt; 19) pour la garde des tuiles de perte. Les deux lectures cohabitent.</p>
+  <p class="ancre">src/features/home/homeOverview.ts</p>
+  <div class="exemple"><p>Camille : 88.4 / 1.68² = 31.32… → 31.3.</p></div>
+  <h3 id="maison-categorie-d-imc-bmicategorylabel">Catégorie d'IMC (bmiCategoryLabel)</h3>
+  <pre><code>&lt; 18.5 → 'Insuffisance pondérale'  &lt; 25 → 'Corpulence normale'  &lt; 30 → 'Surpoids'
+&lt; 35  → 'Obésité I'  &lt; 40 → 'Obésité II'  sinon → 'Obésité III'</code></pre>
+  <p>Ces libellés ne sont PAS ceux de getBmiTierInfo (« Obésité modérée (Classe I) », « sévère (Classe II) », « très sévère (Classe III) ») : le carré poids affiche les premiers, le bloc de palier franchi les seconds. IMC 25 : « Surpoids » ; 30 : « Obésité I » ; 0 : « Insuffisance pondérale », mais la ligne n'est révélée que par l'œil.</p>
+  <p class="ancre">src/features/home/homeOverview.ts · src/utils/bmiHelpers.ts</p>
+  <h3 id="maison-paliers-d-imc-indexes-getbmitierinfo">Paliers d'IMC indexés (getBmiTierInfo)</h3>
+  <pre><code>bmi ≤ 0 → 99 'Inconnu'  ≥ 40 → 5  ≥ 35 → 4  ≥ 30 → 3
+≥ 25 → 2 'Surpoids'  ≥ 18.5 → 1  sinon → 0 'Insuffisance pondérale'
+palier franchi ⇔ currentTier.index &lt; startTier.index</code></pre>
+  <p>Le palier de DÉPART se calcule sur l'IMC non arrondi (startingWeight / heightM²) ; le palier actuel part de bmiOf, arrondi au dixième. Le clic sur l'IMC révélé ne fait rien si currentTier.index ≥ startTier.index.</p>
+  <p class="ancre">src/utils/bmiHelpers.ts · src/versions/mixte/components/Maison.tsx</p>
+  <details><summary>Cas limites</summary><p>Taille absente : les deux paliers valent 99, jamais de franchissement. IMC qui remonte : aucun bloc ouvert.</p></details>
+  <div class="exemple"><p>Camille : départ 96/2.8224 = 34.01 → index 3 ; actuel 31.3 → index 3. Même palier, pas de bloc.</p></div>
+  <h3 id="maison-date-du-franchissement-d-un-palier-bmitransitiondate">Date du franchissement d'un palier (bmiTransitionDate)</h3>
+  <pre><code>si heightCm/100 ≤ 0 → ''
+startTier = getBmiTierInfo(startingWeight / heightM²)
+pour chaque pesée triée par byDateTimeAsc :
+  tier = getBmiTierInfo(log.weight / heightM²)
+  si tier.index ≤ targetTierIndex ET startTier.index &gt; targetTierIndex :
+     retourner log.date reformatée JJ/MM/AAAA
+sinon ''</code></pre>
+  <p>targetTierIndex est l'index ACTUEL, passé par l'appelant. La condition sur startTier ne dépend pas de la boucle : elle est vraie ou fausse une fois pour toutes.</p>
+  <p class="ancre">src/features/home/homeOverview.ts</p>
+  <details><summary>Cas limites</summary><p>Sans taille, ou départ déjà dans le palier visé : chaîne vide, la phrase se lit sans date. Une pesée antidatée plus basse devient la date du franchissement : c'est la PREMIÈRE par date, pas la première saisie.</p></details>
+  <h3 id="maison-serie-du-traitement-en-cours-coupure-au-changement-currenttr">Série du traitement en cours — coupure au changement (currentTreatmentInjections)</h3>
+  <pre><code>current  = resolveTreatmentId(undefined, profileTreatmentId)
+chronologique = [...injectionHistory] triées par `${date}T${time || '00:00'}`  // absente = MINUIT
+debut = chronologique.length
+pour i de la fin vers 0 :
+   si resolveTreatmentId(chronologique[i].brand, profileTreatmentId) !== current : arrêter
+   debut = i
+retourner chronologique.slice(debut)</code></pre>
+  <p>Un changement de traitement est une COUPURE : revenir à un traitement déjà pris ne rouvre pas son ancien épisode. Une ligne sans brand est réputée du traitement courant. Aucun filtre de date : c'est la liste que compte le carré traitement de la home standard.</p>
+  <p class="ancre">src/features/home/homeOverview.ts</p>
+  <details><summary>Cas limites</summary><p>Dernière ligne d'un autre traitement : liste VIDE, et le carré affiche « Semaine n° 0 — traitement non commencé ». Wegovy, Ozempic, Wegovy, Wegovy : deux lignes retenues.</p></details>
+  <h3 id="maison-serie-du-traitement-currenttreatmentseries-le-futur-s-ecarte">Série du traitement (currentTreatmentSeries) — le futur s'écarte</h3>
+  <pre><code>passees  = injectionHistory.filter(inj =&gt; hasOccurred(inj.date, inj.time, now))
+injections = currentTreatmentInjections(passees, profileTreatmentId)
+count = injections.length ; initialDose = injections[0]?.dose ?? null
+currentDose = injections[dernier]?.dose ?? null ; totalMg = parseFloat(Σ dose .toFixed(2))</code></pre>
+  <p>Le filtre du futur passe DEVANT la coupure : une prise future d'un AUTRE traitement viderait sinon la série entière, la coupure remontant depuis la dernière ligne. La somme est figée au centième puis débarrassée d'une décimale nulle — l'addition de dixièmes de mg produit sinon des 1.7999999999999998.</p>
+  <p>La home standard n'appelle PAS cette fonction : elle lit currentTreatmentInjections et recalcule sa somme dessus. Une prise datée de demain y compte donc dans le nombre de prises et dans les mg cumulés, et devient l'« Actuel » ; sur la home sections, la même prise est écartée.</p>
+  <p class="ancre">src/features/home/homeOverview.ts · src/versions/mixte/components/Maison.tsx (lignes 305-333)</p>
+  <details><summary>Cas limites</summary><p>Série vide : les deux doses valent null, totalMg 0. Une seule prise : elle est initiale et actuelle. now est injectable : les tests ne dépendent pas du jour où ils tournent.</p></details>
+  <div class="exemple"><p>Camille : 4 × 0.25 + 4 × 0.5 + 11 × 1 → 19 prises, initiale 0.25 mg, actuelle 1 mg, total 14 mg. <a href="spec-fonctionnelle.html#maison-carre-traitement-home-standard">→ fonctionnelle</a></p></div>
+  <h3 id="maison-jours-depuis-la-derniere-prise-carre-traitement">Jours depuis la dernière prise (carré traitement)</h3>
+  <pre><code>daysSinceLastDose = treatmentLatest
+  ? Math.round((Date.parse(getLocalDateStr()) − Date.parse(treatmentLatest.date)) / 86 400 000) : null
+affichage = daysSinceLastDose === 0 ? "aujourd'hui"
+          : `il y a ${daysSinceLastDose} jour${daysSinceLastDose &gt; 1 ? 's' : ''}`</code></pre>
+  <p>Date.parse d'une chaîne AAAA-MM-JJ l'interprète en UTC ; les deux bornes subissent le même décalage, l'écart est exact quel que soit le fuseau. treatmentLatest est la dernière ligne de currentTreatmentInjections, futur compris.</p>
+  <p>La fonction voisine injectionRecency produit d'autres libellés — « Aujourd'hui », « 1 jour », « n jours », « Dans n j », « Aucune » — et leurs légendes selon la forme. Elle est importée par la home standard, son résultat n'est rendu nulle part. <span class="marque non">non implémenté</span></p>
+  <p class="ancre">src/versions/mixte/components/Maison.tsx · src/features/home/homeOverview.ts</p>
+  <details><summary>Cas limites</summary><p>Prise datée de demain : écart négatif, la phrase devient « il y a -1 jour ». Aucune prise : le bandeau de droite n'est pas rendu.</p></details>
+  <div class="exemple"><p>Camille, dernière injection le 7 septembre, lue le 12 : « il y a 5 jours ».</p></div>
+  <h3 id="maison-concentration-active-activeglpconcentration">Concentration active (activeGlpConcentration)</h3>
+  <pre><code>si injectionHistory vide → { 0, multiple: false }
+recentes = injectionHistory.filter(inj =&gt;
+    Date(`${inj.date}T${inj.time || '12:00'}:00`) ≥ now − 60 × 86 400 000)  // absente = MIDI
+retenues = recentes.length &gt; 0 ? recentes : injectionHistory
+pour chaque groupe de groupInjectionsByMolecule(retenues, profileTreatmentId) :
+    history = injectionHistory.filter(inj =&gt; groupe.treatmentIds.includes(resolveTreatmentId(inj.brand, …)))
+    conc  = calculateCumulativeConcentration(now, history, inj =&gt; getPKParameters(…))
+    retenir si conc &gt; 0.001
+0 molécule → { 0, false }  1 → { conc, false }  ≥ 2 → { 0, multiple: true }</code></pre>
+  <p>Deux temps : les 60 derniers jours choisissent QUELLES molécules sont en jeu, puis chaque molécule retenue est cumulée sur TOUT son historique. Le cumul est par MOLÉCULE — passer d'Ozempic à Wegovy, ou de l'injection au comprimé, ne fait pas deux traitements actifs ; chaque prise garde la cinétique de SA fiche. Deux appels coexistent : l'un sur tout l'historique pour la tuile « En direct », l'autre sur la seule série en cours pour la valeur « Actif ».</p>
+  <p class="ancre">src/features/home/homeOverview.ts · src/utils/pharmacokinetics.ts</p>
+  <details><summary>Cas limites</summary><p>Aucune prise dans les 60 jours : tout l'historique sert au choix — une cure arrêtée depuis trois mois montre encore un résidu s'il dépasse 0,001 mg. Deux molécules actives : 0 mg, multiple vrai, la tuile écrit « voir détail ».</p></details>
+  <h3 id="maison-humeur-du-jour-sideeffectsmood">Humeur du jour (sideEffectsMood)</h3>
+  <pre><code>score = Σ severity du jour  hasSevere = ∃ severity ≥ 4
+score === 0  → serein,  « pas d'effet secondaire aujourd'hui »
+score &gt; 8 || hasSevere → difficile, hasSevere ? « au moins un symptôme intense » : « plusieurs symptômes »
+sinon  → modéré,  nb effets &gt; 1 ? « symptômes modérés » : « symptôme modéré »</code></pre>
+  <p>Calculée sur les seules lignes du jour (log.date === todayStr). Ces libellés sont ceux de l'infobulle ; la phrase sous le smiley vient d'une autre fonction.</p>
+  <p class="ancre">src/features/home/homeOverview.ts</p>
+  <details><summary>Cas limites</summary><p>Score 8 sans sévérité ≥ 4 : modéré. Score 9 : difficile. Une sévérité 5 seule : difficile. Journal du jour vide : score 0, donc serein — « rien déclaré » et « rien ressenti » ne se distinguent pas.</p></details>
+  <div class="exemple"><p>Camille, une nausée de sévérité 2 : score 2, pas de sévère → modéré, un seul effet → « symptôme modéré ».</p></div>
+  <h3 id="maison-phrases-sous-le-smiley-moodcaption-moodcaptioncarre">Phrases sous le smiley (moodCaption / moodCaptionCarre)</h3>
+  <table>
+  <thead><tr><th>Ton</th><th>moodCaption — standard</th><th>moodCaptionCarre — sections</th></tr></thead>
+  <tbody>
+  <tr><td>serein</td><td>pas ou très peu d'effet secondaire aujourd'hui</td><td>pas ou peu d'effet secondaire aujourd'hui</td></tr>
+  <tr><td>modere</td><td>quelques effets secondaires aujourd'hui</td><td>quelques effets secondaires</td></tr>
+  <tr><td>difficile</td><td>beaucoup d'effets secondaires aujourd'hui</td><td>effets secondaires désagréables</td></tr>
+  </tbody>
+  </table>
+  <p>Elles ne décident pas de l'humeur : elles traduisent un ton déjà rendu. La divergence est délibérée, comme celle des trois visages — tricolores sur la home standard, monochromes sur la home sections.</p>
+  <p class="ancre">src/features/home/homeOverview.ts</p>
+  <h3 id="maison-bloc-mes-pas">Bloc « Mes pas »</h3>
+  <pre><code>todaySteps  = stepLogs.find(l =&gt; l.date === getLocalDateStr())?.steps || 0
+objectif  = DEFAULT_DAILY_GOAL_STEPS = 8000
+pourcentage = Math.min(100, Math.round((todaySteps / 8000) × 100))
+km  = parseFloat((todaySteps × 0.00076).toFixed(1))  // KM_PER_STEP
+duree  = formatCalendarDuration(Math.round(max(0, todaySteps) / 95))  // STEPS_PER_MINUTE
+              formatCalendarDuration(m) : m &lt; 60 → `${m}min` ; sinon `${floor(m/60)}h${(m%60) sur 2}`
+kcal  = max(0, round(3.5 × poidsDuJour × ((pas × taille × 0.414 / 100000) / 4.2)))</code></pre>
+  <p>WALKING_SPEED_KMH = 4.2 est affiché en troisième colonne et n'entre dans aucun calcul du bloc — mais la même valeur 4,2 est écrite en dur dans calculateStepCalories, qui divise la distance par cette vitesse. La durée vient des 95 pas par minute.</p>
+  <p class="ancre">src/versions/mixte/features/home/HomeStepsProgress.tsx · src/features/steps/steps.constants.ts</p>
+  <details><summary>Cas limites</summary><p>Aucun relevé : 0 pas, 0 %, 0 km, « 0min », 0 kcal — le bloc est rendu quand même. Objectif dépassé : pourcentage et barre bornés à 100. Taille absente : repli sur 170 cm.</p></details>
+  <div class="exemple"><p>Camille, 6 240 pas : 78 %, 4.7 km, round(6240/95) = 66 min → « 1h06 ». <a href="spec-fonctionnelle.html#maison-bloc-mes-pas-home-standard">→ fonctionnelle</a></p></div>
+  <h3 id="maison-defile-des-journaux-recentjournalentries">Défilé des journaux (recentJournalEntries)</h3>
+  <pre><code>tri : b.date.localeCompare(a.date), puis (b.time || '').localeCompare(a.time || '')
+      → une entrée sans heure passe APRÈS celles de son jour qui en portent une
+RECENT_JOURNAL_DAYS = 7 ; RECENT_JOURNAL_MAX = 40
+debut = getLocalDateStr(now − 6 × 86 400 000) ; aujourdhui = getLocalDateStr(now)
+entrées.filter(e =&gt; e.date ≥ debut &amp;&amp; e.date ≤ aujourdhui).slice(0, max(0, maxEntries))</code></pre>
+  <p>Le socle entreesTousJournaux fond sept journaux — repas, traitement, pesées, sport, temps pour soi, sommeil, effets. Les pas n'y sont pas : un total du jour n'est pas une entrée de journal. Le plafond s'applique APRÈS le tri : les 40 plus récentes restent. Liste vide : rien n'est rendu.</p>
+  <p class="ancre">src/features/home/recentJournal.ts</p>
+  <details><summary>Cas limites</summary><p>Entrée de demain : écartée ici, gardée par le tiroir Journal qui lit le même socle sans fenêtre. Une nuit se range à sa date de RÉVEIL. Plus de 40 entrées : les plus anciennes tombent.</p></details>
+  <h3 id="maison-nature-d-une-entree-du-defile">Nature d'une entrée du défilé</h3>
+  <table>
+  <thead><tr><th>Nature</th><th>Règle</th><th>Onglet</th></tr></thead>
+  <tbody>
+  <tr><td>repas/encas</td><td>type === 'snack' || 'snacks' → en-cas, sinon repas ; jamais sur le libellé, traduisible.</td><td>meals</td></tr>
+  <tr><td>injection/comprime</td><td>isOralMedication(resolveTreatmentId(brand, glp1Brand)) — la fiche, jamais le nom.</td><td>injection</td></tr>
+  <tr><td>pesee</td><td>Libellé fixe « Pesée », weightKg en kg.</td><td>history</td></tr>
+  <tr><td>sport</td><td>kcal = getSportCalories(log, getWeightAtDate(log.date, …)), absente si ≤ 0 ; durationIsFloors si « Montée escaliers ».</td><td>sports</td></tr>
+  <tr><td>metime</td><td>Nom et durée, ni intensité ni calories.</td><td>metime</td></tr>
+  <tr><td>sommeil</td><td>date/time du RÉVEIL ; duration = sleepLogMinutes(log), absente si 0 ; libellé SLEEP_KIND_LABELS[kind].</td><td>sleep</td></tr>
+  <tr><td>effet</td><td>Nom libre du symptôme et sévérité.</td><td>symptoms</td></tr>
+  </tbody>
+  </table>
+  <p>La clé est préfixée par table (repas:, traitement:…) : deux journaux peuvent porter le même identifiant. Les kcal d'une séance emploient le poids DU JOUR de la séance.</p>
+  <p class="ancre">src/features/home/recentJournal.ts · src/shared/body-metrics</p>
+  <h3 id="maison-formats-de-ligne-du-defile-lignevaleur-ligneduree">Formats de ligne du défilé (ligneValeur / ligneDuree)</h3>
+  <pre><code>ligneDuree : duration absente → '' ; durationIsFloors → `${duration} ét.` ; sinon `${duration} min`
+ligneTemps = [time, ligneDuree(entry)].filter(non vide).join(' · ')
+ligneValeur(entry, options) — morceaux joints par ' · ', dans cet ordre :
+  `${Math.round(kcal)} kcal`  sauf options.sansCalories
+  `${format1Dec(weightKg)} kg`
+  `${parseFloat(doseMg.toFixed(2))} mg`
+  EFFORTS[effort] ∈ {douce, modérée, intensive}  sauf options.sansEffort
+  `${severity}/5`  sauf options.sansSeverite
+  `${quality}/5`
+  `${hungerBefore ?? '–'}→${hungerAfter ?? '–'}`  dès qu'UN des deux existe</code></pre>
+  <p>Le modèle ne porte que des grandeurs canoniques : les unités sont posées ici, et nulle part ailleurs. Les trois options sont éteintes par défaut ; le tiroir Journal en allume selon le journal.</p>
+  <p class="ancre">src/versions/mixte/features/home/RecentJournalStrip.tsx</p>
+  <details><summary>Cas limites</summary><p>Sévérité et qualité ne se rencontrent jamais sur un même carré : les deux écrivent « n/5 ». Un seul niveau de faim renseigné : l'autre s'écrit « – ».</p></details>
+  <h3 id="maison-divination-bilan-des-7-derniers-jours">Divination — bilan des 7 derniers jours</h3>
+  <pre><code>savedMeals = meals.filter(m =&gt; hasOccurred(m.date, m.time, now))  // le futur ne compte pas
+sportLogs  = sports.filter(s =&gt; hasOccurred(s.date, s.time, now))
+stepLogs  = steps.filter(s =&gt; hasOccurred(s.date, undefined, now))
+summary = computeMetabolismSummary(profile, weightHistory, sportLogs, stepLogs, savedMeals, now)
+
+metabolismeBasal7j  = Math.round(summary.totalBmr)  // Mifflin-St Jeor, poids du jour
+kcalPas7j  = Math.round(Σ dailyStats.stepCalories)
+kcalSport7j  = Math.round(Σ dailyStats.sportCalories)
+kcalIngerees7j  = summary.totalIngested
+depenses7j  = metabolismeBasal7j + kcalPas7j + kcalSport7j  // somme des TROIS ARRONDIS
+differentielKcal  = kcalIngerees7j − depenses7j  // &gt; 0 = surplus
+differentielGrammes = Math.round((differentielKcal / 8000) × 1000)  // KCAL_PER_KILO = 8000
+poidsActuel = dailyStats[6].weight ; dates7j = summary.last7DaysDates</code></pre>
+  <p>La somme porte sur les trois arrondis, pas sur les valeurs brutes : la soustraction posée à l'écran retombe ainsi exactement sur differentielKcal. Le métabolisme est calculé jour par jour avec le poids de ce jour-là ; l'âge vaut 42 par défaut, la taille 170 cm, le genre « femme ».</p>
+  <p class="ancre">src/features/divination/divination.ts · src/features/metabolism/metabolism.utils.ts</p>
+  <details><summary>Cas limites</summary><p>Repas noté à 20 h, lu à 18 h : écarté. Journal de pas vide : dépense 0, pas null. Fenêtre fixe de sept dates finissant aujourd'hui, quelle que soit l'ancienneté de la cure.</p></details>
+  <div class="exemple"><p>Camille : 10 731 + 1 450 + 600 = 12 781 de dépenses ; 9 800 ingérées → −2 981 kcal → round(−372.6) = −373 g.</p></div>
+  <h3 id="maison-verdict-de-divination-getdivinationverdict">Verdict de divination (getDivinationVerdict)</h3>
+  <pre><code>abs = Math.abs(differentielGrammes)  // STABLE_MAX_GRAMS = 300, MARKED_MIN_GRAMS = 1000
+abs ≤ 300  → 'stable'
+abs &lt; 1000 → differentielGrammes &gt; 0 ? 'legere-hausse'  : 'legere-baisse'
+sinon  → differentielGrammes &gt; 0 ? 'hausse-marquee' : 'baisse-marquee'</code></pre>
+  <p>Libellés courts (employés par le tiroir) : « stable », « légère hausse », « légère baisse », « hausse assez marquée », « baisse assez marquée ».</p>
+  <p><span class="marque">arbitrage non validé</span> La consigne nommait « ± 700 g » pour la bande légère et « ± 1 kg » pour la marquée, sans nommer la bande de 700 g à 1 kg. La lecture codée fait couvrir par « légère » tout l'intervalle de 300 g exclu à 1 kg exclu.</p>
+  <p class="ancre">src/features/divination/divination.ts</p>
+  <details><summary>Cas limites</summary><p>Exactement 300 g : stable ; 301 g : légère hausse ; exactement 1 000 g : marquée. Zéro : stable — c'est le signe strictement positif qui départage, un zéro tomberait sinon en baisse.</p></details>
+  <h3 id="maison-phrases-de-la-dynamique">Phrases de la dynamique</h3>
+  <pre><code>// la ligne de la home — DIVINATION_LIGNE_HOME_PARTS { avant, tendance, apres }
+stable  : « Dynamique générale : la balance devrait rester » + « à peu près stable » + « . »
+legere-hausse  : « Dynamique générale : » + « légère hausse » + « attendue sur la balance. »
+legere-baisse  : … + « légère baisse » + …
+hausse-marquee : … + « hausse relativement marquée » + …
+baisse-marquee : … + « baisse relativement marquée » + …
+
+// la phrase du tiroir — divinationAttenteParts(verdict, differentielKcal)
+arrondi = Math.round(differentielKcal)
+chiffre = arrondi === 0 ? '0' : (arrondi &lt; 0 ? '−' : '+') + formatNumber(Math.abs(arrondi))
+{ avant: 'Un différentiel de ', differentiel: `${chiffre} kcal`,
+  apres: ` sur une semaine ${DIVINATION_VERDICT_ATTENTES[verdict]}.` }
+
+DIVINATION_VERDICT_ATTENTES :
+  stable  → devrait laisser la balance à peu près stable
+  legere-hausse  → devrait se matérialiser par une légère hausse sur la balance
+  legere-baisse  → devrait se matérialiser par une légère baisse sur la balance
+  hausse-marquee → devrait se matérialiser par une hausse marquée sur la balance
+  baisse-marquee → devrait se matérialiser par une baisse marquée sur la balance</code></pre>
+  <p>Les phrases sont décrites en MORCEAUX à la source pour que le gabarit peigne un fragment sans découper une chaîne : tendance sur la home, differentiel dans le tiroir. Signe moins U+2212, milliers en espace insécable. Le mot est « marquée » dans le tiroir et « relativement marquée » sur la home : deux tables distinctes, volontairement.</p>
+  <p class="ancre">src/features/divination/divination.ts</p>
+  <details><summary>Cas limites</summary><p>0 kcal : « 0 kcal » sans signe — « +0 » se lirait comme un surplus. 0,4 kcal : arrondi à 0.</p></details>
+  <div class="exemple"><p>Camille : « Dynamique générale : légère baisse attendue sur la balance. » ; dans le tiroir, « Un différentiel de −2 981 kcal sur une semaine devrait se matérialiser par une légère baisse sur la balance. » <a href="spec-fonctionnelle.html#maison-section-dynamique-bloc-du-verdict-partage">→ fonctionnelle</a></p></div>
+  <h3 id="maison-deblocage-de-la-section-dynamique">Déblocage de la section Dynamique</h3>
+  <pre><code>DYNAMIQUE_UNLOCK_DAYS = 7
+INSTALL_KEY = 'glp1_first_open_date' ; CELEBRATION_KEY = 'glp1_dynamique_celebrated'
+firstOpenDate(appData, today) {  // PURE : lit, n'écrit pas
+  1. la clé stockée si c'est une date valide
+  2. sinon oldestDataDate(appData) — la plus ancienne date des NEUF journaux, modules
+     éteints compris — si elle est ≤ today
+  3. sinon today }
+stampFirstOpenDate : n'écrit que si la clé manque, et n'y revient jamais
+dynamiqueAgeDays  = Math.max(0, daysBetween(firstOpenDate, today))
+isDynamiqueUnlocked = dynamiqueAgeDays ≥ 7
+dynamiqueTitre(d)  = d ? 'Dynamique sur les 7 derniers jours' : 'Dynamique'</code></pre>
+  <p>Comparaison sur des dates locales, pas sur des millisecondes : six jours et vingt-trois heures ne font pas sept jours. L'horodatage est posé dans un effet, jamais pendant le rendu ; la déduction étant pure, le premier rendu affiche déjà le bon état. Une donnée datée du futur n'est pas retenue comme origine.</p>
+  <p><span class="marque">arbitrage non validé</span> Le titre sous verrou reste « Dynamique » : la consigne ne donnait qu'un titre, pour l'état dévoilé.</p>
+  <p class="ancre">src/features/divination/dynamiqueUnlock.ts</p>
+  <details><summary>Cas limites</summary><p>Application vierge : origine = aujourd'hui, âge 0, verrouillé. Cure de six mois sans clé : la plus ancienne pesée sert d'origine, la section est ouverte dès la première ouverture et la fête paraît aussitôt.</p></details>
+  <h3 id="maison-cliquabilite-du-bloc-dynamique">Cliquabilité du bloc Dynamique</h3>
+  <pre><code>deverrouillee = isDynamiqueUnlocked(appData)  // relu par le bloc lui-même
+ouvrable  = Boolean(onOpenDetail) &amp;&amp; deverrouillee</code></pre>
+  <p>Sous verrou, « Voir le calcul » est un texte inerte : ni bouton, ni lien, ni cible de tabulation. Sans onOpenDetail, le bloc se rend sans son lien. La surface de clic n'est tendue — et le conteneur ne prend sa classe relative — que si ouvrable. Aucun drapeau n'est soufflé par la home : le bloc, la home sections et la fête interrogent chacun isDynamiqueUnlocked.</p>
+  <p class="ancre">src/versions/mixte/components/DivinationBlock.tsx</p>
+  <h3 id="maison-place-de-la-section-dynamique">Place de la section Dynamique</h3>
+  <table>
+  <thead><tr><th>Home</th><th>Dévoilée</th><th>Verrouillée</th></tr></thead>
+  <tbody>
+  <tr><td>standard</td><td>dernier bloc, avant le pied de page médical</td><td>même place</td></tr>
+  <tr><td>sections / blocs</td><td>deuxième section, juste après « En direct »</td><td>dernière section, après « Côte à côte »</td></tr>
+  </tbody>
+  </table>
+  <p>Un seul morceau de JSX, posé à l'un ou l'autre bout. Verrouillée sur la home sections, la rangée des trois sens est enveloppée dans SectionVerrouillee SANS message ; le message est porté par le bloc du verdict, juste dessous — les deux zones se touchent et se lisent comme une seule surface masquée.</p>
+  <p><span class="marque">arbitrage non validé</span> Les deux places sont des choix : la consigne laissait « en dernier ou en deuxième après En direct » ouvert, et la home standard n'a pas de section « En direct ».</p>
+  <p class="ancre">src/versions/mixte/components/Maison.tsx · src/versions/mixte/homes/sections/MaisonSections.tsx</p>
+  <h3 id="maison-tiroir-dynamique-valeurs-derivees">Tiroir Dynamique — valeurs dérivées</h3>
+  <pre><code>mbJour  = Math.round(metabolismeBasal7j / 7)
+inclinaison = stable ? 0 : legere-hausse ? 9 : legere-baisse ? −9
+            : hausse-marquee ? 17 : −17  // degrés, hausse à droite
+poidsSigne(g) = |g| ≥ 1000 ? `${signe}${formatNumber(|g|/1000, 2)} kg` : `${signe}${|g|} g`
+kcalSigne(n)  = (n &lt; 0 ? '−' : '+') + formatNumber(|n|)</code></pre>
+  <p>La ligne « Métabolisme : {mbJour} × 7 » porte un « ≈ » pour couvrir l'arrondi ; la soustraction posée travaille sur les vrais totaux et retombe exactement sur le différentiel. Seul le fléau de la balance pivote : la colonne et le socle ne bougent jamais, et chaque plateau contre-pivote pour rester horizontal.</p>
+  <p class="ancre">src/versions/mixte/components/DivinationDrawer.tsx</p>
+  <details><summary>Cas limites</summary><p>−1 226 g → « −1,23 kg » (virgule, deux décimales) ; −373 g → « −373 g ». Le tiroir a son propre titre, « Dynamique », distinct de celui du bloc. <a href="spec-fonctionnelle.html#maison-tiroir-dynamique-calcul-de-la-projection">→ fonctionnelle</a></p></details>
+  <h3 id="maison-rangee-ajout-rapide">Rangée « Ajout rapide »</h3>
+  <p>La section entière — séparateur compris — est absente en menu simplifié.</p>
+  <pre><code>BOTTOM_MENU_ORDER = [maison, injection, history, symptoms, sports, meals, sleep, metime, report]
+bottomMenuTabs(profile) = pickTabs(profile, BOTTOM_MENU_ORDER)
+                            .filter(tab =&gt; isModuleOn(profile, tab.id))
+                            .map(maison → libellé « Accueil »)
+boutons = bottomMenuTabs(profile).filter(tab =&gt; tab.id ∈ QUICK_ADD_TILES)
+QUICK_ADD_TILES = { injection, history, symptoms, sports, metime, sleep, meals }</code></pre>
+  <p>L'intersection retire maison et report ; l'ordre reste celui du menu : injection, pesée, effet secondaire, activité physique, repas, sommeil, temps pour soi. Le picto de l'injection est résolu au rendu par treatmentIcon(profile.glp1Brand), et le libellé devient « Ajouter une prise » pour un oral. Chaque bouton appelle onQuickAddNavigate(tabId), qui ouvre la page formulaire déplié. La sortie d'écran de la rangée est signalée à la page, qui fait alors apparaître le « + » flottant.</p>
+  <p class="ancre">src/versions/mixte/homes/sections/MaisonSections.tsx · src/versions/mixte/app/navigation.ts</p>
+  <details><summary>Cas limites</summary><p>Tous les modules éteints : il reste la pesée, qui n'a pas de module. Sept boutons sur 320 px : chacun cède de la largeur (flex-1 max-w-20 min-w-0). <a href="spec-fonctionnelle.html#maison-section-ajout-rapide-home-sections">→ fonctionnelle</a></p></details>
+  <h3 id="maison-garde-fous-d-ouverture-des-couches-en-direct">Garde-fous d'ouverture des couches « En direct »</h3>
+  <pre><code>aDeQuoiTracer = !isNoTreatment(resolveTreatmentId(undefined, profile.glp1Brand))
+                &amp;&amp; (appData.injectionHistory?.length ?? 0) &gt; 0
+  → vrai : couche « Niveau sanguin actif » ; faux : onNavigate('injection', 'plot')
+
+aDeQuoiMontrerLesEffets = isModuleOn(profile, 'symptoms')
+                          &amp;&amp; (appData.sideEffectHistory?.length ?? 0) &gt; 0
+  → vrai : couche « Effets secondaires » (la matrice) ; faux : onNavigate('symptoms')</code></pre>
+  <p>Ce sont les conditions du contenu lui-même, lues en amont : sans traitement ni prise, le graphe ne dessine rien ; sans déclaration, la matrice n'a ni effet à nommer ni semaine à montrer. isModuleOn et non le drapeau nu : les effets sont allumés par défaut.</p>
+  <p class="ancre">src/versions/mixte/homes/sections/MaisonSections.tsx</p>
+  <h3 id="maison-ouverture-de-la-couche-menus-selon-l-entree">Ouverture de la couche Menus selon l'entrée</h3>
+  <table>
+  <thead><tr><th>Geste</th><th>Paramètres passés</th></tr></thead>
+  <tbody>
+  <tr><td>bande kcal ou barre d'objectif de « En direct »</td><td>{ titre: 'Aujourd’hui', vue: 'jour' }</td></tr>
+  <tr><td>bouton « + Ajouter » de « En direct »</td><td>{ titre: 'Aujourd’hui', vue: 'jour', saisie: true }</td></tr>
+  <tr><td>colonne « Depuis le début » de Côte à côte</td><td>{ titre: 'Depuis le début', vue: 'moyenne', fenetre: 'all' }</td></tr>
+  <tr><td>colonne « 7 derniers jours » de Côte à côte</td><td>{ titre: '7 derniers jours', vue: 'moyenne', fenetre: '7days' }</td></tr>
+  </tbody>
+  </table>
+  <p>Le clic est le MÊME sur les trois blocs de la bande kcal, journée vierge comprise : c'est la couche qui choisit son visage — formulaire si la journée est vide, récapitulatif sinon. Créer un aliment absent referme la couche et ouvre le formulaire de la page ; la saisie en cours est perdue.</p>
+  <p class="ancre">src/versions/mixte/homes/sections/MaisonSections.tsx</p>
+  <h3 id="maison-sens-des-tuiles-dynamique">Sens des tuiles Dynamique</h3>
+  <pre><code>sensRepas = periodShift(caloriesTrend(appData.savedMeals)) ?? 'stable'
+sensSport = periodShift(sportTrend(appData.sportLogs))  ?? 'stable'
+sensPas  = periodShift(stepsTrend(appData.stepLogs))  ?? 'stable'</code></pre>
+  <p>Les séries font 14 jours ; periodShift compare la somme des sept jours anciens à celle des sept récents, seuil 5 %. Le repli ?? 'stable' ne joue que sur une série VIDE — un journal qui n'a jamais rien enregistré : deux semaines à zéro sont stables.</p>
+  <p>La tuile repas est toujours rendue ; celles du sport et des pas s'effacent avec leur module (sportEnabled, stepsEnabled, tous deux lus en « différent de faux ») et laissent leur case vide, la rangée gardant ses trois colonnes.</p>
+  <p class="ancre">src/versions/mixte/homes/sections/MaisonSections.tsx · src/features/trends/trends.ts</p>
+  <div class="exemple"><p>Camille, 7 × 1 000 kcal puis 7 × 1 040 : 4 %, stable. À 7 × 1 060 : 6 %, hausse. <a href="spec-fonctionnelle.html#maison-section-dynamique-rangee-des-trois-sens-home-sections">→ fonctionnelle</a></p></div>
+  <h3 id="maison-rangee-progres-composition-et-plafond">Rangée Progrès — composition et plafond</h3>
+  <pre><code>candidates (dans leur ordre d'affichage) :
+  'semaine'  rang 1  si cure &amp;&amp; cure.totalDays ≥ 7
+  'imc'  rang 2  si bmiPoints !== null
+  'total_loss' rang 3  si showTotalLoss
+  'last_loss'  rang 4  si showLastLoss
+
+PROGRES_MAX = 4 ; PROGRES_MIN = 2
+gardees  = candidates triées par RANG, coupées à PROGRES_MAX
+tuiles  = candidates.filter(c =&gt; gardees.has(c.cle))  // l'ORDRE d'affichage est conservé
+colonnes = PROGRES_COLONNES[min(4, max(2, tuiles.length))]  // 'grid-cols-2' | 3 | 4
+titre  = currentWeight ≥ startingWeight ? 'Évolution' : 'Progrès'</code></pre>
+  <p>Le plafond coupe par le RANG, la rangée s'écrit dans l'ORDRE. Le plancher de deux colonnes empêche une tuile seule de s'étirer sur toute la page ; les classes sont écrites en toutes lettres, Tailwind ne lisant pas une classe fabriquée à l'exécution.</p>
+  <p class="ancre">src/versions/mixte/homes/sections/MaisonSections.tsx</p>
+  <details><summary>Cas limites</summary><p>Quatre candidates au plus : le plafond ne mord jamais aujourd'hui. Une seule candidate : grille à deux colonnes, une case vide. Aucune : le séparateur et la grille demeurent, vides. <a href="spec-fonctionnelle.html#maison-section-progres-evolution-home-sections">→ fonctionnelle</a></p></details>
+  <h3 id="maison-points-d-imc-gagnes-perdus-bmipointschange">Points d'IMC gagnés / perdus (bmiPointsChange)</h3>
+  <pre><code>heightM = heightCm / 100
+si heightM ≤ 0 OU startingWeightKg ≤ 0 → null
+ecart = (currentWeightKg − startingWeightKg) / heightM²
+return Math.round(ecart × 10) / 10
+affichage : `${bmiPoints &gt; 0 ? '+' : ''}${format1Dec(bmiPoints)}`</code></pre>
+  <p>Le signe est celui de la VARIATION : perdre du poids donne un nombre négatif — la convention de pctOfStart, l'inverse de totalLoss. L'arrondi porte sur la DIFFÉRENCE et non sur les deux IMC : retrancher deux arrondis au dixième peut décaler le résultat d'un dixième entier.</p>
+  <p class="ancre">src/features/home/homeOverview.ts</p>
+  <details><summary>Cas limites</summary><p>null — donc pas de tuile — sans taille ou sans poids de départ. Jamais un « — » orphelin. Variation nulle : « 0 », sans signe.</p></details>
+  <div class="exemple"><p>Camille : (88.4 − 96)/2.8224 = −2.6928… → −2.7 points d'IMC.</p></div>
+  <h3 id="maison-duree-d-une-perte-lossspanlabel-lossspandates">Durée d'une perte (lossSpanLabel / lossSpanDates)</h3>
+  <pre><code>lossSpanDates(weightHistory) :
+  sorted  = [...weightHistory].sort(byDateTimeDesc)
+  totalFrom = findStartingWeighIn(weightHistory)?.date  // la pesée de DÉPART, pas la plus ancienne
+  totalTo  = sorted[0]?.date
+  lastFrom  = sorted[1]?.date  // l'AVANT-DERNIÈRE pesée
+  lastTo  = sorted[0]?.date
+
+lossSpanLabel(debut, fin) :
+  si !debut OU debut &gt; fin → null
+  jours = daysBetween(debut, fin) ; si jours &lt; 1 → null
+  si jours &lt; 7 → `en ${dayCountLabel(jours)}`
+  semaines = Math.max(1, Math.round(jours / 7)) → `en ${semaines} semaine(s)`</code></pre>
+  <p>Les semaines sont arrondies à l'entier le plus proche, pas tronquées. La durée de la dernière perte est le temps entre les DEUX pesées qui la mesurent, pas le temps écoulé depuis.</p>
+  <p class="ancre">src/features/home/homeOverview.ts</p>
+  <details><summary>Cas limites</summary><p>Deux pesées le même jour : 0 jour, donc null, aucune durée écrite. 13 jours → « en 2 semaines » ; 3 jours → « en 3 jours » ; 7 jours → « en 1 semaine ».</p></details>
+  <div class="exemple"><p>Camille : 4 mai → 12 septembre = 131 jours → round(18.71) = « en 19 semaines » ; 5 → 12 septembre = 7 jours → « en 1 semaine ».</p></div>
+  <h3 id="maison-repli-du-dessin-d-equivalence-insolite">Repli du dessin d'équivalence insolite</h3>
+  <pre><code>ludic = useLudicAssignment(appData.weightHistory)  // l'assignation persistée, produite par la pesée
+ludicTotal = (ludic.total.length &gt; 0 || totalLoss ≤ 0) ? ludic.total
+             : getLudicDecomposition(totalLoss)
+ludicLast  = (ludic.last.length &gt; 0 || lastLoss ≤ 0)  ? ludic.last
+             : getLudicDecomposition(lastLoss, { exclude: ludicTotal.map(i =&gt; i.name) })</code></pre>
+  <p>Le repli ne choisit pas à la place de l'assignation : tant qu'elle a quelque chose à dire, c'est elle qui parle, et les règles de turn-over et de non-répétition restent les siennes. getLudicDecomposition est pure et déterministe, et n'admet que les combinaisons vraies à 200 g près. La home standard n'a PAS ce repli : elle lit ludic.total et ludic.last tels quels.</p>
+  <p class="ancre">src/versions/mixte/homes/sections/MaisonSections.tsx · src/utils/ludicWeight.ts</p>
+  <details><summary>Cas limites</summary><p>Perte nulle ou négative : la liste vide est légitime, aucun recalcul. Le recalcul de la dernière perte exclut les noms de la perte totale : jamais le même objet des deux côtés. <a href="spec-fonctionnelle.html#maison-surimpression-d-une-equivalence-insolite-home-sections">→ fonctionnelle</a></p></details>
+  <h3 id="maison-fenetre-7-derniers-jours-des-bilans">Fenêtre « 7 derniers jours » des bilans</h3>
+  <pre><code>sevenDaysAgoStr = getLocalDateStr(new Date(now.getTime() − 6 × 86 400 000))
+retenus  = logs.filter(l =&gt; l.date ≥ sevenDaysAgoStr)</code></pre>
+  <table>
+  <thead><tr><th>Fonction</th><th>Ce qu'elle rend</th></tr></thead>
+  <tbody>
+  <tr><td>sportMinutesLast7Days</td><td>Σ duration brute — les étages de la montée d'escaliers comptés comme des minutes.</td></tr>
+  <tr><td>sportSessionsLast7Days</td><td>nombre de LIGNES : une séance = une ligne.</td></tr>
+  <tr><td>meTimeCountLast7Days</td><td>nombre d'ENTRÉES, pas de journées : deux moments le même jour font deux.</td></tr>
+  <tr><td>sideEffectsCountLast7Days</td><td>nombre d'entrées.</td></tr>
+  <tr><td>stepsDailyAverageLast7Days</td><td>stepsDailyAverage appliquée à la fenêtre.</td></tr>
+  <tr><td>sleepDailyAverageLast7Days</td><td>Σ minutes ÷ journées renseignées, null si aucune.</td></tr>
+  <tr><td>weightedQualityLast7Days</td><td>weightedQuality appliquée à la fenêtre.</td></tr>
+  <tr><td>countCreatedLast7Days</td><td>objets datés par un instant createdAt, ramené à son jour local ; sans createdAt, non compté.</td></tr>
+  </tbody>
+  </table>
+  <p>Le filtre est un simple ≥ : une entrée datée du FUTUR est comptée par ces huit fonctions.</p>
+  <p class="ancre">src/features/home/homeOverview.ts · src/features/steps/steps.utils.ts</p>
+  <h3 id="maison-moyennes-repas-sur-7-jours-revolus-mealcaloriesdailyaveragel">Moyennes repas sur 7 jours révolus (mealCaloriesDailyAverageLast7Days)</h3>
+  <p>La seule fenêtre à sept jours du dépôt qui ÉCARTE le jour courant : la journée n'est pas finie, et la compter tirerait la moyenne vers le bas d'autant plus qu'il est tôt.</p>
+  <pre><code>hier  = getLocalDateStr(now − 86 400 000)
+debut  = getLocalDateStr(now − 7 × 86 400 000)
+retenus  = savedMeals.filter(m =&gt; m.date ≥ debut &amp;&amp; m.date ≤ hier)
+journees = new Set(retenus.map(m =&gt; m.date)).size
+si journees === 0 → null
+calories = Σ calories / journees
+// mealMacrosDailyAverageLast7Days : même fenêtre, même dénominateur
+protein  = Σ protein / journees ; fiber = Σ fiber / journees</code></pre>
+  <p>Le dénominateur est le nombre de JOURNÉES RENSEIGNÉES, pas sept : une journée sans repas saisi est une journée non tenue, pas un jeûne. Les deux fonctions partagent fenêtre et dénominateur pour que les trois tuiles de la rangée se lisent ensemble.</p>
+  <p class="ancre">src/features/home/homeOverview.ts</p>
+  <details><summary>Cas limites</summary><p>Aucune journée renseignée : null, la tuile se tait — zéro se lirait comme un jour à jeun. Un repas noté pour demain n'entre pas : la borne haute est hier.</p></details>
+  <h3 id="maison-moyennes-du-journal-des-repas-sur-la-cure-mealdailyaverages">Moyennes du journal des repas sur la cure (mealDailyAverages)</h3>
+  <pre><code>parJour = mealsByDate(meals)  // toutes les dates du journal, sans fenêtre
+jours  = parJour.size ; si 0 → null
+pour chaque journée :
+   repas += dayMealCounts(logs).repas ; encas += dayMealCounts(logs).snacks
+   { calories, protein, fiber } += nutritionTotalsOn(logs, date)
+rendu : { jours, repas/jours, encas/jours, calories/jours, protein/jours, fiber/jours }</code></pre>
+  <p>Le partage repas / en-cas suit mealTypeLabel, seule autorité : un type inconnu compte pour un en-cas. Aucune valeur nutritionnelle n'est recalculée ici. La fenêtre est TOUT le journal, futur compris : la colonne « Depuis le début » ne pose aucune borne haute.</p>
+  <p class="ancre">src/features/meal-journal/mealAverages.ts</p>
+  <details><summary>Cas limites</summary><p>Journal vide : null, le domaine repas perd sa colonne gauche. jours est exposé pour l'infobulle : c'est le dénominateur, pas la durée de la cure.</p></details>
+  <h3 id="maison-moyenne-de-pas-par-jour-stepsdailyaverage">Moyenne de pas par jour (stepsDailyAverage)</h3>
+  <pre><code>parJour = Map&lt;date, Σ steps&gt;  // cumul par journée
+releves = [...parJour.values()].filter(pas =&gt; pas &gt; 0)  // les journées à 0 sont ÉCARTÉES
+si releves.length === 0 → null
+return Σ releves / releves.length</code></pre>
+  <p>Un podomètre muet n'est pas une journée immobile : une journée relevée à zéro ne compte ni au numérateur ni au dénominateur. La version à sept jours applique cette fonction à la fenêtre filtrée.</p>
+  <p class="ancre">src/features/steps/steps.utils.ts</p>
+  <details><summary>Cas limites</summary><p>Toutes les journées à 0 : null, pas 0. Deux lignes pour la même date : elles s'additionnent avant le filtre. Une journée à 0 pas reste montrée par le tiroir Journal : l'exclusion ne vaut que pour cette moyenne.</p></details>
+  <h3 id="maison-sommeil-moyen-et-qualite-ponderee">Sommeil moyen et qualité pondérée</h3>
+  <pre><code>sleepDailyAverage(logs) :
+  journees = new Set(logs.map(l =&gt; l.date)).size  // date = jour du RÉVEIL
+  si journees === 0 → null
+  return Σ sleepLogMinutes(log) / journees  // nuits ET siestes
+
+weightedQuality(logs) :
+  poids = 0 ; somme = 0
+  pour chaque log : d = sleepLogMinutes(log) ; si d ≤ 0 → passer
+                    poids += d ; somme += d × log.quality
+  si poids === 0 → null
+  return Math.round((somme / poids) × 10) / 10
+
+formatSleepAverage(min) : total = max(0, round(min)) → `${floor(total/60)}h${(total%60) sur 2 chiffres}`</code></pre>
+  <p>Le dénominateur est la JOURNÉE, pas l'entrée : une journée qui porte une nuit et une sieste ne compte qu'une fois, et ses deux durées s'additionnent. La qualité est pondérée par la durée — une nuit pèse plus qu'une sieste.</p>
+  <p class="ancre">src/features/sleep/sleep.utils.ts</p>
+  <details><summary>Cas limites</summary><p>Entrée de durée nulle ou illisible : ignorée par la qualité pondérée, comptée 0 minute par la moyenne. Aucune entrée : null des deux côtés.</p></details>
+  <h3 id="maison-moyennes-hebdomadaires-du-sport-sportweeklyaverages">Moyennes hebdomadaires du sport (sportWeeklyAverages)</h3>
+  <p>Exception assumée à la règle « on divise par les journées renseignées » : une semaine sans séance est une semaine SANS SÉANCE, pas une semaine non tenue.</p>
+  <pre><code>parJour = sportsByDate(logs) ; si parJour.size === 0 → null
+jours  = daysBetween(première date du journal, getLocalDateStr(now)) + 1  // bornes comprises
+minutes = Σ sportDayMinutes(jour)  // les ÉTAGES sont convertis ici, jamais Σ duration
+total  = Σ jour.length  // une séance = une ligne
+si jours &lt; 7 → { minutes: null, seances: null, total, jours }
+semaines = jours / 7 → { minutes: minutes/semaines, seances: total/semaines, total, jours }</code></pre>
+  <p>La fenêtre part de la PREMIÈRE SÉANCE, pas de la pesée de départ : le suivi de l'activité s'active souvent des semaines après le début de la cure. Les deux moyennes se taisent sous sept jours ; le total est exact dès la première séance.</p>
+  <p class="ancre">src/features/sport/sportAverages.ts</p>
+  <details><summary>Cas limites</summary><p>Journal vide : null en bloc, le domaine disparaît de « Côte à côte ». Trois séances le jour même : moyennes null (elles annonceraient sinon vingt et une par semaine), total 3.</p></details>
+  <div class="exemple"><p>Camille, 2 séances de 45 min par semaine depuis le 4 mai : « 90 min · 2 séances » à gauche. <a href="spec-fonctionnelle.html#maison-section-cote-a-cote-home-sections">→ fonctionnelle</a></p></div>
+  <h3 id="maison-moyenne-hebdomadaire-depuis-la-premiere-entree-metimeweeklya">Moyenne hebdomadaire depuis la première entrée (meTimeWeeklyAverage)</h3>
+  <pre><code>entriesWeeklyAverageSinceFirst(logs, now) :
+  si logs vide → null
+  premiere = min des dates
+  jours  = daysBetween(premiere, getLocalDateStr(now)) + 1  // bornes comprises
+  si jours &lt; 7 → null
+  return logs.length / (jours / 7)
+
+meTimeWeeklyAverage  = entriesWeeklyAverageSinceFirst(meTimeLogs, now)
+sideEffectsWeeklyAverage = entriesWeeklyAverageSinceFirst(sideEffectHistory, now)</code></pre>
+  <p>Ce sont les ENTRÉES qu'on compte, jamais les journées. Compter depuis la première entrée épargne les semaines où le module n'était pas encore activé. sideEffectsWeeklyAverage n'a aucun lecteur dans les deux homes. <span class="marque non">non implémenté</span></p>
+  <p class="ancre">src/features/home/homeOverview.ts</p>
+  <details><summary>Cas limites</summary><p>Moins de sept jours de recul : null — deux moments notés le jour même s'annonceraient sinon comme quatorze par semaine. Une entrée datée du futur : elle allonge la fenêtre si elle est la première, et compte au numérateur dans tous les cas.</p></details>
+  <h3 id="maison-de-la-recommandation-infobulles-cote-a-cote">% de la recommandation (infobulles Côte à côte)</h3>
+  <pre><code>pctFibres  = mealAverages  &amp;&amp; goals.fiber  &gt; 0 ? round(mealAverages.fiber  / goals.fiber  × 100) : null
+pctProteines  = mealAverages  &amp;&amp; goals.protein &gt; 0 ? round(mealAverages.protein / goals.protein × 100) : null
+pctFibres7j  = macrosSemaine &amp;&amp; goals.fiber  &gt; 0 ? round(macrosSemaine.fiber  / goals.fiber  × 100) : null
+pctProteines7j = macrosSemaine &amp;&amp; goals.protein &gt; 0 ? round(macrosSemaine.protein / goals.protein × 100) : null</code></pre>
+  <p>La référence est l'OBJECTIF DU JOUR (dailyNutritionGoals), le même que les barres de « En direct » : un second jeu de valeurs aurait fait dire deux choses à la même page. Les deux colonnes partagent cette référence, seule la moyenne change. Le pourcentage n'est pas borné.</p>
+  <p class="ancre">src/versions/mixte/homes/sections/MaisonSections.tsx</p>
+  <h3 id="maison-pluriel-des-unites-cote-a-cote">Pluriel des unités « Côte à côte »</h3>
+  <pre><code>pluriel = (n, mot) =&gt; n ≥ 2 ? `${mot}s` : mot</code></pre>
+  <p>Le pluriel commence à DEUX : « 1,6 séance » reste au singulier, « 2,4 séances » passe au pluriel. Ces valeurs sont des moyennes, donc rarement entières.</p>
+  <p><span class="marque">arbitrage non validé</span> La règle ne vaut que pour les tuiles de « Côte à côte ». Le reste du site accorde encore au-dessus de un (n &gt; 1 ? 's' : '') : « 1,6 séances » ailleurs.</p>
+  <p class="ancre">src/versions/mixte/homes/sections/MaisonSections.tsx</p>
+  <h3 id="maison-gardes-de-la-section-cote-a-cote">Gardes de la section Côte à côte</h3>
+  <pre><code>meTimeEnabled = profile.meTimeTrackingEnabled ?? false  // absent = ÉTEINT
+sleepEnabled  = profile.sleepTrackingEnabled  ?? false  // absent = ÉTEINT
+stepsEnabled  = profile.stepsTrackingEnabled !== false  // absent = ALLUMÉ
+sportEnabled  = profile.sportTrackingEnabled !== false  // absent = ALLUMÉ
+
+aGroupeJour =
+     mealAverages !== null || mealCaloriesAverage !== null || macrosSemaine !== null
+  || (stepsEnabled &amp;&amp; (pasMoyens !== null || pasMoyens7j !== null))
+  || (sleepEnabled &amp;&amp; (sommeilMoyenCure !== null || sleepAverage !== null
+                       || qualiteMoyenne !== null || qualiteMoyenne7j !== null))
+aGroupeSemaine =
+     (sportEnabled  &amp;&amp; sportMoyennes !== null)
+  || (meTimeEnabled &amp;&amp; (meTimeParSemaine !== null || meTimeCount &gt; 0))
+aBilans  = aGroupeJour || aGroupeSemaine
+aDebutAujourdhui = treatmentSeries.initialDose !== null || treatmentSeries.currentDose !== null
+                || weights.startingWeight &gt; 0
+aSynthese  = aBilans || aDebutAujourdhui</code></pre>
+  <p>Chaque garde est le OU logique des conditions des rangées qu'elle annonce : pas de sous-titre au-dessus de rangées muettes. Une rangée se montre dès qu'UN de ses deux côtés a une valeur ; le côté muet laisse sa case vide, jamais un tiret. « début | aujourd'hui » est séparée de aBilans parce qu'elle peut vivre sans lui : une cure qui commence a déjà son dosage et son poids de départ.</p>
+  <p><span class="marque">arbitrage non validé</span> Le domaine des repas n'est pas conditionné à son module : il reste visible module éteint tant qu'une moyenne existe. Le médaillon, lui, perd son geste (isModuleOn).</p>
+  <p class="ancre">src/versions/mixte/homes/sections/MaisonSections.tsx</p>
+  <h3 id="maison-medaillon-du-traitement-formes-melangees">Médaillon du traitement (formes mélangées)</h3>
+  <pre><code>formeDebutId  = resolveTreatmentId(treatmentSeries.injections[0]?.brand, profile.glp1Brand)
+formeActuelleId = resolveTreatmentId(treatmentSeries.injections[dernier]?.brand, profile.glp1Brand)
+formesMelangees = isOralMedication(formeDebutId) !== isOralMedication(formeActuelleId)
+→ vrai : deux pictos de 16 px en diagonale dans une boîte de 24 px (début en haut à gauche,
+         actuel en bas à droite), et un picto de forme devant chaque nom de tuile
+→ faux : un seul picto</code></pre>
+  <p><span class="marque">arbitrage non validé</span> La branche mixte est écrite et prête, mais AUCUNE donnée ne peut l'allumer : currentTreatmentSeries applique la coupure au changement de traitement, si bien que toutes les prises retenues résolvent vers la même fiche, donc vers la même forme. Elle deviendrait atteignable le jour où la colonne « début » lirait la première prise de tout l'historique.</p>
+  <p>Le repli sur le traitement du profil ne sert qu'à ne jamais rendre un médaillon vide : les deux bornes sortent de la même liste, s'il y a une première prise il y a une dernière.</p>
+  <p class="ancre">src/versions/mixte/homes/sections/MaisonSections.tsx</p>
+  <h3 id="maison-tiroir-journal-recententriesbytab-recentstepentries">Tiroir Journal (recentEntriesByTab / recentStepEntries)</h3>
+  <pre><code>ENTREES_PAR_JOURNAL = 3
+
+recentEntriesByTab(data, maxParJournal) :
+  pour chaque entrée de entreesTousJournaux(data)  // tri date puis heure DÉCROISSANTES
+     liste = parJournal[entry.tab] ??= []
+     si liste.length &lt; maxParJournal → pousser
+  → Record&lt;tab, RecentJournalEntry[]&gt;  // aucune fenêtre, futur INCLUS
+
+recentStepEntries(stepLogs, maxEntries, depense?) :
+  si journal vide → []
+  [...stepLogs].sort((a,b) =&gt; b.date.localeCompare(a.date))
+               .slice(0, max(0, maxEntries))
+               .map(log =&gt; ({ date, steps: log.steps || 0,
+                              kcal: depense ? getStepsCaloriesForLog(...) : 0 → gardée si &gt; 0 }))</code></pre>
+  <p>Le plafond de 40 du défilé ne s'applique pas ici : un journal borné à trois entrées ne peut pas déborder, et sans cette séparation deux journées chargées en repas pousseraient la dernière pesée hors de la liste. Les pas ne rejoignent pas RecentJournalEntry — leur union est fermée — et ont leur propre modèle. Une journée relevée à ZÉRO pas reste une journée relevée : elle se montre, sans ses kcal.</p>
+  <p class="ancre">src/features/home/recentJournal.ts · src/versions/mixte/components/JournalDrawer.tsx</p>
+  <details><summary>Cas limites</summary><p>Une prise notée pour demain prend la tête de sa case. Journal sans entrée : « Rien d'enregistré », la case et sa porte vers la page restent.</p></details>
+  <h3 id="maison-forme-des-lignes-du-tiroir-journal-formedeligne">Forme des lignes du tiroir Journal (formeDeLigne)</h3>
+  <pre><code>date  = formatDayMonthStr(entry.date)  // « 31/08 »
+duree = (duration !== undefined &amp;&amp; !durationIsFloors &amp;&amp; duration ≥ 60)
+        ? formatCalendarDuration(duration)  // « 1h05 »
+        : ligneDuree(entry)  // « 45 min » / « 12 ét. »
+
+sommeil  : deuxBords = bedDate ≠ date
+           tete = deuxBords ? `${mot} du ${jours} :` : `${jours} ${mot} :`
+           valeurs = duree, sinon ligneValeur(entry, { sansSeverite: true })
+pesee  : tete = date ; valeurs = ligneValeur(entry)  // « 31/08 · 86.1 kg »
+repas  : tete = date ; nom = typeLabel ; valeurs = ligneValeur(entry)
+sport  : tete = [date, duree].join(' · ') ; nom = sport ;
+           valeurs = ligneValeur(entry, { sansCalories: true, sansEffort: true })
+metime  : tete = date ; nom = activity  // rien d'autre
+injection
+/comprime: tete = [date, ligneValeur(entry)].join(' · ') ; nom = traitement ;
+           valeurs = siteInitials(entry.site)
+défaut  : tete = [date, duree].join(' · ') ; nom = label  // effets secondaires
+
+siteInitials(site) = fiche connue &amp;&amp; côté latéral ? (zone[0] + côté[0]).toUpperCase() : ''</code></pre>
+  <p>Aucune ligne du tiroir n'affiche d'heure : le sommeil porte les siennes dans ses deux jours, les autres n'ont que leur date. Les pas ont leur ligne écrite dans le composant, « 31/08 · 7 300 pas ».</p>
+  <p><span class="marque">arbitrage non validé</span> L'alignement de l'ordre sur celui de la page (dose, traitement, site) coûte 12 à 22 px : les initiales de site peuvent tomber derrière la coupure sur une ligne longue.</p>
+  <p class="ancre">src/versions/mixte/components/JournalDrawer.tsx · src/shared/medication/medication.utils.ts</p>
+  <details><summary>Cas limites</summary><p>Nuit sans bedDate : forme courte, « 28/08 nuit : 7h40 ». Prise orale : siteInitials rend '' et rien n'est ajouté. Montée d'escaliers : durationIsFloors empêche la conversion en heures, « 12 ét. » quel que soit le nombre.</p></details>
+  <h3 id="maison-ordre-et-presence-des-cases-des-tiroirs">Ordre et présence des cases des tiroirs</h3>
+  <pre><code>ADD_DRAWER_ORDER  = [injection, history, symptoms, sports, meals, sleep, metime]
+journalDrawerItems = drawerItems(profile, [...ADD_DRAWER_ORDER, 'steps'])
+
+drawerItems(profile, order) =
+  pickTabs({ …profile, les cinq drapeaux forcés à true }, order)  // la table n'est pas amputée
+    .filter(tab =&gt; !isModuleHidden(profile, tab.id))  // un module MASQUÉ disparaît
+    .map(tab =&gt; ({ tab: DRAWER_LABELS[tab.id] ? renommé : tab,
+                   enabled: MODULE_FLAGS[tab.id] ? isModuleOn(profile, tab.id) : true }))
+
+DRAWER_LABELS = { history: 'Balance', meals: 'Menus' }  // ces deux noms ne valent QUE dans les tiroirs
+
+// le tri allumés-d'abord est fait au RENDU, pas dans la table :
+[...items.filter(i =&gt; i.enabled), ...items.filter(i =&gt; !i.enabled)]  // tri stable</code></pre>
+  <p>Un module éteint ne disparaît pas : il paraît grisé (opacity-45) en fin de liste, et son clic mène à la page vitrée du module au lieu d'ouvrir le journal. Un module masqué est retiré de la table.</p>
+  <p>Le tiroir Tendance n'a aucun tri : ses huit cartes sont rendues dans l'ordre fixe de la table — actif sanguin, balance, calories, activité physique, temps pour soi, sommeil, pas — la carte des effets secondaires étant ajoutée en huitième, hors table.</p>
+  <p class="ancre">src/versions/mixte/app/navigation.ts · src/versions/mixte/components/JournalDrawer.tsx</p>
+  <h3 id="maison-series-de-tendance-trend-days-14">Séries de tendance (TREND_DAYS = 14)</h3>
+  <p>Quatorze dates locales, de J−13 à aujourd'hui, du plus ancien au plus récent. Un journal vide rend une série VIDE, pas une série de zéros.</p>
+  <table>
+  <thead><tr><th>Série</th><th>Valeur d'un jour</th><th>Jour sans saisie</th></tr></thead>
+  <tbody>
+  <tr><td>weightTrend</td><td>dernier poids connu à cette date (état reporté)</td><td>la valeur reportée ; avant la première pesée, la PREMIÈRE valeur connue</td></tr>
+  <tr><td>bloodLevelTrend</td><td>calculateCumulativeConcentration à MIDI, sur toutes les prises</td><td>recalculée, jamais absente ; ne se tait pas à deux molécules</td></tr>
+  <tr><td>caloriesTrend</td><td>nutritionTotalsOn(meals, date).calories</td><td>0</td></tr>
+  <tr><td>sportTrend</td><td>Σ duration du jour</td><td>0</td></tr>
+  <tr><td>meTimeTrend</td><td>Σ duration du jour</td><td>0</td></tr>
+  <tr><td>sleepTrend</td><td>sleepMinutesOn(logs, date)</td><td>0</td></tr>
+  <tr><td>stepsTrend</td><td>stepLogs.find(l =&gt; l.date === date)?.steps</td><td>0</td></tr>
+  </tbody>
+  </table>
+  <p>Midi et non minuit pour la concentration : une prise faite dans la journée compte pour ce jour-là. Les journées simulées du jeu de démonstration comptent comme les vraies.</p>
+  <p class="ancre">src/features/trends/trends.ts</p>
+  <details><summary>Cas limites</summary><p>Aucune pesée : weightTrend rend [] — pas de courbe, pas de valeurs. weightTrend([90 le 22, 89 le 24], 4 jours, le 25) = [90, 90, 89, 89].</p></details>
+  <h3 id="maison-forme-a-dessiner-hasshape">Forme à dessiner (hasShape)</h3>
+  <pre><code>connues = series.filter(v =&gt; v !== null)
+return connues.length ≥ 2 &amp;&amp; Math.min(...connues) !== Math.max(...connues)</code></pre>
+  <p>Deux valeurs connues au moins, et deux valeurs différentes. Une ligne parfaitement plate ne dit rien qu'un trait.</p>
+  <p class="ancre">src/features/trends/trends.ts</p>
+  <details><summary>Cas limites</summary><p>[2,2,2] → faux ; [0,0,0,1] → vrai, un zéro est une valeur connue ; [] → faux. Depuis que les jours sans saisie valent 0, la coupure de courbe ne se produit plus que sur les séries qui portent encore des null.</p></details>
+  <h3 id="maison-valeurs-des-cartes-de-tendance">Valeurs des cartes de tendance</h3>
+  <pre><code>lastTrendValue(s)  = dernière valeur non nulle, sinon null
+firstTrendValue(s)  = première valeur non nulle, sinon null
+informedTrendMean(s) = moyenne des seules valeurs non nulles, null si aucune
+trendTotal(s)  = Σ (v ?? 0), null si la série est VIDE
+sportTrendKcalPerDay = Σ sportDayCalories sur les 14 dates / 14  // diviseur = la FENÊTRE
+stepsTrendKcalPerDay = Σ kcal des journées RELEVÉES / nombre de journées relevées</code></pre>
+  <table>
+  <thead><tr><th>Carte</th><th>Valeur affichée</th></tr></thead>
+  <tbody>
+  <tr><td>Actif sanguin</td><td>parseFloat(last.toFixed(2)) mg, plus l'encadré « en direct »</td></tr>
+  <tr><td>Balance</td><td>first → last en kg (format1Dec) ; une seule valeur connue, ou deux égales : la valeur seule</td></tr>
+  <tr><td>Calories</td><td>round(informedTrendMean) kcal/j</td></tr>
+  <tr><td>Activité physique</td><td>formatCalendarDuration(trendTotal), puis « −{kcal/j} kcal/j » si ≥ 1</td></tr>
+  <tr><td>Temps pour soi</td><td>« total : » + formatCalendarDuration(trendTotal)</td></tr>
+  <tr><td>Sommeil</td><td>formatCalendarDuration(informedTrendMean) /j</td></tr>
+  <tr><td>Pas</td><td>formatNumber(mean / 1000, 1) Kpas/j, puis « −{kcal/j} kcal/j » si ≥ 1</td></tr>
+  <tr><td>Effets secondaires</td><td>aucune valeur : la carte n'a pas de bascule</td></tr>
+  </tbody>
+  </table>
+  <p>Une carte au module ÉTEINT ne montre que son titre : d'anciennes données donneraient sinon des valeurs à un module coupé. La bascule titre ↔ valeurs est mémorisée par carte dans le stockage local.</p>
+  <p class="ancre">src/features/trends/trends.ts · src/versions/mixte/components/TrendDrawer.tsx</p>
+  <details><summary>Cas limites</summary><p>informedTrendMean([1600, null, 1400, null]) = 1500. Dépense sous 1 kcal/j : le fragment « −… kcal/j » n'est pas écrit. Aucune journée relevée de pas : null. <a href="spec-fonctionnelle.html#maison-tiroir-tendance-des-15-derniers-jours">→ fonctionnelle</a></p></details>
+  <h3 id="maison-evolution-des-effets-secondaires-sideeffectshift">Évolution des effets secondaires (sideEffectShift)</h3>
+  <pre><code>si history vide → null
+dates  = trendDates(14)
+dansFenetre = history.filter(log =&gt; dates.includes(log.date)) ; si vide → null
+moitie  = Math.floor(14 / 2) = 7
+
+tonDe(jours) :
+  duBloc  = dansFenetre.filter(log =&gt; jours.includes(log.date))
+  severiteMoyenne = Σ severity / jours.length  // dénominateur = 7, pas le nombre d'effets
+  journeeType  = severiteMoyenne &gt; 0 ? [{ severity: severiteMoyenne }] : []
+  intense  = duBloc.some(log =&gt; log.severity ≥ 4)
+  return sideEffectsMood(intense ? [...journeeType, { severity: 4 }] : journeeType).tone
+
+before = tonDe(dates[0..6]) ; after = tonDe(dates[7..13]) ; changed = before !== after</code></pre>
+  <p>La moyenne et non la somme : sideEffectsMood juge UNE journée, et sur sept jours une somme dirait surtout combien de jours ont été renseignés. Un symptôme intense ne se dilue pas — il porte sa moitié à « difficile » par l'ajout d'une sévérité 4 factice.</p>
+  <p class="ancre">src/features/trends/trends.ts</p>
+  <details><summary>Cas limites</summary><p>Aucune déclaration sur la quinzaine : null — le tiroir montre un sourire et « Pas ou peu d'effet secondaire ». Deux moitiés vides ne sont pas une stabilité. Une sévérité 5 dans la seconde moitié : before serein, after difficile. Tons égaux : un seul visage, sans flèche.</p></details>
+  <h3 id="maison-echelle-de-la-sparkline">Échelle de la sparkline</h3>
+  <p>Repère de 100 × 34 ; la bande de tracé va de HAUT = 5 à BAS = 25.</p>
+  <pre><code>connues = series.filter(v =&gt; v !== null)
+min = Math.min(...connues) ; max = Math.max(...connues)
+brut  = (max − min) || 1
+marge = brut × 0.2
+bas  = Math.max(0, min − marge)  // la marge ne franchit JAMAIS zéro
+span  = (max + marge) − bas
+x = (index / (series.length − 1)) × 100
+y = BAS − ((value − bas) / span) × (BAS − HAUT)  // l'axe y du SVG descend</code></pre>
+  <p>La marge de 20 % de chaque côté empêche la plus basse valeur de se poser sur le plancher, où l'aire sous le trait s'annulerait et se lirait comme un zéro ; le plancher à zéro garantit qu'une journée vide se lit bien comme un zéro.</p>
+  <p>Tracé par interpolation cubique MONOTONE (Fritsch–Carlson) : tangente = moyenne des deux pentes voisines, pente elle-même aux extrémités ; un segment plat force ses deux tangentes à zéro ; aucune tangente ne dépasse trois fois la pente du segment, et une tangente de signe opposé est ramenée à zéro. Un morceau continu ne se dessine qu'à partir de deux points ; les null coupent la courbe.</p>
+  <p class="ancre">src/versions/mixte/components/TrendDrawer.tsx</p>
+  <details><summary>Cas limites</summary><p>Série plate : brut vaut 1 par le || 1 — mais hasShape l'a déjà écartée. Série de poids 79,2 → 80,3 : la marge la décolle du fond, l'aire garde une épaisseur.</p></details>
+  <h3 id="maison-cartes-du-tiroir-tendance-sans-forme">Cartes du tiroir Tendance sans forme</h3>
+  <pre><code>zone de dessin =
+  hasShape(series) → &lt;Sparkline /&gt;
+  sinon, enabled  → invite de saisie :
+        series.some(v =&gt; v !== null) ? 'Pas encore de tendance' : 'Pas encore de données'
+  sinon  → rien
+valeurs = enabled ? valeursDe(row) : null  // titre seul si le module est éteint
+clic d'une carte éteinte → « Activez le module {nom} pour pouvoir suivre l'évolution de {quoi}. »,
+                           et ce message mène à la page Modules</code></pre>
+  <p>Un module allumé sans donnée n'est pas grisé : sa zone de courbe parle, avec le lien de saisie. Un module éteint est grisé et n'est plus inerte. La carte des effets secondaires est toujours enabled: true et ne suit pas cette règle : sans déclaration sur la quinzaine, elle montre un sourire et sa légende.</p>
+  <p class="ancre">src/versions/mixte/components/TrendDrawer.tsx</p>
+  <h3 id="maison-fenetre-temporelle-getcutoffdatestr-filterbytimewindow">Fenêtre temporelle (getCutoffDateStr / filterByTimeWindow)</h3>
+  <pre><code>WINDOW_DAYS = { '7days': 7, '14days': 14, '30days': 30, '90days': 90 }
+
+getCutoffDateStr(window, customRange) :
+  'all'  → null  // aucune coupure
+  'custom' → customRange?.startDate valide ? startDate : null
+  sinon  → getLocalDateStr(aujourd'hui − (WINDOW_DAYS[window] − 1) jours)
+
+filterByTimeWindow(items, window, getDate, customRange) :
+  'all'  → items
+  'custom' → items.filter(d =&gt; (!startDate || d ≥ startDate) &amp;&amp; (!endDate || d ≤ endDate))
+  sinon  → items.filter(d =&gt; d ≥ getCutoffDateStr(window))</code></pre>
+  <p>La fenêtre est INCLUSIVE et compte le jour en cours, d'où le décalage de n − 1. La comparaison se fait entre chaînes AAAA-MM-JJ, jamais entre instants : convertir une telle chaîne en Date l'interpréterait en UTC et décalerait d'un jour selon le fuseau.</p>
+  <p class="ancre">src/shared/time-window/timeWindow.utils.ts</p>
+  <details><summary>Cas limites</summary><p>« 7 derniers jours » lu le 25/08 : entrées à partir du 19/08. Bornes personnalisées : une borne vide vaut « illimitée » de ce côté.</p></details>
+  <h3 id="maison-options-et-defaut-de-periode">Options et défaut de période</h3>
+  <pre><code>PERIOD_OPTIONS = [ '7days' « 7 derniers jours », '14days', '30days', '90days',
+                   'all' « Depuis le début », 'custom' « Choisir » ]
+DEFAULT_PERIOD = '30days'
+
+usePeriodWindow(storageKey, defaultWindow = DEFAULT_PERIOD) :
+  fullKey = `glp1_period_${storageKey}`
+  état initial : { window: isPeriodWindow(stocké) ? stocké : defaultWindow,
+                   customRange: stocké?.customRange ?? bornes vides }
+  chaque changement écrit l'objet entier sous cette clé</code></pre>
+  <p>La liste est unique et dans cet ordre partout sur le site. L'état est mémorisé PAR BLOC, la clé nommant le bloc : le graphe ouvert depuis le tiroir Tendance et la page du même domaine partagent la clé, donc la période. Un appelant peut passer un autre défaut — le tableau des créneaux horaires ouvre sur 7 jours.</p>
+  <p class="ancre">src/shared/time-window/periodOptions.ts · src/shared/time-window/usePeriodWindow.ts</p>
+  <details><summary>Cas limites</summary><p>Valeur relue inconnue : le défaut du bloc reprend la main, sans effacer le stockage. En mode « Choisir », les en-têtes affichent les bornes « du … au … » et non un libellé. <a href="spec-fonctionnelle.html#maison-surimpression-du-graphe-principal-tiroir-tendance">→ fonctionnelle</a></p></details>
+  <h3 id="maison-matrice-des-effets-par-moment">Matrice des effets par moment</h3>
+  <pre><code>MOMENTS = [ matin 0 ≤ h &lt; 12 , après-midi 12 ≤ h &lt; 18 , soir 18 ≤ h &lt; 24 ]  // sur l'HEURE DE SAISIE
+cranDe(severite) = severite ≤ 0 ? 0 : severite ≤ 2 ? 1 : severite === 3 ? 2 : 3
+CRAN_NOMS = ['rien', 'légère', 'modérée', 'marquée']
+
+// ordre des effets, celui que les chevrons parcourent
+trier par : dernière déclaration DÉCROISSANTE, puis fréquence décroissante, puis nom croissant
+
+// la semaine montrée
+derniere = max des dates du type courant
+jours  = les 7 dates finissant à `derniere`, du plus ancien au plus récent
+
+matrice[ligne][colonne] = Math.max(matrice[ligne][colonne], cranDe(e.severity))
+total = nombre de déclarations du type courant dans ces sept jours</code></pre>
+  <p>La semaine montrée est la dernière où CET effet-là a parlé, pas les sept derniers jours : les effets sont rares et par salves, et deux symptômes ne se manifestent pas la même semaine. Les dates sont donc écrites en tête. Une case porte le cran le plus FORT du moment, jamais une moyenne ; une heure illisible ou une date hors fenêtre est passée sans rien inventer.</p>
+  <p class="ancre">src/versions/mixte/components/TrendGraphOverlay.tsx</p>
+  <details><summary>Cas limites</summary><p>Journal d'effets vide : « Aucun effet secondaire déclaré. » Un effet supprimé pendant l'affichage : le rang est ramené dans les bornes. Sévérité 1 ou 2 → cran 1 ; 3 → cran 2 ; 4 ou 5 → cran 3. <a href="spec-fonctionnelle.html#maison-matrice-des-effets-secondaires-par-moment-de-la-journee">→ fonctionnelle</a></p></details>
+  <h3 id="maison-mapping-type-de-felicitation-scene-scene-par-type">Mapping type de félicitation → scène (SCENE_PAR_TYPE)</h3>
+  <pre><code>deblocage-badge  → averse  augmentation-badge  → spirale
+palier-imc  → poussiere  premier-jour  → nebuleuse
+derniere-perte  → eclat  premiere-semaine  → envol
+premier-mois  → fusee  premiere-annee  → amas
+mois-additionnel  → brume  annee-additionnelle → passeuse
+jours-cinquantaines → brume  autre  → brume</code></pre>
+  <p>Douze types, dix scènes : trois types partagent « brume ».</p>
+  <p><span class="marque non">non implémenté</span> Aucun déclenchement n'existe : les règles sont consignées dans src/features/celebrations/DECLENCHEMENTS.md et ne sont pas codées. Seule la page d'essai de l'administration monte le widget.</p>
+  <p class="ancre">src/features/celebrations/celebrations.ts</p>
+  <h3 id="maison-messages-de-felicitation">Messages de félicitation</h3>
+  <p>Un titre et un corps par type, composés depuis un contexte optionnel. Chaque champ a un repli, si bien qu'un message se rend toujours.</p>
+  <pre><code>nf(n) = (Math.round(n × 10) / 10).toString().replace('.', ',')  // virgule, une décimale au plus
+
+derniere-perte  : titre « {nf(pourcent ?? 50)} % de l’objectif »
+                      corps « Encore {nf(perteDerniereKg ?? 0.5)} kg de moins,
+                              {nf(perteTotaleKg ?? 5)} kg depuis le début. Le cap est bon. »
+palier-imc  : corps « Votre IMC vient de passer sous {nf(imcPalier ?? 30)}. … »
+mois-additionnel  : titre « {mois ?? 2} mois complets ! »
+annee-additionnelle : titre « {annees ?? 2} années complètes ! »
+jours-cinquantaines : titre « {jours ?? 50} jours ! »
+augmentation-badge  : titre « Niveau {BADGE_TIER_LABELS[badgeTier ?? 'bronze']} ! »</code></pre>
+  <p>Les nombres sont écrits à la française, virgule décimale : c'est la seule fonction de ce périmètre à le faire — format1Dec, ailleurs, écrit un point.</p>
+  <p><span class="marque">arbitrage non validé</span> Ces messages sont des PROPOSITIONS, à retoucher.</p>
+  <p class="ancre">src/features/celebrations/celebrations.ts</p>
+  <div class="exemple"><p>Camille à 30 % de son objectif, après 0,6 kg : « 30 % de l’objectif » / « Encore 0,6 kg de moins, 6,3 kg depuis le début. Le cap est bon. » <a href="spec-fonctionnelle.html#maison-widget-de-felicitation">→ fonctionnelle</a></p></div>
+  <h3 id="maison-semis-reproductible-creerrng">Semis reproductible (creerRng)</h3>
+  <pre><code>creerRng(graine) {  // mulberry32
+  let a = graine &gt;&gt;&gt; 0
+  return () =&gt; {
+    a += 0x6d2b79f5
+    let t = a
+    t = Math.imul(t ^ (t &gt;&gt;&gt; 15), t | 1)
+    t ^= t + Math.imul(t ^ (t &gt;&gt;&gt; 7), t | 61)
+    return ((t ^ (t &gt;&gt;&gt; 14)) &gt;&gt;&gt; 0) / 4294967296
+  }
+}</code></pre>
+  <p>Même graine, même suite, donc même scène : positions, délais et teintes des particules sont reproductibles et testables. « Rejouer l'animation » change la graine, ce qui resème la scène.</p>
+  <p>Le même générateur sert aux tirages de la page d'essai : multiple de 50 dans [50, 10 000], mois complets dans [2, 24], années complètes dans [2, 9], pourcentage parmi JALONS_POURCENT (les dizaines, les quarts, puis chaque unité de 90 à 100), palier parmi bronze / argent / or.</p>
+  <p class="ancre">src/features/celebrations/sceneGenerators.ts · src/features/celebrations/celebrations.ts</p>
+  <h3 id="maison-duree-d-une-scene-dureescene">Durée d'une scène (dureeScene)</h3>
+  <pre><code>dureeScene(particules) = max sur les particules de (p.delaiMs + p.dureeMs × (p.iterations ?? 1))</code></pre>
+  <p>Elle ne sert QU'au bouton « Rejouer » : rien ne ferme le widget, aucune minuterie n'existe. Une particule sans iterations compte pour un passage.</p>
+  <p class="ancre">src/features/celebrations/sceneGenerators.ts</p>
+  <h3 id="maison-widget-de-felicitation-mouvement-reduit-et-surfaces-sombres">Widget de félicitation — mouvement réduit et surfaces sombres</h3>
+  <pre><code>reduit = window.matchMedia?.('(prefers-reduced-motion: reduce)').matches
+→ l'animation ne démarre qu'au bouton, libellé « Voir l’animation » tant qu'elle n'a pas joué,
+  puis « Rejouer l’animation »
+
+carteSombre  = luminanceDeCouleur(--glow-ink-main) &gt; 0.5
+vitrageSombre = PREFIXES_VITRAGE_SOMBRE.has(prefixeTheme(ecran))</code></pre>
+  <p>La luminance est calculée sur l'encre principale du thème : une encre CLAIRE signe une carte sombre. Le vitrage, lui, n'est pas déduit — il est relevé à la main sur une liste de préfixes de thème.</p>
+  <p class="ancre">src/versions/mixte/components/CelebrationFelicitation.tsx</p>
+  <h3 id="maison-hasoccurred">hasOccurred</h3>
+  <p>La frontière du « déjà eu lieu », partagée par la Dynamique, la série du traitement, les badges et le calcul des sites de rotation.</p>
+  <pre><code>today = getLocalDateStr(now)
+if (date &lt; today) return true
+if (date &gt; today) return false
+if (!time)  return true  // heure absente = déjà eu lieu
+return time &lt;= getLocalTimeStr(now)</code></pre>
+  <p>Comparaison entre chaînes locales, jamais entre instants.</p>
+  <p class="ancre">src/shared/date/date.local.ts</p>
+  <details><summary>Cas limites</summary><p>Séance notée à 20:00, lue à 18:00 : pas encore eue. Notée à 18:00, lue à 18:00 : eue (comparaison large). Le carré traitement de la home standard n'appelle pas cette fonction : le futur y compte.</p></details>
+  <h3 id="maison-sens-d-une-periode-periodshift">Sens d'une période (periodShift)</h3>
+  <pre><code>si series.length &lt; 2 → null
+moitie = Math.floor(series.length / 2)
+avant  = Σ (v ?? 0) sur series[0 … moitie−1]
+apres  = Σ (v ?? 0) sur series[moitie … fin]
+
+si avant ≤ 0 || apres ≤ 0 :
+   si avant ≤ 0 &amp;&amp; apres ≤ 0 → 'stable'
+   return apres &gt; avant ? 'hausse' : 'baisse'
+
+ecart = (apres − avant) / avant
+si Math.abs(ecart) &lt; seuil (0.05) → 'stable'
+return ecart &gt; 0 ? 'hausse' : 'baisse'</code></pre>
+  <p>La somme et non la moyenne : les deux moitiés ayant exactement sept jours, le rapport est le même et la somme se lit sans diviseur. Le seuil de 5 % se compare au rapport de l'écart à la période PRÉCÉDENTE, la référence dont on s'écarte. Les trois cas où une moitié vaut zéro sont tranchés AVANT le rapport, le dénominateur serait nul : zéro séance n'est pas une donnée manquante, passer de rien à quelque chose est une hausse.</p>
+  <p class="ancre">src/features/trends/trends.ts</p>
+  <details><summary>Cas limites</summary><p>Série vide : null ; les tuiles de la home replient alors sur « stable ». 7 × 1 000 puis 7 × 1 040 : 4 %, stable. 7 × 1 060 : 6 %, hausse. 7 × 0 puis 7 × 1 200 : hausse. Deux moitiés à zéro : stable.</p></details>
+</section>

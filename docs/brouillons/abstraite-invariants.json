@@ -1,0 +1,358 @@
+{
+ "inventions": [
+  {
+   "categorie": "Rendu",
+   "fonctionnalite": "Écrire un nombre, une date, une durée",
+   "texte": "Les règles d'écriture — séparateur de milliers insécable, point décimal, zéros de queue retirés, « JJ/MM/AAAA », « Aujourd'hui »/« Hier », « 7h30 » — sont des règles de rendu et non des invariants du modèle : elles ne figurent pas dans ce chapitre.",
+   "origine": "formatNumber (src/shared/number/number.format.ts), formatDateShort et formatDateRelative (src/shared/date/date.utils.ts), formatCalendarDuration (src/shared/calendar.ts) : elles ne touchent aucune valeur enregistrée."
+  },
+  {
+   "categorie": "Rendu",
+   "fonctionnalite": "Ordonner ce qui est restitué",
+   "texte": "Les ordres de restitution (ordre des libellés d'un menu, ordre des vues d'un diaporama, ordre des neuf mesures corporelles) sont des choix de présentation : ils ne contraignent pas les données et sont écartés d'ici.",
+   "origine": "src/app/navigation.ts, src/features/meal-charts/nutritionViews.ts : listes constantes lues par l'affichage seul."
+  },
+  {
+   "categorie": "Identifiants",
+   "fonctionnalite": "Générer l'identifiant d'une ligne",
+   "texte": "Un invariant d'unicité des identifiants au sein d'un journal.",
+   "origine": "Rien ne le garantit : hors alimentation, les identifiants valent un préfixe suivi de Date.now() (`w-`, `inj-`, `se-`, `step-`, `sport-`, `metime-`, `sleep-`, src/app/useAppData.ts:233-401) ; deux écritures dans la même milliseconde donneraient le même identifiant. Seules les prises alimentaires emploient un UUID v7 (src/shared/platform/id.ts). Aucun test ni aucune garde ne couvre le cas. L'invariant nº 3 l'énonce désormais comme exigence du modèle, en disant expressément que le code ne le tient pas."
+  },
+  {
+   "categorie": "Sommeil",
+   "fonctionnalite": "Enregistrer un sommeil",
+   "texte": "Une borne haute sur la durée d'une plage de sommeil.",
+   "origine": "sleepMinutesBetween n'exige que la stricte positivité, et sleepRangesOverlap ne borne rien : une plage de plusieurs jours est acceptable pour le modèle. Aucune borne n'est écrite dans le code ni dans CONVENTIONS.md."
+  },
+  {
+   "categorie": "Poids",
+   "fonctionnalite": "Tenir une seule pesée par jour",
+   "texte": "L'invariant « une seule pesée par jour » tenu aussi par la modification d'une pesée, et non seulement par l'ajout.",
+   "origine": "updateWeighIn ne l'applique pas et ne retrie pas — deux écarts assumés et testés dans src/features/weight/weighInWrites.ts ; c'est l'appelant qui refuse. Un modèle réimplémenté ailleurs perdrait la garantie s'il ne reprenait pas ce refus."
+  },
+  {
+   "categorie": "Suppression",
+   "fonctionnalite": "Purger les lignes marquées supprimées",
+   "texte": "La purge appliquée aux journaux du temps pour soi et du sommeil.",
+   "origine": "purgeDeleted ne traverse que sept journaux (src/shared/model/purgeDeleted.ts) ; ces deux-là sont nés après l'abandon de la suppression logique. Le code ne dit pas si l'omission est voulue ou oubliée."
+  },
+  {
+   "categorie": "Chargement",
+   "fonctionnalite": "Vérifier une sauvegarde chargée",
+   "texte": "Un contrôle qui rejoue les dix-neuf invariants sur la sauvegarde une fois chargée et signale ceux qui sont rompus.",
+   "origine": "Le chargement convertit et répare au coup par coup (chaîne de src/app/useAppData.ts:130, keepStartingOnOldest à l'écriture) ; aucune vérification d'ensemble n'existe."
+  },
+  {
+   "categorie": "V2",
+   "fonctionnalite": "Tenir les invariants sur des données réelles",
+   "texte": "Aucun de ces invariants n'a encore de données à contraindre en V2 : rien n'y est enregistré, et un rechargement perd tout.",
+   "origine": "GUIDELINES.md § 5 (« Non traité, au 2026-09-09 ») ; la V2 ne porte aujourd'hui que le parcours d'onboarding et ses réponses en mémoire (src/app/useParcours.ts)."
+  },
+  {
+   "categorie": "Dérivations",
+   "fonctionnalite": "Corriger une fiche d'aliment",
+   "texte": "« Corriger une fiche d'aliment corrige tout l'historique » — phrase retirée de l'invariant nº 1, où elle était fausse deux fois.",
+   "origine": "Réfutation fondée. Une recette stocke ses cinq valeurs pour 100 g à côté de sa composition et ne les recalcule qu'au ré-enregistrement (computeRecipeNutritionPer100, src/shared/food/food.nutrition.ts:66-88, écrites par src/features/custom-food/useRecipeForm.ts:211-258 ; commentaire de src/features/custom-food/customFood.utils.ts:119-135). Une prise alimentaire garde son cache jusqu'à la prochaine réécriture de la ligne. Le chapitre énonce maintenant les trois dérivations stockées au lieu d'une."
+  },
+  {
+   "categorie": "Statistiques",
+   "fonctionnalite": "Moyenner sur une période",
+   "texte": "« Le dénominateur d'une moyenne est TOUJOURS le nombre de journées renseignées » — le « toujours » est retiré.",
+   "origine": "Réfutation fondée. entriesWeeklyAverageSinceFirst (src/features/home/homeOverview.ts:727-736) et sportWeeklyAverages (src/features/sport/sportAverages.ts:105-121) divisent par les jours écoulés depuis la première entrée, bornes comprises, journées vides comprises. La règle dépend du journal ; l'invariant nº 6 le dit désormais."
+  },
+  {
+   "categorie": "Unités",
+   "fonctionnalite": "Recueillir un poids en V2",
+   "texte": "« Le système d'unités ne touche jamais la valeur écrite » — tenu pour la taille, faux pour le poids en V2.",
+   "origine": "Réfutation fondée. src/domaine/unites.ts ne porte aucune conversion de poids ; la réponse est une chaîne sans unité (poids: '95.0', src/screens/onboarding/reponses.ts) produite dans l'unité du système choisi et bornée par POIDS_MAX[unite]. Ce qu'il faudra : une conversion lb→kg au moment d'enregistrer, ou une unité portée par la valeur — le second choix contredirait l'invariant nº 8."
+  },
+  {
+   "categorie": "Unités",
+   "fonctionnalite": "Confiner la conversion du pouce",
+   "texte": "« Les deux fonctions de conversion sont les seuls endroits où le pouce existe » — commentaire du code repris à tort, corrigé.",
+   "origine": "Réfutation fondée. Le pouce figure aussi dans UNITES et UNITES_DU_SYSTEME (src/domaine/unites.ts:31 et :60-63) et dans TAILLE_BORNES (src/domaine/mesures.ts:56-59). Le commentaire de unites.ts est démenti par ses propres voisins."
+  },
+  {
+   "categorie": "Onboarding",
+   "fonctionnalite": "Défaire les réponses d'une question retirée",
+   "texte": "« Passer une question efface les réponses qu'elle portait » en V2.",
+   "origine": "Réfutation fondée. Tenu en V1 par clearStepAnswers et STEP_ANSWER_KEYS (src/features/onboarding/onboarding.steps.ts:155-190) ; aucun équivalent en V2 — src/app/useParcours.ts ne défait que le triplet du traitement, et etapesVisibles filtre sans toucher aux réponses : passer de « perdre » à « stabiliser » laisse poidsCible en place. L'invariant nº 7 le constate au lieu de l'affirmer."
+  },
+  {
+   "categorie": "Poids",
+   "fonctionnalite": "Tenir un seul drapeau de départ",
+   "texte": "La cardinalité « exactement une pesée porte le drapeau de départ ».",
+   "origine": "Réfutation fondée. keepStartingOnOldest (src/features/weight/weighInWrites.ts:60-71) s'arrête au premier drapeau trouvé : `const current = entries.find(w => w.isStartingWeight); if (current && (current.id === oldest.id || current.date === oldest.date)) return entries;`. Un second drapeau posé plus loin survit indéfiniment, et ensureStartingWeighIn a la même faiblesse au chargement. Le modèle exige `= 1` ; le code tient `>= 1`."
+  },
+  {
+   "categorie": "Chargement",
+   "fonctionnalite": "Ouvrir une sauvegarde illisible",
+   "texte": "« L'état est signalé plutôt que remplacé par un profil d'usine ».",
+   "origine": "Réfutation fondée. L'état EST le profil d'usine : après le catch, useAppData.ts:148-157 rend INITIAL_PROFILE et sème une pesée à INITIAL_STARTING_WEIGHT. Ce qui est empêché est l'écriture (mayPersist, :168-171), pas le remplacement."
+  },
+  {
+   "categorie": "Confidentialité",
+   "fonctionnalite": "Sortir des données de l'appareil",
+   "texte": "« Le seul flux sortant est un document que la personne produit et transmet elle-même », et « il n'y a ni base distante ».",
+   "origine": "Réfutation fondée. firestore.rules ouvre surveys/{uid}, feedbacks/{uid}/messages, reportErrors/{uid}/failures et mail/{id} ; une base distante et un compte existent (src/shared/platform/firestore.ts, src/features/auth/). L'écriture de reportErrors part sans acte distinct de la personne (recordReportExportFailure, src/features/feedback/remoteSubmit.ts:332) et emporte bornes de période et comptes d'entrées par journal — pas de donnée de santé, mais pas un document transmis par elle non plus."
+  },
+  {
+   "categorie": "Chargement",
+   "fonctionnalite": "Décrire la chaîne du chargement",
+   "texte": "L'ordre « chaîne de conversions PUIS retrait des traces des fonctionnalités supprimées », et l'omission de dropPreMigrationMeals.",
+   "origine": "Réfutation fondée. Les delete précèdent la chaîne (useAppData.ts:105-114), dropPreMigrationMeals s'exécute ensuite (:127) et détruit toute prise alimentaire sans tableau items (appData.ts:71-74), puis vient la chaîne de sept (:130). Un chapitre qui promet la lisibilité d'une sauvegarde ancienne devait nommer la seule étape qui en détruit le contenu."
+  },
+  {
+   "categorie": "Sommeil",
+   "fonctionnalite": "Enregistrer les quatre repères d'une plage",
+   "texte": "« Tous les quatre écrits, aucun déduit » — vrai du stockage seul.",
+   "origine": "Réfutation fondée. Le jour d'endormissement est posé par déduction (la veille du réveil pour une nuit) et se repose seul tant que les heures n'ont pas été touchées : src/features/sleep/useSleepForm.ts:268, :322, :367. Corrigeable, mais non fourni."
+  },
+  {
+   "categorie": "Dates",
+   "fonctionnalite": "Compter les lectures en temps universel",
+   "texte": "« Deux endroits construisent encore une date depuis la chaîne du jour », et « un endroit prend la dernière ligne du tableau des pesées ».",
+   "origine": "Réfutations fondées, les deux comptes étaient faux. Constructions nues : src/features/home/homeOverview.ts:225, src/features/steps/steps.utils.ts:170, src/features/injections/injections.utils.ts:140, plus une cinquantaine dans src/versions/ (les `new Date(`${date}T12:00:00`)` sont locaux et hors de cause). Dernière ligne du tableau : src/versions/cartes/App.tsx:362, components/PlusMenu.tsx:40, components/MedicalReportExport.tsx:235. Les deux écarts sont désormais situés à la ligne."
+  },
+  {
+   "categorie": "Structure",
+   "fonctionnalite": "Compter les invariants",
+   "texte": "Le compte de quinze, et l'énoncé d'ouverture « quinze propriétés que les données doivent vérifier après n'importe quelle écriture ».",
+   "origine": "Réfutations fondées. L'ancien nº 11 conjoignait deux invariants tenus par deux fonctions dans deux fichiers, qui tombent séparément : ils sont scindés (nº 14 et nº 15). Trois nouveaux sont ajoutés (nº 3 l'identifiant, nº 5 le journal absent, nº 9 les bornes). L'ouverture distingue maintenant les propriétés de données, le périmètre du modèle (nº 18) et la lecture d'une sauvegarde ancienne (nº 19). Total : dix-neuf."
+  },
+  {
+   "categorie": "Bornes",
+   "fonctionnalite": "Vérifier une borne à l'écriture",
+   "texte": "Une vérification des bornes au moment d'enregistrer, en V1.",
+   "origine": "Aucune n'existe : roundWeight arrondit sans plafonner (src/features/weight/weight.utils.ts:27-29), et HungerLevel et SeverityLevel sont déclarés dans src/types.ts sans être employés — les champs valent number, avec un commentaire pour toute borne (CONVENTIONS.md, « Reste à faire »). Les seules bornes du domaine sont celles de la V2 (src/domaine/mesures.ts)."
+  }
+ ],
+ "glossaire": [
+  {
+   "terme": "Invariant",
+   "definition": "Propriété que les données doivent vérifier après n'importe quelle écriture. Elle prime sur toute règle particulière : une capacité qui la contredirait n'est pas une capacité du produit."
+  },
+  {
+   "terme": "Dérivable",
+   "definition": "Se dit d'une grandeur entièrement calculable à partir d'autres attributs déjà enregistrés — une durée à partir de deux instants, un apport à partir d'une composition. Une grandeur dérivable ne doit pas avoir d'attribut à elle."
+  },
+  {
+   "terme": "Cache",
+   "definition": "Copie enregistrée d'une valeur dérivable, recalculée à l'écriture. Le modèle en compte trois : les cinq valeurs nutritionnelles d'une prise alimentaire, les cinq valeurs pour 100 g d'une recette, l'âge du profil."
+  },
+  {
+   "terme": "Journal",
+   "definition": "Tableau de lignes datées d'une même nature — pesées, prises de traitement, effets indésirables, séances, temps pour soi, sommeils, prises alimentaires, pas. Un journal absent vaut le journal vide."
+  },
+  {
+   "terme": "Ligne",
+   "definition": "Une entrée d'un journal, désignée par son identifiant, portant une date et le plus souvent une heure."
+  },
+  {
+   "terme": "Unité canonique",
+   "definition": "Unique unité dans laquelle une grandeur est enregistrée : kilogramme, centimètre, gramme, millilitre, milligramme, minute, mètre, kilocalorie. Aucune étiquette d'unité n'accompagne une valeur enregistrée."
+  },
+  {
+   "terme": "Heure murale",
+   "definition": "Heure locale telle que la personne l'a vécue, écrite AAAA-MM-JJ et HH:MM sans fuseau, comparée comme une chaîne et jamais confiée à un constructeur de date."
+  },
+  {
+   "terme": "Minutes rondes",
+   "definition": "L'ensemble 0, 10, 15, 20, 30, 40, 45, 50, auquel appartient toute heure enregistrée, par arrondi vers le bas."
+  },
+  {
+   "terme": "Clé de date",
+   "definition": "La chaîne date + T + heure d'une ligne, l'heure absente valant midi. C'est elle qui ordonne un journal, jamais le rang dans le tableau."
+  },
+  {
+   "terme": "Poids de départ",
+   "definition": "La pesée la plus ancienne du journal, reconnue à son drapeau et non à sa valeur. Elle ne se supprime pas, et vider le journal des pesées ne garde qu'elle."
+  },
+  {
+   "terme": "Plafond quotidien",
+   "definition": "Nombre maximal de lignes qu'une date peut porter dans un journal : 1 pesée, 2 prises de traitement, 15 effets indésirables, 15 séances, 15 temps pour soi, 15 sommeils par date de réveil, 30 prises alimentaires."
+  },
+  {
+   "terme": "Recouvrement",
+   "definition": "Étendue commune à deux plages de sommeil, jugée par inégalités strictes : le bout-à-bout est permis, et une plage sans étendue ne recouvre rien."
+  },
+  {
+   "terme": "Idempotence",
+   "definition": "Propriété d'une conversion de chargement qui rend le même résultat appliquée deux fois. Chaque étape de la chaîne du chargement la tient par une garde explicite."
+  },
+  {
+   "terme": "Chaîne du chargement",
+   "definition": "La suite appliquée à une sauvegarde ouverte : retrait des traces des fonctionnalités supprimées, suppression des prises alimentaires antérieures à la bascule, puis sept conversions idempotentes."
+  },
+  {
+   "terme": "Garde-fou de lecture",
+   "definition": "Comportement d'une sauvegarde illisible : recopie sous une clé de secours, une seule fois, et interdiction de toute écriture de la session. L'état présenté est alors le profil d'usine."
+  }
+ ],
+ "index": [
+  {
+   "terme": "Âge (remplacé par l'année de naissance)",
+   "ancre": "invariants-rien-de-derivable-n-est-stocke"
+  },
+  {
+   "terme": "Bornes du poids, de la taille, de l'âge",
+   "ancre": "invariants-les-bornes-n-ecartent-que-l-absurde"
+  },
+  {
+   "terme": "Cache nutritionnel d'une prise alimentaire",
+   "ancre": "invariants-rien-de-derivable-n-est-stocke"
+  },
+  {
+   "terme": "Catalogue des traitements",
+   "ancre": "invariants-on-reference-par-identifiant-jamais-par-nom"
+  },
+  {
+   "terme": "Chaîne du chargement",
+   "ancre": "invariants-une-sauvegarde-ancienne-reste-lisible"
+  },
+  {
+   "terme": "Clé de date",
+   "ancre": "invariants-l-ordre-est-celui-des-dates"
+  },
+  {
+   "terme": "Compte distant et collections distantes",
+   "ancre": "invariants-une-seule-personne-par-installation"
+  },
+  {
+   "terme": "Dénominateur d'une moyenne",
+   "ancre": "invariants-une-valeur-absente-se-tait"
+  },
+  {
+   "terme": "Dérivation stockée",
+   "ancre": "invariants-rien-de-derivable-n-est-stocke"
+  },
+  {
+   "terme": "Drapeau de départ",
+   "ancre": "invariants-le-depart-est-la-pesee-la-plus-ancienne"
+  },
+  {
+   "terme": "Faim déduite d'une prise alimentaire",
+   "ancre": "invariants-une-valeur-absente-se-tait"
+  },
+  {
+   "terme": "Fibres",
+   "ancre": "invariants-les-fibres-comptent-partout"
+  },
+  {
+   "terme": "Garde-fou de lecture",
+   "ancre": "invariants-une-sauvegarde-ancienne-reste-lisible"
+  },
+  {
+   "terme": "Heure murale",
+   "ancre": "invariants-les-dates-sont-locales"
+  },
+  {
+   "terme": "Identifiant d'une ligne",
+   "ancre": "invariants-l-identifiant-d-une-ligne-est-unique-et-stable"
+  },
+  {
+   "terme": "Idempotence des conversions",
+   "ancre": "invariants-une-sauvegarde-ancienne-reste-lisible"
+  },
+  {
+   "terme": "Intégrité référentielle d'une recette",
+   "ancre": "invariants-supprimer-supprime"
+  },
+  {
+   "terme": "Journal absent",
+   "ancre": "invariants-un-journal-absent-vaut-le-journal-vide"
+  },
+  {
+   "terme": "Minutes rondes",
+   "ancre": "invariants-les-heures-tombent-sur-des-minutes-rondes"
+  },
+  {
+   "terme": "Mot de passe, huit signes",
+   "ancre": "invariants-aucune-suite-ne-se-decide-sur-un-silence"
+  },
+  {
+   "terme": "Nutrition, les cinq valeurs",
+   "ancre": "invariants-les-fibres-comptent-partout"
+  },
+  {
+   "terme": "Objectif quotidien de fibres (25 g)",
+   "ancre": "invariants-les-fibres-comptent-partout"
+  },
+  {
+   "terme": "Ordre d'un journal",
+   "ancre": "invariants-l-ordre-est-celui-des-dates"
+  },
+  {
+   "terme": "Plafond quotidien",
+   "ancre": "invariants-une-seule-pesee-par-jour"
+  },
+  {
+   "terme": "Plage de sommeil",
+   "ancre": "invariants-deux-plages-de-sommeil-ne-se-recouvrent-pas"
+  },
+  {
+   "terme": "Poids de départ, non-suppression",
+   "ancre": "invariants-le-depart-ne-se-supprime-pas"
+  },
+  {
+   "terme": "Poids de départ, pesée la plus ancienne",
+   "ancre": "invariants-le-depart-est-la-pesee-la-plus-ancienne"
+  },
+  {
+   "terme": "Prises alimentaires antérieures à la bascule",
+   "ancre": "invariants-une-sauvegarde-ancienne-reste-lisible"
+  },
+  {
+   "terme": "Purge des lignes marquées supprimées",
+   "ancre": "invariants-supprimer-supprime"
+  },
+  {
+   "terme": "Qualité de sommeil, échelle",
+   "ancre": "invariants-les-bornes-n-ecartent-que-l-absurde"
+  },
+  {
+   "terme": "Question conditionnée par une réponse explicite",
+   "ancre": "invariants-aucune-suite-ne-se-decide-sur-un-silence"
+  },
+  {
+   "terme": "Recette, valeurs pour 100 g",
+   "ancre": "invariants-rien-de-derivable-n-est-stocke"
+  },
+  {
+   "terme": "Recouvrement de deux plages",
+   "ancre": "invariants-deux-plages-de-sommeil-ne-se-recouvrent-pas"
+  },
+  {
+   "terme": "Référence par identifiant",
+   "ancre": "invariants-on-reference-par-identifiant-jamais-par-nom"
+  },
+  {
+   "terme": "Sévérité d'un effet indésirable",
+   "ancre": "invariants-les-bornes-n-ecartent-que-l-absurde"
+  },
+  {
+   "terme": "Suppression franche",
+   "ancre": "invariants-supprimer-supprime"
+  },
+  {
+   "terme": "Système d'unités",
+   "ancre": "invariants-les-unites-stockees-sont-canoniques"
+  },
+  {
+   "terme": "Une seule pesée par jour",
+   "ancre": "invariants-une-seule-pesee-par-jour"
+  },
+  {
+   "terme": "Unité canonique",
+   "ancre": "invariants-les-unites-stockees-sont-canoniques"
+  },
+  {
+   "terme": "Valeur absente",
+   "ancre": "invariants-une-valeur-absente-se-tait"
+  },
+  {
+   "terme": "Zéro enregistré",
+   "ancre": "invariants-une-valeur-absente-se-tait"
+  }
+ ]
+}

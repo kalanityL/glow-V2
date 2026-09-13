@@ -1,0 +1,366 @@
+{
+ "inventions": [
+  {
+   "categorie": "pharmacocinétique",
+   "fonctionnalite": "Concentration active",
+   "texte": "Le modèle de Bateman lui-même — constantes d'absorption et d'élimination par molécule, forme de la courbe, demi-vies — n'est pas décrit : calculateCumulativeConcentration et getPKParameters n'ont pas été lus ligne à ligne, seuls leurs appels l'ont été.",
+   "origine": "src/utils/pharmacokinetics.ts non lu ; il relève du chapitre Traitement."
+  },
+  {
+   "categorie": "équivalences insolites",
+   "fonctionnalite": "Repli du dessin d'équivalence",
+   "texte": "La règle de turn-over de useLudicAssignment (quel objet est réassigné, quand, et comment le compteur d'usage départage) est mentionnée sans être décrite.",
+   "origine": "useLudicAssignment et getLudicDecomposition non lus en détail ; ils relèvent du chapitre Métabolisme et badges."
+  },
+  {
+   "categorie": "géométrie des tiroirs",
+   "fonctionnalite": "Tiroirs Journal, Tendance, Dynamique",
+   "texte": "D'où sort chaque tiroir, comment il s'arrime au menu du bas, ce qui le ferme (croix, vitre, geste de barre) et comment App.tsx câble handleNavigate et handleQuickAddNavigate.",
+   "origine": "App.tsx n'a été lu que par grep ; la géométrie n'a pas été vérifiée à la ligne."
+  },
+  {
+   "categorie": "couches vitrées",
+   "fonctionnalite": "Les dix couches de la home sections",
+   "texte": "Le contenu calculé de chaque couche (Balance, Où en est l'IMC, Paliers de dose, Pas, Sommeil, Menus…) : leurs formules propres ne sont pas ici.",
+   "origine": "SurimpressionVitree et ses dix contenus non lus ; ils relèvent des chapitres de domaine."
+  },
+  {
+   "categorie": "bloc de palier d'IMC",
+   "fonctionnalite": "Bloc palier franchi",
+   "texte": "La composition interne de BmiMilestoneBlock — seuil de bascule vers le message de vigilance sous 18,5, contenu de la fiche à deux chiffres — au-delà de la date de franchissement et des libellés de palier.",
+   "origine": "BmiMilestoneBlock.tsx non lu."
+  },
+  {
+   "categorie": "analyses non branchées",
+   "fonctionnalite": "Progrès sportif et alimentaire",
+   "texte": "analyzeSportProgress (fenêtres semaine J−6/J−13, mois J−29/J−59, étages de verdict) et analyzeMealProgress (score d'écart lipides/glucides/protéines) sont écrits et testés, mais aucun lecteur n'a été trouvé dans les deux homes ; ils ne sont donc pas décrits comme des règles de la Maison.",
+   "origine": "src/features/home/homeProgressAnalysis.ts — aucun appel constaté dans Maison.tsx ni MaisonSections.tsx."
+  },
+  {
+   "categorie": "carrés de suivi éteints",
+   "fonctionnalite": "Home sections",
+   "texte": "showBmi, handleBmiClick et le bloc de palier de la home sections ne sont atteignables que par des carrés désactivés par la constante CARRES_SUIVI = false : chemins morts, non décrits.",
+   "origine": "MaisonSections.tsx ligne 264."
+  }
+ ],
+ "glossaire": [
+  {
+   "terme": "pesée de départ",
+   "definition": "La ligne de weightHistory portant isStartingWeight === true. Elle fixe le poids de départ, la date de début de cure et la borne basse de la durée d'une perte totale — jamais la pesée la plus ancienne."
+  },
+  {
+   "terme": "coupure au changement de traitement",
+   "definition": "Règle qui, en remontant l'historique des prises depuis la fin, s'arrête à la première ligne d'un autre traitement. Revenir à un traitement déjà pris n'en rouvre pas l'ancien épisode."
+  },
+  {
+   "terme": "hasOccurred",
+   "definition": "Prédicat « a déjà eu lieu » : date passée, ou date du jour avec une heure atteinte (heure absente = déjà eu lieu). Il écarte les saisies à venir de la Dynamique, de la série du traitement et des badges."
+  },
+  {
+   "terme": "journée renseignée",
+   "definition": "Dénominateur de la plupart des moyennes /jour : le nombre de dates distinctes portant au moins une entrée. Une journée sans saisie est une journée non tenue, pas un zéro."
+  },
+  {
+   "terme": "série de tendance",
+   "definition": "Quatorze valeurs, une par jour local de J−13 à aujourd'hui. Ce qui se cumule vaut 0 le jour sans saisie ; ce qui est un état (poids, concentration) se reporte ou se recalcule."
+  },
+  {
+   "terme": "periodShift",
+   "definition": "Comparaison des deux moitiés de sept jours d'une série ; hausse, baisse ou stable, avec un seuil de 5 % sur la moitié ancienne prise pour référence."
+  },
+  {
+   "terme": "module",
+   "definition": "Un des sept domaines commandés par un drapeau du profil. Absent, il vaut allumé pour le traitement et les effets secondaires, éteint pour les cinq autres. Un module éteint peut en outre être masqué."
+  },
+  {
+   "terme": "différentiel (Dynamique)",
+   "definition": "Calories ingérées moins dépenses sur sept jours ; converti en grammes à raison de 8 000 kcal pour un kilo, puis traduit en verdict par les seuils 300 g et 1 000 g."
+  },
+  {
+   "terme": "fenêtre inclusive",
+   "definition": "Convention des sélecteurs de période : « n derniers jours » couvre aujourd'hui et les n−1 jours précédents, la coupure étant une chaîne de date locale comparée en chaînes."
+  },
+  {
+   "terme": "équivalence insolite",
+   "definition": "Objet du quotidien assigné à une perte de poids par la pesée, vrai à 200 g près, jamais le même pour la perte totale et la dernière perte."
+  },
+  {
+   "terme": "assignation persistée",
+   "definition": "Le résultat de useLudicAssignment, écrit au fil des pesées et relu par la home ; la home sections le recalcule si la liste arrive vide alors que la perte est positive."
+  },
+  {
+   "terme": "grandeur canonique",
+   "definition": "L'unité de stockage et de calcul, sans étiquette : kg, cm, mg, minutes, kcal, pas. Les unités ne sont posées qu'à l'affichage."
+  }
+ ],
+ "index": [
+  {
+   "terme": "poids actuel",
+   "ancre": "maison-vue-des-poids-weightoverview"
+  },
+  {
+   "terme": "poids de départ",
+   "ancre": "maison-vue-des-poids-weightoverview"
+  },
+  {
+   "terme": "dernière perte",
+   "ancre": "maison-affichage-des-tuiles-de-perte"
+  },
+  {
+   "terme": "signe d'une variation",
+   "ancre": "maison-signe-d-une-variation-de-poids-signedkg"
+  },
+  {
+   "terme": "espace insécable des milliers",
+   "ancre": "maison-format1dec"
+  },
+  {
+   "terme": "template d'accueil",
+   "ancre": "maison-choix-de-la-home-homechoice"
+  },
+  {
+   "terme": "module activé",
+   "ancre": "maison-etat-d-un-module-ismoduleon-ismodulehidden"
+  },
+  {
+   "terme": "module masqué",
+   "ancre": "maison-etat-d-un-module-ismoduleon-ismodulehidden"
+  },
+  {
+   "terme": "poids cible",
+   "ancre": "maison-reste-a-perdre-bloc-salut"
+  },
+  {
+   "terme": "barre d'avancement",
+   "ancre": "maison-avancement-vers-la-cible-goalprogresspercent"
+  },
+  {
+   "terme": "rappels d'injection",
+   "ancre": "maison-ligne-rappels-du-bloc-salut"
+  },
+  {
+   "terme": "badges débloqués",
+   "ancre": "maison-badges-du-bloc-salut"
+  },
+  {
+   "terme": "objectif protéines",
+   "ancre": "maison-objectifs-nutritionnels-du-jour-dailynutritiongoals"
+  },
+  {
+   "terme": "barre d'objectif",
+   "ancre": "maison-pourcentage-d-une-barre-d-objectif-blockcal"
+  },
+  {
+   "terme": "semaine de cure",
+   "ancre": "maison-semaine-de-cure-cureweek-weekssincedate"
+  },
+  {
+   "terme": "kg par semaine",
+   "ancre": "maison-perte-moyenne-par-semaine-weeklyrate"
+  },
+  {
+   "terme": "IMC",
+   "ancre": "maison-imc-bmiof"
+  },
+  {
+   "terme": "palier d'IMC",
+   "ancre": "maison-paliers-d-imc-indexes-getbmitierinfo"
+  },
+  {
+   "terme": "points d'IMC",
+   "ancre": "maison-points-d-imc-gagnes-perdus-bmipointschange"
+  },
+  {
+   "terme": "dose initiale et actuelle",
+   "ancre": "maison-serie-du-traitement-currenttreatmentseries-le-futur-s-ecarte"
+  },
+  {
+   "terme": "mg cumulés",
+   "ancre": "maison-serie-du-traitement-currenttreatmentseries-le-futur-s-ecarte"
+  },
+  {
+   "terme": "concentration active",
+   "ancre": "maison-concentration-active-activeglpconcentration"
+  },
+  {
+   "terme": "humeur du jour",
+   "ancre": "maison-humeur-du-jour-sideeffectsmood"
+  },
+  {
+   "terme": "objectif de pas",
+   "ancre": "maison-bloc-mes-pas"
+  },
+  {
+   "terme": "défilé des journaux",
+   "ancre": "maison-defile-des-journaux-recentjournalentries"
+  },
+  {
+   "terme": "8 000 kcal par kilo",
+   "ancre": "maison-divination-bilan-des-7-derniers-jours"
+  },
+  {
+   "terme": "verdict de la Dynamique",
+   "ancre": "maison-verdict-de-divination-getdivinationverdict"
+  },
+  {
+   "terme": "déblocage à sept jours",
+   "ancre": "maison-deblocage-de-la-section-dynamique"
+  },
+  {
+   "terme": "ajout rapide",
+   "ancre": "maison-rangee-ajout-rapide"
+  },
+  {
+   "terme": "couche vitrée",
+   "ancre": "maison-garde-fous-d-ouverture-des-couches-en-direct"
+  },
+  {
+   "terme": "durée d'une perte",
+   "ancre": "maison-duree-d-une-perte-lossspanlabel-lossspandates"
+  },
+  {
+   "terme": "équivalence insolite",
+   "ancre": "maison-repli-du-dessin-d-equivalence-insolite"
+  },
+  {
+   "terme": "7 derniers jours",
+   "ancre": "maison-fenetre-7-derniers-jours-des-bilans"
+  },
+  {
+   "terme": "journée renseignée",
+   "ancre": "maison-moyennes-repas-sur-7-jours-revolus-mealcaloriesdailyaveragel"
+  },
+  {
+   "terme": "qualité de sommeil pondérée",
+   "ancre": "maison-sommeil-moyen-et-qualite-ponderee"
+  },
+  {
+   "terme": "séance de sport",
+   "ancre": "maison-moyennes-hebdomadaires-du-sport-sportweeklyaverages"
+  },
+  {
+   "terme": "initiales de site",
+   "ancre": "maison-forme-des-lignes-du-tiroir-journal-formedeligne"
+  },
+  {
+   "terme": "tiroir Journal",
+   "ancre": "maison-tiroir-journal-recententriesbytab-recentstepentries"
+  },
+  {
+   "terme": "série de tendance",
+   "ancre": "maison-series-de-tendance-trend-days-14"
+  },
+  {
+   "terme": "sparkline",
+   "ancre": "maison-echelle-de-la-sparkline"
+  },
+  {
+   "terme": "fenêtre temporelle",
+   "ancre": "maison-fenetre-temporelle-getcutoffdatestr-filterbytimewindow"
+  },
+  {
+   "terme": "période par défaut",
+   "ancre": "maison-options-et-defaut-de-periode"
+  },
+  {
+   "terme": "matrice des effets",
+   "ancre": "maison-matrice-des-effets-par-moment"
+  },
+  {
+   "terme": "scène de félicitation",
+   "ancre": "maison-mapping-type-de-felicitation-scene-scene-par-type"
+  },
+  {
+   "terme": "mouvement réduit",
+   "ancre": "maison-widget-de-felicitation-mouvement-reduit-et-surfaces-sombres"
+  },
+  {
+   "terme": "déjà eu lieu",
+   "ancre": "maison-hasoccurred"
+  },
+  {
+   "terme": "seuil de stabilité 5 %",
+   "ancre": "maison-sens-d-une-periode-periodshift"
+  }
+ ],
+ "ancres_traitees": [
+  "maison-vue-des-poids-weightoverview",
+  "maison-affichage-des-tuiles-de-perte",
+  "maison-signe-d-une-variation-de-poids-signedkg",
+  "maison-format1dec",
+  "maison-choix-de-la-home-homechoice",
+  "maison-etat-d-un-module-ismoduleon-ismodulehidden",
+  "maison-reste-a-perdre-bloc-salut",
+  "maison-avancement-vers-la-cible-goalprogresspercent",
+  "maison-ligne-rappels-du-bloc-salut",
+  "maison-badges-du-bloc-salut",
+  "maison-totaux-nutritionnels-du-jour-nutritiontotalson",
+  "maison-objectifs-nutritionnels-du-jour-dailynutritiongoals",
+  "maison-pourcentage-d-une-barre-d-objectif-blockcal",
+  "maison-semaine-de-cure-cureweek-weekssincedate",
+  "maison-compte-de-jours-daycountlabel",
+  "maison-perte-moyenne-par-semaine-weeklyrate",
+  "maison-arc-depart-objectif",
+  "maison-variation-en-du-poids-de-depart-pctofstart",
+  "maison-imc-bmiof",
+  "maison-categorie-d-imc-bmicategorylabel",
+  "maison-paliers-d-imc-indexes-getbmitierinfo",
+  "maison-date-du-franchissement-d-un-palier-bmitransitiondate",
+  "maison-serie-du-traitement-en-cours-coupure-au-changement-currenttr",
+  "maison-serie-du-traitement-currenttreatmentseries-le-futur-s-ecarte",
+  "maison-jours-depuis-la-derniere-prise-carre-traitement",
+  "maison-concentration-active-activeglpconcentration",
+  "maison-humeur-du-jour-sideeffectsmood",
+  "maison-phrases-sous-le-smiley-moodcaption-moodcaptioncarre",
+  "maison-bloc-mes-pas",
+  "maison-defile-des-journaux-recentjournalentries",
+  "maison-nature-d-une-entree-du-defile",
+  "maison-formats-de-ligne-du-defile-lignevaleur-ligneduree",
+  "maison-divination-bilan-des-7-derniers-jours",
+  "maison-verdict-de-divination-getdivinationverdict",
+  "maison-phrases-de-la-dynamique",
+  "maison-deblocage-de-la-section-dynamique",
+  "maison-cliquabilite-du-bloc-dynamique",
+  "maison-place-de-la-section-dynamique",
+  "maison-tiroir-dynamique-valeurs-derivees",
+  "maison-rangee-ajout-rapide",
+  "maison-garde-fous-d-ouverture-des-couches-en-direct",
+  "maison-ouverture-de-la-couche-menus-selon-l-entree",
+  "maison-sens-des-tuiles-dynamique",
+  "maison-rangee-progres-composition-et-plafond",
+  "maison-points-d-imc-gagnes-perdus-bmipointschange",
+  "maison-duree-d-une-perte-lossspanlabel-lossspandates",
+  "maison-repli-du-dessin-d-equivalence-insolite",
+  "maison-fenetre-7-derniers-jours-des-bilans",
+  "maison-moyennes-repas-sur-7-jours-revolus-mealcaloriesdailyaveragel",
+  "maison-moyennes-du-journal-des-repas-sur-la-cure-mealdailyaverages",
+  "maison-moyenne-de-pas-par-jour-stepsdailyaverage",
+  "maison-sommeil-moyen-et-qualite-ponderee",
+  "maison-moyennes-hebdomadaires-du-sport-sportweeklyaverages",
+  "maison-moyenne-hebdomadaire-depuis-la-premiere-entree-metimeweeklya",
+  "maison-de-la-recommandation-infobulles-cote-a-cote",
+  "maison-pluriel-des-unites-cote-a-cote",
+  "maison-gardes-de-la-section-cote-a-cote",
+  "maison-medaillon-du-traitement-formes-melangees",
+  "maison-tiroir-journal-recententriesbytab-recentstepentries",
+  "maison-forme-des-lignes-du-tiroir-journal-formedeligne",
+  "maison-ordre-et-presence-des-cases-des-tiroirs",
+  "maison-series-de-tendance-trend-days-14",
+  "maison-forme-a-dessiner-hasshape",
+  "maison-valeurs-des-cartes-de-tendance",
+  "maison-evolution-des-effets-secondaires-sideeffectshift",
+  "maison-echelle-de-la-sparkline",
+  "maison-cartes-du-tiroir-tendance-sans-forme",
+  "maison-fenetre-temporelle-getcutoffdatestr-filterbytimewindow",
+  "maison-options-et-defaut-de-periode",
+  "maison-matrice-des-effets-par-moment",
+  "maison-mapping-type-de-felicitation-scene-scene-par-type",
+  "maison-messages-de-felicitation",
+  "maison-semis-reproductible-creerrng",
+  "maison-duree-d-une-scene-dureescene",
+  "maison-widget-de-felicitation-mouvement-reduit-et-surfaces-sombres",
+  "maison-hasoccurred",
+  "maison-sens-d-une-periode-periodshift"
+ ],
+ "ancres_sans_matiere": []
+}

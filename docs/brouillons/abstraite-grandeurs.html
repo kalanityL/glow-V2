@@ -1,0 +1,242 @@
+<section id="grandeurs">
+  <h2>3. Grandeurs, unités et nombres <a class="retour" href="#sommaire">↑ sommaire</a></h2>
+  <p>Chaque grandeur mesurée par le produit a une unité de conservation, et le nombre conservé ne porte jamais l'étiquette de cette unité. Ce chapitre donne ces unités, les facteurs de conversion qui existent, les bornes et les pas admis, ce qui contraint la granularité au moment d'écrire, et la forme littérale d'un nombre au stockage.</p>
+
+  <h3 id="grandeurs-les-unites-canoniques">Les unités canoniques</h3>
+  <p>La doctrine est écrite dans les deux versions : une valeur se conserve en unité métrique de base, sans étiquette, et le système d'unités ne décide que de l'unité dans laquelle elle est exprimée vers l'extérieur et interprétée quand elle arrive. Deux systèmes existent, <code>metrique</code> et <code>imperial</code> ; le défaut est <code>metrique</code>, et choisir une langue repose le système sur celui qu'elle amène — le français le métrique, l'anglais l'impérial — sans l'imposer. <span class="marque v2">V2</span></p>
+  <p>La doctrine n'est tenue que pour une seule grandeur : la taille, seule à disposer de fonctions de conversion. Pour le poids, elle n'est tenue par aucun code — voir plus bas.</p>
+  <p>La conséquence symétrique vaut pour les étiquettes dérivées d'une propriété de la donnée. Une quantité d'aliment est conservée sans savoir si elle est un poids ou un volume : c'est la nature solide ou liquide de la fiche référencée qui détermine son unité, et cette nature n'est pas recopiée dans la quantité. Reclasser un aliment de solide en liquide change donc l'unité de toutes les quantités déjà conservées qui le référencent, sans qu'aucune d'elles soit réécrite.</p>
+  <table>
+    <thead><tr><th>Grandeur</th><th>Unité de conservation</th><th>Type</th><th>Granularité conservée</th></tr></thead>
+    <tbody>
+      <tr><td>Poids d'une pesée, poids de départ, poids visé (V1)</td><td>kilogramme</td><td>nombre</td><td>dixième de kilogramme</td></tr>
+      <tr><td>Poids actuel, poids visé <span class="marque v2">V2</span></td><td>celle que le système désigne, <code>kg</code> ou <code>lb</code> — aucune conversion n'existe</td><td>chaîne, « 95.0 »</td><td>dixième</td></tr>
+      <tr><td>Taille</td><td>centimètre</td><td>entier</td><td>1 cm</td></tr>
+      <tr><td>Mensuration (facultative)</td><td>centimètre</td><td>nombre</td><td>dixième de centimètre, par pas de 0,5</td></tr>
+      <tr><td>Quantité d'un aliment solide</td><td>gramme</td><td>nombre</td><td>dixième de gramme</td></tr>
+      <tr><td>Quantité d'un aliment liquide</td><td>millilitre</td><td>nombre</td><td>dixième de millilitre</td></tr>
+      <tr><td>Énergie d'une fiche d'aliment, objectif d'énergie</td><td>kilocalorie</td><td>nombre</td><td>pour 100 g ou 100 ml de la fiche</td></tr>
+      <tr><td>Protéines, glucides, lipides, fibres d'une fiche</td><td>gramme</td><td>nombre</td><td>pour 100 g ou 100 ml de la fiche</td></tr>
+      <tr><td>Dose d'une prise de traitement</td><td>milligramme</td><td>nombre</td><td>millième de milligramme</td></tr>
+      <tr><td>Durée d'une séance, d'un moment pour soi</td><td>minute</td><td>entier</td><td>1 min</td></tr>
+      <tr><td>Montée d'escaliers</td><td>étage</td><td>entier</td><td>1 étage — la seule activité dont la « durée » ne compte pas des minutes</td></tr>
+      <tr><td>Distance parcourue pendant une séance</td><td>mètre</td><td>entier</td><td>1 m</td></tr>
+      <tr><td>Pas d'une journée</td><td>sans unité (un compte)</td><td>entier</td><td>1 pas</td></tr>
+      <tr><td>Poids d'un objet de comparaison</td><td>kilogramme</td><td>nombre</td><td>gramme — la valeur est posée et relue en grammes</td></tr>
+      <tr><td>Âge (V1)</td><td>année</td><td>entier</td><td>1 an</td></tr>
+      <tr><td>Année de naissance <span class="marque v2">V2</span></td><td>année</td><td>entier</td><td>1 an — remplace l'âge, qui se périme</td></tr>
+      <tr><td>Instant technique (création, modification)</td><td>milliseconde depuis l'époque Unix</td><td>entier</td><td>1 ms</td></tr>
+      <tr><td>Date d'une entrée</td><td>jour local, <code>AAAA-MM-JJ</code></td><td>chaîne</td><td>1 jour, sans fuseau</td></tr>
+      <tr><td>Heure d'une entrée</td><td>heure murale locale, <code>HH:MM</code></td><td>chaîne</td><td>quantifiée, voir plus bas</td></tr>
+    </tbody>
+  </table>
+  <p>Il n'existe pas d'instant de suppression. Le modèle a porté un <code>deletedAt</code> et gardé la ligne marquée ; il l'a retiré — supprimer retire la ligne de la sauvegarde — et une conversion irréversible efface la métadonnée des sauvegardes héritées, ligne marquée comprise. Seuls <code>createdAt</code> et <code>updatedAt</code> subsistent.</p>
+  <p>Les objectifs quotidiens vivent dans le compte, chacun dans l'unité de la grandeur qu'il vise : énergie en kilocalories (à défaut 1 400), protéines en grammes (à défaut le poids courant en kilogrammes multiplié par 1,5, arrondi à l'entier), fibres en grammes (à défaut 25). L'objectif de pas, lui, n'est pas conservé : c'est une constante de 8 000 pas.</p>
+  <p>L'énergie n'existe qu'en kilocalories : aucune valeur n'est conservée en kilojoules, et aucun facteur de conversion vers le kilojoule n'existe. L'énergie d'un repas n'est pas une grandeur enregistrée mais une grandeur dérivée des fiches d'aliments et des quantités.</p>
+
+  <h3 id="grandeurs-le-poids-echappe-a-la-doctrine">Le poids échappe à la doctrine <span class="marque v2">V2</span></h3>
+  <p>Le poids actuel et le poids visé de la V2 sont deux chaînes, « 95.0 », posées dans l'unité que le système désigne au moment où elles sont produites, et rien ne conserve cette unité à côté de la valeur. Aucun facteur livre ↔ kilogramme n'existe dans le domaine : le seul facteur déclaré est <code>2,54</code>, pour la taille. Le commentaire du modèle garantit l'unité de conservation pour la seule taille et se tait sur le poids.</p>
+  <p>Il s'ensuit qu'un changement de système laisse la chaîne en place et en change le sens : « 95.0 » posé en métrique vaut 95,0 kg, puis 95,0 lb une fois le système passé à l'impérial. C'est le trou par lequel l'invariant central du chapitre fuit, et il est ouvert. <span class="marque">arbitrage non validé</span></p>
+  <details><summary>Cas limites</summary>
+    <ul>
+      <li>Un code-barres est conservé en chaîne et non en nombre : les zéros de tête d'un code à douze chiffres seraient perdus par un type numérique.</li>
+      <li>La durée d'un sommeil n'est pas conservée : elle se déduit des deux instants d'endormissement et de réveil, franchissement de minuit compris.</li>
+      <li>En V1, le système d'unités du compte n'agit sur aucune grandeur : la propriété existe dans le modèle et aucune ligne du dépôt ne la lit. Les fonctions de conversion des quantités d'aliments existent, mais aucun appelant ne leur transmet jamais <code>imperial</code>. <span class="marque non">non implémenté</span></li>
+      <li>Les valeurs nutritionnelles d'un repas subsistent en V1 comme cache transitoire recalculé à chaque écriture, alors même qu'elles sont dérivables ; le modèle cible ne les conserve pas.</li>
+    </ul>
+  </details>
+
+  <h3 id="grandeurs-les-valeurs-de-depart">Les valeurs de départ</h3>
+  <p>Plusieurs grandeurs partent d'une valeur posée d'avance, et non d'une absence. Une valeur de départ conservée telle quelle est indiscernable d'une valeur choisie.</p>
+  <table>
+    <thead><tr><th>Grandeur</th><th>Valeur de départ</th><th>Remarque</th></tr></thead>
+    <tbody>
+      <tr><td>Poids actuel <span class="marque v2">V2</span></td><td><code>'95.0'</code></td><td>deux grandeurs jumelles, jamais fusionnées</td></tr>
+      <tr><td>Poids visé <span class="marque v2">V2</span></td><td><code>'95.0'</code></td><td>ne part jamais du poids actuel et ne le suit jamais</td></tr>
+      <tr><td>Taille <span class="marque v2">V2</span></td><td>165 cm</td><td>en centimètres, l'unité de conservation</td></tr>
+      <tr><td>Année de naissance <span class="marque v2">V2</span></td><td>1980</td><td>—</td></tr>
+      <tr><td>Qualité d'un sommeil (V1)</td><td>3, « Correcte »</td><td>partait de 0, « Très mauvaise »</td></tr>
+      <tr><td>Faim avant un repas (V1)</td><td>2</td><td>—</td></tr>
+      <tr><td>Faim après un repas (V1)</td><td>0</td><td>—</td></tr>
+    </tbody>
+  </table>
+  <p>Le poids actuel et le poids visé partent de la même valeur, ce qui peut donner le change : ce sont deux grandeurs indépendantes, l'une ne se propage jamais dans l'autre, et les fusionner est explicitement interdit.</p>
+
+  <h3 id="grandeurs-les-conversions">Les conversions et leurs facteurs</h3>
+  <p>Une conversion n'a lieu qu'aux deux extrémités : quand une valeur entre, et quand elle sort. Aucun facteur n'est appliqué au stockage.</p>
+  <table>
+    <thead><tr><th>De</th><th>Vers</th><th>Facteur</th><th>Arrondi appliqué</th><th>État</th></tr></thead>
+    <tbody>
+      <tr><td>pouce</td><td>centimètre</td><td>× 2,54 (exact)</td><td>à l'entier</td><td>taille — le seul facteur du domaine V2 <span class="marque v2">V2</span></td></tr>
+      <tr><td>centimètre</td><td>pouce</td><td>÷ 2,54</td><td>à l'entier</td><td>taille <span class="marque v2">V2</span></td></tr>
+      <tr><td>kilomètre</td><td>mètre</td><td>× 1000</td><td>au mètre</td><td>distance d'une séance</td></tr>
+      <tr><td>étage</td><td>minute d'équivalent</td><td>× 0,5</td><td>aucun</td><td>cumul des durées d'activité et score</td></tr>
+      <tr><td>once avoirdupois</td><td>gramme</td><td>× 28,349523125 (exact)</td><td>aucun</td><td>déclaré, jamais atteint : aucun appelant ne transmet <code>imperial</code> <span class="marque non">non implémenté</span></td></tr>
+      <tr><td>once liquide américaine</td><td>millilitre</td><td>× 29,5735295625 (exact)</td><td>aucun</td><td>même état <span class="marque non">non implémenté</span></td></tr>
+      <tr><td>kilogramme, litre</td><td>gramme, millilitre</td><td>× 1000</td><td>aucun</td><td>fonction exportée sans aucun appelant <span class="marque non">non implémenté</span></td></tr>
+      <tr><td>livre</td><td>kilogramme</td><td colspan="3">aucun facteur n'existe, dans aucune des deux versions <span class="marque non">non implémenté</span></td></tr>
+    </tbody>
+  </table>
+  <p>Les deux fonctions de conversion de la taille sont les seuls endroits où le pouce existe. Elles arrondissent à l'entier aux deux bouts, si bien que la conversion n'est pas une involution : une taille exprimée en pouces puis réinterprétée en centimètres peut perdre un centimètre.</p>
+  <pre><code>centimetres = arrondi(pouces × 2,54)
+pouces      = arrondi(centimetres ÷ 2,54)
+166 cm → 65 in → 165 cm   (perte d'un centimètre)
+168 cm → 66 in → 168 cm   (stable)</code></pre>
+  <p>Une table d'équivalences entre unités usuelles et unités de conservation existe : 16 contenants génériques (un verre, une tasse, un bol, une cuillère à soupe) et 74 unités attachées à une famille d'aliments par son nom générique (un œuf, une part de pizza, une tranche de pain), chacune pouvant porter plusieurs tailles. Chaque valeur est un poids net comestible, jamais un poids brut ; chaque ligne cite ses sources et nomme, le cas échéant, la partie retirée. Rien ne la lit encore. <span class="marque non">non implémenté</span></p>
+  <div class="exemple"><p>Camille mesure 168 cm. En système impérial, sa taille est exprimée 66 pouces (168 ÷ 2,54 = 66,14) ; réinterprétée, elle revaut 168 cm (66 × 2,54 = 167,64). La valeur conservée n'a pas bougé : 168. Son poids, lui, n'a aucun facteur : « 95.0 » posé en métrique se relit 95,0 lb dès que le système passe à l'impérial.</p></div>
+
+  <h3 id="grandeurs-les-bornes">Les bornes et les pas</h3>
+  <p>Les bornes n'écartent que l'absurde : la valeur aberrante et la valeur manquante. Elles ne disent jamais à quelqu'un quel corps il a le droit d'avoir — c'est la raison pour laquelle un âge va jusqu'à 130 ans et une taille jusqu'à 3 mètres. À côté de la borne, chaque grandeur déclare un pas : la troisième dimension du contrat numérique, après l'unité et la fourchette.</p>
+  <table>
+    <thead><tr><th>Grandeur</th><th>Minimum</th><th>Maximum</th><th>Décimales</th><th>Pas</th><th>Vide admis</th></tr></thead>
+    <tbody>
+      <tr><td>Poids, en kilogrammes <span class="marque v2">V2</span></td><td>1 (non déclaré)</td><td>999</td><td>1</td><td>0,1</td><td>non</td></tr>
+      <tr><td>Poids, en livres <span class="marque v2">V2</span></td><td>1 (non déclaré)</td><td>2000</td><td>1</td><td>0,1</td><td>non</td></tr>
+      <tr><td>Poids, en kilogrammes (V1)</td><td>0,1</td><td>1000</td><td>1</td><td>0,1</td><td>non</td></tr>
+      <tr><td>Taille, en centimètres</td><td>50</td><td>300</td><td>0</td><td>1</td><td>non</td></tr>
+      <tr><td>Taille, en pouces <span class="marque v2">V2</span></td><td>20</td><td>118</td><td>0</td><td>1</td><td>non</td></tr>
+      <tr><td>Âge, en années (V1)</td><td>1</td><td>130</td><td>0</td><td>1</td><td>non</td></tr>
+      <tr><td>Année de naissance <span class="marque v2">V2</span></td><td>année courante − 130</td><td>année courante − 1</td><td>0</td><td>1</td><td>non</td></tr>
+      <tr><td>Mensuration, en centimètres (V1)</td><td>1</td><td>300</td><td>1</td><td>0,5</td><td>oui</td></tr>
+      <tr><td>Durée, en minutes (V1)</td><td>1</td><td>480</td><td>0</td><td>5</td><td>non</td></tr>
+      <tr><td>Étages (V1)</td><td>1</td><td>480</td><td>0</td><td>1</td><td>non</td></tr>
+      <tr><td>Distance fournie en kilomètres (V1)</td><td>0,1</td><td>1000</td><td>1</td><td>0,1</td><td>oui</td></tr>
+      <tr><td>Distance fournie en mètres (V1)</td><td>10</td><td>100000</td><td>0</td><td>10</td><td>oui</td></tr>
+      <tr><td>Dose, en milligrammes (V1)</td><td>0,001</td><td>1000000</td><td>3</td><td>0,25</td><td>non</td></tr>
+      <tr><td>Quantité d'un aliment (V1)</td><td>1</td><td>10000</td><td>1</td><td>10</td><td>non</td></tr>
+      <tr><td>Valeur nutritionnelle pour 100 (V1)</td><td>0</td><td>10000</td><td>1</td><td>0,1</td><td>oui</td></tr>
+      <tr><td>Poids d'un objet de comparaison, en grammes (V1)</td><td>1</td><td>1000000</td><td>0</td><td>1</td><td>non</td></tr>
+      <tr><td>Longueur de nom, en lettres (V1, outillage interne de revue)</td><td>0</td><td>200</td><td>0</td><td>1</td><td>oui</td></tr>
+    </tbody>
+  </table>
+  <p>Le pas non déclaré vaut un cran de la dernière décimale autorisée : 1 pour un entier, 0,1 pour une décimale, 0,001 pour trois.</p>
+  <p>Les deux plafonds de poids de la V2 ne sont pas la conversion l'un de l'autre : 999 kg valent 2 202 lb, et non 2 000. Ce sont deux plafonds ronds, chacun choisi dans son unité, et ce choix est délibéré. Le plancher de 1, lui, n'est déclaré nulle part : il tombe de la construction de l'ensemble des poids atteignables, dont le premier élément est 1.</p>
+  <p>Les bornes en pouces sont la conversion arrondie des bornes en centimètres : 50 cm donnent 20 pouces et 300 cm en donnent 118. La règle reste la fourchette en centimètres ; elle ne change pas d'unité.</p>
+  <p>La borne haute est facultative dans le modèle de contrainte : une grandeur peut n'avoir aucun plafond défendable, et n'en porter aucun ; la contrainte ne refuse alors rien par le haut. Le signe négatif n'est jamais admis : il est retiré de ce qui arrive plutôt que refusé après coup. Zéro reste une réponse juste là où elle a un sens — un aliment sans calories.</p>
+  <p>Une borne se tient de deux manières. En V1, une valeur hors bornes n'est pas retenue et la valeur enregistrée reste en place : le refus ne détruit rien. En V2, le poids, la taille et l'année de naissance ne se posent que par choix dans un ensemble énuméré, borné à la construction ; hors de cet ensemble aucune valeur n'est jamais produite, et il n'y a donc plus rien à refuser. <span class="marque v2">V2</span></p>
+  <p>Ce raisonnement est exact pour la taille et l'année de naissance, entières, dont l'ensemble énuméré est exactement l'intervalle. Il ne l'est pas pour le poids, la seule des trois à porter une décimale : l'ensemble atteignable est le produit d'une partie entière de 1 à 999 par un dixième de 0 à 9, soit le réseau discret <code>{1,0 ; 1,1 ; … ; 999,9}</code>. Son maximum, 999,9, dépasse le plafond déclaré de 999. <span class="marque">arbitrage non validé</span></p>
+  <details><summary>Cas limites</summary>
+    <ul>
+      <li>Une valeur non finie est refusée : la contrainte ne rend aucune valeur, et la valeur enregistrée reste en place. C'est un chemin distinct de l'absence de valeur, qui n'est admise que pour une grandeur facultative.</li>
+      <li>Une grandeur facultative distingue le vide de zéro : une mensuration non prise n'est pas une mensuration nulle.</li>
+      <li>Un plafond en pouces borne ce qui est fourni en pouces, pas le résultat de sa conversion : 118 pouces valent 300 cm, la borne en centimètres est donc atteinte exactement.</li>
+      <li>Le plafond de poids en V1 (1000 kg) est supérieur au plafond en V2 (999 kg) : une valeur déjà enregistrée entre les deux resterait valide. Aucune migration, aucune vérification à la lecture et aucune garde n'existe pour la ramener. <span class="marque non">non implémenté</span></li>
+    </ul>
+  </details>
+
+  <h3 id="grandeurs-les-arrondis-de-calcul">Les arrondis et la troncature</h3>
+  <p>Deux familles appartiennent à ce document. La troncature et l'arrondi d'écriture changent la valeur conservée ; l'arrondi de calcul détermine la valeur d'une grandeur dérivée. Ce qui n'existe que le temps d'exprimer un nombre vers l'extérieur ne touche aucune donnée et est hors de ce document.</p>
+  <p>Ce qui impose réellement la granularité d'une valeur fournie n'est pas un arrondi mais une <strong>troncature</strong> : les décimales au-delà du nombre autorisé sont coupées, non arrondies, et la valeur n'est pas refusée pour autant.</p>
+  <pre><code>tronquee(« 95.65 », 1 décimale) = « 95.6 »
+tronquee(« 95.65 », 0 décimale) = « 95 »</code></pre>
+  <p>L'arrondi d'écriture du poids s'applique ensuite, sur une valeur déjà tronquée : il ne modifie donc rien d'une valeur fournie à la main, et ne mord que sur une valeur produite par un calcul.</p>
+  <table>
+    <thead><tr><th>Grandeur</th><th>Règle</th><th>Moment</th></tr></thead>
+    <tbody>
+      <tr><td>Toute grandeur à décimales bornées</td><td>troncature au nombre de décimales autorisé</td><td>avant l'écriture</td></tr>
+      <tr><td>Poids (pesée, départ, visé) (V1)</td><td><code>arrondi(kg × 10) ÷ 10</code></td><td>à l'écriture</td></tr>
+      <tr><td>Distance d'une séance</td><td><code>arrondi(mètres)</code></td><td>à l'écriture</td></tr>
+      <tr><td>Taille convertie <span class="marque v2">V2</span></td><td><code>arrondi(pouces × 2,54)</code></td><td>à l'écriture</td></tr>
+      <tr><td>Heure d'une entrée</td><td>plus grande minute ronde inférieure ou égale</td><td>à l'écriture</td></tr>
+      <tr><td>Poids d'un objet de comparaison</td><td><code>grammes ÷ 1000</code>, sans arrondi</td><td>à l'écriture</td></tr>
+      <tr><td>IMC</td><td><code>arrondi(imc × 10) ÷ 10</code></td><td>au calcul</td></tr>
+      <tr><td>Points d'IMC</td><td><code>arrondi(écart × 10) ÷ 10</code>, sur l'écart et non sur les deux IMC</td><td>au calcul</td></tr>
+      <tr><td>Énergie dépensée par une séance ou par des pas</td><td>arrondi à l'entier, entrée par entrée</td><td>au calcul</td></tr>
+      <tr><td>Énergie ingérée d'une journée</td><td>arrondi à l'entier, une fois la somme faite</td><td>au calcul</td></tr>
+      <tr><td>Objectif de protéines par défaut</td><td><code>arrondi(poids × 1,5)</code></td><td>au calcul</td></tr>
+      <tr><td>Durée de marche estimée</td><td><code>arrondi(pas ÷ 95)</code>, en minutes</td><td>au calcul</td></tr>
+      <tr><td>Distance de marche estimée</td><td><code>(pas × 0,00076)</code> ramené à une décimale</td><td>au calcul</td></tr>
+      <tr><td>Pourcentage d'atteinte d'un objectif</td><td><code>max(0, min(100, arrondi(valeur ÷ objectif × 100)))</code></td><td>au calcul</td></tr>
+      <tr><td>Score d'activité d'une journée</td><td><code>arrondi(score × 10) ÷ 10</code></td><td>au calcul</td></tr>
+    </tbody>
+  </table>
+  <p>L'arrondi du poids au dixième vaut pour les trois poids du modèle de la V1 — la pesée, le poids de départ, le poids visé : la granularité est un invariant de la grandeur, pas une règle locale. L'arrondi des points d'IMC porte sur l'écart et non sur les deux IMC pris séparément, parce que retrancher deux valeurs déjà arrondies peut décaler le résultat d'un dixième entier.</p>
+  <p>Un cumul sur plusieurs jours n'est pas la somme des valeurs journalières arrondies : le métabolisme de base est accumulé sans arrondi et le total n'est arrondi qu'une fois, si bien que le total d'une semaine peut différer d'une unité de la somme de ses sept valeurs journalières.</p>
+  <details><summary>Cas limites</summary>
+    <ul>
+      <li>La seule opération qui arrondisse au pas déclaré est le déplacement d'une valeur d'un cran, pour écarter les résidus de la virgule flottante. Le chemin ordinaire d'une valeur fournie tronque et n'arrondit jamais au pas.</li>
+      <li>Une valeur déplacée d'un cran est ramenée dans les bornes plutôt que refusée ; un déplacement ne produit jamais une valeur hors bornes.</li>
+      <li>L'arrondi d'une heure est toujours vers le bas, jamais au plus proche : arrondir vers le haut produirait un instant futur, qu'aucun calcul rapporté à l'instant présent ne compterait.</li>
+      <li>Deux modèles de foulée coexistent : la distance de marche estimée d'un nombre de pas emploie une foulée fixe de 0,00076 km, tandis que l'énergie dépensée par ces mêmes pas emploie une foulée proportionnelle à la taille (<code>taille_cm × 0,414 ÷ 100000</code> km). Les deux donnent des distances différentes pour le même nombre de pas. <span class="marque">arbitrage non validé</span></li>
+    </ul>
+  </details>
+
+  <h3 id="grandeurs-l-ecriture-d-un-nombre">L'écriture d'un nombre au stockage</h3>
+  <p>Le séparateur décimal du stockage est le point, dans toutes les langues et dans tous les systèmes d'unités. Le séparateur qu'une langue emploie — la virgule en français, le point en anglais — est une propriété de la langue et ne touche jamais la valeur conservée : une valeur écrite « 95,1 » puis relue dans une autre langue ne voudrait plus rien dire.</p>
+  <p>Un nombre conservé ne porte ni séparateur de milliers, ni étiquette d'unité, ni signe positif. Ce qui arrive est nettoyé avant d'être interprété : la virgule devient un point, tout ce qui n'est ni chiffre ni point est retiré, un seul point survit, les décimales au-delà du nombre autorisé sont tronquées plutôt que refusées, un point final orphelin est retiré, et le signe négatif est retiré. Le nettoyage ne borne pas : il vaut sur toute valeur partielle, alors que la vérification des bornes ne vaut qu'une fois la valeur complète — sans quoi une valeur en cours de composition serait refusée avant d'avoir atteint son minimum.</p>
+  <p>La valeur retenue est la chaîne nettoyée elle-même, sans recomposition : « 70 » reste « 70 » et ne devient pas « 70.0 ». Une valeur absente reste absente ; aucune substitution — ni zéro, ni moyenne — ne prend sa place.</p>
+  <p>Une valeur peut transiter sous forme de texte avant d'être enregistrée ; elle porte alors le point décimal, la même forme dans toutes les langues, et sa conversion en nombre a lieu à l'enregistrement. <span class="marque v2">V2</span></p>
+  <details><summary>Cas limites</summary>
+    <ul>
+      <li>Une chaîne réduite à un point vaut une valeur vide, admise pour une grandeur facultative et refusée sinon.</li>
+      <li>Une chaîne dont le nettoyage ne laisse rien vaut également une valeur vide.</li>
+      <li>Le format déjà enregistré ne change pas sans migration explicite ; aucun code de migration n'existe à ce jour. <span class="marque non">non implémenté</span></li>
+    </ul>
+  </details>
+  <div class="exemple"><p>Camille est partie de 96 kg en mai 2026. La valeur conservée est <code>96</code>, la même dans toutes les langues. Une pesée fournie à 95,65 kg est conservée à <code>95.6</code> : la troncature au dixième la coupe avant que l'arrondi ne la voie, et l'arrondi ne la remonte pas à 95,7.</p></div>
+
+  <h3 id="grandeurs-les-echelles-sans-unite">Les échelles sans unité</h3>
+  <p>Certaines grandeurs sont des positions sur une échelle et non des mesures. Leur seule définition est l'intervalle et l'ordre de leurs échelons.</p>
+  <table>
+    <thead><tr><th>Grandeur</th><th>Valeurs</th><th>Sens</th></tr></thead>
+    <tbody>
+      <tr><td>Faim avant un repas, faim après</td><td>entier de 0 à 5</td><td>croissant</td></tr>
+      <tr><td>Qualité d'un sommeil</td><td>entier de 0 à 5, six échelons nommés</td><td>croissant, de « Très mauvaise » à « Excellente »</td></tr>
+      <tr><td>Sévérité d'un effet indésirable</td><td>entier de 0 à 5, six échelons nommés</td><td>croissant, de « Imperceptible » à « Élevé »</td></tr>
+      <tr><td>Score d'activité d'une journée</td><td>nombre de 0 à 10, au dixième</td><td>croissant, plafonné</td></tr>
+      <tr><td>Intensité d'une séance</td><td>trois valeurs nommées : douce, modérée, intensive</td><td>ordinale, avec les facteurs 0,8, 1,0 et 1,3</td></tr>
+    </tbody>
+  </table>
+  <p>Le type du modèle cible déclare la sévérité de 1 à 5 ; rien ne l'applique, et ce qui est écrit aujourd'hui peut valoir 0. L'échelle vivante est celle des six échelons nommés. <span class="marque">arbitrage non validé</span></p>
+  <p>Le score d'activité n'est pas conservé : il se calcule à partir des minutes pondérées d'une journée, la durée de chaque séance multipliée par son facteur d'intensité, un étage valant une demi-minute d'équivalent. 78 minutes pondérées valent le score plein de 10, au-delà duquel il est plafonné : le plafond fait qu'une séance de trois heures ne vaut pas trois journées.</p>
+  <pre><code>minutesPonderees = durée × facteurIntensite      (étages : durée × 0,5 × facteur)
+score            = min(minutesPonderees ÷ 78 × 10, 10)</code></pre>
+  <p>Une valeur d'échelle conservée à sa valeur de départ est indiscernable d'une valeur choisie : rien dans la donnée ne distingue une qualité de sommeil laissée à sa position initiale d'une qualité posée volontairement. Les entrées ainsi conservées restent ambiguës et ne sont pas réécrites — les réécrire détruirait aussi les vraies valeurs basses.</p>
+  <div class="exemple"><p>Camille marche 45 minutes à intensité modérée : 45 minutes pondérées, soit un score de 45 ÷ 78 × 10 = 5,769, tracé 5,8. Ses 6 200 pas contre un objectif de 8 000 donnent un pourcentage d'atteinte de 78.</p></div>
+
+  <h3 id="grandeurs-les-grandeurs-derivees">Les grandeurs dérivées</h3>
+  <p>Rien de dérivable n'est conservé : une grandeur dérivée se recalcule à chaque lecture, de sorte que corriger une valeur source corrige tout l'historique qui en dépend. Les formules ci-dessous prennent leurs entrées dans les unités de conservation.</p>
+  <pre><code>imc            = arrondi(kg ÷ (cm ÷ 100)² × 10) ÷ 10
+pointsImc      = arrondi((kgActuel − kgDepart) ÷ (cm ÷ 100)² × 10) ÷ 10
+metabolismeBase= 10 × kg + 6,25 × cm − 5 × ans + 5      (homme)
+                 10 × kg + 6,25 × cm − 5 × ans − 161    (femme)
+                 moyenne des deux                        (neutre)
+energiePas     = arrondi(3,5 × kg × (pas × (cm × 0,414 ÷ 100000)) ÷ 4,2)
+distanceMarche = pas × 0,00076                           (km, une décimale)
+dureeMarche    = arrondi(pas ÷ 95)                       (minutes)
+energieSeance  = arrondi(MET × facteurIntensite × kg × minutes ÷ 60)
+energieEtages  = arrondi(0,05 × facteurIntensite × kg × etages)
+nutriment      = valeurPour100 × quantite ÷ 100
+pourcentage    = max(0, min(100, arrondi(valeur ÷ objectif × 100)))</code></pre>
+  <p>Le MET est un équivalent métabolique : une kilocalorie par kilogramme de masse corporelle et par heure. C'est ce qui rend homogène <code>MET × kg × heures</code>, dont le résultat est en kilocalories. Le MET de la marche vaut 3,5 dans la formule des pas, dont la vitesse de référence est fixée à 4,2 km/h.</p>
+  <p>Quand une séance porte une distance non nulle, une durée non nulle et que son activité admet une allure, l'énergie ne se lit plus sur l'intensité ressentie mais sur l'allure, exprimée en kilomètres par heure : <code>allure = mètres ÷ 1000 ÷ heures</code>, puis un coût énergétique interpolé linéairement entre les deux points d'une table d'ancrages, bloqué à la valeur du point extrême au-delà des bornes de la table. Le facteur tiré de l'allure est ramené à la même plage que le ressenti, de 0,8 à 1,3, faute de quoi les deux chemins ne seraient plus comparables.</p>
+  <p>Un pourcentage d'atteinte est une grandeur dérivée bornée sans unité : il vaut 0 quand l'objectif est nul ou négatif, et il est ramené dans <code>[0, 100]</code>.</p>
+  <p>L'IMC vaut 0 quand la taille est inconnue ou nulle ; les points d'IMC valent alors une absence de valeur, et non zéro. Le signe des points d'IMC est celui de la variation : perdre du poids donne un nombre négatif.</p>
+  <p>La concentration sanguine d'une molécule est une grandeur dérivée sans unité physiologique : elle est exprimée sur l'échelle de la dose, en milligrammes, mise à l'échelle par la biodisponibilité relative de la forme prise et normalisée pour que son maximum vaille la dose ainsi mise à l'échelle. Elle n'est comparable qu'à elle-même.</p>
+  <details><summary>Cas limites</summary>
+    <ul>
+      <li>Une quantité dont l'aliment ne se résout pas est ignorée dans un total plutôt que comptée pour zéro : le total reste juste pour ce qui est connu.</li>
+      <li>Un poids total nul dans une composition donne des valeurs nulles, jamais une division par zéro.</li>
+      <li>Une activité absente du catalogue n'a pas de MET ; le score d'activité la compte quand même, puisqu'il ne demande qu'une durée et une intensité.</li>
+      <li>Le poids employé par une formule dérivée est le dernier poids connu à la date considérée, à défaut le poids de départ, à défaut le poids visé, à défaut 80 kg.</li>
+    </ul>
+  </details>
+  <div class="exemple"><p>Camille, née en 1978, 168 cm, 96 kg : son IMC vaut 96 ÷ 1,68² = 34,01…, soit 34,0. À 85,9 kg il vaut 30,4, et la variation est de −3,6 points d'IMC. Son métabolisme de base, à 48 ans, vaut 10 × 96 + 6,25 × 168 − 5 × 48 − 161 = 1 609 kcal. Ses 6 200 pas donnent 4,7 km par la foulée fixe, 65 minutes de marche, et 345 kcal par la foulée proportionnelle à sa taille, qui ne compte que 4,31 km.</p></div>
+
+  <h3 id="grandeurs-le-temps-comme-grandeur">Le temps comme grandeur</h3>
+  <p>Une durée est conservée en minutes entières, jamais en texte. Un instant technique est un nombre de millisecondes depuis l'époque Unix. Une date et une heure d'entrée sont des chaînes d'heure murale locale, sans fuseau ni suffixe : elles sont lues sur les composantes locales de l'horloge, jamais sur une représentation universelle, faute de quoi une entrée faite en soirée ou en début de nuit changerait de jour selon le fuseau.</p>
+  <p>Toute heure conservée est quantifiée sur huit minutes rondes, arrondie vers le bas.</p>
+  <pre><code>minutesRondes = { 0, 10, 15, 20, 30, 40, 45, 50 }
+heureConservee(h:m) = h : max{ r ∈ minutesRondes | r ≤ m }
+14:37 → 14:30   14:47 → 14:45   14:58 → 14:50   14:07 → 14:00</code></pre>
+  <p>La quantification est appliquée au moment d'écrire, dans le domaine, et non au moment où la valeur est fournie : l'ensemble étant irrégulier, il mêle des pas de cinq et de dix. Elle vaut pour toutes les heures conservées, y compris celles d'un rappel et les deux heures d'un sommeil.</p>
+  <p>Fuseau et langue sont indépendants : la langue ne détermine que la manière d'écrire une date, jamais le jour auquel une entrée appartient.</p>
+  <details><summary>Cas limites</summary>
+    <ul>
+      <li>Une chaîne qui n'a pas la forme <code>HH:MM</code>, ou dont les minutes dépassent 59, ressort inchangée de la quantification : c'est aux vérifications amont de la refuser.</li>
+      <li>Une entrée sans heure est réputée avoir eu lieu ; pour ordonner les entrées d'un même jour, une heure absente vaut midi.</li>
+      <li>L'arrondi vers le bas garantit que l'heure conservée est déjà passée et que le passage à minuit n'est jamais franchi.</li>
+      <li>Une nuit appartient au jour de son réveil : les deux jours, celui de l'endormissement et celui du réveil, sont conservés séparément, ce qui rend détectable une paire d'instants impossible.</li>
+    </ul>
+  </details>
+</section>

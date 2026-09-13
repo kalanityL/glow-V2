@@ -1,0 +1,101 @@
+<section id="partage">
+  <h2>20. Le partage <a class="retour" href="#sommaire">↑ sommaire</a></h2>
+  <p>Ce chapitre décrit le seul partage du carnet : celui d'un badge gagné. Il donne la charge remise au système, la géométrie et l'encodage de l'image jointe, l'ordre des tests de capacité et le repli presse-papier.</p>
+
+  <h3 id="partage-entites">Entités</h3>
+  <p>Le partage n'écrit rien : aucune clé de stockage, aucun compteur, aucune trace du geste. Tous ses objets sont transitoires, construits à l'appel et perdus au retour. Il lit trois choses : la définition du badge, le palier atteint et le composant qui dessine le badge.</p>
+  <table>
+    <thead><tr><th>Objet</th><th>Champs</th><th>Nature</th></tr></thead>
+    <tbody>
+      <tr>
+        <td><code>BadgeDefinition</code> (lu)</td>
+        <td><code>id</code> (chaîne : <code>athlete</code>, <code>lapin</code>, <code>kangourou</code>, <code>herisson</code>), <code>title</code>, <code>animalOrRole</code>, <code>categoryName</code>, <code>categoryEnabled(profile)</code>, <code>getTier(appData)</code>, <code>criteria</code> (<code>eveil</code>, <code>bronze</code>, <code>argent</code>, <code>or</code>, <code>notes?</code>)</td>
+        <td>Constante de code (<code>ALL_BADGE_DEFINITIONS</code>), non stockée. Le partage n'en lit que <code>id</code>, <code>title</code> et <code>criteria</code>.</td>
+      </tr>
+      <tr>
+        <td><code>BadgeTier</code> (lu)</td>
+        <td><code>'aucun' | 'eveil' | 'bronze' | 'argent' | 'or'</code>, dans cet ordre croissant</td>
+        <td>Palier calculé à la volée par <code>getTier</code>, jamais stocké par le partage.</td>
+      </tr>
+      <tr>
+        <td><code>BadgeDrawing</code> (lu)</td>
+        <td>Composant React de props <code>{ id, tier, sizePxOverride?, iconOnly? }</code></td>
+        <td>Passé par l'écran qui partage, parce que chaque version du site a le sien.</td>
+      </tr>
+      <tr>
+        <td><code>File</code> (produit)</td>
+        <td>nom <code>badge-{id}-{tier}.jpg</code>, type MIME <code>image/jpeg</code></td>
+        <td>Dérivé, jamais écrit sur disque par l'application : remis au système, ou abandonné.</td>
+      </tr>
+      <tr>
+        <td><code>ShareData</code> (produit)</td>
+        <td><code>title</code>, <code>text</code>, <code>url</code>, <code>files?</code></td>
+        <td>Charge remise à <code>navigator.share</code>. <code>files</code> n'existe que si le système l'accepte.</td>
+      </tr>
+    </tbody>
+  </table>
+  <p class="ancre">src/utils/badgeSystem.ts, src/utils/badgeShare.ts, src/utils/badgeCardImage.ts</p>
+
+  <h3 id="partage-partage-d-un-badge">Partage d'un badge</h3>
+  <p>Une seule fonction, <code>shareBadgeItem(badge, tier, BadgeIcon, onNotice?)</code>. Elle compose le texte, tente de peindre la carte, puis remet la charge à la feuille de partage du système ; sans feuille de partage, elle copie le texte seul. Elle ne rend rien et ne lève rien.</p>
+  <pre><code>texte  = `🏆 J'ai débloqué le badge "${badge.title}" Niveau ${BADGE_TIER_LABELS[tier].toUpperCase()} sur G(lp1)LOW`
+carte  = await renderBadgeCardFile(badge, tier, BadgeIcon)   // toujours appelée, même sans navigator.share
+fichiers = (carte &amp;&amp; navigator.canShare &amp;&amp; navigator.canShare({ files: [carte] })) ? [carte] : []
+
+si navigator.share :
+    charge = { title: `Badge ${badge.title} - GLP1LOW`, text: texte, url: window.location.href }
+    si fichiers.length &gt; 0 : charge.files = fichiers
+    si navigator.canShare &amp;&amp; !navigator.canShare(charge) &amp;&amp; fichiers.length &gt; 0 : delete charge.files
+    essayer await navigator.share(charge)
+    attraper err : si err.name !== 'AbortError' → console.error ; rien à l'écran
+sinon :
+    essayer await navigator.clipboard.writeText(texte)       // le TEXTE seul : ni titre, ni url
+            onNotice?.('Lien et texte de partage copiés dans le presse-papier.')
+    attraper → console.error ; rien à l'écran</code></pre>
+  <p>Ordre des opérations : le texte d'abord, la carte ensuite (attendue), les deux tests de capacité enfin. Le premier test porte sur le fichier seul, le second sur la charge entière — titre, texte, adresse et fichier ; il ne peut retirer que les fichiers. Le libellé du palier vient de <code>BADGE_TIER_LABELS</code>, jamais de <code>tier.toUpperCase()</code>, pour que « ÉVEIL » garde son accent.</p>
+  <p><code>onNotice</code> n'est fourni que par la page Badges (<code>setShareNotice</code>) ; le bloc de célébration appelle <code>shareBadgeItem(badge, tier, BadgeIcon)</code> sans quatrième argument et n'affiche donc jamais la notice. <a href="spec-fonctionnelle.html#partage-partager-un-badge">→ fonctionnelle</a></p>
+
+  <p><strong>La carte.</strong> <code>renderBadgeCardFile</code> peint dans un canvas de 600 × 600 unités mis à l'échelle 2 (<code>ctx.scale(2, 2)</code>) : le fichier sort à 1 200 × 1 200 px. Toutes les coordonnées ci-dessous sont dans l'espace 600 × 600.</p>
+  <table>
+    <thead><tr><th>Élément</th><th>Géométrie</th><th>Style</th></tr></thead>
+    <tbody>
+      <tr><td>Fond</td><td><code>fillRect(0, 0, 600, 600)</code></td><td>Dégradé linéaire (0,0) → (600,600), <code>#f8fafc</code> → <code>#e2e8f0</code></td></tr>
+      <tr><td>Carte</td><td><code>roundRect(50, 50, 500, 500, 32)</code></td><td><code>#FFFFFF</code>, ombre <code>rgba(0,0,0,0.15)</code> flou 30 décalée de 10 en y, puis ombre remise à zéro</td></tr>
+      <tr><td>Pastille de palier</td><td><code>roundRect(210, 75, 180, 34, 17)</code>, texte centré en (300, 97)</td><td>Fond <code>tierBg</code>, encre <code>tierColor</code>, <code>bold 14px sans-serif</code>, texte <code>★ NIVEAU {tierName} ★</code></td></tr>
+      <tr><td>Dessin du badge</td><td><code>drawImage(img, 185, 120, 230, 230)</code></td><td>SVG du composant rendu par <code>renderToStaticMarkup</code> à <code>sizePxOverride: 460</code>, <code>iconOnly: true</code>, extrait par expression régulière, chargé en blob <code>image/svg+xml</code></td></tr>
+      <tr><td>Titre</td><td>centré en (300, 375)</td><td><code>bold 24px sans-serif</code>, <code>#0f172a</code></td></tr>
+      <tr><td>Critère</td><td>centré en (300, 402), largeur maximale 420</td><td><code>14px sans-serif</code>, <code>#64748b</code></td></tr>
+      <tr><td>Filet</td><td>(120, 428) → (480, 428)</td><td><code>#e2e8f0</code>, épaisseur 2</td></tr>
+      <tr><td>Marque</td><td><code>drawImage(img, 215, 436, 170, 41)</code></td><td>SVG en dur : pavé logo dégradé <code>#38bdf8</code> → <code>#14b8a6</code> → <code>#34d399</code>, « G » et l'empilement L/P/1 en <code>#14b8a6</code>, « LOW » en <code>#082f49</code>, baseline « READY, SHINE, GLOW! » en <code>#0d9488</code></td></tr>
+      <tr><td>Mention</td><td>centrée en (300, 492)</td><td><code>12px sans-serif</code>, <code>#94a3b8</code>, « © Partagé depuis l'application officielle GLP1LOW »</td></tr>
+    </tbody>
+  </table>
+  <p>Couleurs et nom du palier, écrits en dur dans le canvas (il ne lit ni le CSS ni le thème) : bronze <code>#d97706</code> sur <code>#fef3c7</code>, « BRONZE » ; éveil <code>#075985</code> sur <code>#f0f9ff</code>, « ÉVEIL » ; argent <code>#2563eb</code> sur <code>#eff6ff</code>, « ARGENT » ; or <code>#ca8a04</code> sur <code>#fef9c3</code>, « OR ». Le bronze est la valeur par défaut : tout palier hors de cette liste, <code>aucun</code> compris, sort en bronze.</p>
+  <p>Le critère affiché est <code>badge.criteria[tier === 'aucun' ? 'bronze' : tier]</code>, avec une exception unique : pour <code>badge.id === 'athlete'</code> (Kangourou Musclé), il est remplacé par « Récompense votre régularité dans la pratique d'une activité physique », quel que soit le palier.</p>
+  <p>Encodage : <code>canvas.toBlob(resolve, 'image/jpeg', 0.95)</code>, puis <code>new File([blob], `badge-${badge.id}-${tier}.jpg`, { type: 'image/jpeg' })</code>. Pas de PNG, pas de transparence, pas de QR code.</p>
+  <p class="ancre">src/utils/badgeShare.ts, src/utils/badgeCardImage.ts, src/utils/badgeSystem.ts, src/versions/mixte/components/BadgesPage.tsx, src/versions/mixte/components/UnlockedBadgeBlock.tsx</p>
+  <details><summary>Cas limites</summary>
+    <ul>
+      <li>Contexte 2D indisponible (<code>getContext('2d')</code> nul), <code>roundRect</code> absent, ou n'importe quelle exception du peintre : <code>renderBadgeCardFile</code> rend <code>null</code> ; le partage part en texte, titre et adresse, sans image.</li>
+      <li><code>toBlob</code> rend <code>null</code> : même issue, <code>null</code> et partage sans image.</li>
+      <li>Le SVG du badge ne charge pas (<code>img.onerror</code>) : la promesse est résolue quand même, la carte est produite <em>sans le dessin</em> — fond, pastille, titre, critère, marque restent. Même chose pour le SVG de la marque : la carte sort sans logo.</li>
+      <li><code>navigator.canShare</code> absent : le fichier est joint sans vérification et les deux tests sont sautés ; c'est la feuille de partage qui décide.</li>
+      <li><code>canShare</code> refuse le fichier : la liste reste vide, la charge part sans <code>files</code>, la carte peinte est jetée.</li>
+      <li><code>canShare</code> refuse la charge entière alors que la liste de fichiers est vide : rien n'est retiré, <code>navigator.share</code> est appelé quand même.</li>
+      <li>Annulation par la personne : <code>AbortError</code>, avalé, aucun message.</li>
+      <li>Autre erreur de <code>navigator.share</code> : <code>console.error</code> seulement, aucun message à l'écran.</li>
+      <li><code>navigator.share</code> absent : la carte a déjà été peinte et est perdue ; seul le texte est copié. L'adresse n'est pas copiée, la notice l'annonce pourtant.</li>
+      <li>Copie refusée (permission, contexte non sécurisé) : <code>console.error</code>, ni notice ni message d'erreur.</li>
+      <li>Palier <code>aucun</code> : le texte dirait « Niveau AUCUN » et la carte porterait « ★ NIVEAU BRONZE ★ » avec le critère bronze. Le cas ne se produit pas depuis les écrans : la page Badges ne montre le bouton que pour les badges filtrés <code>tier !== 'aucun'</code>, et le bloc de célébration ne s'ouvre que sur une montée de palier.</li>
+      <li>La notice de la page Badges n'a pas de minuterie : elle est effacée par <code>setShareNotice(null)</code> au clic sur le dessin d'un badge — le seul geste qui ouvre le badge en grand —, pas par la croix de fermeture.</li>
+      <li>Un titre de badge trop long n'est pas tronqué : <code>fillText</code> l'écrit sans largeur maximale et il peut déborder de la carte blanche. Seul le critère est contraint, à 420 unités, et le canvas le condense au lieu de le couper.</li>
+    </ul>
+  </details>
+  <div class="exemple">
+    <p>Camille dépasse 8 000 pas quatre jours sur les sept derniers : <code>evaluateHerissonBadge</code> rend <code>argent</code> et le bloc de célébration s'ouvre. Elle touche Partager. Texte : <code>🏆 J'ai débloqué le badge "Hérisson Marcheur" Niveau ARGENT sur G(lp1)LOW</code>. Titre : <code>Badge Hérisson Marcheur - GLP1LOW</code>. Adresse : <code>window.location.href</code>. Fichier : <code>badge-herisson-argent.jpg</code>, JPEG 1 200 × 1 200 px de qualité 0,95, pastille <code>★ NIVEAU ARGENT ★</code> en <code>#2563eb</code> sur <code>#eff6ff</code>, titre « Hérisson Marcheur », critère « 8 000 pas par jour pendant 4 jours /7j ». Le bloc de célébration ne passant pas <code>onNotice</code>, un navigateur sans <code>navigator.share</code> copierait le texte et n'afficherait rien.</p>
+  </div>
+  <p>Le partage d'un badge appelle <code>navigator.share</code> et <code>navigator.clipboard</code> en direct, sans passer par <code>shared/platform/share</code> ni <code>shared/platform/clipboard</code> : le contrat de <code>shareNative</code> ne joint pas l'adresse au fichier et ne retire pas les fichiers refusés, donc l'aligner changerait ce que reçoit l'application de destination. Unification renvoyée à la conversion native. <span class="marque">arbitrage non validé</span></p>
+
+  <p><strong>Rien d'autre ne se partage.</strong> Deux surfaces existent dans le code sans qu'aucun écran du carnet mixte les affiche : <code>ShareBlock</code> (carte 1080 × 1920 peinte au canvas, <code>shareNative</code>, téléchargement PNG, lien Facebook, copie de légende pour Instagram), montée seulement par les écrans de la version cartes, et <code>buildSportShareConfig</code> (la légende d'une séance d'activité physique), qui n'alimente que <code>ShareBlock</code>. Les quinze maquettes de <code>share/shareTemplates.tsx</code> sont des aperçus dessinés en HTML : elles ne produisent ni fichier ni appel de partage.</p>
+  <p class="ancre">src/shared/components/ShareBlock.tsx, src/shared/platform/share.ts, src/shared/platform/clipboard.ts, src/features/sport/sport.utils.ts, src/versions/mixte/components/share/shareTemplates.tsx</p>
+</section>

@@ -1,0 +1,516 @@
+{
+ "inventions": [
+  {
+   "categorie": "mesure",
+   "fonctionnalite": "Poids du fichier et durée de génération",
+   "texte": "Le rapport de Camille (30 jours, sept sections) pèse environ N Ko et se construit en M millisecondes.",
+   "origine": "Le seul chiffre du dépôt est une mesure du 2026-08-23 sur un jeu d'essai non décrit — 378 Ko sans police ni compression, 436 Ko avec la police seule, 83 Ko avec les deux, « génération sous la centaine de millisecondes ». Rien ne l'attache à une période, à un nombre de sections ni à un volume de journaux : la transposer à Camille serait une extrapolation."
+  },
+  {
+   "categorie": "règle",
+   "fonctionnalite": "Export sur une période à l'envers",
+   "texte": "L'export refuse de partir tant que la période est invalide, ou corrige la borne fautive.",
+   "origine": "Le code ne bloque ni ne corrige rien : le message est purement indicatif, le bouton reste actif, le document sort avec des journaux vides et un nombre de jours couverts nul ou négatif. Aucune décision n'existe sur ce que le document devrait faire dans ce cas."
+  },
+  {
+   "categorie": "règle",
+   "fonctionnalite": "Accord de la ligne secondaire de la section IV",
+   "texte": "« 1 jour relevé » au singulier, « N jours relevés » au pluriel, comme les cartouches.",
+   "origine": "Le code écrit « jours relevés » en dur, sans accord ; l'accord n'existe que pour les cartouches, par l'auxiliaire `chiffre`. L'écrire accordé serait décrire un correctif, pas le code."
+  },
+  {
+   "categorie": "V2",
+   "fonctionnalite": "Repère de thème dans le bandeau",
+   "texte": "Le repère de débogage « thème : … » du bandeau disparaît en V2.",
+   "origine": "Le champ `debugThemeName` est marqué provisoire dans le code V1 et documente sa procédure de retrait, mais ni GUIDELINES.md ni le code V2 ne tranchent son sort. Annoncer sa disparition serait décider à sa place."
+  },
+  {
+   "categorie": "V2",
+   "fonctionnalite": "Langue du document",
+   "texte": "Le PDF s'écrit dans la langue choisie à l'onboarding.",
+   "origine": "Tous les libellés du document sont en français en dur, y compris les noms de mois et les mots de sévérité. GUIDELINES §4 dit que la langue de l'onboarding est recueillie et non branchée, et aucune décision ne concerne le rapport."
+  }
+ ],
+ "glossaire": [
+  {
+   "terme": "Bornes effectives",
+   "definition": "Le couple (periodStart, periodEnd) réellement employé par le document, replis compris : la coupure ou la borne saisie d'un côté, la borne de fin saisie ou aujourd'hui de l'autre."
+  },
+  {
+   "terme": "Coupure (cutoff)",
+   "definition": "La date de début d'une fenêtre fixe : aujourd'hui − (N − 1), N valant 7, 14, 30 ou 90. La fenêtre est inclusive et compte le jour en cours."
+  },
+  {
+   "terme": "Fenêtre fixe",
+   "definition": "Une des quatre fenêtres à N jours du sélecteur commun, par opposition à « Depuis le début » (all) et « Choisir » (custom)."
+  },
+  {
+   "terme": "Masque des données disponibles",
+   "definition": "La table `available` : pour chaque journal, vrai si son module est actif et si la période porte des données. Croisée avec les cases cochées, elle donne `effective`."
+  },
+  {
+   "terme": "Section effective",
+   "definition": "Une section que le document dessine réellement : sa case est cochée et son masque est vrai."
+  },
+  {
+   "terme": "Tirage",
+   "definition": "Le choix de palette au moment du clic : noir et blanc, couleurs du thème, ou neutre. Jamais mémorisé."
+  },
+  {
+   "terme": "patterned",
+   "definition": "Drapeau de palette : les séries se distinguent par la texture (barres hachurées) et non par la couleur, et les encres nutritionnelles reviennent au gris."
+  },
+  {
+   "terme": "Cartouche (mini-tuile)",
+   "definition": "Une case de 16 mm de haut portant une valeur en gros, éventuellement une seconde valeur, et une légende en petites capitales. Cinq par rangée au plus."
+  },
+  {
+   "terme": "Rangée fermée",
+   "definition": "Une rangée de cartouches qu'aucun groupe suivant ne peut venir compléter. Seul le groupe poids ferme la sienne, pour tenir sa légende la plus longue."
+  },
+  {
+   "terme": "Jauge",
+   "definition": "La barre de progression du site portée au papier : un rail en pilule de 60 × 3,4 mm, rempli d'un dégradé, employé par la section III pour la sévérité moyenne d'un type d'effet."
+  },
+  {
+   "terme": "Grille fusionnée",
+   "definition": "Une carte d'annexe réunissant deux ou trois mois voisins sous un même bandeau, chacun gardant sa colonne."
+  },
+  {
+   "terme": "Semaine partagée",
+   "definition": "La dernière ligne de la grille d'un mois quand elle est identique, date par date, à la première ligne du mois suivant. Elle reste au mois précédent."
+  },
+  {
+   "terme": "Journée documentée",
+   "definition": "Une date portée par au moins une entrée de journal ; un relevé de pas à 0 n'en est pas une."
+  },
+  {
+   "terme": "Journée renseignée",
+   "definition": "Le dénominateur des moyennes alimentaires et de sommeil : une journée portant au moins une saisie du journal concerné, jamais un jour de la période."
+  },
+  {
+   "terme": "Journée dormie",
+   "definition": "Une journée dont la somme nuit + siestes est strictement positive ; le dénominateur de la moyenne de sommeil et le point du graphe."
+  },
+  {
+   "terme": "Pesée de départ",
+   "definition": "La pesée portant le drapeau `isStartingWeight`, cherchée sur l'historique complet et jamais reconnue à sa valeur."
+  },
+  {
+   "terme": "Série en cours",
+   "definition": "Les prises passées du traitement actuel, à partir du dernier changement de traitement ; sa première ligne donne la date de première prise de l'encart d'identité."
+  },
+  {
+   "terme": "Palier de dose",
+   "definition": "Le tracé en marches du graphique II : la dose de la dernière prise est tenue jusqu'à la suivante, puis jusqu'au bord droit du cadre. Rien avant la première prise."
+  },
+  {
+   "terme": "Palier de teinte",
+   "definition": "L'indice 1 à 5 d'une barre de sommeil, ceil(5 × durée / durée max), qui choisit son encre dans `palette.sleepTiers`."
+  },
+  {
+   "terme": "Sous-embarquement",
+   "definition": "La double réduction de la police : 349 points de code coupés dans le dépôt, puis les seuls glyphes employés par ce document-là embarqués par jsPDF."
+  },
+  {
+   "terme": "Plancher d'affichage",
+   "definition": "Les 450 ms pendant lesquelles le bouton reste « Génération… », comptés depuis le clic et tenus dans le `finally`. Le fichier, lui, n'est pas retardé."
+  },
+  {
+   "terme": "Seuil du panneau",
+   "definition": "Les 250 ms de délai d'apparition du sommaire d'attente ; sous ce temps, le panneau est retiré de l'affichage plutôt que de clignoter."
+  },
+  {
+   "terme": "Fiche d'échec",
+   "definition": "L'objet `ReportExportFailure` : erreur, étape, période, cases, volumes, tirage, temps écoulé. Des comptes et des bornes, jamais des valeurs de santé."
+  },
+  {
+   "terme": "Étape (stage)",
+   "definition": "Le moment de l'export en cours : preparation, palette, construction, enregistrement. Elle distingue trois recherches différentes dans une fiche d'échec."
+  },
+  {
+   "terme": "Volumes",
+   "definition": "Les onze comptes d'entrées joints à une fiche d'échec, plus leur somme : la taille du travail, jamais son contenu."
+  },
+  {
+   "terme": "Réservation (ensure)",
+   "definition": "L'appel qui ouvre une page si les millimètres demandés ne tiennent pas sous BOTTOM. C'est lui qui empêche un titre orphelin et une grille coupée."
+  },
+  {
+   "terme": "Colonne nutritionnelle (NUT_X)",
+   "definition": "L'abscisse 105 mm d'où partent toutes les valeurs nutritionnelles, alignées à gauche, pour qu'une ligne courte et une ligne longue commencent au même endroit."
+  }
+ ],
+ "index": [
+  {
+   "terme": "Bornes effectives",
+   "ancre": "rapport-periode-du-rapport-et-bornes-effectives"
+  },
+  {
+   "terme": "Coupure (cutoff)",
+   "ancre": "rapport-periode-du-rapport-et-bornes-effectives"
+  },
+  {
+   "terme": "filterByTimeWindow",
+   "ancre": "rapport-periode-du-rapport-et-bornes-effectives"
+  },
+  {
+   "terme": "oldestEntryDate",
+   "ancre": "rapport-periode-du-rapport-et-bornes-effectives"
+  },
+  {
+   "terme": "Période invalide",
+   "ancre": "rapport-refus-de-periode-invalide"
+  },
+  {
+   "terme": "Masque des données disponibles",
+   "ancre": "rapport-bascules-proposees-masque-des-donnees-disponibles"
+  },
+  {
+   "terme": "isModuleOn",
+   "ancre": "rapport-bascules-proposees-masque-des-donnees-disponibles"
+  },
+  {
+   "terme": "Section effective",
+   "ancre": "rapport-masque-des-sections-dessinees"
+  },
+  {
+   "terme": "available / effective",
+   "ancre": "rapport-masque-des-sections-dessinees"
+  },
+  {
+   "terme": "DEFAULT_INCLUDE",
+   "ancre": "rapport-defauts-et-memorisation-des-choix-du-sur-mesure"
+  },
+  {
+   "terme": "glow_report_include_v2",
+   "ancre": "rapport-defauts-et-memorisation-des-choix-du-sur-mesure"
+  },
+  {
+   "terme": "MealDetailLevel",
+   "ancre": "rapport-defauts-et-memorisation-des-choix-du-sur-mesure"
+  },
+  {
+   "terme": "Tirage",
+   "ancre": "rapport-tirage-trois-palettes"
+  },
+  {
+   "terme": "patterned",
+   "ancre": "rapport-tirage-trois-palettes"
+  },
+  {
+   "terme": "BW_PALETTE",
+   "ancre": "rapport-tirage-trois-palettes"
+  },
+  {
+   "terme": "medicalReportFileName",
+   "ancre": "rapport-nom-du-fichier"
+  },
+  {
+   "terme": "latestWeight",
+   "ancre": "rapport-poids-de-repere-et-de-depart-du-document"
+  },
+  {
+   "terme": "Pesée de départ",
+   "ancre": "rapport-poids-de-repere-et-de-depart-du-document"
+  },
+  {
+   "terme": "isStartingWeight",
+   "ancre": "rapport-poids-de-repere-et-de-depart-du-document"
+  },
+  {
+   "terme": "Étape (stage)",
+   "ancre": "rapport-succes-et-echec-d-export"
+  },
+  {
+   "terme": "Fiche d'échec",
+   "ancre": "rapport-fiche-d-echec-d-export"
+  },
+  {
+   "terme": "Volumes",
+   "ancre": "rapport-fiche-d-echec-d-export"
+  },
+  {
+   "terme": "reportErrors",
+   "ancre": "rapport-fiche-d-echec-d-export"
+  },
+  {
+   "terme": "Plancher d'affichage",
+   "ancre": "rapport-attente-et-plancher-d-affichage"
+  },
+  {
+   "terme": "Seuil du panneau",
+   "ancre": "rapport-attente-et-plancher-d-affichage"
+  },
+  {
+   "terme": "playbackRate",
+   "ancre": "rapport-attente-et-plancher-d-affichage"
+  },
+  {
+   "terme": "prefers-reduced-motion",
+   "ancre": "rapport-panneau-d-attente-en-mouvement-reduit"
+  },
+  {
+   "terme": "KM_PER_STEP",
+   "ancre": "rapport-pas-de-la-periode-avec-journee-en-cours-figee"
+  },
+  {
+   "terme": "Journée en cours figée",
+   "ancre": "rapport-pas-de-la-periode-avec-journee-en-cours-figee"
+  },
+  {
+   "terme": "Journée documentée",
+   "ancre": "rapport-journees-documentees-page-et-pdf"
+  },
+  {
+   "terme": "signedKg",
+   "ancre": "rapport-variation-de-poids-signee"
+  },
+  {
+   "terme": "IMC",
+   "ancre": "rapport-imc-et-reste-a-l-objectif"
+  },
+  {
+   "terme": "Reste à l'objectif",
+   "ancre": "rapport-imc-et-reste-a-l-objectif"
+  },
+  {
+   "terme": "Série en cours",
+   "ancre": "rapport-forme-du-traitement-et-premiere-prise"
+  },
+  {
+   "terme": "hasOccurred",
+   "ancre": "rapport-forme-du-traitement-et-premiere-prise"
+  },
+  {
+   "terme": "frNumber",
+   "ancre": "rapport-formats-de-nombres-du-document"
+  },
+  {
+   "terme": "round1",
+   "ancre": "rapport-formats-de-nombres-du-document"
+  },
+  {
+   "terme": "cleanType",
+   "ancre": "rapport-formats-de-nombres-du-document"
+  },
+  {
+   "terme": "Sous-embarquement",
+   "ancre": "rapport-police-embarquee-en-sous-ensemble"
+  },
+  {
+   "terme": "REPORT_FONT",
+   "ancre": "rapport-police-embarquee-en-sous-ensemble"
+  },
+  {
+   "terme": "Réservation (ensure)",
+   "ancre": "rapport-sauts-de-page"
+  },
+  {
+   "terme": "BOTTOM",
+   "ancre": "rapport-sauts-de-page"
+  },
+  {
+   "terme": "daysBetween",
+   "ancre": "rapport-jours-couverts"
+  },
+  {
+   "terme": "Cartouche (mini-tuile)",
+   "ancre": "rapport-rangees-de-cartouches-de-la-synthese"
+  },
+  {
+   "terme": "Rangée fermée",
+   "ancre": "rapport-rangees-de-cartouches-de-la-synthese"
+  },
+  {
+   "terme": "injectionIntervalDays",
+   "ancre": "rapport-intervalle-entre-deux-prises"
+  },
+  {
+   "terme": "weeklyLossPercent",
+   "ancre": "rapport-pourcentage-de-poids-perdu-par-semaine"
+  },
+  {
+   "terme": "computeWeeklyLoss",
+   "ancre": "rapport-pourcentage-de-poids-perdu-par-semaine"
+  },
+  {
+   "terme": "Poids d'entrée de période",
+   "ancre": "rapport-pourcentage-de-poids-perdu-par-semaine"
+  },
+  {
+   "terme": "mealDailyAverages",
+   "ancre": "rapport-moyennes-alimentaires-et-part-de-la-recommandation"
+  },
+  {
+   "terme": "dailyNutritionGoals",
+   "ancre": "rapport-moyennes-alimentaires-et-part-de-la-recommandation"
+  },
+  {
+   "terme": "Journée renseignée",
+   "ancre": "rapport-moyennes-alimentaires-et-part-de-la-recommandation"
+  },
+  {
+   "terme": "daySeverityTier",
+   "ancre": "rapport-paliers-de-severite-d-un-effet"
+  },
+  {
+   "terme": "severityTierCounts",
+   "ancre": "rapport-paliers-de-severite-d-un-effet"
+  },
+  {
+   "terme": "weightedQuality",
+   "ancre": "rapport-sommeil-moyennes-et-graphe"
+  },
+  {
+   "terme": "Journée dormie",
+   "ancre": "rapport-sommeil-moyennes-et-graphe"
+  },
+  {
+   "terme": "sleepChartPoints",
+   "ancre": "rapport-sommeil-moyennes-et-graphe"
+  },
+  {
+   "terme": "sportWeeklyAverages",
+   "ancre": "rapport-activite-par-semaine-dans-le-document"
+  },
+  {
+   "terme": "splitFigureValue",
+   "ancre": "rapport-decoupage-d-une-valeur-de-mini-tuile"
+  },
+  {
+   "terme": "Palier de dose",
+   "ancre": "rapport-graphique-poids-doses"
+  },
+  {
+   "terme": "selectionnerReperesPesee",
+   "ancre": "rapport-graphique-poids-doses"
+  },
+  {
+   "terme": "getLudicEquivalence",
+   "ancre": "rapport-equivalence-insolite-dans-le-pdf"
+  },
+  {
+   "terme": "Jauge",
+   "ancre": "rapport-section-iii-statistiques-par-type-d-effet"
+  },
+  {
+   "terme": "stepsDailyAverage",
+   "ancre": "rapport-section-iv-moyennes"
+  },
+  {
+   "terme": "Palier de teinte",
+   "ancre": "rapport-teinte-des-barres-de-sommeil"
+  },
+  {
+   "terme": "sleepBarTier",
+   "ancre": "rapport-teinte-des-barres-de-sommeil"
+  },
+  {
+   "terme": "meTimeSummary",
+   "ancre": "rapport-temps-pour-soi-synthese"
+  },
+  {
+   "terme": "monthsSpanning",
+   "ancre": "rapport-mois-dessines-par-une-annexe"
+  },
+  {
+   "terme": "Grille fusionnée",
+   "ancre": "rapport-fusion-des-grilles-mensuelles"
+  },
+  {
+   "terme": "Semaine partagée",
+   "ancre": "rapport-fusion-des-grilles-mensuelles"
+  },
+  {
+   "terme": "monthsShareWeek",
+   "ancre": "rapport-fusion-des-grilles-mensuelles"
+  },
+  {
+   "terme": "formatCalendarDuration",
+   "ancre": "rapport-valeur-d-une-case-de-calendrier"
+  },
+  {
+   "terme": "formatCalendarDose",
+   "ancre": "rapport-valeur-d-une-case-de-calendrier"
+  },
+  {
+   "terme": "hasMeasurements",
+   "ancre": "rapport-aiguillage-de-l-annexe-b"
+  },
+  {
+   "terme": "MEAL_ORDER",
+   "ancre": "rapport-ordre-des-repas-et-libelles"
+  },
+  {
+   "terme": "mealFamilyLabel",
+   "ancre": "rapport-ordre-des-repas-et-libelles"
+  },
+  {
+   "terme": "NUTRI_INKS",
+   "ancre": "rapport-encres-nutritionnelles-du-pdf"
+  },
+  {
+   "terme": "Colonne nutritionnelle (NUT_X)",
+   "ancre": "rapport-encres-nutritionnelles-du-pdf"
+  },
+  {
+   "terme": "groupReportDays",
+   "ancre": "rapport-regroupement-des-journees-du-carnet"
+  },
+  {
+   "terme": "sleepSpansTwoDays",
+   "ancre": "rapport-nommage-des-nuits-dans-le-pdf"
+  },
+  {
+   "terme": "formatDayRangeStr",
+   "ancre": "rapport-nommage-des-nuits-dans-le-pdf"
+  }
+ ],
+ "ancres_traitees": [
+  "rapport-periode-du-rapport-et-bornes-effectives",
+  "rapport-refus-de-periode-invalide",
+  "rapport-bascules-proposees-masque-des-donnees-disponibles",
+  "rapport-masque-des-sections-dessinees",
+  "rapport-defauts-et-memorisation-des-choix-du-sur-mesure",
+  "rapport-tirage-trois-palettes",
+  "rapport-nom-du-fichier",
+  "rapport-poids-de-repere-et-de-depart-du-document",
+  "rapport-succes-et-echec-d-export",
+  "rapport-fiche-d-echec-d-export",
+  "rapport-attente-et-plancher-d-affichage",
+  "rapport-panneau-d-attente-en-mouvement-reduit",
+  "rapport-pas-de-la-periode-avec-journee-en-cours-figee",
+  "rapport-journees-documentees-page-et-pdf",
+  "rapport-variation-de-poids-signee",
+  "rapport-imc-et-reste-a-l-objectif",
+  "rapport-forme-du-traitement-et-premiere-prise",
+  "rapport-formats-de-nombres-du-document",
+  "rapport-police-embarquee-en-sous-ensemble",
+  "rapport-sauts-de-page",
+  "rapport-jours-couverts",
+  "rapport-rangees-de-cartouches-de-la-synthese",
+  "rapport-intervalle-entre-deux-prises",
+  "rapport-pourcentage-de-poids-perdu-par-semaine",
+  "rapport-moyennes-alimentaires-et-part-de-la-recommandation",
+  "rapport-paliers-de-severite-d-un-effet",
+  "rapport-sommeil-moyennes-et-graphe",
+  "rapport-activite-par-semaine-dans-le-document",
+  "rapport-decoupage-d-une-valeur-de-mini-tuile",
+  "rapport-graphique-poids-doses",
+  "rapport-equivalence-insolite-dans-le-pdf",
+  "rapport-section-iii-statistiques-par-type-d-effet",
+  "rapport-section-iv-moyennes",
+  "rapport-teinte-des-barres-de-sommeil",
+  "rapport-temps-pour-soi-synthese",
+  "rapport-mois-dessines-par-une-annexe",
+  "rapport-fusion-des-grilles-mensuelles",
+  "rapport-valeur-d-une-case-de-calendrier",
+  "rapport-aiguillage-de-l-annexe-b",
+  "rapport-ordre-des-repas-et-libelles",
+  "rapport-encres-nutritionnelles-du-pdf",
+  "rapport-regroupement-des-journees-du-carnet",
+  "rapport-nommage-des-nuits-dans-le-pdf"
+ ],
+ "ancres_sans_matiere": []
+}

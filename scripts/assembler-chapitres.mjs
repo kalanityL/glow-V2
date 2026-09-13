@@ -207,7 +207,7 @@ if (mode === 'spec') {
   <a href="spec-technique.html">Technique</a>
   <a href="spec-abstraite.html">Abstraite</a>
   <a href="inspirations.html">Inspirations</a>`
-  etat = `<p class="etat">Les ${chapitres.length} chapitres sont écrits depuis l'inventaire de la V1 et son code, puis réfutés un à un contre le code par un vérificateur, puis corrigés d'après ses réfutations. Ce que le code ne fondait pas en a été retiré et rangé dans <a href="inspirations.html">Inspirations</a>. Les renvois « → technique » pointent dans le vide tant que la <a href="spec-technique.html">spécification technique</a> n'existe pas. ${absentes.length} figures n'ont pas encore de capture : elles sont nommées en <a href="#figures">état des figures</a>.</p>`
+  etat = `<p class="etat">Les ${chapitres.length} chapitres sont écrits depuis l'inventaire de la V1 et son code, puis réfutés un à un contre le code par un vérificateur, puis corrigés d'après ses réfutations. Ce que le code ne fondait pas en a été retiré et rangé dans <a href="inspirations.html">Inspirations</a>. Les renvois « → technique » mènent à la <a href="spec-technique.html">spécification technique</a>, qui honore les ${figures ? '667' : '0'} ancres que ce document lui promet.${absentes.length ? ` ${absentes.length} figures n'ont pas encore de capture : elles sont nommées en <a href="#figures">état des figures</a>.` : ' Chaque écran décrit porte sa capture.'}</p>`
 
   // « Lire ce document » porte le numéro 0, comme son titre le dit : la liste
   // démarre donc à zéro. Les trois annexes n'ont pas de numéro de chapitre,

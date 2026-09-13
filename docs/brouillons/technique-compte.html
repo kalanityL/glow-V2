@@ -1,0 +1,445 @@
+<section id="compte">
+  <h2>2. Le compte et les données <a class="retour" href="#sommaire">↑ sommaire</a></h2>
+  <p>Ce chapitre décrit le verrou d'accès, la sauvegarde locale et leur effacement : entités, clés de stockage, ordre des conversions au chargement, codes d'erreur et messages, ordre de la suppression de compte. Les écrans correspondants sont décrits dans la spécification fonctionnelle <a href="spec-fonctionnelle.html#compte">→ fonctionnelle</a>.</p>
+
+  <h3 id="compte-entites">Entités</h3>
+  <p>Un seul objet du domaine est stocké : <code>AppData</code>, sérialisé en JSON sous une clé unique. Les objets d'authentification ne sont jamais écrits par l'application : le SDK Firebase les détient.</p>
+
+  <table>
+    <thead><tr><th>Champ d'<code>AppData</code></th><th>Type</th><th>Facultatif</th><th>Remarque</th></tr></thead>
+    <tbody>
+      <tr><td><code>profile</code></td><td><code>UserProfile</code></td><td>non</td><td>Complété sur le profil d'usine à chaque chargement.</td></tr>
+      <tr><td><code>weightHistory</code></td><td><code>WeightLog[]</code></td><td>non</td><td>Porte la pesée de départ, reconnue au drapeau <code>isStartingWeight</code>.</td></tr>
+      <tr><td><code>dailyLogs</code></td><td><code>DailyLog[]</code></td><td>non</td><td></td></tr>
+      <tr><td><code>injectionHistory</code></td><td><code>InjectionLog[]</code></td><td>non</td><td></td></tr>
+      <tr><td><code>savedMeals</code></td><td><code>SavedMealLog[]</code></td><td>oui</td><td></td></tr>
+      <tr><td><code>sideEffectHistory</code></td><td><code>SideEffectLog[]</code></td><td>oui</td><td></td></tr>
+      <tr><td><code>stepLogs</code></td><td><code>StepLog[]</code></td><td>oui</td><td></td></tr>
+      <tr><td><code>sportLogs</code></td><td><code>SportLog[]</code></td><td>oui</td><td></td></tr>
+      <tr><td><code>meTimeLogs</code></td><td><code>MeTimeLog[]</code></td><td>oui</td><td></td></tr>
+      <tr><td><code>sleepLogs</code></td><td><code>SleepLog[]</code></td><td>oui</td><td></td></tr>
+    </tbody>
+  </table>
+  <p>Les neuf listes sont matérialisées à <code>[]</code> par <code>dropSeedData</code> au chargement : après conversion, aucune n'est absente, quel que soit l'état de la sauvegarde lue.</p>
+
+  <p>Les champs d'identité de <code>UserProfile</code>, unités canoniques comprises — le reste du profil relève du chapitre profil.</p>
+  <table>
+    <thead><tr><th>Champ</th><th>Type</th><th>Unité</th></tr></thead>
+    <tbody>
+      <tr><td><code>name</code></td><td><code>string</code></td><td>—</td></tr>
+      <tr><td><code>gender</code></td><td><code>'homme' | 'femme' | 'neutre'</code></td><td>—</td></tr>
+      <tr><td><code>age</code></td><td><code>number</code></td><td>années</td></tr>
+      <tr><td><code>height</code></td><td><code>number</code></td><td>centimètres</td></tr>
+      <tr><td><code>targetWeight</code></td><td><code>number</code></td><td>kilogrammes</td></tr>
+    </tbody>
+  </table>
+
+  <p>Les entités d'authentification, en mémoire seulement.</p>
+  <pre><code>interface AuthUser { id: string; email: string | null; name: string | null }
+type AuthState =
+  | { status: 'loading' }
+  | { status: 'signedOut' }
+  | { status: 'signedIn'; user: AuthUser }</code></pre>
+  <p><code>id</code> est l'<code>uid</code> Firebase, <code>name</code> le <code>displayName</code>. Les deux derniers champs valent <code>null</code> sur un compte créé sans eux.</p>
+
+  <p>Deux clés du domaine portent une chaîne nue et non du JSON : <code>hasAcceptedMedicalDisclaimer_v1</code> (valeur <code>'true'</code>, ou absente) et <code>glp1_app_companion_data__secours</code> (la sauvegarde illisible, recopiée telle quelle).</p>
+
+  <p>Dérivé, donc non stocké : le poids de départ (lu au drapeau dans <code>weightHistory</code>), l'état du verrou (dérivé de la clé d'API), la session (détenue par le SDK), et l'échec de chargement (une <code>ref</code> de la durée de la session).</p>
+  <p class="ancre">src/types.ts, src/app/useAppData.ts, src/shared/platform/auth.ts, src/features/auth/useAuth.ts</p>
+
+  <h3 id="compte-connexion-champs-requis">Connexion : champs requis</h3>
+  <p>Le formulaire e-mail/mot de passe refuse localement avant tout appel réseau. Le test porte sur l'e-mail <em>trimé</em> et sur le mot de passe <em>brut</em>.</p>
+  <pre><code>if (!email.trim() || !password) {
+  setMessage('Renseignez l’e-mail et le mot de passe.');
+  return;                      // aucun appel réseau
+}
+void run(() =&gt; signInWithPassword(email, password));
+
+// run(action) : setMessage(''), setIsBusy(true)
+//   try   { await action() }            // aucune navigation : AuthGate bascule seul
+//   catch { setMessage(authErrorMessage(code ?? '')) }
+//   finally { setIsBusy(false) }
+
+// signInWithPassword : signInWithEmailAndPassword(auth, email.trim(), password)</code></pre>
+  <p>Le trim n'a lieu qu'à deux endroits : le test ci-dessus et l'envoi. Le champ affiché n'est pas modifié. Le mot de passe part tel quel, espaces compris. Les deux boutons portent <code>disabled={isBusy}</code> pendant l'appel.</p>
+  <p class="ancre">src/features/auth/LoginPage.tsx, src/shared/platform/auth.ts</p>
+  <details><summary>Cas limites</summary>
+    <ul>
+      <li>E-mail composé d'espaces : <code>''.trim()</code> est faux → message local, aucun appel.</li>
+      <li>Mot de passe d'un seul espace : chaîne non vide → l'appel part et Firebase répond <code>auth/invalid-credential</code>.</li>
+      <li>Bouton Google : aucun champ n'est testé, <code>run(signInWithGoogle)</code> part directement — le message des champs requis ne le concerne pas.</li>
+      <li>Succès : aucune redirection n'est écrite ici ; c'est <code>AuthGate</code> qui repasse en <code>signedIn</code> et rend l'application.</li>
+    </ul>
+  </details>
+  <div class="exemple"><p>Camille saisit «  camille@exemple.fr  » et son mot de passe : le test passe, et c'est « camille@exemple.fr » qui part à Firebase.</p></div>
+
+  <h3 id="compte-messages-d-echec-de-connexion">Messages d'échec de connexion</h3>
+  <p><code>authErrorMessage(code)</code> traduit le code <code>auth/…</code> rejeté par le SDK. Fonction pure, un <code>switch</code>, sans repli sur le code anglais.</p>
+  <table>
+    <thead><tr><th>Code</th><th>Message</th></tr></thead>
+    <tbody>
+      <tr><td><code>auth/invalid-email</code></td><td>L'adresse e-mail n'est pas valide.</td></tr>
+      <tr><td><code>auth/invalid-credential</code>, <code>auth/user-not-found</code>, <code>auth/wrong-password</code></td><td>E-mail ou mot de passe incorrect.</td></tr>
+      <tr><td><code>auth/user-disabled</code></td><td>Ce compte a été désactivé.</td></tr>
+      <tr><td><code>auth/too-many-requests</code></td><td>Trop de tentatives. Réessayez dans quelques minutes.</td></tr>
+      <tr><td><code>auth/network-request-failed</code></td><td>Connexion impossible. Vérifiez votre accès à Internet.</td></tr>
+      <tr><td><code>auth/popup-closed-by-user</code>, <code>auth/cancelled-popup-request</code></td><td>La fenêtre Google a été refermée avant la fin.</td></tr>
+      <tr><td><code>auth/popup-blocked</code></td><td>Le navigateur a bloqué la fenêtre Google. Autorisez les pop-ups puis réessayez.</td></tr>
+      <tr><td><code>auth/unauthorized-domain</code></td><td>Ce domaine n'est pas autorisé dans la console Firebase.</td></tr>
+      <tr><td>tout autre code</td><td>La connexion a échoué. Réessayez.</td></tr>
+    </tbody>
+  </table>
+  <p>Trois codes partagent un même message : rien à l'écran ne distingue un e-mail inconnu d'un mot de passe faux.</p>
+  <p class="ancre">src/shared/platform/auth.errors.ts</p>
+  <details><summary>Cas limites</summary>
+    <ul>
+      <li>Erreur sans champ <code>code</code> : l'appelant passe <code>''</code>, qui tombe sur le message par défaut.</li>
+      <li>Le message est effacé (<code>setMessage('')</code>) au début de chaque tentative, pas à la saisie : il reste affiché tant qu'on ne renvoie pas le formulaire.</li>
+    </ul>
+  </details>
+  <div class="exemple"><p>Camille tape « camille@ » : Firebase rejette <code>auth/invalid-email</code>, l'écran affiche « L'adresse e-mail n'est pas valide. » Une lettre fausse dans le mot de passe donne <code>auth/invalid-credential</code>, donc « E-mail ou mot de passe incorrect. »</p></div>
+
+  <h3 id="compte-verrou-actif">Verrou actif</h3>
+  <p>Le verrou n'a pas de réglage : il se déduit de la clé d'API de la configuration.</p>
+  <pre><code>export const isAuthConfigured = FIREBASE_CONFIG.apiKey !== '';
+export const isDatabaseConfigured = isAuthConfigured;   // firestore.ts</code></pre>
+  <p>La configuration du dépôt porte <code>apiKey: 'AIzaSyAww…'</code>, projet <code>glow-private</code> : le verrou est actif. <code>AuthGate</code> ne monte le hook d'authentification que si <code>isAuthConfigured</code> ; sinon il rend ses enfants tels quels. L'objet <code>Auth</code> est construit au premier usage et jamais à l'import : sans configuration, aucun appel réseau ni stockage Firebase n'existe, et <code>getFirebaseAuth()</code> lèverait une <code>Error</code>.</p>
+  <p class="ancre">src/shared/platform/firebase.config.ts, src/shared/platform/firestore.ts, src/features/auth/AuthGate.tsx</p>
+  <details><summary>Cas limites</summary>
+    <ul>
+      <li>Configuration vide : <code>currentAuthUser()</code> rend <code>null</code> sans lever — l'absence de compte n'est pas un incident.</li>
+      <li>Configuration vide : l'application s'ouvre sans page de connexion, et la suppression de compte saute l'étape Firebase.</li>
+      <li>Une clé d'API remplie mais fausse n'éteint pas le verrou : elle le laisse actif et fait échouer chaque connexion.</li>
+    </ul>
+  </details>
+
+  <h3 id="compte-verrou-et-session-firebase">Verrou et session Firebase</h3>
+  <p><code>useAuth()</code> part en <code>loading</code> et s'abonne à <code>onAuthStateChanged</code>. Le premier rappel arrive quand le SDK a fini de restaurer (ou non) la session mémorisée ; l'état devient alors <code>signedIn</code> avec <code>{ id, email, name }</code>, ou <code>signedOut</code>. L'attente existe pour ne pas éclairer la page de connexion à une session déjà ouverte.</p>
+  <pre><code>AuthGate :
+  isAuthConfigured === false      → children
+  status === 'loading'            → dégradé + point animé (aria-label « Chargement »)
+  status === 'signedOut'          → LoginPage
+  status === 'signedIn'           → children</code></pre>
+  <p>La persistance est celle du SDK par défaut : <code>getAuth()</code> passe <code>[indexedDBLocalPersistence, browserLocalPersistence, browserSessionPersistence]</code>, dans cet ordre. La session survit donc à la fermeture de l'onglet et n'a pas de durée limite ; seule une déconnexion explicite l'efface. L'application n'expose qu'un chemin de déconnexion : <code>signOutUser()</code>, appelé par le bouton « Se reconnecter » du bloc de suppression.</p>
+  <p class="ancre">src/features/auth/useAuth.ts, src/features/auth/AuthGate.tsx, src/shared/platform/auth.ts</p>
+  <details><summary>Cas limites</summary>
+    <ul>
+      <li>IndexedDB indisponible (navigation privée de certains navigateurs) : le SDK retombe sur <code>localStorage</code>, puis sur <code>sessionStorage</code> — dans ce dernier cas la session ne survit pas à la fermeture de l'onglet.</li>
+      <li>Le compte supprimé côté console pendant que l'onglet est ouvert : <code>onAuthStateChanged</code> repasse en <code>signedOut</code> et la page de connexion revient sans rechargement.</li>
+      <li><code>currentAuthUser()</code> ne s'abonne pas : il lit <code>currentUser</code> à l'instant et rendrait <code>null</code> s'il était appelé avant la fin de la restauration.</li>
+    </ul>
+  </details>
+  <div class="exemple"><p>Camille s'est connectée en mai 2026. Chaque lancement depuis passe par l'état <code>loading</code>, le temps du premier rappel, puis <code>signedIn</code> avec son <code>uid</code> et son adresse.</p></div>
+
+  <h3 id="compte-acceptation-legale">Acceptation légale</h3>
+  <p>Une clé à chaîne nue, <code>hasAcceptedMedicalDisclaimer_v1</code>, dont la seule valeur écrite est <code>'true'</code>. Deux états dérivent de sa lecture, à l'initialisation de l'application.</p>
+  <pre><code>const [isLegalModalOpen,   …] = useState(() =&gt; getString(CLE) !== 'true');
+const [isFirstLaunchLegal, …] = useState(() =&gt; getString(CLE) !== 'true');
+
+// rendu du contenu principal
+(isLegalModalOpen || isFirstLaunchLegal) ? &lt;LegalPrivacyPage …/&gt; : …
+
+handleAcceptLegalFirstTime : setString(CLE, 'true') ; les deux états à false
+openLegalModal            : isFirstLaunchLegal = (getString(CLE) !== 'true') ; isLegalModalOpen = true</code></pre>
+  <p>La condition de rendu est un <em>ou</em> : au premier lancement, fermer sans accepter laisserait <code>isFirstLaunchLegal</code> à <code>true</code> et la page resterait affichée. La seule sortie est <code>handleAcceptLegalFirstTime</code>, qui écrit la clé et éteint les deux états. La page est rendue à la place du contenu du <code>main</code> : l'entête et le menu du bas restent affichés.</p>
+  <p class="ancre">src/versions/mixte/App.tsx</p>
+  <details><summary>Cas limites</summary>
+    <ul>
+      <li>Clé absente, vide, ou portant une autre valeur que <code>'true'</code> : traitée comme non acceptée.</li>
+      <li>Les deux états sont lus une fois, à l'initialisation : effacer la clé dans un autre onglet ne rouvre pas la page tant que celui-ci n'est pas rechargé.</li>
+      <li>Stockage indisponible : <code>getString</code> rend <code>null</code> et <code>setString</code> échoue en silence — la page revient à chaque lancement.</li>
+      <li><code>clearAll()</code> emporte la clé : la page reparaît au rechargement qui suit une suppression de compte.</li>
+    </ul>
+  </details>
+
+  <h3 id="compte-premier-lancement-legal">Premier lancement légal</h3>
+  <p><code>LegalPrivacyPage</code> reçoit <code>isFirstLaunch</code> et en tire trois différences : le titre, la croix, le pied. Deux états locaux, remis à zéro à chaque montage.</p>
+  <pre><code>const [activeTab, setActiveTab] = useState&lt;'disclaimer' | 'privacy' | 'security'&gt;('disclaimer');
+const [hasCheckedNotice, setHasCheckedNotice] = useState(false);
+
+handleAccept : if (isFirstLaunch &amp;&amp; onAcceptFirstTime) onAcceptFirstTime(); onClose();
+
+titre  = isFirstLaunch ? 'Information Médicale' : 'Avertissement Médical'
+croix  : rendue seulement si !isFirstLaunch
+bouton « J'accepte et j'accède » : disabled={!hasCheckedNotice}</code></pre>
+  <p>L'onglet initial est <code>'disclaimer'</code> (« Cadre ») dans les deux états. <code>hasCheckedNotice</code> n'est pas persisté : cocher la case n'a d'effet que dans le montage courant.</p>
+  <p class="ancre">src/versions/mixte/components/LegalPrivacyPage.tsx</p>
+  <details><summary>Cas limites</summary>
+    <ul>
+      <li>Case décochée : le bouton est <code>disabled</code>, <code>handleAccept</code> n'est jamais appelé, rien n'est écrit.</li>
+      <li>Rouvrir la page après acceptation la remonte : l'onglet revient à « Cadre », la case redevient décochée — sans effet, le pied d'acceptation n'étant plus rendu.</li>
+      <li><code>onAcceptFirstTime</code> est facultatif : absent, <code>handleAccept</code> se réduit à <code>onClose()</code> et la clé n'est pas écrite.</li>
+    </ul>
+  </details>
+
+  <h3 id="compte-avertissement-medical">Avertissement médical</h3>
+  <p>Second état, atteint quand la clé vaut <code>'true'</code> et que <code>openLegalModal()</code> est appelé. La croix apparaît, le pied d'acceptation est remplacé par la mention « Données 100 % locales » et le bouton « Fermer » ; les deux appellent <code>onClose()</code>, qui met <code>isLegalModalOpen</code> à <code>false</code> — <code>isFirstLaunchLegal</code> valant déjà <code>false</code>, la condition de rendu tombe et le contenu de la page en cours revient.</p>
+  <p>Les trois onglets et leur contenu sont identiques dans les deux états ; seuls le titre, la croix et le pied changent. Le sous-titre « Vie privée, sécurité &amp; cadre clinique » est inconditionnel.</p>
+  <p class="ancre">src/versions/mixte/components/LegalPrivacyPage.tsx, src/versions/mixte/App.tsx</p>
+  <details><summary>Cas limites</summary>
+    <ul>
+      <li><code>openLegalModal()</code> relit la clé : si elle a été effacée entre-temps dans ce même onglet, l'ouverture repasse en mode premier lancement, croix comprise.</li>
+      <li>Un seul appelant réel de <code>openLegalModal</code> est joignable : le bouton du pied de page. L'entrée « Sécurité, Avertissements &amp; Confidentialité » de « Configuration &amp; Plus » existe, mais aucun menu ne mène à l'onglet <code>'plus'</code>. La prop <code>onOpenLegalModal</code> reçue par la home n'est jamais appelée. <span class="marque non">non implémenté</span></li>
+    </ul>
+  </details>
+
+  <h3 id="compte-cle-et-format-de-la-sauvegarde">Clé et format de la sauvegarde</h3>
+  <p><code>AppData</code> entier est écrit en un seul JSON sous <code>STORAGE_KEY = 'glp1_app_companion_data'</code>, par un effet dépendant de <code>appData</code>.</p>
+  <pre><code>useEffect(() =&gt; {
+  if (!mayPersist(loadFailed.current)) return;
+  setItem(STORAGE_KEY, appData);      // localStorage.setItem(key, JSON.stringify(value))
+}, [appData]);</code></pre>
+  <p>L'effet s'exécute aussi au montage, avant toute modification : c'est cette écriture initiale que le garde-fou du chargement doit bloquer. Il n'y a ni écriture différée, ni fusion, ni numéro de version dans le document : la valeur écrite remplace la précédente en entier.</p>
+  <p>Le reste de ce que l'application retient vit sous d'autres clés — une quarantaine de chaînes <code>glp1_*</code>, <code>glow_*</code> et <code>hasAcceptedMedicalDisclaimer_v1</code>, déclarées dans autant de fichiers — qui ne passent pas par <code>AppData</code>.</p>
+  <p class="ancre">src/app/useAppData.ts, src/shared/platform/storage.ts</p>
+  <details><summary>Cas limites</summary>
+    <ul>
+      <li>Quota dépassé : <code>setItem</code> avale l'exception, la sauvegarde en mémoire diverge de celle du stockage sans aucun signe à l'écran.</li>
+      <li>Chaque changement d'état réécrit le document entier, même pour un champ : la taille écrite est celle de tout le suivi.</li>
+    </ul>
+  </details>
+  <div class="exemple"><p>Camille corrige son objectif de poids : l'effet réécrit sous la même clé le JSON complet — profil, pesées depuis mai 2026, injections d'Ozempic, effets secondaires — et non le seul champ modifié.</p></div>
+
+  <h3 id="compte-ordre-de-conversion-au-chargement">Ordre de conversion au chargement</h3>
+  <p>Le chargement lit la clé en chaîne nue (<code>getString</code>) puis analyse lui-même le JSON, pour distinguer une sauvegarde absente d'une sauvegarde illisible. Les suppressions de champs précèdent la fusion du profil, qui précède la chaîne de migrations.</p>
+  <pre><code>saved = getString(STORAGE_KEY)          // null ou '' → profil d'usine, sans échec
+parsed = JSON.parse(saved)
+
+delete parsed.waterLogs                 // suivi hydrique, supprimé le 2026-08-07
+delete parsed.milestones                // objectifs à paliers, supprimés le 2026-08-09
+if (parsed.profile) {
+  delete parsed.profile.hydrationTrackingEnabled
+  delete parsed.profile.dailyWaterGoalMl
+  delete parsed.profile.weightGoalsEnabled
+}
+
+hydrated = {
+  ...parsed,
+  profile:    { ...INITIAL_PROFILE, ...parsed.profile,
+                avatar: { ...INITIAL_PROFILE.avatar, ...(parsed.profile?.avatar || {}) } },
+  savedMeals: dropPreMigrationMeals(parsed.savedMeals),
+  stepLogs:   parsed.stepLogs || [],
+}
+
+return ensureStartingWeighIn(
+         fillMealHunger(
+           mergeTableTennisSport(
+             mergeSideEffectNotes(
+               purgeDeleted(
+                 migrateTreatmentIds(
+                   dropSeedData(hydrated)))))))</code></pre>
+  <p>L'ordre d'application est donc, du premier au dernier :</p>
+  <ol>
+    <li><code>dropSeedData</code> — retire les lignes dont l'<code>id</code> commence par <code>se-seed-</code>, <code>dl-s-</code>, <code>step-seed-</code>, <code>sport-seed-</code> ou <code>meal-seed-</code>, sur les neuf listes, et matérialise à <code>[]</code> celles qui manquent.</li>
+    <li><code>migrateTreatmentIds</code> — <code>profile.glp1Brand = toTreatmentId(…) ?? DEFAULT_TREATMENT_ID</code> ; chaque <code>injection.brand = toTreatmentId(brand)</code>, <code>undefined</code> conservé (il signifie « celui du profil »).</li>
+    <li><code>purgeDeleted</code> — retire les lignes portant un <code>deletedAt</code> non nul et retire le champ des autres. Sept listes seulement : <code>meTimeLogs</code> et <code>sleepLogs</code> n'en ont jamais porté.</li>
+    <li><code>mergeSideEffectNotes</code> — replie <code>description</code> dans <code>notes</code> : <code>notes = rest.notes || description || undefined</code>. <code>notes</code> l'emporte ; une <code>description</code> vide ne crée pas de note vide.</li>
+    <li><code>mergeTableTennisSport</code> — remplace les anciens noms de sport par <code>MERGED_TABLE_TENNIS</code>, le nom d'un sport étant sa clé au catalogue des MET.</li>
+    <li><code>fillMealHunger</code> — pose <code>hungerBefore</code> et <code>hungerAfter</code> sur les repas qui n'ont pas les deux en <code>number</code> ; un repas complet n'est jamais retouché.</li>
+    <li><code>ensureStartingWeighIn</code> — pose <code>isStartingWeight</code> sur toutes les lignes (<code>w.isStartingWeight ?? w.id === 'starting-weight-log'</code>) ; si une ligne le porte, s'arrête là ; sinon, et seulement si l'ancien profil porte un <code>startingWeight &gt; 0</code>, crée la pesée de départ et retrie par <code>byDateTimeAsc</code>.</li>
+  </ol>
+  <p>Les sept fonctions sont pures et idempotentes : les rejouer sur des données déjà converties ne change rien. La conversion n'est pas réécrite au chargement — elle ne devient définitive qu'à la première écriture de la sauvegarde.</p>
+  <p class="ancre">src/app/useAppData.ts, src/shared/model/appData.ts, src/shared/model/purgeDeleted.ts, src/shared/model/startingWeighIn.ts</p>
+  <details><summary>Cas limites</summary>
+    <ul>
+      <li>Sauvegarde valant la chaîne <code>'null'</code> : <code>JSON.parse</code> réussit, <code>delete parsed.waterLogs</code> lève une <code>TypeError</code> — la sauvegarde est traitée comme illisible.</li>
+      <li>Sauvegarde valant un scalaire ou un tableau (<code>'0'</code>, <code>'[]'</code>) : le <code>delete</code> passe, <code>...parsed</code> n'apporte rien, et l'on obtient le profil d'usine avec un journal des pesées <strong>vide</strong> — sans pesée de départ, <code>ensureStartingWeighIn</code> n'en créant une que depuis un ancien <code>profile.startingWeight</code>.</li>
+      <li>Chaîne vide : <code>if (saved)</code> est faux — profil d'usine et pesée semée, sans passer par le <code>catch</code>.</li>
+      <li>Plusieurs lignes marquées <code>isStartingWeight</code> : <code>ensureStartingWeighIn</code> ne corrige rien, et <code>findStartingWeighIn</code> retient la première du tableau.</li>
+      <li>Un champ inconnu de la sauvegarde traverse <code>...parsed</code> intact et sera réécrit à la prochaine écriture.</li>
+    </ul>
+  </details>
+
+  <h3 id="compte-profil-d-usine-et-pesee-semee">Profil d'usine et pesée semée</h3>
+  <p>Sans sauvegarde, l'état initial est <code>INITIAL_PROFILE</code> et une pesée de départ semée. Le même état sert de socle à la fusion des profils existants.</p>
+  <pre><code>INITIAL_STARTING_WEIGHT = 95.0   // kg
+
+INITIAL_PROFILE = {
+  name: 'Chloé', gender: 'femme', age: 42, height: 168, targetWeight: 72.0,
+  silhouetteType: 'sablier',
+  avatar: { gender:'femme', faceShape:'oval', skinColor:'#FFE5D9', eyeColor:'#2E8B57',
+            hairStyle:'long', hairColor:'#4E3629', hasGlasses:false, expression:'happy' },
+  reminderDay: 0, reminderTime: '20:00', reminderEnabled: false,
+  medicalReminderEnabled: false,
+  foodTrackingEnabled: false, stepsTrackingEnabled: false, sportTrackingEnabled: false,
+  meTimeTrackingEnabled: false, sleepTrackingEnabled: false,
+  quickAddEnabled: false, insoliteLibraryEnabled: false,
+  countdownTargetDate: '2026-11-15', glp1Brand: DEFAULT_TREATMENT_ID,
+}
+
+état initial = {
+  profile: INITIAL_PROFILE,
+  weightHistory: setStartingWeight([], 95.0),
+  dailyLogs: [], injectionHistory: [], savedMeals: [], sideEffectHistory: [], stepLogs: [],
+}</code></pre>
+  <p><code>setStartingWeight([], 95.0)</code> crée une ligne unique : <code>{ id: 'starting-weight-log', date: veille locale, time: '08:00', weight: 95, isStartingWeight: true }</code>. La date vient de <code>dateDeDepartParDefaut</code> : sur un historique vide, l'instant de référence moins un jour, formaté <code>AAAA-MM-JJ</code> en heure locale ; sur un historique existant, la veille de la pesée la plus ancienne.</p>
+  <p>Le poids de départ affiché est <code>getStartingWeight(weightHistory, INITIAL_STARTING_WEIGHT)</code> : le poids de la ligne marquée, sinon 95,0 kg.</p>
+  <p class="ancre">src/app/useAppData.ts, src/shared/model/startingWeighIn.ts</p>
+  <details><summary>Cas limites</summary>
+    <ul>
+      <li>Le drapeau, jamais la valeur : repasser par 95 kg ou le dépasser ne fait pas d'une pesée ordinaire un départ.</li>
+      <li>Le poids de départ n'est pas modifié par <code>setStartingWeight</code> quant à sa date ni à ses mensurations : seule <code>weight</code> est remplacée si la ligne existe déjà.</li>
+      <li>Une installation le 1<sup>er</sup> d'un mois sème la pesée au dernier jour du mois précédent — l'arithmétique passe par <code>Date.setDate(-1)</code>, donc par le calendrier local.</li>
+    </ul>
+  </details>
+  <div class="exemple"><p>Camille est réellement partie de 96 kg en mai 2026. Sur une installation neuve, l'application n'affiche pas un écran vide mais 95,0 kg à la veille du jour d'installation, 08:00 : une valeur d'usine que rien ne distingue visuellement d'une saisie.</p></div>
+
+  <h3 id="compte-couche-de-stockage">Couche de stockage</h3>
+  <p>Un seul fichier appelle <code>localStorage</code> ; il expose six fonctions, toutes muettes en cas d'erreur.</p>
+  <table>
+    <thead><tr><th>Fonction</th><th>Effet</th><th>Sur erreur</th></tr></thead>
+    <tbody>
+      <tr><td><code>getItem&lt;T&gt;(key)</code></td><td><code>JSON.parse</code> de la valeur</td><td><code>null</code> — clé absente et contenu invalide sont indiscernables</td></tr>
+      <tr><td><code>setItem&lt;T&gt;(key, value)</code></td><td><code>JSON.stringify</code> puis écriture</td><td>rien, en silence</td></tr>
+      <tr><td><code>getString(key)</code></td><td>la chaîne telle quelle</td><td><code>null</code></td></tr>
+      <tr><td><code>setString(key, value)</code></td><td>la chaîne telle quelle</td><td>rien, en silence</td></tr>
+      <tr><td><code>removeItem(key)</code></td><td>retire la clé</td><td>rien, en silence</td></tr>
+      <tr><td><code>clearAll()</code></td><td><code>localStorage.clear()</code></td><td>rien, en silence</td></tr>
+    </tbody>
+  </table>
+  <p>Les deux familles ne sont pas interchangeables : <code>setItem</code> ré-encoderait un drapeau <code>true</code> en <code>"true"</code> et rendrait illisibles les valeurs déjà écrites en chaîne nue. La sauvegarde principale n'emprunte pas <code>getItem</code> à la lecture : elle passe par <code>getString</code> puis <code>JSON.parse</code>, précisément parce que <code>getItem</code> confond absence et illisibilité — distinction dont dépend le garde-fou.</p>
+  <p><code>clearAll</code> efface en bloc plutôt que clé par clé : la liste des clés est éparpillée dans une vingtaine de fichiers, et une liste écrite à la main laisserait survivre la première clé ajoutée ailleurs.</p>
+  <p class="ancre">src/shared/platform/storage.ts</p>
+  <details><summary>Cas limites</summary>
+    <ul>
+      <li>Stockage indisponible (mode privé, quota) : toute lecture rend <code>null</code>, l'application démarre sur le profil d'usine et n'enregistre rien, sans message.</li>
+      <li><code>getItem</code> sur une valeur écrite par <code>setString</code> : <code>JSON.parse('true')</code> rend <code>true</code>, mais <code>JSON.parse</code> d'un identifiant de thème lèverait et rendrait <code>null</code>.</li>
+      <li><code>clearAll</code> ne se limite pas aux clés de l'application : il vide l'origine entière.</li>
+    </ul>
+  </details>
+
+  <h3 id="compte-garde-fou-du-chargement">Garde-fou du chargement</h3>
+  <p>Une lecture ratée ne doit pas écraser ce qu'elle n'a pas su lire : c'est l'effacement réel du 2026-08-17, causé par l'écriture au montage de l'effet de persistance. Le <code>catch</code> du chargement fait trois choses, dans cet ordre.</p>
+  <pre><code>catch (e) {
+  console.error(…)
+  loadFailed.current = true                       // une ref, pas un état :
+                                                  // l'effet la relit au même rendu
+  if (getString(rescueKeyFor(STORAGE_KEY)) === null)
+    setString(rescueKeyFor(STORAGE_KEY), saved)   // la chaîne BRUTE, une seule fois
+}
+// puis : retour de l'état initial (profil d'usine + pesée semée à 95 kg)
+
+rescueKeyFor(k)       = `${k}__secours`
+mayPersist(loadFailed) = !loadFailed
+unreadableSaveNotice(k) = 'La sauvegarde n’a pas pu être lue. Elle a été mise à l’abri
+  sous la clé « &lt;clé&gt;__secours » et RIEN ne sera enregistré tant que cet écran
+  n’aura pas été rechargé : vos données ne sont pas effacées.'</code></pre>
+  <p>La condition de mise à l'abri est <code>=== null</code>, donc « clé absente » : une clé de secours présente mais vide empêche le sauvetage. Le message est posé par un effet à montage unique dans <code>limitNotice</code>, l'état qui sert aussi aux refus de plafond ; le bloc qui l'affiche porte donc le titre « Limite atteinte » et se ferme par <code>dismissLimitNotice</code>.</p>
+  <p>La portée du gel est exactement d'une écriture : <code>mayPersist</code> n'a qu'un appelant, l'effet qui écrit <code>STORAGE_KEY</code>. Les autres clés — acceptation médicale, menu, thème, vues d'historique, compteurs — continuent d'être écrites pendant la session.</p>
+  <p class="ancre">src/shared/model/loadGuard.ts, src/app/useAppData.ts, src/versions/mixte/App.tsx</p>
+  <details><summary>Cas limites</summary>
+    <ul>
+      <li>Second échec après un premier sauvetage : la clé de secours n'est pas recouverte, c'est le premier sauvetage qui porte les vraies données.</li>
+      <li>L'écriture de la clé de secours échoue (quota) : l'exception est journalisée, le gel reste en place, la sauvegarde illisible reste sous sa clé d'origine.</li>
+      <li>Message refermé : il ne revient pas — l'effet qui le pose a une liste de dépendances vide.</li>
+      <li>Aucun écran ne lit ni ne restaure <code>__secours</code> : la récupération est manuelle, hors de l'application. <span class="marque non">non implémenté</span></li>
+      <li><code>loadFailed</code> est une <code>ref</code> de la durée du montage : un rechargement rejoue le chargement, qui échouera de nouveau si la sauvegarde n'a pas été réparée.</li>
+    </ul>
+  </details>
+  <div class="exemple"><p>La sauvegarde de Camille est tronquée par un onglet fermé pendant l'écriture. Au lancement suivant : sa chaîne brute passe sous <code>glp1_app_companion_data__secours</code>, l'écran affiche 95,0 kg de départ à la veille, et rien de ce qu'elle saisirait dans cette session ne serait écrit sous la clé principale — mais l'acceptation médicale, elle, s'écrirait normalement.</p></div>
+
+  <h3 id="compte-ordre-de-la-suppression-de-compte">Ordre de la suppression de compte</h3>
+  <p>Trois états locaux : <code>step</code> (<code>'idle' | 'confirming' | 'working'</code>), <code>message</code>, <code>needsFreshLogin</code>. Le geste de confirmation supprime le compte avant les données ; un échec du compte laisse tout en place.</p>
+  <pre><code>confirm() :
+  message = '' ; needsFreshLogin = false ; step = 'working'
+  try {
+    if (isAuthConfigured) await deleteCurrentUser()
+  } catch (e) {
+    code = e.code ?? ''
+    message        = accountDeletionErrorMessage(code)
+    needsFreshLogin = (code === 'auth/requires-recent-login')
+    step            = 'confirming'
+    return                       // rien n'est effacé
+  }
+  clearAll()                     // localStorage.clear()
+  reloadApp()                    // window.location.reload()
+
+reconnect() :                    // bouton « Se reconnecter »
+  signOutUser().catch(() =&gt; undefined).then(reloadApp)   // ne touche à aucune donnée</code></pre>
+  <p>L'ordre est imposé : effacer avant de savoir laisserait une personne sans données mais avec un compte. <code>reloadApp</code> est un simple <code>window.location.reload()</code> ; la page de connexion réapparaît parce que <code>deleteUser</code> a déconnecté et que le verrou est actif — sans configuration Firebase, le rechargement rouvre directement l'application, sur le profil d'usine et l'avertissement médical.</p>
+  <p><code>reconnect</code> enchaîne <code>reloadApp</code> après le <code>catch</code> : la page est rechargée même si la déconnexion échoue.</p>
+  <p class="ancre">src/versions/mixte/components/DeleteAccountBlock.tsx, src/shared/platform/appUrl.ts</p>
+  <details><summary>Cas limites</summary>
+    <ul>
+      <li>Sans configuration Firebase : l'étape compte est sautée, <code>clearAll()</code> et <code>reloadApp()</code> s'exécutent quand même.</li>
+      <li>Pendant <code>'working'</code> : « Supprimer définitivement », « Annuler » et la croix portent <code>disabled</code>, et le premier affiche « Suppression… ».</li>
+      <li>Échec : retour à <code>'confirming'</code>, la mise en garde reste ouverte, le message s'affiche au-dessus des boutons ; « Annuler » et la croix le remettent à zéro.</li>
+      <li><code>clearAll()</code> échoue en silence : le rechargement se ferait alors sur des données intactes, sans message — le compte, lui, n'existe plus.</li>
+    </ul>
+  </details>
+
+  <h3 id="compte-suppression-du-compte-firebase">Suppression du compte Firebase</h3>
+  <p><code>deleteCurrentUser()</code> encapsule le SDK et ajoute un code maison quand personne n'est connecté.</p>
+  <pre><code>export const deleteCurrentUser = async (): Promise&lt;void&gt; =&gt; {
+  const user = getFirebaseAuth().currentUser;
+  if (!user) throw { code: 'auth/no-current-user' };   // code maison
+  await deleteUser(user);
+};</code></pre>
+  <p><code>deleteUser</code> côté SDK : obtient un jeton d'identité, appelle <code>deleteAccount</code>, vide le jeton de rafraîchissement, puis <strong>termine par <code>auth.signOut()</code></strong>. La déconnexion est donc faite par le SDK, dans la foulée, sans appel supplémentaire.</p>
+  <p><code>auth/requires-recent-login</code> est le cas courant et non un incident : la session est mémorisée sans limite de durée, et Firebase refuse une suppression sur une session ancienne. C'est pourquoi le bloc propose « Se reconnecter » sur ce seul code.</p>
+  <p class="ancre">src/shared/platform/auth.ts, @firebase/auth 1.13.4</p>
+  <details><summary>Cas limites</summary>
+    <ul>
+      <li>Verrou inactif : <code>deleteCurrentUser</code> n'est pas appelé — <code>getFirebaseAuth()</code> lèverait une <code>Error</code> sans champ <code>code</code>, qui tomberait sur le message par défaut.</li>
+      <li><code>auth/no-current-user</code> est un objet nu <code>{ code }</code>, pas une <code>Error</code> : seul le champ <code>code</code> est lu par l'appelant.</li>
+      <li>Réseau coupé pendant <code>deleteAccount</code> : le compte peut avoir été supprimé côté serveur sans que le <code>signOut</code> final ait lieu ; le <code>catch</code> du bloc s'exécute et rien n'est effacé localement.</li>
+    </ul>
+  </details>
+
+  <h3 id="compte-messages-d-echec-de-suppression">Messages d'échec de suppression</h3>
+  <p><code>accountDeletionErrorMessage(code)</code> est une fonction distincte de <code>authErrorMessage</code> : mêmes codes <code>auth/…</code>, mais un message générique qui ne peut pas parler de connexion. Tous ses messages contiennent « n'a été effacé ».</p>
+  <table>
+    <thead><tr><th>Code</th><th>Message</th></tr></thead>
+    <tbody>
+      <tr><td><code>auth/requires-recent-login</code></td><td>Par sécurité, cette suppression demande une connexion récente. Reconnectez-vous, puis recommencez — rien n'a été effacé.</td></tr>
+      <tr><td><code>auth/no-current-user</code></td><td>Personne n'est connecté. Rien n'a été effacé.</td></tr>
+      <tr><td><code>auth/network-request-failed</code></td><td>Connexion impossible. Vérifiez votre accès à Internet — rien n'a été effacé.</td></tr>
+      <tr><td><code>auth/too-many-requests</code></td><td>Trop de tentatives. Réessayez dans quelques minutes — rien n'a été effacé.</td></tr>
+      <tr><td><code>auth/user-token-expired</code>, <code>auth/user-disabled</code></td><td>Votre session n'est plus valable. Reconnectez-vous, puis recommencez — rien n'a été effacé.</td></tr>
+      <tr><td>tout autre code</td><td>La suppression a échoué. Rien n'a été effacé — réessayez.</td></tr>
+    </tbody>
+  </table>
+  <p>Le bouton « Se reconnecter » n'est rendu que sur <code>auth/requires-recent-login</code>, alors que le message de <code>auth/user-token-expired</code> et <code>auth/user-disabled</code> invite lui aussi à se reconnecter.</p>
+  <p class="ancre">src/shared/platform/auth.errors.ts, src/versions/mixte/components/DeleteAccountBlock.tsx</p>
+  <details><summary>Cas limites</summary>
+    <ul>
+      <li>La promesse d'un message est tenue par l'ordre du code : le <code>return</code> du <code>catch</code> précède <code>clearAll()</code>, donc aucun message d'échec ne peut s'afficher après un effacement.</li>
+      <li>Erreur sans <code>code</code> : <code>''</code> tombe sur le message par défaut, qui dit lui aussi que rien n'a été effacé.</li>
+    </ul>
+  </details>
+  <div class="exemple"><p>Camille, connectée depuis mai 2026, confirme : Firebase rejette <code>auth/requires-recent-login</code>, l'écran revient à la mise en garde avec le message et le bouton « Se reconnecter ». Après reconnexion et seconde tentative, <code>deleteUser</code> passe, <code>clearAll()</code> efface le stockage et la page se recharge sur la connexion.</p></div>
+
+  <h3 id="compte-stockage-local">Stockage local</h3>
+  <p><code>clearAll()</code> est <code>localStorage.clear()</code> : il vide l'origine entière, sans liste de clés. Il emporte donc <code>glp1_app_companion_data</code>, sa clé de secours si elle existe, <code>hasAcceptedMedicalDisclaimer_v1</code>, et la quarantaine de clés <code>glp1_*</code> et <code>glow_*</code> — menu, thème, sports et effets suivis, vues d'historique, paliers de badges, retours et sondage locaux, date de première ouverture.</p>
+  <p>Il n'emporte en revanche pas la session Firebase par lui-même : le SDK persiste d'abord dans IndexedDB, que <code>localStorage.clear()</code> ne touche pas. La session disparaît parce que <code>deleteUser</code> appelle <code>signOut()</code>. Le commentaire de <code>storage.ts</code> qui attribue la disparition de la session à <code>clearAll</code> est inexact ; il ne le serait pas dans le cas de repli où IndexedDB est indisponible et où le SDK écrit dans <code>localStorage</code>.</p>
+  <p class="ancre">src/shared/platform/storage.ts, @firebase/auth 1.13.4</p>
+  <details><summary>Cas limites</summary>
+    <ul>
+      <li>Sans configuration Firebase, <code>clearAll()</code> est le geste entier : il n'y a pas de session à défaire.</li>
+      <li>Ce qui survit à <code>clearAll</code> : IndexedDB, <code>sessionStorage</code>, les cookies, et le contenu des autres origines.</li>
+      <li>L'acceptation médicale partant avec le reste, le rechargement qui suit la suppression rouvre l'application sur le premier lancement légal.</li>
+    </ul>
+  </details>
+
+  <h3 id="compte-dans-la-v2">Dans la V2</h3>
+  <p><span class="marque v2">V2</span> Aucune dépendance Firebase (<code>package.json</code> : <code>react</code> et <code>react-dom</code> seuls), aucun stockage, aucun appel réseau. Le compte se réduit à deux champs de l'onboarding et à une règle de longueur.</p>
+  <pre><code>// src/domaine/compte.ts
+export const LONGUEUR_MOT_DE_PASSE = 8;
+export function motDePasseValide(m: string): boolean { return m.length &gt;= 8; }
+
+// src/screens/onboarding/parcours.ts — peutValider
+if (etape === 'profil')
+  return reponses.motDePasse.length === 0 || motDePasseValide(reponses.motDePasse);</code></pre>
+  <p>Les cinq réponses de l'étape <code>'profil'</code> : <code>anneeNaissance</code> (défaut 1980, bornes <code>anneeCourante − 130</code> à <code>anneeCourante − 1</code>, soit 1896–2025 en 2026), <code>tailleCm</code> (défaut 165 ; bornes 50–300 cm ou 20–118 in selon le système, la valeur restant toujours stockée en centimètres, <code>Math.round</code> aux deux conversions à 2,54 cm par pouce), <code>prenom</code>, <code>email</code>, <code>motDePasse</code>. Tout vit dans un <code>useState</code> de <code>useParcours</code> : un rechargement perd tout.</p>
+  <p>Le bouton final n'appelle que <code>avancer: () =&gt; setRang(Math.min(rangBorne + 1, visibles.length - 1))</code>, borné à la dernière étape : rien n'est envoyé, rien n'est enregistré, aucune session n'est ouverte. La règle « Huit caractères au moins. » prend la classe <code>regle--manquee</code> quand <code>0 &lt; motDePasse.length &lt; 8</code>, jamais sur un champ vide.</p>
+  <p class="ancre">GIT-APP-V2 src/domaine/compte.ts, src/domaine/mesures.ts, src/domaine/unites.ts, src/screens/onboarding/parcours.ts, src/app/useParcours.ts</p>
+  <details><summary>Cas limites</summary>
+    <ul>
+      <li>Mot de passe vide : <code>peutValider</code> rend <code>true</code>, le bouton reste allumé — rien n'est obligatoire dans cet onboarding.</li>
+      <li>De un à sept signes : bouton <code>disabled</code> et <code>aria-disabled</code>, règle à l'accent.</li>
+      <li>L'e-mail n'est ni validé, ni trimé, ni comparé à quoi que ce soit.</li>
+      <li>Système impérial : la roue montre <code>Math.round(cm / 2,54)</code> et rend <code>Math.round(pouces × 2,54)</code> — un aller-retour peut déplacer la valeur d'un centimètre.</li>
+    </ul>
+  </details>
+  <div class="exemple"><p>Camille choisit 1978 et 168 cm, saisit « Camille » et son adresse, puis un mot de passe de six signes : la règle passe à l'accent et le bouton s'éteint. À huit signes il se rallume, et n'ouvre rien.</p></div>
+</section>

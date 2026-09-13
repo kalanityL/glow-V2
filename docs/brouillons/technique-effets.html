@@ -1,0 +1,848 @@
+<section id="effets">
+  <h2>7. Les effets secondaires <a class="retour" href="#sommaire">↑ sommaire</a></h2>
+  <p>Ce chapitre décrit comment un ressenti est stocké, arrondi, plafonné, trié, filtré et agrégé. Il donne les formules du calendrier, du graphique d'impact, de l'humeur du jour, de la matrice par moment et des trois sorties du rapport PDF.</p>
+
+  <h3 id="effets-entites">Entités</h3>
+  <p>Un seul objet du domaine est stocké : <code>SideEffectLog</code>, rangé dans <code>AppData.sideEffectHistory</code> (tableau facultatif, absent des sauvegardes anciennes). L'ordre du tableau est l'ordre de création ; il ne sert qu'au plafond quotidien, jamais à l'affichage.</p>
+  <table>
+    <thead><tr><th>Champ</th><th>Type</th><th>Unité canonique</th><th>Facultatif</th></tr></thead>
+    <tbody>
+      <tr><td><code>id</code></td><td>string</td><td><code>se-</code> + <code>Date.now()</code> à la création</td><td>non</td></tr>
+      <tr><td><code>date</code></td><td>string</td><td><code>YYYY-MM-DD</code>, heure locale de l'appareil</td><td>non</td></tr>
+      <tr><td><code>time</code></td><td>string</td><td><code>HH:MM</code>, heure locale, minutes rondes</td><td>non</td></tr>
+      <tr><td><code>type</code></td><td>string</td><td>le libellé de l'effet, tel qu'écrit dans la liste</td><td>non</td></tr>
+      <tr><td><code>severity</code></td><td>number</td><td>entier sans dimension</td><td>non</td></tr>
+      <tr><td><code>notes</code></td><td>string</td><td>texte libre, 280 caractères au plus à la saisie</td><td>oui</td></tr>
+    </tbody>
+  </table>
+  <p><code>severity</code> est déclaré <code>number</code> avec le commentaire « 1 to 5 ». Le type <code>SeverityLevel = 1 | 2 | 3 | 4 | 5</code> existe dans le même fichier mais n'est pas celui du champ : le formulaire y écrit 0 à 5. <code>SideEffectType</code> (<code>id</code>, <code>label</code>, <code>createdAt</code>, <code>updatedAt</code>) appartient au nouveau modèle de données et n'est lu par aucun écran du domaine <span class="marque non">non implémenté</span>.</p>
+  <p>Trois champs du profil commandent le domaine : <code>sideEffectsTrackingEnabled?: boolean</code> (absent = allumé), <code>sideEffectsModuleHidden?: boolean</code> (ne mord que module éteint), <code>deleteAllButtonsEnabled?: boolean</code> (<code>false</code> masque la corbeille). <code>glp1Brand</code> décide de la légende « Injection » ou « Comprimé » du graphique.</p>
+  <p>Le graphique d'impact lit en plus <code>InjectionLog</code> (<code>date</code>, <code>time</code>, <code>dose</code> en mg, <code>site</code>, <code>notes</code>, <code>brand</code>).</p>
+  <p>Rien d'autre n'est stocké. Sont DÉRIVÉS et recalculés à chaque rendu : <code>SideEffectOption {value, label}</code>, <code>TrendDataPoint</code> (les points du graphique), <code>DaySeverityTier</code> et <code>SeverityTierCounts</code> (les paliers), <code>DayMood {tone, label}</code>, <code>SideEffectShift {before, after, changed}</code>, <code>RecentJournalEntry</code>, <code>CalendarDay {date, dayOfMonth, inMonth}</code>, <code>HistoryView</code>. Aucune moyenne, aucun palier, aucun score n'est écrit en base.</p>
+  <p class="ancre">src/types.ts · src/features/side-effects/sideEffects.utils.ts · src/features/side-effects/sideEffectCalendar.ts</p>
+
+  <h3 id="effets-vue-d-historique-par-defaut">Vue d'historique par défaut</h3>
+  <p><code>useHistoryView(clé)</code> initialise la vue en lisant le stockage local : la valeur ne vaut <code>'journal'</code> que si elle est exactement la chaîne <code>'journal'</code> ; tout le reste — absence, valeur inconnue, stockage indisponible — vaut <code>'calendrier'</code>. Chaque bascule réécrit la clé.</p>
+  <pre><code>view = getItem&lt;string&gt;('glp1_side_effects_history_view') === 'journal'
+     ? 'journal'
+     : 'calendrier'</code></pre>
+  <p class="ancre">src/versions/mixte/components/HistoryToolbar.tsx</p>
+  <details><summary>Cas limites</summary>
+    <p>Clé absente → calendrier. Valeur <code>'Journal'</code> (majuscule) → calendrier, la comparaison est exacte. <code>localStorage</code> inaccessible → <code>getItem</code> rend <code>null</code> → calendrier.</p>
+  </details>
+  <p><a href="spec-fonctionnelle.html#effets-ligne-d-outils-de-l-historique-calendrier-journal-ajouter">→ fonctionnelle</a></p>
+
+  <h3 id="effets-ouverture-par-le-flottant-et-le-titre">Ouverture par le flottant et le titre</h3>
+  <p>Deux mécanismes distincts : l'armement du bouton et la demande d'ouverture.</p>
+  <p><strong>Armement.</strong> <code>useOnScreen</code> observe (IntersectionObserver) le curseur segmenté de la ligne d'outils — <code>bandRef</code> de <code>HistoryToolbar</code>, un seul porteur. À chaque changement de visibilité, la page appelle <code>onAddButtonOffScreenChange(!visible)</code>, et l'App exécute <code>armFloatingAdd('symptoms', offScreen)</code> : l'onglet passe à <code>true</code> à la première sortie d'écran et ne redescend jamais. <code>floatingAddArmedTabs</code> est remis à <code>{}</code> à chaque changement d'onglet. Le bouton se rend si <code>floatingAddArmedTabs[activeTab] &amp;&amp; !simplifiedMenu</code>.</p>
+  <p><strong>Demande.</strong> Le bouton flottant et le titre de page (<code>activeTab === 'symptoms'</code>) font tous deux <code>setFloatingAddRequest(n =&gt; n + 1)</code>. Le tracker mémorise la valeur trouvée au montage dans un <code>useRef</code> et n'ouvre le formulaire que si la valeur reçue en diffère.</p>
+  <pre><code>lastAddRequest = useRef(openAddRequest ?? 0)
+useEffect :
+  request = openAddRequest ?? 0
+  si request === lastAddRequest.current → rien
+  sinon lastAddRequest.current = request ; form.openAddForm()</code></pre>
+  <p class="ancre">src/versions/mixte/App.tsx · src/versions/mixte/features/side-effects/SideEffectsTracker.tsx · src/shared/ui/useOnScreen.ts</p>
+  <details><summary>Cas limites</summary>
+    <p>Élément démonté ou ref reposé à <code>null</code> : <code>useOnScreen</code> signale « visible », donc n'arme pas. Menu simplifié : le bouton n'est pas rendu, mais le compteur reste incrémentable par le titre. Retour sur la page déjà parcourue : l'armement repart de zéro, le « + » n'apparaît qu'après un nouveau défilement.</p>
+  </details>
+  <p><a href="spec-fonctionnelle.html#effets-page-effets-secondaires-tracker">→ fonctionnelle</a></p>
+
+  <h3 id="effets-effacement-du-bandeau-de-confirmation">Effacement du bandeau de confirmation</h3>
+  <p><code>useDismissWhenHidden</code> pose un ref sur le bandeau, remonte au premier ancêtre dont <code>overflow-y</code> vaut <code>auto</code> ou <code>scroll</code>, et n'efface que si trois conditions sont réunies au moment d'un événement <code>scroll</code>.</p>
+  <pre><code>MIN_READABLE_MS = 800   TICK_MS = 250   USER_INPUT_WINDOW_MS = 200
+
+toutes les 250 ms :
+  inView = banner.bottom &gt; view.top ET banner.top &lt; view.bottom
+  si !inView → on n'accumule rien
+  topmost = elementFromPoint(centre horizontal du bandeau,
+                             centre vertical borné à [view.top+1, view.bottom-1])
+  si el.contains(topmost) → readableMs += temps écoulé depuis le tick précédent
+
+wheel | touchmove sur le conteneur → lastUserInputAt = now
+
+à chaque scroll :
+  si readableMs &lt; 800                          → rien
+  si now - lastUserInputAt &gt; 200               → rien
+  si banner.bottom &lt;= view.top
+     OU banner.top &gt;= view.bottom              → onDismiss()</code></pre>
+  <p>Le temps est cumulé, pas continu : un bandeau recouvert (fenêtre de badge par-dessus) n'accumule rien. Le défilement animé de la validation ne compte pas, faute de geste dans les 200 ms.</p>
+  <p class="ancre">src/shared/ui/useDismissWhenHidden.ts</p>
+  <details><summary>Cas limites</summary>
+    <p>Aucun ancêtre défilant : le hook sort sans rien installer, le bandeau ne s'efface qu'à la croix. Bandeau partiellement visible : la troisième condition est fausse, rien ne s'efface. Défilement au clavier ou programmatique : pas de <code>wheel</code> ni de <code>touchmove</code>, rien ne s'efface.</p>
+  </details>
+
+  <h3 id="effets-migration-description-notes">Migration description → notes</h3>
+  <p>Au chargement, la sauvegarde traverse une chaîne de conversions dont trois touchent ce journal, dans cet ordre : <code>dropSeedData</code>, <code>purgeDeleted</code>, puis <code>mergeSideEffectNotes</code>.</p>
+  <pre><code>dropSeedData    : sideEffectHistory.filter(row =&gt; !isSeedRow(row))
+purgeDeleted    : retire les lignes dont deletedAt != null,
+                  puis retire le champ deletedAt des survivantes
+mergeSideEffectNotes(log) :
+  { description, ...rest } = log
+  si description === undefined  → log inchangé
+  sinon → { ...rest, notes: rest.notes || description || undefined }</code></pre>
+  <p><code>notes</code> l'emporte sur <code>description</code>. Une <code>description</code> vide ne crée pas de note vide : <code>|| undefined</code> et non <code>|| description</code>. Le champ <code>description</code> disparaît de la ligne dans tous les cas où il était présent. Les trois conversions sont idempotentes.</p>
+  <p class="ancre">src/shared/model/appData.ts · src/shared/model/purgeDeleted.ts · src/app/useAppData.ts</p>
+  <details><summary>Cas limites</summary>
+    <p><code>notes</code> = <code>''</code> et <code>description</code> = « nausée » → notes vaut « nausée » (la chaîne vide est fausse). <code>notes</code> et <code>description</code> tous deux vides → <code>notes: undefined</code>. Ligne sans <code>description</code> : renvoyée par identité, aucune allocation.</p>
+  </details>
+
+  <h3 id="effets-etat-du-module-effets-secondaires">État du module « Effets secondaires »</h3>
+  <p>L'onglet <code>symptoms</code> est associé au drapeau <code>sideEffectsTrackingEnabled</code>. Il appartient à <code>MODULES_ALLUMES_PAR_DEFAUT = {'injection', 'symptoms'}</code> : l'absence de valeur vaut allumé.</p>
+  <pre><code>isModuleOn(profile, 'symptoms') :
+  valeur = profile.sideEffectsTrackingEnabled
+  si valeur === undefined || valeur === null → true
+  sinon → Boolean(valeur)
+
+isModuleHidden(profile, 'symptoms') :
+  → !isModuleOn(profile, 'symptoms') ET Boolean(profile.sideEffectsModuleHidden)</code></pre>
+  <p>Le menu du bas et l'ajout rapide filtrent par <code>isModuleOn</code> ; les tiroirs rendent l'entrée grisée (<code>enabled: false</code>) sauf si <code>isModuleHidden</code>, auquel cas elle disparaît. La bascule d'activation écrit les deux champs en une seule fois : allumer joint <code>sideEffectsModuleHidden: false</code> ; éteindre ne touche pas au masquage.</p>
+  <pre><code>onSaveProfile({
+  ...profile,
+  sideEffectsTrackingEnabled: !isSideEffectsEnabled,
+  ...(isSideEffectsEnabled ? {} : { sideEffectsModuleHidden: false })
+})</code></pre>
+  <p class="ancre">src/versions/mixte/app/navigation.ts · src/versions/mixte/components/NotificationsSettings.tsx</p>
+  <details><summary>Cas limites</summary>
+    <p><code>sideEffectsModuleHidden: true</code> sur un module allumé : sans effet, <code>isModuleHidden</code> exige l'extinction. Sauvegarde ancienne sans aucun des deux drapeaux : module allumé, non masqué.</p>
+  </details>
+  <p><a href="spec-fonctionnelle.html#effets-carte-module-effets-secondaires-page-modules">→ fonctionnelle</a></p>
+
+  <h3 id="effets-echelle-et-defaut-d-intensite-du-formulaire">Échelle et défaut d'intensité du formulaire</h3>
+  <p>L'échelle est faite par la liste des mots : <code>SEVERITY_LABELS = ['Imperceptible', 'Léger', 'Modéré', 'Marqué', 'Fort', 'Élevé']</code>, longueur 6. Le curseur porte <code>min="0"</code>, <code>max={SEVERITY_LABELS.length - 1}</code> soit 5, <code>step="1"</code> ; il rend <code>parseInt(value, 10)</code>. La ligne de texte affiche <code>`${severity} — ${SEVERITY_LABELS[severity]}`</code>.</p>
+  <p><code>DEFAULT_SEVERITY = 0</code>. Cette valeur est posée à l'initialisation du hook et par <code>resetForm</code> (après enregistrement ou fermeture). <code>openAddForm</code> — le geste de « + ajouter », du « + » flottant, du titre et d'un jour vide du calendrier — ne touche PAS à <code>severity</code> : rouvrir le formulaire alors qu'il est déjà ouvert garde l'intensité en place. <code>startEdit</code> y met <code>log.severity</code>.</p>
+  <p class="ancre">src/versions/mixte/features/side-effects/SideEffectForm.tsx · src/features/side-effects/useSideEffectForm.ts</p>
+  <details><summary>Cas limites</summary>
+    <p><code>severity</code> hors de 0–5 (ligne venue d'une sauvegarde) : <code>SEVERITY_LABELS[severity]</code> vaut <code>undefined</code>, l'<code>aria-valuetext</code> retombe sur la chaîne vide, la ligne de texte affiche « 7 — » ; le curseur borne l'affichage à 5.</p>
+  </details>
+  <p><a href="spec-fonctionnelle.html#effets-formulaire-nouveau-ressenti-modifier-le-ressenti">→ fonctionnelle</a></p>
+
+  <h3 id="effets-valeurs-par-defaut-du-formulaire">Valeurs par défaut du formulaire</h3>
+  <p>À l'initialisation du hook — donc à l'arrivée sur la page, pas à l'ouverture du formulaire :</p>
+  <pre><code>selectedEffect = activeSideEffects[0]?.value || 'Nausées'
+date           = getLocalDateStr(new Date())
+time           = getRoundedLocalTimeStr(new Date())
+notes          = ''      showNotes = false</code></pre>
+  <p><code>activeSideEffects</code> est trié par <code>localeCompare('fr', {sensitivity:'base'})</code> : <code>[0]</code> est donc le premier effet actif dans l'ordre alphabétique français, et le repli <code>'Nausées'</code> ne sert que si la liste est vide.</p>
+  <p><code>openAddForm</code> recale l'effet, la date et l'heure sur l'instant présent avant d'ouvrir, puis <code>scrollToTop(true)</code>. <code>openAddFormAt(d)</code>, appelé par un jour du calendrier, enchaîne <code>openAddForm()</code> puis <code>setDate(d)</code> : l'ordre compte, <code>openAddForm</code> ayant remis la date à aujourd'hui.</p>
+  <p class="ancre">src/features/side-effects/useSideEffectForm.ts · src/versions/mixte/features/side-effects/SideEffectsTracker.tsx</p>
+  <details><summary>Cas limites</summary>
+    <p>Formulaire ouvert par <code>autoOpenAdd</code> (ajout rapide) : <code>showAddForm</code> part à <code>true</code> dès la première peinture, puis l'effet appelle <code>openAddForm</code>, qui recale l'instant. La date et l'heure du montage vieillissent si l'on reste longtemps sur la page sans ouvrir le formulaire par un geste : seul <code>openAddForm</code> les rafraîchit.</p>
+  </details>
+  <div class="exemple"><p>Camille arrive sur la page le 12/09/2026 à 08:37, effets actifs par défaut : le formulaire propose « Ballonnements », 2026-09-12, 08:30, intensité 0.</p></div>
+
+  <h3 id="effets-heure-arrondie-vers-le-bas-aux-minutes-rondes">Heure arrondie vers le bas aux minutes rondes</h3>
+  <p>L'ensemble des minutes admises est irrégulier : <code>ROUNDED_MINUTES = [0, 10, 15, 20, 30, 40, 45, 50]</code>, croissant. L'arrondi est toujours vers le bas, pour ne jamais produire une heure future.</p>
+  <pre><code>snapToRoundedMinutes(time) :
+  m = /^(\d{2}):(\d{2})$/.exec(time)
+  si !m                → time inchangé
+  minutes = Number(m[2])
+  si minutes &gt; 59      → time inchangé
+  r = dernière valeur de ROUNDED_MINUTES telle que valeur &lt;= minutes, sinon 0
+  → `${m[1]}:${pad2(r)}`
+
+getRoundedLocalTimeStr(d) = snapToRoundedMinutes(`${pad2(d.getHours())}:${pad2(d.getMinutes())}`)</code></pre>
+  <p>La règle s'applique deux fois : à la saisie, pour la valeur pré-remplie, et à l'écriture, où <code>snapLogTime</code> passe toute ligne portant un champ <code>time</code> de type <code>string</code> par <code>snapToRoundedMinutes</code>. Les trois gestes d'écriture du journal (ajout, écrasement au plafond, fusion de modification) y passent.</p>
+  <p class="ancre">src/shared/date/date.local.ts · src/shared/model/logbook.ts</p>
+  <details><summary>Cas limites</summary>
+    <p>14:37 → 14:30 ; 14:47 → 14:45 ; 09:58 → 09:50 ; 12:05 → 12:00 ; 00:00 → 00:00. <code>"9:05"</code> (une seule chiffre d'heure) ne correspond pas à l'expression et ressort tel quel. Une heure sans champ <code>time</code> traverse <code>snapLogTime</code> sans changer.</p>
+  </details>
+  <div class="exemple"><p>Camille ouvre le formulaire à 08:37 : l'heure proposée est 08:30. Elle la corrige à 08:44 dans l'horloge : la ligne enregistrée porte 08:40.</p></div>
+
+  <h3 id="effets-validation-a-la-soumission-du-formulaire">Validation à la soumission du formulaire</h3>
+  <p>Une seule garde, en tête de <code>handleSubmit</code>, après <code>preventDefault</code> :</p>
+  <pre><code>si !selectedEffect || selectedEffect === 'ajouter-gerer' || !date || !time → return
+
+isEditing = !!editingId
+si editingId ET onUpdateSideEffect :
+   onUpdateSideEffect({ id: editingId, type, date, time, severity, notes })
+sinon :
+   onAddSideEffect({ type, date, time, severity, notes })
+
+resetForm()
+lastAction   = isEditing ? 'updated' : 'added'
+savedSuccess = true
+scrollToTop()</code></pre>
+  <p>L'intensité n'est pas validée : 0 est enregistrable. Aucun message n'est affiché en cas de refus — le formulaire reste simplement ouvert. Le remontage se fait après le <code>resetForm</code>, le bandeau étant rendu en haut de page.</p>
+  <p class="ancre">src/features/side-effects/useSideEffectForm.ts</p>
+  <details><summary>Cas limites</summary>
+    <p>Mode édition sans <code>onUpdateSideEffect</code> fourni : la branche <code>else</code> n'est pas prise non plus (la condition porte sur <code>editingId</code> seul dans le <code>if</code>) — rien n'est écrit, mais <code>resetForm</code> et le bandeau « mis à jour » s'exécutent. La page passe toujours ce gestionnaire.</p>
+  </details>
+
+  <h3 id="effets-note-espaces-absence-texte-conserve-tel-quel">Note : espaces = absence, texte conservé tel quel</h3>
+  <p>Une seule expression, répétée à l'identique dans les deux branches de <code>handleSubmit</code> :</p>
+  <pre><code>notes: notes.trim() ? notes : undefined</code></pre>
+  <p>Le test porte sur la chaîne rognée, la valeur écrite est la chaîne NON rognée. Une note faite d'espaces vaut absence de note ; toute autre note est conservée avec ses espaces de bord. <code>NOTE_MAX_LENGTH = 280</code> est un <code>maxLength</code> de champ, appliqué à la saisie et non à l'écriture.</p>
+  <p class="ancre">src/features/side-effects/useSideEffectForm.ts · src/shared/ui/NotesField.tsx</p>
+  <details><summary>Cas limites</summary>
+    <p><code>'   '</code> → pas de note. <code>' nausée '</code> → <code>' nausée '</code>, espaces compris. <code>'\n'</code> → pas de note. Une note de plus de 280 caractères venue d'une sauvegarde n'est pas tronquée à la relecture.</p>
+  </details>
+
+  <h3 id="effets-plafond-quotidien-de-15-ressentis">Plafond quotidien de 15 ressentis</h3>
+  <p>L'ajout passe par la fonction commune des journaux, avec <code>cap = 15</code>. Le décompte porte sur la seule date de la ligne à écrire, pas sur la date du jour.</p>
+  <pre><code>handleAddSideEffect(log) :
+  sideEffectHistory = addLogWithinDailyCap(
+      prev.sideEffectHistory, log, 15, `se-${Date.now()}`,
+      () =&gt; setLimitNotice("Limite atteinte pour aujourd'hui : cette saisie remplace la dernière."))
+
+addLogWithinDailyCap(logs, log, cap, newId, onCapReached) :
+  duJour = logs.filter(l =&gt; l.date === log.date)
+  si duJour.length &lt; cap :
+      → [...logs, snapLogTime({ ...log, id: newId })]
+  onCapReached()
+  i = plus grand indice tel que logs[i].date === log.date
+  si i existe : logs[i] = snapLogTime({ ...logs[i], ...log })   // id conservé
+  → logs</code></pre>
+  <p>« La dernière du jour » est la dernière dans l'ORDRE DU TABLEAU, donc la dernière créée, quelle que soit son heure. L'identifiant de la ligne écrasée survit ; ses champs sont tous remplacés par ceux de la nouvelle saisie (l'étalement <code>{...logs[i], ...log}</code> ne laisse que <code>id</code>, absent de <code>log</code>). L'avis paraît APRÈS l'écrasement, puisque <code>onCapReached</code> est appelé dans la même passe.</p>
+  <p><code>limitNotice</code> est un état de l'application, pas de la page : il est rendu en tête du contenu, quel que soit l'onglet, et ne s'efface qu'à sa croix (<code>dismissLimitNotice</code> le remet à <code>null</code>). Il survit donc à un changement de page. Le même état porte les refus des autres journaux.</p>
+  <p class="ancre">src/app/useAppData.ts · src/shared/model/logbook.ts</p>
+  <details><summary>Cas limites</summary>
+    <p>Quinze lignes le 05/09 et une seizième saisie datée du 12/09 : le plafond ne mord pas, les journées sont comptées séparément. Une note absente dans la nouvelle saisie efface celle de la ligne écrasée : <code>notes: undefined</code> écrase la valeur précédente. Journal vide pour cette date : la branche d'écrasement ne trouve rien et le tableau ressort inchangé — impossible ici, <code>duJour.length &gt;= 15</code> garantissant l'existence.</p>
+  </details>
+  <div class="exemple"><p>Camille a saisi 15 ressentis le 12/09, dans l'ordre de création, le dernier à 21:00. Un seizième à 07:00 écrase la ligne de 21:00 et prend son identifiant ; l'avis « Limite atteinte » s'affiche.</p></div>
+  <p><a href="spec-fonctionnelle.html#effets-avis-limite-atteinte">→ fonctionnelle</a></p>
+
+  <h3 id="effets-modification-par-fusion-suppression-franche">Modification par fusion, suppression franche</h3>
+  <pre><code>applyLogUpdate(logs, update) :
+  logs.map(l =&gt; l.id === update.id ? snapLogTime({ ...l, ...update }) : l)
+
+removeLogById(logs, id) :
+  logs.filter(l =&gt; l.id !== id)
+
+handleClearAllSideEffects() :
+  sideEffectHistory = []</code></pre>
+  <p>La fusion conserve les champs absents de la charge de modification — c'est ce qui permet à la bulle du calendrier, qui n'édite pas la note, de ne pas la perdre. La position dans le tableau ne bouge pas : l'ordre de création est préservé, donc le rang au plafond quotidien aussi. La suppression est franche : plus aucun <code>deletedAt</code> n'est posé, la ligne quitte la sauvegarde.</p>
+  <p class="ancre">src/shared/model/logbook.ts · src/app/useAppData.ts</p>
+  <details><summary>Cas limites</summary>
+    <p>Identifiant inconnu : <code>applyLogUpdate</code> et <code>removeLogById</code> rendent le tableau inchangé, sans erreur. Tableau absent : les deux fonctions ont <code>[]</code> pour valeur par défaut de leur paramètre.</p>
+  </details>
+
+  <h3 id="effets-libelle-court-et-nettoyage-du-type">Libellé court et nettoyage du type</h3>
+  <p>Deux transformations distinctes, appliquées à des endroits différents.</p>
+  <pre><code>shortSideEffectLabel(label) = label.replace(/\s*\([^)]*\)\s*$/, '').trim() || label
+cleanSideEffectLabel(type)  = type.replace(/^[^a-zA-ZÀ-ÿ]+/, '').trim()</code></pre>
+  <p><code>shortSideEffectLabel</code> ne s'applique qu'au libellé FERMÉ du sélecteur du formulaire ; la liste ouverte garde le libellé entier. Le <code>|| label</code> protège un libellé entièrement parenthésé. <code>cleanSideEffectLabel</code> retire un préfixe non alphabétique (émoji, chiffre, ponctuation) et sert au nom affiché dans la ligne du journal, dans la bulle du calendrier, au brouillon d'édition, et — sous le nom <code>cleanType</code>, même expression — au rapport PDF. Aucune des deux ne modifie ce qui est stocké : <code>type</code> reste la chaîne saisie, sauf lorsque <code>startEdit</code> place <code>cleanSideEffectLabel(log.type)</code> dans le sélecteur, valeur qu'une revalidation réécrira.</p>
+  <p class="ancre">src/features/side-effects/sideEffects.utils.ts · src/versions/mixte/features/report/medicalReportPdf.ts</p>
+  <details><summary>Cas limites</summary>
+    <p>« Asthénie (fatigue sans possibilité de récupération) » → « Asthénie ». « Douleur (aiguë) au flanc » → inchangé, la parenthèse n'est pas finale. « (sans nom) » → inchangé grâce au repli. <code>cleanSideEffectLabel('🤢 Nausées')</code> → « Nausées » ; <code>cleanSideEffectLabel('123')</code> → chaîne vide.</p>
+  </details>
+
+  <h3 id="effets-fermeture-du-formulaire-au-clic-a-cote">Fermeture du formulaire au clic à côté</h3>
+  <p><code>useFormPressOutside(close)</code> rend un ref à poser sur la carte du formulaire et installe un écouteur sur le geste <code>pressStart</code> (l'appui, pas le clic complet) : le formulaire se ferme AVANT que le clic n'agisse ailleurs, ce qui évite un double clic.</p>
+  <pre><code>isInside(target) :
+  si target n'est pas un Element        → true  (rien ne ferme)
+  si cardRef.current.contains(target)   → true
+  → Boolean(target.closest('.glow-sel'))</code></pre>
+  <p><code>.glow-sel</code> est le contrat des surfaces que les formulaires portent hors de leur carte par <code>createPortal</code> vers <code>#phone-screen</code> : calendriers, horloges et listes déroulantes maison. Sans cette exception, choisir un jour fermerait le formulaire sous le doigt. La fermeture est celle de la croix : <code>resetForm</code>, rien n'est enregistré.</p>
+  <p class="ancre">src/versions/mixte/app/useFormPressOutside.ts</p>
+
+  <h3 id="effets-liste-exhaustive-et-effets-actifs-par-defaut">Liste exhaustive et effets actifs par défaut</h3>
+  <p><code>ALL_SIDE_EFFECTS</code> compte 36 libellés, transformés en <code>{value, label}</code> avec <code>value === label</code>, puis triés une fois pour toutes :</p>
+  <pre><code>sortSideEffectOptions(options) =
+  [...options].sort((a, b) =&gt; a.label.localeCompare(b.label, 'fr', { sensitivity: 'base' }))</code></pre>
+  <p><code>DEFAULT_CHECKED_SIDE_EFFECTS</code> compte 12 libellés. La sélection est relue au premier rendu du hook :</p>
+  <pre><code>saved = getItem&lt;string[]&gt;('glp1_active_side_effects')
+si saved &amp;&amp; saved.length &gt; 0 :
+   → sortSideEffectOptions(ALL_SIDE_EFFECTS.filter(s =&gt; saved.includes(s.value)))
+sinon :
+   → sortSideEffectOptions(ALL_SIDE_EFFECTS.filter(s =&gt; DEFAULT_CHECKED_SIDE_EFFECTS.includes(s.value)))</code></pre>
+  <p>Le filtre se fait dans le sens <code>ALL_SIDE_EFFECTS → saved</code> : une valeur mémorisée qui n'existe plus dans la liste des 36 disparaît silencieusement. Une sélection mémorisée dont AUCUNE valeur ne subsiste rend une liste vide — le repli sur les 12 ne joue que si <code>saved</code> est absent ou de longueur nulle.</p>
+  <p class="ancre">src/features/side-effects/sideEffects.constants.ts · src/features/side-effects/useActiveSideEffects.ts</p>
+  <details><summary>Cas limites</summary>
+    <p><code>saved = ['Effet inventé']</code> : la liste active est vide, <code>activeSideEffects[0]?.value</code> vaut <code>undefined</code>, le formulaire retombe sur <code>'Nausées'</code>. Le tri est calculé au chargement du module : la liste ne se retrie pas si la langue change.</p>
+  </details>
+  <p><a href="spec-fonctionnelle.html#effets-panneau-effets-secondaires-disponibles-ajouter-gerer">→ fonctionnelle</a></p>
+
+  <h3 id="effets-gestion-des-effets-actifs">Gestion des effets actifs</h3>
+  <p>À l'ouverture du panneau, un effet resynchronise trois états : <code>checkedValues = activeSideEffects.map(s =&gt; s.value)</code>, <code>error = null</code>, <code>searchQuery = ''</code>.</p>
+  <pre><code>filterSideEffectOptions(options, query) :
+  si !query.trim() → options            (toutes les 36)
+  q = query.toLowerCase()
+  → options.filter(s =&gt; s.label.toLowerCase().includes(q))
+
+selectAllVisible()   : checkedValues = Array.from(new Set([...prev, ...visibles]))
+deselectAllVisible() : checkedValues = prev.filter(v =&gt; !visibles.includes(v))
+
+saveSelection() :
+  si checkedValues.length === 0 :
+     error = 'Au moins un effet secondaire doit être sélectionné' ; return
+  setItem('glp1_active_side_effects', checkedValues)
+  activeSideEffects = sortSideEffectOptions(ALL_SIDE_EFFECTS.filter(s =&gt; checkedValues.includes(s.value)))
+  showManageModal = false</code></pre>
+  <p>La recherche est une inclusion de sous-chaîne, insensible à la casse et non à l'accent (aucun <code>localeCompare</code> ici). Les deux commandes globales ne portent que sur <code>filteredOptions</code>, donc sur les cases visibles : les cases cochées hors recherche survivent à « Tout décocher ». Cocher une case efface l'erreur en cours. Ce qui est persisté est <code>checkedValues</code> dans son ordre de constitution, pas la liste triée.</p>
+  <p class="ancre">src/features/side-effects/useActiveSideEffects.ts</p>
+  <details><summary>Cas limites</summary>
+    <p>Recherche faite d'espaces : <code>query.trim()</code> est vide, toutes les options ressortent — la comparaison utilise ensuite <code>query</code> non rogné. La recherche est insensible à la casse mais PAS aux accents : « nausees » ne trouve rien. « ver » retient « Aversion alimentaire » et « Vertiges », l'inclusion ne portant pas sur le début du mot ; « Vomissements » ne contient pas « ver ». Recherche sans résultat : les deux commandes n'ont rien à faire, « Aucun effet trouvé » s'affiche.</p>
+  </details>
+
+  <h3 id="effets-soulignement-de-tout-cocher-tout-decocher">Soulignement de « Tout cocher » / « Tout décocher »</h3>
+  <pre><code>allVisibleChecked  = filteredOptions.length &gt; 0
+                     ET filteredOptions.every(s =&gt; checkedValues.includes(s.value))
+noneVisibleChecked = filteredOptions.every(s =&gt; !checkedValues.includes(s.value))
+
+restsToCheck   = filteredOptions.length &gt; 0 ET !allVisibleChecked
+restsToUncheck = !noneVisibleChecked</code></pre>
+  <p>Le souligné marque la commande qui a encore un effet, jamais celle qui est déjà accomplie. La garde <code>length &gt; 0</code> est nécessaire au premier calcul : sur une liste vide, <code>every</code> rend <code>true</code> pour la seconde et <code>allVisibleChecked</code> serait faux sans elle, ce qui soulignerait une commande sans cible. Aucune des deux n'est soulignée sur une recherche sans résultat.</p>
+  <p class="ancre">src/versions/mixte/features/side-effects/ManageSideEffectsBlock.tsx</p>
+
+  <h3 id="effets-options-affichees-dans-un-selecteur-d-effet">Options affichées dans un sélecteur d'effet</h3>
+  <pre><code>buildDisplayOptions(activeSideEffects, selectedEffect) :
+  options = [...activeSideEffects]
+  si selectedEffect
+     ET selectedEffect !== 'ajouter-gerer'
+     ET aucune option n'a cette valeur :
+       options.push({ value: selectedEffect, label: selectedEffect })
+       → sortSideEffectOptions(options)
+  → options</code></pre>
+  <p>Le libellé de l'option rajoutée est la valeur elle-même : un effet désactivé depuis la saisie réapparaît sous son texte brut. L'option <code>'ajouter-gerer'</code> est ajoutée au JSX, après la liste, dans les trois sélecteurs (formulaire, ligne du journal, ligne de bulle) ; elle n'est jamais une valeur de <code>selectedEffect</code>, chaque gestionnaire l'interceptant pour ouvrir le panneau et sortir sans changer la sélection.</p>
+  <p class="ancre">src/features/side-effects/sideEffects.utils.ts · src/versions/mixte/features/side-effects/JournalEntryCard.tsx · src/versions/mixte/features/side-effects/SideEffectCalendar.tsx</p>
+  <details><summary>Cas limites</summary>
+    <p>Dans le journal et la bulle, la valeur comparée est <code>cleanSideEffectLabel(type)</code> : un type à préfixe non alphabétique est ajouté sous sa forme nettoyée, et l'écrire enregistre la forme nettoyée. La garde <code>!== 'ajouter-gerer'</code> empêche l'option de sortie de se dupliquer dans la liste.</p>
+  </details>
+
+  <h3 id="effets-stockage-local">Stockage local</h3>
+  <p>Quatre clés, toutes en JSON par <code>getItem</code>/<code>setItem</code>, qui échouent silencieusement (lecture → <code>null</code>, écriture → rien) si le stockage est indisponible ou plein.</p>
+  <table>
+    <thead><tr><th>Clé</th><th>Contenu</th><th>Écrite par</th></tr></thead>
+    <tbody>
+      <tr><td><code>glp1_active_side_effects</code></td><td><code>string[]</code> des libellés cochés</td><td>« Enregistrer la sélection »</td></tr>
+      <tr><td><code>glp1_side_effects_history_view</code></td><td><code>'journal'</code> ou <code>'calendrier'</code></td><td>chaque bascule du curseur</td></tr>
+      <tr><td><code>glp1_period_side_effects_journal</code></td><td><code>{ window, customRange }</code></td><td>chaque changement de période du journal</td></tr>
+      <tr><td><code>glp1_period_side_effects_trend</code></td><td><code>{ window, customRange }</code></td><td>chaque changement de période du graphique</td></tr>
+    </tbody>
+  </table>
+  <p>Ces quatre clés vivent sur l'appareil, hors de la sauvegarde <code>AppData</code> : elles ne suivent ni l'export ni le compte. La suppression de compte passe par <code>clearAll()</code>, qui vide tout le stockage.</p>
+  <p class="ancre">src/shared/platform/storage.ts · src/shared/time-window/usePeriodWindow.ts</p>
+
+  <h3 id="effets-ordre-du-journal">Ordre du journal</h3>
+  <p>Le tri précède le filtre, sur une copie du tableau.</p>
+  <pre><code>filterJournalHistory(history, window, customRange) :
+  triee = [...history].sort(byDateTimeDesc)
+  → filterByTimeWindow(triee, window, log =&gt; log.date, customRange)
+
+orderKey(log)      = `${log.date}T${log.time || '12:00'}`
+byDateTimeDesc(a,b)= orderKey(b).localeCompare(orderKey(a))</code></pre>
+  <p>La clé est une chaîne : la comparaison lexicographique de <code>YYYY-MM-DDTHH:MM</code> EST l'ordre chronologique, aucun objet <code>Date</code> n'est construit, aucun fuseau n'intervient. Une heure absente ou vide compte pour <code>12:00</code>. Le tri de JavaScript étant stable, deux lignes de même date et même heure gardent leur ordre de création.</p>
+  <p class="ancre">src/features/side-effects/sideEffects.utils.ts · src/shared/model/logOrder.ts</p>
+  <div class="exemple"><p>Le 12/09, le journal de Camille sort : 12/09 08:30 Nausées ; 10/09 15:00 Fatigue ; 10/09 09:30 Nausées ; 05/09 19:00 Fatigue ; 05/09 11:30 Vertiges ; 05/09 08:00 Nausées.</p></div>
+  <p><a href="spec-fonctionnelle.html#effets-vue-journal-des-effets-secondaires">→ fonctionnelle</a></p>
+
+  <h3 id="effets-fenetre-temporelle-inclusive">Fenêtre temporelle inclusive</h3>
+  <pre><code>WINDOW_DAYS = { '7days': 7, '14days': 14, '30days': 30, '90days': 90 }
+
+getCutoffDateStr(window, customRange) :
+  'all'    → null
+  'custom' → customRange.startDate si présente et parsable, sinon null
+  sinon    → cutoff = new Date() ; cutoff.setDate(cutoff.getDate() - (WINDOW_DAYS[window] - 1))
+             → getLocalDateStr(cutoff)
+
+filterByTimeWindow(items, window, getDate, customRange) :
+  'all'    → items
+  'custom' → items.filter(i =&gt; !(startDate &amp;&amp; d &lt; startDate) &amp;&amp; !(endDate &amp;&amp; d &gt; endDate))
+  sinon    → cutoff = getCutoffDateStr(window)
+             si !cutoff → items ; sinon items.filter(i =&gt; getDate(i) &gt;= cutoff)</code></pre>
+  <p>Le décalage de <code>n − 1</code> rend la fenêtre inclusive : « 7 derniers jours » couvre aujourd'hui et les six jours précédents. En mode <code>custom</code>, une borne vide est illimitée de son côté, et les deux bornes sont incluses. Toutes les comparaisons sont des comparaisons de chaînes <code>YYYY-MM-DD</code>. Une fenêtre fixe n'a pas de borne de fin : les dates futures passent le filtre.</p>
+  <p class="ancre">src/shared/time-window/timeWindow.utils.ts</p>
+  <details><summary>Cas limites</summary>
+    <p>Le 12/09/2026, « 7 derniers jours » → coupure 2026-09-06 ; « 30 derniers jours » → 2026-08-14. <code>custom</code> sans <code>customRange</code> du tout : le filtre rend tous les éléments. <code>startDate</code> postérieure à <code>endDate</code> : le filtre rend une liste vide, et les bornes affichent « Choisissez une période valide » sans rien bloquer.</p>
+  </details>
+
+  <h3 id="effets-memoire-et-defaut-des-periodes">Mémoire et défaut des périodes</h3>
+  <p><code>usePeriodWindow(clé)</code> mémorise un couple sous <code>glp1_period_${clé}</code>. Le domaine en utilise deux, indépendantes : <code>side_effects_journal</code> et <code>side_effects_trend</code>.</p>
+  <pre><code>état initial :
+  stored = getItem(`glp1_period_${clé}`)
+  window      = isPeriodWindow(stored?.window) ? stored.window : DEFAULT_PERIOD   // '30days'
+  customRange = stored?.customRange ?? { startDate: '', endDate: '' }
+
+setWindow(w)       : persist({ window: w,        customRange: état.customRange })
+setCustomRange(r)  : persist({ window: état.window, customRange: r })
+setCustomWindow(r) : persist({ window: 'custom', customRange: r })</code></pre>
+  <p><code>setCustomWindow</code> existe parce qu'enchaîner <code>setWindow('custom')</code> puis <code>setCustomRange(r)</code> dans le même rendu perdrait la première écriture : chaque geste persiste depuis l'état d'avant l'autre. C'est lui qu'appellent les bornes éditables quand la fenêtre est fixe — modifier une borne bascule donc en « Choisir » avec les deux bornes en place.</p>
+  <p>Les six fenêtres proposées sont communes à tout le site : <code>7days</code>, <code>14days</code>, <code>30days</code>, <code>90days</code>, <code>all</code>, <code>custom</code>. <code>rangeForFilter</code> ne rend <code>customRange</code> qu'en mode <code>custom</code>.</p>
+  <p class="ancre">src/shared/time-window/usePeriodWindow.ts · src/shared/time-window/periodOptions.ts</p>
+  <details><summary>Cas limites</summary>
+    <p>Valeur stockée inconnue (ancienne fenêtre « un an ») : <code>isPeriodWindow</code> la rejette, retour à <code>30days</code>, la plage personnalisée mémorisée étant conservée. Le graphique reçoit <code>trendPeriod.customRange</code> tel quel et non <code>rangeForFilter</code> : hors mode <code>custom</code>, <code>filterByTimeWindow</code> l'ignore de toute façon.</p>
+  </details>
+
+  <h3 id="effets-bornes-affichees-du-au">Bornes affichées « du … au … »</h3>
+  <p>Le composant reçoit une plage et deux replis. Sur une fenêtre fixe, la plage est fabriquée à la volée :</p>
+  <pre><code>range = window === 'custom'
+        ? customRange
+        : { startDate: getCutoffDateStr(window) ?? '', endDate: '' }
+
+fallbackStart (journal) = sideEffectHistory.reduce((min, log) =&gt;
+                            log.date &amp;&amp; log.date &lt; min ? log.date : min, getLocalDateStr())
+fallbackStart (graphe)  = même réduction sur [...sideEffectHistory, ...injectionHistory]
+fallbackEnd             = getLocalDateStr()
+
+boundLabel(value, fallback, empty, wordAtFallback) :
+  shown = value || fallback || ''
+  si !shown                    → empty          ('début' | 'fin')
+  si fallback &amp;&amp; shown === fallback → wordAtFallback  ('début' | 'aujourd’hui')
+  → shown.split('-').reverse().join('/')          // JJ/MM/AAAA
+
+endIsWord = Boolean(fallbackEnd &amp;&amp; (range.endDate || fallbackEnd) === fallbackEnd)
+préposition = endIsWord ? 'à' : 'au'</code></pre>
+  <p>Le repli de début est la plus ancienne date du journal, initialisée à aujourd'hui : un journal vide donne donc « du début à aujourd'hui ». Le mot s'écrit aussi quand la borne a été choisie et tombe exactement sur le repli. « Depuis le début » (<code>all</code>) donne une <code>startDate</code> vide, remplacée par le repli, donc le mot « début ».</p>
+  <p><code>invalidPeriod = effectiveStart &gt; effectiveEnd</code> (comparaison ISO sur les bornes effectives, replis compris) affiche « Choisissez une période valide » sans rien corriger.</p>
+  <p class="ancre">src/versions/mixte/components/InlineCustomDateRange.tsx · src/versions/mixte/components/PeriodBounds.tsx · src/versions/mixte/features/side-effects/SideEffectsTracker.tsx</p>
+  <details><summary>Cas limites</summary>
+    <p>Une borne en cours d'édition se referme au <code>mousedown</code> hors du champ, sauf sur une surface <code>.glow-sel</code> (le calendrier maison, porté hors du composant). Rien n'est à valider : <code>DateSelect</code> écrit la date dès qu'elle est complète et possible.</p>
+  </details>
+  <div class="exemple"><p>Le 12/09/2026, « 30 derniers jours » : <code>getCutoffDateStr</code> rend 2026-08-14, la fin est vide donc vaut aujourd'hui — la ligne se lit « du 14/08/2026 à aujourd'hui ».</p></div>
+
+  <h3 id="effets-compteur-et-etat-vide-du-journal">Compteur et état vide du journal</h3>
+  <p>Le compteur du bandeau et le message d'absence ne lisent pas la même liste.</p>
+  <pre><code>compteur   = journal.listHistory.length          // après tri ET filtre
+message    = (!sideEffectHistory || sideEffectHistory.length === 0)
+             ? "Aucun effet secondaire enregistré. Vos ressentis s'afficheront ici."
+             : liste défilante des listHistory</code></pre>
+  <p>Une période sans ligne sur un journal non vide affiche donc « Journal (0) » et une liste vide, sans message. La liste défile dans une zone de 160 px au plus.</p>
+  <p class="ancre">src/versions/mixte/features/side-effects/SideEffectsTracker.tsx</p>
+
+  <h3 id="effets-bouton-tout-supprimer">Bouton « Tout supprimer »</h3>
+  <pre><code>(sideEffectHistory?.length || 0) &gt; 0
+  ET onClearAllSideEffects fourni
+  ET profile?.deleteAllButtonsEnabled !== false</code></pre>
+  <p>Les trois conditions sont cumulatives. La troisième est un <code>!== false</code> strict : le drapeau absent laisse la corbeille visible, seule la valeur <code>false</code> la retire. La corbeille n'ouvre que le bloc de confirmation ; <code>onClearAllSideEffects</code> n'est appelé qu'au bouton « Supprimer » de ce bloc, qui met <code>sideEffectHistory</code> à <code>[]</code>.</p>
+  <p class="ancre">src/versions/mixte/features/side-effects/SideEffectsTracker.tsx · src/app/useAppData.ts</p>
+  <p><a href="spec-fonctionnelle.html#effets-bloc-de-confirmation-supprimer-tout">→ fonctionnelle</a></p>
+
+  <h3 id="effets-edition-en-place-dans-le-journal-severite-1-a-5">Édition en place dans le journal (intensité 1 à 5)</h3>
+  <p>La ligne du journal emploie <code>useInlineEditableLog</code> : un brouillon de chaînes, resynchronisé sur l'identité de la ligne, lu par <code>draftRef</code> (et non par l'état) pour que les sélecteurs qui choisissent et referment dans le même geste voient bien la valeur choisie.</p>
+  <pre><code>brouillon = { severity: String(l.severity), type: l.type, date: l.date,
+              time: l.time || '12:00', notes: l.notes || '' }
+
+à l'enregistrement :
+  sVal = parseInt(d.severity, 10)
+  si isNaN(sVal) || sVal &lt; 1 || sVal &gt; 5 || !d.date || !d.type → return
+  si sVal === l.severity ET d.type === l.type ET d.date === l.date
+     ET d.time === (l.time || '12:00') ET d.notes === (l.notes || '') → return
+  onUpdateSideEffect({ ...l, severity: sVal, type: d.type, date: d.date,
+                       time: d.time || '12:00',
+                       notes: d.notes.trim() ? d.notes : undefined })</code></pre>
+  <p>Le sélecteur d'intensité ne propose que <code>1/5</code> à <code>5/5</code> : l'échelle 0–5 décidée pour le formulaire n'est pas appliquée ici, et une ligne à 0 s'affiche « 0/5 » sans pouvoir y être remise <span class="marque non">non implémenté</span>. L'étalement <code>{...l}</code> conserve les champs non édités ; la ligne est donc écrite entière, puis fusionnée par <code>applyLogUpdate</code>.</p>
+  <p class="ancre">src/versions/mixte/features/side-effects/JournalEntryCard.tsx · src/shared/ui/useInlineEditableLog.ts</p>
+  <details><summary>Cas limites</summary>
+    <p>Ligne sans heure : le brouillon la lit « 12:00 » et la comparaison de non-changement utilise la même valeur, donc rouvrir puis refermer le champ n'écrit rien — mais tout autre changement écrit 12:00 en base. Note vidée : <code>notes: undefined</code>, la note disparaît. Date effacée dans le champ : la garde <code>!d.date</code> refuse, la valeur d'origine reste affichée au rendu suivant.</p>
+  </details>
+  <p><a href="spec-fonctionnelle.html#effets-ligne-du-journal-journalentrycard">→ fonctionnelle</a></p>
+
+  <h3 id="effets-rangement-des-effets-par-jour">Rangement des effets par jour</h3>
+  <pre><code>sideEffectsByDate(history) :
+  map = Map&lt;date, SideEffectLog[]&gt;
+  pour chaque log : map.get(log.date) ?? [] , push, set
+  pour chaque liste : liste.sort((a,b) =&gt; (a.time ?? '').localeCompare(b.time ?? ''))
+  → map</code></pre>
+  <p>Heure croissante à l'intérieur d'un jour. Le repli est la chaîne vide, non <code>'12:00'</code> : une ligne sans heure passe en TÊTE de sa journée, contrairement au tri du journal. La fonction sert au calendrier de la page, au regroupement du rapport PDF (<code>groupReportDays</code>) et donc à l'annexe C comme au détail des journées.</p>
+  <p class="ancre">src/features/side-effects/sideEffectCalendar.ts · src/versions/mixte/features/report/reportDays.ts</p>
+  <div class="exemple"><p>Le 05/09, Camille a Nausées 08:00, Vertiges 11:30, Fatigue 19:00 : la journée sort dans cet ordre, quelle que soit la suite des saisies.</p></div>
+
+  <h3 id="effets-note-moyenne-de-la-tuile-du-calendrier">Note moyenne de la tuile du calendrier</h3>
+  <pre><code>dayAverageSeverity(logs) :
+  si logs.length === 0 → ''
+  moyenne = logs.reduce((s, log) =&gt; s + log.severity, 0) / logs.length
+  → `${formatNumber(moyenne, 1)}/5`</code></pre>
+  <p>Moyenne arithmétique non pondérée des intensités du jour, arrondie à une décimale par <code>Math.round</code>, zéros de queue supprimés, point décimal, suffixe « /5 ». Le calendrier ne dessine une valeur que sur les jours à donnée : la branche vide n'est jamais atteinte depuis la tuile.</p>
+  <p class="ancre">src/features/side-effects/sideEffectCalendar.ts</p>
+  <details><summary>Cas limites</summary>
+    <p><code>[3]</code> → « 3/5 » ; <code>[3,4]</code> → « 3.5/5 » ; <code>[2,2]</code> → « 2/5 » ; <code>[4,1,2]</code> → 2,333… → « 2.3/5 » ; <code>[0]</code> → « 0/5 ».</p>
+  </details>
+  <div class="exemple"><p>05/09 : (4 + 1 + 2) / 3 = 2,333… → « 2.3/5 ». 10/09 : (3 + 2) / 2 = 2,5 → « 2.5/5 ». 12/09 : 2 / 1 = 2 → « 2/5 ».</p></div>
+  <p><a href="spec-fonctionnelle.html#effets-vue-calendrier-des-effets-secondaires">→ fonctionnelle</a></p>
+
+  <h3 id="effets-formatage-des-nombres-a-l-ecran">Formatage des nombres à l'écran</h3>
+  <pre><code>formatNumber(value, decimals = 0) :
+  si !Number.isFinite(value) → ''
+  negatif = value &lt; 0
+  arrondi = |Math.round(value * 10^decimals) / 10^decimals|
+  [entiere, fraction] = arrondi.toFixed(decimals).split('.')
+  groupee = entiere.replace(/\B(?=(\d{3})+(?!\d))/g, NBSP)   // NBSP = U+00A0
+  utile   = fraction.replace(/0+$/, '')
+  → `${negatif ? '-' : ''}${groupee}${utile ? '.' + utile : ''}`</code></pre>
+  <p><code>decimals</code> est un maximum, pas une longueur imposée. Le séparateur de milliers est U+00A0 (insécable ordinaire), jamais U+202F ; le séparateur décimal est le point. Le calcul ne passe pas par <code>toLocaleString('fr-FR')</code>, dont la table dépend du moteur. À la SAISIE, la virgule reste acceptée et convertie ; seul l'affichage normalise.</p>
+  <p class="ancre">src/shared/number/number.format.ts</p>
+  <details><summary>Cas limites</summary>
+    <p><code>formatNumber(2.25, 1)</code> → « 2.3 » ; <code>formatNumber(3, 1)</code> → « 3 » ; <code>formatNumber(NaN)</code> → chaîne vide ; <code>formatNumber(-1200)</code> → « -1 200 », l'espace n'étant jamais posée derrière le signe.</p>
+  </details>
+
+  <h3 id="effets-coquille-calendarblock-bornes-gestes-titres">Coquille CalendarBlock : bornes, gestes, titres</h3>
+  <p>La coquille est commune aux sept calendriers du site ; les effets n'en changent que les rendus (<code>renderValue</code>, <code>renderBubble</code>) et les intitulés.</p>
+  <pre><code>mois affiché initial = mois courant (getLocalDateStr(new Date()))
+firstDate = plus petite clé de entriesByDate  (undefined si vide)
+minKey = min(monthKey(aujourd'hui), firstDate ? monthKey(firstDate) : monthKey(aujourd'hui))
+maxKey = monthKey(aujourd'hui)
+canPrev = shownKey &gt; minKey        canNext = shownKey &lt; maxKey
+
+glissé (touchstart → touchend) :
+  dx = clientX_fin - clientX_début ; dy = idem en Y
+  si |dx| &lt; 48 OU |dx| &lt;= |dy| → rien
+  dx &lt; 0 → goNext() ; sinon goPrev()
+  (goPrev/goNext sortent immédiatement si la borne est atteinte)</code></pre>
+  <p>Les chevrons aux bornes sont <code>disabled</code> et voilés (<code>opacity-40</code>). Le glissé aux bornes ne fait rien, par les mêmes gardes.</p>
+  <p><strong>Clic d'une tuile.</strong> Jour à donnée : <code>stopPropagation</code> puis bascule de la bulle (<code>selectedDate</code>). Jour sans donnée, du mois ou voisin : <code>stopPropagation</code>, fermeture de la bulle, <code>onAddAt(date)</code>. Sans <code>onAddAt</code>, un jour vide n'a aucun gestionnaire. Les intitulés viennent des rendus : <code>dataTitle</code> vaut « n effets secondaires — voir le détail » dès deux effets, « Effet secondaire — voir le détail » sinon ; <code>addTitle</code> vaut « Ajouter un effet secondaire à cette date ».</p>
+  <p><strong>Fermeture.</strong> Aucun voile : un écouteur <code>click</code> posé sur le document tant qu'une bulle est ouverte la referme ; les tuiles et la bulle arrêtent leurs clics.</p>
+  <p><strong>Défilement.</strong> À l'ouverture, après un <code>requestAnimationFrame</code> :</p>
+  <pre><code>scroller = bubble.closest('.overflow-y-auto')
+menu     = scroller.parentElement.querySelector('nav')
+limite   = (menu ? menu.getBoundingClientRect().top : scroller.bottom) - 8
+debord   = bubble.getBoundingClientRect().bottom - limite
+si debord &gt; 0 → scroller.scrollBy({ top: debord, behavior: 'smooth' })</code></pre>
+  <p>La bulle s'ouvre vers le haut sur les deux dernières semaines (<code>weekIdx &gt;= weeks.length - 2</code>), et se cale à gauche (<code>dayIdx &lt;= 1</code>), à droite (<code>dayIdx &gt;= 5</code>) ou centrée. Le bloc passe en <code>z-40</code> tant qu'une bulle est ouverte.</p>
+  <p>L'invite « Cliquez sur la date choisie pour saisir <em>…</em> » ne se rend que si l'appelant fournit <code>premiereSaisie</code> ; pour ce domaine, <code>history.length === 0</code>.</p>
+  <p class="ancre">src/versions/mixte/components/CalendarBlock.tsx · src/versions/mixte/features/side-effects/SideEffectCalendar.tsx</p>
+  <details><summary>Cas limites</summary>
+    <p>Journal vide : <code>firstDate</code> est <code>undefined</code>, <code>minKey = maxKey</code>, les deux chevrons sont inertes. Une entrée future : elle n'élargit pas <code>maxKey</code>, qui reste le mois courant — son mois n'est pas atteignable. Aucun ancêtre <code>.overflow-y-auto</code> : la mesure sort sans rien faire défiler.</p>
+  </details>
+
+  <h3 id="effets-grille-de-mois">Grille de mois</h3>
+  <pre><code>monthGrid(year, month) :          // month de 1 à 12
+  first  = new Date(year, month - 1, 1)
+  offset = (first.getDay() + 6) % 7             // 0 = lundi
+  daysInMonth = new Date(year, month, 0).getDate()
+  pour i de 0 à offset + daysInMonth - 1 :
+     dayNum = i - offset + 1
+     case = { date: dateStrOf(year, month, dayNum),
+              dayOfMonth: new Date(year, month - 1, dayNum).getDate(),
+              inMonth: dayNum &gt;= 1 }
+     tous les 7, la semaine est close
+  la dernière semaine incomplète est complétée par les jours suivants, inMonth: false</code></pre>
+  <p>Semaines complètes du lundi au dimanche, grille toujours rectangulaire. <code>dateStrOf</code> normalise les débordements (jour 0, jour 32) par <code>new Date(year, month - 1, day)</code> en heure locale — c'est le seul usage de <code>Date</code> ici, et il ne part jamais d'une chaîne. <code>WEEKDAY_INITIALS = ['L','M','M','J','V','S','D']</code>. <code>monthLabel</code> compose le mois français en minuscules et l'année ; le bandeau l'affiche en capitales par CSS.</p>
+  <p class="ancre">src/shared/calendar.ts</p>
+
+  <h3 id="effets-bulle-du-calendrier-deux-effets-voir-plus-ajout">Bulle du calendrier : deux effets, « Voir plus », ajout</h3>
+  <pre><code>renderBubble(logs, date, close) :
+  lignes de logs.slice(0, 2)
+  si logs.length &gt; 2 : bouton « Voir plus (${logs.length} effets) »
+      → close() puis setDetailDate(date)
+  si onAddAt : bouton « Ajouter un enregistrement » → close() puis onAddAt(date)
+
+detailLogs = detailDate ? byDate.get(detailDate) ?? [] : []
+le bloc de détail se rend si detailDate ET detailLogs.length &gt; 0</code></pre>
+  <p>Le bloc de détail relit <code>byDate</code> à chaque rendu : vider le jour le fait disparaître de lui-même, sans geste de fermeture. Après <code>setDetailDate</code>, un effet fait <code>scrollIntoView({behavior:'smooth', block:'start'})</code> au <code>requestAnimationFrame</code> suivant, une fois le bloc posé. Dans la bulle, supprimer alors que <code>logs.length === 1</code> appelle <code>close()</code> avant la suppression, sans quoi la tuile redevenue muette garderait son anneau de sélection.</p>
+  <p>Le bloc de détail porte l'identifiant <code>side-effect-day-detail-block</code>, le calendrier <code>side-effect-calendar-block</code>, le graphique <code>side-effect-chart-section</code>.</p>
+  <p class="ancre">src/versions/mixte/features/side-effects/SideEffectCalendar.tsx</p>
+  <p><a href="spec-fonctionnelle.html#effets-bulle-d-un-jour-du-calendrier">→ fonctionnelle</a></p>
+
+  <h3 id="effets-edition-en-place-dans-le-calendrier-severite-0-a-5-note-pres">Édition en place dans le calendrier (intensité 0 à 5, note préservée)</h3>
+  <p><code>DayEffectLines</code> reprend la mécanique de la ligne du journal, avec un brouillon de quatre champs — pas de note — et des bornes différentes.</p>
+  <pre><code>brouillon = { severity: String(l.severity), type: l.type, date: l.date, time: l.time || '12:00' }
+
+à l'enregistrement :
+  sVal = parseInt(d.severity, 10)
+  si isNaN(sVal) || sVal &lt; 0 || sVal &gt; 5 || !d.date || !d.type → return
+  si sVal === l.severity ET d.type === l.type
+     ET d.date === l.date ET d.time === (l.time || '12:00') → return
+  onUpdateSideEffect?.({ ...l, severity: sVal, type: d.type, date: d.date, time: d.time || '12:00' })</code></pre>
+  <p>L'étalement <code>{...l}</code> conserve <code>notes</code> : la bulle ne l'édite pas et ne doit pas la perdre. Le sélecteur propose <code>0/5</code> à <code>5/5</code>.</p>
+  <p><code>modifiable = !!onUpdateSideEffect</code> : sans gestionnaire d'écriture, les quatre valeurs se rendent figées, sans curseur ni infobulle, et « Modifier » / « Supprimer » ne paraissent que si <code>onEdit</code> / <code>onDelete</code> sont fournis. La page passe toujours les trois ; cet état de lecture seule n'est atteint par aucun montage actuel.</p>
+  <p class="ancre">src/versions/mixte/features/side-effects/SideEffectCalendar.tsx</p>
+
+  <h3 id="effets-points-du-graphique-d-impact">Points du graphique d'impact</h3>
+  <p>L'ensemble des abscisses est l'UNION des dates d'effets et des dates de prises : un jour de prise sans effet est un point à 0 pt.</p>
+  <pre><code>buildTrendData(sideEffectHistory, injectionHistory, isOral, window, customRange) :
+
+  pour chaque effet :   datesSet += log.date
+     dailySymptomStats[date] = { sum += severity, count += 1 }
+
+  pour chaque prise :   datesSet += inj.date
+     si aucune prise retenue pour ce jour OU inj.dose &gt; retenue.dose → retenue = inj
+
+  sortedDates = filterByTimeWindow(Array.from(datesSet).sort(), window, d =&gt; d, customRange)
+
+  pour chaque date :
+     date         = formatDayMonthStr(date)                 // « JJ/MM »
+     fullDate     = date ISO
+     impactScore  = stats ? stats.sum : 0                   // « pts »
+     count        = stats ? stats.count : 0
+     avgSeverity  = stats ? Number((stats.sum / stats.count).toFixed(1)) : null
+     injectionDose / injectionSite / injectionNotes = ceux de la prise retenue, sinon null
+     isOralLog    = prise ? (site === 'prise_orale' || isOralMedication(brand)) : isOral</code></pre>
+  <p>Le tri est un <code>sort()</code> de chaînes <code>YYYY-MM-DD</code>, donc chronologique croissant, ET IL PRÉCÈDE le filtre. À dose égale, la PREMIÈRE prise rencontrée dans le tableau est retenue (<code>&gt;</code> strict). <code>avgSeverity</code> passe par <code>toFixed(1)</code> puis <code>Number</code> : les zéros de queue tombent d'eux-mêmes, et l'infobulle affiche cette valeur brute, sans <code>formatNumber</code>.</p>
+  <p class="ancre">src/features/side-effects/sideEffects.utils.ts</p>
+  <details><summary>Cas limites</summary>
+    <p>Sévérités 2, 3, 5 → <code>impactScore</code> 10, <code>count</code> 3, <code>avgSeverity</code> 3.3. Un jour à un seul effet d'intensité 0 : <code>impactScore</code> 0, <code>count</code> 1, <code>avgSeverity</code> 0 — le point existe et l'infobulle affiche « 0/5 ». Une prise sans effet : <code>count</code> 0, <code>avgSeverity</code> <code>null</code>, l'infobulle affiche « Aucun effet secondaire enregistré ».</p>
+  </details>
+  <div class="exemple"><p>05/09 : 4 + 1 + 2 = 7 pts, 3 effets, moyenne 2.3. 10/09 : 3 + 2 = 5 pts, 2 effets, moyenne 2.5. 12/09 : 2 pts, 1 effet, moyenne 2.</p></div>
+  <p><a href="spec-fonctionnelle.html#effets-graphique-impact-tendance-de-tolerance">→ fonctionnelle</a></p>
+
+  <h3 id="effets-axes-et-pastilles-du-graphique">Axes et pastilles du graphique</h3>
+  <pre><code>XAxis : dataKey="date"  (« JJ/MM »), sans ligne ni graduation
+
+YAxis : allowDecimals={false}   domain={[0, 'auto']}
+        tickFormatter = val =&gt; `${val} pts`
+        width = yAxisWidth([`${Math.ceil(max(0, ...trendData.map(p =&gt; p.impactScore ?? 0)) * 1.25)} pts`])
+        yAxisWidth(labels, charPx = 6.5, padPx = 8)
+          = ceil(longueur du plus long libellé * 6.5 + 8)
+
+Area  : type="monotone", dataKey="impactScore", strokeWidth 2.5,
+        connectNulls, activeDot={false}
+        dot : rendu SEULEMENT si payload.injectionDose n'est ni null ni undefined
+              → cercle r = 3.5
+Tooltip : trigger="click"</code></pre>
+  <p>Le facteur 1,25 anticipe la graduation haute « ronde » que recharts choisira sur un domaine <code>auto</code> : la largeur de l'axe est calculée sur cette étiquette hypothétique, pas sur la valeur maximale réelle. La pastille marque un jour de prise, pas un jour d'effet ; elle est posée sur la courbe d'impact, donc à la hauteur du score de ce jour — 0 s'il n'y a pas eu d'effet. Le rendu du point rend <code>null</code> si <code>cx</code> ou <code>cy</code> est absent ou <code>NaN</code>.</p>
+  <p class="ancre">src/versions/mixte/features/side-effects/SideEffectTrendChart.tsx · src/shared/charts/axisWidth.ts</p>
+
+  <h3 id="effets-fermeture-de-l-infobulle">Fermeture de l'infobulle</h3>
+  <p>L'état est un booléen tenu par le graphe lui-même, dans un <code>useReducer</code>. Ce qui est mémorisé n'est pas « CE point est fermé » mais « LA bulle est fermée ».</p>
+  <pre><code>état initial : { dismissed: false }
+
+tooltipDismissReducer(state, event) :
+  'chart-click'  → state.dismissed ? { dismissed: false } : state
+  'close-button' → state.dismissed ? state : { dismissed: true }
+  'pointer-move' | 'pointer-leave' | 'pointer-enter' | 'rerender' → state
+
+shouldShowTooltip({ active, hasPayload, dismissed }) =
+  Boolean(active) ET hasPayload ET !dismissed</code></pre>
+  <p>Seuls deux événements changent l'état : la croix ferme, un clic sur le graphe rouvre. Le déplacement du curseur, sa sortie, son retour et un re-rendu sont sans effet — c'est cette absence d'effet qui est la correction. La croix appelle en plus <code>onCloseTooltip(fullDate)</code>, que le tracker range dans <code>closedTooltipKey</code> ; cette clé est toujours transmise mais ne décide plus de l'affichage. Au tactile, le tap est un clic et suit le même chemin.</p>
+  <p class="ancre">src/shared/charts/tooltipDismiss.ts</p>
+
+  <h3 id="effets-humeur-du-jour-home">Humeur du jour (home)</h3>
+  <p>L'entrée est la liste des effets du JOUR : <code>sideEffectHistory.filter(log =&gt; log.date === todayStr)</code>. Le calcul n'a ni fenêtre ni pondération.</p>
+  <pre><code>sideEffectsMood(todayEffects) :
+  score           = somme des severity
+  hasSevereEffect = au moins un severity &gt;= 4
+
+  si score === 0 → { serein,   "pas d'effet secondaire aujourd'hui" }
+  si score &gt; 8 OU hasSevereEffect
+                 → { difficile, hasSevereEffect ? 'au moins un symptôme intense'
+                                                : 'plusieurs symptômes' }
+  sinon          → { modere,    todayEffects.length &gt; 1 ? 'symptômes modérés'
+                                                        : 'symptôme modéré' }</code></pre>
+  <p>Le seuil n'est écrit qu'ici. <code>label</code> sert d'infobulle ; les phrases affichées viennent de <code>moodCaption(tone)</code> (home standard) ou <code>moodCaptionCarre(tone)</code> (home sections), deux traductions distinctes d'un ton déjà décidé.</p>
+  <p class="ancre">src/features/home/homeOverview.ts</p>
+  <details><summary>Cas limites</summary>
+    <p>Journée à trois effets d'intensité 0 : score 0 → serein, alors que trois ressentis ont été déclarés. <code>[2,3,4]</code> → difficile (une intensité ≥ 4). <code>[3,3,3]</code> → difficile (9 &gt; 8). <code>[2,2]</code> → modéré. Liste vide → serein.</p>
+  </details>
+  <div class="exemple"><p>12/09 : Nausées à 2, score 2, aucune intensité ≥ 4 → modéré. 05/09 : 4 + 1 + 2 = 7, mais une intensité vaut 4 → difficile.</p></div>
+  <p><a href="spec-fonctionnelle.html#effets-tuile-ressentis-du-jour-de-la-rangee-en-direct-home-sections">→ fonctionnelle</a></p>
+
+  <h3 id="effets-ouverture-de-la-surimpression-depuis-la-tuile-home">Ouverture de la surimpression depuis la tuile home</h3>
+  <pre><code>aDeQuoiMontrerLesEffets =
+    isModuleOn(profile, 'symptoms') ET (appData.sideEffectHistory?.length ?? 0) &gt; 0
+
+clic : aDeQuoiMontrerLesEffets ? setSurimpression('effets') : onNavigate('symptoms')</code></pre>
+  <p>Le test porte sur le journal ENTIER, sans fenêtre : un journal ancien mais non vide ouvre la couche. Un journal vide y montrerait « Aucun effet secondaire déclaré » — la tuile garde alors la navigation vers la page, où la saisie est à portée. Sur la home standard, la tuile équivalente (le badge du carré traitement) navigue toujours vers la page et ne s'affiche que si une semaine de traitement est en cours et le module allumé.</p>
+  <p class="ancre">src/versions/mixte/homes/sections/MaisonSections.tsx · src/versions/mixte/components/Maison.tsx</p>
+
+  <h3 id="effets-matrice-par-moment-de-la-journee-moments-et-crans">Matrice par moment de la journée : moments et crans</h3>
+  <pre><code>MOMENTS = [ { matin,       min: 0,  max: 12 },
+            { après-midi,  min: 12, max: 18 },
+            { soir,        min: 18, max: 24 } ]
+
+cranDe(s) = s &lt;= 0 ? 0 : s &lt;= 2 ? 1 : s === 3 ? 2 : 3
+            (0 rien · 1 légère · 2 modérée · 3 marquée)
+
+remplissage :
+  h     = Number(e.time.slice(0, 2))            // l'heure entière
+  ligne = index du moment tel que h &gt;= min ET h &lt; max
+  col   = jours.indexOf(e.date)
+  si !Number.isFinite(h) OU ligne &lt; 0 OU col &lt; 0 → la déclaration est ignorée
+  matrice[ligne][col] = max(matrice[ligne][col], cranDe(e.severity))</code></pre>
+  <p>Les bornes portent sur l'heure ENTIÈRE, les minutes n'entrent pas : les intervalles sont [0, 12), [12, 18), [18, 24). L'heure lue est celle portée par la ligne — réécrivable au formulaire, au journal ou dans la bulle —, jamais l'instant de la saisie. La case garde le MAXIMUM des crans du moment : une matrice de rythme montre les pics, pas des moyennes. La grille est de 3 lignes × 7 colonnes, initialisée à 0.</p>
+  <p class="ancre">src/versions/mixte/components/TrendGraphOverlay.tsx</p>
+  <details><summary>Cas limites</summary>
+    <p>Heure vide : <code>Number('')</code> vaut 0, donc rangée au matin ; le formulaire refusant l'enregistrement sans heure, le cas ne se produit pas par la page. Une intensité de 0 donne le cran 0, indiscernable d'une absence. Nausées à 09:00 intensité 2 puis à 11:30 intensité 4 → case matin au cran 3.</p>
+  </details>
+  <div class="exemple"><p>Nausées de Camille : 10/09 09:30 intensité 3 → matin, cran 2 « modérée » ; 12/09 08:30 intensité 2 → matin, cran 1 « légère ».</p></div>
+  <p><a href="spec-fonctionnelle.html#effets-surimpression-vitree-effets-secondaires-matrice-matin-apres">→ fonctionnelle</a></p>
+
+  <h3 id="effets-matrice-ordre-des-effets-et-semaine-montree">Matrice : ordre des effets et semaine montrée</h3>
+  <pre><code>pour chaque ligne du journal :
+   comptes[type] += 1
+   derniere[type] = max(derniere[type], date)      // comparaison de chaînes
+
+tri des types :
+   dx = derniere[x], dy = derniere[y]
+   si dx !== dy → dy &lt; dx ? -1 : 1                 // dernière date DÉCROISSANTE
+   sinon        → comptes[y] - comptes[x] || x.localeCompare(y)
+
+indice = min(rang, max(0, types.length - 1))
+typeCourant = types[indice] ?? ''</code></pre>
+  <p>Le premier critère est la dernière déclaration, la plus récente en tête : on entre par l'effet qui a parlé le plus récemment, pas par le plus fréquent. La semaine montrée est propre à l'effet courant :</p>
+  <pre><code>pourCetEffet = journal.filter(e =&gt; e.type === typeCourant)   // journal entier si aucun type
+derniere     = plus grande date de pourCetEffet ('' si aucune)
+fin          = derniere ? new Date(`${derniere}T12:00:00`) : new Date() ; fin.setHours(12,0,0,0)
+jours        = les 7 dates de fin-6 à fin, croissantes (getLocalDateStr)
+total        = nombre de déclarations de typeCourant dans ces 7 jours</code></pre>
+  <p>En-têtes de colonne au format « JJ/MM », dérivés des chaînes ISO. Le rang « i/n » et les deux chevrons ne se dessinent que si <code>types.length &gt; 1</code> ; ils s'éteignent aux bornes plutôt que de boucler. Journal vide : <code>typeCourant</code> est vide et le bloc rend sa seule phrase, « Aucun effet secondaire déclaré. »</p>
+  <p class="ancre">src/versions/mixte/components/TrendGraphOverlay.tsx</p>
+  <details><summary>Cas limites</summary>
+    <p>La matrice compte les déclarations de l'effet courant DANS la semaine (<code>total</code>), pas dans tout le journal. Un effet supprimé pendant la consultation raccourcit <code>types</code> : <code>indice</code> est borné à <code>types.length - 1</code> sans reposer <code>rang</code>.</p>
+  </details>
+  <div class="exemple"><p>Camille au 12/09 : Nausées (dernière le 12/09), Fatigue (10/09), Vertiges (05/09). Ouverture sur Nausées, rang « 1/3 », semaine du 06/09 au 12/09 ; l'entrée du 05/09 est hors de cette semaine.</p></div>
+
+  <h3 id="effets-evolution-des-effets-sur-la-quinzaine">Évolution des effets sur la quinzaine</h3>
+  <pre><code>TREND_DAYS = 14
+trendDates(14, today) = les 14 dates locales de today-13 à today (croissantes)
+
+sideEffectShift(history, days = 14, today = new Date()) :
+  si history est vide                       → null
+  dates        = trendDates(14, today)
+  dansLaFenetre = history.filter(log =&gt; dates.includes(log.date))
+  si dansLaFenetre est vide                 → null
+  moitie = floor(14 / 2) = 7
+
+  tonDe(jours) :                              // jours = 7 dates
+    duBloc          = dansLaFenetre.filter(log =&gt; jours.includes(log.date))
+    severiteMoyenne = somme des severity de duBloc / jours.length      // TOUJOURS / 7
+    journeeType     = severiteMoyenne &gt; 0 ? [{ severity: severiteMoyenne }] : []
+    intense         = duBloc.some(log =&gt; log.severity &gt;= 4)
+    → sideEffectsMood(intense ? [...journeeType, { severity: 4 }] : journeeType).tone
+
+  before  = tonDe(dates.slice(0, 7))
+  after   = tonDe(dates.slice(7))
+  changed = before !== after</code></pre>
+  <p>Le diviseur est le nombre de JOURS de la moitié (7), pas le nombre d'effets : c'est une journée moyenne, pas une intensité moyenne. Le résultat est passé à la règle de l'humeur du jour, dont le seuil « score &gt; 8 » ne peut plus être atteint que par une somme hebdomadaire supérieure à 56. Un effet à 4 ou plus dans la moitié y ajoute une ligne factice à 4, qui force <code>difficile</code> : un symptôme intense ne se dilue pas.</p>
+  <p class="ancre">src/features/trends/trends.ts</p>
+  <details><summary>Cas limites</summary>
+    <p>Moitié à un seul effet d'intensité 5 : moyenne 5/7 ≈ 0,71 → <code>modere</code> par la moyenne, mais l'intense force <code>difficile</code>. Moitié vide : <code>journeeType</code> est <code>[]</code>, score 0 → <code>serein</code>. Journal non vide mais entièrement hors des 14 jours → <code>null</code>.</p>
+  </details>
+  <div class="exemple"><p>Le 12/09, fenêtre du 30/08 au 12/09. Première moitié (30/08–05/09) : 4 + 1 + 2 = 7, moyenne 1, mais une intensité vaut 4 → difficile. Seconde (06/09–12/09) : 3 + 2 + 2 = 7, moyenne 1, aucune intensité ≥ 4 → modéré. <code>changed</code> est vrai.</p></div>
+
+  <h3 id="effets-affichage-de-la-carte-tendance">Affichage de la carte Tendance</h3>
+  <pre><code>shift = sideEffectShift(appData.sideEffectHistory)      // fenêtre par défaut, 14 jours
+
+shift === null   → Smile (24 px) + « Pas ou peu d'effet secondaire »
+shift.changed    → MoodFace(before) · ArrowRight · MoodFace(after)
+sinon            → MoodFace(after)</code></pre>
+  <p>La carte est la huitième du tiroir « Tendance des 15 derniers jours » et vaut toujours <code>enabled: true</code>, sans condition de module ni de données. Le clic ouvre <code>GRAPHES_EN_SURIMPRESSION['side-effects']</code>, c'est-à-dire la matrice par moment, et non la page. Le visage rendu quand les deux tons coïncident est celui de la SECONDE moitié — identique au premier par construction.</p>
+  <p class="ancre">src/versions/mixte/components/TrendDrawer.tsx</p>
+  <p><a href="spec-fonctionnelle.html#effets-carte-effets-secondaires-du-tiroir-tendance-des-15-derniers">→ fonctionnelle</a></p>
+
+  <h3 id="effets-entrees-recentes-et-tiroir-journal">Entrées récentes et tiroir Journal</h3>
+  <p>Les deux surfaces partent du même socle et divergent ensuite.</p>
+  <pre><code>sideEffectEntries(logs) → { key: `effet:${id}`, kind: 'effet', date,
+                            time: log.time || undefined, label: log.type,
+                            severity, tab: 'symptoms' }
+
+entreesTousJournaux(data) : concaténation des sept journaux, puis
+  si a.date !== b.date → b.date.localeCompare(a.date)
+  sinon                → (b.time || '').localeCompare(a.time || '')
+
+RECENT_JOURNAL_DAYS = 7      RECENT_JOURNAL_MAX = 40      ENTREES_PAR_JOURNAL = 3
+
+recentJournalEntries(data, now, max = 40) :          // défilé de la home
+  aujourdhui = getLocalDateStr(now)
+  debut      = getLocalDateStr(now - 6 jours)
+  → entreesTousJournaux(data)
+      .filter(e =&gt; e.date &gt;= debut ET e.date &lt;= aujourdhui)
+      .slice(0, 40)
+
+recentEntriesByTab(data, 3) :                        // tiroir « Journal »
+  parcourt entreesTousJournaux dans l'ordre, garde les 3 premières par onglet
+  aucune fenêtre, futur compris</code></pre>
+  <p>Une entrée sans heure passe APRÈS celles de son jour qui en portent une (le repli est la chaîne vide, en tri décroissant). Le plafond de 40 est GLOBAL, tous journaux confondus : un ressenti de la semaine peut en être poussé dehors par les repas et les séances. Le plafond du tiroir est par onglet, donc jamais concurrent. La ligne du tiroir s'écrit « JJ/MM » + <code>label</code>, sans heure ni intensité (<code>sansSeverite</code>).</p>
+  <p class="ancre">src/features/home/recentJournal.ts · src/versions/mixte/components/JournalDrawer.tsx</p>
+  <details><summary>Cas limites</summary>
+    <p>Un ressenti daté de demain : absent du défilé de la home, en tête du tiroir. Un ressenti vieux de deux mois : absent du défilé, présent dans le tiroir si le journal en compte moins de trois plus récents.</p>
+  </details>
+  <p><a href="spec-fonctionnelle.html#effets-carre-effet-du-defile-recent-de-la-home-standard">→ fonctionnelle</a></p>
+
+  <h3 id="effets-pdf-inclusion-et-synthese">PDF : inclusion et synthèse</h3>
+  <pre><code>filteredSideEffects = filterByTimeWindow(sideEffectHistory, période du rapport, s =&gt; s.date, plage)
+hasSideEffectsData  = isModuleOn(profile, 'symptoms') ET filteredSideEffects.length &gt; 0
+available.sideEffects = hasSideEffectsData          // la case n'est proposée qu'alors
+selection.sideEffects = true par défaut
+include.sideEffects   = selection.sideEffects ET available.sideEffects
+
+journées documentées :
+  si include.sideEffects → chaque date d'effet est ajoutée à l'ensemble dayCount
+
+synthèse (si include.sideEffects ET sideEffects.length &gt; 0) :
+  « n effet déclaré » / « n effets déclarés »
+  paliers = severityTierCounts(opts.sideEffects)
+  tuiles « Effets légers » / « Effets modérés » / « Effets sévères »</code></pre>
+  <p><code>dayCount</code> est un <code>Set</code> de dates : une journée portant un effet compte une fois, quel que soit le nombre d'effets, et elle est déjà comptée si un autre journal l'a inscrite. Le module éteint entre VIDE dans le regroupement par journée : ni case de calendrier, ni rubrique.</p>
+  <p class="ancre">src/versions/mixte/components/MedicalReportExport.tsx · src/versions/mixte/features/report/medicalReportPdf.ts</p>
+  <div class="exemple"><p>Rapport de Camille sur 30 jours au 12/09 : 6 lignes retenues → « 6 effets déclarés » ; paliers par effet 1 léger (Vertiges 1), 4 modérés (2, 3, 2, 2), 1 sévère (Nausées 4).</p></div>
+  <p><a href="spec-fonctionnelle.html#effets-export-du-rapport-medical-case-les-effets-secondaires-ressen">→ fonctionnelle</a></p>
+
+  <h3 id="effets-pdf-section-iii-tolerance">PDF : section III Tolérance</h3>
+  <pre><code>seStats :
+  clé = cleanType(se.type)          // même expression que cleanSideEffectLabel
+  par clé : sum += severity ; count += 1 ; max = Math.max(max, severity)
+  → [...entrées].map(([type, e]) =&gt; ({ type, avg: e.sum / e.count, count: e.count, max: e.max }))
+              .sort((a, b) =&gt; b.count - a.count)      // nombre DÉCROISSANT
+
+phrase : « ${sideEffects.length} déclaration(s) sur ${seStats.length} type(s) d’effet,
+           intensité déclarée de 1 (léger) à 5 (sévère). »
+
+une ligne par type : gaugeRow(type, avg, `${count}×  •  max ${max}/5`)
+  remplissage = clamp(avg / 5, 0, 1) × (largeur du rail - 2 × 0,45 mm)
+                dessiné seulement si le remplissage dépasse 0,2 mm
+  valeur écrite = `${round1(avg)}/5`
+
+sans donnée : « Aucun effet secondaire déclaré sur cette période. »</code></pre>
+  <p>Le tri est stable : deux types de même nombre gardent leur ordre de première apparition dans la liste filtrée. La phrase d'intro annonce une échelle de 1 à 5 alors que le formulaire en écrit 0 à 5 <span class="marque">arbitrage non validé</span>.</p>
+  <p class="ancre">src/versions/mixte/features/report/medicalReportPdf.ts</p>
+  <div class="exemple"><p>Camille : Nausées <code>avg</code> (4+3+2)/3 = 3, <code>count</code> 3, <code>max</code> 4 → jauge à 3/5 = 60 %, « 3/5 », « 3×  •  max 4/5 ». Fatigue 2/5, « 2×  •  max 2/5 ». Vertiges 1/5, « 1×  •  max 1/5 ».</p></div>
+
+  <h3 id="effets-pdf-annexe-c-et-detail-des-journees">PDF : annexe C et détail des journées</h3>
+  <p>Les deux sorties lisent le MÊME regroupement, <code>groupReportDays</code>, qui range les effets par <code>sideEffectsByDate</code> — donc par date, chaque jour trié par heure croissante. Une journée n'existe que si elle porte au moins une donnée.</p>
+  <pre><code>Annexe C « Effets secondaires déclarés », rendue si include.sideEffects ET sideEffects.length &gt; 0 :
+  calendrier mensuel de periodStart à periodEnd
+  case d'un jour = sideEffectCellLines(day.sideEffects)
+     = [] si aucun effet, sinon [{ value: daySeverityWord(logs) }]
+
+Détails des journées, pour chaque jour à effets :
+  rubrique « Effets secondaires »
+  une ligne par effet, dans l'ordre du jour :
+     heure = se.time ; valeur = `${se.severity}/5` ; nom = cleanType(se.type)
+  si se.notes?.trim() non vide → note en dessous, rognée</code></pre>
+  <p>L'annexe ne montre qu'un mot par jour ; le détail montre chaque effet avec son intensité brute, sans palier ni moyenne. Aucune des deux ne recalcule un tri : l'ordre vient du regroupement.</p>
+  <p class="ancre">src/versions/mixte/features/report/medicalReportPdf.ts · src/versions/mixte/features/report/reportCalendar.ts · src/versions/mixte/features/report/reportDays.ts</p>
+
+  <h3 id="effets-palier-de-severite-d-un-jour">Palier de sévérité d'un jour</h3>
+  <pre><code>daySeverityTier(logs) :
+  max = 0
+  pour chaque log : si log.severity &gt; max → max = log.severity
+  → max &gt; 3 ? 'severe' : max &gt; 1 ? 'modere' : 'leger'</code></pre>
+  <p>C'est le MAXIMUM des intensités du jour qui décide, jamais leur somme ni leur nombre. Les bornes sont écrites une seule fois dans le dépôt, ici. L'échelle allant de 0 à 5, le 0 tombe dans « léger » avec le 1. <code>max</code> partant de 0, une intensité négative — impossible par la saisie — ne ferait pas descendre le palier.</p>
+  <p class="ancre">src/features/side-effects/sideEffectCalendar.ts</p>
+  <details><summary>Cas limites</summary>
+    <p><code>[0,1,4]</code> → sévère ; <code>[1,3]</code> → modéré ; <code>[0,1]</code> → léger ; <code>[]</code> → léger (max reste 0), cas que les appelants n'atteignent pas, la case vide étant écartée avant.</p>
+  </details>
+
+  <h3 id="effets-mot-de-severite-accorde-en-nombre">Mot de sévérité accordé en nombre</h3>
+  <pre><code>TIER_WORDS = { leger: 'léger', modere: 'modéré', severe: 'sévère' }
+
+daySeverityWord(logs) :
+  word = TIER_WORDS[daySeverityTier(logs)]
+  → logs.length &gt; 1 ? `${word}s` : word</code></pre>
+  <p>Le pluriel dit le NOMBRE d'effets du jour, le mot dit le PIRE d'entre eux : les deux informations sont indépendantes. Seule l'annexe C du PDF emploie ce mot ; la tuile du calendrier affiche désormais la moyenne.</p>
+  <p class="ancre">src/features/side-effects/sideEffectCalendar.ts</p>
+  <details><summary>Cas limites</summary>
+    <p><code>[1,0]</code> → « légers » ; <code>[2,4]</code> → « sévères » ; <code>[5]</code> → « sévère ».</p>
+  </details>
+  <div class="exemple"><p>Annexe C de Camille : 05/09 trois effets dont un à 4 → « sévères » ; 10/09 deux effets, max 3 → « modérés » ; 12/09 un effet à 2 → « modéré ».</p></div>
+
+  <h3 id="effets-decompte-des-paliers-par-effet">Décompte des paliers par effet</h3>
+  <pre><code>severityTierCounts(history) :
+  counts = { leger: 0, modere: 0, severe: 0 }
+  pour chaque log de (history || []) :
+     counts[daySeverityTier([log])] += 1
+  → counts</code></pre>
+  <p>Chaque effet est passé SEUL dans sa liste à <code>daySeverityTier</code> : la question posée n'est pas « comment était cette journée » mais « combien d'effets de chaque intensité ». Une journée portant une nausée à 1 et un vertige à 5 compte un léger et un sévère, là où le calendrier peindrait la journée en sévère. Les bornes ne sont pas réécrites : elles restent celles de <code>daySeverityTier</code>. Historique vide ou absent → <code>{leger: 0, modere: 0, severe: 0}</code>.</p>
+  <p class="ancre">src/features/side-effects/sideEffectCalendar.ts</p>
+  <details><summary>Cas limites</summary>
+    <p><code>[0,1,2,3,4,5]</code> → <code>{leger: 2, modere: 2, severe: 2}</code>. La somme des trois tuiles est le nombre d'effets de la période, jamais un nombre de journées.</p>
+  </details>
+
+  <h3 id="effets-partage-dernier-ressenti">Partage : dernier ressenti</h3>
+  <pre><code>latest(logs) :
+  si !logs || logs.length === 0 → undefined
+  → [...logs].sort(byDateTimeDesc)[0]
+
+log = latest(appData.sideEffectHistory) ?? SAMPLE_SIDE_EFFECT
+
+SEVERITY_WORDS = ['Imperceptible','Léger','Modéré','Marqué','Fort','Élevé']
+mot            = SEVERITY_WORDS[log.severity] ?? 'Intensité'
+pastilles      = [1..5], remplie si step &lt;= log.severity
+note           = affichée si log.notes est vérité</code></pre>
+  <p>Le tri est le même que celui du journal : date puis heure décroissantes, heure absente comptée <code>12:00</code>. L'échantillon de repli est Nausées, intensité 2, heure 10:30, avec une note. <code>SEVERITY_WORDS</code> est une recopie de <code>SEVERITY_LABELS</code> du formulaire, volontairement dupliquée pour ne pas faire dépendre une maquette d'un formulaire <span class="marque">arbitrage non validé</span>.</p>
+  <p class="ancre">src/versions/mixte/components/share/shareTemplates.tsx · src/versions/mixte/components/share/shareSamples.ts</p>
+  <details><summary>Cas limites</summary>
+    <p>Intensité 0 : aucune pastille remplie, mot « Imperceptible ». Intensité hors 0–5 : le repli « Intensité » s'affiche, et les cinq pastilles sont remplies au-delà de 5.</p>
+  </details>
+  <p><a href="spec-fonctionnelle.html#effets-maquette-de-partage-un-effet-secondaire-mon-ressenti">→ fonctionnelle</a></p>
+</section>

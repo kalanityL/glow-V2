@@ -1,0 +1,1234 @@
+<section id="traitement">
+  <h2>5. Le traitement <a class="retour" href="#sommaire">↑ sommaire</a></h2>
+  <p>Ce chapitre décrit les objets stockés du domaine — journal des prises, identifiant de traitement dans le profil, fiche du catalogue — et les calculs qui en sortent : résolution du traitement d'une ligne, regroupement par molécule, modèle pharmacocinétique de Bateman, séries de la home, paliers de dose, fenêtres temporelles. Il donne les formules, les unités, les seuils, l'ordre des opérations et les cas limites ; les écrans qui les affichent sont décrits dans la spécification fonctionnelle.</p>
+
+  <h3 id="traitement-entites">Entités</h3>
+  <p>Trois objets sont stockés : la ligne de journal <code>InjectionLog</code>, les champs de traitement du profil, et — en dur dans le code, non modifiable par l'utilisatrice — la fiche <code>Treatment</code>. Tout le reste est dérivé à la lecture.</p>
+
+  <p><strong><code>InjectionLog</code></strong> — une prise, injection ou comprimé. Une ligne du tableau <code>AppData.injectionHistory</code>.</p>
+  <table>
+    <thead><tr><th>Champ</th><th>Type</th><th>Unité / format</th><th>Règle</th></tr></thead>
+    <tbody>
+      <tr><td><code>id</code></td><td>string</td><td>—</td><td>Obligatoire. <code>inj-{Date.now()}</code> à la création.</td></tr>
+      <tr><td><code>date</code></td><td>string</td><td><code>AAAA-MM-JJ</code>, date locale</td><td>Obligatoire. Date de la <em>prise</em>, jamais de la saisie.</td></tr>
+      <tr><td><code>time</code></td><td>string</td><td><code>HH:MM</code>, heure locale</td><td>Ramenée à la minute ronde inférieure à l'écriture. Absente ou vide, les lectures la remplacent par <code>12:00</code> — sauf <code>currentTreatmentInjections</code> (<code>00:00</code>) et <code>hasOccurred</code> (journée entière).</td></tr>
+      <tr><td><code>dose</code></td><td>number</td><td>mg</td><td>Obligatoire. Bornée à la saisie par <code>RULE_DOSE</code>, pas au stockage.</td></tr>
+      <tr><td><code>site</code></td><td>string</td><td>clé de <code>SITE_LABELS</code></td><td>Obligatoire. Six zones corporelles ou <code>prise_orale</code> ; toute autre chaîne est tolérée en lecture.</td></tr>
+      <tr><td><code>notes</code></td><td>string</td><td>—</td><td>Facultatif. Vide après <code>trim</code> ⇒ <code>undefined</code>, jamais chaîne vide.</td></tr>
+      <tr><td><code>brand</code></td><td>string</td><td>identifiant du catalogue</td><td>Facultatif. Absent signifie « le traitement du profil au moment de la lecture », ce qui n'est pas « aucun traitement ».</td></tr>
+    </tbody>
+  </table>
+  <p class="ancre">src/types.ts</p>
+
+  <p><strong><code>UserProfile</code>, champs du domaine</strong> — <code>glp1Brand: string</code> (identifiant du catalogue, seule valeur enregistrée), <code>reminderEnabled: boolean</code>, <code>reminderDay: number</code> (0 = dimanche … 6 = samedi), <code>reminderTime: string</code> (<code>HH:MM</code>), <code>injectionReminderType?: 'weekly' | 'custom'</code>, <code>injectionReminderDaysInterval?: number</code> (jours), <code>injectionReminderStartDate?: string</code> (<code>AAAA-MM-JJ</code>), <code>treatmentTrackingEnabled?: boolean</code> (absent = allumé), <code>treatmentModuleHidden?: boolean</code>, <code>deleteAllButtonsEnabled?: boolean</code>.</p>
+  <p class="ancre">src/types.ts</p>
+
+  <p><strong><code>Treatment</code></strong> — fiche du catalogue, en dur dans le code : <code>id</code>, <code>name</code> (nom court), <code>label</code> (libellé du sélecteur), <code>form: 'injection' | 'oral'</code>, <code>molecule: string | null</code>, <code>dosePresets: number[]</code> (mg), <code>halfLifeHours: number</code>, <code>absorptionHalfLifeHours: number</code>, <code>doseScale?: number</code> (biodisponibilité relative, défaut 1), <code>doseIntervalDays?: number</code>, <code>requiresTrialCertification?: boolean</code>. Seul l'<code>id</code> est enregistré ; il ne s'affiche jamais.</p>
+  <p class="ancre">src/shared/medication/treatment.catalog.ts</p>
+
+  <p><strong>Charges d'écriture</strong> : <code>NewLog&lt;T&gt; = Omit&lt;T, 'id'&gt;</code> à l'ajout, <code>LogUpdate&lt;T&gt; = NewLog&lt;T&gt; &amp; { id }</code> à la modification, fusionnée dans la ligne existante.</p>
+  <p class="ancre">src/types.ts</p>
+
+  <p><strong>Dérivé, donc non stocké</strong> : la forme, la molécule, les paliers, les demi-vies et le rythme (lus dans la fiche par l'identifiant) ; le traitement d'une ligne sans <code>brand</code> ; la concentration sanguine à tout instant ; les groupes de molécules (<code>MoleculeGroup</code>, <code>ActiveMolecule</code>) ; les points de courbe (<code>PKDataPoint</code>) ; les paramètres <code>PKParameters</code> (<code>ke</code>, <code>ka</code>, <code>tMax</code>, <code>normFactor</code>) ; la série du traitement en cours (<code>TreatmentSeries</code>), la semaine de cure (<code>CureWeek</code>), l'ancienneté (<code>InjectionRecency</code>), les paliers (<code>Palier</code>), les statistiques par zone (<code>SiteStats</code>), la fréquence observée. Tout cela se recalcule à chaque rendu.</p>
+
+  <h3 id="traitement-entree-et-titre-de-page">Entrée du menu « + » et titre de page</h3>
+  <p>Le titre de l'onglet et de la page vient de la table partagée des onglets : <code>label = treatmentSectionLabel(profile.glp1Brand)</code>, <code>icon = treatmentIcon(profile.glp1Brand)</code>. L'entrée du menu « + » de la home se décide sur deux tests, dans cet ordre : absence de traitement d'abord, forme ensuite.</p>
+  <pre><code>noTreatment = (tab.id === 'injection') &amp;&amp; isNoTreatment(profile.glp1Brand)
+label = noTreatment            ? 'Indiquer un changement de traitement'
+      : isOralMedication(brand)? 'Ajouter un comprimé'
+      :                          'Ajouter une injection'
+clic : noTreatment ? navigate('injection') + autoOpenChangeTreatment = true
+                   : quickAddNavigate('injection')   // autoOpenAdd = true</code></pre>
+  <p><code>autoOpenAdd</code> est l'état initial de <code>showAddForm</code> dans le hook du formulaire, pas un effet : le formulaire est déjà ouvert à la première peinture.</p>
+  <p class="ancre">src/versions/mixte/App.tsx · src/app/navigation.ts · src/features/injections/useInjectionForm.ts</p>
+  <details><summary>Cas limites</summary>
+    <p><code>isNoTreatment</code> teste <code>id === 'aucun'</code> exactement : un profil dont <code>glp1Brand</code> est la chaîne vide n'est pas « aucun » pour ce test, et l'entrée dit « Ajouter une injection » — la migration au chargement écrit pourtant <code>'aucun'</code> dans ce cas, l'état est donc inatteignable après un chargement.</p>
+  </details>
+  <p><a href="spec-fonctionnelle.html#traitement-menu-plus-entree-traitement">→ fonctionnelle</a></p>
+
+  <h3 id="traitement-libelles-et-icone-selon-la-forme">Libellés et icône selon la forme</h3>
+  <p>Trois fonctions, une seule bascule : <code>getTreatment(id).form === 'oral'</code>.</p>
+  <pre><code>treatmentActionLabel(id)  = oral ? 'Comprimé'  : 'Injection'   // le geste, au singulier
+treatmentSectionLabel(id) = oral ? 'Comprimé'  : 'Injections'  // la rubrique
+treatmentIcon(id)         = oral ? RoundPillIcon : Syringe</code></pre>
+  <p>Les deux libellés ne sont pas interchangeables : la rubrique est au pluriel côté injection, au singulier côté comprimé.</p>
+  <p class="ancre">src/shared/medication/medication.labels.tsx</p>
+  <details><summary>Cas limites</summary>
+    <p>Identifiant absent, inconnu, ou <code>'aucun'</code> : <code>getTreatment</code> retombe sur la fiche <code>NO_TREATMENT</code>, dont <code>form</code> vaut <code>'injection'</code>. Un traitement non déclaré est donc traité comme injectable partout.</p>
+  </details>
+  <p><a href="spec-fonctionnelle.html#traitement-page-injections-comprimes">→ fonctionnelle</a></p>
+
+  <h3 id="traitement-fenetres-temporelles">Fenêtres temporelles</h3>
+  <p>Six fenêtres : <code>7days</code>, <code>14days</code>, <code>30days</code>, <code>90days</code>, <code>all</code>, <code>custom</code>. Défaut <code>30days</code>. La coupure est une chaîne de date locale, comparée aux dates des entrées comme des chaînes — jamais convertie en <code>Date</code>, ce qui ferait intervenir un fuseau.</p>
+  <pre><code>getCutoffDateStr(w) :
+  'all'    → null                                    // pas de coupure
+  'custom' → customRange.startDate si lisible, sinon null
+  sinon    → getLocalDateStr(aujourd'hui − (WINDOW_DAYS[w] − 1) jours)
+             WINDOW_DAYS = { 7days:7, 14days:14, 30days:30, 90days:90 }
+
+filterByTimeWindow(items, w, getDate, range) :
+  'all'    → tous
+  'custom' → startDate &amp;&amp; d &lt; startDate ⇒ exclu ; endDate &amp;&amp; d &gt; endDate ⇒ exclu
+             (borne vide = illimitée de ce côté)
+  sinon    → d &gt;= cutoff        // aucune borne haute</code></pre>
+  <p>La fenêtre compte le jour en cours, d'où le <code>n − 1</code>. Les fenêtres fixes n'ont pas de borne haute : une prise datée du futur reste retenue.</p>
+  <p><strong>Mémorisation.</strong> <code>usePeriodWindow(clé)</code> écrit <code>{ window, customRange }</code> sous <code>glp1_period_{clé}</code> dans <code>localStorage</code>. Le journal des prises emploie la clé <code>injections_journal</code> — donc <code>glp1_period_injections_journal</code>. Le graphe de concentration n'emploie pas ce hook : il gère plusieurs graphes à la fois et écrit un dictionnaire <code>{ molécule → fenêtre }</code> sous <code>glp1_period_blood_level_by_brand</code> ; ses plages personnalisées vivent en mémoire et ne sont pas persistées.</p>
+  <pre><code>getDefaultCustomRange(plusAncienne?) =
+  { startDate: plusAncienne ?? getLocalDateStr(maintenant − 28 j),
+    endDate:   getLocalDateStr(maintenant) }</code></pre>
+  <p class="ancre">src/shared/time-window/timeWindow.utils.ts · src/shared/time-window/usePeriodWindow.ts · src/features/blood-level/useMoleculeChartState.ts · src/features/blood-level/bloodLevel.utils.ts</p>
+  <details><summary>Cas limites</summary>
+    <p>Fenêtre fixe : les bornes « du … au … » affichées sont <code>{ startDate: cutoff, endDate: '' }</code> ; éditer une borne appelle <code>setCustomWindow</code>, qui écrit la fenêtre <code>custom</code> et la plage en une seule opération — deux écritures enchaînées repartiraient chacune de l'état d'avant l'autre.</p>
+    <p>Valeur relue du stockage inconnue de la liste : <code>isPeriodWindow</code> la rejette et le défaut s'applique.</p>
+    <p><code>custom</code> avec <code>startDate</code> vide : aucune coupure basse, tout l'historique passe.</p>
+  </details>
+  <div class="exemple"><p>Le 12/09/2026, « 7 derniers jours » retient les lignes dont la date est ≥ <code>2026-09-06</code> ; la prise de Camille du 07/09 y est, celle du 31/08 non.</p></div>
+  <p><a href="spec-fonctionnelle.html#traitement-bloc-de-suivi-des-prises">→ fonctionnelle</a></p>
+
+  <h3 id="traitement-tri-du-journal">Tri du journal</h3>
+  <p><code>computeSiteStats</code> rend, en plus des statistiques par zone, l'historique trié du plus récent au plus ancien sur l'instant complet. Le journal affiche cette liste, filtrée par la fenêtre.</p>
+  <pre><code>sortedHistory = [...history].sort((a, b) =&gt;
+  Date(`${b.date}T${b.time || '12:00'}:00`) − Date(`${a.date}T${a.time || '12:00'}:00`))
+filteredJournalHistory = filterByTimeWindow(sortedHistory, window, log =&gt; log.date, range)</code></pre>
+  <p>Le tri se fait sur les dates portées par les lignes, jamais sur leur rang dans le tableau — l'ordre du tableau est celui des saisies, et une prise antidatée s'y trouve n'importe où.</p>
+  <p class="ancre">src/features/injections/injections.utils.ts · src/features/injections/useInjectionJournal.ts</p>
+  <details><summary>Cas limites</summary>
+    <p>Heure absente : midi. Deux lignes du même jour, l'une sans heure et l'autre à 08:00, se rangent donc « 12:00 » avant « 08:00 ».</p>
+    <p>Date illisible : <code>new Date</code> rend <code>NaN</code>, la comparaison rend <code>NaN</code> et l'ordre de la ligne dépend de l'implémentation du tri. Aucune écriture ne produit ce cas.</p>
+    <p>Le filtre par fenêtre compare la seule <code>date</code>, jamais l'heure : en mode <code>custom</code>, la borne haute inclut la journée entière.</p>
+  </details>
+
+  <h3 id="traitement-plafond-quotidien-et-identifiant">Plafond quotidien et identifiant</h3>
+  <p>L'ajout passe par <code>addLogWithinDailyCap</code>, plafond 2, préfixe d'identifiant <code>inj-</code>.</p>
+  <pre><code>handleAddInjection(log) :
+  addLogWithinDailyCap(injectionHistory, log, cap = 2, `inj-${Date.now()}`, onCapReached)
+
+addLogWithinDailyCap(logs, log, cap, newId, onCapReached) :
+  duJour = logs.filter(l =&gt; l.date === log.date)
+  si duJour.length &lt; cap → logs + [ snapLogTime({ ...log, id: newId }) ]   // ajout en fin
+  sinon :
+    onCapReached()                       // avis « Limite atteinte pour aujourd'hui :
+                                         //   cette saisie remplace la dernière. »
+    index = dernier index i tel que logs[i].date === log.date
+    logs[index] = snapLogTime({ ...logs[index], ...log })   // l'id de la ligne est conservé
+
+snapLogTime(log) : si log.time est une chaîne, time ← snapToRoundedMinutes(time)</code></pre>
+  <p>La dernière ligne <em>du tableau</em> pour ce jour est écrasée — pas la plus tardive en heure. La modification (<code>applyLogUpdate</code>) fusionne les champs fournis et applique le même arrondi de l'heure. La suppression est franche : <code>removeLogById</code> retire la ligne du tableau ; « Tout supprimer » remplace <code>injectionHistory</code> par <code>[]</code>.</p>
+  <p class="ancre">src/app/useAppData.ts · src/shared/model/logbook.ts</p>
+  <details><summary>Cas limites</summary>
+    <p>Le plafond porte sur la date <em>saisie</em>, pas sur aujourd'hui : une troisième prise antidatée au 07/09 écrase la dernière du 07/09, et l'avis parle malgré tout d'« aujourd'hui ».</p>
+    <p>Deux ajouts dans la même milliseconde produiraient le même <code>id</code> ; le plafond de deux par jour rend le cas très improbable et rien ne le vérifie.</p>
+    <p>Modification par le formulaire : elle passe par <code>applyLogUpdate</code>, jamais par le plafond — une ligne déplacée sur une journée qui en porte déjà deux en fait trois.</p>
+  </details>
+  <p><a href="spec-fonctionnelle.html#traitement-formulaire-de-prise">→ fonctionnelle</a></p>
+
+  <h3 id="traitement-changement-de-traitement">Changement de traitement</h3>
+  <p>Choisir dans le sélecteur du bloc vaut validation : <code>validateBrand(id)</code> écrit <code>profile.glp1Brand = id</code> et referme le bloc. Le bloc d'acquittement est armé sur une comparaison faite <em>avant</em> l'écriture, sur l'identifiant résolu.</p>
+  <pre><code>onValidateBrand(id) :
+  change = (id !== resolveTreatmentId(brand))   // brand = profile.glp1Brand, peut être ''
+  validateBrand(id)                              // écrit le profil, referme
+  si change → confirmedTreatment = id            // « Traitement mis à jour »
+
+ouverture du bloc : openModal(hasNoTreatment ? 'aucun' : resolveTreatmentId(brand))</code></pre>
+  <p>Aucune ligne du journal n'est réécrite : les prises passées gardent leur <code>brand</code>.</p>
+  <p class="ancre">src/versions/mixte/features/injections/InjectionsTracker.tsx · src/features/injections/useChangeTreatmentModal.ts</p>
+  <details><summary>Cas limites</summary>
+    <p>Profil sans traitement (<code>glp1Brand</code> vide) : <code>resolveTreatmentId('')</code> rend <code>'aucun'</code> ; choisir « Pas de traitement » ne change donc rien et n'affiche pas l'acquittement.</p>
+    <p>Le rétatrutide n'écrit rien tant que la certification n'est pas validée : <code>onChange</code> — donc <code>onValidateBrand</code> — n'est appelé qu'au clic sur Valider.</p>
+    <p>Les lignes sans <code>brand</code> antérieures au changement basculent avec le profil : elles ne portent pas d'identifiant à conserver.</p>
+  </details>
+  <div class="exemple"><p>Camille passe d'<code>ozempic</code> à <code>wegovy-injection</code>. Ses 19 lignes gardent <code>brand: 'ozempic'</code> ; <code>currentTreatmentInjections</code> rend une liste vide tant qu'aucune prise Wegovy n'est enregistrée ; le graphe reste unique, les deux fiches partageant la molécule <code>sémaglutide</code>.</p></div>
+  <p><a href="spec-fonctionnelle.html#traitement-bloc-indiquer-un-changement-de-traitement">→ fonctionnelle</a></p>
+
+  <h3 id="traitement-resolution-du-traitement-d-une-ligne">Résolution du traitement d'une ligne</h3>
+  <p>Un repli en cascade, appelé partout où une ligne doit nommer son traitement.</p>
+  <pre><code>resolveTreatmentId(logTreatmentId?, profileTreatmentId?) =
+  logTreatmentId || profileTreatmentId || DEFAULT_TREATMENT_ID   // 'aucun'</code></pre>
+  <p>L'opérateur est <code>||</code> : la chaîne vide tombe au repli suivant, comme <code>undefined</code>. <code>resolveTreatmentId(undefined, profile.glp1Brand)</code> est l'écriture canonique du « traitement du profil ».</p>
+  <p class="ancre">src/shared/medication/medication.utils.ts</p>
+  <details><summary>Cas limites</summary>
+    <p><code>resolveTreatmentId(undefined, undefined)</code> = <code>'aucun'</code> : la ligne est alors nommée « Pas de traitement » et prend la cinétique du sémaglutide injectable.</p>
+    <p>Un <code>brand</code> inconnu du catalogue est rendu tel quel par ce résolveur ; c'est <code>getTreatment</code> qui retombe ensuite sur la fiche <code>'aucun'</code>. Le regroupement par molécule, lui, prend <code>moleculeKeyOf</code> = <code>null ?? id</code> et garde donc l'identifiant inconnu comme clé de groupe.</p>
+  </details>
+
+  <h3 id="traitement-catalogue-des-traitements">Catalogue des traitements</h3>
+  <p>Treize fiches, dans l'ordre des sélecteurs : neuf injectables puis quatre comprimés, chaque famille terminée par son « Autre traitement ». <code>NO_TREATMENT</code> est séparé du catalogue — c'est un état, pas un traitement — et ferme la liste.</p>
+  <table>
+    <thead><tr><th>id</th><th>nom</th><th>forme</th><th>molécule</th><th>paliers (mg)</th><th>t½ (h)</th><th>t½ abs. (h)</th><th>doseScale</th><th>rythme (j)</th></tr></thead>
+    <tbody>
+      <tr><td><code>ozempic</code></td><td>Ozempic</td><td>injection</td><td>sémaglutide</td><td>0,25 / 0,5 / 1 / 1,7 / 2 / 2,4</td><td>168</td><td>15</td><td>—</td><td>7</td></tr>
+      <tr><td><code>wegovy-injection</code></td><td>Wegovy</td><td>injection</td><td>sémaglutide</td><td>0,25 / 0,5 / 1 / 1,7 / 2 / 2,4</td><td>168</td><td>15</td><td>—</td><td>7</td></tr>
+      <tr><td><code>mounjaro</code></td><td>Mounjaro</td><td>injection</td><td>tirzépatide</td><td>2,5 / 5 / 7,5 / 10 / 12,5 / 15</td><td>120</td><td>12</td><td>—</td><td>7</td></tr>
+      <tr><td><code>zepbound</code></td><td>Zepbound</td><td>injection</td><td>tirzépatide</td><td>2,5 / 5 / 7,5 / 10 / 12,5 / 15</td><td>120</td><td>12</td><td>—</td><td>7</td></tr>
+      <tr><td><code>saxenda</code></td><td>Saxenda</td><td>injection</td><td>liraglutide</td><td>0,6 / 1,2 / 1,8 / 2,4 / 3</td><td>13</td><td>2,5</td><td>—</td><td>1</td></tr>
+      <tr><td><code>victoza</code></td><td>Victoza</td><td>injection</td><td>liraglutide</td><td>0,6 / 1,2 / 1,8 / 2,4 / 3</td><td>13</td><td>2,5</td><td>—</td><td>1</td></tr>
+      <tr><td><code>trulicity</code></td><td>Trulicity</td><td>injection</td><td>dulaglutide</td><td>0,75 / 1,5 / 3 / 4,5</td><td>113</td><td>14</td><td>—</td><td>7</td></tr>
+      <tr><td><code>retatrutide</code></td><td>Rétatrutide</td><td>injection</td><td>rétatrutide</td><td>1 / 2 / 4 / 8 / 12</td><td>144</td><td>12</td><td>—</td><td>7</td></tr>
+      <tr><td><code>autre-injection</code></td><td>Autre traitement</td><td>injection</td><td><code>null</code></td><td>0,25 / 0,5 / 1 / 1,7 / 2,4</td><td>168</td><td>15</td><td>—</td><td>7</td></tr>
+      <tr><td><code>rybelsus</code></td><td>Rybelsus</td><td>oral</td><td>sémaglutide</td><td>3 / 7 / 14</td><td>160</td><td>0,1</td><td>0,008</td><td>1</td></tr>
+      <tr><td><code>wegovy-oral</code></td><td>Wegovy</td><td>oral</td><td>sémaglutide</td><td>3 / 7 / 14</td><td>160</td><td>0,1</td><td>0,008</td><td>1</td></tr>
+      <tr><td><code>orforglipron</code></td><td>Foundayo</td><td>oral</td><td>orforglipron</td><td>1 / 3 / 10 / 36 / 45</td><td>36</td><td>0,7</td><td>—</td><td>1</td></tr>
+      <tr><td><code>autre-comprime</code></td><td>Autre traitement</td><td>oral</td><td><code>null</code></td><td>3 / 7 / 14</td><td>160</td><td>1,5</td><td>—</td><td>1</td></tr>
+      <tr><td><code>aucun</code></td><td>Pas de traitement</td><td>injection</td><td><code>null</code></td><td>0,25 / 0,5 / 1 / 1,7 / 2,4</td><td>168</td><td>15</td><td>—</td><td>7</td></tr>
+    </tbody>
+  </table>
+  <p>Les colonnes <code>doseScale</code> et <code>rythme</code> vides portent le défaut : <code>doseScale = 1</code>, et <code>doseIntervalDaysOf</code> rend 1 pour un comprimé, 7 pour une injection. Seuls Saxenda et Victoza dérogent explicitement (1 jour, injections quotidiennes). Le rythme ne sert qu'aux textes explicatifs, jamais au modèle de courbe, qui ne connaît que les prises saisies.</p>
+  <pre><code>DEFAULT_TREATMENT_ID = NO_TREATMENT.id = 'aucun'
+getTreatment(id?) : id absent ou inconnu → fiche 'aucun'
+getDosePresetsForBrand(id) = getTreatment(id).dosePresets
+TREATMENT_GROUPS = [ { 'Stylos Injectables', form === 'injection' },
+                     { 'Comprimés Oraux',    form === 'oral' } ]</code></pre>
+  <p><span class="marque v2">V2</span> Le catalogue V2 (<code>src/domaine/traitements.ts</code>) porte les mêmes treize entrées, réduites à trois champs : <code>id</code>, <code>nom</code>, <code>forme: 'injection' | 'comprime'</code>. Ni paliers, ni cinétique, ni molécule, ni certification. Douze identifiants sur treize sont repris ; <code>orforglipron</code> devient <code>foundayo</code>. Chaque fin de famille s'appelle « Autre », et il n'y a pas d'entrée « Pas de traitement » : l'absence est la réponse « non » à <code>traitementCommence</code>. La sélection se fait par <code>traitementsDeLaForme(forme)</code>, jamais par saisie libre ; l'écran ne se valide que si <code>formeTraitement</code> et <code>traitement</code> sont tous deux renseignés, et changer de forme efface la spécialité.</p>
+  <p class="ancre">src/shared/medication/treatment.catalog.ts · src/shared/medication/medication.utils.ts · GIT-APP-V2 : src/domaine/traitements.ts, src/screens/onboarding/reponses.ts, src/screens/onboarding/parcours.ts</p>
+  <details><summary>Cas limites</summary>
+    <p>Identifiant inconnu : la fiche <code>'aucun'</code> est rendue, donc le nom « Pas de traitement » et la cinétique du sémaglutide. Aucun nom de médicament n'est inventé.</p>
+    <p>Wegovy figure deux fois, une par forme, avec le même <code>name</code> : le sélecteur les distingue par leur <code>label</code>, la ligne de graphe les dédoublonne par <code>name</code> et n'en montre qu'un.</p>
+    <p><code>orforglipron</code> garde son identifiant historique alors que la fiche s'appelle « Foundayo » : le changer aurait rendu les données déjà enregistrées introuvables.</p>
+  </details>
+  <div class="exemple"><p>Camille est sous <code>ozempic</code> : ses paliers sont 0,25 / 0,5 / 1 / 1,7 / 2 / 2,4 mg, sa demi-vie 168 h, sa demi-vie d'absorption 15 h, sa biodisponibilité relative 1, son rythme 7 jours.</p></div>
+  <p><a href="spec-fonctionnelle.html#traitement-selecteur-de-traitement">→ fonctionnelle</a></p>
+
+  <h3 id="traitement-certification-d-essai-clinique">Certification d'essai clinique</h3>
+  <p>Un seul drapeau dans le catalogue : <code>retatrutide.requiresTrialCertification = true</code>. Le sélecteur détourne alors la validation au clic.</p>
+  <pre><code>clic sur l'option id :
+  listOpen ← false
+  si id !== value &amp;&amp; getTreatment(id).requiresTrialCertification :
+      certChecked ← false ; certifyingId ← id ; return   // onChange n'est PAS appelé
+  onChange(id)
+
+pendant la certification : le bouton fermé affiche certifyingId ?? value
+Valider : disabled tant que !certChecked ; au clic → certifyingId ← null ; onChange(id)
+clic hors du panneau → certifyingId ← null ; onDismiss() ; rien n'est écrit</code></pre>
+  <p>La condition <code>id !== value</code> compte : rechoisir le traitement déjà en cours ne redemande rien.</p>
+  <p class="ancre">src/versions/mixte/components/TreatmentSelect.tsx</p>
+  <details><summary>Cas limites</summary>
+    <p>Rouvrir la liste pendant la certification l'abandonne (<code>certifyingId ← null</code>) : un seul panneau à la fois sous le bouton.</p>
+    <p>En liste flottante, tout défilement de la page referme aussi le panneau de certification ; en liste insérée (bloc de changement), non.</p>
+  </details>
+
+  <h3 id="traitement-nettoyage-du-libelle-dans-le-selecteur">Nettoyage du libellé dans le sélecteur</h3>
+  <p>Une seule expression rationnelle, appliquée au bouton fermé comme à chaque option.</p>
+  <pre><code>cleanTreatmentLabel(label) = label.replace(/\s+-\s+[^)]*\)/, ')')</code></pre>
+  <p>Le tiret doit être entouré d'espaces : « Ozempic (Sémaglutide - Injection) » devient « Ozempic (Sémaglutide) », « Rétatrutide (Injection GLP-1) » reste entier, le tiret de « GLP-1 » n'étant pas espacé. La forme est portée par l'icône.</p>
+  <p class="ancre">src/versions/mixte/components/TreatmentSelect.tsx</p>
+  <details><summary>Cas limites</summary>
+    <p>« Rybelsus (Sémaglutide oral - Comprimé) » → « Rybelsus (Sémaglutide oral) » : le mot « oral » précède le tiret et survit.</p>
+    <p>« Pas de traitement / Aucun » ne contient ni tiret espacé ni parenthèse : il est rendu tel quel, sans icône.</p>
+  </details>
+
+  <h3 id="traitement-conversion-des-valeurs-enregistrees-en-identifiants">Conversion des valeurs enregistrées en identifiants</h3>
+  <p><code>toTreatmentId</code> convertit une valeur enregistrée en identifiant du catalogue. Elle est idempotente et se rejoue sans risque ; <code>migrateTreatmentIds</code> l'applique à chaque chargement de la sauvegarde.</p>
+  <pre><code>toTreatmentId(stored) :
+  1. stored === undefined | null            → undefined   // « le traitement du profil »
+  2. identifiant connu du catalogue          → lui-même
+  3. libellé historique (table)              → son identifiant
+  4. looksLikeNoTreatment(stored)            → 'aucun'
+  5. looksOralByName(stored) ? 'autre-comprime' : 'autre-injection'
+
+table des libellés : Ozempic→ozempic · Wegovy→wegovy-injection · Mounjaro→mounjaro
+  Zepbound→zepbound · Saxenda→saxenda · Victoza→victoza · Trulicity→trulicity
+  Rybelsus→rybelsus · 'Wegovy (Comprimé)'→wegovy-oral · Orforglipron→orforglipron
+  'Autre Comprimé'→autre-comprime · 'Autre Injection'→autre-injection
+  'Autre traitement'→autre-injection · 'Pas de traitement'→aucun
+
+looksLikeNoTreatment(l) : l.trim().toLowerCase() est '' ou 'sans',
+  ou contient 'pas de traitement' | 'aucun' | 'sans traitement'
+looksOralByName(l) : l.toLowerCase() contient 'rybelsus' | 'comprimé' | 'oral' | 'orforglipron'
+
+migrateTreatmentIds(data) :
+  profile.glp1Brand ← toTreatmentId(profile.glp1Brand) ?? 'aucun'
+  chaque injection.brand ← toTreatmentId(injection.brand)</code></pre>
+  <p>La reconnaissance par le nom, fausse dès qu'un nom libre contient le mot cherché, ne vit plus qu'ici et ne s'applique qu'une fois. Une fois l'identifiant écrit, plus rien ne devine.</p>
+  <p class="ancre">src/shared/medication/treatment.catalog.ts · src/shared/model/appData.ts · src/app/useAppData.ts</p>
+  <details><summary>Cas limites</summary>
+    <p>Sur une ligne de journal, <code>undefined</code> reste <code>undefined</code> : cela signifie « le traitement du profil », pas « aucun ». Sur le profil, <code>undefined</code> est ramené à <code>'aucun'</code> par le <code>?? DEFAULT_TREATMENT_ID</code>.</p>
+    <p>Un nom libre inconnu rejoint l'« Autre traitement » de sa famille et le nom saisi est perdu, faute d'endroit où le conserver.</p>
+    <p>« Comprimé du docteur » → <code>autre-comprime</code> ; « Floral » ne contient pas <code>oral</code> en tant que mot mais bien en sous-chaîne — <code>looksOralByName</code> le classe donc en comprimé, une dernière fois, à la migration seulement.</p>
+    <p>L'ordre des tests compte : « Aucun comprimé » tomberait sur <code>'aucun'</code> avant d'être testé comme oral.</p>
+  </details>
+
+  <h3 id="traitement-forme-et-absence-de-traitement">Forme et absence de traitement</h3>
+  <p>Trois prédicats, tous lus dans la fiche du catalogue, jamais dans le nom.</p>
+  <pre><code>isOralMedication(id) = getTreatment(id).form === 'oral'
+isNoTreatment(id)    = id === 'aucun'                      // comparaison exacte, sans fiche
+doseIntervalDaysOf(t)= t.doseIntervalDays ?? (t.form === 'oral' ? 1 : 7)</code></pre>
+  <p>Lire la forme dans le nom donnait la cinétique orale — 1,5 h d'absorption au lieu de 15 h — à tout nom contenant <code>oral</code>.</p>
+  <p class="ancre">src/shared/medication/medication.utils.ts · src/shared/medication/treatment.catalog.ts</p>
+  <details><summary>Cas limites</summary>
+    <p><code>isOralMedication('Floral')</code> = <code>false</code> : identifiant inconnu ⇒ fiche <code>'aucun'</code>, forme <code>injection</code>.</p>
+    <p><code>isNoTreatment</code> ne passe pas par <code>getTreatment</code> : un identifiant inconnu n'est pas « aucun » pour ce test, alors que sa fiche l'est.</p>
+    <p><code>doseIntervalDaysOf(saxenda)</code> = 1, <code>(ozempic)</code> = 7, <code>(rybelsus)</code> = 1 par défaut de forme.</p>
+  </details>
+
+  <h3 id="traitement-valeurs-par-defaut-du-formulaire">Valeurs par défaut du formulaire</h3>
+  <p>Les états initiaux sont posés au montage du hook, c'est-à-dire à l'arrivée sur l'onglet, et non à l'ouverture du formulaire ; <code>openAddForm</code> les repose.</p>
+  <pre><code>état initial :
+  selectedSite = isOral ? 'prise_orale' : (defaultSite || 'abdomen_gauche')
+  dose         = presets[0] || 0.25
+  date         = getLocalDateStr()          // aujourd'hui, local
+  time         = getRoundedLocalTimeStr()   // maintenant, arrondi VERS LE BAS
+  useCustomDose = false ; notes = '' ; showNotes = false
+  showAddForm  = autoOpenAdd ?? false
+
+openAddForm() :
+  date ← getLocalDateStr() ; time ← getRoundedLocalTimeStr()
+  si !isOral &amp;&amp; defaultSite → selectedSite ← defaultSite
+  showAddForm ← true ; défilement en haut
+
+au changement de `brand` (effet) :
+  si isOral → selectedSite ← 'prise_orale'
+  si presets.length &gt; 0 &amp;&amp; !presets.includes(dose) &amp;&amp; !useCustomDose → dose ← presets[0]
+
+ROUNDED_MINUTES = [0, 10, 15, 20, 30, 40, 45, 50]
+snapToRoundedMinutes('HH:MM') = HH:(plus grande minute ronde ≤ MM)</code></pre>
+  <p>L'arrondi est vers le bas et jamais vers le haut : une heure arrondie au plus proche pourrait tomber dans le futur, et l'entrée ne serait alors pas comptée comme survenue.</p>
+  <p class="ancre">src/features/injections/useInjectionForm.ts · src/shared/date/date.local.ts</p>
+  <details><summary>Cas limites</summary>
+    <p>14:37 → 14:30 ; 14:47 → 14:45 ; 14:58 → 14:50 ; 14:07 → 14:00. Une chaîne qui n'est pas <code>HH:MM</code> est rendue telle quelle.</p>
+    <p>Fermer puis rouvrir le formulaire ne retire pas la zone au sort : <code>defaultSite</code> est mémoïsé sur l'historique et ne change qu'avec lui.</p>
+    <p><code>presets</code> n'est jamais vide dans le catalogue actuel ; le <code>|| 0.25</code> ne joue donc pas.</p>
+    <p>En saisie libre, un changement de traitement ne ramène pas la dose au premier palier.</p>
+  </details>
+  <div class="exemple"><p>Camille ouvre le formulaire le 12/09/2026 à 11:43 : date <code>2026-09-12</code>, heure <code>11:40</code>, dose 0,25 mg (premier palier d'Ozempic), zone tirée au sort.</p></div>
+  <p><a href="spec-fonctionnelle.html#traitement-formulaire-de-prise">→ fonctionnelle</a></p>
+
+  <h3 id="traitement-zone-proposee-voisinage-aleatoire">Zone proposée : voisinage aléatoire</h3>
+  <p>La suggestion écarte la zone de la prise la plus proche avant l'instant visé et celle de la plus proche après, puis tire au sort parmi les zones restantes.</p>
+  <pre><code>ROTATION_SITES = clés de SITE_LABELS sauf 'prise_orale'
+  = [abdomen_gauche, abdomen_droit, cuisse_gauche, cuisse_droite, bras_gauche, bras_droit]
+
+suggestInjectionSite(history, at = maintenant, rng = Math.random) :
+  pour chaque prise dont le site ∈ ROTATION_SITES et dont l'instant est lisible
+    (instant = date + (time || '12:00')) :
+      ms &lt;= at.getTime() → candidate « avant » si plus tardive que l'actuelle
+      ms &gt;  at.getTime() → candidate « après » si plus précoce que l'actuelle
+  exclues   = { avant.site, apres.site }
+  candidats = ROTATION_SITES \ exclues ; si vide → ROTATION_SITES
+  index     = min(candidats.length − 1, floor(rng() × candidats.length))
+  → candidats[index]</code></pre>
+  <p>La page appelle <code>suggestInjectionSite(history)</code> mémoïsé sur <code>history</code> : la suggestion est donc calculée à <em>maintenant</em>, pas à la date saisie dans le formulaire, et n'est retirée au sort que lorsque le journal change.</p>
+  <p class="ancre">src/features/injections/injections.utils.ts · src/versions/mixte/features/injections/InjectionsTracker.tsx</p>
+  <details><summary>Cas limites</summary>
+    <p>Historique vide : aucune exclusion, tirage parmi les six ; avec <code>rng</code> à 0, <code>abdomen_gauche</code>.</p>
+    <p>Les prises orales ne comptent pas : elles n'occupent aucune zone.</p>
+    <p>Une prise exactement à l'instant visé compte comme « avant » (<code>&lt;=</code>).</p>
+    <p>Le <code>min</code> garde l'index dans la liste si un remplaçant de <code>Math.random</code> rendait 1.</p>
+  </details>
+  <div class="exemple"><p>Camille a piqué en cuisse droite le 07/09 à 08:00 et n'a rien saisi après. Le 12/09, « avant » = cuisse droite, « après » = aucune : le tirage porte sur les cinq zones restantes.</p></div>
+
+  <h3 id="traitement-avertissement-de-meme-zone">Avertissement de même zone</h3>
+  <p>Comparaison de la zone choisie avec celle de la dernière ligne du journal, la ligne en cours de modification exclue.</p>
+  <pre><code>lastInjection = sortedHistory.find(log =&gt; log.id !== excludeId)   // excludeId = editingId
+isSelectedSiteLastUsed = !!lastInjection &amp;&amp; lastInjection.site === selectedSite
+affichage = !isOral &amp;&amp; isSelectedSiteLastUsed &amp;&amp; !dismissedRotationWarning
+dismissedRotationWarning ← false à chaque changement de selectedSite (effet)</code></pre>
+  <p><code>sortedHistory</code> est trié du plus récent au plus ancien sur date + heure : « la dernière » est la plus récente en date, pas la dernière saisie. Le texte reprend <code>lastInjection.dose</code> et <code>SITE_LABELS[selectedSite].label</code>.</p>
+  <p class="ancre">src/features/injections/useInjectionSiteStats.ts · src/versions/mixte/features/injections/InjectionForm.tsx</p>
+  <details><summary>Cas limites</summary>
+    <p>Sans l'exclusion, rouvrir une prise en modification la comparerait à elle-même : sa zone est celle du formulaire, l'avertissement se déclencherait toujours et annoncerait sa propre dose.</p>
+    <p>Une prise datée du futur peut être « la dernière » : le tri ne filtre pas l'avenir.</p>
+    <p>Traitement oral : l'avertissement ne s'affiche jamais, la comparaison est pourtant calculée.</p>
+    <p>Fermer l'avertissement à la croix pose <code>dismissed</code> ; rechoisir la même zone après en avoir choisi une autre le réarme.</p>
+  </details>
+
+  <h3 id="traitement-regle-de-dose-rule-dose">Règle de dose (<code>RULE_DOSE</code>)</h3>
+  <p>Une règle numérique unique, partagée par le formulaire, l'édition en place du journal et celle de la bulle du calendrier.</p>
+  <pre><code>RULE_DOSE = { min: 0.001, max: 1000000, decimals: 3, step: 0.25, unit: 'mg',
+              message: 'Une dose entre 0,001 et 1000000 mg est attendue.' }
+
+cleanNumericInput(raw, 3)  // à chaque frappe, ne juge pas :
+  ',' → '.' ; tout caractère hors [0-9.] retiré (le signe moins compris) ;
+  un seul point conservé ; décimales tronquées à 3
+
+sanitizeNumber(raw, rule) :
+  cleaned = cleanNumericInput(raw, 3)
+  cleaned ∈ { '', '.' }            → null      // allowEmpty absent
+  !Number.isFinite(Number(cleaned))→ null
+  valeur &lt; 0.001 ou &gt; 1000000      → null
+  sinon → cleaned, point final orphelin retiré
+isAcceptable(raw, rule) = sanitizeNumber(raw, rule) !== null</code></pre>
+  <p>Deux garde-fous se succèdent à la validation : la page juge la saisie libre contre <code>RULE_DOSE</code>, le hook juge ensuite la valeur numérique.</p>
+  <pre><code>InjectionsTracker.handleSubmit :
+  si useCustomDose &amp;&amp; !isAcceptable(customDose, RULE_DOSE) → preventDefault ;
+     doseOutOfBounds ← true ; return
+useInjectionForm.handleSubmit :
+  activeDose = useCustomDose ? parseFloat(customDose) : dose
+  si !Number.isFinite(activeDose) || activeDose &lt;= 0 → doseRefused ← true ; return</code></pre>
+  <p>Le formulaire affiche <code>boundsMessage(RULE_DOSE)</code> — donc le message de la règle — dès que l'un des deux drapeaux est levé : une exigence, une phrase. Les trois gestes de la dose (préréglage, saisie libre, bascule) sont enveloppés et effacent le refus.</p>
+  <p class="ancre">src/versions/mixte/app/form.rules.ts · src/shared/ui/numberRules.ts · src/versions/mixte/features/injections/InjectionsTracker.tsx · src/features/injections/useInjectionForm.ts</p>
+  <details><summary>Cas limites</summary>
+    <p>« 0,25 » est accepté et vaut 0.25 ; « 1,2345 » est tronqué à 1.234 (troncature, pas arrondi) ; « » et « 0 » sont refusés.</p>
+    <p>Le repli qui écrivait 0,25 mg pour une dose vide a été supprimé : le formulaire refuse au lieu d'inventer.</p>
+    <p>Le pas de 0,25 ne vaut que pour les flèches du clavier ; il ne borne ni n'arrondit la saisie.</p>
+    <p>Le plafond de 1 000 000 mg n'écarte que l'absurde : aucune dose réelle n'est jugée.</p>
+  </details>
+
+  <h3 id="traitement-enregistrement-d-une-prise">Enregistrement d'une prise</h3>
+  <p>Le formulaire écrit les mêmes champs en ajout et en modification.</p>
+  <pre><code>charge = {
+  date, time, dose: activeDose, site: selectedSite,
+  notes: notes.trim() ? notes : undefined,
+  brand: resolveTreatmentId(undefined, profile?.glp1Brand)   // le traitement DU PROFIL
+}
+editingId ? onUpdateInjection({ id: editingId, ...charge })
+          : onAddInjection(charge)
+puis : notes ← '' ; showNotes ← false ; lastAction ← 'updated' | 'added' ;
+       savedSuccess ← true ; défilement en haut ; showAddForm ← false</code></pre>
+  <p>Le <code>brand</code> de la ligne est réécrit avec le traitement du profil du moment, en modification comme en ajout : modifier une vieille prise par ce formulaire la rattache au traitement d'aujourd'hui. L'édition en place du journal et de la bulle, elle, ne touche pas au <code>brand</code>.</p>
+  <p class="ancre">src/features/injections/useInjectionForm.ts</p>
+  <details><summary>Cas limites</summary>
+    <p>Profil sans traitement : <code>brand</code> vaut <code>'aucun'</code>, valeur écrite en clair dans la ligne — la ligne n'est plus « celle du profil », elle est explicitement « aucun ».</p>
+    <p>Une prise datée du futur est acceptée : rien ne compare la date à aujourd'hui à l'écriture.</p>
+    <p>L'heure est ramenée à la minute ronde inférieure par le modèle, pas par le formulaire.</p>
+  </details>
+
+  <h3 id="traitement-ouverture-en-modification">Ouverture en modification</h3>
+  <p><code>startEdit</code> décide du mode de saisie de la dose sur une liste <em>générique</em>, indépendante des paliers de la marque.</p>
+  <pre><code>DEFAULT_DOSE_PRESETS = [0.25, 0.5, 1.0, 1.7, 2.4]     // injections.constants.ts
+
+startEdit(log) :
+  doseRefused ← false ; editingId ← log.id ; selectedSite ← log.site
+  si DEFAULT_DOSE_PRESETS.includes(log.dose) → useCustomDose ← false ; dose ← log.dose
+  sinon                                       → useCustomDose ← true  ;
+                                                customDose ← log.dose.toString()
+  date ← log.date ; time ← log.time || '12:00'
+  notes ← log.notes || '' ; showNotes ← !!log.notes
+
+cancelEdit() :
+  editingId ← null ; selectedSite ← 'abdomen_gauche' ; dose ← 0.25 ;
+  useCustomDose ← false ; customDose ← '' ; date ← aujourd'hui ;
+  time ← heure arrondie ; notes ← '' ; formulaire fermé</code></pre>
+  <p>La liste générique n'est pas celle de la fiche : une prise Mounjaro de 5 mg — palier légitime de sa marque — s'ouvre en « Autre dose ».</p>
+  <p class="ancre">src/features/injections/useInjectionForm.ts · src/features/injections/injections.constants.ts</p>
+  <details><summary>Cas limites</summary>
+    <p>Une prise Ozempic de 2 mg s'ouvre aussi en saisie libre : 2 n'est pas dans la liste générique.</p>
+    <p><code>cancelEdit</code> remet <code>abdomen_gauche</code>, pas la zone suggérée : l'annulation ne repasse pas par <code>openAddForm</code>.</p>
+    <p>Une ligne orale s'ouvre avec <code>site = 'prise_orale'</code>, que l'effet de forme confirme.</p>
+  </details>
+
+  <h3 id="traitement-rotation-d-ordre-fixe-ancienne-regle-toujours-presente">Rotation d'ordre fixe (ancienne règle, toujours présente)</h3>
+  <p><code>nextRotationSite</code> propose la zone suivante dans l'ordre de <code>SITE_LABELS</code> après celle de la dernière prise passée. Elle est exportée, testée, et <strong>aucun écran de la Mixte ne l'appelle</strong> : la suggestion de voisinage aléatoire l'a remplacée.</p>
+  <pre><code>nextRotationSite(history, now = maintenant) :
+  passees = history filtré sur site ∈ ROTATION_SITES et instant lisible ≤ now,
+            trié croissant sur la chaîne `date + 'T' + (time || '12:00')`
+  derniere = passees.at(-1)
+  sans derniere → ROTATION_SITES[0]   // abdomen_gauche
+  sinon → ROTATION_SITES[(index(derniere.site) + 1) % 6]</code></pre>
+  <p>Le défaut qu'elle avait : en saisissant une prise <em>entre</em> deux autres, la zone suivante pouvait tomber sur celle de la prise d'après.</p>
+  <p class="ancre">src/features/injections/injections.utils.ts</p>
+  <details><summary>Cas limites</summary>
+    <p>Dernière prise en <code>bras_droit</code> → <code>abdomen_gauche</code> : la liste boucle.</p>
+    <p>Le tri se fait par comparaison de chaînes, pas d'instants : correct puisque le format est <code>AAAA-MM-JJTHH:MM</code>.</p>
+    <p>Les prises postérieures à maintenant ne commandent rien.</p>
+  </details>
+
+  <h3 id="traitement-libelles-des-paliers">Libellés des paliers</h3>
+  <p>Le sélecteur de dose rend une option par palier de la fiche, suffixée selon son rang.</p>
+  <pre><code>presets.map((p, idx) =&gt;
+  `${p.toString()} mg ${idx === 0 ? '(Initiation)'
+                      : idx === presets.length - 1 ? '(Dose max)'
+                      : ''}`)</code></pre>
+  <p>Le suffixe « Dose max » informe ; il ne refuse rien. Seule <code>RULE_DOSE</code> refuse.</p>
+  <p class="ancre">src/versions/mixte/features/injections/DoseSelector.tsx</p>
+  <details><summary>Cas limites</summary>
+    <p>Une fiche à un seul palier porterait « (Initiation) » — le premier test l'emporte. Aucune fiche du catalogue n'est dans ce cas.</p>
+    <p><code>p.toString()</code> : 1.0 s'écrit « 1 », 2.40 s'écrit « 2.4 ». Le point décimal, pas la virgule.</p>
+  </details>
+  <p><a href="spec-fonctionnelle.html#traitement-selecteur-de-dose">→ fonctionnelle</a></p>
+
+  <h3 id="traitement-edition-en-place-de-la-dose-journal-bulle">Édition en place (journal, bulle du calendrier)</h3>
+  <p>Chaque champ d'une ligne s'édite en place ; le brouillon est validé par une seule fonction de commit.</p>
+  <pre><code>brouillon = { dose: log.dose.toString(), site: log.site, date: log.date,
+              time: log.time || '12:00', notes: log.notes || '' }
+
+commit(d, l) :
+  dVal = parseFloat(d.dose)
+  si isNaN(dVal) || dVal &lt; 0 || !d.date → return          // rien n'est écrit
+  si dVal === l.dose &amp;&amp; d.site === l.site &amp;&amp; d.date === l.date
+     &amp;&amp; d.time === (l.time || '12:00') &amp;&amp; d.notes === (l.notes || '') → return
+  onUpdateInjection({ ...l, dose: dVal, site: d.site, date: d.date,
+                      time: d.time || '12:00',
+                      notes: d.notes.trim() ? d.notes : undefined })</code></pre>
+  <p>Le <code>brand</code> de la ligne est conservé par le <code>...l</code> : l'édition en place ne rattache pas la ligne au traitement du profil. La zone n'est éditable que si la ligne n'est pas orale (<code>logTreatment.form === 'oral' || log.site === 'prise_orale'</code>) ; sa liste porte les sept entrées de <code>SITE_LABELS</code>. La dose passe par le champ numérique avec <code>RULE_DOSE</code>, dont le refus s'écrit sous la ligne.</p>
+  <p class="ancre">src/versions/mixte/features/injections/JournalEntryCard.tsx</p>
+  <details><summary>Cas limites</summary>
+    <p>Le commit accepte une dose de 0 (test <code>&lt; 0</code>, pas <code>&lt;= 0</code>) alors que le formulaire la refuse ; <code>RULE_DOSE</code> l'aurait cependant refusée dans le champ.</p>
+    <p>Notes ramenées à des espaces : <code>trim()</code> les considère vides et le champ est effacé (<code>undefined</code>).</p>
+    <p>Une ligne sans heure prend <code>12:00</code> au brouillon : la comparaison d'inchangé s'aligne sur cette valeur, un commit sans retouche n'écrit donc rien.</p>
+    <p><code>applyLogUpdate</code> arrondit ensuite l'heure à la minute ronde inférieure.</p>
+  </details>
+  <p><a href="spec-fonctionnelle.html#traitement-ligne-du-journal">→ fonctionnelle</a></p>
+
+  <h3 id="traitement-zones-d-injection-et-initiales">Zones d'injection et initiales</h3>
+  <p>Table canonique unique : six zones corporelles et la voie orale.</p>
+  <pre><code>SITE_LABELS = {
+  abdomen_gauche: { label: 'Abdomen Gauche', area: 'Abdomen',    side: 'Gauche' },
+  abdomen_droit:  { label: 'Abdomen Droit',  area: 'Abdomen',    side: 'Droit'  },
+  cuisse_gauche:  { label: 'Cuisse Gauche',  area: 'Cuisse',     side: 'Gauche' },
+  cuisse_droite:  { label: 'Cuisse Droite',  area: 'Cuisse',     side: 'Droit'  },
+  bras_gauche:    { label: 'Bras Gauche',    area: 'Bras',       side: 'Gauche' },
+  bras_droit:     { label: 'Bras Droit',     area: 'Bras',       side: 'Droit'  },
+  prise_orale:    { label: 'Prise Orale',    area: 'Voie Orale', side: 'Comprimé' },
+}
+
+siteInitials(site) :
+  fiche = SITE_LABELS[site]
+  si !fiche || fiche.side ∉ { 'Gauche', 'Droit' } → ''
+  sinon → (fiche.area[0] + fiche.side[0]).toUpperCase()</code></pre>
+  <p>Les initiales se dérivent de la table, jamais d'une seconde liste. <code>prise_orale</code> porte <code>side: 'Comprimé'</code> : la dérivation mécanique en ferait « VC », la fonction rend donc la chaîne vide et l'appelant n'écrit rien.</p>
+  <p class="ancre">src/shared/medication/medication.constants.ts · src/shared/medication/medication.utils.ts</p>
+  <details><summary>Cas limites</summary>
+    <p><code>siteInitials('cuisse_droite')</code> = « CD » ; <code>siteInitials('prise_orale')</code> = « » ; <code>siteInitials(undefined)</code> = « » ; un site inconnu de la table = « ».</p>
+    <p><code>BODY_MAP_SITES</code> (<code>src/features/injections/injections.constants.ts</code>) porte les mêmes six codes avec des coordonnées SVG : c'est une table de dessin, non montée dans la Mixte, jamais une table de vérité.</p>
+    <p>La ligne du journal replie sur <code>{ label: site, area: 'Corps', side: '' }</code> quand la clé est inconnue.</p>
+  </details>
+
+  <h3 id="traitement-calendrier-rangement-et-arrondi-des-tuiles">Calendrier : rangement et arrondi des tuiles</h3>
+  <p>Deux fonctions pures : le rangement par jour et l'arrondi d'affichage.</p>
+  <pre><code>injectionsByDate(history) : Map&lt;date, InjectionLog[]&gt;
+  chaque liste triée par (a.time ?? '').localeCompare(b.time ?? '')
+
+formatCalendarDose(dose) :
+  decimales = dose &lt; 10 ? 2 : dose &lt; 100 ? 1 : 0
+  → parseFloat(dose.toFixed(decimales)).toString()   // zéros de queue retirés
+
+tuile : logs.length &gt; 1 ? `×${logs.length}` : formatCalendarDose(logs[0].dose)
+infobulle : `${logs.length &gt; 1 ? logs.length + ' prises'
+              : isOral ? 'Prise' : 'Injection'} — voir le détail`</code></pre>
+  <p>La bulle du jour montre la dose exacte du journal, jamais l'arrondi de la tuile. La navigation est bornée du mois de la première entrée au mois courant.</p>
+  <p class="ancre">src/features/injections/injectionCalendar.ts · src/versions/mixte/features/injections/InjectionCalendar.tsx · src/versions/mixte/components/CalendarBlock.tsx</p>
+  <details><summary>Cas limites</summary>
+    <p>0.355 → « 0.35 » (troncature de <code>toFixed</code> après arrondi au centième) ; 14.25 → « 14.3 » ; 112.5 → « 113 » ; 2.40 → « 2.4 ».</p>
+    <p>Au-delà de 1000 mg, la règle s'arrête : l'entier continue de valoir.</p>
+    <p>Une ligne sans heure est triée avant celles qui en portent une : <code>''</code> précède <code>'08:00'</code>.</p>
+  </details>
+  <div class="exemple"><p>Le 07/09/2026 de Camille porte une prise de 1 mg : la tuile affiche « 1 », la bulle « 1 mg ». Une seconde prise le même jour ferait « ×2 ».</p></div>
+  <p><a href="spec-fonctionnelle.html#traitement-calendrier-des-prises">→ fonctionnelle</a></p>
+
+  <h3 id="traitement-ajout-a-une-date-depuis-le-calendrier">Ajout à une date depuis le calendrier</h3>
+  <p>Deux gestes, dans cet ordre — et l'ordre compte, <code>openAddForm</code> remettant la date à aujourd'hui.</p>
+  <pre><code>openAddFormAt(date) :
+  doseOutOfBounds ← false
+  form.openAddForm()     // date ← aujourd'hui, heure ← maintenant, zone ← suggérée
+  form.setDate(date)     // puis la date du jour cliqué</code></pre>
+  <p>L'heure reste celle de l'instant présent et la zone reste la suggestion calculée à maintenant, pas au voisinage de la date cliquée.</p>
+  <p class="ancre">src/versions/mixte/features/injections/InjectionsTracker.tsx</p>
+  <details><summary>Cas limites</summary>
+    <p>Cliquer un jour futur ouvre le formulaire à cette date : la prise est acceptée et compte comme non survenue partout où <code>hasOccurred</code> filtre.</p>
+  </details>
+
+  <h3 id="traitement-molecules-actives">Molécules actives</h3>
+  <p>Le calcul central du niveau sanguin : rétention, regroupement, seuil, courbes.</p>
+  <pre><code>computeActiveMolecules(injectionHistory, profile) :
+  si historique vide → []
+  sixtyDaysAgo = maintenant − 60 j
+  recentes = prises dont date + (time || '12:00') ≥ sixtyDaysAgo
+  retenues = recentes.length &gt; 0 ? recentes : injectionHistory   // repli : tout
+
+  pour chaque groupe de groupInjectionsByMolecule(retenues, profile.glp1Brand) :
+    history  = TOUTES les lignes de injectionHistory dont
+               resolveTreatmentId(inj.brand, profile.glp1Brand) ∈ groupe.treatmentIds
+    pkOf(inj)= getPKParameters(resolveTreatmentId(inj.brand, profile.glp1Brand))
+    conc     = calculateCumulativeConcentration(maintenant, history, pkOf)
+    si conc &lt;= 0.001 → le groupe est écarté
+    rawChartData    = generatePKChartData(history, pkOf, 10)
+    pastHistory     = history dont l'instant ≤ maintenant
+    peakChartData   = pastHistory.length === history.length
+                      ? rawChartData
+                      : generatePKChartData(pastHistory, pkOf, 10)
+    maxConcentration= rawChartData.length &gt; 0
+                      ? max(concentrations, 0.25) : 1
+    brand           = groupe.treatmentIds[0]     // la prise la plus récente
+    pkParams        = getPKParameters(brand)
+    peakWindowHours = (forme de la dernière prise FAITE) === 'oral' ? 20/60 : 12
+
+  résultat trié par latestIntakeMs(history) décroissant</code></pre>
+  <p>La rétention de 60 jours ne sert qu'à décider <em>quels groupes existent</em> ; une fois le groupe formé, c'est l'historique complet de la molécule qui alimente sa concentration et sa courbe — une prise d'il y a 70 jours contribue encore.</p>
+  <p class="ancre">src/features/blood-level/bloodLevel.utils.ts</p>
+  <details><summary>Cas limites</summary>
+    <p>Aucune prise dans les 60 jours : tout l'historique est retenu, sans quoi un traitement arrêté mais encore actif dans le sang disparaîtrait de l'écran.</p>
+    <p>Le seuil est strict (<code>conc &gt; 0.001</code>) et porte sur des milligrammes.</p>
+    <p>Sans prise déjà faite, la forme retenue pour la fenêtre du pic est <code>injection</code> par défaut ; la phrase ne s'affichera de toute façon pas.</p>
+    <p><code>peakChartData</code> n'est recalculé que s'il existe une prise à venir : sinon c'est la même courbe.</p>
+    <p>Le mémo <code>useActiveMolecules</code> ne dépend que de <code>injectionHistory</code> et de <code>profile.glp1Brand</code>.</p>
+  </details>
+  <p><a href="spec-fonctionnelle.html#traitement-niveau-sanguin-actif">→ fonctionnelle</a></p>
+
+  <h3 id="traitement-regroupement-par-molecule">Regroupement par molécule</h3>
+  <p>La clé de cumul est la molécule de la fiche, à défaut l'identifiant du traitement.</p>
+  <pre><code>moleculeKeyOf(treatmentId) = getTreatment(treatmentId).molecule ?? treatmentId
+intakeMs(inj) = Date(`${inj.date}T${inj.time || '12:00'}:00`).getTime()
+
+groupInjectionsByMolecule(history, profileTreatmentId) :
+  pour chaque prise : id = resolveTreatmentId(inj.brand, profileTreatmentId)
+                      key = moleculeKeyOf(id)
+                      group(key).logs.push(inj)
+                      group(key).latestByTreatment[id] = max(actuel, intakeMs(inj))
+                      (un instant NaN n'écrase aucun maximum)
+  par groupe : treatmentIds = clés triées par instant le plus récent, décroissant
+               forms, names  = dédoublonnés dans cet ordre
+               history       = logs dans l'ordre où ils ont été fournis
+               latest        = max des instants
+  groupes triés par latest décroissant</code></pre>
+  <p>Les entrées génériques portent <code>molecule: null</code> : elles restent seules, chacune dans son groupe. La cinétique, elle, ne se mélange pas : chaque prise garde celle de sa fiche, et c'est la somme des courbes qui est tracée — le <code>doseScale</code> rend l'addition légitime en ramenant chaque forme à une exposition comparable.</p>
+  <p class="ancre">src/shared/medication/molecule.ts</p>
+  <details><summary>Cas limites</summary>
+    <p>Wegovy comprimé il y a 10 jours et Ozempic hier : un seul groupe <code>sémaglutide</code>, <code>treatmentIds = ['ozempic', 'wegovy-oral']</code>, <code>forms = ['injection', 'oral']</code>, <code>names = ['Ozempic', 'Wegovy']</code>.</p>
+    <p>Deux fiches du même nom (Wegovy injectable et oral) : <code>names</code> n'en garde qu'une, la ligne du graphe affiche « Wegovy » une fois.</p>
+    <p>Un groupe dont toutes les prises ont un instant illisible aurait <code>latest = -Infinity</code> et passerait en fin de tri.</p>
+  </details>
+
+  <h3 id="traitement-ordre-des-graphes">Ordre des graphes</h3>
+  <p>Les molécules actives arrivent déjà triées de la prise la plus récente à la plus ancienne ; le bloc les repartitionne en deux.</p>
+  <pre><code>currentBrand = resolveTreatmentId(undefined, profile.glp1Brand)
+isCurrent(m) = m.treatmentIds.includes(currentBrand)      // « contient », pas « est »
+orderedMolecules = [ ...actives.filter(isCurrent), ...actives.filter(!isCurrent) ]
+bande « Actif résiduel du traitement précédent encore présent » si !isCurrent(m)</code></pre>
+  <p>Le test porte sur l'appartenance au groupe : le groupe du sémaglutide contient Ozempic <em>et</em> Wegovy, il est donc « en cours » dès que l'un des deux l'est. C'est ce qui fait qu'un changement de marque sans changement de molécule ne crée pas de « résiduel ». La plage personnalisée par défaut d'une molécule va de la plus ancienne date de son <code>history</code> à aujourd'hui.</p>
+  <p class="ancre">src/versions/mixte/features/blood-level/BloodLevelPlot.tsx</p>
+  <details><summary>Cas limites</summary>
+    <p>Traitement du profil sans aucune molécule active : aucun graphe n'est « en cours », l'ordre reste celui de la prise la plus récente, et tous portent la bande « résiduel ».</p>
+    <p>Les accordéons « Comprendre vos sensations » suivent le même ordre, un par molécule.</p>
+  </details>
+
+  <h3 id="traitement-parametres-pharmacocinetiques">Paramètres pharmacocinétiques</h3>
+  <p>Quatre constantes dérivées de la fiche, calculées à chaque appel de <code>getPKParameters(id)</code>.</p>
+  <pre><code>ke         = ln 2 / halfLifeHours              (h⁻¹)
+ka         = ln 2 / absorptionHalfLifeHours    (h⁻¹)
+tMax       = ln(ka / ke) / (ka − ke)           (h)
+normFactor = 1 / (e^(−ke·tMax) − e^(−ka·tMax))
+doseScale  = fiche.doseScale ?? 1</code></pre>
+  <table>
+    <thead><tr><th>Traitement</th><th>ke (h⁻¹)</th><th>ka (h⁻¹)</th><th>tMax (h)</th><th>normFactor</th></tr></thead>
+    <tbody>
+      <tr><td>Ozempic, Wegovy inj., Autre inj., aucun</td><td>0,004126</td><td>0,04621</td><td>57,4</td><td>1,392</td></tr>
+      <tr><td>Mounjaro, Zepbound</td><td>0,005776</td><td>0,05776</td><td>44,3</td><td>1,357</td></tr>
+      <tr><td>Saxenda, Victoza</td><td>0,05332</td><td>0,2773</td><td>7,4</td><td>1,532</td></tr>
+      <tr><td>Trulicity</td><td>0,006134</td><td>0,04951</td><td>48,1</td><td>1,406</td></tr>
+      <tr><td>Rétatrutide</td><td>0,004813</td><td>0,05776</td><td>46,9</td><td>1,374</td></tr>
+      <tr><td>Rybelsus, Wegovy oral</td><td>0,004332</td><td>6,931</td><td>1,07</td><td>1,005</td></tr>
+      <tr><td>Foundayo</td><td>0,01926</td><td>0,9902</td><td>4,06</td><td>1,081</td></tr>
+      <tr><td>Autre comprimé</td><td>0,004332</td><td>0,4621</td><td>7,5</td><td>1,073</td></tr>
+    </tbody>
+  </table>
+  <p class="ancre">src/utils/pharmacokinetics.ts</p>
+  <details><summary>Cas limites</summary>
+    <p>Si <code>ka ≤ ke</code> — absorption plus lente que l'élimination —, <code>tMax</code> devient négatif ou indéfini et <code>normFactor</code> part en <code>Infinity</code>. Aucune fiche du catalogue n'est dans ce cas ; rien ne le vérifie ici (le calcul du creux à l'équilibre, lui, le teste et rend <code>null</code>).</p>
+    <p>Les paramètres ne sont pas mémoïsés : <code>getPKParameters</code> est rappelée pour chaque prise à chaque point de courbe, via le résolveur par ligne.</p>
+  </details>
+
+  <h3 id="traitement-concentration-d-une-prise-bateman-complet">Concentration d'une prise (Bateman complet)</h3>
+  <p>Modèle à un compartiment, appliqué sur toute la courbe — montée et descente.</p>
+  <pre><code>calculateSingleInjectionConcentration(dose, t, params) :
+  si t &lt; 0 → 0
+  → dose × doseScale × (e^(−ke·t) − e^(−ka·t)) × normFactor</code></pre>
+  <p>Par construction du <code>normFactor</code>, le maximum vaut exactement <code>dose × doseScale</code>, atteint à <code>t = tMax</code>. Loin du pic, le terme d'absorption devient négligeable et la décroissance suit exactement <code>halfLifeHours</code> : la demi-vie affichée reste vraie asymptotiquement. <code>doseScale</code> porte la biodisponibilité relative — sans lui, un comprimé de 14 mg écraserait la courbe d'une injection de 1 mg d'exposition réelle comparable.</p>
+  <p class="ancre">src/utils/pharmacokinetics.ts</p>
+  <details><summary>Cas limites</summary>
+    <p>Une injection de 1 mg d'Ozempic culmine à 1,000 mg 57,4 h après la prise ; un Rybelsus de 14 mg culmine à 14 × 0,008 = 0,112 mg, 1,07 h après.</p>
+    <p><code>t &lt; 0</code> — prise à venir — rend 0, sans jamais dessiner de valeur négative.</p>
+    <p>Une dose de 0 rend 0 partout.</p>
+  </details>
+
+  <h3 id="traitement-concentration-cumulee">Concentration cumulée</h3>
+  <p>Somme des contributions des prises déjà survenues à l'instant visé, chacune avec sa propre cinétique.</p>
+  <pre><code>calculateCumulativeConcentration(targetMs, history, params) :
+  total = 0
+  pour chaque prise portant une date :
+    injMs = safeParseDate(inj.date, inj.time)
+    si targetMs &gt;= injMs :
+      total += calculateSingleInjectionConcentration(
+                 inj.dose, (targetMs − injMs) / 3 600 000, paramsFor(params, inj))
+  → total
+
+safeParseDate(date?, time?) :
+  sans date                              → maintenant
+  `${date.trim()}T${time || '12:00'}:00` si lisible
+  sinon new Date(date.trim())            si lisible
+  sinon                                  → maintenant
+
+paramsFor : `params` est soit un PKParameters unique, soit une fonction (inj) =&gt; PKParameters</code></pre>
+  <p>La forme « une cinétique par ligne » existe depuis que le cumul se fait par molécule : un comprimé et une injection de sémaglutide entrent dans la même courbe, mais n'ont ni la même absorption ni la même biodisponibilité.</p>
+  <p class="ancre">src/utils/pharmacokinetics.ts</p>
+  <details><summary>Cas limites</summary>
+    <p>Une prise datée du futur contribue 0 : le test <code>targetMs &gt;= injMs</code> l'écarte.</p>
+    <p>Une prise sans <code>date</code> est ignorée ; une date illisible est ramenée à maintenant par <code>safeParseDate</code>, ce qui la fait contribuer 0 au présent.</p>
+    <p>L'instant retenu est <code>date + (time || '12:00')</code> en heure locale, jamais UTC.</p>
+  </details>
+
+  <h3 id="traitement-points-de-la-courbe">Points de la courbe</h3>
+  <p><code>generatePKChartData</code> échantillonne la somme toutes les trois heures locales.</p>
+  <pre><code>generatePKChartData(history, brand | paramsFor, futurePredictionDays = 7) :
+  validHistory = lignes portant une date ; si vide → []
+  trié chronologiquement par safeParseDate
+  début : curseur = safeParseDate(première.date, '00:00'), −1 jour, setHours(0,0,0,0)
+  fin   : endTimeMs = max(dernière prise + futurePredictionDays × 24 h, maintenant)
+  boucle tant que curseur ≤ endTimeMs et compteur &lt; 30 000 :
+    concentration = round4(cumul(curseur, validHistory, params))
+    dateStr       = `${jour abrégé} ${quantième}/${mois}` en fr-FR
+    curseur.setHours(curseur.getHours() + 3)     // heures LOCALES, jamais des ms
+  puis, pour chaque prise : marquer le point de timestamp le PLUS PROCHE
+    injectedToday ← true ; injectionDose ← (injectionDose || 0) + inj.dose</code></pre>
+  <p>Le pas se compte en heures locales et non en millisecondes : un pas fixe de 3 h en millisecondes dérive d'une heure à chaque changement d'heure et décale la courbe entière. Le niveau sanguin appelle avec <code>futurePredictionDays = 10</code>.</p>
+  <p class="ancre">src/utils/pharmacokinetics.ts</p>
+  <details><summary>Cas limites</summary>
+    <p>Une seule prise le 01/08 à 12:00 : premier point le 31/07 à 00:00, dernier point au plus tard entre le 11/08 (10 jours) et aujourd'hui.</p>
+    <p>Un traitement arrêté depuis plus de dix jours voit sa courbe courir jusqu'à aujourd'hui : la fin est un maximum.</p>
+    <p>Deux prises du même jour tombant sur le même point cumulent leur <code>injectionDose</code> sur ce point.</p>
+    <p>Le garde-fou de 30 000 pas vaut environ dix ans de courbe.</p>
+    <p>La concentration est arrondie à quatre décimales à l'écriture du point ; l'infobulle et la valeur « En direct » ne lisent pas la même source.</p>
+  </details>
+
+  <h3 id="traitement-statut-du-pic">Statut du pic</h3>
+  <p>Le sommet est cherché dans les points de la courbe, pas déduit du <code>tMax</code> d'une dose isolée : sur un cumul, le sommet arrive plus tôt, la dose qui monte s'ajoutant à un fond qui descend.</p>
+  <pre><code>localMaxima(points) : pour i de 1 à n−2,
+  c[i] &gt; c[i−1] &amp;&amp; c[i] &gt;= c[i+1]        // les extrémités ne comptent pas
+
+peakStatus(points, nowMs, windowHours = 12) :
+  points absents ou &lt; 3           → null
+  maxima vide                      → null
+  next     = premier sommet dont timestamp &gt; nowMs
+  previous = dernier sommet dont timestamp ≤ nowMs
+  candidat = si les deux existent : |next − now| ≤ |now − previous| ? next : previous
+             sinon next ?? previous
+  deltaHours = (candidat.timestamp − nowMs) / 3 600 000
+  |deltaHours| ≤ windowHours → { kind: 'now' }
+  deltaHours &gt; 0             → { kind: 'upcoming', hours: deltaHours }
+  sinon                      → { kind: 'past',     hours: −deltaHours }
+
+PEAK_WINDOW_INJECTION_HOURS = 12
+PEAK_WINDOW_ORAL_HOURS      = 20 / 60      // vingt minutes</code></pre>
+  <p>La courbe fournie est <code>peakChartData</code> — bâtie sur les seules prises déjà faites : annoncer « prochain pic dans 3 jours » pour une piqûre qui n'est pas faite serait donner une prévision pour un fait. La demi-largeur du « pic en cours » suit la forme de la dernière prise faite : douze heures pour une injection, vingt minutes pour un comprimé, qui culmine environ une heure après la prise et se répète chaque jour.</p>
+  <p class="ancre">src/features/blood-level/peakStatus.ts</p>
+  <details><summary>Cas limites</summary>
+    <p>Une courbe qui ne fait que descendre — une seule prise très ancienne — n'a aucun sommet : <code>null</code>, et la phrase ne s'affiche pas.</p>
+    <p>Égalité de distance : <code>next</code> l'emporte.</p>
+    <p>Le test du plateau est <code>c[i] &gt;= c[i+1]</code> : un plateau de deux points retient le premier.</p>
+    <p>Le pas d'échantillonnage de 3 h borne la précision : un sommet réel entre deux points est rapporté au point le plus haut.</p>
+  </details>
+
+  <h3 id="traitement-ecriture-du-delai-du-pic">Écriture du délai du pic</h3>
+  <pre><code>formatPeakDelay(hours) :
+  hours &gt;= 72 → `${Math.round(hours / 24)} jour(s)`   // pluriel si &gt; 1
+  sinon       → `${Math.round(hours)} h`
+
+peakLabel(status) :
+  null       → ''
+  'now'      → 'pic en cours'
+  'upcoming' → `prochain pic dans ${formatPeakDelay(hours)}`
+  'past'     → `dernier pic il y a ${formatPeakDelay(hours)}`</code></pre>
+  <p>Le seuil est inclusif : 72 h s'écrit « 3 jours ». Sur le graphe, la phrase est suivie d'un astérisque qui appelle la note d'estimation théorique.</p>
+  <p class="ancre">src/features/blood-level/peakStatus.ts</p>
+  <details><summary>Cas limites</summary>
+    <p>71,4 → « 71 h » ; 72 → « 3 jours » ; 84 → « 4 jours » (<code>Math.round(3.5) = 4</code>) ; 96 → « 4 jours ».</p>
+    <p>Entre 71 h et 72 h, l'écriture saute de « 71 h » à « 3 jours » : la marche est assumée.</p>
+  </details>
+  <div class="exemple"><p>Camille, 1 mg tous les lundis à 08:00. Le samedi 12/09 à 12:00, le dernier sommet de la courbe est le 09/09 à 00:00, soit 84 h plus tôt : « dernier pic il y a 4 jours ».</p></div>
+
+  <h3 id="traitement-affichage-du-graphe-de-concentration">Affichage du graphe de concentration</h3>
+  <p>Le composant ne recalcule rien de la cinétique : il filtre, borne et met en forme.</p>
+  <pre><code>chartData = filterChartDataByWindow(rawChartData, timeWindow, customRange)
+  → filterByTimeWindow(points, window, pt =&gt; getLocalDateStr(new Date(pt.timestamp)), range)
+
+yMax    = chartData.length &gt; 0 ? max(concentrations affichées, 0.25) : maxConcentration
+domaine = [0, parseFloat((yMax × 1.15).toFixed(2))]
+graduations Y : parseFloat(val.toFixed(2))
+
+spanMs        = dernier.timestamp − premier.timestamp (0 si &lt; 2 points)
+ticksShowHours= spanMs &gt; 0 &amp;&amp; spanMs ≤ 2 jours
+graduation X  = 'JJ/MM' (+ `, {h}h` si ticksShowHours)
+
+« En direct » et l'infobulle « Actif » :
+  Number.isInteger(c) ? c : c.toFixed(3)
+
+phrase du pic : peakLabel(peakStatus(molecule.peakChartData, Date.now(),
+                                     molecule.peakWindowHours))
+  — sur la courbe ENTIÈRE, jamais sur la fenêtre affichée
+
+ligne du traitement : une icône par forme de `forms`, puis `names.join('/')`
+légende : forms.length &gt; 1 ? 'Prise ou injection'
+        : forms[0] === 'oral' ? 'Prise' : 'Injection GLP-1'</code></pre>
+  <p>Le filtre porte sur la date locale du point et n'a pas de borne haute pour les fenêtres fixes : les dix jours de prévision restent visibles à droite d'aujourd'hui quelle que soit la période choisie. Une pastille marque chaque point portant <code>injectedToday</code> ; son étiquette affiche <code>injectionDose</code>, une seule à la fois.</p>
+  <p class="ancre">src/versions/mixte/features/blood-level/MoleculeConcentrationChart.tsx · src/features/blood-level/bloodLevel.utils.ts</p>
+  <details><summary>Cas limites</summary>
+    <p>Fenêtre ne retenant aucun point : <code>yMax</code> retombe sur <code>maxConcentration</code> du groupe (1 quand la courbe est vide).</p>
+    <p>Le plancher de 0,25 mg empêche un axe écrasé sur des concentrations minuscules — un groupe de sémaglutide oral, par exemple.</p>
+    <p>Le graphe lit <code>rawChartData</code>, la phrase du pic <code>peakChartData</code> : une dose saisie à l'avance dessine sa bosse mais n'est pas annoncée.</p>
+    <p>Sous une surimpression, le bandeau du bloc perd son titre et ne garde que les outils de période.</p>
+  </details>
+  <div class="exemple"><p>Le 12/09/2026, la courbe de Camille oscille entre 1,391 mg (creux, juste avant le lundi) et environ 2,1 mg ; le maximum affiché sur 30 jours donne un plafond d'axe de <code>round2(max × 1,15)</code>.</p></div>
+  <p><a href="spec-fonctionnelle.html#traitement-graphe-niveau-sanguin-actif">→ fonctionnelle</a></p>
+
+  <h3 id="traitement-textes-evolution-du-niveau-sanguin">Textes « Évolution du niveau sanguin »</h3>
+  <p>Aucune durée n'est écrite en dur : tout vient de la cinétique du traitement du profil.</p>
+  <pre><code>durationUnit(h)         = h &gt;= 24 ? 'jours' : 'h'
+formatDurationIn(h, u)  = u === 'h' ? `${round(h)} h`
+                        : (r = round1(h / 24)) === 1 ? '1 jour' : `${r} jours`
+daily                   = doseIntervalDays &lt;= 1
+
+pic   : daily ? `environ ${max(1, round(tMax))} h après ${la prise|l'injection}`
+              : picDay = max(1, round(tMax / 24))
+                `entre le ${ordinal(max(1, picDay−1))} et le ${ordinal(picDay+1)} jour`
+rythme: daily ? 'chaque jour'
+              : doseIntervalDays === 7 ? 'une fois par semaine'
+                                       : `tous les ${doseIntervalDays} jours`
+demi-vie : halfLifeLabel = formatDurationIn(t½, unit) ; deux et trois demi-vies
+           s'écrivent dans LA MÊME unité que la demi-vie
+équilibre : steadyDays = max(1, ceil(4.33 × t½ / 24))
+            steadyLabel = steadyDays &gt;= 14 ? `${round(steadyDays / 7)} semaines`
+                        : steadyDays === 1 ? '1 jour' : `${steadyDays} jours`</code></pre>
+  <p>Le creux à l'équilibre est calculé sur le modèle qui trace réellement la courbe, pas sur le raccourci <code>2^(−τ/t½)</code>, qui supposerait un pic instantané et exagérerait la chute.</p>
+  <pre><code>steadyStateTroughRatio(t½, t½abs, doseIntervalDays) :
+  ke, ka &gt; 0 et doseIntervalDays &gt; 0, sinon null ; ka &gt; ke, sinon null
+  τ  = doseIntervalDays × 24
+  dE = 1 − e^(−ke·τ) ; dA = 1 − e^(−ka·τ) ; les deux &gt; 0, sinon null
+  t_pic = ln[ ka·dE / (ke·dA) ] / (ka − ke) ; fini et dans ]0 ; τ[, sinon null
+  C(t)  = e^(−ke·t)/dE − e^(−ka·t)/dA
+  → C(τ) / C(t_pic)                 // creux sur pic
+
+troughPhrase(ratio), sur drop = 1 − ratio :
+  &lt; 0.12 « à peine plus bas … presque plate » · &lt; 0.20 « environ un dixième plus bas »
+  &lt; 0.30 « environ un quart plus bas »        · &lt; 0.42 « environ un tiers plus bas »
+  &lt; 0.58 « environ moitié moins haut »        · &lt; 0.72 « environ deux tiers plus bas »
+  sinon  « très nettement plus bas »</code></pre>
+  <p>Le titre est fixe (« Évolution du niveau sanguin ») ; la question entière porte le verbe de la forme (« je m'injecte » / « je prends »).</p>
+  <p class="ancre">src/versions/mixte/features/blood-level/treatmentCurveExplainer.ts</p>
+  <details><summary>Cas limites</summary>
+    <p>Ratio <code>null</code> — cinétique impossible — : la phrase se passe de chiffre (« Ce creux est le point le plus bas du cycle… »).</p>
+    <p>Les multiples de la demi-vie gardent son unité : pour Saxenda (13 h), deux demi-vies s'écrivent « 26 h », jamais « 1.1 jours ».</p>
+    <p>Bloc absent quand le traitement du profil est « aucun ».</p>
+  </details>
+  <div class="exemple"><p>Ozempic : demi-vie « 7 jours », pic « entre le 1er et le 3e jour », ratio creux/pic 0,650 donc drop 0,350 → « environ un tiers plus bas que le pic », équilibre <code>ceil(4,33 × 7) = 31</code> jours → « ~4 semaines ». Saxenda : « 13 h », « environ 7 h après l'injection », ratio 0,470 → « environ moitié moins haut », <code>ceil(4,33 × 0,542) = 3</code> → « ~3 jours ». Rybelsus : « 6.7 jours », « environ 1 h après la prise », ratio 0,905 → « presque plate ».</p></div>
+  <p><a href="spec-fonctionnelle.html#traitement-accordeon-evolution-du-niveau-sanguin">→ fonctionnelle</a></p>
+
+  <h3 id="traitement-textes-comprendre-vos-sensations">Textes « Comprendre vos sensations »</h3>
+  <p>Un accordéon par molécule active, aux durées du traitement représentant du groupe — celui de la prise la plus récente (<code>molecule.brand</code>).</p>
+  <pre><code>halfLifeDays  = halfLifeHours / 24
+halfLifeLabel = halfLifeDays &gt;= 1 ? `${formatNumber(halfLifeDays, 1)} jours`
+                                  : `${round(halfLifeHours)} h`
+daily         = doseIntervalDays &lt;= 1
+
+picDay   = round(tMax / 24)                       // sans plancher, ici
+picLabel = daily ? `~${max(1, round(tMax))} h après la prise`
+                 : `jours ${max(1, picDay − 1)} à ${picDay + 1}`
+intitulé = daily ? 'Pic de Concentration' : 'Pics de Concentration'
+
+eliminationLabel = daily ? 'avant la prise suivante'
+                         : `jours ${doseIntervalDays − 2} à ${doseIntervalDays}`
+
+steadyDays  = max(1, ceil(4.33 × halfLifeDays))
+steadyLabel = steadyDays &gt;= 14 ? `${round(steadyDays / 7)} semaines`
+                               : `${steadyDays} jour(s)`</code></pre>
+  <p>Le nom affiché est <code>molecule.names.join(' / ')</code> — espaces autour de la barre, contrairement à la ligne du graphe. Les phrases sur la satiété, les nausées et le retour d'appétit sont fixes.</p>
+  <p class="ancre">src/versions/mixte/features/blood-level/PhysiologyExplainerAccordion.tsx · src/versions/mixte/features/blood-level/BloodLevelPlot.tsx</p>
+  <details><summary>Cas limites</summary>
+    <p><code>halfLifeLabel</code> s'écrit toujours au pluriel dès un jour : « 1.5 jours », jamais « 1 jour » — contrairement au bloc « Évolution du niveau sanguin », qui traite le singulier.</p>
+    <p>Rythme de 1 ou 2 jours et forme injectable : <code>daily</code> est faux pour 2, et l'élimination s'écrit « jours 0 à 2 » — <code>doseIntervalDays − 2</code> n'a pas de plancher. Aucune fiche du catalogue n'est dans ce cas.</p>
+    <p>Ozempic : <code>picDay = round(57,4 / 24) = 2</code> → « jours 1 à 3 » ; élimination « jours 5 à 7 » ; équilibre « ~4 semaines ».</p>
+  </details>
+  <p><a href="spec-fonctionnelle.html#traitement-accordeon-comprendre-vos-sensations-physiologiques">→ fonctionnelle</a></p>
+
+  <h3 id="traitement-niveau-en-direct-de-la-home">Niveau en direct de la home</h3>
+  <p>Même rétention et même regroupement que la page, mais sans courbe : seule la concentration à maintenant est calculée.</p>
+  <pre><code>activeGlpConcentration(injectionHistory, profileTreatmentId, now = maintenant) :
+  historique vide → { concentration: 0, multiple: false }
+  retenues = prises des 60 derniers jours, sinon tout l'historique
+  pour chaque groupe de molécule :
+    history = toutes les lignes du groupe (historique complet)
+    conc    = cumul à `now`, cinétique par ligne
+    si conc &gt; 0.001 → le groupe est actif
+  0 groupe actif  → { 0, false }
+  1 groupe actif  → { conc, false }
+  ≥ 2 groupes     → { 0, true }        // la somme n'aurait pas de sens</code></pre>
+  <p>La tuile affiche <code>parseFloat(concentration.toFixed(2))</code>, ou « voir détail » quand <code>multiple</code>. Le clic ouvre la surimpression « Niveau sanguin actif » si le traitement du profil n'est pas « aucun » <em>et</em> que le journal n'est pas vide, sinon il mène à la page.</p>
+  <p class="ancre">src/features/home/homeOverview.ts · src/versions/mixte/homes/sections/MaisonSections.tsx</p>
+  <details><summary>Cas limites</summary>
+    <p>Sémaglutide et tirzépatide actifs en même temps : « voir détail ».</p>
+    <p>Passer d'Ozempic à Wegovy, ou de l'injection au comprimé, ne fait pas deux traitements actifs : c'est la même molécule.</p>
+    <p>Le carré traitement de la home standard appelle la même fonction sur les seules lignes de la série en cours : la valeur « Actif » y est donc celle du traitement en cours, pas celle de tout le sang.</p>
+  </details>
+  <p><a href="spec-fonctionnelle.html#traitement-tuile-en-direct-du-niveau-sanguin">→ fonctionnelle</a></p>
+
+  <h3 id="traitement-serie-du-traitement-en-cours">Série du traitement en cours</h3>
+  <p>Deux fonctions superposées. La coupure au changement de traitement d'abord, le filtre du futur ensuite — et l'ordre des deux compte.</p>
+  <pre><code>currentTreatmentInjections(history, profileTreatmentId) :
+  current       = resolveTreatmentId(undefined, profileTreatmentId)
+  chronologique = trié croissant sur `${date}T${time || '00:00'}` (comparaison de chaînes)
+  debut = chronologique.length
+  pour i de la fin vers 0 :
+    si resolveTreatmentId(chronologique[i].brand, profileTreatmentId) !== current → stop
+    debut = i
+  → chronologique.slice(debut)        // [] si la dernière ligne est d'un autre traitement
+
+currentTreatmentSeries(history, profileTreatmentId, now = maintenant) :
+  passees    = history filtré par hasOccurred(date, time, now)   // AVANT la coupure
+  injections = currentTreatmentInjections(passees, profileTreatmentId)
+  count        = injections.length
+  initialDose  = injections[0]?.dose ?? null
+  currentDose  = injections.at(-1)?.dose ?? null
+  totalMg      = parseFloat(somme(dose).toFixed(2))
+
+hasOccurred(date, time?, now) :
+  date &lt; aujourd'hui → true
+  date &gt; aujourd'hui → false
+  sans time          → true          // la journée en cours compte en entier
+  sinon              → time &lt;= heure locale courante</code></pre>
+  <p>Le filtre passe devant la coupure : une prise future d'un <em>autre</em> traitement — un changement déjà planifié — viderait sinon la série entière, la coupure remontant depuis la dernière ligne. La somme est figée au centième puis débarrassée d'une décimale nulle, l'addition de flottants produisant sinon des <code>1.7999999999999998</code>.</p>
+  <p><strong>Deux lectures coexistent.</strong> <code>MaisonSections</code>, la couche « Paliers de dose » et le rapport PDF lisent <code>currentTreatmentSeries</code>, donc sans les prises à venir. <code>Maison.tsx</code> — le carré traitement de la home standard — lit <code>currentTreatmentInjections</code> directement, sans filtre du futur : une dose saisie à l'avance y devient le dosage « Actuel », entre dans le compte et dans les milligrammes cumulés, et rend l'ancienneté négative.</p>
+  <p class="ancre">src/features/home/homeOverview.ts · src/shared/date/date.local.ts · src/versions/mixte/components/Maison.tsx · src/versions/mixte/homes/sections/MaisonSections.tsx</p>
+  <details><summary>Cas limites</summary>
+    <p>Wegovy, puis Mounjaro, puis Wegovy : la série ne compte que depuis le retour à Wegovy — revenir à un traitement déjà pris ne rouvre pas son ancien épisode.</p>
+    <p>Une ligne sans <code>brand</code> est réputée du traitement courant, et ne coupe donc jamais la série.</p>
+    <p>Heure absente : <code>currentTreatmentInjections</code> trie sur <code>00:00</code>, alors que le journal trie sur <code>12:00</code>. Deux lignes du même jour, l'une sans heure, ne se rangent pas dans le même ordre selon la lecture.</p>
+    <p>Série vide : <code>initialDose</code> et <code>currentDose</code> valent <code>null</code>, <code>totalMg</code> vaut 0.</p>
+  </details>
+
+  <h3 id="traitement-semaine-de-cure-et-compte-de-jours">Semaine de cure et compte de jours</h3>
+  <pre><code>weeksSinceDate(dateStr, today = maintenant) :
+  [année, mois, jour] = dateStr.split('-').map(Number)
+  l'un des trois faux (0 ou NaN) → null
+  minuitDebut       = new Date(année, mois − 1, jour).getTime()        // minuit LOCAL
+  minuitAujourdhui  = new Date(today.year, today.month, today.date).getTime()
+  totalDays = Math.round((minuitAujourdhui − minuitDebut) / 86 400 000)
+  totalDays &lt; 0 → null
+  → { weekNumber: Math.floor(totalDays / 7) + 1, totalDays }
+
+dayCountLabel(totalDays) : jours = max(1, totalDays) ;
+  `${jours} ${jours &gt; 1 ? 'jours' : 'jour'}`      // jamais « 0 jour »</code></pre>
+  <p>Le carré traitement compte depuis la <em>première prise de la série</em> ; <code>cureWeek</code>, employée ailleurs, compte depuis la pesée de départ. L'arrondi absorbe l'heure que le passage à l'heure d'été ajoute ou retire au milieu d'un intervalle.</p>
+  <p class="ancre">src/features/home/homeOverview.ts</p>
+  <details><summary>Cas limites</summary>
+    <p>Le jour même : <code>totalDays = 0</code> → « Semaine n° 1 (1 jour) ».</p>
+    <p>39 jours → semaine n° 6, « 39 jours ».</p>
+    <p>Date de départ future : <code>null</code>, et le carré affiche « Semaine n° 0 — traitement non commencé ».</p>
+    <p>Un mois écrit « 00 » rendrait <code>null</code> par le test de véracité.</p>
+  </details>
+  <div class="exemple"><p>Première prise de Camille le 04/05/2026, consultée le 12/09/2026 : 131 jours, <code>floor(131 / 7) + 1 = 19</code> → « Semaine n° 19 (131 jours) ».</p></div>
+  <p><a href="spec-fonctionnelle.html#traitement-carre-traitement">→ fonctionnelle</a></p>
+
+  <h3 id="traitement-doses-de-la-home">Doses de la home</h3>
+  <p>Trois valeurs et un pied, écrits au centième sans zéro de queue.</p>
+  <pre><code>home sections (MaisonSections, série filtrée du futur) :
+  Initial = parseFloat((treatmentSeries.initialDose ?? 0).toFixed(2))
+  Actuel  = parseFloat((treatmentSeries.currentDose ?? 0).toFixed(2))
+  Actif   = parseFloat(activeGlpConcentration(treatmentSeries.injections,
+                                              profile.glp1Brand).concentration.toFixed(2))
+  pied    = `${nom} · ${count} injection(s)|comprimé(s) · ${totalMg}mg cumulé`
+
+home standard (Maison.tsx, série NON filtrée du futur) :
+  Initial = parseFloat(treatmentInjections[0].dose.toFixed(2))
+  Actuel  = parseFloat(treatmentInjections.at(-1).dose.toFixed(2))
+  Actif   = parseFloat(activeGlpConcentration(treatmentInjections,
+                                              profile.glp1Brand).concentration.toFixed(2))
+  totalMg = parseFloat(somme(dose).toFixed(2))          // recalculé sur place
+  daysSinceLastDose = Math.round((Date.parse(aujourd'hui) − Date.parse(derniere.date))
+                                 / 86 400 000)
+  → « aujourd'hui » si 0, sinon `il y a ${n} jour(s)`</code></pre>
+  <p>Le mot du pied et l'accord « Dernière / Dernier » suivent <code>isOralMedication(profile.glp1Brand)</code> — la forme du profil, pas celle de la ligne. Les deux dates de <code>daysSinceLastDose</code> sont des chaînes <code>AAAA-MM-JJ</code> parsées en UTC : l'écart en jours est exact quel que soit le fuseau.</p>
+  <p class="ancre">src/versions/mixte/components/Maison.tsx · src/versions/mixte/homes/sections/MaisonSections.tsx · src/features/home/homeOverview.ts</p>
+  <details><summary>Cas limites</summary>
+    <p>Home sections : une série vide affiche 0 mg pour Initial et Actuel, le <code>?? 0</code> substituant un zéro à l'absence — mais le groupe entier ne se monte que s'il y a une dose ou un poids de départ.</p>
+    <p>Home standard, prise saisie pour demain : <code>daysSinceLastDose</code> est négatif et la ligne s'écrit « il y a −1 jour ».</p>
+    <p>« Actif » n'est jamais « voir détail » sur ces carrés : la série ne porte qu'un traitement, donc au plus une molécule.</p>
+  </details>
+  <div class="exemple"><p>Camille le 12/09/2026 : Initial 0.25 mg, Actuel 1 mg, Actif 1.66 mg, pied « Ozempic · 19 injections · 14mg cumulé », dernière prise « il y a 5 jours ».</p></div>
+
+  <h3 id="traitement-paliers-de-dose">Paliers de dose</h3>
+  <p>Les prises consécutives de même dose de la série en cours forment un palier ; la fenêtre d'un palier court jusqu'au <em>début</em> du suivant.</p>
+  <pre><code>paliersDeDose(injections, aujourdhui) :
+  suite = [...injections].sort(byDateTimeAsc)      // heure absente = 12:00
+  pour chaque prise :
+    si le dernier palier a la même dose → finPrises ← prise.date ; prises += 1
+    sinon → nouveau { dose, debut: prise.date, finPrises: prise.date, prises: 1 }
+  pour chaque palier i :
+    finFenetre ← paliers[i+1] ? paliers[i+1].debut : aujourdhui
+    enCours    ← (i est le dernier)
+
+durée = daysBetween(debut, finFenetre)      // jours entiers, UTC champ par champ
+écriture :
+  jours &lt;= 0 → « aujourd'hui »
+  jours &lt; 14 → `${jours} jour(s)`
+  sinon      → `${round(jours / 7)} semaines`
+
+titre = i === 0 ? 'Début à ' : 'Passage à '
+dose  = String(parseFloat(dose.toFixed(2)))
+mot   = isOralMedication(fiche de la dernière ligne de la série)
+        ? 'comprimé(s)' : 'injection(s)'
+indexCerne = miseEnAvant === 'debut' ? 0
+           : miseEnAvant === 'actuel' ? paliers.length − 1 : −1</code></pre>
+  <p>Une pesée faite entre la dernière prise d'un palier et la première du suivant appartient encore à la dose qui était en cours ce jour-là : c'est pourquoi la fenêtre court jusqu'au début du suivant et non jusqu'à <code>finPrises</code>.</p>
+  <p class="ancre">src/versions/mixte/components/SurimpressionDoses.tsx</p>
+  <details><summary>Cas limites</summary>
+    <p>Série vide : aucun palier, et le bloc affiche « Aucune prise enregistrée pour le traitement en cours : l'escalier des doses se dessinera dès la première. »</p>
+    <p>Un palier ouvert le jour même : durée 0 → « aujourd'hui », sans nombre.</p>
+    <p>13 jours → « 13 jours » ; 15 jours → « 2 semaines » (<code>round(15/7) = 2</code>).</p>
+    <p>Revenir à une dose déjà prise après en avoir changé crée un nouveau palier : le regroupement est sur les prises <em>consécutives</em>.</p>
+    <p>La forme est lue sur la dernière ligne de la série ; toutes résolvent vers la même fiche, la coupure au changement de traitement l'assurant.</p>
+  </details>
+  <p><a href="spec-fonctionnelle.html#traitement-paliers-de-dose">→ fonctionnelle</a></p>
+
+  <h3 id="traitement-variation-de-poids-par-palier">Variation de poids par palier</h3>
+  <p>La brique est celle du domaine poids, nourrie des bornes que le palier porte déjà. L'historique entier lui est passé : c'est elle qui décide ce qui tombe dans l'intervalle.</p>
+  <pre><code>averageWeeklyChange(weightHistory, { startDate, endDate }) :
+  dedans = lastWeighInPerDay(weightHistory)          // une pesée par jour, la dernière
+           filtré sur startDate ≤ date ≤ endDate
+  dedans.length &lt; 2                    → null
+  jours = daysBetween(startDate, endDate)
+  jours &lt; MIN_DAYS_FOR_WEEKLY_RATE (7) → null
+  → parseFloat((((dernier.weight − premier.weight) × 7) / jours).toFixed(1))
+
+écriture, derrière « ≈ » :
+  s = signedKg(delta)                  // '+2.4' | '-2.4' | '-0'
+  s === '-0' ? '0' : s.replace('-', '−')     // vrai signe moins, U+2212
+  null → rien n'est écrit : ni zéro, ni tiret</code></pre>
+  <p class="ancre">src/features/weight/weight.utils.ts · src/versions/mixte/components/SurimpressionDoses.tsx · src/features/home/homeOverview.ts</p>
+  <details><summary>Cas limites</summary>
+    <p>Moins de deux pesées dans la fenêtre, ou fenêtre de moins de sept jours : rien n'est écrit.</p>
+    <p>Poids stable : <code>signedKg</code> rendrait « −0 », converti en « 0 » sans signe — « −0 » se lirait comme une baisse.</p>
+    <p>Les bornes sont inclusives des deux côtés ; le palier suivant partage donc sa date de début avec la fin de fenêtre du précédent, et une pesée ce jour-là compte des deux côtés.</p>
+  </details>
+  <div class="exemple"><p>Camille : 96,0 kg le 04/05 et 94,8 kg le 01/06 → <code>(−1,2 × 7) / 28 = −0,3</code> → « ≈ −0.3 kg / semaine ». 93,2 kg le 29/06 et 87,8 kg le 12/09 → <code>(−5,4 × 7) / 75 = −0,504</code> → « ≈ −0.5 kg / semaine ».</p></div>
+
+  <h3 id="traitement-rappels-d-injection">Rappels d'injection</h3>
+  <p>Six champs de profil et leurs défauts, lus à chaque affichage.</p>
+  <pre><code>isInjectionEnabled = profile.reminderEnabled                    // faux par défaut
+injectionType      = profile.injectionReminderType ?? 'weekly'
+reminderDay        = profile.reminderDay ?? 0                   // 0 = dimanche … 6 = samedi
+reminderTime       = profile.reminderTime ?? '20:00'
+intervalDays       = profile.injectionReminderDaysInterval ?? 7  // liste de 1 à 30
+startDate          = profile.injectionReminderStartDate ?? getLocalDateStr()
+
+ligne « Cure » du bloc Salut :
+  !reminderEnabled          → 'Non'
+  type === 'custom'         → `${intervalDays}j`
+  sinon → ['Dim','Lun','Mar','Mer','Jeu','Ven','Sam'][reminderDay]</code></pre>
+  <p>La liste du sélecteur de jour est ordonnée lundi → dimanche, mais les valeurs restent 1…6 puis 0. <code>reminderTime</code> est ramenée à la minute ronde inférieure à l'enregistrement du profil. Ces réglages sont écrits dans le profil ; <span class="marque non">non implémenté</span> aucun code ne planifie ni n'envoie de notification.</p>
+  <p class="ancre">src/versions/mixte/components/NotificationsSettings.tsx · src/versions/mixte/components/SalutBlock.tsx · src/app/useAppData.ts</p>
+  <details><summary>Cas limites</summary>
+    <p>La partie « Rappels » de la ligne « Cure » disparaît quand le traitement est « aucun ».</p>
+    <p>Le mode hebdomadaire et le mode personnalisé partagent le même champ <code>reminderTime</code> : changer l'heure dans l'un la change dans l'autre.</p>
+  </details>
+  <p><a href="spec-fonctionnelle.html#traitement-module-et-rappels">→ fonctionnelle</a></p>
+
+  <h3 id="traitement-derniere-prise-passee">Dernière prise passée</h3>
+  <pre><code>getMostRecentPastInjection(injectionHistory, now = maintenant) :
+  historique vide ou absent → null
+  passees = lignes dont safeParseDate(date, time) ≤ now
+  base    = passees.length &gt; 0 ? passees : injectionHistory   // repli délibéré
+  → base trié par instant décroissant, premier élément</code></pre>
+  <p>Le repli est délibéré : tant qu'aucune prise n'est passée — un traitement qui commence, ou des doses saisies à l'avance —, l'écran montre celle qui est prévue plutôt que rien. L'appelant qui calcule un délai depuis cette date doit donc s'attendre à un nombre de jours négatif.</p>
+  <p class="ancre">src/utils/pharmacokinetics.ts · src/versions/mixte/components/PlusMenu.tsx</p>
+  <details><summary>Cas limites</summary>
+    <p>Une seule prise, datée du 20/08, consultée le 05/08 : elle est rendue.</p>
+    <p>La carte profil du menu « Plus » affiche <code>lastInjection.dose</code> brute — sans <code>toFixed</code> — suivie de « mg », ou « N/A » sans aucune prise.</p>
+    <p>Une date illisible est ramenée à maintenant par <code>safeParseDate</code> : la ligne passe donc pour survenue.</p>
+  </details>
+  <p><a href="spec-fonctionnelle.html#traitement-carte-profil-du-menu-plus">→ fonctionnelle</a></p>
+
+  <h3 id="traitement-ligne-de-traitement-du-tiroir-journal-et-du-defile">Ligne de traitement du tiroir « Journal » et du défilé</h3>
+  <p>Une seule projection alimente les deux surfaces.</p>
+  <pre><code>treatmentEntries(injections, profileTreatmentId) → RecentJournalEntry :
+  treatmentId = resolveTreatmentId(inj.brand, profileTreatmentId)
+  kind   = isOralMedication(treatmentId) ? 'comprime' : 'injection'
+  date   = inj.date ; time = inj.time || undefined
+  label  = getTreatment(treatmentId).name
+  doseMg = inj.dose || undefined
+  site   = inj.site || undefined
+  tab    = 'injection'
+
+tri de toutes les entrées : date décroissante, puis time décroissant
+  (une entrée sans heure passe APRÈS celles de son jour qui en portent une)
+
+ligneValeur(entry) : `${parseFloat(doseMg.toFixed(2))} mg`
+tiroir Journal : tête = `${date} · ${ligneValeur}` ; nom = label ;
+                 valeurs = siteInitials(entry.site)</code></pre>
+  <p>Le tiroir montre les trois dernières lignes de chaque journal, sans fenêtre et prises futures comprises ; le défilé de la home applique sa fenêtre de sept jours et écarte le futur.</p>
+  <p class="ancre">src/features/home/recentJournal.ts · src/versions/mixte/components/JournalDrawer.tsx · src/versions/mixte/features/home/RecentJournalStrip.tsx</p>
+  <details><summary>Cas limites</summary>
+    <p>Un comprimé n'affiche pas d'initiales : <code>siteInitials('prise_orale')</code> rend la chaîne vide.</p>
+    <p>Une dose de 0 tombe à <code>undefined</code> par le <code>||</code> et la valeur n'est pas écrite.</p>
+    <p>Le nom vient de la fiche résolue, jamais du champ <code>brand</code> brut.</p>
+  </details>
+  <p><a href="spec-fonctionnelle.html#traitement-tiroir-journal">→ fonctionnelle</a></p>
+
+  <h3 id="traitement-graphe-poids-vs-traitement-domaine-poids-donnees-de-traiteme">Graphe poids contre traitement (données de traitement)</h3>
+  <p>Le domaine du poids possède le graphe ; le traitement lui fournit deux séries et les pastilles de prise.</p>
+  <pre><code>brand    = resolveTreatmentId(undefined, profile?.glp1Brand)
+pkParams = getPKParameters(brand)                        // une seule cinétique
+currentTreatmentLogs = injectionHistory filtré sur
+  resolveTreatmentId(inj.brand, profile?.glp1Brand) === brand
+
+à chaque point (pas de 3 h locales, curseur calé sur midi) :
+  'Concentration (mg)' = round4(calculateCumulativeConcentration(
+                                  currentMs, currentTreatmentLogs, pkParams))
+  'Dose GLP1 (mg)'     = getActiveDoseForDate(dateStr)
+  injectedToday        = isNoon &amp;&amp; !isOralTreatment
+                         &amp;&amp; une prise du traitement courant porte cette date
+
+getActiveDoseForDate(dateStr) :
+  aucune prise → 0
+  prises du traitement courant dont Date(inj.date) ≤ Date(dateStr),
+  triées par instant décroissant → dose de la première, sinon 0
+
+axe des doses : dMax = parseFloat((max(valeurs, 0.1) × 1.15).toFixed(2)) || 0.5
+                5 graduations régulières
+légende : showRealConcentration ? 'Concentration Sanguine GLP1'
+        : isOral ? 'Dosage Comprimé' : 'Dose GLP-1'</code></pre>
+  <p>Le graphe est monté avec <code>hasEnoughData = effectiveWeightHistory.length &gt;= 2</code> : deux pesées au minimum. La cinétique employée est celle de la fiche du <em>profil</em>, appliquée à toutes les lignes retenues — ici, pas de cinétique par ligne, la sélection ne gardant qu'un traitement.</p>
+  <p><span class="marque non">non implémenté</span> Le composant porte <code>const MONTRER_GLP1 = false</code> : l'axe de droite, la courbe de concentration, les pastilles de prise et leurs deux entrées de légende sont sous cette garde et ne s'affichent pas. Les données sont calculées à chaque rendu, la période est réglable, et rien n'en paraît.</p>
+  <p class="ancre">src/versions/mixte/features/weight/useWeightTreatmentChart.ts · src/versions/mixte/features/weight/WeightTreatmentChart.tsx · src/versions/mixte/features/weight/WeightTracker.tsx</p>
+  <details><summary>Cas limites</summary>
+    <p><code>getActiveDoseForDate</code> compare <code>new Date(inj.date)</code> à <code>new Date(dateStr)</code>, deux lectures UTC : la comparaison reste juste, les deux étant lues de la même façon.</p>
+    <p>Traitement oral : aucune pastille de prise, ni sur le graphe ni en légende.</p>
+    <p>La période est partagée avec la page poids sous la clé <code>glp1_period_history_weight_chart</code> : la régler depuis le tiroir la règle aussi sur la page.</p>
+  </details>
+  <p><a href="spec-fonctionnelle.html#traitement-surimpressions-du-tiroir-tendances">→ fonctionnelle</a></p>
+
+  <h3 id="traitement-frequence-observee-des-prises">Fréquence observée des prises</h3>
+  <p>L'écart moyen entre deux <em>journées</em> de prise, mesuré sur les seules prises survenues.</p>
+  <pre><code>injectionIntervalDays(history, now = maintenant) :
+  dates = [...new Set(
+             history.filter(log =&gt; hasOccurred(log.date, log.time, now))
+                    .map(log =&gt; log.date))].sort()
+  dates.length &lt; 2 → null
+  ecart = daysBetween(dates[0], dates.at(-1))
+  ecart &lt;= 0 → null
+  → ecart / (dates.length − 1)</code></pre>
+  <p>Ce sont des journées, pas des lignes : deux prises le même jour ne comptent pas pour un écart nul, ce qui raccourcirait la fréquence annoncée. La moyenne ne dépend que des deux extrémités, elle ne masque donc pas les semaines sautées. Le calcul porte sur tout l'historique fourni, sans distinction de traitement.</p>
+  <p class="ancre">src/features/injections/injections.utils.ts</p>
+  <details><summary>Cas limites</summary>
+    <p>01/08, 08/08, 15/08 → <code>14 / 2 = 7</code>. 25/07, 01/08, 08/08, 22/08 → <code>28 / 3 ≈ 9,33</code>.</p>
+    <p>Deux lignes le 08/08 comptent pour une journée.</p>
+    <p>Moins de deux journées survenues : <code>null</code>, et la tuile ne s'affiche pas.</p>
+    <p>Un changement de traitement qui change aussi de rythme mêle deux fréquences ; le cas est rare, les GLP-1 injectables étant tous hebdomadaires.</p>
+  </details>
+
+  <h3 id="traitement-rapport-pdf-traitement">Rapport PDF : données de traitement</h3>
+  <p>Quatre endroits du document lisent le domaine.</p>
+  <pre><code>bloc d'identité :
+  treatment      = getTreatment(profile.glp1Brand)
+  oral           = treatment.form === 'oral'
+  treatmentLabel = `${treatment.name} (${oral ? 'comprimé' : 'injection'})`
+  treatmentSeries= currentTreatmentSeries(opts.injectionHistory ?? opts.injections,
+                                          profile.glp1Brand)
+  sous-ligne     = premiere ? `1re ${oral ? 'prise' : 'injection'} le ${JJ/MM/AAAA}` : —
+
+tuiles de suivi (sur les prises de la PÉRIODE exportée) :
+  { `${opts.injections.length}`, oral ? 'Prises' : 'Injections' }
+  sortedInjections = [...opts.injections].sort par date croissante
+  { lastDose !== null ? `${lastDose} mg` : '-', 'Dernière dose' }
+  intervalle = injectionIntervalDays(opts.injections)
+  si non null → { `≈ ${frDecimal(intervalle)} j`, oral ? 'Entre 2 prises'
+                                                       : 'Entre 2 injections' }
+
+annexe A : titre `Journal des prises de comprimés` | `Journal des injections`
+           selon la forme de la CURE EN COURS
+  injectionCellLines(logs) :
+    0 ligne  → []
+    1 ligne  → [ formatCalendarDose(logs[0].dose) ]
+    ≥ 2      → [ `×${logs.length}` ]</code></pre>
+  <p>La première prise est lue sur l'historique complet (<code>injectionHistory</code>), les tuiles sur la seule période exportée (<code>injections</code>). L'annexe A est un calendrier ; la case porte la dose arrondie du jour ou « ×N ». Le carnet quotidien du rapport écrit la dose en tête, le traitement pour nom et la zone en seconde ligne — la répartition de la ligne de journal.</p>
+  <p class="ancre">src/versions/mixte/features/report/medicalReportPdf.ts · src/versions/mixte/features/report/reportCalendar.ts</p>
+  <details><summary>Cas limites</summary>
+    <p>« Dernière dose » est la dose de la dernière ligne par <em>date</em> de la période, sans départage par l'heure ni distinction de traitement.</p>
+    <p>Aucune prise sur la période : l'annexe A affiche « Aucune injection sur la période. » ou « Aucune prise sur la période. »</p>
+    <p>Le titre de l'annexe suit la cure en cours, alors que les cases peuvent porter des prises d'un autre traitement : un changement de traitement ne réécrit pas le passé.</p>
+  </details>
+  <p><a href="spec-fonctionnelle.html#traitement-export-pdf">→ fonctionnelle</a></p>
+
+  <h3 id="traitement-partage-d-une-injection">Partage d'une prise</h3>
+  <p>La carte reprend la dernière prise du journal ; le graphe n'apparaît qu'à deux conditions.</p>
+  <pre><code>log        = latest(injectionHistory)   // tri byDateTimeDesc, sinon l'exemple
+treatment  = getTreatment(log.brand ?? profile.glp1Brand)
+isOral     = treatment.form === 'oral'
+dose écrite= String(Math.round(dose × 10) / 10)          // une décimale
+lignes     = Traitement (name) · Molécule (molecule ?? '—')
+             · (isOral ? 'Voie' : 'Zone') → SITE_LABELS[log.site]?.label ?? log.site
+
+CHART_AFTER_DAYS = 4 ; BLOOD_CHART_DAYS = 14
+molecules   = useActiveMolecules(history, profile)       // même calcul que la page
+startedDays = daysBetween(plus ancienne date du journal, aujourd'hui)
+curve       = molecules.length &gt; 0
+              ? lastDaysOfCurve(molecules[0].rawChartData, 14) : []
+showChart   = startedDays &gt; 4 &amp;&amp; curve.length &gt; 1
+
+lastDaysOfCurve(points, days) :
+  from = addDays(aujourd'hui, −(days − 1))
+  points dont getLocalDateStr(new Date(timestamp)) ∈ [from ; aujourd'hui]</code></pre>
+  <p>La molécule retenue est la première du tableau, donc celle de la prise la plus récente. Le réglage de période du graphe de page est délibérément écarté : une maquette ne touche à aucun réglage de l'utilisatrice.</p>
+  <p class="ancre">src/versions/mixte/components/share/shareTemplates.tsx · src/versions/mixte/components/share/ShareChart.tsx</p>
+  <details><summary>Cas limites</summary>
+    <p>Journal vide : <code>oldestDate</code> rend la chaîne vide, <code>daysBetween</code> rend 0, aucun graphe — et la carte affiche l'exemple.</p>
+    <p>Le seuil est strict : exactement quatre jours ne suffisent pas.</p>
+    <p>La courbe filtrée n'a pas de borne haute au-delà d'aujourd'hui : les dix jours de prévision sont écartés par <code>lastDaysOfCurve</code>.</p>
+    <p>Le <code>brand</code> de la ligne prime sur le profil ; un identifiant absent bascule sur le profil, jamais sur « aucun » directement.</p>
+  </details>
+  <p><a href="spec-fonctionnelle.html#traitement-carte-de-partage">→ fonctionnelle</a></p>
+
+  <h3 id="traitement-module-traitement">Module Traitement</h3>
+  <p>Deux drapeaux, et un défaut qui n'est pas celui des autres modules.</p>
+  <pre><code>MODULE_FLAGS.injection        = 'treatmentTrackingEnabled'
+MODULE_HIDDEN_FLAGS.injection = 'treatmentModuleHidden'
+MODULES_ALLUMES_PAR_DEFAUT    = { 'injection', 'symptoms' }
+
+isModuleOn(profile, 'injection') :
+  valeur = profile.treatmentTrackingEnabled
+  valeur === undefined | null → true          // l'absence vaut ALLUMÉ
+  sinon → Boolean(valeur)
+
+isModuleHidden(profile, 'injection') =
+  !isModuleOn(profile, 'injection') &amp;&amp; Boolean(profile.treatmentModuleHidden)</code></pre>
+  <p>Lire le drapeau nu dirait « éteint » pour un traitement dont le drapeau n'a jamais été écrit, et amputerait d'un coup toutes les cures en cours de leur page principale. Le masquage ne mord que module éteint : allumé, le module paraît toujours. Le nom du module suit la cure — <code>treatmentSectionLabel(profile.glp1Brand)</code>.</p>
+  <p class="ancre">src/versions/mixte/app/navigation.ts · src/versions/mixte/App.tsx</p>
+  <details><summary>Cas limites</summary>
+    <p>Module éteint : l'onglet quitte le menu du bas, l'entrée quitte le menu « + », la ligne « Cure » du bloc Salut et le carré traitement de la home standard disparaissent.</p>
+    <p>Rallumer le module écrit <code>treatmentModuleHidden = false</code>.</p>
+    <p>La pesée est le seul suivi hors module.</p>
+  </details>
+
+  <h3 id="traitement-statistiques-par-zone-et-zone-recommandee">Statistiques par zone et zone recommandée</h3>
+  <p>Calculées à chaque rendu de la page, et — dans la Mixte — jamais affichées : aucun écran ne consomme <code>recommendedSite</code>.</p>
+  <pre><code>computeSiteStats(history) :
+  stats[site] = { count: 0 } pour chaque clé de SITE_LABELS (prise_orale comprise)
+  sortedHistory = trié décroissant sur date + (time || '12:00')
+  pour chaque log de sortedHistory, si stats[log.site] existe :
+    count += 1
+    si lastUsedDate absent :
+      lastUsedDate = log.date
+      daysAgo      = ceil(|maintenant − new Date(log.date)| / 86 400 000)
+
+getRecommendedSite(stats) :
+  sites     = clés de SITE_LABELS, dans l'ordre de la table
+  neverUsed = sites sans lastUsedDate ; s'il y en a → neverUsed[0]
+  sinon → celui dont daysAgo est le plus grand (premier trouvé en cas d'égalité)</code></pre>
+  <p>Le parcours étant du plus récent au plus ancien, <code>lastUsedDate</code> est bien la dernière utilisation. <code>daysAgo</code> passe par <code>new Date(log.date)</code>, qui lit la chaîne en UTC, et par une valeur absolue : une prise du jour rend 1 (le plafond d'un reste positif), une prise future rend un nombre positif également.</p>
+  <p class="ancre">src/features/injections/injections.utils.ts · src/features/injections/useInjectionSiteStats.ts</p>
+  <details><summary>Cas limites</summary>
+    <p><code>prise_orale</code> fait partie des candidats de <code>getRecommendedSite</code> : dans un journal sans comprimé, elle sera « jamais utilisée » et pourra donc être recommandée — mais elle vient en dernier dans l'ordre de la table, et les six zones corporelles la précèdent.</p>
+    <p>Un site absent de la table n'est pas compté : le test <code>if (stats[log.site])</code> l'écarte.</p>
+    <p>La valeur absolue efface le signe : une prise datée du futur est comptée comme ancienne.</p>
+  </details>
+
+  <h3 id="traitement-anciennete-de-la-derniere-prise-injectionrecency">Ancienneté de la dernière prise (<code>injectionRecency</code>)</h3>
+  <pre><code>injectionRecency(lastInjection, isOral, now = maintenant) :
+  sans prise → { 'Aucune', isOral ? 'dernière prise' : 'dernière injection' }
+  injDate = new Date(lastInjection.date) ; injDate.setHours(0,0,0,0)
+  today   = new Date(now)                ; today.setHours(0,0,0,0)
+  diffDays= Math.round((today − injDate) / 86 400 000)
+  0   → { "Aujourd'hui",  isOral ? 'dernier comprimé'          : 'dernière injection' }
+  1   → { '1 jour',       isOral ? 'depuis le dernier comprimé': 'depuis la dernière injection' }
+  &gt; 1 → { `${diffDays} jours`, même légende qu'à 1 }
+  &lt; 0 → { `Dans ${|diffDays|} j`, isOral ? 'prochain comprimé' : 'prochaine injection' }
+
+isLastOral (Maison.tsx) = lastInj
+  ? (lastInj.brand &amp;&amp; isOralMedication(lastInj.brand))
+    || (lastInj.site &amp;&amp; lastInj.site.toLowerCase().includes('oral'))
+    || (!lastInj.brand &amp;&amp; isOralMedication(profile.glp1Brand))
+  : isOralMedication(profile.glp1Brand)</code></pre>
+  <p class="ancre">src/features/home/homeOverview.ts · src/versions/mixte/components/Maison.tsx</p>
+  <details><summary>Cas limites</summary>
+    <p><code>new Date('2026-09-07')</code> est lu en UTC, puis ramené à minuit <em>local</em> : dans un fuseau négatif, l'instant obtenu appartient à la veille locale et le compte de jours est décalé d'une unité. En France, le décalage n'apparaît pas.</p>
+    <p>La prise rendue par <code>getMostRecentPastInjection</code> peut être future : la branche « Dans N j » existe pour cela.</p>
+    <p><code>isLastOral</code> teste la sous-chaîne <code>'oral'</code> dans le site : <code>prise_orale</code> la contient. C'est le seul endroit du domaine qui devine encore une forme dans une chaîne.</p>
+  </details>
+</section>

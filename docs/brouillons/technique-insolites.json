@@ -1,0 +1,422 @@
+{
+ "inventions": [
+  {
+   "categorie": "Écart entre la fonctionnelle et le code",
+   "fonctionnalite": "Export rapide du rapport",
+   "texte": "« l'export rapide l'exclut toujours » — l'export rapide n'existe plus. Le bloc « Export rapide », son bouton, son composant ReportQuickBlock et le geste exportQuick ont été supprimés le 2026-08-25 ; il ne reste que l'export sur mesure. J'ai écrit dans le chapitre technique le fait de code (available.insolites vaut false mais n'entre dans aucun calcul) et signalé la suppression, sans reprendre l'affirmation de la fonctionnelle.",
+   "origine": "src/versions/mixte/components/MedicalReportExport.tsx, commentaire « L'EXPORT RAPIDE N'EXISTE PLUS » (l. 974-982)"
+  },
+  {
+   "categorie": "Chiffre à corriger",
+   "fonctionnalite": "Nombre d'objets illustrés",
+   "texte": "La fonctionnelle dit « 68 objets ont un dessin dédié ». 68 est le nombre de CLÉS de dessin (68 tests dans getLudicIllustrationKey, 68 entrées dans DESSINS_LUDIQUES). Seuls 65 des 222 objets du catalogue déclenchent une clé quand le nom est minusculé, 64 sans minuscule. Quatre clés (pasta, water, pack_water, duck) ne correspondent à aucun objet du catalogue actuel. J'ai écrit les chiffres vérifiés.",
+   "origine": "src/utils/ludicWeight.ts (LUDIC_ITEMS, getLudicIllustrationKey), src/versions/mixte/components/LudicComposition.tsx (DESSINS_LUDIQUES) — comptés programmatiquement"
+  },
+  {
+   "categorie": "Divergence entre deux écrans, non décrite par la fonctionnelle",
+   "fonctionnalite": "IMC de garde des blocs insolites",
+   "texte": "La carte de confirmation prend subBmi = poids/taille², NON arrondi, avec 22 par défaut quand la taille manque ; les homes prennent bmiOf, arrondi au dixième, avec 0 quand la taille manque. Taille inconnue : la carte affiche les blocs, les homes se taisent. Un IMC de 18,97 : la carte bloque, les homes passent (arrondi à 19,0). Écrit en cas limite, faute de savoir si c'est voulu.",
+   "origine": "src/versions/mixte/features/weight/WeighInSubmissionCard.tsx l. 50-52 ; src/features/home/homeOverview.ts bmiOf l. 133-136"
+  },
+  {
+   "categorie": "Défaut non signalé par la fonctionnelle",
+   "fonctionnalite": "Bloc déplié de la home sections",
+   "texte": "Quand openEquivalences.total_loss est vrai mais showTotalLoss faux, la branche par défaut rend le bloc « dernière perte » sans vérifier showLastLoss : un bloc peut paraître alors que sa tuile est masquée. L'état étant persisté sous glow_home_equivalences, le cas survit à une fermeture de l'application. Écrit en cas limite.",
+   "origine": "src/versions/mixte/homes/sections/MaisonSections.tsx l. 5293-5295"
+  },
+  {
+   "categorie": "Comportement de compteur non décrit",
+   "fonctionnalite": "Compteurs de turn-over",
+   "texte": "commitLudicAssignment fait +1 par ENTRÉE de la liste, pas par exemplaire : une entrée { count: 2 } compte 1. Et si l'exclusion a cédé (aucune combinaison vraie sans objet exclu), le même nom peut figurer dans total et dans last et prendre +2 au même commit. Écrit en cas limites, mais je n'ai trouvé aucune décision qui tranche l'un ou l'autre.",
+   "origine": "src/utils/ludicUsage.ts l. 160-165"
+  },
+  {
+   "categorie": "Code inatteignable",
+   "fonctionnalite": "Second repli du moteur et clé car_battery",
+   "texte": "La passe 2 de getBestLudicCombination ne peut jamais s'exécuter (les 71 objets de catégorie 'objet' passent seuls isValidCombo). La clé 'car_battery' est déclarée dans le type LudicIllustrationKey, n'est renvoyée par aucun test et n'a pas d'entrée dans DESSINS_LUDIQUES. Les paramètres bestDiff et weightKg de pickByExclusionAndTurnover sont reçus et jamais lus. Écrits comme faits, sans recommandation de suppression.",
+   "origine": "src/utils/ludicWeight.ts l. 280-285, 416-436, 586-600"
+  },
+  {
+   "categorie": "Détail d'implémentation non observable",
+   "fonctionnalite": "Nombre de combinaisons énumérées",
+   "texte": "J'ai calculé, en rejouant l'algorithme sur le catalogue, 110 objets seuls valides et 10 473 paires valides, soit 10 583 candidats — ce qui fixe la plage des rangs (0-109 pour les objets seuls, 110-10 582 pour les paires). Ces nombres ne figurent nulle part dans le code ; ils en découlent. Je les ai gardés parce qu'ils rendent le départage par rang vérifiable, mais ils vieilliront avec le catalogue.",
+   "origine": "calcul sur src/utils/ludicWeight.ts (LUDIC_ITEMS + isValidCombo)"
+  },
+  {
+   "categorie": "Écran hors périmètre des ancres",
+   "fonctionnalite": "Page Objets Insolites (revue du catalogue)",
+   "texte": "L'inventaire porte une règle « Page Objets Insolites — liste et revue » (tri par poids croissant, clés glow-mixte-insolites-revue-supprimes / -modifs / -ok-pasok, saisie du poids en grammes entiers, catégories < 1 kg / < 10 kg / ≥ 10 kg). Aucune ancre imposée ne la couvre et la fonctionnelle n'en parle pas ; je ne l'ai pas écrite.",
+   "origine": "src/versions/mixte/components/InsolitesPage.tsx, inventaire result.inventaires[7].regles"
+  }
+ ],
+ "glossaire": [
+  {
+   "terme": "Catalogue ludique (LUDIC_ITEMS)",
+   "definition": "Constante du code, 222 objets nommés avec leur masse en kilogrammes, leur pluriel, leur article et leur émoji. Non stockée, non éditable par l'utilisatrice depuis les écrans couverts ici."
+  },
+  {
+   "terme": "Objet courant / objet insolite",
+   "definition": "Les deux valeurs du champ category. 71 objets courants, 151 insolites. Un insolite de 1 kg ou plus n'est valide qu'accompagné d'un insolite de moins de 1 kg ; un objet courant est toujours valide seul."
+  },
+  {
+   "terme": "Combinaison",
+   "definition": "Un ou deux objets du catalogue, répétition du même objet permise. Le résultat du moteur est une liste d'au plus deux entrées { name, count } dont la somme des count vaut au plus 2."
+  },
+  {
+   "terme": "Équivalence vraie",
+   "definition": "Combinaison dont la masse totale s'écarte du poids visé d'au plus 0,2 kg (LUDIC_TRUE_WITHIN_KG, écart absolu, tolérance numérique 1e-5). Le filtre ne s'applique qu'au chemin à options."
+  },
+  {
+   "terme": "Écart (diff)",
+   "definition": "Valeur absolue de la différence entre la masse de la combinaison et le poids visé, en kilogrammes."
+  },
+  {
+   "terme": "Rang d'énumération",
+   "definition": "Indice de poussée d'un candidat dans la liste candidates : objets seuls valides d'abord dans l'ordre du catalogue, puis paires (i, j ≥ i). Sert de dernier départage."
+  },
+  {
+   "terme": "Turn-over",
+   "definition": "Départage par l'usage cumulé d'une combinaison : la somme des compteurs de ses objets. Minimum gagne, avant l'écart et avant le rang."
+  },
+  {
+   "terme": "Exclusion",
+   "definition": "Liste de noms d'objets qu'une combinaison ne doit pas contenir. Sert à empêcher que « dernière perte enregistrée » reprenne les objets de « Depuis le début »."
+  },
+  {
+   "terme": "Chemin à options / chemin nu",
+   "definition": "Le chemin à options (withOptions vrai) applique le filtre des 200 g, l'exclusion et le turn-over ; le chemin nu rend la combinaison la plus juste, vraie ou non. Le PDF, le recalcul de secours de la carte de confirmation et le repli de la perte totale prennent le chemin nu."
+  },
+  {
+   "terme": "Signature de pesée",
+   "definition": "Chaîne `id|date|heure` de la pesée la plus récente du journal, ou « aucune-pesee ». Son changement, et lui seul, fait avancer les compteurs de turn-over."
+  },
+  {
+   "terme": "Assignation",
+   "definition": "Les objets attribués aux deux blocs pour une pesée donnée, avec la signature et les deux pertes au dixième. Conservée sous glow_ludic_usage et relue tant que ces trois identités ne changent pas."
+  },
+  {
+   "terme": "Perte totale (totalLoss)",
+   "definition": "Poids de départ moins pesée la plus récente. Positif = perte."
+  },
+  {
+   "terme": "Dernière perte (lastLoss)",
+   "definition": "Avant-dernière pesée moins dernière pesée, dans l'ordre date+heure décroissant. Vaut 0 sous deux pesées."
+  },
+  {
+   "terme": "hasOnlyStartingWeight",
+   "definition": "Booléen de weightOverview : journal vide, ou une seule ligne marquée départ, ou perte totale nulle ou négative. Masque les deux tuiles."
+  },
+  {
+   "terme": "Clé d'illustration (LudicIllustrationKey)",
+   "definition": "Identifiant du dessin d'un objet, dérivé de son nom par sous-chaîne. 'emoji' quand aucun test ne passe : l'objet est alors rendu par son émoji dans un SVG."
+  },
+  {
+   "terme": "DecomposedLudicItem",
+   "definition": "L'objet tel qu'il est stocké dans une assignation : name, count, emoji, key. Le dessin et la phrase lisent cette même liste."
+  },
+  {
+   "terme": "Fragment d'équivalence (LudicEquivalencePart)",
+   "definition": "Paire { prefix, itemName } : « une » + « boule de bowling » pour un exemplaire, « 2 » + « boules de bowling » au-delà."
+  },
+  {
+   "terme": "Variation de période (periodDelta)",
+   "definition": "Dans le PDF : dernière pesée de la période moins première pesée de la période. Négative quand la période est une perte."
+  },
+  {
+   "terme": "Masque de données (available)",
+   "definition": "Table des sections que la période peut alimenter. Une section n'est écrite que si sa case est cochée ET que le masque l'autorise — sauf insolites, qui n'a pas de masque."
+  }
+ ],
+ "index": [
+  {
+   "terme": "LUDIC_ITEMS (catalogue, 222 objets)",
+   "ancre": "insolites-entites"
+  },
+  {
+   "terme": "LudicItem",
+   "ancre": "insolites-entites"
+  },
+  {
+   "terme": "DecomposedLudicItem",
+   "ancre": "insolites-entites"
+  },
+  {
+   "terme": "LudicAssignment",
+   "ancre": "insolites-entites"
+  },
+  {
+   "terme": "LudicUsageState",
+   "ancre": "insolites-entites"
+  },
+  {
+   "terme": "glow_ludic_usage",
+   "ancre": "insolites-entites"
+  },
+  {
+   "terme": "glow_home_equivalences",
+   "ancre": "insolites-affichage-des-tuiles-de-perte"
+  },
+  {
+   "terme": "glow_report_include_v2",
+   "ancre": "insolites-defauts-et-memorisation-des-choix-du-sur-mesure"
+  },
+  {
+   "terme": "getBestLudicCombination",
+   "ancre": "insolites-combinaison-ludique-la-plus-juste"
+  },
+  {
+   "terme": "isValidCombo",
+   "ancre": "insolites-combinaison-ludique-la-plus-juste"
+  },
+  {
+   "terme": "insolite de 1 kg ou plus",
+   "ancre": "insolites-combinaison-ludique-la-plus-juste"
+  },
+  {
+   "terme": "passe 2 (repli du moteur)",
+   "ancre": "insolites-combinaison-ludique-la-plus-juste"
+  },
+  {
+   "terme": "LUDIC_TRUE_WITHIN_KG (200 g)",
+   "ancre": "insolites-exclusion-et-turn-over-blocs-de-la-home"
+  },
+  {
+   "terme": "pickByExclusionAndTurnover",
+   "ancre": "insolites-exclusion-et-turn-over-blocs-de-la-home"
+  },
+  {
+   "terme": "turn-over",
+   "ancre": "insolites-exclusion-et-turn-over-blocs-de-la-home"
+  },
+  {
+   "terme": "rang d'énumération",
+   "ancre": "insolites-exclusion-et-turn-over-blocs-de-la-home"
+  },
+  {
+   "terme": "LudicPickOptions (exclude, usage)",
+   "ancre": "insolites-exclusion-et-turn-over-blocs-de-la-home"
+  },
+  {
+   "terme": "latestWeighInSignature",
+   "ancre": "insolites-assignation-des-objets-a-la-pesee"
+  },
+  {
+   "terme": "resolveLudicAssignment",
+   "ancre": "insolites-assignation-des-objets-a-la-pesee"
+  },
+  {
+   "terme": "commitLudicAssignment",
+   "ancre": "insolites-assignation-des-objets-a-la-pesee"
+  },
+  {
+   "terme": "useLudicAssignment",
+   "ancre": "insolites-assignation-des-objets-a-la-pesee"
+  },
+  {
+   "terme": "signature « id|date|heure »",
+   "ancre": "insolites-assignation-des-objets-a-la-pesee"
+  },
+  {
+   "terme": "weightOverview",
+   "ancre": "insolites-pertes-de-l-assignation"
+  },
+  {
+   "terme": "totalLoss",
+   "ancre": "insolites-pertes-de-l-assignation"
+  },
+  {
+   "terme": "lastLoss",
+   "ancre": "insolites-pertes-de-l-assignation"
+  },
+  {
+   "terme": "hasOnlyStartingWeight",
+   "ancre": "insolites-pertes-de-l-assignation"
+  },
+  {
+   "terme": "isStartingWeight",
+   "ancre": "insolites-pertes-de-l-assignation"
+  },
+  {
+   "terme": "LudicComposition",
+   "ancre": "insolites-dessin-de-la-composition"
+  },
+  {
+   "terme": "DESSINS_LUDIQUES",
+   "ancre": "insolites-dessin-de-la-composition"
+  },
+  {
+   "terme": "LudicEmoji (SVG viewBox)",
+   "ancre": "insolites-dessin-de-la-composition"
+  },
+  {
+   "terme": "getLudicIllustrationKey",
+   "ancre": "insolites-cle-d-illustration"
+  },
+  {
+   "terme": "LudicIllustrationKey",
+   "ancre": "insolites-cle-d-illustration"
+  },
+  {
+   "terme": "car_battery (clé morte)",
+   "ancre": "insolites-cle-d-illustration"
+  },
+  {
+   "terme": "figurine Funko Pop",
+   "ancre": "insolites-cle-d-illustration"
+  },
+  {
+   "terme": "getLudicEquivalenceParts",
+   "ancre": "insolites-texte-d-une-equivalence"
+  },
+  {
+   "terme": "getLudicEquivalencePartsFor",
+   "ancre": "insolites-texte-d-une-equivalence"
+  },
+  {
+   "terme": "getLudicEquivalence",
+   "ancre": "insolites-texte-d-une-equivalence"
+  },
+  {
+   "terme": "getLudicEquivalenceFor",
+   "ancre": "insolites-texte-d-une-equivalence"
+  },
+  {
+   "terme": "LudicEquivalenceText",
+   "ancre": "insolites-texte-d-une-equivalence"
+  },
+  {
+   "terme": "computeSubmissionInfo",
+   "ancre": "insolites-conditions-d-affichage-de-la-carte-de-confirmation"
+  },
+  {
+   "terme": "WeighInSubmissionCard",
+   "ancre": "insolites-conditions-d-affichage-de-la-carte-de-confirmation"
+  },
+  {
+   "terme": "assignedItemsFor",
+   "ancre": "insolites-conditions-d-affichage-de-la-carte-de-confirmation"
+  },
+  {
+   "terme": "isMostRecent",
+   "ancre": "insolites-conditions-d-affichage-de-la-carte-de-confirmation"
+  },
+  {
+   "terme": "subBmi",
+   "ancre": "insolites-conditions-d-affichage-de-la-carte-de-confirmation"
+  },
+  {
+   "terme": "bmiOf",
+   "ancre": "insolites-affichage-des-tuiles-de-perte-homes"
+  },
+  {
+   "terme": "isBmiLow (seuil 19)",
+   "ancre": "insolites-affichage-des-tuiles-de-perte-homes"
+  },
+  {
+   "terme": "showLastLoss / showTotalLoss",
+   "ancre": "insolites-affichage-des-tuiles-de-perte-homes"
+  },
+  {
+   "terme": "lossesEqual",
+   "ancre": "insolites-affichage-des-tuiles-de-perte-homes"
+  },
+  {
+   "terme": "TOTAL_LOSS_LABEL / LAST_LOSS_LABEL",
+   "ancre": "insolites-affichage-des-tuiles-de-perte-homes"
+  },
+  {
+   "terme": "PROGRES_MAX",
+   "ancre": "insolites-affichage-des-tuiles-de-perte-homes"
+  },
+  {
+   "terme": "ludicTotal / ludicLast (repli)",
+   "ancre": "insolites-repli-du-dessin-d-equivalence-insolite"
+  },
+  {
+   "terme": "getLudicDecomposition",
+   "ancre": "insolites-repli-du-dessin-d-equivalence-insolite"
+  },
+  {
+   "terme": "lossSpanDates",
+   "ancre": "insolites-duree-d-une-perte-lossspanlabel-lossspandates"
+  },
+  {
+   "terme": "lossSpanLabel",
+   "ancre": "insolites-duree-d-une-perte-lossspanlabel-lossspandates"
+  },
+  {
+   "terme": "dayCountLabel",
+   "ancre": "insolites-duree-d-une-perte-lossspanlabel-lossspandates"
+  },
+  {
+   "terme": "daysBetween",
+   "ancre": "insolites-duree-d-une-perte-lossspanlabel-lossspandates"
+  },
+  {
+   "terme": "openEquivalences",
+   "ancre": "insolites-affichage-des-tuiles-de-perte"
+  },
+  {
+   "terme": "equivalenceBlock",
+   "ancre": "insolites-affichage-des-tuiles-de-perte"
+  },
+  {
+   "terme": "useFermetureCouche",
+   "ancre": "insolites-affichage-des-tuiles-de-perte"
+  },
+  {
+   "terme": "periodDelta",
+   "ancre": "insolites-equivalence-insolite-dans-le-pdf"
+  },
+  {
+   "terme": "section II Poids et doses",
+   "ancre": "insolites-equivalence-insolite-dans-le-pdf"
+  },
+  {
+   "terme": "« Soit l’équivalent de : … »",
+   "ancre": "insolites-equivalence-insolite-dans-le-pdf"
+  },
+  {
+   "terme": "MedicalReportSelection",
+   "ancre": "insolites-bascules-proposees-masque-des-donnees-disponibles"
+  },
+  {
+   "terme": "available (masque)",
+   "ancre": "insolites-bascules-proposees-masque-des-donnees-disponibles"
+  },
+  {
+   "terme": "effective",
+   "ancre": "insolites-bascules-proposees-masque-des-donnees-disponibles"
+  },
+  {
+   "terme": "export rapide (supprimé)",
+   "ancre": "insolites-bascules-proposees-masque-des-donnees-disponibles"
+  },
+  {
+   "terme": "DEFAULT_INCLUDE",
+   "ancre": "insolites-defauts-et-memorisation-des-choix-du-sur-mesure"
+  },
+  {
+   "terme": "REPORT_INCLUDE_KEY",
+   "ancre": "insolites-defauts-et-memorisation-des-choix-du-sur-mesure"
+  }
+ ],
+ "ancres_traitees": [
+  "insolites-combinaison-ludique-la-plus-juste",
+  "insolites-exclusion-et-turn-over-blocs-de-la-home",
+  "insolites-assignation-des-objets-a-la-pesee",
+  "insolites-pertes-de-l-assignation",
+  "insolites-dessin-de-la-composition",
+  "insolites-cle-d-illustration",
+  "insolites-texte-d-une-equivalence",
+  "insolites-conditions-d-affichage-de-la-carte-de-confirmation",
+  "insolites-affichage-des-tuiles-de-perte-homes",
+  "insolites-repli-du-dessin-d-equivalence-insolite",
+  "insolites-duree-d-une-perte-lossspanlabel-lossspandates",
+  "insolites-affichage-des-tuiles-de-perte",
+  "insolites-equivalence-insolite-dans-le-pdf",
+  "insolites-bascules-proposees-masque-des-donnees-disponibles",
+  "insolites-defauts-et-memorisation-des-choix-du-sur-mesure"
+ ],
+ "ancres_sans_matiere": []
+}

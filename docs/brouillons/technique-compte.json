@@ -1,0 +1,415 @@
+{
+ "inventions": [
+  {
+   "categorie": "stockage",
+   "fonctionnalite": "Nombre exact de clés du stockage local",
+   "texte": "La liste exhaustive et commentée des clés que clearAll emporte, avec le rôle de chacune.",
+   "origine": "Un grep sur src rend 42 chaînes littérales 'glp1_*', 'glow_*' et 'hasAcceptedMedicalDisclaimer_v1', mais certaines sont administratives (glow_ciqual_admin_*, glp1_test_data) et d'autres ne sont plus écrites (glp1_meals_cleared). Un compte fiable demanderait de lire les 42 sites d'usage un par un ; j'ai écrit « une quarantaine » et laissé le détail dehors."
+  },
+  {
+   "categorie": "sortie de données",
+   "fonctionnalite": "Ce qui quitte l'appareil malgré tout (Firestore)",
+   "texte": "Un paragraphe sur les écritures distantes signées de l'uid et de l'e-mail du compte : sondage, retours, courrier, journal des échecs d'export.",
+   "origine": "isDatabaseConfigured = isAuthConfigured est vérifié à la ligne (firestore.ts:37), mais je n'ai pas lu remoteSubmit.ts moi-même, aucune ancre imposée ne le couvre, et le sujet relève des chapitres retours et partage."
+  },
+  {
+   "categorie": "récupération",
+   "fonctionnalite": "Restauration de la clé de secours",
+   "texte": "Une procédure de restauration depuis glp1_app_companion_data__secours.",
+   "origine": "Aucun code ne lit cette clé. Seul le mécanisme administratif dataBackup.ts (horodaté, indexé) restaure, et l'administration est hors périmètre. Je n'ai écrit que le constat d'absence."
+  },
+  {
+   "categorie": "session",
+   "fonctionnalite": "Durée de vie de la session",
+   "texte": "Une durée d'expiration, un rafraîchissement de jeton, une politique de renouvellement.",
+   "origine": "Rien dans le code de l'application ne fixe de durée : la persistance est celle du SDK par défaut. Le seuil de « connexion récente » qui déclenche auth/requires-recent-login est côté serveur Firebase, introuvable dans ce dépôt."
+  },
+  {
+   "categorie": "connexion",
+   "fonctionnalite": "Politique de mot de passe en V1",
+   "texte": "Une longueur minimale, un format, une limite de tentatives côté application.",
+   "origine": "LoginPage ne teste que le vide. auth/too-many-requests vient du serveur Firebase ; aucun compteur local n'existe. La règle des huit signes est une décision V2 (compte.ts) et ne s'applique pas à la V1."
+  },
+  {
+   "categorie": "suppression",
+   "fonctionnalite": "Atomicité de clearAll",
+   "texte": "Ce qui reste si localStorage.clear() échoue à mi-chemin.",
+   "origine": "clearAll enveloppe un seul appel dans un try/catch sans valeur de retour : le code ne distingue pas un échec total d'un échec partiel, et rien n'observe le résultat. J'ai seulement noté que l'échec est muet."
+  },
+  {
+   "categorie": "conversion",
+   "fonctionnalite": "Version de schéma de la sauvegarde",
+   "texte": "Un numéro de version dans le JSON et une table des migrations par version.",
+   "origine": "Le document ne porte aucun champ de version : chaque migration se reconnaît à la forme des données et s'exécute à chaque chargement, d'où l'exigence d'idempotence."
+  }
+ ],
+ "glossaire": [
+  {
+   "terme": "Verrou",
+   "definition": "Le garde-barrière d'accès à l'application (AuthGate). Actif dès que FIREBASE_CONFIG.apiKey n'est pas la chaîne vide ; inactif, il rend ses enfants sans demander de compte."
+  },
+  {
+   "terme": "isAuthConfigured",
+   "definition": "Booléen dérivé de la clé d'API. Commande le verrou, le montage du hook d'authentification, l'accès à Firestore (isDatabaseConfigured en est un alias) et l'étape Firebase de la suppression de compte."
+  },
+  {
+   "terme": "Session mémorisée",
+   "definition": "L'état de connexion persisté par le SDK Firebase, sans durée limite, dans IndexedDB (repli : localStorage, puis sessionStorage). L'application n'y accède que par subscribeToAuth et currentAuthUser."
+  },
+  {
+   "terme": "AuthState",
+   "definition": "Union à trois branches — loading, signedOut, signedIn { user } — rendue par useAuth. loading dure le temps de la restauration de la session."
+  },
+  {
+   "terme": "Chaîne nue",
+   "definition": "Valeur stockée telle quelle par setString/getString, sans encodage JSON : un drapeau 'true', un identifiant de thème, un nombre. Passer par setItem la ré-encoderait et rendrait illisibles les valeurs déjà écrites."
+  },
+  {
+   "terme": "Couche de stockage",
+   "definition": "src/shared/platform/storage.ts, seul fichier autorisé à appeler localStorage. Six fonctions, toutes muettes en cas d'erreur : lecture ratée → null, écriture ratée → rien."
+  },
+  {
+   "terme": "AppData",
+   "definition": "L'objet racine du suivi — profil et neuf journaux — sérialisé en un seul JSON sous 'glp1_app_companion_data' et réécrit en entier à chaque changement d'état."
+  },
+  {
+   "terme": "Chaîne de conversion",
+   "definition": "Les sept fonctions pures et idempotentes appliquées au chargement, dans l'ordre dropSeedData → migrateTreatmentIds → purgeDeleted → mergeSideEffectNotes → mergeTableTennisSport → fillMealHunger → ensureStartingWeighIn."
+  },
+  {
+   "terme": "Idempotente",
+   "definition": "Se dit d'une conversion qu'on peut rejouer sans effet sur des données déjà converties. Exigence de toute la chaîne, faute de numéro de version dans le document."
+  },
+  {
+   "terme": "Garde-fou du chargement",
+   "definition": "La règle posée après l'effacement du 2026-08-17 : une lecture ratée met la chaîne brute à l'abri, gèle l'écriture de la clé principale pour la session, et le dit à l'écran."
+  },
+  {
+   "terme": "mayPersist",
+   "definition": "!loadFailed. Un seul appelant : l'effet qui écrit STORAGE_KEY. Les autres clés continuent d'être écrites même après un échec de chargement."
+  },
+  {
+   "terme": "Clé de secours",
+   "definition": "rescueKeyFor(k) = `${k}__secours`. Reçoit la sauvegarde illisible telle quelle, et une seule fois — la condition est « clé absente » (=== null), pas « clé vide »."
+  },
+  {
+   "terme": "Profil d'usine",
+   "definition": "INITIAL_PROFILE : le profil d'une installation neuve, et le socle sur lequel tout profil lu est fusionné (avatar compris) à chaque chargement."
+  },
+  {
+   "terme": "Pesée semée",
+   "definition": "La pesée de départ créée sans sauvegarde : 95,0 kg, veille locale, 08:00, isStartingWeight à true, id 'starting-weight-log'."
+  },
+  {
+   "terme": "Pesée de départ",
+   "definition": "La ligne du journal des pesées qui sert de référence à la perte totale, aux badges et au rapport médical. Reconnue à son drapeau isStartingWeight, jamais à sa valeur."
+  },
+  {
+   "terme": "clearAll",
+   "definition": "localStorage.clear(). Efface l'origine entière plutôt qu'une liste de clés. N'atteint ni IndexedDB, ni sessionStorage, ni les cookies."
+  },
+  {
+   "terme": "auth/requires-recent-login",
+   "definition": "Code Firebase rejeté quand la session est trop ancienne pour une suppression de compte. Cas courant ici, la session n'expirant pas : c'est le seul code qui fait apparaître le bouton « Se reconnecter »."
+  },
+  {
+   "terme": "auth/no-current-user",
+   "definition": "Code maison, levé par deleteCurrentUser comme objet nu { code } quand currentUser est null. N'existe pas dans le SDK."
+  },
+  {
+   "terme": "reloadApp",
+   "definition": "window.location.reload(). Redémarrage complet après une suppression de compte, distinct à dessein de reloadForThemeChange."
+  }
+ ],
+ "index": [
+  {
+   "terme": "AppData",
+   "ancre": "compte-entites"
+  },
+  {
+   "terme": "AuthState",
+   "ancre": "compte-entites"
+  },
+  {
+   "terme": "AuthUser",
+   "ancre": "compte-entites"
+  },
+  {
+   "terme": "UserProfile (identité)",
+   "ancre": "compte-entites"
+  },
+  {
+   "terme": "Champs requis à la connexion",
+   "ancre": "compte-connexion-champs-requis"
+  },
+  {
+   "terme": "Trim de l'e-mail",
+   "ancre": "compte-connexion-champs-requis"
+  },
+  {
+   "terme": "Connexion Google (fenêtre surgissante)",
+   "ancre": "compte-connexion-champs-requis"
+  },
+  {
+   "terme": "authErrorMessage",
+   "ancre": "compte-messages-d-echec-de-connexion"
+  },
+  {
+   "terme": "auth/invalid-email",
+   "ancre": "compte-messages-d-echec-de-connexion"
+  },
+  {
+   "terme": "auth/invalid-credential",
+   "ancre": "compte-messages-d-echec-de-connexion"
+  },
+  {
+   "terme": "auth/unauthorized-domain",
+   "ancre": "compte-messages-d-echec-de-connexion"
+  },
+  {
+   "terme": "isAuthConfigured",
+   "ancre": "compte-verrou-actif"
+  },
+  {
+   "terme": "isDatabaseConfigured",
+   "ancre": "compte-verrou-actif"
+  },
+  {
+   "terme": "FIREBASE_CONFIG",
+   "ancre": "compte-verrou-actif"
+  },
+  {
+   "terme": "AuthGate",
+   "ancre": "compte-verrou-et-session-firebase"
+  },
+  {
+   "terme": "useAuth",
+   "ancre": "compte-verrou-et-session-firebase"
+  },
+  {
+   "terme": "Session mémorisée",
+   "ancre": "compte-verrou-et-session-firebase"
+  },
+  {
+   "terme": "indexedDBLocalPersistence",
+   "ancre": "compte-verrou-et-session-firebase"
+  },
+  {
+   "terme": "signOutUser",
+   "ancre": "compte-verrou-et-session-firebase"
+  },
+  {
+   "terme": "hasAcceptedMedicalDisclaimer_v1",
+   "ancre": "compte-acceptation-legale"
+  },
+  {
+   "terme": "isFirstLaunchLegal",
+   "ancre": "compte-acceptation-legale"
+  },
+  {
+   "terme": "openLegalModal",
+   "ancre": "compte-acceptation-legale"
+  },
+  {
+   "terme": "LegalPrivacyPage",
+   "ancre": "compte-premier-lancement-legal"
+  },
+  {
+   "terme": "hasCheckedNotice",
+   "ancre": "compte-premier-lancement-legal"
+  },
+  {
+   "terme": "Onglet Cadre (disclaimer)",
+   "ancre": "compte-premier-lancement-legal"
+  },
+  {
+   "terme": "Données 100 % locales",
+   "ancre": "compte-avertissement-medical"
+  },
+  {
+   "terme": "glp1_app_companion_data",
+   "ancre": "compte-cle-et-format-de-la-sauvegarde"
+  },
+  {
+   "terme": "STORAGE_KEY",
+   "ancre": "compte-cle-et-format-de-la-sauvegarde"
+  },
+  {
+   "terme": "Écriture au montage",
+   "ancre": "compte-cle-et-format-de-la-sauvegarde"
+  },
+  {
+   "terme": "dropSeedData",
+   "ancre": "compte-ordre-de-conversion-au-chargement"
+  },
+  {
+   "terme": "migrateTreatmentIds",
+   "ancre": "compte-ordre-de-conversion-au-chargement"
+  },
+  {
+   "terme": "purgeDeleted",
+   "ancre": "compte-ordre-de-conversion-au-chargement"
+  },
+  {
+   "terme": "mergeSideEffectNotes",
+   "ancre": "compte-ordre-de-conversion-au-chargement"
+  },
+  {
+   "terme": "mergeTableTennisSport",
+   "ancre": "compte-ordre-de-conversion-au-chargement"
+  },
+  {
+   "terme": "fillMealHunger",
+   "ancre": "compte-ordre-de-conversion-au-chargement"
+  },
+  {
+   "terme": "ensureStartingWeighIn",
+   "ancre": "compte-ordre-de-conversion-au-chargement"
+  },
+  {
+   "terme": "dropPreMigrationMeals",
+   "ancre": "compte-ordre-de-conversion-au-chargement"
+  },
+  {
+   "terme": "Idempotence des migrations",
+   "ancre": "compte-ordre-de-conversion-au-chargement"
+  },
+  {
+   "terme": "INITIAL_PROFILE",
+   "ancre": "compte-profil-d-usine-et-pesee-semee"
+  },
+  {
+   "terme": "INITIAL_STARTING_WEIGHT",
+   "ancre": "compte-profil-d-usine-et-pesee-semee"
+  },
+  {
+   "terme": "setStartingWeight",
+   "ancre": "compte-profil-d-usine-et-pesee-semee"
+  },
+  {
+   "terme": "getStartingWeight",
+   "ancre": "compte-profil-d-usine-et-pesee-semee"
+  },
+  {
+   "terme": "isStartingWeight",
+   "ancre": "compte-profil-d-usine-et-pesee-semee"
+  },
+  {
+   "terme": "getItem / setItem",
+   "ancre": "compte-couche-de-stockage"
+  },
+  {
+   "terme": "getString / setString",
+   "ancre": "compte-couche-de-stockage"
+  },
+  {
+   "terme": "removeItem",
+   "ancre": "compte-couche-de-stockage"
+  },
+  {
+   "terme": "Erreurs avalées",
+   "ancre": "compte-couche-de-stockage"
+  },
+  {
+   "terme": "loadGuard",
+   "ancre": "compte-garde-fou-du-chargement"
+  },
+  {
+   "terme": "mayPersist",
+   "ancre": "compte-garde-fou-du-chargement"
+  },
+  {
+   "terme": "rescueKeyFor",
+   "ancre": "compte-garde-fou-du-chargement"
+  },
+  {
+   "terme": "unreadableSaveNotice",
+   "ancre": "compte-garde-fou-du-chargement"
+  },
+  {
+   "terme": "glp1_app_companion_data__secours",
+   "ancre": "compte-garde-fou-du-chargement"
+  },
+  {
+   "terme": "limitNotice",
+   "ancre": "compte-garde-fou-du-chargement"
+  },
+  {
+   "terme": "DeleteAccountBlock",
+   "ancre": "compte-ordre-de-la-suppression-de-compte"
+  },
+  {
+   "terme": "reloadApp",
+   "ancre": "compte-ordre-de-la-suppression-de-compte"
+  },
+  {
+   "terme": "needsFreshLogin",
+   "ancre": "compte-ordre-de-la-suppression-de-compte"
+  },
+  {
+   "terme": "deleteCurrentUser",
+   "ancre": "compte-suppression-du-compte-firebase"
+  },
+  {
+   "terme": "auth/no-current-user",
+   "ancre": "compte-suppression-du-compte-firebase"
+  },
+  {
+   "terme": "auth/requires-recent-login",
+   "ancre": "compte-suppression-du-compte-firebase"
+  },
+  {
+   "terme": "accountDeletionErrorMessage",
+   "ancre": "compte-messages-d-echec-de-suppression"
+  },
+  {
+   "terme": "clearAll",
+   "ancre": "compte-stockage-local"
+  },
+  {
+   "terme": "Clés glp1_* et glow_*",
+   "ancre": "compte-stockage-local"
+  },
+  {
+   "terme": "LONGUEUR_MOT_DE_PASSE",
+   "ancre": "compte-dans-la-v2"
+  },
+  {
+   "terme": "motDePasseValide",
+   "ancre": "compte-dans-la-v2"
+  },
+  {
+   "terme": "peutValider",
+   "ancre": "compte-dans-la-v2"
+  },
+  {
+   "terme": "bornesAnneeNaissance",
+   "ancre": "compte-dans-la-v2"
+  },
+  {
+   "terme": "TAILLE_BORNES",
+   "ancre": "compte-dans-la-v2"
+  }
+ ],
+ "ancres_traitees": [
+  "compte-entites",
+  "compte-connexion-champs-requis",
+  "compte-messages-d-echec-de-connexion",
+  "compte-verrou-actif",
+  "compte-verrou-et-session-firebase",
+  "compte-acceptation-legale",
+  "compte-premier-lancement-legal",
+  "compte-avertissement-medical",
+  "compte-cle-et-format-de-la-sauvegarde",
+  "compte-ordre-de-conversion-au-chargement",
+  "compte-profil-d-usine-et-pesee-semee",
+  "compte-couche-de-stockage",
+  "compte-garde-fou-du-chargement",
+  "compte-ordre-de-la-suppression-de-compte",
+  "compte-suppression-du-compte-firebase",
+  "compte-messages-d-echec-de-suppression",
+  "compte-stockage-local",
+  "compte-dans-la-v2"
+ ],
+ "ancres_sans_matiere": []
+}

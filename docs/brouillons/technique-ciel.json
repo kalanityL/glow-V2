@@ -1,0 +1,132 @@
+{
+ "inventions": [
+  {
+   "categorie": "jeu-concours",
+   "fonctionnalite": "Attribution des abonnements",
+   "texte": "Le règlement promet des abonnements de un an à plusieurs années par tirage au sort. Aucun code ne désigne de compte Instagram officiel, n'enregistre de participation, ni n'attribue d'abonnement : le lien pointe sur https://www.instagram.com sans compte, et aucune entité de participation n'existe.",
+   "origine": "Voulu comme règle technique (identification du participant, tirage) ; rien à lire dans src/versions/mixte/components/MonCiel.tsx ni ailleurs."
+  },
+  {
+   "categorie": "compte à rebours",
+   "fonctionnalite": "Effet de l'échéance",
+   "texte": "J'ai voulu documenter ce que déclenche l'arrivée à zéro (dévoilement de la fonctionnalité cachée, notification, changement d'écran). Le code se contente de figer l'affichage à 00 : 00 : 00 : 00 ; aucune branche ne teste diff === 0.",
+   "origine": "Attendu par la formule du compte à rebours ; absent du code."
+  },
+  {
+   "categorie": "compte à rebours",
+   "fonctionnalite": "Validation de countdownTargetDate à l'écriture",
+   "texte": "J'ai voulu donner la règle de validation du format AAAA-MM-JJ à la saisie. Le seul point d'écriture est un champ d'administration (hors périmètre) qui affecte la valeur telle quelle ; aucune validation n'a été trouvée dans le domaine.",
+   "origine": "Attendu par le champ ; seul écrivain hors périmètre, non relu."
+  },
+  {
+   "categorie": "compte à rebours",
+   "fonctionnalite": "Fuseau horaire de référence",
+   "texte": "L'exemple chiffré suppose Europe/Paris pour placer le passage à l'heure d'hiver du 25 octobre 2026. Le code n'impose aucun fuseau : il construit la cible en heure locale du navigateur, donc le résultat dépend du réglage de l'appareil.",
+   "origine": "Nécessaire pour chiffrer l'exemple ; le code est agnostique."
+  },
+  {
+   "categorie": "étoiles",
+   "fonctionnalite": "Sens des paires or/argent qui partagent une citation",
+   "texte": "Le décalage de 3 fait que trois citations sont servies par deux étoiles et qu'aucune n'est inatteignable. Rien dans le code n'indique si ce décalage est un choix ou un reste.",
+   "origine": "Interprétation ; le code ne porte ni commentaire ni test sur ce point."
+  }
+ ],
+ "glossaire": [
+  {
+   "terme": "countdownTargetDate",
+   "definition": "Champ facultatif de UserProfile, chaîne au format AAAA-MM-JJ, non validée. Seule donnée stockée que Mon Ciel lit. Valeur du profil initial : '2026-11-15'."
+  },
+  {
+   "terme": "Repli du compte à rebours",
+   "definition": "Cible codée en dur new Date(2026, 10, 15, 0, 0, 0), soit le 15 novembre 2026 à 00:00 locale, utilisée uniquement quand la chaîne ne se découpe pas en exactement trois segments sur le tiret."
+  },
+  {
+   "terme": "diff",
+   "definition": "Écart en millisecondes entre la cible et l'instant courant, borné par max(0, …) ; consommé par soustractions successives lors de la décomposition en jours, heures, minutes, secondes."
+  },
+  {
+   "terme": "padStart(2, '0')",
+   "definition": "Cadrage d'affichage sur deux chiffres au minimum ; il complète à gauche mais n'ampute jamais, donc une valeur à trois chiffres (jours ≥ 100) ou la chaîne NaN passent telles quelles."
+  },
+  {
+   "terme": "starQuotes",
+   "definition": "Tableau constant de sept citations du module MonCiel, indexé de 0 à 6."
+  },
+  {
+   "terme": "handleStarClick(type, index)",
+   "definition": "Fonction qui choisit la citation — index (index + décalage) mod 7, décalage 0 pour l'or et 3 pour l'argent — et compose le libellé du panneau « Message Étoilé »."
+  },
+  {
+   "terme": "Star3D",
+   "definition": "Composant SVG de l'étoile à cinq branches : viewBox 100 × 100, centre (50, 50), rayon externe 44, rayon interne 18, dix sommets et dix facettes triangulaires à éclairage alterné. Porte le onClick."
+  },
+  {
+   "terme": "Particules (tinyStars)",
+   "definition": "45 points blancs dont position, taille, durée et retard sont tirés au sort une seule fois par useMemo sans dépendance, donc à chaque montage de la scène."
+  },
+  {
+   "terme": "Panneau amarré",
+   "definition": "Bloc positionné en absolute inset-x-3 bottom-3 dans la scène, sans voile ni blocage de l'arrière-plan ; plan z-40 pour le jeu et le message étoilé, z-50 pour le règlement."
+  }
+ ],
+ "index": [
+  {
+   "terme": "countdownTargetDate",
+   "ancre": "ciel-entites"
+  },
+  {
+   "terme": "Profil (champ lu par Mon Ciel)",
+   "ancre": "ciel-entites"
+  },
+  {
+   "terme": "Positions des dix étoiles",
+   "ancre": "ciel-entites"
+  },
+  {
+   "terme": "Particules de fond (45)",
+   "ancre": "ciel-entites"
+  },
+  {
+   "terme": "Compte à rebours",
+   "ancre": "ciel-compte-a-rebours-de-mon-ciel"
+  },
+  {
+   "terme": "Repli 15/11/2026",
+   "ancre": "ciel-compte-a-rebours-de-mon-ciel"
+  },
+  {
+   "terme": "Décomposition jours/heures/minutes/secondes",
+   "ancre": "ciel-compte-a-rebours-de-mon-ciel"
+  },
+  {
+   "terme": "padStart",
+   "ancre": "ciel-compte-a-rebours-de-mon-ciel"
+  },
+  {
+   "terme": "Heure locale et changement d'heure",
+   "ancre": "ciel-compte-a-rebours-de-mon-ciel"
+  },
+  {
+   "terme": "Citations des étoiles",
+   "ancre": "ciel-citations-des-etoiles"
+  },
+  {
+   "terme": "Décalage argent (+3)",
+   "ancre": "ciel-citations-des-etoiles"
+  },
+  {
+   "terme": "Message Étoilé",
+   "ancre": "ciel-citations-des-etoiles"
+  },
+  {
+   "terme": "Star3D",
+   "ancre": "ciel-citations-des-etoiles"
+  }
+ ],
+ "ancres_traitees": [
+  "ciel-entites",
+  "ciel-compte-a-rebours-de-mon-ciel",
+  "ciel-citations-des-etoiles"
+ ],
+ "ancres_sans_matiere": []
+}

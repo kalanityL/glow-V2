@@ -1,0 +1,453 @@
+<section id="insolites">
+  <h2>16. Les équivalences insolites <a class="retour" href="#sommaire">↑ sommaire</a></h2>
+  <p>Ce chapitre décrit le moteur qui traduit un nombre de kilos en un ou deux objets d'un catalogue figé : énumération des combinaisons, seuil de vérité, départages, et l'assignation qui fige le résultat entre deux pesées. Il décrit aussi les conditions sous lesquelles chaque écran affiche ces objets, et le chemin nu qu'emprunte le rapport PDF.</p>
+
+  <h3 id="insolites-entites">Entités</h3>
+  <p><strong>Le catalogue n'est pas stocké</strong> : <code>LUDIC_ITEMS</code> est une constante du code, 222 entrées, 71 de catégorie <code>objet</code> et 151 de catégorie <code>insolite</code>, de 0,001 kg (« un trombone à papier ») à 200 kg (« un piano droit »). Les noms y sont uniques ; c'est le nom qui sert de clé partout (compteurs, exclusion, retrouvage d'un objet assigné).</p>
+  <table>
+    <thead><tr><th>Entité</th><th>Champ</th><th>Type</th><th>Note</th></tr></thead>
+    <tbody>
+      <tr><td rowspan="7"><code>LudicItem</code><br>(catalogue, non stocké)</td><td><code>name</code></td><td>string</td><td>Nom au singulier, article compris : « une boule de bowling ». Clé fonctionnelle.</td></tr>
+      <tr><td><code>plural</code></td><td>string</td><td>Pluriel sans article : « boules de bowling ».</td></tr>
+      <tr><td><code>weight</code></td><td>number</td><td>Unité canonique : le kilogramme.</td></tr>
+      <tr><td><code>category</code></td><td><code>'objet' | 'insolite'</code></td><td>Pilote la validité d'une combinaison.</td></tr>
+      <tr><td><code>prefix</code></td><td>string</td><td>« un » / « une » / « des », pour la phrase.</td></tr>
+      <tr><td><code>emoji</code></td><td>string</td><td>Repli de dessin.</td></tr>
+      <tr><td><code>isAnimal</code></td><td>boolean, facultatif</td><td>Déclaré, jamais renseigné ni lu. <span class="marque non">non implémenté</span></td></tr>
+      <tr><td rowspan="4"><code>DecomposedLudicItem</code><br>(stocké dans l'assignation)</td><td><code>name</code></td><td>string</td><td>Le nom du <code>LudicItem</code>.</td></tr>
+      <tr><td><code>count</code></td><td>number</td><td>1 ou 2 — le même objet peut être pris deux fois.</td></tr>
+      <tr><td><code>emoji</code></td><td>string</td><td>Recopié du catalogue au moment de l'assignation.</td></tr>
+      <tr><td><code>key</code></td><td><code>LudicIllustrationKey</code></td><td>Clé de dessin, dérivée du nom au moment de l'assignation puis figée.</td></tr>
+      <tr><td rowspan="5"><code>LudicAssignment</code></td><td><code>signature</code></td><td>string</td><td><code>id|date|heure</code> de la pesée la plus récente.</td></tr>
+      <tr><td><code>totalKg</code></td><td>number, facultatif</td><td>Perte totale au dixième pour laquelle les objets ont été choisis. Absent = assignation écrite avant le 2026-08-16, tenue pour périmée.</td></tr>
+      <tr><td><code>lastKg</code></td><td>number, facultatif</td><td>Idem pour la dernière perte.</td></tr>
+      <tr><td><code>total</code></td><td><code>DecomposedLudicItem[]</code></td><td>Objets de « Depuis le début ». Vide si la perte est nulle ou négative.</td></tr>
+      <tr><td><code>last</code></td><td><code>DecomposedLudicItem[]</code></td><td>Objets de « dernière perte enregistrée ».</td></tr>
+      <tr><td rowspan="2"><code>LudicUsageState</code><br>clé <code>glow_ludic_usage</code></td><td><code>counts</code></td><td><code>Record&lt;string, number&gt;</code></td><td>Nombre d'assignations comptées, par nom d'objet.</td></tr>
+      <tr><td><code>assignment</code></td><td><code>LudicAssignment</code>, facultatif</td><td>L'assignation en cours.</td></tr>
+    </tbody>
+  </table>
+  <p>Deux autres clés portent des choix d'affichage : <code>glow_home_equivalences</code> (<code>{ last_loss: boolean, total_loss: boolean }</code>, les blocs dépliés de la home sections) et <code>glow_report_include_v2</code> (<code>MedicalReportSelection</code>, dont le booléen <code>insolites</code>). Les trois passent par <code>getItem</code>/<code>setItem</code> : JSON dans <code>localStorage</code>, échec silencieux, lecture nulle en cas d'erreur.</p>
+  <p><strong>Dérivés, donc non stockés</strong> : la perte totale et la dernière perte (recalculées du journal des pesées à chaque lecture), l'IMC, la validité et l'écart d'une combinaison, les fragments de phrase, et la clé de dessin effectivement rendue.</p>
+  <p class="ancre">src/utils/ludicWeight.ts, src/utils/ludicUsage.ts, src/shared/platform/storage.ts</p>
+
+  <h3 id="insolites-combinaison-ludique-la-plus-juste">La combinaison la plus juste</h3>
+  <p><code>getBestLudicCombination(weightKg, options)</code> rend la combinaison de 1 ou 2 objets dont la somme des masses s'écarte le moins de <code>weightKg</code>. Un poids nul ou négatif rend un tableau vide, avant toute énumération.</p>
+  <pre><code>isValidCombo(combo) :
+  1 ≤ combo.length ≤ 2
+  ET nombre d'insolites ≤ 2
+  ET (aucun insolite OU au moins un insolite de masse &lt; 1,0 kg)
+
+passe 1 — objets seuls, i = 0…221 dans l'ordre du catalogue
+  si valide : diff = |poids(i) − weightKg|
+              si diff &lt; bestDiff        → bestCombo = [i]
+passe 1 — paires, i = 0…221, j = i…221
+  si valide : diff = |poids(i) + poids(j) − weightKg|
+              si diff &lt; bestDiff − 1e-5 → bestCombo = [i, j]
+
+si options : bestCombo = pickByExclusionAndTurnover(...) ?? bestCombo
+
+passe 2 (repli) — seulement si bestCombo est vide : même énumération
+  sans isValidCombo
+
+regroupement : les deux entrées de même nom fusionnent en { item, count: 2 }</code></pre>
+  <p>Le seuil <code>1e-5</code> sur les paires est le départage qui fait qu'<strong>un objet seul l'emporte sur une paire à justesse égale</strong> : la paire doit être meilleure d'au moins un centième de gramme pour passer devant. Entre deux objets seuls, ou entre deux paires, la comparaison est stricte (<code>&lt;</code>) : le premier rencontré dans l'ordre du catalogue gagne.</p>
+  <p class="ancre">src/utils/ludicWeight.ts</p>
+  <details><summary>Cas limites</summary>
+    <ul>
+      <li><code>weightKg ≤ 0</code> → <code>[]</code>. Les quatre fonctions publiques (<code>getLudicDecomposition</code>, <code>getLudicEquivalence</code>, <code>getLudicEquivalenceParts</code>, <code>getLudicEmojis</code>) rendent vide sans appeler le moteur : rien à dessiner, rien à dire.</li>
+      <li>Un insolite de 1 kg ou plus seul → combinaison invalide, jamais énumérée. 112 des 151 insolites sont dans ce cas ; il reste 110 objets seuls valides sur 222.</li>
+      <li>Deux insolites de moins de 1 kg → valide (chacun satisfait la clause).</li>
+      <li>Le repli de la passe 2 <strong>ne peut jamais s'exécuter</strong> : les 71 objets de catégorie <code>objet</code> passent seuls <code>isValidCombo</code>, donc <code>bestCombo</code> n'est jamais vide à la sortie de la passe 1. <span class="marque non">non implémenté</span> en pratique — le code est mort.</li>
+      <li>Un poids que le catalogue n'approche pas à 200 g près (quelques tonnes) est rendu quand même : la combinaison la plus juste sort, si fausse soit-elle. Le seuil de 200 g ne filtre que le chemin à options.</li>
+      <li>Sans options, la liste <code>candidates</code> n'est jamais remplie : le coût du choix par exclusion et turn-over n'est payé que par les blocs de la home.</li>
+    </ul>
+  </details>
+  <div class="exemple"><p>Camille, 96,0 kg au départ, 88,6 kg le 12 septembre 2026 : perte totale 7,4 kg. Le moteur nu retient « une manette de console rétro » (0,4 kg) et « une boule de bowling » (7,0 kg), écart 0. La perte de 0,6 kg contre la pesée du 5 septembre (89,2 kg) donne « une bougie parfumée en pot » (0,6 kg), écart 0.</p></div>
+
+  <h3 id="insolites-exclusion-et-turn-over-blocs-de-la-home">Exclusion et turn-over</h3>
+  <p><code>pickByExclusionAndTurnover</code> ne s'exécute que si <code>withOptions</code> est vrai, c'est-à-dire si <code>options.exclude</code> est non vide <em>ou</em> si <code>options.usage</code> est présent — un objet <code>usage</code> vide suffit à activer le chemin, un <code>exclude</code> vide ne suffit pas.</p>
+  <pre><code>vraies = candidats dont diff ≤ 0,2 + 1e-5          // 200 g, écart ABSOLU
+pool   = vraies dont aucun objet n'est dans exclude
+si pool est vide → null (l'appelant garde la combinaison la plus juste)
+
+sinon, réduction sur pool, dans cet ordre :
+  1. usage cumulé de la combinaison croissant  (Σ usage[nom], 0 par défaut)
+  2. écart croissant, à 1e-5 près
+  3. rang d'énumération croissant</code></pre>
+  <p>Le rang est l'indice de poussée dans <code>candidates</code> : <strong>tous les objets seuls valides d'abord</strong> (rangs 0 à 109, ordre du catalogue), puis toutes les paires valides (rangs 110 à 10 582, ordre <code>i</code> puis <code>j ≥ i</code>). À usage et écart égaux, un objet seul l'emporte donc sur toute paire.</p>
+  <p>Le turn-over prime la justesse : une paire d'usage cumulé 0 bat un objet seul d'usage 1, quel que soit l'écart, tant que les deux sont dans les 200 g.</p>
+  <p class="ancre">src/utils/ludicWeight.ts</p>
+  <details><summary>Cas limites</summary>
+    <ul>
+      <li>Aucune combinaison vraie à 200 g près → <code>vraies</code> vide → <code>pool</code> vide → <code>null</code> : la plus juste sort, l'exclusion et le turn-over sont abandonnés ensemble. Jamais une équivalence fausse pour éviter une répétition.</li>
+      <li>Toutes les combinaisons vraies contiennent un objet exclu → même sortie : la répétition est acceptée.</li>
+      <li>L'usage se compte <strong>par combinaison</strong>, pas par objet : une paire d'objets vus 0 et 2 fois totalise 2 et cède à un objet seul vu 1 fois.</li>
+      <li>Une paire du même objet compte cet objet deux fois dans le total d'usage.</li>
+      <li>Les paramètres <code>bestDiff</code> et <code>weightKg</code> sont reçus par la fonction et jamais lus.</li>
+    </ul>
+  </details>
+  <div class="exemple"><p>Le 19 septembre 2026, Camille pèse encore 88,6 kg. Les compteurs valent 1 pour la manette, la boule et la bougie. Pour 7,4 kg, la manette + boule (usage 2) cède à « un globe terrestre » (0,9 kg) + « une paire de skis avec fixations » (6,5 kg), usage 0, écart 0.</p></div>
+
+  <h3 id="insolites-assignation-des-objets-a-la-pesee">L'assignation des objets à la pesée</h3>
+  <p>Trois fonctions, un seul appelant. <code>useLudicAssignment(weightHistory)</code> est appelé par <code>useAppData</code>, donc à chaque changement du journal quel que soit l'écran ouvert ; les homes et la carte de confirmation ne font que lire son résultat.</p>
+  <pre><code>latestWeighInSignature(history) :
+  la plus récente = max sur `${date}T${time ?? '00:00'}` (comparaison de chaînes,
+                    strictement supérieur : à égalité, la première rencontrée reste)
+  aucune ligne → 'aucune-pesee'
+  sinon        → `${id}|${date}|${time ?? ''}`
+
+resolveLudicAssignment(signature, totalLoss, lastLoss) :
+  total10 = round(totalLoss × 10) / 10 ; last10 = idem
+  videAlorsQuePositive = conservée ET ((total10 &gt; 0 ET total vide)
+                                    OU (last10  &gt; 0 ET last  vide))
+  CONSERVER si conservée ET !videAlorsQuePositive
+              ET signature identique ET totalKg === total10 ET lastKg === last10
+  SINON :
+    total = getLudicDecomposition(totalLoss, { usage: counts })
+    last  = getLudicDecomposition(lastLoss,  { usage: counts,
+                                               exclude: noms de total })
+    isNew = true
+
+commitLudicAssignment(assignment) :   // appelée sous useEffect si isNew
+  si assignment.signature ≠ signature écrite :
+     counts[nom] += 1 pour chaque entrée de total puis de last
+  écriture systématique de { counts, assignment } sous glow_ludic_usage</code></pre>
+  <p>Deux identités distinctes : la <strong>signature</strong> (la ligne la plus récente) commande les compteurs ; la signature <em>et</em> les deux pertes au dixième commandent la conservation. Une correction sur une pesée passée change les pertes sans changer la signature : elle réassigne sans compter.</p>
+  <p>« Depuis le début » est résolu en premier et sert d'<code>exclude</code> à la dernière perte : c'est la dernière perte qui cède.</p>
+  <p class="ancre">src/utils/ludicUsage.ts, src/utils/useLudicAssignment.ts, src/app/useAppData.ts</p>
+  <details><summary>Cas limites</summary>
+    <ul>
+      <li>Journal vide → signature <code>'aucune-pesee'</code>, pertes 0, deux listes vides, aucun compteur touché (les boucles ne parcourent rien).</li>
+      <li><code>totalKg</code> ou <code>lastKg</code> absents (assignation écrite avant le 2026-08-16) → la comparaison à <code>undefined</code> échoue → réassignation, une fois.</li>
+      <li>Liste vide alors que la perte correspondante est positive → réassignation, même signature inchangée : une tuile ne peut pas rester sans image.</li>
+      <li>Liste vide alors que la perte est nulle ou négative → conservée : c'est le cas légitime.</li>
+      <li>L'incrément vaut <strong>+1 par entrée</strong>, pas par exemplaire : « 2 balles de jonglage » compte 1.</li>
+      <li>Si l'exclusion a cédé (aucune vraie sans objet exclu), le même nom peut figurer dans <code>total</code> et dans <code>last</code> : il prend alors +2 au même commit.</li>
+      <li>L'heure manquante vaut <code>'00:00'</code> pour le tri mais chaîne vide dans la signature : deux lignes ne diffèrent jamais par ce défaut, puisque l'identifiant les sépare déjà.</li>
+      <li>Le tri du plus récent se lit sur <code>date</code>/<code>time</code>, jamais sur l'ordre d'insertion : une pesée antidatée ne devient pas la dernière.</li>
+    </ul>
+  </details>
+  <div class="exemple"><p>Le 12 septembre 2026, Camille enregistre 88,6 kg. Signature <code>&lt;uuid&gt;|2026-09-12|08:30</code>, pertes 7,4 et 0,6. L'assignation neuve donne manette + boule pour le total, bougie pour la dernière perte ; <code>counts</code> passe à <code>{ manette: 1, boule: 1, bougie: 1 }</code>. Corriger ensuite 89,2 en 89,3 le 5 septembre laisse la signature intacte mais fait passer la dernière perte à 0,7 : réassignation, compteurs inchangés.</p></div>
+
+  <h3 id="insolites-pertes-de-l-assignation">Les deux pertes</h3>
+  <p><code>weightOverview(weightHistory)</code> produit les deux nombres que l'assignation consomme. Convention : <strong>positif = perte</strong>.</p>
+  <pre><code>startingWeight = poids de la ligne portant isStartingWeight === true, sinon 0
+sorted         = weightHistory trié par date+heure DÉCROISSANTE
+currentWeight  = sorted[0].weight, ou startingWeight si le journal est vide
+totalLoss      = startingWeight − currentWeight
+lastLoss       = sorted.length ≥ 2 ? sorted[1].weight − sorted[0].weight : 0
+hasOnlyStartingWeight = journal vide
+                     OU (une seule ligne, marquée isStartingWeight)
+                     OU totalLoss ≤ 0</code></pre>
+  <p>Le poids de départ se reconnaît au drapeau <code>isStartingWeight</code>, jamais à sa valeur ni à sa place dans le journal.</p>
+  <p class="ancre">src/features/home/homeOverview.ts, src/shared/model/startingWeighIn.ts</p>
+  <details><summary>Cas limites</summary>
+    <ul>
+      <li>Moins de deux pesées → <code>lastLoss = 0</code>, donc aucun bloc « dernière perte ».</li>
+      <li>Reprise de poids → <code>totalLoss</code> ou <code>lastLoss</code> négatif ; le moteur rend une liste vide et les écrans se taisent.</li>
+      <li>Aucune ligne marquée départ → <code>startingWeight = 0</code>, donc <code>totalLoss</code> négatif dès la première pesée : tout se tait.</li>
+      <li>Les soustractions sont flottantes : 96,0 − 88,6 vaut 7,400000000000006. L'arrondi au dixième n'intervient que pour l'identité de l'assignation et pour l'affichage.</li>
+    </ul>
+  </details>
+
+  <h3 id="insolites-dessin-de-la-composition">Le dessin de la composition</h3>
+  <p><code>LudicComposition</code> reçoit une liste de <code>DecomposedLudicItem</code> et rend au plus deux images.</p>
+  <pre><code>liste absente ou vide → null (rien n'est rendu, pas même un cadre)
+
+à plat : pour chaque entrée, qty = min(count, 2) exemplaires, chacun portant
+         key = DESSINS_LUDIQUES[entrée.key] ? entrée.key
+                                            : getLudicIllustrationKey(entrée.name)
+puis    : slice(0, 2)
+
+rendu d'un exemplaire : le composant de DESSINS_LUDIQUES[key] s'il existe,
+                        sinon l'émoji dans un &lt;svg viewBox="0 0 100 100"&gt;
+                        (fontSize 86, fontes émoji nommées explicitement)</code></pre>
+  <p>Les deux exemplaires se partagent la largeur (<code>flex-1</code>), écart de 4 px en taille normale et 2 px en taille compacte ; chaque image est en <code>object-contain</code> sur toute la hauteur du cadre fourni par l'appelant. L'attribut <code>title</code> porte le nom de l'objet.</p>
+  <p class="ancre">src/versions/mixte/components/LudicComposition.tsx</p>
+  <details><summary>Cas limites</summary>
+    <ul>
+      <li>Le plafond <code>min(count, 2)</code> et le <code>slice(0, 2)</code> font double emploi : le moteur ne rend jamais plus de deux exemplaires au total.</li>
+      <li>Une clé conservée qui n'existe plus dans la table est redérivée du nom au rendu, sans attendre une pesée.</li>
+      <li>Ni le nom ni la clé ne donnent de dessin → l'émoji conservé dans l'assignation. Aucun repli sur un objet d'une autre masse.</li>
+    </ul>
+  </details>
+
+  <h3 id="insolites-cle-d-illustration">La clé d'illustration</h3>
+  <p><code>getLudicIllustrationKey(name)</code> est une chaîne de 68 tests <code>name.includes("…")</code> dans un ordre fixe ; le premier qui passe rend sa clé, sinon <code>'emoji'</code>. Les sous-chaînes cherchées sont en minuscules.</p>
+  <p>Deux appelants, deux traitements du nom :</p>
+  <pre><code>getLudicDecomposition : key = getLudicIllustrationKey(item.name.toLowerCase())
+LudicComposition      : key = getLudicIllustrationKey(item.name)   // brut</code></pre>
+  <p>Sur les 222 objets du catalogue, <strong>65 déclenchent une clé de dessin quand le nom est minusculé, 64 quand il ne l'est pas</strong> : « une figurine Funko Pop » ne correspond à <code>"funko pop"</code> que minusculé. La redérivation au rendu ne s'applique qu'aux clés absentes de <code>DESSINS_LUDIQUES</code>, <code>'emoji'</code> comprise ; une assignation portant déjà <code>funko_pop</code> est donc dessinée normalement. C'est une assignation ancienne, écrite avec <code>'emoji'</code>, que la redérivation devrait réparer et ne répare pas pour ce seul objet : le nom brut ne correspond à aucun test, la clé retombe sur <code>'emoji'</code>.</p>
+  <p class="ancre">src/utils/ludicWeight.ts, src/versions/mixte/components/LudicComposition.tsx</p>
+  <details><summary>Cas limites</summary>
+    <ul>
+      <li><code>DESSINS_LUDIQUES</code> compte 68 entrées, exactement les 68 clés que la fonction sait rendre. Aucune clé produite n'est orpheline de dessin.</li>
+      <li>La clé <code>'car_battery'</code> figure dans le type <code>LudicIllustrationKey</code> mais n'est renvoyée par aucun test et n'a pas d'entrée dans la table. <span class="marque non">non implémenté</span></li>
+      <li>Quatre tests — <code>pasta</code>, <code>water</code>, <code>pack_water</code>, <code>duck</code> — ne correspondent à aucun objet du catalogue actuel : leurs dessins sont inatteignables.</li>
+      <li>Deux tests portent une alternative (<code>"paquet de pâtes" || "pâtes"</code> ; <code>"boule de pétanque" || "pétanque"</code>).</li>
+      <li>La détection est par sous-chaîne : renommer un objet du catalogue sans toucher aux tests peut faire basculer son dessin en émoji, ou lui en donner un autre.</li>
+    </ul>
+  </details>
+
+  <h3 id="insolites-texte-d-une-equivalence">Le texte d'une équivalence</h3>
+  <p>Deux jeux de fonctions, selon que la phrase part d'un poids ou d'objets déjà assignés.</p>
+  <table>
+    <thead><tr><th>Fonction</th><th>Entrée</th><th>Sortie</th></tr></thead>
+    <tbody>
+      <tr><td><code>getLudicEquivalenceParts</code></td><td>poids + options</td><td><code>{ prefix, itemName }[]</code></td></tr>
+      <tr><td><code>getLudicEquivalencePartsFor</code></td><td>objets assignés</td><td><code>{ prefix, itemName }[]</code></td></tr>
+      <tr><td><code>getLudicEquivalence</code></td><td>poids + options</td><td>une chaîne, articles compris</td></tr>
+      <tr><td><code>getLudicEquivalenceFor</code></td><td>objets assignés</td><td>une chaîne, articles compris</td></tr>
+    </tbody>
+  </table>
+  <pre><code>fragment, count === 1 : prefix   = `${item.prefix} `
+                        itemName = item.name.replace(/^(un|une|des)\s+/i, '')
+fragment, count &gt; 1   : prefix   = `${count} `
+                        itemName = item.plural
+
+chaîne, count === 1   : item.name (article compris)
+chaîne, count &gt; 1     : `${count} ${item.plural}`
+jonction              : parts.join(', ') + ' et ' + dernier</code></pre>
+  <p><code>LudicEquivalenceText</code> rend <code>null</code> à zéro fragment, le fragment seul à un, deux fragments reliés par « et » à deux, et « a, b et c » à trois ou plus — ce dernier cas ne peut pas survenir, le moteur ne rendant jamais plus de deux entrées. Les variantes <code>…For</code> retrouvent l'objet par son nom dans <code>LUDIC_ITEMS</code> et sautent silencieusement un nom inconnu.</p>
+  <p class="ancre">src/utils/ludicWeight.ts, src/versions/mixte/components/LudicEquivalenceText.tsx</p>
+  <details><summary>Cas limites</summary>
+    <ul>
+      <li>Objets assignés dont le nom a disparu du catalogue → sautés : la phrase peut être plus courte que le dessin, qui, lui, lit l'émoji conservé.</li>
+      <li>Tous sautés → <code>parts.length === 0</code> → <code>null</code>, aucune phrase.</li>
+      <li>Le retrait de l'article est un remplacement de préfixe insensible à la casse ; un nom qui ne commence pas par un article reste entier.</li>
+    </ul>
+  </details>
+  <div class="exemple"><p>Pour Camille : <code>[{manette, 1}, {boule, 1}]</code> donne « une manette de console rétro et une boule de bowling » ; <code>[{bougie, 1}]</code> donne « une bougie parfumée en pot ».</p></div>
+
+  <h3 id="insolites-conditions-d-affichage-de-la-carte-de-confirmation">La carte de confirmation de pesée</h3>
+  <p><code>computeSubmissionInfo(afterList, targetDate, type, departKg)</code> décide de quoi parle la carte, <code>WeighInSubmissionCard</code> de ce qu'elle montre. <a href="spec-fonctionnelle.html#insolites-carte-de-confirmation-de-pesee-equivalences-insolites">→ fonctionnelle</a></p>
+  <pre><code>computeSubmissionInfo :
+  sorted = afterList trié par date+heure CROISSANTE ; vide → null
+  idx    = index de la première ligne dont date === targetDate,
+           sinon dernière ligne
+  previousWeight = poids de sorted[idx − 1], ou departKg s'il n'y en a pas
+  lossSinceLast  = previousWeight − poids(idx)
+  lossSinceStart = departKg − poids(idx)
+  isMostRecent   = idx === sorted.length − 1
+  hasPreviousLogs = idx &gt; 0
+  isStartingWeight = drapeau de la ligne visée
+
+WeighInSubmissionCard :
+  heightM = profile.height / 100
+  subBmi  = heightM &gt; 0 ? poids / heightM² : 22        // NON arrondi
+  insolite = subBmi ≥ 19 ET lossSinceStart &gt; 0
+             ET isMostRecent ET !isStartingWeight
+  bloc « dernière perte enregistrée » si insolite ET hasPreviousLogs
+             ET lossSinceLast &gt; 0
+             ET lossSinceLast.toFixed(1) ≠ lossSinceStart.toFixed(1)
+  bloc « Depuis le début » si insolite (la condition lossSinceStart &gt; 0
+             y est retestée, elle est déjà dans insolite)
+
+objets d'un bloc — assignedItemsFor(loss, assignedKg, assigned) :
+  assignedKg !== undefined ET round(loss × 10)/10 === assignedKg
+     → assigned                       (les objets de l'assignation)
+     → sinon getLudicDecomposition(loss)   // sans usage ni exclude</code></pre>
+  <p>Le bouton OK n'existe que dans le bloc <code>insolite</code> ; sans lui, seule la croix ferme la carte.</p>
+  <p class="ancre">src/features/weight/submissionInfo.ts, src/versions/mixte/features/weight/WeighInSubmissionCard.tsx</p>
+  <details><summary>Cas limites</summary>
+    <ul>
+      <li>Taille inconnue ou nulle → <code>subBmi = 22</code>, donc jamais bloquant. La home, elle, prend <code>bmiOf</code> qui rend 0 dans le même cas et bloque : les deux écrans divergent quand la taille manque.</li>
+      <li><code>subBmi</code> n'est pas arrondi ; un IMC de 18,97 bloque ici alors que <code>bmiOf</code> l'arrondirait à 19,0 et laisserait passer la home.</li>
+      <li>Les deux pertes égales au dixième → seul « Depuis le début » paraît.</li>
+      <li>Pesée déplacée dans le passé par une édition → <code>isMostRecent</code> faux → aucun bloc.</li>
+      <li>Édition du poids de départ → <code>isStartingWeight</code> vrai → aucun bloc.</li>
+      <li>Reprise de poids → <code>lossSinceStart ≤ 0</code> → aucun bloc, même sur la pesée la plus récente.</li>
+      <li>La recherche de la ligne visée se fait sur la date seule (une pesée par jour) ; date absente du journal après écriture → repli sur la dernière ligne.</li>
+      <li>Le recalcul de secours passe <em>sans</em> options : il peut nommer un autre objet que la home pour le même nombre.</li>
+    </ul>
+  </details>
+  <div class="exemple"><p>Camille, 168 cm, enregistre 95,2 kg le 11 mai 2026, deuxième pesée. <code>subBmi = 95,2 / 1,68² = 33,7</code> ≥ 19 ; <code>lossSinceStart = lossSinceLast = 0,8</code> ; <code>"0.8" === "0.8"</code> → seul « Depuis le début » -0.8 kg s'affiche, avec « un sèche-cheveux » (0,8 kg).</p></div>
+
+  <h3 id="insolites-affichage-des-tuiles-de-perte-homes">Les tuiles de perte des homes</h3>
+  <p>Les deux homes calculent les mêmes trois booléens, à partir de <code>weightOverview</code> et de <code>bmiOf</code>. <a href="spec-fonctionnelle.html#insolites-tuiles-d-equivalence-insolite-de-la-home-standard-depuis-le">→ fonctionnelle</a></p>
+  <pre><code>bmiOf(poids, tailleCm) = tailleCm &gt; 0
+                         ? round(poids / (tailleCm/100)² × 10) / 10
+                         : 0
+isBmiLow      = bmi &lt; 19
+showLastLoss  = !isBmiLow ET lastLoss  &gt; 0 ET !hasOnlyStartingWeight
+showTotalLoss = !isBmiLow ET !hasOnlyStartingWeight ET totalLoss &gt; 0
+
+home standard seulement :
+lossesEqual   = showLastLoss ET showTotalLoss
+                ET lastLoss.toFixed(1) === totalLoss.toFixed(1)
+
+ordre de rendu, home standard :
+  emplacement de la dernière perte :
+     lossesEqual ? tuile « Depuis le début » : showLastLoss &amp;&amp; tuile dernière perte
+  plus bas :
+     showTotalLoss &amp;&amp; !lossesEqual &amp;&amp; tuile « Depuis le début »</code></pre>
+  <p>Sur la home sections, <code>lossesEqual</code> n'existe pas : deux pertes égales gardent leurs deux mini-tuiles. Les tuiles y sont des candidates de la rangée Progrès, rangs 3 (perte totale) et 4 (dernière perte), coupées à <code>PROGRES_MAX = 4</code> tuiles par rang croissant.</p>
+  <p class="ancre">src/versions/mixte/components/Maison.tsx, src/versions/mixte/homes/sections/MaisonSections.tsx, src/features/home/homeOverview.ts</p>
+  <details><summary>Cas limites</summary>
+    <ul>
+      <li>Taille inconnue → <code>bmi = 0</code> → <code>isBmiLow</code> vrai → aucune tuile sur aucune home.</li>
+      <li><code>hasOnlyStartingWeight</code> englobe déjà <code>totalLoss ≤ 0</code> : le test <code>totalLoss &gt; 0</code> de <code>showTotalLoss</code> est redondant.</li>
+      <li>Dernière perte positive mais perte totale négative → <code>hasOnlyStartingWeight</code> vrai → les deux tuiles se taisent.</li>
+      <li>Sur la home standard, quand <code>lossesEqual</code> est vrai, la tuile « Depuis le début » occupe la place de la dernière perte, donc plus haut que d'ordinaire.</li>
+      <li>La home standard est tenue pour morte depuis le 2026-08-31 : ses conditions ne bougent plus.</li>
+    </ul>
+  </details>
+
+  <h3 id="insolites-repli-du-dessin-d-equivalence-insolite">Le repli du dessin sur la home sections</h3>
+  <p>La home sections ne fait pas confiance à l'assignation conservée quand elle est vide alors que la perte ne l'est pas.</p>
+  <pre><code>ludicTotal = (ludic.total.length &gt; 0 OU totalLoss ≤ 0)
+             ? ludic.total
+             : getLudicDecomposition(totalLoss)              // sans options
+
+ludicLast  = (ludic.last.length &gt; 0 OU lastLoss ≤ 0)
+             ? ludic.last
+             : getLudicDecomposition(lastLoss, {
+                 exclude: noms de ludicTotal })              // avec options</code></pre>
+  <p>Le repli de la perte totale part sans options : ni filtre à 200 g, ni turn-over, la combinaison la plus juste sort. Le repli de la dernière perte porte un <code>exclude</code> non vide, ce qui active <code>pickByExclusionAndTurnover</code> : le filtre des 200 g s'applique, le turn-over est neutre puisque <code>usage</code> est absent et que tous les cumuls valent 0 — le départage tombe donc sur l'écart, puis sur le rang.</p>
+  <p>Le repli ne choisit jamais à la place de l'assignation : tant qu'elle porte des objets, c'est elle qui est lue, et rien n'est écrit en retour.</p>
+  <p class="ancre">src/versions/mixte/homes/sections/MaisonSections.tsx</p>
+  <details><summary>Cas limites</summary>
+    <ul>
+      <li>Assignation vide et perte nulle ou négative → liste vide gardée, <code>LudicComposition</code> ne rend rien, mais la tuile est de toute façon masquée par <code>showLastLoss</code> / <code>showTotalLoss</code>.</li>
+      <li>Les objets du repli ne sont ni comptés ni mémorisés : ils changent au prochain rendu si l'assignation, elle, se répare.</li>
+      <li>La garde de <code>resolveLudicAssignment</code> couvre déjà ce cas ; ce repli est le second filet, indépendant de ce qui est écrit sur l'appareil.</li>
+    </ul>
+  </details>
+
+  <h3 id="insolites-duree-d-une-perte-lossspanlabel-lossspandates">La durée d'une perte</h3>
+  <p>Deux fonctions : <code>lossSpanDates</code> donne les bornes, <code>lossSpanLabel</code> les écrit. <a href="spec-fonctionnelle.html#insolites-rangee-progres-evolution-de-la-home-sections">→ fonctionnelle</a></p>
+  <pre><code>lossSpanDates(weightHistory) :        // sorted = tri date+heure DÉCROISSANTE
+  totalFrom = date de la ligne portant isStartingWeight
+  totalTo   = date de sorted[0]
+  lastFrom  = date de sorted[1]
+  lastTo    = date de sorted[0]
+
+lossSpanLabel(debut, fin) :
+  debut absent OU debut &gt; fin              → null
+  jours = daysBetween(debut, fin)          // round(ΔUTC / 86 400 000)
+  jours &lt; 1                                → null
+  jours &lt; 7                                → `en ${max(1, jours)} jour(s)`
+  sinon    semaines = max(1, round(jours / 7))
+                                           → `en ${semaines} semaine(s)`
+
+appel : lossSpanLabel(spans.totalFrom, spans.totalTo ?? aujourd'hui)
+        lossSpanLabel(spans.lastFrom,  spans.lastTo  ?? aujourd'hui)</code></pre>
+  <p>La durée est <strong>l'écart entre les deux pesées comparées</strong>, jamais l'écart à aujourd'hui : le repli sur la date du jour ne joue que si le journal est vide, auquel cas la borne de début manque aussi et le résultat est <code>null</code>.</p>
+  <p class="ancre">src/features/home/homeOverview.ts, src/shared/date/date.local.ts</p>
+  <details><summary>Cas limites</summary>
+    <ul>
+      <li>Deux pesées le même jour → 0 jour → <code>null</code>, aucune durée écrite.</li>
+      <li>Pesée de départ postérieure à la plus récente (départ antidaté à l'envers) → <code>debut &gt; fin</code> → <code>null</code>.</li>
+      <li>Aucune ligne marquée départ → <code>totalFrom</code> absent → <code>null</code>.</li>
+      <li>Une seule pesée → <code>sorted[1]</code> absent → <code>lastFrom</code> absent → <code>null</code>.</li>
+      <li>13 jours → <code>round(13/7) = 2</code> → « en 2 semaines » ; 7 jours → « en 1 semaine » ; 3 jours → « en 3 jours ».</li>
+      <li><code>daysBetween</code> compte en UTC à partir des seules dates : les heures et les changements d'heure n'entrent pas dans le calcul.</li>
+    </ul>
+  </details>
+  <div class="exemple"><p>Camille : départ le 4 mai 2026, dernière pesée le 12 septembre → 131 jours → <code>round(131/7) = 19</code> → « en 19 semaines ». Dernière perte, du 5 au 12 septembre → 7 jours → « en 1 semaine ».</p></div>
+
+  <h3 id="insolites-affichage-des-tuiles-de-perte">L'équivalence dépliée</h3>
+  <p>Le bloc déplié de la home sections est rendu dans un portail par-dessus l'écran téléphone, conditionné par l'état d'ouverture <em>et</em> par les mêmes booléens que les tuiles. <a href="spec-fonctionnelle.html#insolites-surimpression-d-une-equivalence-insolite-home-sections">→ fonctionnelle</a></p>
+  <pre><code>ouvert = openEquivalences.total_loss OU openEquivalences.last_loss
+si ecranTelephone ET ouvert :
+   openEquivalences.total_loss ET showTotalLoss
+      ? bloc « Depuis le début »
+      : bloc « dernière perte enregistrée »</code></pre>
+  <p><code>openEquivalences</code> est un état local à deux booléens indépendants, initialisé depuis <code>glow_home_equivalences</code> (chaque champ lu en <code>=== true</code>, tout le reste vaut faux) et réécrit sous cette clé à chaque changement. Un clic sur une tuile bascule son booléen ; la croix du bloc remet le sien à faux ; un clic sur le voile, comme la fermeture générale des couches (<code>useFermetureCouche</code>), remet les deux à faux. Les deux peuvent être vrais en même temps, mais un seul bloc est rendu, et c'est la perte totale qui l'emporte.</p>
+  <p>Le bloc reprend le libellé, <code>signedKg(−perte)</code>, « soit l'équivalent de », la même <code>LudicComposition</code> et le même <code>LudicEquivalenceText</code> que la tuile — donc les mêmes listes <code>ludicTotal</code> / <code>ludicLast</code>, repli compris.</p>
+  <p class="ancre">src/versions/mixte/homes/sections/MaisonSections.tsx</p>
+  <details><summary>Cas limites</summary>
+    <ul>
+      <li>Hors écran téléphone (<code>ecranTelephone</code> nul), rien n'est rendu, quel que soit l'état mémorisé.</li>
+      <li><code>total_loss</code> ouvert dans le stockage mais <code>showTotalLoss</code> faux → la branche par défaut rend le bloc « dernière perte » <strong>sans vérifier <code>showLastLoss</code></strong> : un bloc peut donc paraître alors que sa tuile ne paraît pas. La valeur affichée est alors <code>weights.lastLoss</code>, et <code>LudicComposition</code> ne rend rien si la liste est vide.</li>
+      <li>L'état d'ouverture survit à la fermeture de l'application : la surimpression peut s'ouvrir dès l'arrivée sur la home.</li>
+    </ul>
+  </details>
+
+  <h3 id="insolites-equivalence-insolite-dans-le-pdf">L'équivalence dans le rapport PDF</h3>
+  <p>La phrase est écrite dans la section II, sous le paragraphe des pesées. <a href="spec-fonctionnelle.html#insolites-pdf-ii-poids-et-doses">→ fonctionnelle</a></p>
+  <pre><code>sortedWeights = pesées de la période, triées par date+heure croissante
+firstW = sortedWeights[0].weight        // null si aucune
+lastW  = dernière.weight
+periodDelta = lastW − firstW            // NÉGATIF quand la période est une perte
+
+si include.weights :
+   titre « II. Poids et doses »
+   si sortedWeights est non vide :
+      paragraphe « Première pesée de la période : … Dernière : … Variation : … »
+      delta = periodDelta ?? 0
+      si include.insolites ET delta &lt; 0 :
+         paragraphe italique, gris, corps 8 :
+         `Soit l’équivalent de : ${getLudicEquivalence(−delta)}.`
+      graphe poids/doses
+   sinon :
+      « Aucune pesée enregistrée sur cette période. »</code></pre>
+  <p><code>getLudicEquivalence</code> est appelée <strong>sans options</strong> : pas de filtre à 200 g, pas de turn-over, pas d'exclusion, aucune lecture ni écriture de l'assignation. L'objet du PDF peut donc différer de celui de la home pour la même valeur.</p>
+  <p>La variation est celle de la <em>période</em> (dernière moins première pesée de la fenêtre), pas la perte depuis le poids de départ.</p>
+  <p class="ancre">src/versions/mixte/features/report/medicalReportPdf.ts</p>
+  <details><summary>Cas limites</summary>
+    <ul>
+      <li><code>include.weights</code> faux → pas de section II du tout, donc pas de phrase, même case insolites cochée.</li>
+      <li>Période sans pesée → phrase d'absence, pas d'équivalence.</li>
+      <li>Une seule pesée sur la période → <code>firstW === lastW</code> → <code>delta = 0</code> → pas de phrase.</li>
+      <li>Reprise de poids sur la période → <code>delta &gt; 0</code> → pas de phrase.</li>
+      <li>L'apostrophe de « l’équivalent » est typographique (U+2019).</li>
+    </ul>
+  </details>
+  <div class="exemple"><p>Rapport de Camille sur 30 jours : première pesée 90,1 kg le 14/08/2026, dernière 88,6 kg le 12/09/2026, <code>delta = −1,5</code>. La phrase sort : « Soit l’équivalent de : un dictionnaire encyclopédique. » (1,5 kg, écart 0). La home, elle, parle de 7,4 kg et d'autres objets.</p></div>
+
+  <h3 id="insolites-bascules-proposees-masque-des-donnees-disponibles">La case insolites et le masque des données</h3>
+  <p>Chaque section du rapport est produite si sa case est cochée <em>et</em> si la période porte la donnée correspondante. La case insolites échappe à la seconde moitié.</p>
+  <pre><code>available = {
+  weights: filteredWeights.length &gt; 0,
+  meals:   foodTrackingEnabled ET ≥ 1 repas sur la période,
+  sideEffects: isModuleOn(profile, 'symptoms') ET ≥ 1 effet,
+  steps:   stepsTrackingEnabled ET ≥ 1 relevé &gt; 0,
+  sport:   sportTrackingEnabled ET ≥ 1 séance,
+  sleep:   sleepTrackingEnabled ET ≥ 1 entrée,
+  meTime:  false,          // écarté du chemin court, masqué par hasMeTimeData
+  insolites: false,        // n'est pas une donnée
+}
+
+effective = {
+  weights: selection.weights ET available.weights,
+  …
+  meTime:  selection.meTime ET hasMeTimeData,
+  insolites: selection.insolites,        // AUCUN masque
+}</code></pre>
+  <p>La bascule <code>insolites</code> est rendue sans garde, à la différence des modules, dont la bascule disparaît quand le module est éteint ou la période muette. <code>available.insolites</code> n'entre donc dans aucun calcul : c'est un reliquat de l'export rapide, <strong>supprimé le 2026-08-25</strong> — il n'existe plus qu'un seul chemin, l'export sur mesure.</p>
+  <p>La ligne « Les équivalences insolites » entre dans le sommaire de l'écran d'attente dès que la case est cochée, sans autre condition.</p>
+  <p class="ancre">src/versions/mixte/components/MedicalReportExport.tsx</p>
+  <details><summary>Cas limites</summary>
+    <ul>
+      <li>Case cochée et « Le poids et les mensurations » décoché → <code>effective.insolites</code> vrai mais aucune section II : rien n'est écrit.</li>
+      <li>Case cochée et période sans pesée → <code>effective.weights</code> faux (masque), section II absente : rien n'est écrit.</li>
+      <li>Le sommaire d'attente liste la ligne insolites même dans les deux cas ci-dessus : il relit <code>include</code>, pas <code>effective</code>.</li>
+    </ul>
+  </details>
+
+  <h3 id="insolites-defauts-et-memorisation-des-choix-du-sur-mesure">Défauts et mémorisation du sur-mesure</h3>
+  <p>Les cases de l'export sur mesure sont mémorisées sous <code>glow_report_include_v2</code>.</p>
+  <pre><code>DEFAULT_INCLUDE = { weights: true, meals: true, sideEffects: true,
+                    steps: true, sport: true, sleep: true,
+                    meTime: false, insolites: true }
+
+état initial : { ...DEFAULT_INCLUDE, ...(getItem('glow_report_include_v2') ?? {}) }
+
+bascule d'un champ :
+   next = { ...include, [champ]: !include[champ] }
+   setInclude(next) ; setItem('glow_report_include_v2', next)</code></pre>
+  <p>La fusion avec les défauts fait qu'un champ ajouté après coup n'est jamais absent d'une valeur déjà stockée. Le suffixe <code>_v2</code> de la clé a été posé le 2026-08-25 pour que le renversement des défauts — <code>insolites</code> passant de décoché à coché — soit vu au moins une fois par les appareils déjà réglés ; l'ancienne clé n'est ni lue ni effacée.</p>
+  <p class="ancre">src/versions/mixte/components/MedicalReportExport.tsx</p>
+  <details><summary>Cas limites</summary>
+    <ul>
+      <li>Rien en mémoire → les défauts s'appliquent : la case insolites est cochée.</li>
+      <li>Valeur stockée partielle → seuls les champs présents écrasent le défaut.</li>
+      <li>L'écriture porte l'objet entier à chaque bascule : un champ absent du stockage y entre à la première modification d'une autre case.</li>
+      <li><code>localStorage</code> indisponible → <code>getItem</code> rend <code>null</code> et <code>setItem</code> échoue en silence : les défauts reviennent à chaque ouverture.</li>
+    </ul>
+  </details>
+
+  <p>Aucune décision V2 ne porte sur ce domaine : ni <code>GUIDELINES.md</code> ni <code>src</code> de la V2 ne mentionnent les équivalences insolites.</p>
+</section>

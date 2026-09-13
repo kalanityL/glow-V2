@@ -1,0 +1,337 @@
+<section id="etats">
+  <h2>7. États et transitions <a class="retour" href="#sommaire">↑ sommaire</a></h2>
+  <p>Ce chapitre énumère ce qui, dans le produit, porte un état : ses valeurs possibles, sa valeur initiale, ce qui le fait changer et si le changement se défait. Un état y est toujours une propriété des données — une valeur enregistrée, ou une valeur dérivée par une règle — jamais une apparence.</p>
+
+  <h3 id="etats-ce-qui-porte-un-etat">Ce qui porte un état</h3>
+  <p>Treize familles d'état sont retenues, sur un seul critère : commander quelque chose — un calcul, une écriture, ou l'ouverture d'une célébration. L'inventaire n'est pas exhaustif et ne prétend pas l'être : le stockage local porte une trentaine de clés <code>glp1_…</code> et quelques-unes sans préfixe, dont la plupart ne retiennent qu'une préférence de restitution qu'aucune règle de données ne lit.</p>
+  <table>
+    <thead><tr><th>État</th><th>Porté par</th><th>Nature</th><th>Durée de vie</th></tr></thead>
+    <tbody>
+      <tr><td>Activation d'un module de suivi (7)</td><td>Un booléen du profil par module</td><td>Enregistré dans la sauvegarde</td><td>Jusqu'à effacement total</td></tr>
+      <tr><td>Second drapeau d'un module (7)</td><td>Un booléen du profil par module</td><td>Enregistré dans la sauvegarde</td><td>Jusqu'à effacement total</td></tr>
+      <tr><td>Traitement déclaré</td><td>Un identifiant de catalogue dans le profil</td><td>Enregistré dans la sauvegarde</td><td>Jusqu'à effacement total</td></tr>
+      <tr><td>Évaluabilité d'un badge (4)</td><td>Rien — lu sur le drapeau d'activation de sa catégorie</td><td>Dérivé</td><td>Instantané</td></tr>
+      <tr><td>Palier d'un badge (4)</td><td>Rien — recalculé à chaque lecture des journaux</td><td>Dérivé</td><td>Instantané</td></tr>
+      <tr><td>Palier connu d'un badge</td><td>Une table identifiant → palier, hors sauvegarde</td><td>Enregistré</td><td>Jusqu'à effacement total</td></tr>
+      <tr><td>Palier d'IMC signalé</td><td>Un entier, hors sauvegarde</td><td>Enregistré</td><td>Jusqu'à effacement total</td></tr>
+      <tr><td>Paliers nutritifs fêtés du jour</td><td>Un couple (date, liste de nutriments), hors sauvegarde</td><td>Enregistré, périmé au changement de jour</td><td>Jusqu'à effacement total</td></tr>
+      <tr><td>Acceptation de l'avertissement</td><td>Une chaîne, hors sauvegarde</td><td>Enregistré</td><td>Jusqu'à effacement total</td></tr>
+      <tr><td>Session</td><td>Le service d'authentification, dans le même stockage local que la sauvegarde</td><td>Enregistré</td><td>Jusqu'à déconnexion ou effacement total</td></tr>
+      <tr><td>Session en lecture seule</td><td>Rien — décidé au chargement</td><td>Volatil</td><td>Une exécution</td></tr>
+      <tr><td>Ancienneté d'usage et signalement du déverrouillage</td><td>Deux clés hors sauvegarde : une date, une chaîne</td><td>Enregistré, dérivé au besoin</td><td>Jusqu'à effacement total</td></tr>
+      <tr><td>Réglages sans effet sur les données</td><td>Des champs du profil</td><td>Enregistré dans la sauvegarde</td><td>Jusqu'à effacement total</td></tr>
+    </tbody>
+  </table>
+  <p>« Hors sauvegarde » veut dire : conservé à côté du document unique qui porte le profil et les journaux, sous une clé propre. Ces valeurs ne sont pas des données de la personne mais l'état d'un mécanisme ; elles ne partent ni dans une exportation ni dans un partage. Un seul geste les emporte toutes : la suppression du compte, qui efface l'intégralité du stockage local de l'appareil — la session mémorisée comprise, puisqu'elle y vit aussi — puis redémarre l'exécution de zéro.</p>
+
+  <h3 id="etats-ce-qui-a-deja-eu-lieu">Ce qui a déjà eu lieu</h3>
+  <p>Une règle unique décide si une entrée datée compte dans un état dérivé. Elle vaut pour les quatre badges et pour la série du traitement en cours ; elle n'est écrite qu'une fois dans le produit.</p>
+  <pre><code>survenu(date, heure, maintenant) =
+    date &lt; aujourd'hui   → vrai
+    date &gt; aujourd'hui   → faux
+    heure absente        → vrai        // le cas des pas, qui n'ont pas d'heure
+    sinon                → heure ≤ heure courante</code></pre>
+  <p>Une entrée saisie à l'avance existe dans son journal et se relit telle quelle ; elle ne commande simplement aucun état dérivé avant son instant. L'ordre d'application compte : le filtre passe <em>devant</em> toute coupure, jamais après.</p>
+
+  <h3 id="etats-un-module-de-suivi">Un module de suivi</h3>
+  <p>Sept domaines sont modulaires : traitement, effets secondaires, alimentation, pas, activité physique, temps pour soi, sommeil. La pesée n'en est pas un — elle est toujours disponible.</p>
+  <table>
+    <thead><tr><th>Module</th><th>Drapeau d'activation</th><th>Obligatoire au modèle</th><th>Absent vaut</th><th>Second drapeau</th></tr></thead>
+    <tbody>
+      <tr><td>Traitement</td><td><code>treatmentTrackingEnabled</code></td><td>non</td><td>allumé</td><td><code>treatmentModuleHidden</code></td></tr>
+      <tr><td>Effets secondaires</td><td><code>sideEffectsTrackingEnabled</code></td><td>non</td><td>allumé</td><td><code>sideEffectsModuleHidden</code></td></tr>
+      <tr><td>Alimentation</td><td><code>foodTrackingEnabled</code></td><td><strong>oui</strong></td><td>éteint</td><td><code>foodModuleHidden</code></td></tr>
+      <tr><td>Pas</td><td><code>stepsTrackingEnabled</code></td><td><strong>oui</strong></td><td>éteint</td><td><code>stepsModuleHidden</code></td></tr>
+      <tr><td>Activité physique</td><td><code>sportTrackingEnabled</code></td><td><strong>oui</strong></td><td>éteint</td><td><code>sportModuleHidden</code></td></tr>
+      <tr><td>Temps pour soi</td><td><code>meTimeTrackingEnabled</code></td><td>non</td><td>éteint</td><td><code>meTimeModuleHidden</code></td></tr>
+      <tr><td>Sommeil</td><td><code>sleepTrackingEnabled</code></td><td>non</td><td>éteint</td><td><code>sleepModuleHidden</code></td></tr>
+    </tbody>
+  </table>
+  <p>Les trois drapeaux obligatoires sont toujours écrits dans une sauvegarde ; les quatre autres sont facultatifs, et leur absence est le cas ordinaire d'un profil ancien. Le repli existe pour les sept, mais il n'est atteignable que par les quatre facultatifs.</p>
+  <p>L'activation a <strong>deux valeurs</strong> : allumé, éteint. Les sept seconds drapeaux sont des booléens du profil qu'<em>aucune règle de données ne lit</em> : ils n'entrent dans aucun calcul, ne conditionnent aucune écriture et ne changent aucun état dérivé. Leur seul effet relève de la restitution et sort du périmètre de ce document. Ils figurent ici parce que la bascule d'activation les écrit, et que leurs règles d'écriture ne sont pas symétriques.</p>
+  <pre><code>allume(m)     = drapeau(m) == null ? (m ∈ {traitement, effets secondaires}) : Boolean(drapeau(m))
+secondaire(m) = !allume(m) &amp;&amp; Boolean(secondDrapeau(m))   // lu sur l'état effectif, non sur le drapeau nu</code></pre>
+  <p>Valeur initiale d'un profil neuf : traitement et effets secondaires allumés (drapeau non écrit) ; les cinq autres explicitement éteints ; aucun second drapeau écrit.</p>
+  <table>
+    <thead><tr><th>Transition</th><th>Précondition</th><th>Effet sur les données</th><th>Réversible</th></tr></thead>
+    <tbody>
+      <tr><td>Allumer explicitement</td><td>aucune</td><td>Écrit <code>drapeau = true</code> <strong>et</strong> <code>secondDrapeau = false</code>, dans la même écriture du profil.</td><td>oui</td></tr>
+      <tr><td>Éteindre explicitement</td><td>aucune</td><td>Écrit <code>drapeau = false</code>. Le second drapeau n'est pas touché : sa valeur d'avant reprend effet.</td><td>oui</td></tr>
+      <tr><td>Allumer implicitement</td><td>domaine ∈ {alimentation, pas, activité physique} et drapeau faux ou absent</td><td>Écrit <code>drapeau = true</code> et rien d'autre, lorsqu'une capacité de saisie ou de consultation du domaine est demandée. Un second drapeau vrai le reste.</td><td>oui</td></tr>
+      <tr><td>Basculer le second drapeau</td><td>aucune dans les données</td><td>Écrit <code>secondDrapeau = !secondDrapeau</code>.</td><td>oui</td></tr>
+    </tbody>
+  </table>
+  <p>L'allumage implicite ne concerne que ces trois modules. Toutes les demandes n'allument pas : une seconde forme de demande, réservée à la consultation d'un domaine éteint, n'écrit rien du tout. Le traitement, les effets secondaires, le temps pour soi et le sommeil ne s'allument jamais implicitement.</p>
+  <p><strong>Invariant.</strong> L'état d'un module ne conditionne aucune donnée : éteindre n'efface rien, ne supprime aucune entrée déjà enregistrée et n'invalide aucun calcul. Les journaux d'un module éteint restent lus par tout ce qui les consulte — la déduction de l'ancienneté d'usage les parcourt tous, et le palier d'un badge se recalcule sur eux dès que sa catégorie redevient évaluable.</p>
+  <details><summary>Cas limites</summary>
+    <p>Allumer explicitement puis éteindre laisse le second drapeau à faux : la valeur qu'il portait avant l'allumage est perdue.</p>
+    <p>Allumer implicitement puis éteindre laisse le second drapeau tel qu'il était : c'est le seul chemin par lequel un module éteint retrouve la valeur qu'il portait auparavant.</p>
+    <p>Un second drapeau vrai sous un module allumé est inerte au regard de <code>secondaire</code>, mais reste enregistré.</p>
+    <p>Le second drapeau se lit sur l'état effectif du module, pas sur le drapeau nu : un traitement dont le drapeau d'activation n'a jamais été écrit est allumé, et <code>secondaire</code> y rend faux quelle que soit la valeur enregistrée.</p>
+    <p>Un identifiant de domaine sans drapeau associé — la pesée — donne <code>allume = vrai</code> et <code>secondaire = faux</code>.</p>
+  </details>
+  <div class="exemple"><p>Camille éteint le module Sommeil après trois semaines de saisie. Ses nuits enregistrées restent dans le journal, la déduction de son ancienneté d'usage continue de les voir, et rallumer le module les retrouve toutes.</p></div>
+
+  <h3 id="etats-le-traitement-declare">Le traitement déclaré</h3>
+  <p>Le profil porte un <strong>identifiant de traitement</strong>, jamais un nom. L'absence de traitement est une valeur du catalogue (<code>aucun</code>), pas une valeur absente : il y a donc toujours une réponse.</p>
+  <table>
+    <thead><tr><th>Donnée</th><th>Type</th><th>Valeur initiale</th></tr></thead>
+    <tbody>
+      <tr><td>Traitement du profil</td><td>identifiant du catalogue (14 valeurs, <code>aucun</code> compris)</td><td><code>aucun</code></td></tr>
+      <tr><td>Traitement d'une prise</td><td>identifiant, facultatif au modèle</td><td>écrit à l'enregistrement ; jamais absent sur une prise saisie par le produit</td></tr>
+    </tbody>
+  </table>
+  <pre><code>traitementDe(fiche) = catalogue[id] ?? catalogue['aucun']        // id inconnu ⇒ « aucun »
+traitementResolu(prise, profil) = prise.traitement || profil.traitement || 'aucun'</code></pre>
+  <p>Ce que l'enregistrement écrit dans une prise est <code>traitementResolu(rien, profil)</code> : quand le profil dit <code>aucun</code>, c'est <code>aucun</code> qui est écrit dans la prise. Une prise peut donc porter explicitement l'absence de traitement.</p>
+  <table>
+    <thead><tr><th>Transition</th><th>Précondition</th><th>Effet</th><th>Réversible</th></tr></thead>
+    <tbody>
+      <tr><td>Déclarer ou changer</td><td>aucune au niveau des données</td><td>Écrit l'identifiant dans le profil. Rien d'autre n'est touché.</td><td>oui, vers n'importe quel identifiant, <code>aucun</code> compris</td></tr>
+      <tr><td>Migrer</td><td>au chargement d'une sauvegarde</td><td>Convertit en identifiant toute valeur historique du profil et de chaque prise ; un profil sans valeur devient <code>aucun</code> ; une prise sans valeur reste sans valeur.</td><td>non</td></tr>
+      <tr><td>Enregistrer ou modifier une prise</td><td>aucune</td><td>Écrit dans la prise l'identifiant du profil <em>au moment de l'écriture</em>.</td><td>oui, en réécrivant la prise</td></tr>
+    </tbody>
+  </table>
+  <p><strong>L'attestation d'essai clinique est une garde de saisie, pas un invariant de la donnée.</strong> Une seule fiche du catalogue porte l'exigence — le rétatrutide. Le choix guidé la fait valoir : désigner cette fiche alors qu'elle n'est pas déjà celle du profil demande une attestation explicite avant d'écrire. L'écriture du profil, elle, accepte n'importe quel identifiant sans rien vérifier : aucune règle de données ne garantit qu'une attestation a été donnée. Redéclarer un traitement déjà déclaré ne demande rien, même pour cette fiche : l'exigence porte sur le changement, pas sur la valeur.</p>
+  <p><strong>Ce que le changement fait aux dérivés.</strong> Les prises déjà enregistrées gardent leur identifiant. La <em>série du traitement en cours</em> se construit en deux temps, et l'ordre est déterminant :</p>
+  <pre><code>1. filtrer le journal des prises sur `survenu` (§ ce qui a déjà eu lieu)
+2. trier par date puis heure, l'heure absente valant minuit
+3. remonter depuis la fin tant que traitementResolu(prise, profil) == profil.traitement
+   → la série est ce suffixe final</code></pre>
+  <p>Le filtre passe devant la coupure, et c'est délibéré : une prise <em>à venir</em> relevant d'un autre traitement — un changement déjà saisi à l'avance — vide sinon la série entière, puisque la coupure remonte depuis la dernière ligne. Si la dernière prise <strong>déjà survenue</strong> relève d'un autre traitement que celui du profil, la série est vide. Changer de traitement la vide ; elle repart de la première prise enregistrée sous le nouvel identifiant.</p>
+  <details><summary>Cas limites</summary>
+    <p>Modifier une prise ancienne après un changement de traitement lui donne le traitement <em>courant</em> : une prise d'Ozempic corrigée alors que le profil dit Mounjaro devient une prise de Mounjaro.</p>
+    <p>Une prise sans identifiant est réputée relever du traitement du profil ; sa lecture change donc quand le profil change.</p>
+    <p>Un identifiant absent du catalogue est lu comme <code>aucun</code> plutôt que rejeté.</p>
+    <p>Revenir à un traitement déjà utilisé ne recolle pas les deux périodes : la série repart de la première prise du retour.</p>
+    <p>Une prise datée d'aujourd'hui sans heure est réputée survenue et compte dans la série.</p>
+  </details>
+  <div class="exemple"><p>Camille déclare Ozempic en mai 2026, puis passe à Mounjaro le 12 août. Ses prises de mai à août gardent l'identifiant <code>ozempic</code> ; la série du traitement en cours ne compte plus que les prises postérieures au 12 août. Si elle saisit dès le 10 août sa première prise de Mounjaro datée du 12, la série d'Ozempic reste entière jusqu'au 12 : la prise à venir ne coupe rien.</p></div>
+
+  <h3 id="etats-le-palier-d-un-badge">Le palier d'un badge</h3>
+  <p>Quatre badges existent. Chacun porte deux états distincts : son <strong>évaluabilité</strong>, qui se lit sur le drapeau d'activation de sa catégorie, et son <strong>palier</strong>, qui n'existe que s'il est évaluable.</p>
+  <table>
+    <thead><tr><th>État</th><th>Valeurs</th><th>Valeur initiale (profil d'usine)</th><th>Transition</th><th>Réversible</th></tr></thead>
+    <tbody>
+      <tr><td>Évaluabilité</td><td>évaluable / non évaluable</td><td>activité physique et pas : évaluable ; alimentation : non évaluable</td><td>bascule du drapeau d'activation du module</td><td>oui</td></tr>
+      <tr><td>Palier</td><td><code>aucun</code>, <code>eveil</code>, <code>bronze</code>, <code>argent</code>, <code>or</code> — et <em>pas de palier</em> quand la catégorie n'est pas évaluable</td><td><code>aucun</code> sur des journaux vides</td><td>recalcul, à chaque lecture</td><td>oui, dans les deux sens</td></tr>
+    </tbody>
+  </table>
+  <pre><code>paliers, du plus bas au plus haut : ['aucun', 'eveil', 'bronze', 'argent', 'or']
+rang(p) = index de p dans cette liste   // 0 … 4</code></pre>
+  <p>Le palier n'est jamais enregistré : il se recalcule à partir des journaux et de l'instant présent. Il monte et il redescend — une journée qui sort de la période de calcul le fait baisser sans autre geste. Un badge non évaluable n'a pas de palier du tout : il n'est pas calculé, et son palier connu est conservé tel quel.</p>
+  <table>
+    <thead><tr><th>Badge</th><th>Évaluable si</th><th>Éveil</th><th>Bronze</th><th>Argent</th><th>Or</th></tr></thead>
+    <tbody>
+      <tr><td>Kangourou Musclé (activité physique)</td><td>drapeau activité physique ≠ faux</td><td>≥ 1 séance survenue aujourd'hui ou hier</td><td>équivalent modéré ≥ 120 min sur 10 j</td><td>équivalent intensif ≥ 180 min sur 10 j</td><td>équivalent intensif ≥ 180 min sur 7 j</td></tr>
+      <tr><td>Lapin des Fibres (alimentation)</td><td>drapeau alimentation = vrai</td><td>≥ 25 g de fibres aujourd'hui ou hier</td><td>4 journées sur 7</td><td>5 journées sur 7</td><td>7 journées sur 7</td></tr>
+      <tr><td>Requin protéiné (alimentation)</td><td>drapeau alimentation = vrai</td><td>seuil protéines atteint aujourd'hui ou hier</td><td>4 journées sur 7</td><td>5 journées sur 7</td><td>7 journées sur 7</td></tr>
+      <tr><td>Hérisson Marcheur (pas)</td><td>drapeau pas ≠ faux</td><td>≥ 8 000 pas aujourd'hui ou hier</td><td>3 journées sur 7</td><td>4 journées sur 7</td><td>5 journées sur 7</td></tr>
+    </tbody>
+  </table>
+  <pre><code>periode(N)      = [aujourd'hui, … , aujourd'hui − (N−1) jours]   // dates locales
+periodeEveil    = periode(2)                                      // aujourd'hui et hier
+equivIntensif   = duree × (intensive 1 | moderee 0,67 | douce 0,33)
+equivModere     = duree × (intensive 1,5 | moderee 1 | douce 0,5)
+seuilProteines  = round(poidsActuel × 1,5) g      // le PROFIL N'EST PAS LU
+seuilFibres     = 25 g                            // en dur
+palier          = premier seuil satisfait en descendant : or, argent, bronze, eveil, sinon aucun</code></pre>
+  <p><strong>Les deux seuils nutritionnels des badges ne sont pas les objectifs du profil.</strong> Le profil porte <code>dailyProteinGoal</code> et <code>dailyFiberGoal</code>, tous deux facultatifs, dont l'absence vaut respectivement <code>round(poids actuel × 1,5)</code> et 25 g ; ce sont eux que lit le reste du produit. Les badges, eux, recalculent les deux valeurs par défaut et ignorent les champs du profil : un objectif protéines fixé à 110 g ne change aucun palier. Les deux valeurs coïncident tant que la personne n'a rien fixé.</p>
+  <p><code>poidsActuel</code> est la <em>dernière ligne</em> du journal des pesées — le dernier élément de la suite, non la pesée la plus récente par date ; à défaut le poids de départ ; à défaut 70 kg. Le total d'une journée est la somme des entrées portant cette date, filtrées par <code>survenu</code>.</p>
+  <details><summary>Cas limites</summary>
+    <p>Les deux badges d'alimentation exigent le drapeau <em>strictement</em> vrai, tandis que les deux autres se contentent d'un drapeau <em>non faux</em>. Les trois drapeaux concernés étant obligatoires au modèle et toujours écrits, la différence ne se manifeste jamais sur une sauvegarde chargée.</p>
+    <p>La condition d'évaluation lit le drapeau d'activation nu, et rien d'autre : le second drapeau du module n'y entre pas.</p>
+    <p>Le palier éveil se calcule sur deux jours et les autres sur sept ou dix : un palier supérieur atteint l'emporte, l'éveil n'est donc pas un passage obligé.</p>
+    <p>Aucune période ne remonte au-delà de dix jours : un historique ancien ne maintient aucun palier.</p>
+  </details>
+  <div class="exemple"><p>Camille, 96 kg au départ et 88,4 kg à sa dernière pesée, a pour seuil de badge round(88,4 × 1,5) = 133 g de protéines par jour. Quatre journées à 140 g sur les sept derniers jours lui donnent le palier bronze du Requin protéiné ; une seule journée sortie de la période le ramène à éveil si l'une des deux dernières journées tient encore le seuil, à <code>aucun</code> sinon.</p></div>
+
+  <h3 id="etats-la-memoire-des-paliers">La mémoire des paliers</h3>
+  <p>À côté des paliers calculés, le produit retient le <strong>dernier palier observé</strong> de chaque badge : une table identifiant de badge → palier, enregistrée hors de la sauvegarde. C'est elle, et non le palier lui-même, qui décide de ce qui se célèbre.</p>
+  <p>Valeur initiale : table absente, c'est-à-dire aucun badge observé. Une passe d'évaluation rejoue <strong>à chaque écriture de la sauvegarde</strong> — une pesée, un repas, un pas, un réglage de profil — et non une fois par ouverture ; c'est ce qui permet la célébration au moment même où la saisie fait monter un palier. Au premier passage d'une exécution, l'état connu est lu dans le stockage ; ensuite il est celui que la passe précédente a rendu.</p>
+  <pre><code>suivants = { …connus }                       // on PART du connu, on ne le reconstruit pas
+pour chaque badge dont la catégorie est évaluable :
+    p = palier(badge)
+    suivants[badge] = p                      // écrit d'abord, sans comparer
+    si connus[badge] est absent            → rien à célébrer   (découverte)
+    sinon si rang(p) &gt; rang(connus[badge]) → à célébrer        (progression)
+    sinon                                  → rien à célébrer   (stable ou baisse)</code></pre>
+  <table>
+    <thead><tr><th>Situation</th><th>Palier connu après la passe</th><th>Célébration</th></tr></thead>
+    <tbody>
+      <tr><td>Badge jamais observé, quel que soit son palier</td><td>écrit</td><td>non</td></tr>
+      <tr><td>Palier observé qui monte</td><td>écrit</td><td>oui, une fois</td></tr>
+      <tr><td>Palier observé qui baisse</td><td>écrit</td><td>non</td></tr>
+      <tr><td>Catégorie non évaluable</td><td>inchangé, conservé</td><td>non</td></tr>
+      <tr><td>Catégorie redevenue évaluable au même palier</td><td>réécrit à la même valeur</td><td>non</td></tr>
+      <tr><td>Catégorie redevenue évaluable à un palier supérieur</td><td>écrit</td><td>oui, une fois</td></tr>
+    </tbody>
+  </table>
+  <p>Deux conséquences tiennent de ce seul critère, sans cas particulier. Une installation qui démarre sur un historique déjà fourni ne célèbre rien : les quatre badges sont des découvertes. Éteindre puis rallumer une catégorie ne rejoue pas une célébration déjà eue, y compris après une fermeture, parce que le palier connu traverse l'extinction.</p>
+  <details><summary>Cas limites</summary>
+    <p>Une entrée de la table dont la valeur n'est pas un palier connu est ignorée à la lecture, badge par badge : le badge redevient « jamais observé » et sa prochaine évaluation est une découverte.</p>
+    <p>Une table absente et une table vide se comportent identiquement.</p>
+    <p>Un palier qui baisse puis remonte au même niveau se célèbre de nouveau : la remontée est une progression réelle.</p>
+    <p>La passe ne compare rien avant d'écrire : seul un badge non évaluable laisse son entrée intacte.</p>
+  </details>
+
+  <h3 id="etats-les-autres-memoires-de-celebration">Les autres mémoires de célébration</h3>
+  <p>Deux mécanismes de la même famille exacte que la mémoire des paliers vivent hors de la sauvegarde, sous leur propre clé, et retiennent ce qui a déjà été signalé.</p>
+  <p><strong>Le palier d'IMC signalé.</strong> Un entier enregistré comme chaîne ; clé absente vaut 99, c'est-à-dire rien de signalé.</p>
+  <pre><code>imc         = round(poidsCourant / taille² × 10) / 10      // taille en m, 170 cm à défaut
+poidsCourant = pesée la plus récente par (date, heure) décroissantes, à défaut le poids de départ
+poidsPrecedent = pesée suivante dans ce tri, à défaut le poids de départ
+paliers d'IMC, par index : 0 &lt; 18,5 ≤ 1 &lt; 25 ≤ 2 &lt; 30 ≤ 3 &lt; 35 ≤ 4 &lt; 40 ≤ 5 ; 99 si imc ≤ 0
+célébrer et écrire l'index courant si :
+    imc ≥ 19  et  index courant ≠ 99  et  index précédent ≠ 99
+    et index courant &lt; index précédent  et  index courant &lt; index signalé</code></pre>
+  <p>La passe rejoue à chaque changement du journal des pesées ou de la taille. L'index signalé ne se réécrit qu'en baissant : reprendre du poids puis en reperdre ne resignale pas un palier déjà signalé. La transition est irréversible hors effacement total.</p>
+  <p><strong>Les paliers nutritifs du jour.</strong> Un couple <code>{date, nutriments}</code>, où <code>nutriments</code> est une partie de <code>{proteines, fibres}</code> ; clé absente vaut rien de fêté. La passe compare les totaux du jour aux objectifs du profil — <code>dailyProteinGoal ?? round(poids × 1,5)</code> et <code>dailyFiberGoal ?? 25</code>, et non les seuils des badges.</p>
+  <pre><code>dejaFetes = (etat ≠ null et etat.date == jour) ? etat.nutriments : []
+atteint(total, reco) = reco &gt; 0 et total ≥ reco
+aFeter    = les nutriments atteints qui ne sont pas dans dejaFetes
+etat      = { date: jour, nutriments: dejaFetes + aFeter }</code></pre>
+  <p>Les deux nutriments sont indépendants : le même jour peut n'en fêter aucun, un seul, ou les deux. Un jour qui change périme l'état entier par une seule comparaison de dates. Une recommandation nulle ou négative ne se franchit pas. Le mécanisme est écrit et testé, mais aucune capacité ne l'appelle : rien ne l'évalue aujourd'hui. <span class="marque non">non implémenté</span></p>
+  <details><summary>Cas limites</summary>
+    <p>Un état dont la forme n'est pas celle attendue est lu comme absent ; à l'intérieur, une valeur qui n'est ni <code>proteines</code> ni <code>fibres</code> est écartée une à une.</p>
+    <p>Un IMC nul ou négatif — taille absurde — donne l'index 99 et bloque toute célébration, dans les deux sens de la comparaison.</p>
+    <p>Le poids courant de l'IMC est la pesée la plus récente <em>par date</em>, contrairement au poids courant des badges, qui est la dernière ligne de la suite.</p>
+  </details>
+  <div class="exemple"><p>Camille, 168 cm, passe de 88,4 kg à 82,5 kg : son IMC descend de 31,3 (index 3) à 29,2 (index 2). La baisse d'index se signale une fois et l'index 2 est écrit. Remonter à 30,5 puis redescendre à 29,0 ne signale plus rien.</p></div>
+
+  <h3 id="etats-l-acceptation-de-l-avertissement">L'acceptation de l'avertissement</h3>
+  <p>Un drapeau unique, enregistré hors de la sauvegarde, dit si l'avertissement médical a été accepté. Deux valeurs seulement : accepté, non accepté.</p>
+  <table>
+    <thead><tr><th>Valeur enregistrée</th><th>Signification</th></tr></thead>
+    <tbody>
+      <tr><td><code>"true"</code></td><td>accepté</td></tr>
+      <tr><td>toute autre valeur, ou clé absente</td><td>non accepté</td></tr>
+    </tbody>
+  </table>
+  <p>Valeur initiale : non accepté. Aucune donnée ne dépend de ce drapeau : aucun calcul ne le lit, aucune écriture ne l'exige, et rien ne se perd s'il reste à « non accepté ». Sa seule conséquence est une condition de restitution, hors périmètre.</p>
+  <table>
+    <thead><tr><th>Transition</th><th>Précondition</th><th>Effet</th><th>Réversible</th></tr></thead>
+    <tbody>
+      <tr><td>Accepter</td><td>attestation explicite de lecture</td><td>Écrit le drapeau à <code>"true"</code>.</td><td>non</td></tr>
+      <tr><td>Demander de nouveau le texte</td><td>accepté</td><td>Aucun. Aucune écriture, et aucun refus possible.</td><td>sans objet</td></tr>
+      <tr><td>Supprimer le compte</td><td>voir la session</td><td>Efface tout le stockage local, ce drapeau compris : l'acceptation redevient à donner.</td><td>non</td></tr>
+    </tbody>
+  </table>
+  <details><summary>Cas limites</summary>
+    <p>L'acceptation est propre à l'appareil : elle n'est pas attachée au compte et ne suit pas une connexion sur un autre appareil.</p>
+    <p>Le drapeau vaut une chaîne nue et non une valeur structurée : une réécriture au format JSON, qui ajouterait les guillemets à la chaîne, serait lue comme « non accepté ».</p>
+  </details>
+
+  <h3 id="etats-la-session">La session</h3>
+  <p>Le produit se verrouille derrière un compte lorsque, et seulement lorsque, le champ <code>apiKey</code> de la configuration d'authentification est non vide. Cette configuration est écrite en dur dans une source du dépôt, et non fournie à l'exécution : elle est aujourd'hui remplie, le verrou est donc actif. Ce n'est pas un état modifiable en cours d'usage.</p>
+  <table>
+    <thead><tr><th>Verrou</th><th>États possibles</th></tr></thead>
+    <tbody>
+      <tr><td>inactif (<code>apiKey</code> vide)</td><td>un seul état : ouvert, sans compte. Aucune identité, aucune écriture distante.</td></tr>
+      <tr><td>actif</td><td><code>restauration</code> → <code>déconnecté</code> | <code>connecté {identifiant: chaîne, e-mail: chaîne ou nul, nom: chaîne ou nul}</code></td></tr>
+    </tbody>
+  </table>
+  <p>Les trois champs du compte connecté sont toujours présents ; les deux derniers peuvent valoir nul. Valeur initiale, verrou actif : <code>restauration</code>. La session précédente est mémorisée par le service d'authentification, dans le même stockage local que la sauvegarde, et restaurée au démarrage ; la transition suivante est donc automatique et ne demande rien.</p>
+  <table>
+    <thead><tr><th>Transition</th><th>Précondition</th><th>État atteint</th><th>Réversible</th></tr></thead>
+    <tbody>
+      <tr><td>Restauration terminée</td><td>—</td><td><code>connecté</code> ou <code>déconnecté</code></td><td>sans objet</td></tr>
+      <tr><td>Se connecter par e-mail</td><td>couple e-mail / mot de passe non vides, compte préexistant</td><td><code>connecté</code></td><td>oui</td></tr>
+      <tr><td>Se connecter par fournisseur externe</td><td>—</td><td><code>connecté</code>, le compte étant créé au passage s'il n'existait pas</td><td>oui</td></tr>
+      <tr><td>Se déconnecter</td><td><code>connecté</code></td><td><code>déconnecté</code>, puis redémarrage de l'exécution</td><td>oui</td></tr>
+      <tr><td>Supprimer le compte</td><td><code>connecté</code>, et session récente</td><td>compte détruit, puis stockage local effacé, puis redémarrage de l'exécution</td><td>non</td></tr>
+    </tbody>
+  </table>
+  <p>Le produit n'offre aucune capacité de création de compte par e-mail et mot de passe. Le chemin du fournisseur externe en crée un implicitement à la première connexion d'une adresse inconnue : c'est le comportement du service d'authentification, que rien ne bride ici.</p>
+  <p><strong>Ordre imposé de la suppression.</strong> Le compte est détruit d'abord, les données ensuite. Tant que la destruction n'a pas réussi, aucune donnée n'est touchée. Deux refus sont distingués : aucune session courante, et session trop ancienne. Le second ouvre une transition à part entière — déconnexion, puis redémarrage complet de l'exécution, la suppression étant à reprendre depuis une session fraîche. Après une suppression réussie, l'état final décrit ci-dessus n'est jamais observé : l'exécution se termine et tout l'état volatil part avec elle, la session en lecture seule comprise.</p>
+  <p><strong>Invariant.</strong> Aucune donnée de suivi ne dépend de la session : profil, journaux, paliers connus, acceptation et ancienneté vivent sur l'appareil, non dans le compte. Se déconnecter et se reconnecter avec un autre compte, sur le même appareil, retrouve exactement les mêmes données.</p>
+  <details><summary>Cas limites</summary>
+    <p>Verrou inactif : la suppression du compte n'a pas de compte à détruire ; elle efface le stockage local, puis redémarre l'exécution.</p>
+    <p>La session mémorisée vit dans le même stockage que les données : l'effacement total l'emporte aussi.</p>
+    <p>L'état <code>restauration</code> n'est jamais atteint deux fois dans une exécution.</p>
+  </details>
+
+  <h3 id="etats-la-session-en-lecture-seule">La session en lecture seule</h3>
+  <p>Le chargement de la sauvegarde a trois issues, et la troisième change l'état de toute l'exécution.</p>
+  <table>
+    <thead><tr><th>Issue du chargement</th><th>Données</th><th>Écriture</th></tr></thead>
+    <tbody>
+      <tr><td>Sauvegarde absente</td><td>profil d'usine, journaux vides, pesée de départ semée à 95,0 kg</td><td>autorisée</td></tr>
+      <tr><td>Sauvegarde lisible</td><td>profil et journaux restaurés, migrations appliquées</td><td>autorisée</td></tr>
+      <tr><td>Sauvegarde illisible</td><td>identique à l'absence : profil d'usine, journaux vides, pesée de départ semée à 95,0 kg — les deux branches tombent sur le même repli</td><td><strong>interdite pour toute l'exécution</strong></td></tr>
+    </tbody>
+  </table>
+  <p>Valeur initiale : écriture autorisée. La transition vers la lecture seule est unique, automatique et sans retour possible avant un rechargement.</p>
+  <pre><code>si l'analyse de la sauvegarde échoue :
+    si la clé de secours « &lt;clé&gt;__secours » est ABSENTE → y recopier la sauvegarde brute, telle quelle
+    marquer la session en lecture seule
+    plus aucune écriture du document de sauvegarde n'a lieu</code></pre>
+  <p>La condition porte sur l'absence de la clé, non sur son contenu : une clé de secours portant une chaîne vide empêcherait le sauvetage. Elle ne s'écrit donc qu'une fois — un second échec ne recouvre pas le premier sauvetage, qui porte les vraies données. Rien n'est perdu, rien n'est écrasé ; le produit fonctionne sur des données vides plutôt que d'effacer ce qu'il n'a pas su lire. L'échec du sauvetage lui-même n'empêche pas le passage en lecture seule.</p>
+  <details><summary>Cas limites</summary>
+    <p>La lecture seule ne concerne que le document de sauvegarde. Les valeurs conservées sous d'autres clés — paliers connus, palier d'IMC signalé, acceptation, date de première ouverture — restent écrites.</p>
+    <p>La pesée de départ semée sur une sauvegarde illisible n'est jamais persistée, puisque plus rien ne s'écrit : elle disparaît à la fin de l'exécution.</p>
+    <p>Si le stockage lui-même est indisponible, toute écriture échoue en silence : aucun état ne se retient d'une exécution à l'autre, et l'acceptation de l'avertissement est redemandée à chaque ouverture.</p>
+  </details>
+
+  <h3 id="etats-l-anciennete-d-usage">L'ancienneté d'usage</h3>
+  <p>Deux valeurs hors sauvegarde : une <strong>date de première ouverture</strong> et un drapeau disant si le franchissement du seuil a déjà été signalé. L'ancienneté s'en dérive, et vaut <strong>verrouillé</strong> tant que sept jours entiers ne se sont pas écoulés, <strong>déverrouillé</strong> ensuite.</p>
+  <pre><code>premiereOuverture = date enregistrée
+                    ?? plus ancienne date de TOUS les journaux, si elle est ≤ aujourd'hui
+                    ?? aujourd'hui
+anciennete   = max(0, jours entiers entre premiereOuverture et aujourd'hui)   // dates locales
+deverrouille = anciennete ≥ 7</code></pre>
+  <p>La date retenue est écrite une fois pour toutes, dès la première ouverture qui la calcule ; la déduction ne se refait jamais. Une entrée datée dans le futur n'est pas retenue comme origine — l'ancienneté serait négative. Les neuf journaux sont parcourus, ceux des modules éteints compris : une donnée est une preuve de présence. Ce que le déverrouillage ouvre relève de la restitution et sort du périmètre.</p>
+  <table>
+    <thead><tr><th>Transition</th><th>Déclencheur</th><th>Réversible</th></tr></thead>
+    <tbody>
+      <tr><td>Poser la date de première ouverture</td><td>une ouverture sans date enregistrée</td><td>non, sauf suppression du compte</td></tr>
+      <tr><td>verrouillé → déverrouillé</td><td>écoulement du temps : le septième jour</td><td>non, sauf suppression du compte</td></tr>
+      <tr><td>Marquer le franchissement signalé</td><td>la <strong>fermeture</strong> de la célébration par la personne, et non son ouverture</td><td>non, sauf suppression du compte</td></tr>
+    </tbody>
+  </table>
+  <p>La suppression du compte efface les deux clés comme le reste du stockage : la date se redéduira, et l'ancienneté se reverrouillera si aucun journal ne subsiste — ce qui est le cas, puisque la sauvegarde part avec.</p>
+  <details><summary>Cas limites</summary>
+    <p>Vider tous les journaux ne reverrouille pas : la date est enregistrée, elle ne se redéduit plus.</p>
+    <p>Six jours et vingt-trois heures ne font pas sept jours : la comparaison porte sur des dates locales, pas sur des durées.</p>
+    <p>Une installation qui porte déjà des mois de données est déverrouillée dès la première ouverture, par la déduction sur les journaux.</p>
+    <p>Quitter sans fermer la célébration laisse le drapeau à zéro : elle reviendra à l'ouverture suivante.</p>
+  </details>
+  <div class="exemple"><p>Camille installe l'application le 20 mai 2026 et y importe aussitôt une pesée du 3 mai. La date de première ouverture retenue est le 3 mai : l'ancienneté vaut dix-sept jours et le seuil est franchi immédiatement.</p></div>
+
+  <h3 id="etats-les-etats-sans-effet">Les états sans effet sur les données</h3>
+  <p>Plusieurs champs du profil sont enregistrés et modifiables sans qu'aucune règle de données ne les lise : ils ne conditionnent ni un calcul, ni une écriture, ni un état dérivé. Deux règles les excluent du reste de ce chapitre — un champ dont le seul effet est une condition de restitution n'y a pas sa place, et un champ qui ne se règle que depuis la surface d'administration est hors périmètre déclaré. Les voici néanmoins nommés, avec leurs valeurs et leurs défauts.</p>
+  <table>
+    <thead><tr><th>État</th><th>Valeurs</th><th>Valeur initiale</th><th>Ce qu'il commande</th></tr></thead>
+    <tbody>
+      <tr><td>Rappel de prise</td><td>actif / inactif, plus une périodicité hebdomadaire (jour, heure) ou libre (tous les N jours, date de départ, heure)</td><td>inactif ; jour = dimanche ; heure = 20:00 ; N = 7</td><td>rien : aucun planificateur ne le lit <span class="marque non">non implémenté</span></td></tr>
+      <tr><td>Rappel de rendez-vous médical</td><td>actif / inactif, plus date, heure, praticien, délai ∈ {1 h, 2 h, 1 j, 2 j, 3 j, 7 j}</td><td>inactif ; heure = 10:00 ; délai = 1 j</td><td>rien <span class="marque non">non implémenté</span></td></tr>
+      <tr><td>Second drapeau d'un module (7)</td><td>booléen facultatif</td><td>absent, donc faux</td><td>rien dans les données ; une condition de restitution</td></tr>
+      <tr><td><code>mysteryBadgeHidden</code></td><td>booléen facultatif</td><td>absent, donc faux</td><td>rien dans les données ; une condition de restitution, à polarité inversée à la lecture <span class="marque">arbitrage non validé</span></td></tr>
+      <tr><td>Cinq interrupteurs d'administration</td><td><code>quickAddEnabled</code>, <code>insoliteLibraryEnabled</code>, <code>deleteAllButtonsEnabled</code>, <code>homeCornerButtonsEnabled</code>, <code>colorblindModeEnabled</code></td><td>les deux premiers écrits à faux ; les trois autres absents, donc faux</td><td>rien dans les données ; hors périmètre</td></tr>
+    </tbody>
+  </table>
+
+  <h3 id="etats-ce-que-la-v2-decide-autrement">Ce que la V2 décide autrement</h3>
+  <p>La V2 tranche à rebours sur quatre points ; ce qu'elle dit prévaut. <span class="marque v2">V2</span></p>
+  <table>
+    <thead><tr><th>Sujet</th><th>V1</th><th>V2</th></tr></thead>
+    <tbody>
+      <tr><td>Persistance</td><td>Tout état survit à la fermeture, dans le stockage de l'appareil.</td><td>Aucun état n'est enregistré : réponses et rang se perdent entièrement à un rechargement. Aucun des états persistés ci-dessus n'existe encore.</td></tr>
+      <tr><td>Absence de traitement</td><td>Une valeur du catalogue, <code>aucun</code>.</td><td>Trois réponses liées : un booléen « traitement commencé » (vrai par défaut, jamais nul), une forme (<code>injection</code> | <code>comprime</code>) et une spécialité, les deux dernières nulles tant qu'elles ne sont pas données. Répondre « non » remet forme et spécialité à nul ; changer de forme remet la spécialité à nul.</td></tr>
+      <tr><td>Catalogue</td><td>14 entrées, dont <code>aucun</code> ; une entrée exige une attestation d'essai clinique ; chaque entrée porte paliers de dose et paramètres cinétiques.</td><td>13 entrées, aucune entrée d'absence, aucune attestation, aucune posologie ni cinétique : identifiant, nom et forme seulement. Chaque forme finit par « Autre ».</td></tr>
+      <tr><td>Modules, badges, avertissement, compte</td><td>Sept modules, quatre badges, un avertissement à accepter, un verrou de session actif.</td><td>Ni modules, ni badges, ni avertissement. Le compte existe à moitié : une adresse et un mot de passe sont recueillis dans les réponses, une seule règle les contraint — huit signes au moins —, aucun service d'authentification n'est appelé et rien n'est persisté.</td></tr>
+    </tbody>
+  </table>
+  <p>La V2 porte en revanche un état que la V1 n'a pas : le couple <strong>(réponses, rang)</strong> du questionnaire d'entrée. Neuf questions le composent, dont deux conditionnelles — le poids visé, retenu si l'objectif est de perdre ; la forme et la spécialité du traitement, retenues si le traitement est commencé.</p>
+  <table>
+    <thead><tr><th>Donnée</th><th>Type</th><th>Valeur initiale</th><th>Transitions</th></tr></thead>
+    <tbody>
+      <tr><td>Réponses</td><td>un enregistrement de champs typés</td><td>chaque champ a son défaut ; le traitement est réputé commencé, sa forme et sa spécialité nulles</td><td>un champ remplacé à la fois, sauf trois gestes liés : la langue repose les unités, « non » au traitement remet forme et spécialité à nul, changer de forme remet la spécialité à nul</td></tr>
+      <tr><td>Rang</td><td>entier ≥ 0</td><td>0</td><td><code>avancer</code> : <code>min(rangBorné + 1, retenues − 1)</code> ; <code>reculer</code> : <code>max(rangBorné − 1, 0)</code></td></tr>
+    </tbody>
+  </table>
+  <pre><code>retenues  = les étapes dont la condition est vraie pour ces réponses, dans l'ordre
+rangBorne = min(rang, retenues.length − 1)      // borné à chaque lecture, pas à l'écriture
+etape     = retenues[rangBorne]</code></pre>
+  <p>Le bornage est relu à chaque lecture : une réponse qui raccourcit la liste ramène le rang sur la dernière étape retenue au lieu de le laisser hors des bornes. Reculer n'efface aucune réponse. <strong>Deux étapes bloquent l'avancée</strong>, et non une : celle qui demande quel traitement — tant que la forme ou la spécialité manque — et la dernière, celle du compte, si un mot de passe entamé fait moins de huit signes ; un mot de passe vide ne bloque pas. L'étape qui demande <em>si</em> le traitement est commencé ne bloque jamais, sa réponse étant retenue d'avance.</p>
+</section>

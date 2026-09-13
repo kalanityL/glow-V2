@@ -1,0 +1,88 @@
+<section id="ciel">
+  <h2>15. Mon Ciel <a class="retour" href="#sommaire">↑ sommaire</a></h2>
+  <p>Ce chapitre donne les deux seuls calculs de la scène : la décomposition du compte à rebours et le choix de la citation d'une étoile. Mon Ciel n'écrit rien et ne lit qu'un champ du profil.</p>
+
+  <h3 id="ciel-entites">Entités</h3>
+  <p>Aucune entité n'est créée par Mon Ciel. Un seul champ stocké est lu, dans <code>UserProfile</code>, persisté avec le reste du profil sous la clé <code>glp1_app_companion_data</code>.</p>
+  <table>
+    <thead><tr><th>Champ</th><th>Type</th><th>Unité / format</th><th>Défaut</th><th>Écrit par</th></tr></thead>
+    <tbody>
+      <tr><td><code>countdownTargetDate</code></td><td><code>string</code> facultatif</td><td><code>AAAA-MM-JJ</code>, non validé</td><td><code>'2026-11-15'</code> dans le profil initial ; <code>|| '2026-11-15'</code> au montage</td><td>administration seulement (hors périmètre)</td></tr>
+    </tbody>
+  </table>
+  <p class="ancre">src/types.ts, src/app/useAppData.ts, src/versions/mixte/App.tsx</p>
+  <p>Tout le reste est de l'état de composant, non stocké et perdu à la sortie de l'onglet : <code>timeLeft</code> (<code>{days, hours, minutes, seconds}</code>, entiers), <code>activeStarQuote</code> (la phrase déjà composée, ou <code>null</code>), <code>showGameModal</code>, <code>showRulesModal</code>. Les 45 particules sont tirées une fois par <code>useMemo</code> sans dépendance : <code>top</code> et <code>left</code> = <code>Math.floor(Math.random() × 95)</code> en %, <code>size</code> = <code>Math.random() × 2 + 1</code> px, <code>duration</code> = <code>Math.random() × 3 + 2</code> s, <code>delay</code> = <code>Math.random() × 3</code> s.</p>
+  <p>Les positions des dix étoiles sont des constantes du module, en pourcentages du cadre, avec la taille en pixels du carré porteur :</p>
+  <table>
+    <thead><tr><th>n (index)</th><th>Or : top / left / size</th><th>Argent : top / left / size</th></tr></thead>
+    <tbody>
+      <tr><td>0</td><td>10 % / 15 % / 36</td><td>14 % / 48 % / 34</td></tr>
+      <tr><td>1</td><td>20 % / 80 % / 40</td><td>30 % / 25 % / 38</td></tr>
+      <tr><td>2</td><td>42 % / 10 % / 38</td><td>35 % / 85 % / 32</td></tr>
+      <tr><td>3</td><td>60 % / 82 % / 34</td><td>68 % / 60 % / 38</td></tr>
+      <tr><td>4</td><td>78 % / 20 % / 38</td><td>82 % / 76 % / 36</td></tr>
+    </tbody>
+  </table>
+  <p class="ancre">src/versions/mixte/components/MonCiel.tsx</p>
+  <p>La scène est montée sur l'onglet <code>'mon-ciel'</code>, dans un conteneur <code>absolute inset-0</code> qui recouvre l'entête et le pied de page. <a href="spec-fonctionnelle.html#ciel-mon-ciel">→ fonctionnelle</a></p>
+
+  <h3 id="ciel-compte-a-rebours-de-mon-ciel">Compte à rebours de Mon Ciel</h3>
+  <p>La cible est construite à partir de la chaîne <code>countdownTargetDate</code> découpée sur le tiret. Le repli codé en dur — 15 novembre 2026 à 00:00 — ne joue que si le découpage ne donne pas exactement trois segments. L'écart est borné à zéro par le bas, puis décomposé par divisions entières successives, du jour vers la seconde.</p>
+  <pre><code>parts = countdownTargetDate.split('-')
+si parts.length === 3 :
+    cible = new Date(parseInt(parts[0]), parseInt(parts[1]) - 1, parseInt(parts[2]), 0, 0, 0)   // heure locale
+sinon :
+    cible = new Date(2026, 10, 15, 0, 0, 0)
+
+diff = max(0, cible.getTime() - Date.now())          // millisecondes
+jours    = floor(diff / 86 400 000) ; diff -= jours    × 86 400 000
+heures   = floor(diff / 3 600 000)  ; diff -= heures   × 3 600 000
+minutes  = floor(diff / 60 000)     ; diff -= minutes  × 60 000
+secondes = floor(diff / 1000)
+
+affichage : String(valeur).padStart(2, '0') pour chacune des quatre cases</code></pre>
+  <p>Le calcul est lancé une fois au montage, puis par <code>setInterval</code> toutes les 1 000 ms ; chaque tick repart de <code>Date.now()</code>, donc l'affichage ne dérive pas même si les ticks glissent. L'intervalle est détruit au démontage et recréé si <code>countdownTargetDate</code> change.</p>
+  <p class="ancre">src/versions/mixte/components/MonCiel.tsx</p>
+  <details><summary>Cas limites</summary>
+    <ul>
+      <li><code>countdownTargetDate</code> absent du profil : App passe <code>'2026-11-15'</code> avant le montage ; le repli interne n'est pas atteint.</li>
+      <li>Chaîne vide : idem, remplacée par <code>'2026-11-15'</code> par le <code>||</code> de l'appelant.</li>
+      <li>Trois segments non numériques (<code>'aa-bb-cc'</code>) : <code>parseInt</code> rend <code>NaN</code>, la date est invalide, <code>getTime()</code> vaut <code>NaN</code>, <code>Math.max(0, NaN)</code> vaut <code>NaN</code>, et les quatre cases affichent <code>NaN</code>. Aucun repli.</li>
+      <li>Date impossible mais numérique : <code>'2026-13-45'</code> donne <code>new Date(2026, 12, 45)</code>, que JavaScript reporte au 14 février 2027. Aucun repli.</li>
+      <li>Séparateur autre que le tiret (<code>'2026/11/15'</code>) ou segment surnuméraire (<code>'2026-11-15-00'</code>) : <code>length ≠ 3</code>, repli sur le 15/11/2026.</li>
+      <li>Cible dépassée : <code>diff</code> est ramené à 0 et l'affichage reste figé à <code>00 : 00 : 00 : 00</code>. Rien n'est déclenché à l'échéance.</li>
+      <li>Écart de 100 jours ou plus : <code>padStart(2, '0')</code> n'ampute pas, la case Jours passe à trois chiffres.</li>
+      <li>Changement d'heure légale entre maintenant et la cible : l'écart est mesuré en millisecondes absolues, mais découpé en journées de 86 400 000 ms ; la case Heures porte alors l'heure gagnée ou perdue.</li>
+    </ul>
+  </details>
+  <div class="exemple"><p>Camille ouvre la scène le 12 septembre 2026 à 22:35:42, cible au défaut (15/11/2026 à 00:00). L'écart de calendrier local vaut 63 j 1 h 24 min 18 s. En Europe/Paris, le retour à l'heure d'hiver du 25 octobre ajoute 3 600 000 ms à l'écart absolu : <code>diff</code> = 5 451 858 000 ms, jours = floor(5 451 858 000 / 86 400 000) = 63, reste 8 658 000 ms ; heures = 2, reste 1 458 000 ms ; minutes = 24, reste 18 000 ms ; secondes = 18. Affichage <code>63 : 02 : 24 : 18</code>. La fonctionnelle annonce <code>63 : 01 : 24 : 18</code> pour la même scène : c'est l'écart de calendrier, sans le changement d'heure. <a href="spec-fonctionnelle.html#ciel-mon-ciel">→ fonctionnelle</a></p></div>
+
+  <h3 id="ciel-citations-des-etoiles">Citations des étoiles</h3>
+  <p>Sept citations en dur, dans un tableau du module. Le clic sur une étoile compose la phrase du panneau à partir de la couleur et de l'index de l'étoile dans sa couleur ; rien n'est stocké.</p>
+  <pre><code>starQuotes = [
+  0 « Chaque petit pas est une grande victoire. »
+  1 « Prenez soin de vous avec douceur et patience. »
+  2 « La persévérance transforme chaque effort en succès. »
+  3 « Écoutez votre corps, il sait ce dont il a besoin. »
+  4 « Vous êtes plus fort(e) que vous ne le pensez ! »
+  5 « La santé est un voyage, pas une destination. »
+  6 « Dormez bien, votre corps se régénère cette nuit. »
+]
+
+handleStarClick(type, index) :          // index de 0 à 4
+    q = starQuotes[(index + (type === 'gold' ? 0 : 3)) % 7]
+    activeStarQuote = `Étoile ${type === 'gold' ? 'Dorée' : 'Argentée'} #${index + 1} : « ${q} »`</code></pre>
+  <p>Table de correspondance : or 0→0, 1→1, 2→2, 3→3, 4→4 ; argent 0→3, 1→4, 2→5, 3→6, 4→0. Les sept citations sont donc toutes atteignables, et trois d'entre elles (0, 3, 4) le sont par deux étoiles.</p>
+  <p>Le dessin de l'étoile, porteur du <code>onClick</code>, est un polygone à dix sommets calculé par <code>Star3D</code> dans un <code>viewBox</code> 100 × 100 : centre (50, 50), rayon externe R = 44, rayon interne r = 18, sommet i à l'angle <code>i × π / 5 − π / 2</code> avec le rayon R si i est pair, r sinon. Dix facettes triangulaires <code>centre → sommet i → sommet i+1</code> sont peintes en alternant dégradé clair (i pair) et dégradé sombre. Survol : <code>scale 1,25</code> et rotation 12° ; appui : <code>scale 0,9</code>.</p>
+  <p class="ancre">src/versions/mixte/components/MonCiel.tsx, src/versions/mixte/components/Star3D.tsx</p>
+  <details><summary>Cas limites</summary>
+    <ul>
+      <li>Clic sur une seconde étoile alors qu'un message est ouvert : <code>activeStarQuote</code> est remplacé, le panneau ne se réempile pas.</li>
+      <li>Message étoilé et panneau du jeu ouverts ensemble : même ancrage (<code>inset-x-3 bottom-3</code>) et même plan (<code>z-40</code>) ; le message, plus bas dans le DOM, recouvre le panneau du jeu.</li>
+      <li>Règlement affiché : il est en <code>z-50</code> et sa condition d'affichage masque le panneau du jeu (<code>showGameModal &amp;&amp; !showRulesModal</code>) ; il le remplace au lieu de s'y superposer.</li>
+      <li>Les identifiants des dégradés de <code>Star3D</code> sont tirés par <code>Math.random()</code> hors <code>useMemo</code> : ils changent à chaque rendu du composant, et deux étoiles peuvent en théorie tirer le même suffixe de cinq caractères.</li>
+      <li>Sortie de la scène puis retour : les dix étoiles retrouvent leurs positions constantes, les 45 particules sont retirées au sort.</li>
+    </ul>
+  </details>
+  <div class="exemple"><p>Camille touche l'étoile d'argent d'index 0 : (0 + 3) mod 7 = 3, donc « Étoile Argentée #1 : « Écoutez votre corps, il sait ce dont il a besoin. » ». L'étoile d'or d'index 3 donne (3 + 0) mod 7 = 3, la même citation sous le libellé « Étoile Dorée #4 ». <a href="spec-fonctionnelle.html#ciel-le-message-d-une-etoile">→ fonctionnelle</a></p></div>
+</section>

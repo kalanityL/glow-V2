@@ -1,0 +1,867 @@
+<section id="poids">
+  <h2>6. Le poids <a class="retour" href="#sommaire">↑ sommaire</a></h2>
+  <p>Ce chapitre décrit la table des pesées et les calculs qui en sortent : écritures, tris, découpages en semaines, axes de graphe, IMC, moyennes, pourcentages. Poids en kilogrammes, mensurations en centimètres, dates en <code>AAAA-MM-JJ</code>, heures en <code>HH:MM</code> locales.</p>
+
+  <h3 id="poids-entites">Entités</h3>
+  <p>Une seule table : <code>AppData.weightHistory: WeightLog[]</code>, sauvegardée sous <code>glp1_app_companion_data</code>. La pesée de départ y est une ligne comme les autres, distinguée par son seul drapeau.</p>
+  <table>
+    <thead><tr><th>Champ</th><th>Type</th><th>Unité</th><th>Statut</th></tr></thead>
+    <tbody>
+      <tr><td><code>id</code></td><td>string</td><td>—</td><td>obligatoire ; <code>w-${Date.now()}</code> à l'ajout, <code>starting-weight-log</code> pour un départ créé par conversion ou par le profil</td></tr>
+      <tr><td><code>date</code></td><td>string</td><td><code>AAAA-MM-JJ</code> local</td><td>obligatoire</td></tr>
+      <tr><td><code>time</code></td><td>string</td><td><code>HH:MM</code>, minutes rondes</td><td>facultatif ; absent vaut 12:00 dans les tris et les calculs</td></tr>
+      <tr><td><code>weight</code></td><td>number</td><td>kg</td><td>obligatoire, une décimale à l'écriture</td></tr>
+      <tr><td><code>chest, waist, hips, arm, underbust, buttocks, thigh, knee, calf</code></td><td>number</td><td>cm</td><td>facultatifs ; absents valent <code>undefined</code>, jamais 0</td></tr>
+      <tr><td><code>isStartingWeight</code></td><td>boolean</td><td>—</td><td>obligatoire ; <code>true</code> sur la seule pesée de départ</td></tr>
+    </tbody>
+  </table>
+  <p>Le profil apporte <code>height</code> (cm), <code>targetWeight</code> (kg, arrondi au dixième à l'enregistrement) et <code>deleteAllButtonsEnabled</code> (booléen facultatif). Profil d'usine : taille 168, objectif 72,0. Trois champs d'un profil antérieur à la bascule — <code>startingWeight</code>, <code>startingWeightDate</code>, <code>startingMeasurements</code> — ne sont plus ni écrits ni lus, sauf par la conversion.</p>
+  <p>Rien de dérivable n'est stocké : départ, poids actuel, pertes, IMC, points d'IMC, semaine de cure, moyennes, pourcentages, semaines de Cadence et points de courbe se recalculent à chaque rendu. Les seules valeurs annexes persistées sont des préférences : <code>glp1_period_&lt;clé&gt;</code>, <code>glp1_weight_history_view</code>, <code>glp1_notified_bmi_tier_index</code>, <code>glow_ludic_usage</code>.</p>
+  <p>En V2, l'onboarding tient ses réponses dans un <code>useState</code> et n'écrit rien : <code>poids</code> et <code>poidsCible</code> sont deux chaînes distinctes à séparateur point (« 95.0 »), <code>tailleCm</code> un entier. <span class="marque v2">V2</span> <span class="marque non">non implémenté</span></p>
+  <p class="ancre">src/types.ts · src/app/useAppData.ts · GIT-APP-V2/src/screens/onboarding/reponses.ts</p>
+
+  <h3 id="poids-periodes-options-defaut-memorisation">Périodes : options, défaut, mémorisation</h3>
+  <p>Six fenêtres, dans cet ordre : <code>7days</code>, <code>14days</code>, <code>30days</code>, <code>90days</code>, <code>all</code> « Depuis le début », <code>custom</code> « Choisir ». <code>DEFAULT_PERIOD = '30days'</code>.</p>
+  <pre><code>getCutoffDateStr(w) = jour local d'aujourd'hui − (N − 1) jours    // N = 7, 14, 30, 90
+filterByTimeWindow : comparaison de CHAÎNES AAAA-MM-JJ, jamais d'instants
+  'all'    → tout
+  'custom' → date ≥ startDate (si non vide) et date ≤ endDate (si non vide)
+  bornée   → date ≥ getCutoffDateStr(w)</code></pre>
+  <p>La fenêtre est inclusive du jour en cours, d'où le <code>N − 1</code>. <code>usePeriodWindow(clé)</code> lit et écrit <code>glp1_period_&lt;clé&gt;</code>, objet <code>{ window, customRange }</code>. Trois clés pour le poids : <code>history_weight_list</code>, <code>history_weekly_loss</code>, <code>history_weight_chart</code> (partagée page / surimpression). Une valeur relue inconnue retombe sur le défaut.</p>
+  <p class="ancre">src/shared/time-window/periodOptions.ts · timeWindow.utils.ts · usePeriodWindow.ts</p>
+  <details><summary>Cas limites</summary>
+    <p>Borne <code>custom</code> vide : illimitée de son côté.</p>
+    <p><code>setWindow</code> puis <code>setCustomRange</code> dans le même rendu se perdent l'un l'autre ; <code>setCustomWindow(range)</code> écrit les deux en une fois.</p>
+    <p>La coupure de <a href="#poids-filtrage-des-semaines">Cadence</a> n'est pas celle-ci : elle part de la dernière semaine connue.</p>
+  </details>
+  <div class="exemple"><p>Le 12/09/2026, « 7 derniers jours » coupe au 06/09 : la pesée du 05/09 de Camille en sort, celle du 12/09 y reste.</p></div>
+
+  <h3 id="poids-bornes-du-au">Bornes « du … au … »</h3>
+  <p><code>PeriodBounds</code> compose la plage : en <code>custom</code>, le <code>customRange</code> tel quel ; sinon <code>{ startDate: getCutoffDateStr(w) ?? '', endDate: '' }</code>. Repli bas : la plus ancienne pesée ; repli haut : aujourd'hui.</p>
+  <pre><code>boundLabel(valeur, repli, motSiVide, motAuRepli) :
+  affichée = valeur || repli || ''
+  vide            → motSiVide     // « début » / « fin »
+  === repli       → motAuRepli    // « début » / « aujourd'hui »
+  sinon           → JJ/MM/AAAA</code></pre>
+  <p>Éditer une borne appelle <code>onCustomRangeChange</code> si la fenêtre est déjà <code>custom</code>, sinon <code>onCustomWindowChange</code>, qui bascule en <code>custom</code> avec les deux bornes affichées. La préposition suit le mot (« à aujourd'hui », « au 18/08/2026 »). Bornes effectives comparées en ISO : début &gt; fin ajoute « Choisissez une période valide » sans rien bloquer.</p>
+  <p class="ancre">src/versions/mixte/components/PeriodBounds.tsx · InlineCustomDateRange.tsx</p>
+  <details><summary>Cas limites</summary>
+    <p>Une borne choisie qui tombe sur son repli s'écrit en mot.</p>
+    <p><code>oldestEntryDate</code> se replie sur aujourd'hui quand l'historique est vide.</p>
+  </details>
+
+  <h3 id="poids-ordre-des-lignes-de-journal">Ordre des lignes de journal</h3>
+  <pre><code>orderKey(log)        = `${log.date}T${log.time || '12:00'}`
+byDateTimeAsc(a, b)  = orderKey(a).localeCompare(orderKey(b))
+byDateTimeDesc(a, b) = orderKey(b).localeCompare(orderKey(a))</code></pre>
+  <p>Le rang d'une ligne dans le tableau est son ordre de création : une ligne antidatée s'ajoute en fin de tableau. L'heure entre dans la clé parce que le tri de JavaScript est stable — trier sur la seule date laisserait deux pesées d'un même jour dans l'ordre de saisie.</p>
+  <p class="ancre">src/shared/model/logOrder.ts</p>
+  <details><summary>Cas limites</summary>
+    <p>Heure absente : 12:00 — donc après 07:30 et avant 20:10 du même jour. À clé égale, l'ordre du tableau subsiste.</p>
+  </details>
+
+  <h3 id="poids-vue-historique-par-defaut-et-memorisation">Vue historique par défaut et mémorisation</h3>
+  <pre><code>useHistoryView(clé) :
+  vue initiale = (getItem(clé) === 'journal') ? 'journal' : 'calendrier'
+  switchView(v) : setItem(clé, v)</code></pre>
+  <p>Seule la chaîne exacte <code>'journal'</code> donne la vue journal ; absente ou inconnue, c'est le calendrier. Clé de la Balance : <code>glp1_weight_history_view</code>. Les autres pages à journal emploient la même mécanique sous leur clé.</p>
+  <p class="ancre">src/versions/mixte/components/HistoryToolbar.tsx</p>
+
+  <h3 id="poids-arrondi-du-poids-a-l-ecriture">Arrondi du poids à l'écriture</h3>
+  <pre><code>roundWeight(kg) = Math.round(kg * 10) / 10</code></pre>
+  <p>Appliqué par <code>addWeighIn</code>, <code>updateWeighIn</code>, l'écriture du départ depuis le profil et l'enregistrement du poids cible. Jamais à l'affichage : une valeur enregistrée avec plus de décimales resterait affichée telle quelle.</p>
+  <p class="ancre">src/features/weight/weight.utils.ts · src/app/useAppData.ts</p>
+  <details><summary>Cas limites</summary><p>91,87 → 91,9 ; 93,44 → 93,4. La saisie du formulaire est déjà tronquée à une décimale à la frappe.</p></details>
+
+  <h3 id="poids-heure-ramenee-aux-minutes-rondes">Heure ramenée aux minutes rondes</h3>
+  <pre><code>ROUNDED_MINUTES = [0, 10, 15, 20, 30, 40, 45, 50]
+snapToRoundedMinutes("HH:MM") :
+  chaîne non conforme, ou MM > 59  → rendue telle quelle
+  sinon MM ← plus grande valeur de ROUNDED_MINUTES ≤ MM (0 à défaut)
+getRoundedLocalTimeStr(now) = snapToRoundedMinutes(heure locale)</code></pre>
+  <p>Arrondi vers le bas, pour ne jamais produire une heure future, et donc sans franchir minuit. Il porte sur la valeur enregistrée : <code>addWeighIn</code> et <code>updateWeighIn</code> l'appliquent quand une heure est fournie ; le formulaire propose l'heure locale déjà arrondie.</p>
+  <p class="ancre">src/shared/date/date.local.ts · src/features/weight/weighInWrites.ts</p>
+  <details><summary>Cas limites</summary><p>07:37 → 07:30 · 14:47 → 14:45 · 14:58 → 14:50 · 19:07 → 19:00. <code>time</code> absent : rien n'est écrit.</p></details>
+
+  <h3 id="poids-bornes-de-saisie">Bornes de saisie</h3>
+  <table>
+    <thead><tr><th>Règle</th><th>min</th><th>max</th><th>déc.</th><th>pas</th><th>vide</th><th>message</th></tr></thead>
+    <tbody>
+      <tr><td><code>RULE_WEIGHT</code></td><td>0,1</td><td>1000</td><td>1</td><td>0,1</td><td>refusé</td><td>« Un poids entre 0,1 et 1000 kg est attendu. »</td></tr>
+      <tr><td><code>RULE_MEASUREMENT</code> <span class="marque">arbitrage non validé</span></td><td>1</td><td>300</td><td>1</td><td>0,5</td><td>permis</td><td>« Une mesure entre 1 et 300 cm est attendue, ou rien. »</td></tr>
+      <tr><td><code>RULE_HEIGHT</code></td><td>50</td><td>300</td><td>0</td><td>1</td><td>refusé</td><td>« Une taille entre 50 et 300 cm est attendue. »</td></tr>
+    </tbody>
+  </table>
+  <pre><code>sanitizeNumber(saisie, règle) :
+  nettoyée = cleanNumericInput(saisie, décimales)   // , → . ; [^0-9.] retiré ;
+                                                    // un seul point ; décimales tronquées
+  '' ou '.'                → allowEmpty ? '' : null
+  non finie                → null
+  &lt; min ou &gt; max           → null
+  sinon la chaîne nettoyée, point final orphelin retiré</code></pre>
+  <p>Les décimales en trop sont tronquées, pas refusées. Dans le formulaire de pesée, le jugement a lieu au clic sur Valider ; les refus s'empilent avant le bouton, une seule phrase pour les neuf mensurations, et chacun s'efface dès que son champ est retouché.</p>
+  <p>La V2 ne juge plus : le poids se choisit dans deux roues bornées par <code>POIDS_MAX = { kg: 999, lb: 2000 }</code> — deux plafonds ronds, pas la conversion l'un de l'autre —, la première roue offrant 1…max. Plus aucune valeur incorrecte n'est atteignable, donc plus de refus à écrire. Taille : 50–300 cm, 20–118 in. <span class="marque v2">V2</span></p>
+  <p class="ancre">src/versions/mixte/app/form.rules.ts · src/shared/ui/numberRules.ts · GIT-APP-V2/src/domaine/mesures.ts</p>
+
+  <h3 id="poids-nettoyage-de-la-saisie-du-poids">Nettoyage de la saisie du poids</h3>
+  <pre><code>handleWeightInputChange(val) :
+  s = val.replace(/,/g, '.').replace(/[^\d.]/g, '')
+  plus d'un point            → le premier est gardé, les autres retirés
+  décimale de plus d'un signe → tronquée à un chiffre</code></pre>
+  <p>Appliqué à chaque frappe. La même règle vit deux fois ailleurs : <code>cleanDecimalInput</code> pour les champs du profil, <code>cleanNumericInput</code> pour les champs numériques partagés. Aucune ne borne : taper « 1 » en route vers « 168 » reste possible.</p>
+  <p class="ancre">src/versions/mixte/features/weight/WeightTracker.tsx · components/profile.fields.ts</p>
+  <details><summary>Cas limites</summary><p>« 91,87 » → « 91.8 » : troncature, pas arrondi. Le signe moins est retiré, aucun de ces champs n'accepte de négatif.</p></details>
+
+  <h3 id="poids-valeurs-par-defaut-du-formulaire-d-ajout">Valeurs par défaut du formulaire d'ajout</h3>
+  <p><code>openAddForm()</code> repose la date sur <code>getLocalDateStr()</code>, l'heure sur <code>getRoundedLocalTimeStr()</code>, vide les refus et remonte la page. <code>openAddFormAt(d)</code> fait de même puis écrit la date cliquée — l'ordre compte.</p>
+  <pre><code>charge d'un ajout : { date, time, weight, ...measurementsToLog(draft), isStartingWeight: false }
+identifiant posé par le hook : `w-${Date.now()}`</code></pre>
+  <p>Le drapeau écrit vaut toujours <code>false</code> ; <code>keepStartingOnOldest</code>, appelé en fin d'<code>addWeighIn</code>, le repose sur la pesée la plus ancienne. Sur un historique vide, la pesée créée devient donc le départ.</p>
+  <p class="ancre">src/versions/mixte/features/weight/WeightTracker.tsx · src/features/weight/weighInWrites.ts</p>
+
+  <h3 id="poids-une-seule-pesee-par-jour-a-l-ajout">Une seule pesée par jour à l'ajout</h3>
+  <pre><code>addWeighIn(history, log, id) :
+  newLog = { ...log, time: log.time ? snapToRoundedMinutes(log.time) : log.time,
+             weight: roundWeight(log.weight), id }
+  sameDay = history.find(w =&gt; w.date === log.date)
+  si sameDay :
+    ligne remplacée par { ...sameDay, ...newLog, ...keptMeasurements(sameDay, log),
+                          id: sameDay.id, isStartingWeight: sameDay.isStartingWeight }
+    → keepStartingOnOldest
+  sinon :
+    [...history, newLog] trié par date.localeCompare → keepStartingOnOldest
+
+keptMeasurements(prev, next) : pour chacune des neuf clés, next[clé] ?? prev[clé]</code></pre>
+  <p>Trois conséquences : l'identifiant survit, donc les références qui désignent la ligne ; la nature survit, donc se peser le jour du départ met à jour le départ ; les mensurations non ressaisies survivent.</p>
+  <p class="ancre">src/features/weight/weighInWrites.ts</p>
+  <details><summary>Cas limites</summary>
+    <p>Historique <code>undefined</code> : traité comme vide.</p>
+    <p>Le tri d'insertion porte sur la seule <code>date</code> ; le cas de deux lignes d'un même jour est fermé par la règle elle-même.</p>
+    <p>Le drapeau repris est corrigé aussitôt après par <code>keepStartingOnOldest</code>.</p>
+  </details>
+  <div class="exemple"><p>Camille se repèse le 12/09 à 20:10 sans le mètre : la ligne du 12/09 passe à 85,1 kg, 20:10, garde son identifiant et les mensurations du matin.</p></div>
+
+  <h3 id="poids-formulaire-sur-un-jour-occupe-confirmation-puis-remplacement">Formulaire sur un jour occupé : confirmation puis remplacement</h3>
+  <p>Un état <code>confirmingDate</code> retient la date pour laquelle le remplacement a été annoncé ; le formulaire n'écrit qu'au second clic sur cette même date.</p>
+  <pre><code>AJOUT   existingLog = history.find(w =&gt; w.date === date)
+  si existingLog et confirmingDate ≠ date :
+      message dayTakenMessage(date) ; confirmingDate ← date ; rien n'est écrit
+  sinon si existingLog :
+      onUpdateWeight({ ...existingLog, time, weight, ...mergeMeasurements(existingLog, draft) })
+  sinon onAddWeight(nouvelle ligne, isStartingWeight: false)
+
+MODIFICATION
+  1. ligne éditée = départ et une autre ligne a date &lt; nouvelle date
+        → refus startingNotOldestMessage(), confirmingDate ← null
+  2. occupant = history.find(w =&gt; w.date === date &amp;&amp; w.id ≠ éditée.id)
+     versLeDepart = occupant?.isStartingWeight === true
+  3. si occupant et confirmingDate ≠ date :
+        message versLeDepart ? startingDayTakenMessage : dayTakenMessage
+        confirmingDate ← date ; rien n'est écrit
+  4. conservée = versLeDepart ? occupant : éditée ; effacée = l'autre
+     onUpdateWeight({ ...conservée, date, time, weight, ...mesures,
+                      isStartingWeight: conservée.isStartingWeight })
+     si effacée : onDeleteWeight(effacée.id)</code></pre>
+  <p><code>dayTakenMessage(d)</code> = « Une saisie existe déjà le JJ/MM/AAAA. L'application ne prend en compte qu'une saisie par jour : celle-ci sera remplacée. » <code>startingDayTakenMessage(d)</code> = « Le poids de départ est enregistré le JJ/MM/AAAA, et ne se supprime pas. C'est lui qui prendra ce nouveau poids, et cette saisie disparaîtra de son ancienne date. » Changer la date remet <code>confirmingDate</code> à <code>null</code> : la question se repose.</p>
+  <p class="ancre">src/versions/mixte/features/weight/WeightTracker.tsx · src/features/weight/weight.utils.ts</p>
+  <details><summary>Cas limites</summary>
+    <p>Le refus « départ pas le plus ancien » passe avant la question du jour occupé.</p>
+    <p>La ligne écartée part par <code>removeLogById</code>, qui ne repose pas le drapeau : <code>updateWeighIn</code> vient de le faire.</p>
+    <p>À l'ajout, aucun cas particulier pour le départ : <code>...existingLog</code> lui garde son drapeau.</p>
+  </details>
+
+  <h3 id="poids-fusion-des-mensurations">Fusion des mensurations</h3>
+  <pre><code>measurementsToLog(draft)       : clé → draft[clé] ? parseFloat(draft[clé]) : undefined
+mergeMeasurements(prev, draft) : clé → draft[clé] ? parseFloat(draft[clé]) : prev[clé]</code></pre>
+  <p>Un champ rempli écrase, un champ vide conserve la valeur de la pesée remplacée ; le test porte sur la véracité de la chaîne, « 0 » écrase donc bien. Le formulaire choisit : <code>mergeMeasurements(occupant, draft)</code> quand une pesée est remplacée, <code>measurementsToLog(draft)</code> sinon — en modification sans remplacement, un champ vidé retire la mesure. <code>keptMeasurements</code> refait la même fusion dans <code>addWeighIn</code>. Replier la grille appelle <code>setMeasurements(emptyMeasurements())</code> : les neuf champs sont vidés.</p>
+  <p class="ancre">src/features/weight/measurements.ts · weighInWrites.ts</p>
+  <details><summary>Cas limites</summary>
+    <p><code>{waist:78, chest:95}</code> + <code>{waist:'76', hips:'99'}</code> → <code>{waist:76, chest:95, hips:99}</code>.</p>
+    <p>Un champ vide vaut <code>undefined</code>, jamais 0. La grille s'ouvre dépliée si l'une des neuf valeurs existe.</p>
+  </details>
+
+  <h3 id="poids-ordre-et-libelles-des-neuf-mensurations">Ordre et libellés des neuf mensurations</h3>
+  <p><code>MEASUREMENT_FIELDS</code>, trois par ligne : <code>chest</code> Poitrine, <code>waist</code> Taille, <code>hips</code> Hanches, <code>arm</code> Bras, <code>underbust</code> Sous-poitrine, <code>buttocks</code> Fesses, <code>thigh</code> Cuisses, <code>knee</code> Genoux, <code>calf</code> Mollets. La même liste sert au brouillon vide, à son remplissage depuis une pesée, à sa conversion en nombres et à la fusion.</p>
+  <p class="ancre">src/features/weight/measurements.ts</p>
+
+  <h3 id="poids-modification-deux-ecarts-assumes-avec-l-ajout">Modification : deux écarts assumés avec l'ajout</h3>
+  <pre><code>updateWeighIn(history, update) =
+  keepStartingOnOldest(
+    history.map(w =&gt; w.id === update.id
+      ? { ...w, ...update,
+          time: update.time ? snapToRoundedMinutes(update.time) : update.time,
+          weight: roundWeight(update.weight) }
+      : w))</code></pre>
+  <p>Deux écarts avec <code>addWeighIn</code>, d'origine et couverts par des tests : l'historique <strong>n'est pas retrié</strong> — une pesée déplacée garde son rang dans le tableau — et la règle « une seule par jour » <strong>ne s'applique pas</strong> ici. Ce sont les écrans qui refusent avant d'appeler. <span class="marque">arbitrage non validé</span></p>
+  <p class="ancre">src/features/weight/weighInWrites.ts</p>
+  <details><summary>Cas limites</summary><p>Conséquence visible du non-retri : la perte du menu « + », qui lit la dernière ligne du tableau, cesse de suivre les dates.</p></details>
+
+  <h3 id="poids-refus-le-depart-ne-peut-pas-etre-date-apres-une-autre-pesee">Refus : le départ ne peut pas être daté après une autre pesée</h3>
+  <pre><code>si ligne.isStartingWeight et history.some(w =&gt; w.id ≠ ligne.id &amp;&amp; w.date &lt; nouvelleDate)
+   → refus, message startingNotOldestMessage()</code></pre>
+  <p>Message unique : « Le poids de départ est le poids le plus ancien connu. Il ne peut pas être ultérieur à un autre poids connu. » Trois écrans l'appliquent avant d'écrire — formulaire de pesée, ligne du journal, bulle du calendrier — et les deux édités en place reposent la date par le brouillon.</p>
+  <p class="ancre">src/features/weight/weight.utils.ts · WeightTracker.tsx · InlineWeighInRow.tsx · WeightCalendar.tsx</p>
+  <details><summary>Cas limites</summary>
+    <p>Comparaison stricte sur la seule date : le même jour qu'une autre pesée n'est pas refusé ici, c'est le test de jour occupé qui prend le relais.</p>
+    <p>C'est le pendant de <code>keepStartingOnOldest</code>, qui garde l'autre sens.</p>
+  </details>
+
+  <h3 id="poids-contenu-de-la-confirmation-de-pesee">Contenu de la confirmation de pesée</h3>
+  <pre><code>computeSubmissionInfo(afterList, targetDate, type, departKg) :
+  trié = [...afterList].sort(byDateTimeAsc) ; vide → null
+  idx  = index de la première ligne de date === targetDate, sinon trié.length − 1
+  cible = trié[idx] ; avant = trié.slice(0, idx)
+  precedent = avant.length &gt; 0 ? avant[avant.length − 1].weight : departKg
+  {
+    weight: cible.weight, date: cible.date, type,
+    lossSinceLast   : precedent − cible.weight,
+    lossSinceStart  : departKg  − cible.weight,
+    isMostRecent    : idx === trié.length − 1,
+    hasPreviousLogs : avant.length &gt; 0,
+    isStartingWeight: cible.isStartingWeight === true }</code></pre>
+  <p>Tout se juge sur le journal d'après l'écriture, à la nouvelle date si l'édition a déplacé la pesée. <code>departKg</code> est le poids de la pesée à drapeau lu avant l'écriture. Une reprise donne des pertes négatives ; le rendu les tait.</p>
+  <p class="ancre">src/features/weight/submissionInfo.ts · WeightTracker.tsx</p>
+  <details><summary>Cas limites</summary>
+    <p>Déplacer 100 kg du 15/08 au 05/08 (départ 90) : <code>isMostRecent</code> faux, les deux pertes valent −10 — rien n'est fêté.</p>
+    <p>Date visée disparue : repli sur la dernière ligne. Éditer le départ pose <code>isStartingWeight: true</code>, ce qui coupe les équivalences.</p>
+  </details>
+  <div class="exemple"><p>Camille corrige le 05/09 de 85,2 à 85,0 : la ligne du 12/09 la suit, <code>isMostRecent</code> est faux, aucune équivalence.</p></div>
+
+  <h3 id="poids-conditions-d-affichage-de-la-carte-de-confirmation">Conditions d'affichage de la carte de confirmation</h3>
+  <pre><code>subBmi = taille &gt; 0 ? poids / (taille/100)² : 22
+insolite = subBmi ≥ 19 &amp;&amp; lossSinceStart &gt; 0 &amp;&amp; isMostRecent &amp;&amp; !isStartingWeight
+bloc « dernière perte enregistrée » :
+   hasPreviousLogs &amp;&amp; lossSinceLast &gt; 0
+   &amp;&amp; lossSinceLast.toFixed(1) ≠ lossSinceStart.toFixed(1)
+bloc « Depuis le début » : lossSinceStart &gt; 0</code></pre>
+  <p>Sans taille, <code>subBmi</code> vaut 22 : le seuil est franchi quand même. Les deux blocs vivent à l'intérieur d'<code>insolite</code> ; le message, lui, s'affiche toujours. Les objets dessinés sont ceux de l'assignation quand <code>Math.round(loss*10)/10 === assignedKg</code>, recalculés sinon. Le poids y est écrit <code>toFixed(1).replace('.', ',')</code> — virgule, contre le point du reste du site.</p>
+  <p class="ancre">src/versions/mixte/features/weight/WeighInSubmissionCard.tsx</p>
+
+  <h3 id="poids-journal-liste-et-suppression-totale">Journal : liste et suppression totale</h3>
+  <pre><code>effectiveWeightHistory = [...weightHistory].sort(byDateTimeAsc)
+listHistory = filterByTimeWindow(
+                [...effectiveWeightHistory].sort((a,b) =&gt; date(b) − date(a)),
+                window, log =&gt; log.date, rangeForFilter)     // clé history_weight_list
+canDeleteAll = effectiveWeightHistory.length &gt; 0
+            &amp;&amp; onClearAllWeights fourni
+            &amp;&amp; profile.deleteAllButtonsEnabled !== false</code></pre>
+  <p>Le second tri porte sur la seule date ; le tri étant stable, deux pesées d'un même jour restent dans l'ordre croissant des heures. Le compteur « Journal (n) » compte les lignes filtrées. <code>displayedEntries</code> — la liste croissante complète — dit quels jours sont pris. La poubelle ouvre une confirmation dans le journal, qui appelle <code>removeAllWeightsButStarting</code>.</p>
+  <p class="ancre">src/versions/mixte/features/weight/WeightTracker.tsx · WeighInJournal.tsx</p>
+  <details><summary>Cas limites</summary><p><code>deleteAllButtonsEnabled</code> absent vaut activé (test <code>!== false</code>). Liste filtrée vide : « Aucun historique de poids enregistré. », même si l'historique ne l'est pas.</p></details>
+
+  <h3 id="poids-edition-en-place-sur-un-jour-occupe-refus">Édition en place sur un jour occupé : refus</h3>
+  <pre><code>commit(draft, ligne) :
+  wt = parseFloat(draft.weight)
+  isNaN(wt) ou wt ≤ 0 ou draft.date vide                → rien
+  poids, date et heure inchangés                        → rien
+  ligne = départ et une autre ligne est antérieure      → refus, date reposée
+  isDayTaken(displayedEntries, draft.date, ligne.id)    → refus, date reposée
+  sinon onUpdateWeight({ ...ligne, weight: wt, date, time: draft.time || '12:00' })
+
+isDayTaken(entries, date, excludeId) = entries.some(w =&gt; w.id ≠ excludeId &amp;&amp; w.date === date)</code></pre>
+  <p>Le message est « Une saisie existe déjà le JJ/MM/AAAA. » — sans la promesse de remplacement du formulaire, la ligne refusant au lieu de remplacer. La liste testée est la liste affichée : une pesée supprimée n'occupe plus son jour ; le jour du départ compte comme pris. Le champ poids passe par <code>RULE_WEIGHT</code>, son refus s'affichant dans la même bande. La bulle du calendrier applique les deux mêmes refus.</p>
+  <p class="ancre">src/versions/mixte/features/weight/InlineWeighInRow.tsx · WeightCalendar.tsx</p>
+  <details><summary>Cas limites</summary><p>Le commit de la bulle du calendrier n'appelle pas <code>onSaveInlineSuccess</code> : aucune carte de confirmation depuis le calendrier. Heure vide : 12:00 est écrite.</p></details>
+
+  <h3 id="poids-le-poids-de-depart-ne-se-supprime-pas">Le poids de départ ne se supprime pas</h3>
+  <pre><code>removeAllWeightsButStarting(history) = history.filter(w =&gt; w.isStartingWeight)</code></pre>
+  <p>« Tout supprimer » laisse donc un journal réduit à la pesée de départ. Sur les lignes, <code>onDelete</code> vaut <code>undefined</code> quand <code>isStartingWeight</code> est vrai : l'entrée « Supprimer » du menu « ⋯ » n'est pas rendue — dans le journal, dans le tiroir Journal et dans la bulle du calendrier. Le refus est structurel, rien ne le dit après coup.</p>
+  <p class="ancre">src/shared/model/startingWeighIn.ts · InlineWeighInRow.tsx · WeightCalendar.tsx</p>
+
+  <h3 id="poids-le-poids-de-depart-est-la-pesee-la-plus-ancienne">Le poids de départ est la pesée la plus ancienne</h3>
+  <pre><code>keepStartingOnOldest(entries) :
+  entries vide → entries
+  oldest  = [...entries].sort(byDateTimeAsc)[0]
+  current = entries.find(w =&gt; w.isStartingWeight)
+  si current et (current.id === oldest.id ou current.date === oldest.date) → entries
+  sinon entries.map(w =&gt; ({ ...w, isStartingWeight: w.id === oldest.id }))</code></pre>
+  <p>Le drapeau est réécrit sur toute la liste : cela replace le départ et nettoie un historique qui en porterait deux ou zéro. Appelé à la fin d'<code>addWeighIn</code> et d'<code>updateWeighIn</code>, et là seulement : <code>removeLogById</code> et <code>setStartingWeight</code> n'y passent pas.</p>
+  <p class="ancre">src/features/weight/weighInWrites.ts</p>
+  <details><summary>Cas limites</summary>
+    <p>À date égale, le départ en place reste : le test porte aussi sur <code>current.date === oldest.date</code>.</p>
+    <p>Historique vide : rien à poser. La première pesée d'un historique vide devient le départ.</p>
+    <p>Supprimer la pesée la plus ancienne, quand ce n'est pas le départ, ne réévalue rien.</p>
+  </details>
+  <div class="exemple"><p>Camille ajoute une pesée du 27/04/2026 à 96,8 kg : antérieure au 04/05, elle prend le drapeau ; la perte totale devient 96,8 − 84,5 = 12,3 kg.</p></div>
+
+  <h3 id="poids-le-depart-se-reconnait-a-son-drapeau-jamais-a-sa-valeur">Le départ se reconnaît à son drapeau, jamais à sa valeur</h3>
+  <pre><code>findStartingWeighIn(history = []) = history.find(w =&gt; w.isStartingWeight)
+getStartingWeight(history = [], fallback = 0) = findStartingWeighIn(history)?.weight ?? fallback</code></pre>
+  <p>Ce sont les deux seules lectures du départ dans tout le code. Repasser par sa valeur, ou la dépasser, ne fait pas d'une pesée ordinaire un départ. Le repli est 0 ; <code>App.tsx</code> passe <code>INITIAL_STARTING_WEIGHT</code> (95) à trois endroits.</p>
+  <p class="ancre">src/shared/model/startingWeighIn.ts</p>
+
+  <h3 id="poids-calendrier-rangement-et-tuiles">Calendrier : rangement et tuiles</h3>
+  <pre><code>weighInsByDate(history) : Map&lt;date, WeightLog[]&gt;
+  chaque liste triée par (a.time ?? '').localeCompare(b.time ?? '')
+tuile : logs.length &gt; 1 ? `×${logs.length}` : format1Dec(logs[0].weight)
+unité « kg » écrite une seule fois, sous le nom du mois</code></pre>
+  <p>La tuile montre la première ligne du jour, la bulle les liste toutes. Le tri interne se fait sur l'heure brute : une ligne sans heure porte la chaîne vide et passe en tête — seule exception au « 12:00 par défaut ». Navigation bornée du mois de la plus ancienne clé (ou du mois courant si la carte est vide) au mois courant, chevrons et glissé partageant ces bornes. Un jour vide appelle <code>onAddAt(date)</code> ; un jour pesé ouvre sa bulle et n'offre jamais d'ajout. L'invite « Cliquez sur la date choisie pour saisir votre premier poids » est rendue tant qu'aucune ligne non-départ n'existe.</p>
+  <p class="ancre">src/features/weight/weightCalendar.ts · WeightCalendar.tsx · CalendarBlock.tsx</p>
+
+  <h3 id="poids-bilan-de-la-periode-bandeau-cadence">Bilan de la période (bandeau Cadence)</h3>
+  <pre><code>periodLossSummary(points) :
+  points vide → null
+  totalKg     = arrondi1(Σ points[i]['Perte moyenne (kg)'])
+  startWeight = points[0]['Poids moyen (kg)'] + points[0]['Perte moyenne (kg)']
+  pctOfStart  = startWeight &gt; 0 ? arrondi1(totalKg / startWeight × 100) : null
+  perWeekKg   = arrondi1(totalKg / points.length)
+
+à l'écran : fmtSigned(v) = signedKg(−v)
+début : (startingWeighInDate &amp;&amp; points[0].startDateStr === startingWeighInDate)
+          ? « depuis le début » : « entre le {points[0].weekLabel} »
+fin   : pas de borne haute personnalisée, ou égale à aujourd'hui
+          ? « aujourd'hui » : « le JJ/MM »
+mot   : perWeekKg ≥ 0 ? « Perte » : « Prise » moyenne par semaine</code></pre>
+  <p>La somme des pertes hebdomadaires se télescope en « poids au début − poids à la fin », chaque semaine portant exactement son début moins sa fin. Le poids de référence du pourcentage est celui du début de la première semaine affichée. La mention « depuis le début » remplace la borne basse, pas la haute : la phrase se lit « depuis le début et aujourd'hui ».</p>
+  <p class="ancre">src/features/weight/weight.utils.ts · WeeklyLossChart.tsx</p>
+  <div class="exemple"><p>Cinq semaines de Camille ancrées au 14/08, pertes 0,4 + 0,7 + 0,5 + 0,5 + 0,5 : total 2,6 kg, référence 87,1, pourcentage 2,98 → « -2.6 kg / -3 % » ; moyenne 0,52 → « Perte moyenne par semaine : -0.5 kg ».</p></div>
+
+  <h3 id="poids-une-pesee-par-jour-pour-les-calculs-la-derniere-du-jour">Une pesée par jour pour les calculs : la dernière du jour</h3>
+  <pre><code>lastWeighInPerDay(history) :
+  pour chaque log : si aucune retenue pour ce jour,
+      ou (log.time || '12:00') ≥ (retenue.time || '12:00')  → log devient la retenue
+  rend Object.values(parJour) trié par date croissante</code></pre>
+  <p>La dernière du jour fait foi, jamais la moyenne : deux pesées à des heures différentes ne décrivent pas le même poids. À heure égale, la comparaison <code>≥</code> retient la dernière rencontrée dans l'ordre du tableau. Employée par Cadence, par la courbe et par <code>averageWeeklyChange</code>.</p>
+  <p class="ancre">src/features/weight/weight.utils.ts</p>
+  <details><summary>Cas limites</summary><p>100 kg à 07:00 et 102 kg à 20:00 : 102 est retenu, jamais 101.</p></details>
+
+  <h3 id="poids-decoupage-en-semaines-cadence">Découpage en semaines (Cadence)</h3>
+  <pre><code>computeWeeklyLoss(history, range?) :
+  history vide → []
+  logs = lastWeighInPerDay(history)
+  firstDate = (range?.startDate ?? logs[0].date) à 12:00
+  lastDate  = (range?.endDate   ?? dernier log.date) à 12:00
+  chaque log → { day = round((sa date 12:00 − firstDate) / 86 400 000), weight }
+
+  getWeightAtDay(d) :
+    d ≤ premier jour → poids du premier log     // prolongement à plat
+    d ≥ dernier jour → poids du dernier log     // prolongement à plat
+    sinon interpolation linéaire entre les deux logs qui encadrent d
+
+  totalDays  = ceil((lastDate − firstDate) / 86 400 000)
+  totalWeeks = max(1, ceil(totalDays / 7))
+  pour w de 0 à totalWeeks − 1 :
+    'Poids moyen (kg)'   = arrondi1(getWeightAtDay(7(w+1)))
+    'Perte moyenne (kg)' = arrondi1(getWeightAtDay(7w) − getWeightAtDay(7(w+1)))
+    weekLabel = JJ/MM du premier jour ; startTimestamp / endTimestamp en ms</code></pre>
+  <p>« Poids moyen » n'est pas une moyenne : c'est le poids de fin de semaine. « Perte moyenne » est la variation sur les sept jours, positive quand on a perdu. Les jours se comptent depuis la borne basse choisie, pas depuis un lundi.</p>
+  <p class="ancre">src/features/weight/weight.utils.ts</p>
+  <details><summary>Cas limites</summary>
+    <p>100 kg le 01/08, 86 kg le 15/08 : semaine 1 poids 93, perte 7 ; semaine 2 poids 86, perte 7.</p>
+    <p>Une semaine entièrement hors des pesées hérite du prolongement à plat et affiche une perte nulle, dessinée en pointillé.</p>
+    <p><code>totalDays</code> nul ou négatif : une semaine est tout de même produite.</p>
+  </details>
+
+  <h3 id="poids-ancrage-des-semaines-sur-la-periode-page-balance">Ancrage des semaines sur la période (page Balance)</h3>
+  <pre><code>si window === 'all' → filterWeeklyLoss(computeWeeklyLoss(historique), 'all', range)
+sinon :
+  premierePesee = plus petite date de l'historique, repli aujourd'hui
+  startDate = window === 'custom' ? (customRange.startDate || premierePesee)
+                                  : (getCutoffDateStr(window) ?? aujourd'hui)
+  endDate   = (window === 'custom' &amp;&amp; customRange.endDate) || aujourd'hui
+  computeWeeklyLoss(historique, { startDate, endDate })</code></pre>
+  <p>Hors « Depuis le début », les tranches de sept jours partent de la borne basse de la période et courent jusqu'à sa borne haute : plus de semaine entamée en tête, et aucun filtrage après coup. Conséquence assumée : deux périodes ne découpent pas les mêmes semaines.</p>
+  <p class="ancre">src/versions/mixte/features/weight/WeightTracker.tsx</p>
+
+  <h3 id="poids-filtrage-des-semaines">Filtrage des semaines</h3>
+  <pre><code>filterWeeklyLoss(points, window, customRange) :
+  'all'       → points ;  points vide → []
+  'custom'    → endTimestamp ≥ (startDate à 00:00:00, sinon 0)
+             et startTimestamp ≤ (endDate à 23:59:59, sinon +∞)
+  bornée      → cutoff = max(endTimestamp) − N × 86 400 000
+                points où endTimestamp ≥ cutoff</code></pre>
+  <p>Ce chemin n'est plus emprunté que par « Depuis le début », où il ne filtre rien. La coupure des fenêtres bornées se compte depuis la dernière semaine connue, jamais depuis aujourd'hui : sinon « 30 derniers jours » ne montrerait rien à qui n'a pas pesé depuis un mois.</p>
+  <p class="ancre">src/features/weight/weight.utils.ts</p>
+
+  <h3 id="poids-axe-vertical-de-cadence">Axe vertical de Cadence</h3>
+  <pre><code>computeLossAxis(points) :
+  points vide → { ticks: [], min: 0, max: 5, gradientOffset: 1 }
+  losses = pertes hebdomadaires
+  rawMin = floor(min(...losses, 0)) − 1
+  rawMax = ceil(max(...losses, 1)) + 1
+  step   = max(1, ceil((rawMax − rawMin) / 4))
+  min    = step × floor(rawMin / step) ; max = step × ceil(rawMax / step)
+  ticks  = min, min + step, … max
+  gradientOffset = min(losses) ≥ 0 ? 1
+                 : max(losses) ≤ 0 ? 0
+                 : max(losses) / (max(losses) − min(losses))</code></pre>
+  <p>Le zéro figure toujours parmi les graduations : le pas est entier, les bornes en sont des multiples, et le <code>0</code> de <code>rawMin</code> comme le <code>1</code> de <code>rawMax</code> forcent l'axe à couvrir les deux signes — il monte donc au moins à +2. Trois à sept graduations. Une barre dont la perte vaut exactement zéro (<code>|val| &lt; 0,001</code>) est dessinée en trait pointillé de 1,5 px sur la ligne du zéro, pas en rectangle.</p>
+  <p class="ancre">src/features/weight/weight.utils.ts · WeeklyLossChart.tsx</p>
+  <details><summary>Cas limites</summary>
+    <p>Pertes [3, −1] : step 2, axe −2 à 4, ticks −2 · 0 · 2 · 4, <code>gradientOffset</code> 0,75.</p>
+    <p>La largeur de l'axe est mesurée sur les graduations de l'historique complet, pas de la fenêtre : changer de période ne décale pas le tracé.</p>
+  </details>
+  <div class="exemple"><p>Sur les 30 derniers jours de Camille, la plus forte perte vaut 0,7 : rawMin −1, rawMax 2, step 1, axe de −1 à 2.</p></div>
+
+  <h3 id="poids-fenetre-temporelle-de-la-courbe-de-poids">Fenêtre temporelle de la courbe de poids</h3>
+  <pre><code>computeChartWindow(datesPesées, datesInjections, window, customRange, now) :
+  todayMs = now à 12:00 ; dates = toutes les dates à 12:00
+  minData / maxData, replis todayMs − 30 j et todayMs
+  bornée   → { todayMs − N × 86 400 000 , todayMs }
+  'all'    → { minData − 2 × 86 400 000 , max(maxData, todayMs) }
+  'custom' → bornes à 12:00, replis minData / todayMs, remises dans l'ordre
+  défaut   → { todayMs − 30 j , todayMs }</code></pre>
+  <p>Les fenêtres bornées comptent N jours pleins en arrière — pas le <code>N − 1</code> de <code>getCutoffDateStr</code>, qui borne le journal. « Depuis le début » ajoute deux jours d'air avant la première donnée seulement ; la borne haute ne dépasse aujourd'hui que si une donnée est datée du futur, et alors sans marge.</p>
+  <p class="ancre">src/features/weight/weight.utils.ts</p>
+  <details><summary>Cas limites</summary>
+    <p>Aucune donnée : les 30 jours qui précèdent aujourd'hui.</p>
+    <p>Bornes personnalisées inversées : remises dans l'ordre par <code>min</code>/<code>max</code>, sans message.</p>
+    <p>Les dates d'injection entrent dans le calcul de « Depuis le début », même si la courbe GLP-1 n'est pas dessinée.</p>
+  </details>
+
+  <h3 id="poids-construction-de-la-courbe-de-poids">Construction de la courbe de poids</h3>
+  <pre><code>pesées = lastWeighInPerDay(historique trié)
+interpolerPoids = createMonotoneCurve(pesées → { ms: date à 12:00, poids })
+     // spline cubique monotone (Fritsch–Carlson) : passe par chaque pesée,
+     // ne dépasse jamais ses voisines, rend null hors [première, dernière]
+extendConstant = une dernière pesée existe et aucune pesée n'a de date ≥ aujourd'hui
+
+curseur = début de fenêtre posé à 12:00 ; pas de 3 h par setHours ; ≤ 4000 points
+pour chaque point :
+  isNoon = heure locale === 12
+  poidsReel     = isNoon &amp;&amp; pesée du jour ? son poids : null
+  poidsLisse    = (poidsReel null &amp;&amp; isNoon) ? interpolerPoids(ms) : null
+  poidsConstant = extendConstant &amp;&amp; isNoon &amp;&amp; les deux précédents nuls
+                  &amp;&amp; date ≥ dernière pesée &amp;&amp; date ≤ aujourd'hui
+                  ? poids de la dernière pesée : null
+  'Poids (kg)'   = poidsReel ?? arrondi2(poidsLisse) ?? poidsConstant
+  poidsInterpole = poidsReel === null &amp;&amp; 'Poids (kg)' ≠ null</code></pre>
+  <p>Seuls les points de midi portent un poids ; les sept autres du jour restent à <code>null</code>. La spline est calculée sur tout l'historique dédoublonné, jamais sur la fenêtre : une fenêtre qui coupe entre deux pesées voit la courbe traverser ses bords. Le curseur avance en heures locales, sans quoi un changement d'heure décalerait la boucle et midi ne serait plus atteint. Chaque point de midi porte aussi Poitrine, Taille et Hanches du jour ; aucun rendu lu ne les affiche.</p>
+  <p class="ancre">src/versions/mixte/features/weight/useWeightTreatmentChart.ts · weight.utils.ts</p>
+  <details><summary>Cas limites</summary>
+    <p>Une seule pesée : la spline ne rend une valeur qu'à son instant exact, <code>null</code> partout ailleurs.</p>
+    <p>Une pesée datée d'aujourd'hui ou du futur coupe le prolongement à plat.</p>
+    <p>Le compteur de sûreté arrête la boucle à 4000 points, soit 500 jours.</p>
+  </details>
+
+  <h3 id="poids-axe-des-poids-de-la-courbe">Axe des poids de la courbe</h3>
+  <pre><code>poids = valeurs 'Poids (kg)' non nulles des points AFFICHÉS
+si aucune → [tous les poids de l'historique, départ || 100]
+minW, maxW ; pad = 0.5
+pour s dans [0.5, 1, 2, 2.5, 5, 10, 20, 50] :
+  lo = max(0, floor((minW − pad) / s) × s)
+  hi = ceil((maxW + pad) / s) × s
+  si (hi − lo) / s ≤ 6 → wStep = s, wMin = lo, wMax = hi, on s'arrête
+graduations : wMin, wMin + wStep, … wMax, arrondies au dixième (3 à 7 valeurs)</code></pre>
+  <p>L'axe épouse les pesées visibles ; l'historique complet ne sert de secours que si la fenêtre n'en contient aucune. Plancher borné à 0. Si aucun pas ne tient en six intervalles, les replis restent <code>wStep 50, wMin 0, wMax 100</code>.</p>
+  <p class="ancre">src/versions/mixte/features/weight/useWeightTreatmentChart.ts</p>
+  <div class="exemple"><p>Camille, 84,5 à 87,1 kg : au pas de 0,5 il faudrait sept intervalles ; au pas de 1, lo = 84, hi = 88, quatre intervalles — axe 84 à 88 kg.</p></div>
+
+  <h3 id="poids-reperes-de-pesee-sur-la-courbe">Repères de pesée sur la courbe</h3>
+  <pre><code>selectionnerReperesPesee(timestamps triés, max = 10) :
+  length ≤ max, ou max ≤ 0        → toutes
+  max === 1                        → la plus récente
+  toutes au même instant           → les max premières
+  pas = (dernier − premier) / (max − 1) ; precedent = −1
+  pour i de 0 à max − 1 :
+    cible = premier + i × pas
+    rang  = index du timestamp le plus proche de cible,
+            cherché dans [precedent + 1, n − (max − i)]   // à égalité, le plus ancien
+    retenu ; precedent = rang</code></pre>
+  <p>La répartition se fait sur le temps, pas sur le rang : une grappe de pesées ne mange pas les repères des semaines nues. Les deux bornes garantissent exactement <code>max</code> repères distincts, rang 0 pour le premier instant et rang <code>n − 1</code> pour le dernier — première et dernière pesées gardent donc toujours leur repère. Le calcul porte sur les pesées affichées. La légende « Jour de saisie » n'est rendue que s'il reste au moins un rond.</p>
+  <p class="ancre">src/shared/charts/weighInMarkers.ts</p>
+
+  <h3 id="poids-graphe-de-poids-donnees-insuffisantes">Graphe de poids : données insuffisantes</h3>
+  <pre><code>hasEnoughData = effectiveWeightHistory.length ≥ 2    // départ compris</code></pre>
+  <p>En dessous, un encadré remplace le graphe : « Données de graphique insuffisantes », puis « Enregistrez au moins 2 saisies différentes pour générer le graphique de tendance à long terme avec le tramage de dose de GLP-1. » — mention d'un tramage que <code>MONTRER_GLP1 = false</code> a retiré.</p>
+  <p class="ancre">src/versions/mixte/features/weight/WeightTracker.tsx · WeightTreatmentChart.tsx</p>
+
+  <h3 id="poids-glp-1-masque-sur-la-courbe">GLP-1 masqué sur la courbe</h3>
+  <p>Une constante de fichier, <code>const MONTRER_GLP1 = false</code>, garde chaque élément lié au traitement : courbe de concentration ou de dose, axe des milligrammes et ses graduations, pastilles d'injection et leur légende. Aucun n'est rendu. Les données restent calculées — <code>Dose GLP1 (mg)</code>, <code>Concentration (mg)</code>, <code>injectedToday</code> dans chaque point, et <code>dMax = arrondi2(max(valeurs, 0.1) × 1,15)</code> sur quatre intervalles. <code>showRealConcentration</code> vaut <code>true</code> à demeure ; sa bascule n'a plus rien à basculer.</p>
+  <p class="ancre">src/versions/mixte/features/weight/WeightTreatmentChart.tsx · useWeightTreatmentChart.ts</p>
+
+  <h3 id="poids-semaine-de-cure">Semaine de cure</h3>
+  <pre><code>cureWeek(history, today) :
+  debut = findStartingWeighIn(history)?.date ; sans départ → null
+  weeksSinceDate(debut, today) :
+    minuitDebut      = new Date(année, mois − 1, jour).getTime()      // minuit LOCAL
+    minuitAujourdhui = new Date(today.année, today.mois, today.jour).getTime()
+    totalDays = Math.round((minuitAujourdhui − minuitDebut) / 86 400 000)
+    totalDays &lt; 0 → null
+    { weekNumber: floor(totalDays / 7) + 1, totalDays }
+
+dayCountLabel(n) = `${max(1, n)} jour(s)`</code></pre>
+  <p>Les deux dates sont ramenées à minuit local avant soustraction, et l'écart arrondi : l'heure ajoutée ou retirée par un changement d'heure est absorbée. Le jour du départ vaut 0 jour, donc semaine n° 1 et « 1 jour ».</p>
+  <p class="ancre">src/features/home/homeOverview.ts</p>
+  <div class="exemple"><p>Départ le 04/05/2026, aujourd'hui le 12/09/2026 : 131 jours, floor(131 / 7) + 1 = 19 — « Semaine n° 19 (131 jours) ».</p></div>
+
+  <h3 id="poids-moyenne-hebdomadaire-de-la-home-weeklyrate">Moyenne hebdomadaire de la home (weeklyRate)</h3>
+  <pre><code>weeklyRate = (cure &amp;&amp; cure.totalDays &gt; 0)
+             ? ((currentWeight − startingWeight) × 7) / cure.totalDays
+             : 0
+affichée seulement si cure.totalDays ≥ 7 ; écrite par signedKg</code></pre>
+  <p>Signe de la variation : négatif quand le poids descend. Le dénominateur est la durée de la cure, du jour du départ à aujourd'hui, pas l'écart entre première et dernière pesée. La formule est recopiée à l'identique dans <code>BlocSuiviPoids</code>, <code>Maison</code> et <code>MaisonSections</code>.</p>
+  <p>Une version paramétrée et testée existe à part : <code>averageWeeklyChange(history, {startDate, endDate})</code> — pesées dédoublonnées dans l'intervalle, <code>null</code> si moins de deux pesées ou si <code>daysBetween &lt; MIN_DAYS_FOR_WEEKLY_RATE (7)</code>, sinon <code>arrondi1((dernière − première) × 7 / daysBetween)</code>. Elle n'est branchée sur aucun des trois templates. <span class="marque">arbitrage non validé</span></p>
+  <p class="ancre">src/versions/mixte/components/BlocSuiviPoids.tsx · Maison.tsx · MaisonSections.tsx · src/features/weight/weight.utils.ts</p>
+  <div class="exemple"><p>Camille : (84,5 − 96) × 7 / 131 = −0,6145 → « -0.6 kg / semaine ».</p></div>
+
+  <h3 id="poids-pourcentage-du-poids-de-depart">Pourcentage du poids de départ</h3>
+  <pre><code>pctOfStart = startingWeight &gt; 0
+             ? ((currentWeight − startingWeight) / startingWeight) × 100 : 0</code></pre>
+  <p>Négatif quand le poids descend. Le carré poids écrit « +x.x% » si positif, « x.x% » sinon, par <code>format1Dec</code>, légende « poids de départ ». La surimpression le pose en pastille : signe « + » ou « − » séparé, puis <code>format1Dec(|pct|)</code> et « % ».</p>
+  <p class="ancre">src/versions/mixte/components/BlocSuiviPoids.tsx · Maison.tsx</p>
+  <div class="exemple"><p>Camille : (84,5 − 96) / 96 × 100 = −11,979 → « -12% poids de départ ».</p></div>
+
+  <h3 id="poids-etiquettes-des-arcs-du-bloc-suivi">Étiquettes des arcs du bloc suivi</h3>
+  <pre><code>garde commune : startingWeight &gt; 0 &amp;&amp; targetWeight &gt; 0, sinon null (pas d'arc)
+départ → objectif  arcDeltaKg   = targetWeight − startingWeight
+                   arcPct       = arcDeltaKg   / startingWeight × 100
+actuel → objectif  resteDeltaKg = targetWeight − currentWeight
+                   restePct     = resteDeltaKg / startingWeight × 100
+départ → actuel    parcouru     = currentWeight − startingWeight ; % = pctOfStart
+étiquette = signedKg(valeur).replace('-', '−')      // vrai signe moins U+2212</code></pre>
+  <p>Les trois pourcentages partagent la même base, le poids de départ : c'est ce qui rend l'addition vraie, les deux étiquettes du bas s'additionnant exactement en celle du haut, aux kilos comme aux pour cent. Un objectif au-dessus du départ donne un « + » et s'affiche tel quel.</p>
+  <p class="ancre">src/versions/mixte/components/BlocSuiviPoids.tsx</p>
+  <div class="exemple"><p>Camille, objectif 70 : arc haut −26 kg / −27,1 % ; parcouru −11,5 kg / −12 % ; restant −14,5 kg / −15,1 %. −11,5 + −14,5 = −26.</p></div>
+
+  <h3 id="poids-reprise-de-poids-dans-la-surimpression">Reprise de poids dans la surimpression</h3>
+  <pre><code>estEnReprise(depart, actuel) = depart &gt; 0 &amp;&amp; actuel &gt; depart
+reprise = (variante === 'surimpression') &amp;&amp; estEnReprise(départ, actuel)</code></pre>
+  <p>Strict : à poids égal, ce n'est pas une reprise ; sans départ, rien à réordonner. La bascule ne vaut qu'en surimpression : grille réordonnée en 20fr/20fr/27fr/33fr avec Actuel avant Départ, arc parcouru remonté, ligne « IMC : ±x » masquée, bande du bas rendue seulement si <code>resteDeltaKg</code> n'est pas <code>null</code>.</p>
+  <p class="ancre">src/versions/mixte/components/BlocSuiviPoids.tsx</p>
+  <details><summary>Cas limites</summary><p>(90 ; 92,4) vrai · (90 ; 90) faux · (90 ; 90,1) vrai · (0 ; 92) faux.</p></details>
+
+  <h3 id="poids-rangee-d-imc-de-la-surimpression">Rangée d'IMC de la surimpression</h3>
+  <pre><code>startBmi  = bmiOf(startingWeight, height)
+bmi       = bmiOf(currentWeight,  height)
+targetBmi = targetWeight &gt; 0 ? bmiOf(targetWeight, height) : 0   // sinon cellule vide
+bmiPoints = bmiPointsChange(startingWeight, currentWeight, height)
+rangée rendue seulement si bmiPoints ≠ null
+différentiel = « IMC : » + signedKg(bmiPoints).replace('-', '−')</code></pre>
+  <p>La condition d'existence est celle de <code>bmiPointsChange</code> : taille &gt; 0 et poids de départ &gt; 0. Jamais un tiret à la place d'une valeur absente.</p>
+  <p class="ancre">src/versions/mixte/components/BlocSuiviPoids.tsx</p>
+  <div class="exemple"><p>Camille : 34 · 29,9 · 24,8, et « IMC : −4.1 ».</p></div>
+
+  <h3 id="poids-ecriture-signee-d-une-variation">Écriture signée d'une variation</h3>
+  <pre><code>signedKg(deltaKg) :
+  arrondi = parseFloat(deltaKg.toFixed(1))
+  rend arrondi &gt; 0 ? `+${arrondi}` : `-${Math.abs(arrondi)}`
+format1Dec : au plus une décimale, sans « .0 »,
+             milliers séparés d'une espace insécable, point décimal</code></pre>
+  <p>L'argument est un écart, négatif quand le poids descend. Une valeur orientée perte (positive quand on a perdu, comme <code>totalLoss</code>) se passe niée : <code>signedKg(-totalLoss)</code>. Zéro s'écrit « -0 » : la branche <code>&gt; 0</code> est fausse, <code>Math.abs(0)</code> vaut 0.</p>
+  <p class="ancre">src/features/home/homeOverview.ts</p>
+  <details><summary>Cas limites</summary><p>−2,44 → « -2.4 » · 1,06 → « +1.1 » · 0 → « -0 » · −0,04 → « -0 ». Seuls les arcs et la rangée d'IMC remplacent ensuite le tiret ASCII par U+2212.</p></details>
+
+  <h3 id="poids-vue-d-ensemble-des-poids-home">Vue d'ensemble des poids (home)</h3>
+  <pre><code>weightOverview(weightHistory) :
+  startingWeight = getStartingWeight(weightHistory)        // 0 sans départ
+  trié           = [...weightHistory].sort(byDateTimeDesc)
+  currentWeight  = trié.length &gt; 0 ? trié[0].weight : startingWeight
+  totalLoss      = startingWeight − currentWeight          // positif = perte
+  lastLoss       = trié.length ≥ 2 ? trié[1].weight − trié[0].weight : 0
+  hasOnlyStartingWeight =
+       weightHistory.length === 0
+    || (weightHistory.length === 1 &amp;&amp; weightHistory[0].isStartingWeight === true)
+    || totalLoss ≤ 0</code></pre>
+  <p>L'ordre qui compte est celui des dates et des heures : une pesée antidatée ajoutée après coup ne devient pas le poids actuel. <code>hasOnlyStartingWeight</code> ne dit pas seulement « rien qu'un départ » — une prise depuis le début le rend vrai aussi.</p>
+  <p class="ancre">src/features/home/homeOverview.ts</p>
+  <details><summary>Cas limites</summary><p>Départ 100, puis 95, puis 92 : <code>totalLoss</code> 8, <code>lastLoss</code> 3. Sans aucune pesée : tout vaut 0. <code>lastLoss</code> compare les deux pesées les plus récentes, même si l'une est le départ.</p></details>
+
+  <h3 id="poids-imc">IMC</h3>
+  <pre><code>bmiOf(weightKg, heightCm) :
+  heightM = heightCm / 100
+  rend heightM &gt; 0 ? Math.round((weightKg / heightM²) × 10) / 10 : 0</code></pre>
+  <p>Arrondi au dixième, 0 quand la taille est inconnue — un 0 que chaque appelant traite comme « pas d'IMC », <code>getBmiTierInfo(0)</code> rendant le palier 99 « Inconnu ». Le rapport calcule le sien sans passer par cette fonction, en <code>latestWeight / (height/100)²</code> non arrondi, puis l'affiche par <code>round1</code>.</p>
+  <p class="ancre">src/features/home/homeOverview.ts</p>
+  <div class="exemple"><p>Camille : 84,5 / 1,68² = 29,938 → 29,9. Au départ : 96 / 2,8224 = 34,014 → 34.</p></div>
+
+  <h3 id="poids-categories-et-paliers-d-imc">Catégories et paliers d'IMC</h3>
+  <table>
+    <thead><tr><th>IMC</th><th><code>bmiCategoryLabel</code> (ligne IMC)</th><th><code>getBmiTierInfo</code> (bloc palier)</th></tr></thead>
+    <tbody>
+      <tr><td>≤ 0</td><td>Insuffisance pondérale</td><td>99 — Inconnu</td></tr>
+      <tr><td>&lt; 18,5</td><td>Insuffisance pondérale</td><td>0 — Insuffisance pondérale</td></tr>
+      <tr><td>18,5 à &lt; 25</td><td>Corpulence normale</td><td>1 — Corpulence normale</td></tr>
+      <tr><td>25 à &lt; 30</td><td>Surpoids</td><td>2 — Surpoids</td></tr>
+      <tr><td>30 à &lt; 35</td><td>Obésité I</td><td>3 — Obésité modérée (Classe I)</td></tr>
+      <tr><td>35 à &lt; 40</td><td>Obésité II</td><td>4 — Obésité sévère (Classe II)</td></tr>
+      <tr><td>≥ 40</td><td>Obésité III</td><td>5 — Obésité très sévère (Classe III)</td></tr>
+    </tbody>
+  </table>
+  <p>L'index décroît quand la corpulence baisse : c'est ce qui permet de comparer deux paliers par <code>&lt;</code>. Le 99 est hors échelle et doit être écarté avant toute comparaison.</p>
+  <p class="ancre">src/features/home/homeOverview.ts · src/utils/bmiHelpers.ts</p>
+
+  <h3 id="poids-clic-sur-l-imc-du-carre-poids">Clic sur l'IMC du carré poids</h3>
+  <pre><code>startTier   = getBmiTierInfo(height &gt; 0 ? startingWeight / (height/100)² : 0)  // NON arrondi
+currentTier = getBmiTierInfo(bmiOf(currentWeight, height))                    // arrondi
+handleBmiClick() :
+  currentTier.index ≥ startTier.index → rien
+  sinon ouvre le bloc { oldCategory: startTier.label, newCategory: currentTier.label,
+                        newBmi: bmi, weightKg: currentWeight,
+                        customMessage: `Vous avez franchi le cap vers ${currentTier.label}
+                                        le ${bmiTransitionDate(...)}` }</code></pre>
+  <p>Asymétrie assumée : le palier de départ se calcule sur l'IMC brut, le palier actuel sur l'IMC arrondi au dixième. Le clic est inerte tant que le palier actuel n'est pas strictement meilleur que celui du départ.</p>
+  <p class="ancre">src/versions/mixte/components/BlocSuiviPoids.tsx · Maison.tsx</p>
+
+  <h3 id="poids-affichage-des-tuiles-de-perte-homes">Affichage des tuiles de perte (homes)</h3>
+  <pre><code>isBmiLow      = bmiOf(currentWeight, height) &lt; 19
+showLastLoss  = !isBmiLow &amp;&amp; lastLoss &gt; 0 &amp;&amp; !hasOnlyStartingWeight
+showTotalLoss = !isBmiLow &amp;&amp; !hasOnlyStartingWeight &amp;&amp; totalLoss &gt; 0
+lossesEqual   = showLastLoss &amp;&amp; showTotalLoss
+                &amp;&amp; lastLoss.toFixed(1) === totalLoss.toFixed(1)</code></pre>
+  <p>Sans taille, <code>bmiOf</code> rend 0 : <code>isBmiLow</code> est vrai et aucune tuile de perte ne paraît. Sur la home standard, <code>lossesEqual</code> fait prendre à « Depuis le début » la place de la dernière perte, en haut, la seconde tuile n'étant pas rendue. Libellés déclarés une fois pour les sept endroits qui les écrivent : <code>LAST_LOSS_LABEL = 'dernière perte enregistrée'</code>, <code>TOTAL_LOSS_LABEL = 'Depuis le début'</code>. La home sections emploie les deux gardes mais pas <code>lossesEqual</code>.</p>
+  <p class="ancre">src/versions/mixte/components/Maison.tsx · homes/sections/MaisonSections.tsx</p>
+
+  <h3 id="poids-rangee-progres-candidates-et-plafond">Rangée « Progrès » : candidates et plafond</h3>
+  <pre><code>PROGRES_MAX = 4 ; PROGRES_MIN = 2
+candidates, ordre d'affichage, avec leur rang de priorité :
+  rang 1  semaine     si cure &amp;&amp; cure.totalDays ≥ 7
+  rang 2  imc         si bmiPoints ≠ null
+  rang 3  total_loss  si showTotalLoss
+  rang 4  last_loss   si showLastLoss
+gardées  = les PROGRES_MAX plus petits rangs ; la rangée s'écrit dans l'ordre d'affichage
+colonnes = min(PROGRES_MAX, max(PROGRES_MIN, nombre de tuiles))    // 2, 3 ou 4
+titre    = currentWeight ≥ startingWeight ? « Évolution » : « Progrès »</code></pre>
+  <p>La tuile « semaine » n'a pas la garde <code>showTotalLoss</code> : une prise de poids depuis le début la laisse en place, <code>signedKg</code> écrivant le « + ». Le plancher de deux colonnes est un plancher de largeur, pas de contenu.</p>
+  <p class="ancre">src/versions/mixte/homes/sections/MaisonSections.tsx</p>
+
+  <h3 id="poids-points-d-imc-gagnes-ou-perdus">Points d'IMC gagnés ou perdus</h3>
+  <pre><code>bmiPointsChange(startingWeightKg, currentWeightKg, heightCm) :
+  heightM = heightCm / 100
+  heightM ≤ 0 ou startingWeightKg ≤ 0 → null
+  ecart = (currentWeightKg − startingWeightKg) / heightM²
+  rend Math.round(ecart × 10) / 10</code></pre>
+  <p>L'arrondi porte sur la différence, pas sur deux IMC déjà arrondis : retrancher deux arrondis peut décaler d'un dixième entier. Le signe est celui de la variation — perdre donne un nombre négatif, à l'inverse de <code>totalLoss</code>. <code>null</code> ferme la tuile et la rangée d'IMC.</p>
+  <p class="ancre">src/features/home/homeOverview.ts</p>
+  <div class="exemple"><p>Camille : (84,5 − 96) / 2,8224 = −4,0745 → −4,1.</p></div>
+
+  <h3 id="poids-duree-d-une-perte-home-sections">Durée d'une perte (home sections)</h3>
+  <pre><code>lossSpanDates(weightHistory) :
+  trié      = sort(byDateTimeDesc)
+  totalFrom = findStartingWeighIn(history)?.date    // le drapeau, pas la plus ancienne
+  totalTo   = trié[0]?.date
+  lastFrom  = trié[1]?.date ; lastTo = trié[0]?.date
+
+lossSpanLabel(debut, fin) :
+  debut absent ou debut &gt; fin → null
+  jours = daysBetween(debut, fin) ; jours &lt; 1 → null
+  jours &lt; 7 → `en ${dayCountLabel(jours)}`
+  sinon semaines = max(1, round(jours / 7)) → « en N semaine(s) »</code></pre>
+  <p>Les semaines sont arrondies à l'entier le plus proche, pas tronquées. La durée d'une perte est le temps entre les deux pesées comparées, pas le temps écoulé depuis.</p>
+  <p class="ancre">src/features/home/homeOverview.ts</p>
+  <details><summary>Cas limites</summary><p>13 jours → « en 2 semaines » · 7 jours → « en 1 semaine » · 0 jour → <code>null</code>, aucune mention.</p></details>
+  <div class="exemple"><p>Camille : perte totale du 04/05 au 12/09, 131 jours → « en 19 semaines » ; dernière perte du 05/09 au 12/09, 7 jours → « en 1 semaine ».</p></div>
+
+  <h3 id="poids-progression-vers-l-objectif-barre-du-bloc-salut">Progression vers l'objectif (barre du bloc Salut)</h3>
+  <pre><code>goalProgressPercent(startingWeight, currentWeight, targetWeight) :
+  totalGoalDiff = startingWeight − targetWeight
+  si totalGoalDiff &gt; 0 :
+    min(100, max(0, ((startingWeight − currentWeight) / totalGoalDiff) × 100))
+  sinon currentWeight ≤ targetWeight ? 100 : 0</code></pre>
+  <p>Bornée 0–100 : une reprise ne descend pas sous zéro, un objectif dépassé ne monte pas au-dessus de cent. Cible égale ou supérieure au départ : la progression est binaire. Le pourcentage affiché est le <code>Math.round</code> de la valeur animée.</p>
+  <p class="ancre">src/features/home/homeOverview.ts · SalutBlock.tsx</p>
+  <div class="exemple"><p>Camille : 11,5 / 26 × 100 = 44,23 → « 44% ».</p></div>
+
+  <h3 id="poids-reste-a-perdre-bloc-salut">Reste à perdre (bloc Salut)</h3>
+  <pre><code>resteAPerdre = parseFloat((currentWeight − targetWeight).toFixed(1))
+affichage    = resteAPerdre &gt; 0 ? `-${resteAPerdre} kg` : '0 kg'
+enregistrement de l'objectif :
+  parsed = parseFloat(saisie)
+  si !isNaN(parsed) &amp;&amp; parsed &gt; 0 → onSaveProfile({ ...profile, targetWeight: parsed })
+  (le hook applique ensuite roundWeight)</code></pre>
+  <p>Une cible atteinte ou dépassée affiche « 0 kg », jamais une valeur négative. Sur ce chemin, la saisie n'est bornée que par « nombre &gt; 0 » : ni plafond ni décimales ne sont vérifiés, contrairement au champ du profil.</p>
+  <p class="ancre">src/versions/mixte/components/SalutBlock.tsx · src/app/useAppData.ts</p>
+  <div class="exemple"><p>Camille : 84,5 − 70 = 14,5 → « -14.5 kg ».</p></div>
+
+  <h3 id="poids-echelle-d-imc-de-la-surimpression">Échelle d'IMC de la surimpression</h3>
+  <pre><code>IMC_MIN = 16 ; IMC_MAX = 42
+abscisse(imc) = (min(IMC_MAX, max(IMC_MIN, imc)) − IMC_MIN) / (IMC_MAX − IMC_MIN) × largeur
+bandes : 16–18,5 · 18,5–25 · 25–30 · 30–35 · 35–40 · 40–42
+mots   : '' · '' · surpoids · obésité I · obésité II · ''
+GRADUATIONS_IMC = [18.5, 25, 30, 35, 40]
+
+imcDepart = bmiOf(startingWeight, taille)
+aUnDepart = imcDepart &gt; 0 &amp;&amp; |startingWeight − currentWeight| ≥ 0,05
+bas  = aUnDepart ? min(imc, imcDepart) : imc
+haut = aUnDepart ? max(imc, imcDepart) : imc
+caps = GRADUATIONS_IMC filtrées par (seuil &gt; bas &amp;&amp; seuil &lt; haut)
+mot  = caps.length &gt; 1 ? `${caps.length} caps franchis` : 'cap franchi'</code></pre>
+  <p>L'abscisse est bornée : un IMC de 45 se pose au bord droit. Le repère de départ n'est dessiné que si les deux poids diffèrent d'au moins 50 grammes. Sans taille (<code>imc ≤ 0</code>), l'échelle est remplacée par « L'IMC demande de connaître la taille et le poids. Renseignez votre taille dans Préférences pour voir cette échelle. » Trois bandes sur six n'ont pas de mot : insuffisance pondérale, corpulence normale, obésité III. <span class="marque">arbitrage non validé</span> La largeur des étiquettes, qui décide de leur empilement sur deux rangées, est estimée (<code>LARGEUR_CAR_8 = 4,1</code>) et non mesurée. <span class="marque">arbitrage non validé</span></p>
+  <p class="ancre">src/versions/mixte/components/SurimpressionImc.tsx</p>
+  <div class="exemple"><p>Camille : bas 29,9, haut 34 ; seul 30 est strictement compris — « cap franchi ».</p></div>
+
+  <h3 id="poids-detection-automatique-d-un-palier-d-imc-franchi">Détection automatique d'un palier d'IMC franchi</h3>
+  <pre><code>effet sur [weightHistory, profile.height] :
+  trié = sort(byDateTimeDesc)
+  depart = getStartingWeight(history, INITIAL_STARTING_WEIGHT)
+  actuel = trié[0]?.weight ?? depart
+  heightM = (profile.height || 170) / 100
+  bmi = heightM &gt; 0 ? round(actuel / heightM² × 10) / 10 : 0
+  currentTier = getBmiTierInfo(bmi)
+
+  si bmi ≥ 19 et currentTier.index ≠ 99 :
+    lastNotified = parseInt(getString('glp1_notified_bmi_tier_index')) ?? 99
+    precedent = trié.length &gt; 1 ? trié[1].weight : depart
+    prevTier  = getBmiTierInfo(round(precedent / heightM² × 10) / 10)
+    si prevTier.index ≠ 99
+       et currentTier.index &lt; prevTier.index
+       et currentTier.index &lt; lastNotified :
+         ouvre le bloc { oldCategory: prevTier.label, newCategory: currentTier.label,
+                         newBmi: bmi, weightKg: actuel }   // sans customMessage
+         setString('glp1_notified_bmi_tier_index', currentTier.index)</code></pre>
+  <p>Taille absente : 170 cm sert à cette détection seule. La garde <code>bmi ≥ 19</code> place le seuil au-dessus de 18,5 : l'ouverture automatique ne peut donc jamais produire le régime d'alerte, qui exige un IMC inférieur à 18,5 — l'alerte ne vient que du clic sur l'IMC du carré poids, qui n'a pas cette garde. Le palier notifié ne redescend jamais : repasser par un palier déjà fêté ne rouvre rien.</p>
+  <p class="ancre">src/versions/mixte/App.tsx</p>
+
+  <h3 id="poids-regime-d-alerte-du-bloc-palier">Régime d'alerte du bloc palier</h3>
+  <pre><code>isUnderweight = data.newBmi &lt; 18.5</code></pre>
+  <p>Vrai : bandeau « VIGILANCE IMC • SOUS LA NORMALE », titre « Information IMC », message « Votre IMC est inférieur à la normale (insuffisance pondérale). Veuillez en parler à votre médecin. », cadre ambre, encre fixe. Faux : « NOUVEAU PALIER IMC ATTEINT ! », titre « Félicitations ! 🏆 » — ou « Nouveau Cap Franchi ! 🏆 » si un <code>customMessage</code> est présent — et encre du thème.</p>
+  <p class="ancre">src/versions/mixte/components/BmiMilestoneBlock.tsx</p>
+
+  <h3 id="poids-date-du-cap-d-imc-franchi">Date du cap d'IMC franchi</h3>
+  <pre><code>bmiTransitionDate(weightHistory, heightCm, startingWeight, targetTierIndex) :
+  heightM = heightCm / 100 ; ≤ 0 → ''
+  startTier = getBmiTierInfo(startingWeight / heightM²)      // NON arrondi
+  pour chaque log de sort(byDateTimeAsc) :
+    tier = getBmiTierInfo(log.weight / heightM²)             // NON arrondi
+    si tier.index ≤ targetTierIndex et startTier.index &gt; targetTierIndex
+       → rend sa date en JJ/MM/AAAA
+  rend '' sinon</code></pre>
+  <p>La première pesée qui atteint le palier visé ou mieux l'emporte. Si le départ y était déjà, la boucle ne rend jamais rien. Les deux IMC sont calculés sans arrondi, contrairement au <code>currentTier</code> de l'appelant.</p>
+  <p class="ancre">src/features/home/homeOverview.ts</p>
+  <details><summary>Cas limites</summary><p>Chaîne vide sans taille, si le départ était déjà dans la catégorie visée, ou si aucune pesée n'y descend : le message affiche alors « le » sans date.</p></details>
+
+  <h3 id="poids-ordre-d-affichage-du-journal-dans-le-tiroir">Ordre d'affichage du journal dans le tiroir</h3>
+  <pre><code>rangees = [...weightHistory].sort(byDateTimeAsc)              // displayedEntries
+liste   = [...rangees].sort((a, b) =&gt; date(b) − date(a))      // date seule</code></pre>
+  <p>Le second tri porte sur la seule date et le tri est stable : deux pesées d'un même jour restent dans l'ordre croissant des heures. C'est le couple de tris de la page Balance, sans le filtre de période — le tiroir montre tout l'historique. Les lignes sont les mêmes <code>InlineWeighInRow</code> : mêmes refus, suppression réelle sans confirmation, « Modifier » renvoyant vers la page, carte de confirmation posée en portail par-dessus le tiroir.</p>
+  <p class="ancre">src/versions/mixte/components/JournalDrawer.tsx</p>
+
+  <h3 id="poids-tendance-du-poids-tiroir-tendances">Tendance du poids (tiroir Tendances)</h3>
+  <pre><code>TREND_DAYS = 14
+trendDates(days, today) : les `days` jours locaux finissant aujourd'hui, croissants
+weightTrend(weightHistory, days, today) :
+  journal = tri par date croissante ; vide → []
+  pour chaque date : jusqua = journal filtré sur log.date ≤ date
+                     rend (jusqua.length &gt; 0 ? dernier de jusqua : journal[0]).weight</code></pre>
+  <p>Un jour sans pesée garde le dernier poids connu ; avant la première pesée, la série prend la première valeur connue plutôt qu'un zéro. Le tri est sur la seule date. La carte écrit « début → fin kg » quand les deux extrémités diffèrent, la seule valeur sinon, par <code>format1Dec</code>.</p>
+  <p class="ancre">src/features/trends/trends.ts · TrendDrawer.tsx</p>
+  <details><summary>Cas limites</summary><p>Une pesée du futur n'entre jamais dans la série, la fenêtre s'arrêtant à aujourd'hui. Aucune pesée : série vide.</p></details>
+
+  <h3 id="poids-perte-affichee-dans-le-menu">Perte affichée dans le menu « + »</h3>
+  <pre><code>startingWeight = getStartingWeight(weightHistory)
+currentWeight  = weightHistory.length &gt; 0
+                 ? weightHistory[weightHistory.length − 1].weight   // DERNIÈRE LIGNE DU TABLEAU
+                 : startingWeight
+weightLost     = startingWeight − currentWeight
+affichage      = `-${parseFloat(weightLost.toFixed(1))} kg`</code></pre>
+  <p>Seul endroit du domaine à lire le rang dans le tableau plutôt que la date. Comme <code>updateWeighIn</code> ne retrie pas, une pesée modifiée peut laisser en dernière place une ligne qui n'est plus la plus récente : la carte affiche alors une perte différente de celle des homes.</p>
+  <p class="ancre">src/versions/mixte/components/PlusMenu.tsx</p>
+
+  <h3 id="poids-edition-du-profil-poids-de-depart-et-objectif">Édition du profil : poids de départ et objectif</h3>
+  <pre><code>sanitizeWeight(raw) :
+  cleaned = cleanDecimalInput(raw)      // , → . ; un seul point ; une décimale
+  n = Number(cleaned)
+  cleaned === '' ou n non fini ou n ≤ 0 ou n &gt; 1000 → null
+  sinon cleaned
+REFUSAL_WEIGHT = 'Un poids entre 0,1 et 1000 kg est attendu.'
+sanitizeHeight(raw) = entier de 50 à 300, REFUSAL_HEIGHT
+
+écritures :
+  poids de départ → onSaveStartingWeight(kg) → setStartingWeight(history, roundWeight(kg))
+  objectif, taille → onSaveProfile → targetWeight: roundWeight(...)</code></pre>
+  <p>Une valeur refusée n'est pas enregistrée : le champ revient à la valeur en base et le message s'affiche. Les trois champs se valident à la perte du focus ou sur Entrée ; le formulaire complet empile ses refus au-dessus de « Valider ». Le poids de départ n'est pas un champ du profil : l'écrire modifie la pesée à drapeau.</p>
+  <p class="ancre">src/versions/mixte/components/profile.fields.ts · ProfileSettings.tsx · src/app/useAppData.ts</p>
+  <details><summary>Cas limites</summary><p>Le plancher réel de <code>sanitizeWeight</code> est « strictement positif », pas 0,1 : « 0.05 » est accepté par la fonction alors que le message annonce 0,1.</p></details>
+
+  <h3 id="poids-poids-de-depart-saisi-depuis-le-profil">Poids de départ saisi depuis le profil</h3>
+  <pre><code>setStartingWeight(history = [], kg, now) :
+  depart = findStartingWeighIn(history)
+  si depart → history.map(w =&gt; w.id === depart.id ? { ...w, weight: kg } : w)
+  sinon :
+    nouvelle = { id: 'starting-weight-log', date: dateDeDepartParDefaut(history, now),
+                 time: '08:00', weight: kg, isStartingWeight: true }
+    [...history, nouvelle] trié par byDateTimeAsc
+
+dateDeDepartParDefaut(history, now) :
+  reference = history vide ? now : date de la plus ancienne pesée (byDateTimeAsc)
+  reference − 1 jour, en date locale</code></pre>
+  <p>Ni la date ni les mensurations de la pesée existante ne sont touchées. La date par défaut repose sur l'hypothèse que les écrans d'accueil demanderont le poids de départ mais pas sa date. <span class="marque">arbitrage non validé</span> Ce chemin ne passe pas par <code>keepStartingOnOldest</code> : le drapeau reste où il est.</p>
+  <p class="ancre">src/shared/model/startingWeighIn.ts · src/app/useAppData.ts</p>
+  <details><summary>Cas limites</summary><p>Historique vide le 10/08/2026 → départ au 09/08/2026 ; plus ancienne pesée le 20/07/2026 → départ au 19/07/2026. Le décalage passe par <code>setDate(getDate() − 1)</code> local, correct aux débuts de mois et d'année.</p></details>
+
+  <h3 id="poids-poids-de-depart-seme-a-l-installation">Poids de départ semé à l'installation</h3>
+  <pre><code>INITIAL_STARTING_WEIGHT = 95.0
+stockage vierge : weightHistory = setStartingWeight([], INITIAL_STARTING_WEIGHT)</code></pre>
+  <p>La sauvegarde neuve porte donc une seule pesée : <code>starting-weight-log</code>, hier, 08:00, 95 kg, drapeau posé, aucune mensuration. Sans elle, la perte totale, les badges et le rapport médical n'auraient aucune référence. Le profil d'usine l'accompagne : taille 168 cm, objectif 72 kg.</p>
+  <p class="ancre">src/app/useAppData.ts</p>
+  <details><summary>Cas limites</summary><p>Une sauvegarde illisible est mise à l'abri sous une clé de secours, puis le profil d'usine et cette pesée sont posés ; l'écriture est alors suspendue pour ne pas remplacer des données non relues.</p></details>
+
+  <h3 id="poids-conversion-de-l-ancien-profil-en-pesee-de-depart">Conversion de l'ancien profil en pesée de départ</h3>
+  <pre><code>ensureStartingWeighIn(data, now) :
+  drapeaux = history.map(w =&gt; ({ ...w,
+     isStartingWeight: w.isStartingWeight ?? (w.id === 'starting-weight-log') }))
+  si l'une porte le drapeau → on rend drapeaux, rien d'autre
+  ancien = data.profile as { startingWeight?, startingWeightDate?, startingMeasurements? }
+  si !ancien.startingWeight ou ≤ 0 → on rend drapeaux
+  depart = { id: 'starting-weight-log',
+             date: ancien.startingWeightDate ?? dateDeDepartParDefaut(drapeaux, now),
+             time: '08:00', weight: ancien.startingWeight,
+             ...ancien.startingMeasurements, isStartingWeight: true }
+  rend [...drapeaux, depart] trié par byDateTimeAsc</code></pre>
+  <p>Le drapeau est posé sur toutes les lignes, à <code>false</code> partout sauf sur le départ : un champ absent obligerait chaque lecture à traiter le cas. Idempotente — dès qu'une ligne porte le drapeau, elle ne touche plus à rien. C'est là que se tient l'unicité qu'un booléen n'impose pas.</p>
+  <p class="ancre">src/shared/model/startingWeighIn.ts</p>
+  <details><summary>Cas limites</summary><p>Sauvegarde neuve sans <code>startingWeight</code> : rien n'est converti. Une sauvegarde portant deux drapeaux n'est pas nettoyée ici ; <code>keepStartingOnOldest</code> la répare à la première écriture.</p></details>
+
+  <h3 id="poids-rapport-encart-et-synthese">Rapport : encart et synthèse</h3>
+  <pre><code>latestWeight = weightHistory vide ? getStartingWeight(weightHistory)
+             : dernier élément du tri par a.date.localeCompare(b.date)
+bmi          = height &gt; 0 ? latestWeight / (height/100)² : 0      // non arrondi ici
+totalLoss    = startingWeight − latestWeight
+startingDate = findStartingWeighIn(weightHistory)?.date en JJ/MM/AAAA
+
+encart d'identité :
+  'Poids de départ'    : startingDate ? `${startingWeight} kg le ${startingDate}`
+                                      : `${startingWeight} kg`
+  'Taille'             : `${height} cm`
+  'Poids actuel'       : `${latestWeight} kg`
+  'IMC actuel'         : bmi &gt; 0 ? `${round1(bmi)} kg/m²` : 'Non calculable'
+  'Objectif'           : `${targetWeight} kg`
+  'Variation totale'   : signedKg(−totalLoss)
+  'Reste à l’objectif' : `${max(0, round1(latestWeight − targetWeight))} kg`
+
+tuiles de synthèse (section poids) :
+  'Pesées'            : nombre de pesées de la période
+  'Variation période' : signedKg(dernière − première pesée de la période), '-' si null
+  `Depuis le ${startingDate}` : signedKg(−totalLoss), seulement si la pesée à drapeau existe</code></pre>
+  <p>Le poids de repère du document est le plus récent de tout l'historique, pas de la période : un bilan de sept jours doit dire où en est la patiente aujourd'hui. « Reste à l'objectif » ne descend jamais sous zéro.</p>
+  <p class="ancre">src/versions/mixte/features/report/medicalReportPdf.ts · MedicalReportExport.tsx</p>
+  <div class="exemple"><p>Camille : départ 96 kg le 04/05/2026, taille 168 cm, actuel 84.5 kg, IMC 29.9 kg/m², objectif 70 kg, variation totale « -11.5 », reste 14.5 kg.</p></div>
+
+  <h3 id="poids-rapport-pourcentage-perdu-par-semaine">Rapport : pourcentage perdu par semaine</h3>
+  <pre><code>weeklyLossPercent(weights, periodStart, periodEnd) :
+  points = computeWeeklyLoss(weights, { startDate: periodStart, endDate: periodEnd })
+  resume = periodLossSummary(points)
+  si !resume ou resume.pctOfStart === null ou points vide → null
+  rend Math.round((resume.pctOfStart / points.length) × 100) / 100</code></pre>
+  <p>Deux décimales, et le découpage de Cadence : c'est le nombre de tranches de sept jours de la période, arrondi au supérieur, qui divise — une période de 30 jours compte donc cinq semaines dont une partielle. La tuile s'écrit « ≈ x,xx % », libellée « Perdus / sem. (poids d'entrée) », et n'est poussée que si la valeur n'est pas <code>null</code>.</p>
+  <p class="ancre">src/versions/mixte/features/report/reportSummary.ts</p>
+
+  <h3 id="poids-rapport-annexe-b-et-calendrier">Rapport : annexe B et calendrier</h3>
+  <pre><code>hasMeasurements(weights) = weights.some(w =&gt;
+    w.chest || w.waist || w.hips || w.arm || w.underbust
+ || w.buttocks || w.thigh || w.knee || w.calf)
+
+faux → calendrier mensuel, weightCellLines(logs du jour) :
+         logs vide → [] ; sinon [{ value: round1(dernier log du jour) }]   // sans unité
+vrai → tableau : Date (24) | Poids (20) | Poitrine (20) | Taille (20)
+                | Hanches (20) | Autres mesures (cm) (74)
+         Poids : `${round1(w.weight)} kg`
+         Poitrine / Taille / Hanches : round1, ou '-' si absente
+         Autres mesures : « bras x, sous-poitrine x, fesses x, cuisses x,
+                           genoux x, mollets x », seules les renseignées</code></pre>
+  <p>Les neuf mesures comptent pour choisir la forme, pas seulement les trois colonnes de tête : une période où seules les cuisses ont été relevées garde son tableau. Les listes remises aux cases sont déjà triées par heure croissante, la dernière du jour étant donc en fin de liste.</p>
+  <p class="ancre">src/versions/mixte/features/report/reportCalendar.ts · medicalReportPdf.ts</p>
+  <details><summary>Cas limites</summary><p>Une mensuration valant 0 est fausse au sens de <code>||</code> : elle ne compte ni pour <code>hasMeasurements</code> ni dans « Autres mesures ». <code>measurementsToLog</code> n'en produit jamais.</p></details>
+
+  <h3 id="poids-poids-actif-a-une-date-autres-modules">Poids actif à une date (autres modules)</h3>
+  <pre><code>getWeightAtDate(dateStr, weightHistory, profile) :
+  depart = getStartingWeight(weightHistory)
+  weightHistory absent ou vide → depart || profile?.targetWeight || 80
+  trié  = [...weightHistory].sort par new Date(a.date) − new Date(b.date)
+  actif = depart || profile?.targetWeight || trié[0]?.weight || 80
+  pour chaque w de trié : si w.date ≤ dateStr → actif = w.weight ; sinon on s'arrête
+  rend actif</code></pre>
+  <p>Le dernier poids connu à la date visée ou avant. Les pas, l'activité physique et le métabolisme s'en servent : chaque séance est valorisée au poids du jour où elle a eu lieu. La chaîne de replis <code>départ → objectif → première pesée → 80 kg</code> sert de valeur initiale avant la boucle — une date antérieure à toute pesée rend donc le poids de départ, pas la première pesée.</p>
+  <p class="ancre">src/shared/body-metrics/bodyMetrics.utils.ts</p>
+  <details><summary>Cas limites</summary><p>Le tri passe par <code>new Date(a.date)</code>, qui lit la chaîne en UTC ; l'ordre relatif reste correct, toutes les dates subissant le même décalage, et la comparaison de la boucle se fait sur des chaînes. Une pesée du futur n'est jamais retenue pour une date passée.</p></details>
+</section>

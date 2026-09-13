@@ -1,0 +1,400 @@
+<section id="capacites">
+  <h2>5. Les capacités <a class="retour" href="#sommaire">↑ sommaire</a></h2>
+  <p>Ce chapitre énumère ce qu'une personne peut faire des données décrites au chapitre précédent : pour chaque verbe, ses préconditions, ce qu'il écrit, et ce qui le fait refuser. Il est rangé par domaine de relevé ; les règles d'écriture communes à tous les domaines sont posées une fois, en tête.</p>
+
+  <h3 id="capacites-ce-qu-une-capacite-engage">Ce qu'une capacité engage</h3>
+  <p>Une capacité est un verbe qui lit l'état des données, juge une saisie, et écrit ou refuse d'écrire. Elle ne rend jamais un résultat partiel : ou bien tout l'effet a lieu, ou bien rien n'est écrit et un refus est formulé. Les refus sont de quatre natures — hors bornes, journée pleine, unicité violée, cohérence temporelle violée — et aucune n'existe pour juger le corps de qui que ce soit : les bornes n'écartent que l'absurde.</p>
+  <table>
+    <tr><th>Règle d'écriture</th><th>Portée</th></tr>
+    <tr><td>Toute heure retenue est ramenée à la plus grande valeur de {0, 10, 15, 20, 30, 40, 45, 50} minutes inférieure ou égale à la minute donnée.</td><td>Toutes les capacités qui écrivent une heure, y compris les heures de rappel. La règle s'applique à la valeur <em>enregistrée</em>, pas seulement à celle qui est proposée.</td></tr>
+    <tr><td>Tout poids écrit est arrondi au dixième de kilogramme.</td><td>Pesée, poids de départ, poids visé.</td></tr>
+    <tr><td>Une date est un jour local <code>AAAA-MM-JJ</code>, une heure un <code>HH:MM</code> local. Fuseau et langue sont indépendants.</td><td>Toutes.</td></tr>
+    <tr><td>Une suppression retire la ligne de la sauvegarde. Il n'y a pas de suppression logique : rien ne subsiste marqué supprimé.</td><td>Toutes.</td></tr>
+    <tr><td>Une modification fusionne : une grandeur absente de la charge conserve sa valeur d'avant.</td><td>Tous les journaux.</td></tr>
+    <tr><td>Une valeur absente reste absente. Elle ne devient jamais zéro, ni une moyenne, ni un repli.</td><td>Mensurations, notes, distance, valeurs nutritionnelles inconnues.</td></tr>
+    <tr><td>Rien de ce que la personne consigne ne quitte l'appareil sans un geste explicite de sa part.</td><td>Toutes. Les seuls envois sont ceux du chapitre « Les retours », et le document médical, qui est remis à la personne et non transmis.</td></tr>
+  </table>
+  <p>Chaque journal borne le nombre de lignes qu'une même journée peut porter. Le plafond compte les lignes <em>réellement présentes</em> à la <em>date visée</em> — pas au jour courant : consigner trois journées de retard reste possible. Deux régimes coexistent, et c'est le seul endroit du produit où le même mot recouvre deux comportements opposés.</p>
+  <table>
+    <tr><th>Journal</th><th>Plafond par date</th><th>Au plafond</th></tr>
+    <tr><td>Prises de traitement</td><td>2</td><td>La dernière ligne de cette date est remplacée par la nouvelle, en gardant son identité.</td></tr>
+    <tr><td>Ressentis</td><td>15</td><td>Remplacement de la dernière ligne de la date.</td></tr>
+    <tr><td>Séances d'activité physique</td><td>15</td><td>Remplacement de la dernière ligne de la date.</td></tr>
+    <tr><td>Moments pour soi</td><td>15</td><td>Remplacement de la dernière ligne de la date.</td></tr>
+    <tr><td>Sommeils</td><td>15</td><td>Refus. Rien n'est écrit, rien n'est perdu.</td></tr>
+    <tr><td>Prises alimentaires</td><td>30</td><td>Refus, et le refus invite à choisir une autre date.</td></tr>
+    <tr><td>Aliments personnels créés</td><td>50</td><td>Refus.</td></tr>
+    <tr><td>Recettes créées</td><td>20</td><td>Refus. Quota indépendant du précédent.</td></tr>
+    <tr><td>Menus favoris créés</td><td>50</td><td>Refus.</td></tr>
+    <tr><td>Envois de retour</td><td>10</td><td>Refus.</td></tr>
+    <tr><td>Pesées</td><td>1</td><td>La pesée du jour est mise à jour, jamais doublée. Voir « Les pesées ».</td></tr>
+  </table>
+  <pre><code>ajouter(journal, ligne, plafond) :
+  duJour = journal filtré sur ligne.date
+  si |duJour| &lt; plafond           → ajouter ligne
+  sinon si régime = refus         → ne rien écrire, formuler le refus
+  sinon                           → remplacer la dernière ligne de duJour par ligne</code></pre>
+  <p>Quatre journaux remplacent, six refusent. L'invariant énoncé pour le produit est que rien ne détruit une donnée hors une destruction demandée et confirmée : les quatre remplacements sont l'écart à cet invariant, non la règle. <span class="marque">arbitrage non validé</span> Ce document propose de les aligner sur le refus.</p>
+  <details><summary>Cas limites</summary>
+    <p>Une suppression rend sa place au décompte du jour : le plafond ne mémorise rien, il compte.</p>
+    <p>Les quotas de création (aliments, recettes, menus) ne comptent que les entrées qui portent un instant de création ; une entrée antérieure à l'apparition de cet instant ne consomme aucun quota.</p>
+    <p>Modifier une entrée ne consomme jamais de quota de création.</p>
+    <p>Déplacer une ligne vers une autre date, c'est l'ajouter à cette date : le plafond de la date visée s'applique.</p>
+  </details>
+
+  <h3 id="capacites-le-compte-et-la-session">Le compte et la session</h3>
+  <p>Un compte identifie la personne auprès du service qui reçoit ses retours et qui, seul, peut supprimer son identité. Il ne détient aucune donnée de santé.</p>
+  <table>
+    <tr><th>Capacité</th><th>Précondition</th><th>Effet</th><th>Refus</th></tr>
+    <tr><td>Ouvrir une session</td><td>Une adresse et un secret, tous deux non vides après rognage ; ou un fournisseur d'identité tiers.</td><td>La session est mémorisée jusqu'à sa fermeture.</td><td>Adresse ou secret vide : refusé sans tentative distante. Identifiants inconnus, adresse mal formée, compte désactivé, trop de tentatives, réseau injoignable : refusés, chacun avec sa cause.</td></tr>
+    <tr><td>Ouvrir un compte <span class="marque v2">V2</span></td><td>Un prénom, une adresse, un secret. Le secret fait huit signes au moins — <em>seule</em> contrainte : ni majuscule, ni chiffre, ni signe particulier n'est imposé. Un secret vide n'empêche pas d'entrer.</td><td>Le compte est ouvert au terme du recueil initial.</td><td>Un secret commencé mais plus court que huit signes bloque l'entrée.</td></tr>
+    <tr><td>Fermer la session</td><td>Une session ouverte.</td><td>La session tombe. Aucune donnée n'est touchée.</td><td>—</td></tr>
+    <tr><td>Supprimer le compte et toutes les données</td><td>Une confirmation explicite, distincte du geste qui ouvre la capacité.</td><td>Dans cet ordre : le compte distant est supprimé, puis l'intégralité du stockage local est effacée. Le second geste ne part que si le premier a réussi.</td><td>Si la suppression distante échoue, <em>rien n'est effacé</em> et l'échec le dit. Une session trop ancienne exige d'en rouvrir une avant de recommencer.</td></tr>
+    <tr><td>Attester avoir pris connaissance de l'avertissement médical</td><td>Une attestation explicite.</td><td>Un marqueur booléen persistant est posé, une fois pour toutes.</td><td>Tant qu'il n'est pas posé, aucune autre capacité n'est atteignable.</td></tr>
+  </table>
+  <details><summary>Cas limites</summary>
+    <p>Quand aucun service d'authentification n'est configuré, le verrou ne mord pas : tout est atteignable sans session, et rien ne part.</p>
+    <p>L'effacement local emporte la session avec le reste : il n'y a pas de déconnexion à faire ensuite.</p>
+    <p>Il n'existe aucune capacité de récupérer un secret oublié, ni d'ouvrir un compte, depuis la session de connexion de la V1.</p>
+  </details>
+
+  <h3 id="capacites-qui-l-on-est">Qui l'on est</h3>
+  <p>Le profil porte ce qui ne se relève pas : l'identité, le corps de référence et l'objectif. Chacune de ces grandeurs se modifie à tout moment, indépendamment des autres.</p>
+  <table>
+    <tr><th>Grandeur</th><th>Type et bornes</th><th>Refus</th></tr>
+    <tr><td>Prénom ou pseudonyme</td><td>Texte, non vide après rognage.</td><td>Vide ou uniquement des espaces.</td></tr>
+    <tr><td>Âge</td><td>Entier, 1 à 130 ans.</td><td>Hors bornes, illisible, vide.</td></tr>
+    <tr><td>Année de naissance <span class="marque v2">V2</span></td><td>Entier. Les bornes sont celles de l'âge rapportées à l'année en cours : de <code>année − 130</code> à <code>année − 1</code>. Défaut 1980. L'année en cours est passée par l'appelant ; le domaine ne lit pas l'horloge.</td><td>Hors bornes.</td></tr>
+    <tr><td>Taille</td><td>Entier, 50 à 300 cm. Toujours stockée en centimètres ; convertie à la lecture et à la saisie selon le système d'unités (fourchette en pouces : 20 à 118).</td><td>Hors bornes.</td></tr>
+    <tr><td>Genre</td><td>Femme, homme, ou neutre.</td><td>—</td></tr>
+    <tr><td>Poids visé</td><td>Nombre strictement positif, arrondi au dixième de kilogramme.</td><td>Vide, illisible, nul ou négatif, au-delà de 1 000 kg.</td></tr>
+  </table>
+  <p>L'avatar est une composition, non un choix dans une galerie : forme du visage, teinte de peau, teinte des yeux, coiffure, teinte des cheveux, présence de lunettes, expression. <strong>Le genre est une dimension de l'avatar</strong> : il se voit, et le choisir aligne le genre du profil. Le modifier retient une coiffure de départ propre à chaque genre.</p>
+  <p>La V1 permet en outre d'attacher une photographie et de tirer un avatar au hasard. La V2 supprime les deux. <span class="marque v2">V2</span></p>
+  <details><summary>Cas limites</summary>
+    <p>Photographie (V1) : le type est jugé avant le poids ; cinq types d'image sont acceptés ; au-delà de 12 Mio le fichier est refusé sans être lu. L'image retenue est recadrée au carré centré, réduite à 256 pixels de côté au plus — jamais agrandie —, puis réencodée à qualité décroissante (0,82 ; 0,70 ; 0,55) jusqu'à tenir sous 300 Kio ; si les trois tentatives échouent, la photographie est refusée. Toute retouche de l'avatar dessiné efface la photographie.</p>
+    <p>La V1 dérive le genre du profil de celui de l'avatar : c'est le seul endroit où il se choisit.</p>
+    <p>Le système d'unités décide de l'unité de saisie et de lecture, jamais de l'unité de stockage. Le stockage est métrique sans exception (kg, cm, g, ml) et ne porte aucune étiquette d'unité. La langue apporte un système par défaut, rechoisissable aussitôt.</p>
+    <p>Le séparateur décimal de saisie suit la langue ; la forme stockée porte toujours un point.</p>
+  </details>
+  <div class="exemple"><p>Camille est née en 1978 et mesure 168 cm. En système impérial, la même taille se lit 66 pouces et se ressaisit dans cette unité ; la valeur stockée reste 168.</p></div>
+
+  <h3 id="capacites-ce-que-l-on-suit">Ce que l'on suit</h3>
+  <p>Sept domaines de relevé s'allument et s'éteignent indépendamment : l'alimentation, les pas, l'activité physique, le temps pour soi, le sommeil, le traitement, les ressentis. Deux drapeaux par domaine : <em>actif</em> et <em>masqué</em>.</p>
+  <table>
+    <tr><th>Capacité</th><th>Précondition</th><th>Effet</th></tr>
+    <tr><td>Activer ou désactiver un domaine</td><td>Aucune.</td><td>Le drapeau d'activité est inversé. Rallumer un domaine remet son drapeau de masquage à faux — un domaine actif ne peut pas être masqué.</td></tr>
+    <tr><td>Masquer un domaine</td><td>Le domaine est éteint.</td><td>Le drapeau de masquage est posé. Le domaine cesse d'être proposé nulle part.</td></tr>
+  </table>
+  <p>En l'absence de valeur enregistrée, le traitement et les ressentis sont actifs ; l'alimentation, les pas, l'activité physique, le temps pour soi et le sommeil sont éteints. <strong>Éteindre un domaine ne détruit rien</strong> : ses relevés restent, cessent d'être proposés à la saisie et sortent des décomptes transversaux. Le rallumer les y ramène tels quels.</p>
+  <details><summary>Cas limites</summary>
+    <p>V1 : viser le domaine des pas ou celui de l'activité physique l'allume automatiquement ; le sommeil, le temps pour soi, l'alimentation ne s'allument jamais d'eux-mêmes.</p>
+    <p>Un domaine sans drapeau déclaré est réputé actif.</p>
+    <p>Le document médical ne propose une rubrique que si son domaine est actif <em>et</em> porte au moins une donnée sur la période.</p>
+  </details>
+
+  <h3 id="capacites-le-traitement-declare">Le traitement déclaré</h3>
+  <p>Le profil porte l'identifiant d'un traitement, jamais son nom. Le catalogue est fermé et chaque forme s'y termine par une entrée « Autre » : la liste des spécialités bouge plus vite qu'une application, il faut pouvoir répondre quand la sienne n'y est pas. Un identifiant absent ou inconnu vaut « aucun traitement ».</p>
+  <table>
+    <tr><th>Capacité</th><th>Précondition</th><th>Effet</th><th>Refus</th></tr>
+    <tr><td>Déclarer ou changer son traitement</td><td>L'identifiant appartient au catalogue.</td><td>Le profil porte le nouvel identifiant. <strong>Les prises déjà consignées gardent le leur</strong> : changer de traitement n'en réécrit aucune.</td><td>Un identifiant hors catalogue n'est pas atteignable : le traitement se choisit, il ne se saisit pas.</td></tr>
+    <tr><td>Attester d'un essai clinique (V1)</td><td>La spécialité choisie porte le drapeau correspondant — une seule le porte.</td><td>Sans l'attestation, le choix n'est pas écrit. Elle n'est pas redemandée quand la spécialité choisie est déjà celle du profil.</td><td>Attestation absente.</td></tr>
+  </table>
+  <p>Le catalogue de la V1 porte, pour chacune des treize spécialités, une forme (injectable ou orale), une molécule, des paliers de dose et des paramètres de cinétique. <strong>Celui de la V2 ne porte que le nom et la forme</strong> — aucune posologie, aucune cinétique : l'application demande ce qu'on prend, elle ne dit pas quoi prendre. <span class="marque v2">V2</span> Le drapeau d'essai clinique n'y existe pas non plus.</p>
+  <details><summary>Cas limites</summary>
+    <p>Conversion : à la lecture d'une sauvegarde, tout libellé historique est ramené à un identifiant. Un libellé inconnu retombe sur l'entrée « Autre » de la famille qu'il évoque, et sur « aucun traitement » quand il en dit l'absence. La conversion s'applique au profil comme à chaque prise.</p>
+    <p>La forme se lit sur la fiche du catalogue, jamais sur le nom : c'est elle qui décide du mot employé pour une prise et de la zone par défaut.</p>
+    <p>Une prise sans identifiant de traitement est réputée relever du traitement du profil.</p>
+  </details>
+
+  <h3 id="capacites-les-prises-de-traitement">Les prises de traitement</h3>
+  <p>Une prise consigne le fait d'avoir pris son traitement à un instant. Elle vaut pour les deux formes : injection ou comprimé.</p>
+  <table>
+    <tr><th>Grandeur</th><th>Type</th><th>Bornes et défaut</th></tr>
+    <tr><td>Date</td><td>Jour local</td><td>Obligatoire. Proposée : aujourd'hui.</td></tr>
+    <tr><td>Heure</td><td><code>HH:MM</code> local</td><td>Obligatoire. Proposée : maintenant, ramené à la minute ronde inférieure.</td></tr>
+    <tr><td>Dose</td><td>Nombre, en milligrammes</td><td>0,001 ≤ dose ≤ 1 000 000, trois décimales au plus. Proposée : le premier palier de la spécialité.</td></tr>
+    <tr><td>Zone</td><td>Une valeur close : abdomen gauche, abdomen droit, cuisse gauche, cuisse droite, bras gauche, bras droit, voie orale</td><td>Obligatoire. « Voie orale » pour une forme orale ; sinon une zone proposée par rotation.</td></tr>
+    <tr><td>Notes</td><td>Texte facultatif</td><td>Vide après rognage vaut absente.</td></tr>
+    <tr><td>Traitement</td><td>Identifiant du catalogue</td><td>Écrit depuis le profil au moment de l'écriture — à l'ajout <em>comme</em> à la modification.</td></tr>
+  </table>
+  <p><strong>Consigner une prise.</strong> Préconditions : une date non vide, et une dose qui est un nombre fini strictement positif dans les bornes. Effet : une ligne à la date visée, sous le plafond de deux par jour. Une dose vide, illisible, nulle, négative ou hors bornes est refusée d'un seul message, effacé dès que la dose est retouchée.</p>
+  <p><strong>Se voir proposer une zone.</strong> La zone proposée est tirée au sort parmi celles qui ne sont ni la zone de la prise passée la plus proche, ni celle de la prise future la plus proche ; s'il n'en reste aucune, toutes redeviennent candidates. Retenir malgré tout la zone de la dernière prise n'est pas refusé : c'est signalé, et le signalement se tait dès qu'on change de zone. Cette capacité introduit du hasard dans une écriture : deux ouvertures successives ne proposent pas la même zone.</p>
+  <p><strong>Modifier une prise.</strong> Dose, zone, date, heure et notes. Rien n'est écrit si aucune de ces grandeurs n'a changé, ni si la dose est illisible ou négative, ni si la date est vide.</p>
+  <p><strong>Supprimer une prise</strong>, ou <strong>vider le journal des prises</strong> — ce second geste exige une confirmation explicite et ne préserve rien.</p>
+  <details><summary>Cas limites</summary>
+    <p>Une prise peut être datée dans le futur : rien ne l'interdit. Les décomptes de la cure en cours l'écartent ; la lecture du journal ne l'écarte pas.</p>
+    <p>Une prise dont l'heure manque est ordonnée comme s'il était midi.</p>
+    <p>Le plafond de deux par jour vaut par date visée ; consigner une troisième prise sur une journée déjà pleine remplace la dernière ligne de cette journée.</p>
+    <p>La V1 tient un journal des prises par personne, non par traitement : les prises d'un traitement abandonné restent, avec leur identifiant d'origine.</p>
+  </details>
+  <div class="exemple"><p>Camille, sous Ozempic, consigne 0,25 mg le 12 mai 2026. Elle valide à 8 h 37 : l'heure retenue est 08:30. Sa prise précédente était en abdomen gauche ; la zone proposée est tirée parmi cuisse gauche, cuisse droite, bras gauche et bras droit.</p></div>
+
+  <h3 id="capacites-les-pesees">Les pesées</h3>
+  <p>Une pesée porte une date, une heure, un poids en kilogrammes et, facultativement, neuf mensurations. L'une d'elles porte un drapeau : c'est la pesée de départ, référence de toute perte et de toute progression.</p>
+  <p><strong>Deux invariants gouvernent ce journal.</strong></p>
+  <pre><code>1. Au plus une pesée par jour.
+2. La pesée de départ est la plus ancienne.
+   Après CHAQUE écriture : si la ligne marquée n'est ni la plus ancienne
+   ni datée du même jour qu'elle, le drapeau est réécrit sur toute la
+   liste — vrai sur la plus ancienne, faux ailleurs.
+   Un historique sans marque, ou qui en porterait deux, se répare là.
+   À date égale, la marque en place ne change pas de main.</code></pre>
+  <table>
+    <tr><th>Capacité</th><th>Précondition</th><th>Effet</th><th>Refus</th></tr>
+    <tr><td>Enregistrer une pesée</td><td>Poids entre 0,1 et 1 000 kg, une décimale. Date non vide.</td><td>Poids arrondi au dixième, heure ramenée à la minute ronde, ligne insérée à sa place chronologique, puis les deux invariants sont rétablis.</td><td>Poids hors bornes, vide ou illisible.</td></tr>
+    <tr><td>Enregistrer une pesée sur un jour déjà pris</td><td>Une confirmation explicite, après annonce du remplacement.</td><td>La ligne du jour est <em>mise à jour</em> : elle garde son identité, son drapeau de départ, et <strong>toute mensuration que la nouvelle saisie ne renseigne pas</strong>. Se repeser le soir sans ressortir le mètre ne perd pas les mesures du matin.</td><td>Sans confirmation, rien n'est écrit.</td></tr>
+    <tr><td>Modifier une pesée</td><td>Poids dans les bornes ; date non vide ; au moins une grandeur changée.</td><td>Fusion dans la ligne visée, puis rétablissement des invariants.</td><td>Déplacer une pesée sur un jour déjà occupé est refusé, la date revenant à sa valeur d'avant. Dater la pesée de départ après une autre pesée est refusé.</td></tr>
+    <tr><td>Supprimer une pesée</td><td>La pesée n'est pas celle de départ.</td><td>Retrait franc.</td><td>La pesée de départ ne se supprime pas.</td></tr>
+    <tr><td>Vider le journal des pesées</td><td>Confirmation explicite.</td><td>Toutes les pesées sont retirées <em>sauf</em> celle de départ.</td><td>—</td></tr>
+    <tr><td>Modifier le poids de départ directement</td><td>Poids dans les bornes.</td><td>Seul le poids de la ligne marquée change. Sa date et ses mensurations ne sont jamais touchées. Si aucune ligne n'est marquée, elle est créée à la veille de la plus ancienne pesée — ou d'hier sur un historique vide — à 08:00.</td><td>Hors bornes.</td></tr>
+    <tr><td>Fixer le poids visé</td><td>Nombre strictement positif.</td><td>Le profil le porte, arrondi au dixième.</td><td>Vide, nul, négatif.</td></tr>
+  </table>
+  <p><strong>Le poids visé n'est jamais lié au poids courant.</strong> Ce sont deux grandeurs indépendantes : elles peuvent partir de la même valeur, elles ne se recopient jamais l'une dans l'autre, dans aucun sens. <span class="marque v2">V2</span></p>
+  <p><strong>Les mensurations.</strong> Neuf grandeurs facultatives en centimètres, attachées à une pesée : poitrine, taille, hanches, bras, sous-poitrine, fesses, cuisses, genoux, mollets. Chacune vaut entre 1 et 300 cm, une décimale, et le vide est permis — <em>vide n'est pas zéro</em>. Une mensuration ne s'efface qu'en la vidant explicitement sur la pesée qui la porte.</p>
+  <p>En V2, le poids ne se saisit plus librement : il se choisit dans une liste bornée à 999 kg en métrique et 2 000 lb en impérial — deux plafonds ronds, choisis chacun dans son unité, et non la conversion l'un de l'autre. <strong>Il n'y a donc plus de valeur incorrecte à refuser : il n'y en a plus d'atteignable.</strong> <span class="marque v2">V2</span></p>
+  <details><summary>Cas limites</summary>
+    <p>La pesée de départ se reconnaît à son drapeau, jamais à sa valeur : repasser par son poids de départ, ou le dépasser, ne fait d'aucune pesée un départ.</p>
+    <p>Modifier une pesée ne réordonne pas la sauvegarde ; l'ordre qui compte est celui des dates portées, jamais l'ordre d'enregistrement.</p>
+    <p>Une antidatation qui place une pesée avant le départ lui donne le départ. Le refus symétrique — dater le départ après une autre pesée — dit la même chose de l'autre côté.</p>
+    <p>Quand plusieurs pesées existent le même jour dans une sauvegarde ancienne, les calculs retiennent la plus tardive.</p>
+    <p>Sur un historique vide, la première pesée écrite devient le départ : elle est la plus ancienne puisqu'elle est la seule.</p>
+  </details>
+  <div class="exemple"><p>Camille part de 96,0 kg le 4 mai 2026. Le 20 mai, elle retrouve un relevé du 3 mai à 96,4 kg et le consigne : la pesée du 3 mai devient le poids de départ, celle du 4 mai perd le drapeau, et toutes les pertes se recomptent depuis 96,4 kg.</p></div>
+
+  <h3 id="capacites-les-prises-alimentaires">Les prises alimentaires</h3>
+  <p>Une prise alimentaire est un repas ou un en-cas : une composition d'aliments, un instant, et deux notes de faim. <strong>Ses valeurs nutritionnelles ne se saisissent pas</strong> : elles se calculent de la composition à chaque écriture.</p>
+  <table>
+    <tr><th>Grandeur</th><th>Type</th><th>Bornes et défaut</th></tr>
+    <tr><td>Date</td><td>Jour local</td><td>Obligatoire. Proposée : aujourd'hui.</td></tr>
+    <tr><td>Heure</td><td><code>HH:MM</code></td><td>Obligatoire, ramenée à la minute ronde inférieure.</td></tr>
+    <tr><td>Famille</td><td>Repas ou en-cas</td><td>Obligatoire. Les six valeurs historiques (petit-déjeuner, déjeuner, dîner, en-cas…) retombent sur ces deux familles.</td></tr>
+    <tr><td>Composition</td><td>Liste ordonnée de couples { référence d'aliment, quantité }</td><td>Au moins un couple. Quantité en grammes pour un solide, millilitres pour un liquide ; 1 ≤ q ≤ 10 000, une décimale ; proposée à 100.</td></tr>
+    <tr><td>Faim avant</td><td>Entier 0 à 5</td><td>Proposée à 2.</td></tr>
+    <tr><td>Faim après</td><td>Entier 0 à 5</td><td>Proposée à 0.</td></tr>
+    <tr><td>Énergie, protéines, glucides, lipides, fibres</td><td>Cinq nombres</td><td>Calculés, jamais saisis. Les fibres vont toujours avec les quatre autres : elles ne sont jamais omises.</td></tr>
+  </table>
+  <pre><code>apport(quantité) = valeur_pour_100 × quantité / 100
+apport(composition) = Σ apport(quantité) sur les lignes qui se résolvent
+  — une ligne dont l'aliment n'existe plus est IGNORÉE, pas comptée à zéro.</code></pre>
+  <p><strong>Consigner une prise.</strong> Préconditions : au moins une ligne de composition, et chaque ligne référence un aliment existant — du catalogue ou de la bibliothèque personnelle. Un nom saisi sans référence choisie est refusé nommément. Une composition vide est refusée. Le plafond de trente par date visée refuse aussi, sans rien écraser.</p>
+  <p><strong>Modifier une prise.</strong> Composition, famille, date, heure, faim. Les cinq valeurs sont recalculées, l'heure re-arrondie. Déplacer une prise vers une date déjà pleine est refusé et la prise reste à sa date d'origine.</p>
+  <p><strong>Retirer une ligne de composition.</strong> Retirer la dernière supprime la prise : une prise porte toujours au moins un aliment.</p>
+  <p><strong>Supprimer une prise</strong>, ou <strong>vider le journal</strong> après confirmation explicite.</p>
+  <details><summary>Cas limites</summary>
+    <p>Une prise alimentaire est en-cas ou repas ; il n'y a pas de troisième famille, et un type inconnu vaut en-cas.</p>
+    <p>Les cinq valeurs restent inscrites sur la prise bien qu'elles soient dérivables de sa composition : c'est un reste de conversion, contraire à la règle « rien de dérivable n'est stocké ». Le recalcul systématique à l'écriture empêche les deux de diverger.</p>
+    <p>Une sauvegarde antérieure à la conversion — une prise sans composition — est écartée au chargement : elle n'est ni réparable ni comptable.</p>
+    <p>Une prise dont la faim manque reçoit deux valeurs déduites de manière déterministe, pour que la même sauvegarde donne toujours le même résultat.</p>
+  </details>
+  <div class="exemple"><p>Camille consigne 60 g de pain complet et 250 ml de lait à 8 h 12 le 12 mai. L'heure retenue est 08:10. Les cinq valeurs sont calculées ; si l'aliment personnel « lait de mon fromager » est supprimé plus tard, la ligne cesse de compter — elle n'est pas comptée à zéro.</p></div>
+
+  <h3 id="capacites-la-bibliotheque-d-aliments-et-les-menus">La bibliothèque d'aliments et les menus</h3>
+  <p>Trois référentiels servent à composer une prise : un catalogue fermé d'aliments de référence, une bibliothèque personnelle, et une collection de menus favoris. Le catalogue ne se modifie ni ne se supprime.</p>
+  <table>
+    <tr><th>Capacité</th><th>Précondition</th><th>Effet</th><th>Refus</th></tr>
+    <tr><td>Créer un aliment personnel</td><td>Nom non vide et unique après normalisation — rognage, casse et accents ignorés — contre le catalogue <em>et</em> la bibliothèque personnelle. Cinq valeurs pour 100 g ou 100 ml, chacune entre 0 et 10 000, une décimale, le vide permis. Une nature : solide ou liquide.</td><td>Une entrée nouvelle, portant son instant de création. Une valeur laissée vide vaut zéro à l'écriture — zéro est une réponse juste : l'eau n'a pas de calories.</td><td>Nom vide, nom déjà pris, valeur hors bornes. Cinquantième création du jour dépassée : refus.</td></tr>
+    <tr><td>Modifier un aliment personnel</td><td>Mêmes règles, l'entrée modifiée exclue du contrôle d'unicité.</td><td>L'instant de création est conservé.</td><td>Aucun quota consommé.</td></tr>
+    <tr><td>Supprimer un aliment personnel</td><td>Aucune recette ne l'emploie comme ingrédient.</td><td>Retrait franc. Les prises qui le référençaient cessent de le compter.</td><td>Refusé s'il est ingrédient : le refus nomme les recettes concernées.</td></tr>
+    <tr><td>Créer ou modifier une recette</td><td>Nom unique (même règle), au moins un ingrédient, tous référencés.</td><td>Une recette est un aliment personnel qui porte sa composition. Ses valeurs pour 100 g sont calculées puis arrondies à l'entier.</td><td>Vingtième création du jour dépassée : refus. Quota indépendant de celui des aliments.</td></tr>
+    <tr><td>Retrouver un aliment par son code-barres</td><td>Un code non vide.</td><td>Trois recherches, dans l'ordre : la bibliothèque personnelle — l'entrée s'ouvre en modification ; puis le catalogue ; puis un service distant. Ce qui revient préremplit une création.</td><td>Code vide. Service injoignable, service en défaut, réponse illisible : chacun a sa cause, et la saisie à la main reste ouverte.</td></tr>
+    <tr><td>Créer un menu favori</td><td>Un titre non vide et unique après normalisation ; une composition.</td><td>Une entrée portant titre, famille et composition — <em>ni date, ni heure, ni faim</em>. Les lignes sont recopiées avec de nouvelles identités.</td><td>Titre vide ou déjà pris ; cinquantième création du jour dépassée.</td></tr>
+    <tr><td>Reprendre un menu favori</td><td>—</td><td>Sa composition et sa famille sont <em>copiées</em> dans une prise en cours. Aucun lien n'est créé : modifier le menu plus tard ne touche à aucune prise.</td><td>—</td></tr>
+  </table>
+  <pre><code>valeurs_pour_100(recette) :
+  masse = Σ quantités des ingrédients
+  si masse ≤ 0 → les cinq valeurs valent 0
+  sinon        → valeur = apport_total × 100 / masse, arrondi à l'entier</code></pre>
+  <p>Une prise dont la composition est <em>identique</em> à celle d'un menu — même longueur, mêmes références aux mêmes rangs, mêmes quantités, l'ordre compris — est reconnue comme relevant de ce menu. La famille n'entre pas dans la comparaison.</p>
+  <p>La lecture d'un code-barres par l'appareil photo n'existe pas : le code se saisit. <span class="marque non">non implémenté</span> Un vrai lecteur, avec la saisie à la main en repli et chaque échec journalisé anonymement, est décidé pour la conversion en application native.</p>
+  <details><summary>Cas limites</summary>
+    <p>Une valeur venue du service distant n'est retenue que si elle est un nombre fini, positif ou nul, et sous sa borne de vraisemblance (900 kcal, 100 g pour 100 g). Sinon elle est <em>laissée absente</em>, jamais rabattue sur la borne. Une fiche sans nom ni aucune valeur est traitée comme inconnue et n'ouvre qu'une création vierge nommée d'après le code.</p>
+    <p>Le nom d'un aliment personnel se compte pour l'unicité même quand l'entrée est une recette : les deux natures partagent l'espace des noms.</p>
+    <p>Une recette antérieure à la conversion — dont les ingrédients étaient du texte — se rouvre avec une composition vide.</p>
+    <p>Chaque aliment retenu dans une écriture incrémente un compteur d'usage attaché à son libellé officiel. Ce compteur ne sert qu'à ordonner les propositions ; il n'entre dans aucun calcul nutritionnel.</p>
+  </details>
+
+  <h3 id="capacites-les-ressentis">Les ressentis</h3>
+  <p>Un ressenti déclare un effet indésirable à un instant, avec son intensité. Rien n'y est interprété : l'application enregistre ce que la personne dit, et ne produit aucun avis.</p>
+  <table>
+    <tr><th>Grandeur</th><th>Type</th><th>Bornes et défaut</th></tr>
+    <tr><td>Type</td><td>Une valeur de la liste de référence restreinte</td><td>Obligatoire, non vide.</td></tr>
+    <tr><td>Intensité</td><td>Entier</td><td>0 à 5. Proposée à 0.</td></tr>
+    <tr><td>Date, heure</td><td>Jour local, <code>HH:MM</code></td><td>Obligatoires. Proposées : maintenant, minute ronde inférieure.</td></tr>
+    <tr><td>Note</td><td>Texte facultatif</td><td>280 signes au plus. Vide après rognage vaut absente ; le texte lui-même n'est pas rogné.</td></tr>
+  </table>
+  <p><strong>Déclarer un ressenti.</strong> Rien n'est écrit si le type est vide, ou si la date ou l'heure manque. Effet : une ligne à la date visée, sous un plafond de quinze par jour — au-delà, la dernière ligne de la journée est remplacée.</p>
+  <p><strong>Modifier un ressenti</strong> : type, intensité, date, heure, note. Rien n'est écrit si aucune grandeur n'a changé. <strong>Supprimer un ressenti.</strong> <strong>Vider le journal</strong>, après confirmation explicite.</p>
+  <details><summary>Cas limites</summary>
+    <p>Selon le chemin de modification, l'intensité acceptée va de 1 à 5 ou de 0 à 5. La liste de référence, elle, va de 0 à 5. Cet écart est un défaut du code, non une règle.</p>
+    <p>Un ressenti dont le type ne fait plus partie de la liste active reste lisible et modifiable : le type est réintroduit dans le choix tant qu'il est celui de la ligne travaillée.</p>
+    <p>Comme pour les prises, l'ordre qui compte est celui des dates et heures portées ; une heure absente est lue comme midi.</p>
+  </details>
+
+  <h3 id="capacites-l-activite-physique">L'activité physique</h3>
+  <p>Une séance porte une activité, une durée, une intensité ressentie et, pour certaines activités, une distance. La distance et l'intensité ne comptent jamais ensemble.</p>
+  <table>
+    <tr><th>Grandeur</th><th>Type</th><th>Bornes et défaut</th></tr>
+    <tr><td>Activité</td><td>Une valeur de la liste de référence restreinte</td><td>Obligatoire. Chaque activité porte un coût métabolique de référence.</td></tr>
+    <tr><td>Durée</td><td>Entier, en minutes</td><td>1 à 480. Proposée à 30.</td></tr>
+    <tr><td>Étages</td><td>Entier</td><td>1 à 480, <em>à la place</em> de la durée pour la montée d'escaliers — la seule activité dont l'effort ne se compte pas en minutes. Proposé à 5.</td></tr>
+    <tr><td>Intensité</td><td>Douce, modérée ou intensive</td><td>Proposée à douce.</td></tr>
+    <tr><td>Distance</td><td>Nombre, canonique en mètres</td><td>Facultative, offerte aux seules huit activités où elle a un sens. Saisie en kilomètres (0,1 à 1 000) ou en mètres (10 à 100 000) selon l'activité ; convertie et arrondie au mètre ; sous un mètre, absente.</td></tr>
+    <tr><td>Date, heure</td><td>Jour local, <code>HH:MM</code></td><td>Obligatoires, heure ramenée à la minute ronde.</td></tr>
+  </table>
+  <p><strong>Consigner une séance.</strong> Préconditions : une durée entière strictement positive dans les bornes ; une distance, si elle est saisie, dans les bornes de son unité. Une durée hors bornes et une distance hors bornes sont refusées, chacune avec sa cause, et les refus s'effacent dès que la grandeur fautive est retouchée. Changer d'activité efface les deux refus, remet la durée à sa proposition et vide la distance. Plafond : quinze par date, avec remplacement.</p>
+  <p><strong>Invariant.</strong> Une distance renseignée écarte l'intensité du calcul de la dépense — l'effort se lit alors sur l'allure. Effacer la distance ramène l'intensité à « douce ». Une distance ne s'ajoute pas depuis la ligne du journal : elle s'y modifie seulement.</p>
+  <p><strong>Modifier</strong>, <strong>supprimer</strong> une séance, <strong>vider le journal</strong> après confirmation.</p>
+  <details><summary>Cas limites</summary>
+    <p>Si l'activité change dans le même geste qu'une modification, la distance est conservée quand la nouvelle activité l'accepte, supprimée sinon.</p>
+    <p>Une durée non entière ou nulle n'écrit rien, en silence, sans refus formulé.</p>
+    <p>Une activité hors du catalogue reçoit un coût métabolique de repli ; le catalogue n'est pas extensible par la personne.</p>
+    <p>Après une séance <em>nouvelle</em> — jamais après une modification —, une phrase d'encouragement est tirée parmi huit, sans répéter la précédente.</p>
+  </details>
+
+  <h3 id="capacites-le-sommeil">Le sommeil</h3>
+  <p>Un sommeil est une <em>plage</em> : deux instants complets, jour et heure d'endormissement, jour et heure de réveil. La date de la ligne est celle du réveil. <strong>La durée n'est jamais stockée</strong> — les deux instants sont la source de vérité, et une durée écrite à côté d'eux finirait par les contredire.</p>
+  <pre><code>durée = instant(réveil) − instant(endormissement)  si réveil &gt; endormissement
+      = 0                                          sinon
+
+recouvrement(a, b) = début(a) &lt; fin(b) ET début(b) &lt; fin(a)
+  — bout à bout permis : une sieste qui commence à l'instant où la nuit finit passe.</code></pre>
+  <table>
+    <tr><th>Grandeur</th><th>Type</th><th>Bornes et défaut</th></tr>
+    <tr><td>Nature</td><td>Nuit ou sieste</td><td>Obligatoire.</td></tr>
+    <tr><td>Endormissement</td><td>Jour local + <code>HH:MM</code></td><td>Écrits tous deux, jamais déduits. Nuit : la veille à 23:00. Sieste : le jour même à 14:00.</td></tr>
+    <tr><td>Réveil</td><td>Jour local + <code>HH:MM</code></td><td>Nuit : 07:00. Sieste : 15:00.</td></tr>
+    <tr><td>Qualité</td><td>Entier 0 à 5</td><td>Proposée à 3.</td></tr>
+  </table>
+  <p><strong>Consigner un sommeil.</strong> Trois jugements se succèdent, dans cet ordre.</p>
+  <ol>
+    <li><strong>Durée nulle : refus.</strong> Un réveil antérieur ou égal à l'endormissement n'est pas une plage. Rien n'est écrit.</li>
+    <li><strong>Durée au-delà de douze heures strictes : question, pas refus.</strong> Une première validation ne fait qu'interroger ; une seconde écrit. Toute retouche d'un instant ou de la nature désarme la question. Douze heures pile ne la déclenchent pas.</li>
+    <li><strong>Recouvrement : refus.</strong> Deux sommeils ne peuvent pas se recouvrir. Le refus nomme la plage en conflit et dit que rien n'a été enregistré. En modification, une plage inchangée n'est pas contrôlée.</li>
+  </ol>
+  <p>Le plafond est de quinze par date de réveil, et il <strong>refuse</strong> : rien n'est écrasé. Les <em>deux</em> heures sont ramenées aux minutes rondes, à l'ajout comme à la modification.</p>
+  <p><strong>Modifier un sommeil.</strong> En place, déplacer la date du réveil déplace celle de l'endormissement du même nombre de jours : l'écart entre les deux bords est conservé. Une durée devenue nulle abandonne la modification en silence ; un recouvrement la refuse et la ligne garde ses valeurs d'avant.</p>
+  <p><strong>Supprimer un sommeil</strong>, <strong>vider le journal</strong> après confirmation.</p>
+  <details><summary>Cas limites</summary>
+    <p>Une date ou une heure illisible donne une durée nulle : c'est aux préconditions de la refuser, pas au calcul de la deviner.</p>
+    <p>Changer de nature ne déplace les instants que s'ils sont encore ceux proposés pour l'ancienne nature.</p>
+    <p>Rien ne distingue une qualité de 3 choisie d'une qualité laissée telle quelle. Les qualités déjà enregistrées à 0 restent ambiguës pour toujours : les réécrire détruirait de la donnée, y compris de vrais zéros.</p>
+  </details>
+  <div class="exemple"><p>Camille s'endort le 11 mai à 22 h 47 et se réveille le 12 à 6 h 52. Les instants retenus sont 22:45 et 06:50 ; la durée vaut 8 h 05 ; la ligne est datée du 12 mai. Une sieste du 12 mai de 6 h 30 à 7 h 00 serait refusée : elle recoupe cette nuit.</p></div>
+
+  <h3 id="capacites-le-temps-pour-soi">Le temps pour soi</h3>
+  <p>Un moment pour soi est le décalque d'une séance d'activité physique, sans intensité ni distance : une activité prise dans une liste de référence restreinte, une durée entière de 1 à 480 minutes, une date et une heure aux minutes rondes.</p>
+  <p><strong>Consigner, modifier, supprimer un moment</strong>, <strong>vider le journal</strong> : mêmes préconditions et mêmes effets que pour une séance, plafond de quinze par date avec remplacement. Une durée non entière ou nulle n'écrit rien, en silence.</p>
+
+  <h3 id="capacites-les-pas">Les pas</h3>
+  <p>Un relevé de pas porte une date et un nombre de pas. Il n'a pas d'heure. <strong>Plusieurs relevés d'une même date s'additionnent</strong> : il n'y a pas d'unicité par jour, et aucun plafond quotidien.</p>
+  <p><strong>La V1 n'offre aucune capacité de consigner un relevé de pas.</strong> <span class="marque non">non implémenté</span> Le geste existe dans le modèle mais n'est relié à rien : le journal ne se remplit que par génération de données. Ce qui est décidé pour la V2 est le podomètre réel du téléphone, à la conversion en application native.</p>
+  <table>
+    <tr><th>Capacité</th><th>Précondition</th><th>Effet</th></tr>
+    <tr><td>Modifier un relevé</td><td>—</td><td>Fusion dans la ligne visée.</td></tr>
+    <tr><td>Supprimer un relevé</td><td>—</td><td>Retrait franc.</td></tr>
+    <tr><td>Vider le journal des pas</td><td>Confirmation explicite.</td><td>Le journal devient vide.</td></tr>
+    <tr><td>Fixer la date depuis laquelle le cumul se compte</td><td>Un jour local.</td><td>La date est persistée et gouverne le cumul et les moyennes par jour. À défaut, le cumul part du plus ancien relevé.</td></tr>
+  </table>
+  <p>L'objectif quotidien de pas vaut 8 000 et <strong>ne se règle pas</strong> : c'est la seule des quatre grandeurs à objectif qui ne soit pas réglable.</p>
+
+  <h3 id="capacites-les-listes-de-reference">Les listes de référence</h3>
+  <p>Trois catalogues fermés dont la personne choisit le sous-ensemble qui lui sera proposé : les types de ressenti, les activités physiques, les activités de temps pour soi. Le catalogue lui-même ne s'étend pas.</p>
+  <table>
+    <tr><th>Liste</th><th>Taille du catalogue</th><th>Retenus par défaut</th></tr>
+    <tr><td>Types de ressenti</td><td>36</td><td>12</td></tr>
+    <tr><td>Activités physiques</td><td>54</td><td>7</td></tr>
+    <tr><td>Activités de temps pour soi</td><td>9</td><td>6</td></tr>
+  </table>
+  <p><strong>Restreindre une liste.</strong> Préconditions : au moins un élément retenu — une sélection vide est refusée. Effet : le sous-ensemble remplace la liste active, trié, et est persisté. Les gestes disponibles sont : retenir, écarter, filtrer par le nom, tout retenir ou tout écarter parmi ce que le filtre laisse.</p>
+  <p><strong>Invariants.</strong> Restreindre ne touche à aucun relevé déjà consigné. Une valeur enregistrée qui n'appartient plus au catalogue est écartée à la lecture ; une liste devenue vide retombe sur le défaut. Si l'élément d'un relevé en cours de modification n'est plus actif, il est réintroduit dans le choix pour ce relevé-là.</p>
+
+  <h3 id="capacites-les-objectifs-quotidiens">Les objectifs quotidiens</h3>
+  <p>Quatre grandeurs se comparent chaque jour à un objectif ; trois se règlent, une ne se règle pas.</p>
+  <table>
+    <tr><th>Grandeur</th><th>Réglable</th><th>Valeur en l'absence de réglage</th></tr>
+    <tr><td>Énergie</td><td>Oui, en kilocalories</td><td>1 400 kcal</td></tr>
+    <tr><td>Protéines</td><td>Oui, en grammes</td><td><code>arrondi(poids courant × 1,5)</code> g — l'objectif suit donc le poids</td></tr>
+    <tr><td>Fibres</td><td>Oui, en grammes</td><td>25 g</td></tr>
+    <tr><td>Pas</td><td>Non</td><td>8 000</td></tr>
+  </table>
+  <p>Le franchissement d'un objectif de protéines ou de fibres est <strong>constaté une seule fois par jour local et par nutriment</strong>. Les deux sont évalués indépendamment. La mémoire de ce constat est datée et périme d'elle-même au changement de jour.</p>
+
+  <h3 id="capacites-les-rappels">Les rappels</h3>
+  <p>Deux rappels se règlent. <span class="marque non">non implémenté</span> Leur réglage est enregistré ; <strong>rien ne les déclenche</strong>. De vraies notifications du téléphone sont décidées pour la conversion en application native.</p>
+  <table>
+    <tr><th>Rappel</th><th>Grandeurs</th><th>Valeurs en l'absence de réglage</th></tr>
+    <tr><td>Prise de traitement</td><td>Actif ou non. Deux régimes : <em>hebdomadaire</em> — un jour de semaine (0 dimanche à 6 samedi) et une heure ; ou <em>périodique</em> — tous les N jours avec 1 ≤ N ≤ 30, une date de départ et une heure.</td><td>Inactif ; hebdomadaire ; dimanche ; 20:00 ; N = 7 ; départ aujourd'hui.</td></tr>
+    <tr><td>Rendez-vous</td><td>Actif ou non ; nom du praticien (texte libre) ; date ; heure ; préavis parmi une heure, deux heures, un jour, deux jours, trois jours, sept jours.</td><td>Inactif ; nom vide ; date vide ; 10:00 ; un jour.</td></tr>
+  </table>
+  <p>Toute heure de rappel est ramenée aux minutes rondes à l'écriture, comme toute heure retenue par le produit.</p>
+
+  <h3 id="capacites-les-fenetres-d-observation">Les fenêtres d'observation</h3>
+  <p>Capacité transversale : borner dans le temps ce que l'on regarde. Elle n'écrit aucune donnée de santé — seulement une préférence.</p>
+  <table>
+    <tr><th>Fenêtre</th><th>Définition</th></tr>
+    <tr><td>7, 14, 30, 90 derniers jours</td><td>Inclusive du jour courant : la coupure vaut <code>aujourd'hui − (n − 1)</code>. « 7 derniers jours » contient donc aujourd'hui et les six jours précédents.</td></tr>
+    <tr><td>Depuis le début</td><td>Aucune coupure.</td></tr>
+    <tr><td>Bornes libres</td><td>Deux jours locaux, chacun facultatif. Une borne absente est illimitée de son côté.</td></tr>
+  </table>
+  <p>La comparaison est lexicographique sur <code>AAAA-MM-JJ</code> — c'est exact pour ce format et n'exige aucun calcul de fuseau. Chaque endroit qui fait usage d'une fenêtre mémorise son choix indépendamment ; le défaut est de trente jours. Modifier une borne d'une fenêtre fixe la bascule en bornes libres.</p>
+  <details><summary>Cas limites</summary>
+    <p>Un relevé daté dans le futur n'est jamais refusé. Certains décomptes l'écartent explicitement — la série du traitement en cours, les distinctions —, d'autres non. L'écart est réel et n'a pas de règle unique.</p>
+    <p>Une fenêtre bornée sur un journal vide n'est pas une erreur : elle rend un ensemble vide, et une valeur absente se tait.</p>
+  </details>
+
+  <h3 id="capacites-le-document-medical">Le document médical</h3>
+  <p>Capacité : produire, à partir des relevés d'une période, un document destiné à un soignant. Le document est <strong>remis à la personne</strong> ; il n'est transmis à personne.</p>
+  <table>
+    <tr><th>Précondition</th><th>Détail</th></tr>
+    <tr><td>Une période</td><td>Une fenêtre d'observation. La borne de début vaut, à défaut, la plus ancienne donnée tous journaux confondus ; la borne de fin, aujourd'hui.</td></tr>
+    <tr><td>Un choix de rubriques</td><td>Une rubrique n'est proposée que si son domaine est actif <em>et</em> porte au moins une donnée sur la période. Les prises de traitement y figurent toujours, sans choix.</td></tr>
+  </table>
+  <p><strong>Effets.</strong> Un document paginé nommé d'après les deux bornes. Un échec de production consigne une fiche : étape atteinte, période, rubriques demandées et rubriques effectivement écrites, volumes par journal, message d'erreur tronqué. <strong>Cette fiche ne porte aucune donnée de santé</strong>, et rien n'est consigné si personne n'est connecté.</p>
+  <p>Le nombre de journées documentées d'une période est le nombre de dates distinctes portées par les journaux inclus — un relevé de pas nul ne fait pas une journée documentée.</p>
+
+  <h3 id="capacites-le-partage">Le partage</h3>
+  <p>Capacité : composer une image à partir du dernier relevé d'un domaine et la remettre au mécanisme de partage de l'appareil ; à défaut, déposer un texte dans le presse-papiers.</p>
+  <ul>
+    <li>Le partage est toujours demandé, jamais automatique.</li>
+    <li>La matière est le relevé le plus récent du domaine choisi. En l'absence de relevé, un exemple figé sert de matière, et le fait qu'il s'agisse d'un exemple est porté par la donnée elle-même.</li>
+    <li>Ce qui n'est jamais partagé : les notes de faim, les mensurations, les notes libres attachées à un relevé.</li>
+    <li>Il n'existe aucune capacité de comparer son état à celui d'une autre personne, ni d'atteindre les données d'autrui.</li>
+  </ul>
+
+  <h3 id="capacites-les-distinctions">Les distinctions</h3>
+  <p>Quatre distinctions constatent une régularité sur une fenêtre courte. Cinq paliers ordonnés : aucun &lt; éveil &lt; bronze &lt; argent &lt; or. Une distinction n'est évaluée que si le domaine dont elle dépend est actif.</p>
+  <table>
+    <tr><th>Distinction</th><th>Domaine</th><th>Journée réussie</th><th>Paliers</th></tr>
+    <tr><td>Activité physique</td><td>Activité physique</td><td>Minutes pondérées par l'intensité : <em>équivalent intensif</em> ×1 / ×0,67 / ×0,33 ; <em>équivalent modéré</em> ×1,5 / ×1 / ×0,5.</td><td>Or : ≥ 180 min intensives sur 7 jours. Argent : ≥ 180 sur 10 jours. Bronze : ≥ 120 modérées sur 10 jours. Éveil : au moins une séance aujourd'hui ou hier.</td></tr>
+    <tr><td>Fibres</td><td>Alimentation</td><td>Total du jour ≥ 25 g.</td><td>Or 7 journées sur 7, argent 5, bronze 4, éveil aujourd'hui ou hier.</td></tr>
+    <tr><td>Protéines</td><td>Alimentation</td><td>Total du jour ≥ <code>arrondi(poids courant × 1,5)</code> g.</td><td>Or 7 sur 7, argent 5, bronze 4, éveil aujourd'hui ou hier.</td></tr>
+    <tr><td>Pas</td><td>Pas</td><td>Total du jour ≥ 8 000.</td><td>Or 5 journées sur 7, argent 4, bronze 3, éveil aujourd'hui ou hier.</td></tr>
+  </table>
+  <p><strong>Seules les entrées déjà survenues comptent</strong> : une date passée, ou aujourd'hui à une heure déjà atteinte. Une montée de palier est constatée une seule fois : jamais à la première observation d'un palier, jamais lors d'une descente. Le palier connu est persisté et une descente le remplace sans être constatée.</p>
+  <p>Capacité annexe : masquer la distinction non révélée. Effet : un drapeau booléen sur le profil.</p>
+
+  <h3 id="capacites-les-retours">Les retours</h3>
+  <p>Deux capacités adressent quelque chose au dehors, et ce sont les seules. <strong>Aucune ne porte de donnée de santé.</strong></p>
+  <table>
+    <tr><th>Capacité</th><th>Précondition</th><th>Effet</th><th>Refus</th></tr>
+    <tr><td>Adresser un avis, une idée ou un signalement</td><td>Un texte non vide après rognage. Une nature : avis, idée, signalement.</td><td>Consigné d'abord localement, puis transmis <em>sans attente et sans compte rendu d'échec</em> : l'ordre garantit que rien ne se perd si la transmission échoue. Le consentement à être recontactée accompagne l'envoi et retombe à faux après.</td><td>Texte vide. Onzième envoi du jour local : refus, et le refus dit que les envois reprennent le lendemain.</td></tr>
+    <tr><td>Supprimer un envoi de son historique local</td><td>—</td><td>Retrait franc. La place est rendue au décompte du jour.</td><td>—</td></tr>
+    <tr><td>Répondre au questionnaire, ou modifier sa réponse</td><td>—</td><td>Sept notes entières de 0 à 5 et une suggestion libre. <strong>Une seule réponse existe</strong> : la modifier la réécrit. Le décompte des reprises est incrémenté au dehors.</td><td>Même plafond de dix envois par jour local.</td></tr>
+  </table>
+  <p>Ce qui accompagne un envoi : la version du produit, la provenance du geste, le fuseau, les langues, les dimensions de l'appareil, l'instant local et son décalage. Rien d'autre. Le plafond atteint est signalé une seule fois par compte et par jour local.</p>
+
+  <h3 id="capacites-effacer">Effacer</h3>
+  <p>Trois portées, trois régimes. La règle qui les gouverne toutes : <strong>rien ne détruit une donnée hors une destruction demandée et confirmée.</strong></p>
+  <table>
+    <tr><th>Portée</th><th>Confirmation</th><th>Ce qui survit</th></tr>
+    <tr><td>Une ligne</td><td>Non — le retrait est franc et immédiat.</td><td>Rien de la ligne. Exception : la pesée de départ n'offre pas cette capacité.</td></tr>
+    <tr><td>Un journal entier</td><td>Oui, explicite.</td><td>Rien, sauf pour les pesées, où la pesée de départ est épargnée : elle sert de référence à la perte totale, aux distinctions et au document médical.</td></tr>
+    <tr><td>Le compte et toutes les données</td><td>Oui, explicite, et la suppression distante d'abord.</td><td>Rien. Voir « Le compte et la session ».</td></tr>
+  </table>
+  <p>Les quatre plafonds quotidiens qui remplacent la dernière ligne d'une journée sont le seul endroit du produit où une donnée disparaît sans confirmation. Ils sont signalés à la personne au moment où ils mordent, mais le signalement suit l'écrasement, il ne le précède pas.</p>
+  <details><summary>Cas limites</summary>
+    <p>Une sauvegarde illisible n'est jamais écrasée : elle est recopiée sous une clé de secours, une seule fois, et plus rien n'est écrit de la session. C'est la seule situation où l'application refuse d'enregistrer quoi que ce soit.</p>
+    <p>Les capacités de suppression totale d'un journal peuvent être retirées par un drapeau du profil ; leur absence ne retire rien à la suppression ligne à ligne.</p>
+  </details>
+</section>
