@@ -1,0 +1,1087 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>GLP1LOW — Inspirations</title>
+<link rel="stylesheet" href="style.css">
+<style>
+dl.inventions dt { font-weight: 600; margin-top: 14px; }
+dl.inventions dd { margin: 4px 0 0; color: var(--encre-douce); max-width: 72ch; }
+table td:last-child { white-space: nowrap; }
+</style>
+</head>
+<body>
+<main>
+<div class="bandeau">
+  <a href="index.html">Sommaire général</a>
+  <a href="spec-fonctionnelle.html">Fonctionnelle</a>
+  <a href="spec-technique.html">Technique</a>
+  <a href="spec-abstraite.html">Abstraite</a>
+  <a href="inspirations.html" aria-current="page">Inspirations</a>
+</div>
+
+<h1>Inspirations</h1>
+<p class="sous-titre">Tout ce qui a été pensé sans être décidé : les choix pris sans toi, et les idées que le code ne fonde pas.</p>
+
+<p class="etat">Ce document ne décrit pas le produit — c'est le travail des trois autres. Il rassemble ce qui attend une décision. Rien n'y est une recommandation : chaque ligne dit ce qui a été supposé, par qui, et ce que le code fait à la place.</p>
+
+<nav class="sommaire" id="sommaire">
+<h2>Sommaire</h2>
+<ol>
+<li><a href="#arbitrages">Les arbitrages non validés</a>
+<ol>
+<li><a href="#arb-profil-compte-avatar-modules-et-rappels">Profil, compte, avatar, modules et rappels</a></li>
+<li><a href="#arb-le-traitement">Le traitement</a></li>
+<li><a href="#arb-le-poids">Le poids</a></li>
+<li><a href="#arb-l-alimentation">L'alimentation</a></li>
+<li><a href="#arb-les-effets-secondaires">Les effets secondaires</a></li>
+<li><a href="#arb-pas-activite-physique-sommeil-temps-pour-soi">Pas, activité physique, sommeil, temps pour soi</a></li>
+<li><a href="#arb-la-maison">La Maison</a></li>
+<li><a href="#arb-metabolisme-rapport-medical-badges-mon-ciel-equivalences-ins">Métabolisme, rapport médical, badges, Mon Ciel, équivalences insolites</a></li>
+<li><a href="#arb-transversal-modele-de-donnees-stockage-dates-navigation">Transversal : modèle de données, stockage, dates, navigation</a></li>
+</ol></li>
+<li><a href="#inventions">Ce qui a été pensé sans pouvoir être fondé</a>
+<ol>
+<li><a href="#inv-produit">Le produit</a></li>
+<li><a href="#inv-compte">Le compte et les données</a></li>
+<li><a href="#inv-onboarding">L'arrivée : l'onboarding</a></li>
+<li><a href="#inv-maison">La Maison</a></li>
+<li><a href="#inv-traitement">Le traitement</a></li>
+<li><a href="#inv-poids">Le poids</a></li>
+<li><a href="#inv-effets">Les effets secondaires</a></li>
+<li><a href="#inv-alimentation">L'alimentation</a></li>
+<li><a href="#inv-pas">Les pas</a></li>
+<li><a href="#inv-activite">L'activité physique</a></li>
+<li><a href="#inv-sommeil">Le sommeil</a></li>
+<li><a href="#inv-temps-pour-soi">Un temps pour soi</a></li>
+<li><a href="#inv-metabolisme">Le métabolisme</a></li>
+<li><a href="#inv-badges">Les badges</a></li>
+<li><a href="#inv-ciel">Mon Ciel</a></li>
+<li><a href="#inv-insolites">Les équivalences insolites</a></li>
+<li><a href="#inv-rapport">Le rapport médical</a></li>
+<li><a href="#inv-modules">Modules et rappels</a></li>
+<li><a href="#inv-profil">Profil, avatar, compte, avis, sondage, FAQ, légal</a></li>
+<li><a href="#inv-partage">Le partage</a></li>
+<li><a href="#inv-non-implemente">Décidé mais non implémenté, arbitrages non validés</a></li>
+</ol></li>
+</ol>
+</nav>
+
+<section id="arbitrages">
+<h2>1. Les arbitrages non validés <a class="retour" href="#sommaire">↑ sommaire</a></h2>
+<p>105 choix pris par Claude en écrivant la V1, sans décision de l'utilisatrice. Chacun est signalé dans le code par un commentaire, et repris ici pour être confirmé ou renversé. Tant qu'un arbitrage n'est pas tranché, ce qu'il décide reste en place : ce document ne demande pas de tout rouvrir, il dit ce qui n'a jamais été choisi.</p>
+<h3 id="arb-profil-compte-avatar-modules-et-rappels">Profil, compte, avatar, modules et rappels</h3>
+<p class="note">5 arbitrages.</p>
+<table>
+<tr><th>Sujet</th><th>Ce qui a été décidé sans toi</th><th>Où</th></tr>
+<tr><td>Contenu de la FAQ</td><td>Premier jet de contenu (2026-08-11), tiré du fonctionnement réel de l'app — à enrichir ou remplacer sur instruction de l'utilisatrice.</td><td><code>src/versions/mixte/components/Faq.tsx</code></td></tr>
+<tr><td>Bornes des champs numériques hors profil</td><td>D'OÙ VIENNENT CES BORNES. Celles du profil (âge, taille, poids) existaient déjà dans <code>components/profile.fields.ts</code>. […] TOUTES LES AUTRES SONT NOUVELLES et proposées ici : elles sont signalées une par une dans le rapport, pour être discutées plutôt que subies. (Les trois règles du domaine — RULE_AGE, RULE_HEIGHT, RULE_WEIGHT — sont marquées « Borne existante ».)</td><td><code>src/versions/mixte/app/form.rules.ts</code></td></tr>
+<tr><td>Date de la pesée de départ créée depuis le profil</td><td>Repose sur une hypothèse arrêtée le 2026-08-06 : <strong>les écrans d'accueil du premier lancement demanderont le poids de départ, mais pas sa date.</strong> Si l'onboarding finit par la demander, c'est lui qui l'écrira.</td><td><code>src/shared/model/startingWeighIn.ts</code></td></tr>
+<tr><td>Disparition des refus de formulaire</td><td>ET QUAND DISPARAISSENT-ILS ? L'instruction ne le dit pas ; la règle retenue est celle du message de dose, validée le 2026-08-16 : un refus s'efface dès qu'on retouche le champ fautif, et revient au prochain clic sur Valider s'il tient toujours.</td><td><code>src/versions/mixte/app/FormRefusals.tsx</code></td></tr>
+<tr><td>File d'attente locale des alertes hors connexion (non écrite)</td><td>Une file d'attente locale qui rejouerait l'alerte à la prochaine connexion serait possible — elle n'est pas écrite, c'est dit dans le compte rendu du jour.</td><td><code>src/features/feedback/remoteSubmit.ts</code></td></tr>
+</table>
+<h3 id="arb-le-traitement">Le traitement</h3>
+<p class="note">13 arbitrages.</p>
+<table>
+<tr><th>Sujet</th><th>Ce qui a été décidé sans toi</th><th>Où</th></tr>
+<tr><td>Escalier des doses — mise en avant du palier cliqué (cerne, pas de défilement)</td><td>3. LES DEUX TUILES OUVRENT LE MÊME CONTENU — elle écrit « début OU aujourd'hui », et le bloc raconte de toute façon la suite entière. Faire DÉFILER jusqu'au palier concerné selon la tuile cliquée aurait pourtant du sens sur un traitement à six paliers […]. Je le propose sans l'imposer : <code>miseEnAvant</code> cerne le palier visé (<code>'debut'</code> ou <code>'actuel'</code>) partout où il apparaît, et le composant fonctionne sans elle — c'est un cerne, pas un défilement, parce qu'un saut automatique à l'ouverture d'une couche escamote le haut du bloc et fait perdre le fil.</td><td><code>src/versions/mixte/components/SurimpressionDoses.tsx</code></td></tr>
+<tr><td>Escalier des doses — pas de « palier suivant » inventé</td><td>4. <strong>PAS DE « PALIER SUIVANT ».</strong> La cinquième entrée de la frise annonce un palier à venir et une date de visite : rien de tout cela n'existe dans les données. L'inventer serait une promesse. Le dernier palier est donc marqué « en cours », ce qui dit la même chose — la suite n'est pas écrite — sans rien affirmer.</td><td><code>src/versions/mixte/components/SurimpressionDoses.tsx</code></td></tr>
+<tr><td>Escalier des doses — le comprimé garde son escalier</td><td>2. <strong>LE COMPRIMÉ GARDE SON ESCALIER — SEUL LE MOT CHANGE.</strong> […] RIEN N'EST MASQUÉ : masquer aurait été le réflexe facile, il aurait privé la moitié orale des utilisatrices du seul écran qui montre leur montée en dose.</td><td><code>src/versions/mixte/components/SurimpressionDoses.tsx</code></td></tr>
+<tr><td>Escalier des doses — dénominateur de la variation de poids = durée du palier</td><td>LE DÉNOMINATEUR EST LA DURÉE DU PALIER, et ce choix avait été tranché par le bilan des petits multiples qui vivait dessous […]. Ce voisin a disparu le 2026-08-30, mais LE CHOIX RESTE — c'est aussi celui de la home, dont le dénominateur est <code>cure.totalDays</code> : la règle est écrite et testée dans <code>averageWeeklyChange</code>, pas ici.</td><td><code>src/versions/mixte/components/SurimpressionDoses.tsx</code></td></tr>
+<tr><td>Fréquence des prises — compte par journée et sur tout l'historique</td><td>Arbitrage du 2026-08-23, repris de la jumelle <code>intakeIntervalDays</code> du rapport PDF à la fusion des deux calculs. Deux injections saisies le même jour […] ne sont pas deux prises espacées de zéro jour […]. — TOUT L'HISTORIQUE, ET NON LE SEUL TRAITEMENT EN COURS : […] Un changement de traitement qui changerait aussi de rythme mêlerait donc deux fréquences — le cas est rare (les GLP-1 injectables sont tous hebdomadaires) et il est assumé.</td><td><code>src/features/injections/injections.utils.ts</code></td></tr>
+<tr><td>Zone proposée calculée à maintenant, pas à la date du formulaire</td><td>Rapportée à MAINTENANT et non à la date du formulaire : le hook du formulaire réclame <code>defaultSite</code> à sa construction, et le lire depuis l'état du formulaire ferait une boucle. Le cas courant — on saisit une prise du jour — est donc exact ; pour une prise ajoutée à une date ancienne depuis le calendrier, la suggestion reste celle du moment, que la zone se change d'un geste.</td><td><code>src/versions/mixte/features/injections/InjectionsTracker.tsx</code></td></tr>
+<tr><td>Côte à côte — le cas mixte comprimé/injection est inatteignable avec la coupure actuelle</td><td>CE QUE LA MESURE DIT […] : les deux côtés ne PEUVENT PAS différer aujourd'hui. <code>currentTreatmentSeries</code> applique la coupure au changement de traitement décidée le 2026-08-09 […]. La branche mixte est donc écrite et prête, mais aucune donnée du générateur ne peut l'allumer. Elle le pourra le jour où la colonne « début » lira la première prise de TOUT l'historique au lieu de la première de la série en cours — ce qui est un autre geste, qui contredirait la coupure du 2026-08-09 et qui se demande.</td><td><code>src/versions/mixte/homes/sections/MaisonSections.tsx</code></td></tr>
+<tr><td>Surimpression « Niveau sanguin actif » — les deux accordéons restent des cartes séparées</td><td>SES DEUX BLOCS D'EXPLICATION RESTENT DES CARTES À PART, et c'est une décision. […] La règle « tout dans un seul bloc » qu'elle a posée le matin même visait quatre morceaux d'UNE MÊME chose […] ; elle ne visait pas des CONTENUS distincts.</td><td><code>src/versions/mixte/homes/sections/MaisonSections.tsx</code></td></tr>
+<tr><td>Dernière prise passée — repli sur une prise future</td><td>Le repli est délibéré : tant qu'aucune injection n'est passée — un traitement qui commence, ou des doses saisies à l'avance — l'écran montre celle qui est prévue plutôt que rien du tout. L'appelant qui calcule un délai depuis cette date doit donc s'attendre à un nombre de jours négatif.</td><td><code>src/utils/pharmacokinetics.ts</code></td></tr>
+<tr><td>Migration — l'ancien « Autre traitement » générique passe côté injection ; le nom libre est perdu</td><td>Le générique n'existe plus : chaque famille a désormais son « autre ». Il passe côté injection, qui est le comportement qu'il avait — il n'était pas reconnu comme oral et prenait la cinétique du sémaglutide. — Une valeur inconnue ne peut venir que du champ libre supprimé depuis. Elle rejoint l'« autre » de sa famille, déduite du nom une dernière fois. Le nom saisi est alors perdu, faute d'endroit où le conserver.</td><td><code>src/shared/medication/treatment.catalog.ts</code></td></tr>
+<tr><td>Initiales du site — aucune pour la prise orale</td><td>PAS DE CODE POUR CE QUI N'A PAS DE CÔTÉ. <code>prise_orale</code> — un comprimé — porte <code>side: 'Comprimé'</code> : la dérivation mécanique en ferait « VC », un code que personne n'a jamais employé […]. La fonction rend alors une chaîne VIDE, et l'appelant n'écrit rien […]. Même réponse pour un site inconnu de la table.</td><td><code>src/shared/medication/medication.utils.ts</code></td></tr>
+<tr><td>Molécules actives — cinétique des explications = traitement le plus récemment pris</td><td>La cinétique montrée dans « Comprendre vos sensations » est celle du traitement en cours — le plus récemment pris. Quand deux formes se cumulent, elles n'ont pas la même : c'est celle qu'elle prend aujourd'hui qui décrit ce qu'elle ressent.</td><td><code>src/features/blood-level/bloodLevel.utils.ts</code></td></tr>
+<tr><td>Molécules actives — rétention 60 jours puis repli sur tout l'historique</td><td>Les prises des soixante derniers jours d'abord ; si aucune n'est si récente, tout l'historique — sans quoi un traitement arrêté depuis longtemps mais encore actif dans le sang disparaîtrait de l'écran.</td><td><code>src/features/blood-level/bloodLevel.utils.ts</code></td></tr>
+</table>
+<h3 id="arb-le-poids">Le poids</h3>
+<p class="note">9 arbitrages.</p>
+<table>
+<tr><th>Sujet</th><th>Ce qui a été décidé sans toi</th><th>Où</th></tr>
+<tr><td>Date par défaut de la pesée de départ (hypothèse sur l'onboarding)</td><td>« Repose sur une hypothèse arrêtée le 2026-08-06 : les écrans d'accueil du premier lancement demanderont le poids de départ, mais pas sa date. Si l'onboarding finit par la demander, c'est lui qui l'écrira. » (Hier à l'installation ; la veille de la plus ancienne pesée sur un historique existant.)</td><td><code>src/shared/model/startingWeighIn.ts</code></td></tr>
+<tr><td>Modification d'une pesée : deux écarts assumés avec l'ajout</td><td>« DEUX ÉCARTS ASSUMÉS avec <code>addWeighIn</code>, tous deux d'origine et couverts par des tests pour qu'un changement futur soit visible : L'historique n'est PAS retrié. […] La règle « une seule par jour » ne s'applique pas ici. »</td><td><code>src/features/weight/weighInWrites.ts</code></td></tr>
+<tr><td>averageWeeklyChange non branchée sur les quatre templates de la home</td><td>« Le carré poids l'écrit à la main dans quatre templates […] le jour où ces quatre templates seront rouvrables, ils doivent l'appeler au lieu de la réécrire (non fait ici : ces fichiers sont hors du périmètre du lot). » et « Le prix, assumé et connu : un intervalle dont les pesées ne couvrent que le début voit sa moyenne DILUÉE par les jours sans mesure. »</td><td><code>src/features/weight/weight.utils.ts</code></td></tr>
+<tr><td>Bornes des mensurations proposées, à discuter</td><td>« TOUTES LES AUTRES SONT NOUVELLES et proposées ici : elles sont signalées une par une dans le rapport, pour être discutées plutôt que subies. » — RULE_MEASUREMENT (1 à 300 cm, vide permis) est marquée « BORNE NOUVELLE ».</td><td><code>src/versions/mixte/app/form.rules.ts</code></td></tr>
+<tr><td>Échelle d'IMC bornée 16–42 et trois bandes sans nom</td><td>« L'ÉCHELLE VA DE 16 À 42, ET PORTE LES SIX CLASSES DU PROJET. La maquette n'avait qu'un point choisi à placer » ; « CONSÉQUENCE À CONNAÎTRE, signalée dans le compte rendu : depuis que la ligne de classe est retirée, ces mots sont le SEUL endroit où une catégorie est nommée — trois bandes sur six n'ont donc plus de nom à l'écran (insuffisance pondérale, corpulence normale, obésité III). »</td><td><code>src/versions/mixte/components/SurimpressionImc.tsx</code></td></tr>
+<tr><td>Largeur de texte estimée, non mesurée, pour la disposition des étiquettes d'IMC</td><td>« ESTIMÉE ET NON MESURÉE, parce qu'un composant ne peut pas mesurer un texte qu'il n'a pas encore rendu. Elle est donc VÉRIFIÉE AU RENDU, sur les vingt thèmes » (LARGEUR_CAR_8 = 4,1).</td><td><code>src/versions/mixte/components/SurimpressionImc.tsx</code></td></tr>
+<tr><td>Branche 'page' de BlocSuiviPoids non montée</td><td>« <code>BlocSuiviPoids</code> n'est monté que par <code>SurimpressionSuiviPoids</code> — relevé sur tout <code>src</code>, c'est l'unique import du composant. La branche <code>page</code> n'est donc rendue nulle part aujourd'hui ; elle est le miroir du carré poids de la home standard, qui vit en clair dans <code>Maison.tsx</code> ».</td><td><code>src/versions/mixte/components/BlocSuiviPoids.tsx</code></td></tr>
+<tr><td>Garde sur une assignation insolite vide pour une perte positive</td><td>« UNE ASSIGNATION VIDE POUR UNE PERTE NON NULLE NE SE CONSERVE PAS (2026-08-29, garde posée en cherchant « derniere perte l'image n'est pas là »). […] Il suppose un état écrit par une version antérieure ou une reprise interrompue — rare, mais persistant tant que la pesée ne bouge pas ».</td><td><code>src/utils/ludicUsage.ts</code></td></tr>
+<tr><td>Singulier « 1 semaine » prévu sans cas réel</td><td>« LE SINGULIER EST PRÉVU quoiqu'il ne puisse guère arriver : le point d'entrée de la couche exige sept jours de recul, donc au moins la deuxième semaine. »</td><td><code>src/versions/mixte/components/BlocSuiviPoids.tsx</code></td></tr>
+</table>
+<h3 id="arb-l-alimentation">L'alimentation</h3>
+<p class="note">12 arbitrages.</p>
+<table>
+<tr><th>Sujet</th><th>Ce qui a été décidé sans toi</th><th>Où</th></tr>
+<tr><td>Recette dont un ingrédient personnalisé a été supprimé : valeurs abaissées silencieusement au ré-enregistrement</td><td>une <strong>recette</strong> se rouvre depuis <code>recipeIngredients</code>, et <code>computeItemsNutrition</code> ignore alors silencieusement l'ingrédient introuvable. Rouvrir puis ré-enregistrer une telle recette <strong>abaisse ses valeurs sans le dire.</strong> Défaut connu, non traité.</td><td><code>src/shared/food/food.resolve.ts</code></td></tr>
+<tr><td>Barre de composition du journal : parts en masse (g) et non en calories</td><td>LES PARTS SONT DES MASSES, et c'est un arbitrage. Deux conventions coexistent dans le dépôt : la part CALORIQUE (<code>dayMacroPercents</code>, la bulle du calendrier et la couche vitrée) et la part de MASSE (<code>computeTimeSlotComposition</code>, les tableaux de composition). La ligne remplacée écrivait des GRAMMES, et ce sont eux qui reviennent au clic : une portion large sous un petit chiffre — 20 g de lipides pèsent 9 kcal/g contre 4 aux protéines — se lirait comme une erreur de calcul.</td><td><code>src/versions/mixte/features/meal-journal/MealDayGroup.tsx</code></td></tr>
+<tr><td>Base de la composition par créneau (masse plutôt que calories) : choix de diététique renvoyé à une décision globale</td><td>LA BASE EST LA MASSE, en grammes, et non l'énergie : les quatre valeurs stockées sont des grammes, et convertir en calories demanderait la convention 4/4/9 — un choix de diététique, pas d'affichage, qu'il faudrait décider ailleurs et pour tout le site.</td><td><code>src/features/meal-charts/mealCharts.utils.ts</code></td></tr>
+<tr><td>Bornes des champs numériques nutritionnels proposées, non tranchées par l'utilisatrice (RULE_NUTRIENT max 10000)</td><td>TOUTES LES AUTRES SONT NOUVELLES et proposées ici : elles sont signalées une par une dans le rapport, pour être discutées plutôt que subies. […] Une valeur nutritionnelle pour 100 g (calories, protéines, glucides, lipides, fibres). BORNE HAUTE NOUVELLE ; <code>min=&quot;0&quot;</code> existait</td><td><code>src/versions/mixte/app/form.rules.ts</code></td></tr>
+<tr><td>Écart d'un point entre une part de barre (plus forts restes) et la cellule du tableau (arrondi isolé)</td><td>LE PRIX EST ASSUMÉ ET IL EST D'UN POINT : une part affichée peut s'écarter d'une unité de la cellule du tableau, qui l'arrondit isolément.</td><td><code>src/versions/mixte/features/meal-charts/TimeSlotCompositionBars.tsx</code></td></tr>
+<tr><td>Forme du bloc « Repas vs en-cas » (deux barres à 100 %) choisie par Claude sur délégation</td><td>(demande du 2026-08-26 : « ajouter section page alimentation composition repas VS snack. Je te laisse chosir la forme adequate graph courbe histo ou autre »). LA FORME CHOISIE : deux barres horizontales à 100 %, une par famille</td><td><code>src/versions/mixte/features/meal-charts/MealVsSnackChart.tsx</code></td></tr>
+<tr><td>Titres des sous-blocs de la couche Menus centrés (autorisation, pas ordre)</td><td>« Tu peu les centrer » autorise sans ordonner. Ils le sont, pour une raison qui tient au reste de la demande</td><td><code>src/versions/mixte/components/SurimpressionRepas.tsx</code></td></tr>
+<tr><td>Bandeau de confirmation de la page non remplacé par MessageRepasEnregistre (point laissé ouvert)</td><td>Le remplacement dans <code>MealTracker</code> n'est PAS fait ici — ce fichier-là appartient à un autre chantier en cours, et deux mains dessus, c'est un travail perdu. C'est le seul point laissé ouvert de cette demande.</td><td><code>src/versions/mixte/features/meal-form/MessageRepasEnregistre.tsx</code></td></tr>
+<tr><td>Création d'un aliment absent depuis la couche vitrée : renvoi vers la page, saisie perdue</td><td>LA CRÉATION D'UN ALIMENT absent de la base […] MÈNE À LA PAGE, formulaire ouvert. C'est un écran entier (<code>CustomFoodPage</code>, son lecteur de code-barres, sa base à réécrire) : le monter sous la couche est un lot à part, non demandé. Le chemin reste ouvert, il est seulement plus long — et la saisie en cours est perdue, ce que la couche annonce en fermant.</td><td><code>src/versions/mixte/features/meal-form/FormulaireRepasEnSurimpression.tsx</code></td></tr>
+<tr><td>Valeurs de faim inventées au chargement pour les repas qui n'en portent pas (formule déterministe conçue par Claude)</td><td>LA VALEUR POSÉE N'EST PAS UNE MOYENNE UNIQUE. […] Elle se déduit donc de ce que la ligne dit déjà d'elle-même : le moment de la journée […] et la taille du repas […], le tout écarté d'un cran par l'identifiant de la ligne, qui joue le rôle du hasard sans en être</td><td><code>src/shared/model/appData.ts</code></td></tr>
+<tr><td>mealCountsLast7Days conservée sans appelant</td><td>SANS APPELANT depuis le 2026-08-19 : la tuile de la home donne désormais la moyenne de calories par journée et non le compte des repas et en-cas. Gardée le temps que le sujet se pose, avec ses tests — noté dans TODO-CLAUDE.md.</td><td><code>src/features/home/homeOverview.ts</code></td></tr>
+<tr><td>Axes kcal et grammes indépendants d'un graphe à l'autre (conséquence assumée)</td><td>CONSÉQUENCE ASSUMÉE : le rapport kcal/gramme continue de varier d'un graphe et d'une période à l'autre, puisque chaque axe suit ses propres données. C'est son choix — la règle prime sur la comparabilité des deux graphes.</td><td><code>src/features/meal-charts/mealCharts.utils.ts</code></td></tr>
+</table>
+<h3 id="arb-les-effets-secondaires">Les effets secondaires</h3>
+<p class="note">6 arbitrages.</p>
+<table>
+<tr><th>Sujet</th><th>Ce qui a été décidé sans toi</th><th>Où</th></tr>
+<tr><td>Mot du troisième palier (« sévère » et non « intenses » comme dans la demande)</td><td>LE MOT DU TROISIÈME PALIER RESTE « SÉVÈRE » — celui de <code>TIER_WORDS</code>, de la tuile du calendrier et du journal. Sa demande dit « intenses » ici et « sévères » pour le rapport PDF le même jour : deux noms pour un seul palier feraient croire à deux mesures différentes sur le même écran.</td><td><code>src/features/side-effects/sideEffectCalendar.ts</code></td></tr>
+<tr><td>Trois tuiles PDF demandées avec « modérés » écrit deux fois : la troisième devient « légers » (qualifié d'« arbitrages document » dans reportSummary.ts)</td><td>Et le troisième palier de sa demande est le palier LÉGER : « modérés » y est écrit DEUX FOIS (« nb effet secondaires modérés …, nb effet secondaire modérés …, nb effet secondaire severs ») — trois tuiles demandées, deux paliers nommés. Le manquant est le troisième du site, les légers : la règle du domaine n'en connaît que trois, et une répétition littérale ferait deux tuiles identiques côte à côte, sans sens dans une synthèse.</td><td><code>src/versions/mixte/features/report/medicalReportPdf.ts</code></td></tr>
+<tr><td>Matrice matin/après-midi/soir : adaptations que la maquette ne tranchait pas (moments tirés de l'heure, correspondance 1-5 → 3 crans, semaine de la dernière déclaration)</td><td>TROIS ADAPTATIONS, que la maquette ne pouvait pas trancher : […] 2. <strong>Les moments viennent de l'heure de saisie</strong> : matin avant 12 h, après-midi jusqu'à 18 h, soir ensuite. […] 3. <strong>La sévérité du projet va de 1 à 5</strong>, celle de la maquette de 1 à 3. 1 et 2 se lisent « légère », 3 « modérée », 4 et 5 « marquée ». La case d'un jour porte la sévérité LA PLUS FORTE déclarée dans ce moment […] LA SEMAINE MONTRÉE EST LA DERNIÈRE OÙ CET EFFET-LÀ A PARLÉ, pas les sept derniers jours, et pas la dernière du journal entier.</td><td><code>src/versions/mixte/components/TrendGraphOverlay.tsx</code></td></tr>
+<tr><td>Tendance des effets : moyenne des sévérités par moitié plutôt que leur somme</td><td>── POURQUOI LA MOYENNE DES SÉVÉRITÉS, ET NON LEUR SOMME ── <code>sideEffectsMood</code> juge UNE journée : sa somme de sévérités fait sens sur vingt-quatre heures. Sur sept jours, la somme dirait surtout combien de jours ont été renseignés. On donne donc à la même règle la journée MOYENNE de la période — les sévérités cumulées divisées par le nombre de jours de la demi-fenêtre —, ce qui garde le sens de ses seuils. Un symptôme intense compte pour lui-même : s'il y en a eu un seul dans la moitié, elle est « difficile ».</td><td><code>src/features/trends/trends.ts</code></td></tr>
+<tr><td>Liste d'ajout rapide plus courte que la liste complète, volontairement non unifiée</td><td>NOTE : liste volontairement plus courte que la liste complète de features/side-effects/ (choix produit pour une saisie rapide) — pas une duplication accidentelle, donc non unifiée.</td><td><code>src/features/quick-add/quickAdd.constants.ts</code></td></tr>
+<tr><td>Duplication assumée des mots d'intensité dans la maquette de partage</td><td><code>SEVERITY_LABELS</code> vit dans <code>SideEffectForm</code> et n'en sort pas : les mots sont repris ici, à l'identique, plutôt que d'exporter une constante d'un formulaire vers une maquette. Le jour où l'échelle change, les deux listes doivent bouger ensemble — c'est le prix de la duplication, assumé pour ne pas faire dépendre une page d'un formulaire.</td><td><code>src/versions/mixte/components/share/shareTemplates.tsx</code></td></tr>
+</table>
+<h3 id="arb-pas-activite-physique-sommeil-temps-pour-soi">Pas, activité physique, sommeil, temps pour soi</h3>
+<p class="note">14 arbitrages.</p>
+<table>
+<tr><th>Sujet</th><th>Ce qui a été décidé sans toi</th><th>Où</th></tr>
+<tr><td>Date d'une entrée de sommeil = date du réveil</td><td>« <code>date</code> EST LA DATE DU RÉVEIL, et <code>time</code> EST L'HEURE DU RÉVEIL (décision de conception du 2026-08-18, à confirmer par l'utilisatrice) : une nuit commencée le 17 à 23 h et finie le 18 à 7 h appartient au <strong>18</strong>. »</td><td><code>src/types.ts</code></td></tr>
+<tr><td>Définition du temps d'éveil</td><td>« DÉFINITION RETENUE (décision de conception du 2026-08-18) : du réveil du matin à l'endormissement du soir, <strong>moins les siestes de la journée</strong>. […] POURQUOI PAS « 24 h moins le sommeil » […] »</td><td><code>src/features/sleep/sleep.utils.ts</code></td></tr>
+<tr><td>Journée à zéro pas écartée de la moyenne</td><td>« UNE JOURNÉE À ZÉRO PAS EST UN PODOMÈTRE ÉTEINT, pas une journée immobile : elle ne compte ni au numérateur ni au dénominateur (arbitrage du 2026-08-23, à la fusion avec la jumelle <code>stepsAverage</code> du rapport PDF, qui portait cette garde et pas celle-ci — « la règle du carnet »). »</td><td><code>src/features/steps/steps.utils.ts</code></td></tr>
+<tr><td>Nuit de zéro minute écartée de la moyenne des nuits</td><td>« UNE NUIT DE ZÉRO MINUTE N'EST PAS UNE NUIT, et ne compte donc ni au numérateur ni au dénominateur (arbitrage du 2026-08-23, à la fusion avec la jumelle <code>nightAverageMinutes</code> du rapport PDF, qui portait cette garde et pas celle-ci). »</td><td><code>src/features/sleep/sleep.utils.ts</code></td></tr>
+<tr><td>Moyennes du sport divisées par les semaines écoulées</td><td>« C'est l'exception assumée à la convention « on divise par les journées renseignées » que suivent les moyennes /jour de la même section […] AUCUNE MOYENNE AVANT SEPT JOURS, MAIS UN TOTAL TOUT DE SUITE […] c'est le seuil que la home applique déjà à la perte hebdomadaire »</td><td><code>src/features/sport/sportAverages.ts</code></td></tr>
+<tr><td>Dégradé de barres écarté dans « De quoi c'est fait »</td><td>« La planche proposait un dégradé par le rang ; il est écarté ici, faute de pouvoir garantir 3:1 contre la piste sur tous les thèmes pour le cran le plus pâle — question posée à l'utilisatrice. »</td><td><code>src/versions/mixte/features/sport/BlocDeQuoiCestFait.tsx</code></td></tr>
+<tr><td>Bandeau de succès de la page sport non remplacé par MessageActiviteEnregistree</td><td>« CE COMPOSANT EST ÉCRIT POUR QUE LA PAGE L'ADOPTE […] Le remplacement dans <code>SportTracker</code> n'est PAS fait ici : son bandeau porte une poignée de plus (<code>useDismissWhenHidden</code>, l'effacement à la sortie d'écran), qui n'a pas de sens sous une couche tenant dans la hauteur du cadre. C'est le seul point laissé ouvert. »</td><td><code>src/versions/mixte/features/sport/MessageActiviteEnregistree.tsx</code></td></tr>
+<tr><td>Tuile des pas en pleine largeur quand le module repas est éteint</td><td>« […] laisser la moitié droite vide n'aurait aucun sens — la cellule prend alors toute la largeur. Décision de ma main, à défaire d'un mot. »</td><td><code>src/versions/mixte/homes/sections/MaisonSections.tsx</code></td></tr>
+<tr><td>Bornes de distance nouvelles</td><td>« TOUTES LES AUTRES SONT NOUVELLES et proposées ici : elles sont signalées une par une dans le rapport, pour être discutées plutôt que subies. » — RULE_DISTANCE_KM : « BORNE HAUTE NOUVELLE ; la borne basse existait (<code>min=&quot;0&quot;</code>, relevée à 0,1) » ; RULE_DISTANCE_M : « BORNE NOUVELLE. »</td><td><code>src/versions/mixte/app/form.rules.ts</code></td></tr>
+<tr><td>Fonction meTimeMinutesLast7Days gardée sans appelant</td><td>« SANS APPELANT depuis le 2026-08-19 : la tuile de la home compte désormais les occurrences et non les minutes. Gardée le temps que le sujet se pose, avec ses tests — le point est noté dans TODO-CLAUDE.md. »</td><td><code>src/features/home/homeOverview.ts</code></td></tr>
+<tr><td>Bulle du calendrier sport/me-time sans notes ni « Ajouter/Gérer »</td><td>« Deux différences assumées avec le journal : pas de ligne de notes (la bulle dit la séance, le journal reste l'endroit du texte libre), et pas d'entrée « Ajouter/Gérer » dans le sélecteur d'activité — le bloc de gestion vit sur la page, il s'atteint par Modifier. »</td><td><code>src/versions/mixte/features/sport/SportCalendar.tsx</code></td></tr>
+<tr><td>Seuil « nuit courte » à 7 h</td><td>« LA NUIT COURTE — en deçà de 7 h, le plancher bas de la fourchette couramment recommandée pour un adulte. Entre les deux (7 h à 8 h), la durée est dite suffisante : ni courte, ni longue. » (seuil choisi dans le code ; la dictée de l'utilisatrice ne fixe que « &gt; 8h » et « qualité &gt; 4 »)</td><td><code>src/features/sleep/useSleepForm.ts</code></td></tr>
+<tr><td>Seuil de stabilité des tuiles de sens à 5 %</td><td>« LE SEUIL DE STABILITÉ : CINQ POUR CENT — Sans seuil, rien n'est jamais stable […] Cinq pour cent, parce que c'est l'ordre de grandeur du bruit sur ces trois grandeurs »</td><td><code>src/features/trends/trends.ts</code></td></tr>
+<tr><td>Seuils de régularité et de tendance de l'analyse du sommeil</td><td>« SEUILS DE RÉGULARITÉ (2026-08-18) : l'écart-type des durées se lit « régulier » sous 45 min, « assez régulier » sous 90 min, « variable » au-delà » ; « La tendance ne se juge qu'à partir de 7 journées dormies, et un écart des moitiés sous 30 min reste du bruit »</td><td><code>src/features/sleep/sleepAnalysis.ts</code></td></tr>
+</table>
+<h3 id="arb-la-maison">La Maison</h3>
+<p class="note">18 arbitrages.</p>
+<table>
+<tr><th>Sujet</th><th>Ce qui a été décidé sans toi</th><th>Où</th></tr>
+<tr><td>Bande 700 g – 1 kg du verdict de divination (lecture retenue : « légère » couvre 300 g exclu à 1 kg exclu)</td><td>SEUILS — NOTE D'INTERPRÉTATION. Elle a donné : stable = ± 300 g ; légère hausse/baisse = ± 700 g ; hausse/baisse assez marquée = ± 1 kg ou plus. La bande entre 700 g et 1 kg n'est pas nommée dans sa consigne ; lecture retenue ici : « légère » couvre tout l'intervalle de 300 g (exclu) à 1 kg (exclu). À elle de trancher si elle voulait autre chose.</td><td><code>src/features/divination/divination.ts</code></td></tr>
+<tr><td>Titre de la section Dynamique sous verrou</td><td>LE TITRE SOUS VERROU RESTE « Dynamique », et c'est un choix à signaler : sa dictée donne UN titre, sans dire l'état, mais c'est le widget DÉVOILÉ qu'elle a sous les yeux […] un bloc encore verrouillé qui se titrerait « sur les 7 derniers jours » contredirait son propre message.</td><td><code>src/features/divination/dynamiqueUnlock.ts</code></td></tr>
+<tr><td>Place de la section Dynamique sur la home standard (« en dernier » retenu)</td><td>sa dictée laisse DEUX places ouvertes, et sur CETTE home c'est « en dernier » qui est retenu — la seule des deux qui s'y lise sans interprétation, car la home standard n'a PAS de section « En direct » […] Choix à confirmer : si elle préfère un « deuxième » sur cette home aussi (après « Aujourd'hui », son instant présent à elle ?), c'est un déplacement de bloc.</td><td><code>src/versions/mixte/components/Maison.tsx</code></td></tr>
+<tr><td>Place de la section Dynamique dévoilée sur la home sections (« en 2e après En direct » retenu)</td><td>sa dictée du jour retire cette place et en laisse DEUX ouvertes — c'est la seconde qui est retenue ici, la moins disruptive […] Choix à confirmer — « en dernier » reste à un déplacement de bloc si elle le préfère.</td><td><code>src/versions/mixte/homes/sections/MaisonSections.tsx</code></td></tr>
+<tr><td>Mise en page « En direct » quand repas ET pas sont coupés (cellule pleine largeur)</td><td>REPAS COUPÉS ET PAS COUPÉS À LA FOIS : il ne reste que les deux tuiles, et laisser la moitié droite vide n'aurait aucun sens — la cellule prend alors toute la largeur. Décision de ma main, à défaire d'un mot.</td><td><code>src/versions/mixte/homes/sections/MaisonSections.tsx</code></td></tr>
+<tr><td>Libellé conservé sur le carré d'équivalence insolite (écart avec la lettre de la demande)</td><td>LE LIBELLÉ, LUI, RESTE, et c'est un écart avec la lettre de sa demande. […] Le point est remonté : c'est un mot à retirer si elle voulait le carré nu.</td><td><code>src/versions/mixte/homes/sections/MaisonSections.tsx</code></td></tr>
+<tr><td>Rayon des boutons d'ajout rapide (proportionnel : 3 px)</td><td>Le même rapport, pas le même nombre — c'est exactement ce que « proportionnel » veut dire, et c'est ce qui distingue ce réglage de l'autre lecture possible (reprendre les 12 px tels quels), qui reste en arbitrage sur la planche des vingt propositions.</td><td><code>src/versions/mixte/homes/sections/MaisonSections.tsx</code></td></tr>
+<tr><td>Pluriel à partir de 2 limité aux tuiles « Côte à côte »</td><td>Le reste du site accorde encore au-dessus de un (<code>n &gt; 1 ? 's' : ''</code>) : cette règle-ci ne vaut, pour l'instant, que là où elle l'a demandée — les tuiles de « Côte à côte ». La généraliser est un autre geste, qui touche d'autres écrans et se demande.</td><td><code>src/versions/mixte/homes/sections/MaisonSections.tsx</code></td></tr>
+<tr><td>Cas « formes mélangées » du médaillon traitement, inatteignable à cause de la coupure</td><td>La branche mixte est donc écrite et prête, mais aucune donnée du générateur ne peut l'allumer. Elle le pourra le jour où la colonne « début » lira la première prise de TOUT l'historique au lieu de la première de la série en cours — ce qui est un autre geste, qui contredirait la coupure du 2026-08-09 et qui se demande.</td><td><code>src/versions/mixte/homes/sections/MaisonSections.tsx</code></td></tr>
+<tr><td>Domaine des repas visible dans « Côte à côte » même module éteint</td><td>Faire disparaître le domaine ENTIER quand le module est éteint est une autre question, traitée globalement pour tous les modules à la fois.</td><td><code>src/versions/mixte/homes/sections/MaisonSections.tsx</code></td></tr>
+<tr><td>Géométrie du tiroir Tendance (sort du bas, pleine largeur, sans texte)</td><td>── CE QUE J'AI DÉCIDÉ, PUISQU'ELLE ME LE LAISSAIT ── « Je te laisse decider d'où sort ce tiroir et quelle est sa largeur et commnt séparer les différents élements de ce tiroir, s'il faut mettre du texte ou pas. » 1. Il sort du BAS, pleine largeur. […] 3. Aucun texte, et c'est délibéré.</td><td><code>src/versions/mixte/components/TrendDrawer.tsx</code></td></tr>
+<tr><td>Initiales de site tronquées sur la ligne traitement du tiroir Journal</td><td>CE QU'ELLE COÛTE, mesuré après l'alignement de l'ordre : la ligne du traitement perd ses initiales de site (12 à 22 px de trop selon l'entrée) […] C'est le prix de l'ordre demandé, et le choix lui revient.</td><td><code>src/versions/mixte/components/JournalDrawer.tsx</code></td></tr>
+<tr><td>Suppression d'item de repas inerte dans la surimpression du tiroir Journal</td><td><code>onDeleteItem</code> […] reste <code>RIEN</code> : la page appelle <code>journal.deleteItem</code>, une fonction du hook <code>useMealJournal</code> PROPRE à l'instance de <code>MealTracker</code> — <code>App</code> ne la détient pas […] à signaler, pas à trancher dans ce correctif.</td><td><code>src/versions/mixte/components/JournalDrawer.tsx</code></td></tr>
+<tr><td>Phrase longue placée à tort sur la home (erreur reconnue puis corrigée)</td><td>Elle avait porté quelques heures la phrase entière avec son différentiel […], et c'était une erreur de ma part : j'ai transmis ses cinq formulations sans lui demander OÙ elles allaient.</td><td><code>src/versions/mixte/components/DivinationBlock.tsx</code></td></tr>
+<tr><td>Encres du bloc Salut à nu (arbitrage signalé puis déclaré caduc)</td><td>le composant devrait recevoir ses encres de la home qui l'accueille, comme les tuiles reçoivent <code>S.ink</code>. Arbitrage en attente. […] LES DEUX PARAGRAPHES CI-DESSUS SONT CADUCS DEPUIS LE 2026-08-24 […] L'arbitrage en attente est donc rendu, et dans l'autre sens.</td><td><code>src/versions/mixte/components/SalutBlock.tsx</code></td></tr>
+<tr><td>Date d'une entrée de sommeil = date du réveil</td><td><code>date</code> EST LA DATE DU RÉVEIL, et <code>time</code> EST L'HEURE DU RÉVEIL (décision de conception du 2026-08-18, à confirmer par l'utilisatrice)</td><td><code>src/types.ts</code></td></tr>
+<tr><td>Messages de félicitation (propositions non validées)</td><td>les messages proposés (des PROPOSITIONS, à retoucher au goût de l'utilisatrice)</td><td><code>src/features/celebrations/celebrations.ts</code></td></tr>
+<tr><td>Déclenchements des félicitations non implémentés, notes à arbitrer plus tard</td><td>État : SPÉCIFICATION CONSIGNÉE, NON IMPLÉMENTÉE. […] Notes de bord (à arbitrer au moment de l'implémentation réelle, PAS avant)</td><td><code>src/features/celebrations/DECLENCHEMENTS.md</code></td></tr>
+</table>
+<h3 id="arb-metabolisme-rapport-medical-badges-mon-ciel-equivalences-ins">Métabolisme, rapport médical, badges, Mon Ciel, équivalences insolites</h3>
+<p class="note">18 arbitrages.</p>
+<table>
+<tr><th>Sujet</th><th>Ce qui a été décidé sans toi</th><th>Où</th></tr>
+<tr><td>Surface de la carte « Badge à activer » sur le thème immersive-b (lisibilité) — arbitrage laissé ouvert</td><td>LE SEIZIÈME EST immersive-b, ET IL NE SE RÈGLE PAS D'ICI : cette carte-là est <code>bg-slate-50</code>, pas <code>bg-white</code>, elle n'entre donc dans AUCUNE signature que les feuilles repeignent […] Les deux issues sortent de ce fichier — la feuille du thème, ou une décision sur la surface de cette carte et son voile <code>opacity-80</code>. Essayé et ÉCARTÉ : lui donner <code>bg-white</code> + <code>shadow-3xs</code> réparerait immersive-b (4,58) mais casserait Bleu matinal (2,97), Bleu nuit (3,58) et Coucher de soleil (4,10). Arbitrage à rendre, pas à forcer.</td><td><code>src/versions/mixte/components/BadgesPage.tsx</code></td></tr>
+<tr><td>Nom du champ `mysteryBadgeHidden` (polarité inversée à l'affichage, renommage différé)</td><td>LE CHAMP STOCKÉ S'APPELLE ENCORE <code>mysteryBadgeHidden</code> — ÉTAT INTERMÉDIAIRE ASSUMÉ, PAS UNE POSITION DE REPLI. Le champ doit passer au positif pour que le modèle dise ce que l'écran dit […] Le renommage complet (<code>types.ts</code>, cette page, <code>SalutBlock.tsx</code>, <code>App.tsx</code>) suit dans un commit à lui dès ces fichiers libérés. D'ici là, la polarité se retourne À L'AFFICHAGE, par la variable ci-dessous, en un seul endroit.</td><td><code>src/versions/mixte/components/BadgesPage.tsx</code></td></tr>
+<tr><td>Troisième tuile de tolérance : « modérés » écrit deux fois dans la demande, lu comme « légers »</td><td>Et le troisième palier de sa demande est le palier LÉGER : « modérés » y est écrit DEUX FOIS (« nb effet secondaires modérés …, nb effet secondaire modérés …, nb effet secondaire severs ») — trois tuiles demandées, deux paliers nommés. Le manquant est le troisième du site, les légers : la règle du domaine n'en connaît que trois, et une répétition littérale ferait deux tuiles identiques côte à côte, sans sens dans une synthèse.</td><td><code>src/versions/mixte/features/report/medicalReportPdf.ts</code></td></tr>
+<tr><td>Diviseur de l'activité par semaine = la période (pas les journées de sport), seuil des 7 jours désactivé</td><td>LE DIVISEUR EST LA PÉRIODE, pas les journées de sport : la question posée (« moyenne minute activité par semaine ») demande combien de minutes une semaine ordinaire a portées — les semaines sans rien comprises. La fenêtre du domaine est donc la période du document, et le SEUIL DES SEPT JOURS ne s'applique pas (<code>taireSousUneSemaine: false</code>) : la période est écrite dans le titre de la section, le lecteur sait sur quoi porte la moyenne, et une ligne qui disparaît d'un rapport médical sans explication serait pire qu'une moyenne courte.</td><td><code>src/versions/mixte/features/report/medicalReportPdf.ts</code></td></tr>
+<tr><td>Référence du pourcentage de perte hebdomadaire : poids d'entrée de période et non poids de départ</td><td>LA RÉFÉRENCE EST LE POIDS D'ENTRÉE DE PÉRIODE, pas le poids de départ de la cure, et c'est un choix qu'il faut assumer : la section s'intitule « Synthèse du … au … », toutes ses autres valeurs sont bornées à la période […] Conséquence assumée, héritée du découpage : une période de 30 jours compte cinq semaines dont une partielle.</td><td><code>src/versions/mixte/features/report/reportSummary.ts</code></td></tr>
+<tr><td>Renumérotation des sections après suppression du titre « I. PATIENTE ET TRAITEMENT »</td><td>Restait à choisir entre garder les numéros d'avant — un document qui commencerait à « II » — et renuméroter. C'est la renumérotation : un lecteur qui cherche « la section III » compte les titres, il ne devine pas qu'un premier a été retiré.</td><td><code>src/versions/mixte/features/report/medicalReportPdf.ts</code></td></tr>
+<tr><td>Un mois qui commence un lundi rompt la chaîne de fusion des calendriers</td><td>LE MOIS QUI COMMENCE UN LUNDI ROMPT LA CHAÎNE, et c'est un choix. Elle ne demande pas « une carte par période », elle demande de ne pas voir « 2 fois la même ligne » : la fusion est le REMÈDE d'un doublon […] C'est rare — le 1er tombe un lundi une fois sur sept — et cela se VOIT, ce qui vaut mieux qu'une règle invisible.</td><td><code>src/versions/mixte/features/report/reportCalendar.ts</code></td></tr>
+<tr><td>Annexe G « Un temps pour soi » en vue calendrier (non demandé explicitement)</td><td>VUE CALENDRIER ELLE AUSSI, et c'est un choix (2026-08-23) : le temps pour soi est un journal à DURÉE, comme l'activité physique et le sommeil, et les trois calendriers de l'écran écrivent déjà la même valeur dans leur tuile […] Lui donner un tableau quand ses deux voisins ont une grille aurait fait un accident de forme.</td><td><code>src/versions/mixte/features/report/medicalReportPdf.ts</code></td></tr>
+<tr><td>Dégradé du bandeau peint de gauche à droite (au lieu du sens du ciel)</td><td>LE DÉGRADÉ EST PEINT DE GAUCHE À DROITE, quand la plupart des ciels descendent de haut en bas (<code>168deg</code>) ou montent en diagonale (<code>to top right</code>). C'est un choix, pas un oubli […] Le Coucher de soleil est dessiné ainsi depuis le 2026-08-15 et c'est ce qu'elle a validé.</td><td><code>src/versions/mixte/features/report/medicalReportPdf.ts</code></td></tr>
+<tr><td>Seuil de contraste 1,9 pour les séries de graphe de la palette dérivée</td><td>1,9 pour les SÉRIES de graphe : ce sont de larges aplats et des traits d'un millimètre, que la légende nomme, et c'est le seuil qui laisse PASSER TEL QUEL le bleu de la courbe de poids du site (#6DC3FE, 2,02:1). Un seuil plus haut aurait assombri la série du thème d'origine, c'est-à-dire changé la couleur que sa demande veut voir « tel quel ».</td><td><code>src/versions/mixte/features/report/themeReportPalette.ts</code></td></tr>
+<tr><td>Nom du thème dans le bandeau du PDF — provisoire, à retirer</td><td>PROVISOIRE — DÉBOGAGE (demande de l'utilisatrice du 2026-08-23 : « provisoirement, pour débogage : afficher AUSSI dans le bandeau le nom du thème courant »). […] IL N'A RIEN À FAIRE DANS UN DOCUMENT MÉDICAL : il est là le temps de vérifier que la palette « aux couleurs du thème » dérive bien du thème qu'on croit. POUR LE RETIRER : supprimer ce champ, les trois lignes qui l'écrivent dans <code>drawBanner</code>, et l'appel <code>currentThemeDebugLabel()</code> de <code>MedicalReportExport.tsx</code>.</td><td><code>src/versions/mixte/features/report/medicalReportPdf.ts, src/versions/mixte/components/MedicalReportExport.tsx</code></td></tr>
+<tr><td>Critère du palier Éveil du badge d'activité physique (la séance elle-même, alternative écartée)</td><td>Éveil : au moins UNE séance enregistrée sur la journée en cours ou la précédente. Les paliers de ce badge se comptent en heures d'équivalent intensif sur 7/10 jours — ramené à UNE journée, le critère retenu est la séance elle-même : une activité physique enregistrée, quelle que soit sa durée ou son intensité (lecture tranchée le 2026-08-27 ; l'alternative envisagée — 1h d'équivalent modéré sur la journée — a été écartée).</td><td><code>src/utils/badgeSystem.ts</code></td></tr>
+<tr><td>QR code des partages : faux motif, encodeur réel non décidé</td><td>⚠️ CE QR CODE N'EN EST PAS UN. IL NE SE SCANNE PAS, ET C'EST ASSUMÉ. […] LE VRAI ENCODEUR EST UNE DÉCISION QUI LUI REVIENT : bibliothèque tierce, encodeur écrit à la main, ou image fabriquée hors de l'application. Elle est notée, elle n'est pas prise ici.</td><td><code>src/versions/mixte/components/share/QrPlaceholder.tsx</code></td></tr>
+<tr><td>Duplication des mots d'intensité des effets dans les maquettes de partage</td><td><code>SEVERITY_LABELS</code> vit dans <code>SideEffectForm</code> et n'en sort pas : les mots sont repris ici, à l'identique, plutôt que d'exporter une constante d'un formulaire vers une maquette. Le jour où l'échelle change, les deux listes doivent bouger ensemble — c'est le prix de la duplication, assumé pour ne pas faire dépendre une page d'un formulaire.</td><td><code>src/versions/mixte/components/share/shareTemplates.tsx</code></td></tr>
+<tr><td>Partage de badge : `navigator.share` en direct, à unifier à la conversion native</td><td>Le partage lui-même parle encore <code>navigator.share</code> en direct — antérieur à <code>shared/platform/share</code>, et laissé tel quel à dessein […] À unifier À LA CONVERSION, quand tout le partage se réécrira sur l'API native.</td><td><code>src/utils/badgeShare.ts</code></td></tr>
+<tr><td>Seuils de corrélation (Cohen) choisis volontairement exigeants</td><td>LES SEUILS DE LECTURE (2026-08-18) : |r| ≥ 0,5 se dit « net », entre 0,3 et 0,5 « modéré », en dessous de 0,3 « aucun lien ». Ce sont les conventions usuelles en sciences humaines (Cohen) — volontairement exigeantes pour une app de santé : mieux vaut taire un lien faible que suggérer un rapport qui n'existe pas.</td><td><code>src/shared/analysis/analysis.ts</code></td></tr>
+<tr><td>Plancher à 0 ajouté au pourcentage d'objectif</td><td>Le plancher à 0 (absent de certaines copies existantes) est ajouté ici sans changer le résultat des appels existants : il ne peut se déclencher qu'avec un ratio négatif, ce qui n'arrivait dans aucun des usages actuels.</td><td><code>src/shared/goals/goals.utils.ts</code></td></tr>
+<tr><td>Filtre des journées futures non touché, corrigé seulement dans l'analyse</td><td>LE FILTRE PARTAGÉ N'EST PAS TOUCHÉ : il sert aussi les journaux et les versions gelées, et changer ce qu'ELLES affichent est une décision qui ne se prend pas au détour d'une phrase d'analyse. Ici, l'ANALYSE écarte ces journées et le DIT.</td><td><code>src/shared/analysis/analysis.ts</code></td></tr>
+</table>
+<h3 id="arb-transversal-modele-de-donnees-stockage-dates-navigation">Transversal : modèle de données, stockage, dates, navigation</h3>
+<p class="note">10 arbitrages.</p>
+<table>
+<tr><th>Sujet</th><th>Ce qui a été décidé sans toi</th><th>Où</th></tr>
+<tr><td>Date d'une entrée de sommeil = date du réveil</td><td>« <code>date</code> EST LA DATE DU RÉVEIL, et <code>time</code> EST L'HEURE DU RÉVEIL (décision de conception du 2026-08-18, à confirmer par l'utilisatrice) : une nuit commencée le 17 à 23 h et finie le 18 à 7 h appartient au <strong>18</strong>. »</td><td><code>src/types.ts</code></td></tr>
+<tr><td>Bornes numériques nouvelles proposées (mensurations, distances, nutriments, poids d'insolite, longueur de nom)</td><td>« D'OÙ VIENNENT CES BORNES. Celles du profil (âge, taille, poids) existaient déjà […]. TOUTES LES AUTRES SONT NOUVELLES et proposées ici : elles sont signalées une par une dans le rapport, pour être discutées plutôt que subies. » (RULE_MEASUREMENT « BORNE NOUVELLE », RULE_DISTANCE_KM « BORNE HAUTE NOUVELLE », RULE_DISTANCE_M « BORNE NOUVELLE », RULE_NUTRIENT « BORNE HAUTE NOUVELLE », RULE_INSOLITE_WEIGHT « BORNE HAUTE NOUVELLE », RULE_NAME_LENGTH « BORNE NOUVELLE » ; la dose et la quantité ont depuis été tranchées par l'utilisatrice le 2026-08-16.)</td><td><code>src/versions/mixte/app/form.rules.ts</code></td></tr>
+<tr><td>Une nuit de zéro minute n'entre pas dans la moyenne des nuits</td><td>« UNE NUIT DE ZÉRO MINUTE N'EST PAS UNE NUIT, et ne compte donc ni au numérateur ni au dénominateur (arbitrage du 2026-08-23, à la fusion avec la jumelle <code>nightAverageMinutes</code> du rapport PDF, qui portait cette garde et pas celle-ci). »</td><td><code>src/features/sleep/sleep.utils.ts</code></td></tr>
+<tr><td>Définition du temps d'éveil d'une journée</td><td>« DÉFINITION RETENUE (décision de conception du 2026-08-18) : du réveil du matin à l'endormissement du soir, <strong>moins les siestes de la journée</strong>. »</td><td><code>src/features/sleep/sleep.utils.ts</code></td></tr>
+<tr><td>Hypothèse : l'onboarding demandera le poids de départ mais pas sa date</td><td>« Repose sur une hypothèse arrêtée le 2026-08-06 : <strong>les écrans d'accueil du premier lancement demanderont le poids de départ, mais pas sa date.</strong> Si l'onboarding finit par la demander, c'est lui qui l'écrira. » (Le modèle d'onboarding demande depuis la date « si connue ».)</td><td><code>src/shared/model/startingWeighIn.ts</code></td></tr>
+<tr><td>Géométrie et contenu du tiroir Tendance</td><td>« CE QUE J'AI DÉCIDÉ, PUISQU'ELLE ME LE LAISSAIT — « Je te laisse decider d'où sort ce tiroir et quelle est sa largeur et commnt séparer les différents élements de ce tiroir, s'il faut mettre du texte ou pas. » 1. Il sort du BAS, pleine largeur. 2. Une ligne par domaine, séparées d'un filet de cheveu. 3. Aucun texte, et c'est délibéré. 4. Un module ÉTEINT reste visible, grisé. »</td><td><code>src/versions/mixte/components/TrendDrawer.tsx</code></td></tr>
+<tr><td>Disparition des refus de formulaire</td><td>« ET QUAND DISPARAISSENT-ILS ? L'instruction ne le dit pas ; la règle retenue est celle du message de dose, validée le 2026-08-16 : un refus s'efface dès qu'on retouche le champ fautif, et revient au prochain clic sur Valider s'il tient toujours. »</td><td><code>src/versions/mixte/app/FormRefusals.tsx</code></td></tr>
+<tr><td>Modification d'une pesée : pas de retri ni de règle « une par jour »</td><td>« DEUX ÉCARTS ASSUMÉS avec <code>addWeighIn</code>, tous deux d'origine et couverts par des tests pour qu'un changement futur soit visible : L'historique n'est PAS retrié. […] La règle « une seule par jour » ne s'applique pas ici. »</td><td><code>src/features/weight/weighInWrites.ts</code></td></tr>
+<tr><td>Troncature des lignes du tiroir Journal (perte des initiales de site)</td><td>« CE QU'ELLE COÛTE, mesuré après l'alignement de l'ordre : la ligne du traitement perd ses initiales de site (12 à 22 px de trop selon l'entrée) […]. C'est le prix de l'ordre demandé, et le choix lui revient. »</td><td><code>src/versions/mixte/components/JournalDrawer.tsx</code></td></tr>
+<tr><td>Nom négatif du champ mysteryBadgeHidden</td><td>« S'il porte encore son nom négatif, c'est un ÉTAT INTERMÉDIAIRE de quelques heures, pas un choix […]. En attendant ce renommage, la polarité se retourne à l'affichage, dans <code>BadgesPage</code> (<code>badgeMystereAffiche = !profile.mysteryBadgeHidden</code>), en un seul endroit. »</td><td><code>src/types.ts</code></td></tr>
+</table>
+</section>
+
+<section id="inventions">
+<h2>2. Ce qui a été pensé sans pouvoir être fondé <a class="retour" href="#sommaire">↑ sommaire</a></h2>
+<p>348 phrases que les rédacteurs de la <a href="spec-fonctionnelle.html">spécification fonctionnelle</a> ont eu envie d'écrire, et qui n'ont pas résisté au code — soit qu'ils l'aient su en écrivant, soit qu'un vérificateur les ait fait retirer. Elles ne décrivent pas le produit. Elles disent ce qu'on a cru qu'il faisait, ou ce qu'on aurait aimé qu'il fasse : c'est la matière d'une prochaine version. Chacune porte son origine, c'est-à-dire pourquoi elle est venue et ce que le code dit à la place.</p>
+<h3 id="inv-produit">Le produit</h3>
+<h4>contrainte</h4>
+<dl class="inventions">
+<dt>Les données de santé sont chiffrées sur l'appareil.</dt><dd><em>Stockage des données de santé</em> — GUIDELINES §1 le prescrit pour le jour de la conversion native ; en V1 la sauvegarde est un JSON en clair dans localStorage, en V2 rien n'est stocké.</dd>
+<dt>Aucune API du navigateur hors d'un seul fichier.</dt><dd><em>React Native à venir (V2)</em> — Réfutation retenue. GUIDELINES.md:49-51 nomme trois endroits : main.tsx, index.html et src/plateforme/navigateur.ts. Corrigé.</dd>
+<dt>La personne peut retrouver la ligne écrasée par un plafond.</dt><dd><em>Plafonds quotidiens</em> — Rien ne la conserve : addLogWithinDailyCap (logbook.ts:77-88) fusionne la nouvelle saisie dans la dernière ligne du jour et la valeur précédente disparaît. J'aurais voulu écrire qu'un retour en arrière existe ; il n'existe pas.</dd>
+<dt>Les copies de secours se font toutes seules, à intervalle régulier.</dt><dd><em>Copies de secours horodatées</em> — dataBackup.ts n'expose que des verbes (backUpCurrentSave, restoreBackup, writeWithBackup) ; aucun déclencheur périodique n'a été trouvé, et le seul appelant relevé est la page d'administration, hors périmètre. Le chapitre dit donc « peuvent être faites », sans dire par qui.</dd>
+</dl>
+<h4>non-but</h4>
+<dl class="inventions">
+<dt>Le produit n'annonce jamais qu'une prise est en retard.</dt><dd><em>Posologie</em> — App.tsx (V1) calcule getNextInjectionMessage (« En retard de Nj », dernière prise + 7 jours) ; l'inventaire n'a trouvé aucun rendu de ce message et le tient pour du code mort. Je ne peux affirmer ni qu'il s'affiche ni qu'il ne s'affiche pas.</dd>
+<dt>La page « Configuration &amp; Plus » est inatteignable en usage normal.</dt><dd><em>Réseau social</em> — Doute levé depuis : aucune référence à l'onglet « plus » hors de App.tsx (highlightedTab, rendu, et un retour par défaut), et aucune entrée de menu ne le vise. La phrase est donc entrée au chapitre comme un fait ; l'invention est levée.</dd>
+<dt>Une entrée de pas peut être marquée simulée.</dt><dd><em>Objet connecté</em> — Réfutation retenue. isSimulated n'existe qu'en déclaration (types.ts:294) et en lecture (StepsCalendar.tsx:110) ; l'ajout d'un pas (useAppData.ts:300-310) ne pose pas le champ. Le chapitre dit maintenant que le drapeau n'est jamais écrit.</dd>
+</dl>
+<h4>objet</h4>
+<dl class="inventions">
+<dt>Deux comptes ouverts sur le même navigateur partagent la même sauvegarde.</dt><dd><em>Une seule personne par installation</em> — Déduit de la clé unique glp1_app_companion_data, qui ne porte pas l'identifiant du compte ; comportement non vérifié. La déduction est écrite au chapitre comme conséquence de la clé, non comme observation.</dd>
+<dt>Le produit ne pose pas de diagnostic.</dt><dd><em>Posture médicale</em> — Réfutation retenue. Aucun texte du code n'affirme cela ; l'avertissement (LegalPrivacyPage.tsx:141) ne parle que de dispositif médical et de posologies, et l'attestation de « aucun conseil médical ». À l'inverse le produit annonce une catégorie de corpulence (BmiMilestoneBlock) et trace une concentration sanguine modélisée. Phrase remplacée par les citations exactes.</dd>
+<dt>Chaque forme finit par « Autre » (V1 comme V2).</dt><dd><em>Catalogue des traitements</em> — Réfutation retenue. En V1 l'entrée s'appelle « Autre traitement », avec les libellés « Autre traitement (Injection) » et « Autre traitement (Comprimé oral) » (treatment.catalog.ts:174, 219) ; « Autre » est le nom V2 (domaine/traitements.ts). Les deux libellés sont maintenant distingués.</dd>
+<dt>La V2 recueille un mot de passe de huit signes au moins, seule contrainte.</dt><dd><em>Compte (V2)</em> — Réfutation retenue. peutValider ne bloque qu'un mot de passe COMMENCÉ : « return reponses.motDePasse.length === 0 || motDePasseValide(...) ». Un mot de passe vide passe. Phrase corrigée.</dd>
+<dt>Repartie de zéro sans rien copier de la V1 : ce qui en vient est repris pièce par pièce.</dt><dd><em>Reprise depuis la V1 (V2)</em> — Réfutation retenue. La phrase se contredisait et perdait la condition qui fait la règle : « à sa demande explicite, et STRICTEMENT ce dont on a besoin », « ne jamais aller puiser dans la V1 de soi-même » (GUIDELINES.md:28-35). Condition restaurée.</dd>
+<dt>Dans le questionnaire V1, le poids actuel est demandé tant que « j'ai déjà commencé » n'est pas un oui explicite ; passer une étape efface ses réponses ; le questionnaire n'écrit rien hormis le thème.</dt><dd><em>Questionnaire d'accueil V1</em> — Réfutation retenue, deux fois. D'abord hors périmètre : ce questionnaire est une simulation atteignable seulement depuis la page d'administration (AdminSettings.tsx:332). Ensuite faux sur le fond : OnboardingPage.tsx:161-163 écrit à chaque changement l'état complet sous glow_onboarding_sim_mixte — ce qu'il n'écrit pas, c'est la sauvegarde de l'application. Le paragraphe entier a été retiré ; le principe s'appuie désormais sur l'onboarding V2 seul.</dd>
+</dl>
+<h4>principe</h4>
+<dl class="inventions">
+<dt>La V2 enregistrera le poids en kilogrammes quelle que soit l'unité de saisie.</dt><dd><em>Unités canoniques (V2)</em> — unites.ts l'annonce (« on stockera toujours en unités métriques ») et reponses.ts renvoie la conversion « là où on les enregistrera » ; aucune fonction kg↔lb n'existe et rien n'enregistre. Seule la taille est convertie (tailleEnCm).</dd>
+<dt>Les journaux du sommeil et du temps pour soi ne sont pas purgés parce qu'ils sont nés après la suppression logique.</dt><dd><em>Supprimer supprime</em> — purgeDeleted.ts traverse sept journaux et laisse meTimeLogs et sleepLogs sans dire pourquoi ; le doute est dans l'inventaire, non tranché dans le code.</dd>
+<dt>Le libellé relatif d'une date (« lundi 3 août ») recule d'un jour dans les fuseaux à l'ouest de Greenwich.</dt><dd><em>Dates locales</em> — date.relative.ts fait new Date(dateStr) ; la conséquence est décrite dans les commentaires de date.local.ts pour ce motif, mais je ne l'ai pas observée à l'écran.</dd>
+<dt>Aucun rythme hebdomadaire n'est affiché avant sept jours de recul ou avec moins de deux pesées ; dans ce cas rien n'est écrit, ni zéro ni tiret.</dt><dd><em>Une valeur absente se tait</em> — Réfutation retenue. Le seuil (MIN_DAYS_FOR_WEEKLY_RATE = 7, moins de deux pesées → null) ne vit que dans averageWeeklyChange, appelée uniquement par la surimpression des paliers de dose. Les trois accueils réécrivent la formule à la main sans borne (MaisonSections.tsx:1083, BlocSuiviPoids.tsx:303, Maison.tsx:249) et signedKg rend « -0 ». Le chapitre dit maintenant les deux comportements.</dd>
+<dt>Seules les dates relatives construisent une date depuis une chaîne, ce que la couche de dates interdit ailleurs.</dt><dd><em>Dates locales</em> — Réfutation retenue. homeOverview.ts:225, steps.utils.ts:170 et injections.utils.ts:140 construisent une Date depuis un AAAA-MM-JJ, alors que date.local.ts:104-127 l'interdit. La phrase a été corrigée pour nommer ces trois calculs.</dd>
+<dt>Un aliment saisi en litres ou en kilos est multiplié par mille avant enregistrement.</dt><dd><em>Unités canoniques (V1)</em> — Réfutation retenue. fromLargeUnit (food.units.ts:61) n'est appelée nulle part — sa seule autre occurrence est la ré-export de shared/food/index.ts:10 — et le formulaire d'aliment n'offre que « 100 g » et « 100 ml » (CustomFoodPage.tsx:28-29). Phrase retirée.</dd>
+<dt>Une seule étape bloque, celle qui demande quel traitement.</dt><dd><em>Aucune branche ne se ferme sur un silence (V2)</em> — Réfutation retenue. Deux étapes bloquent : « quel-traitement » et « profil » quand un mot de passe commencé n'atteint pas huit signes. J'avais repris le commentaire d'en-tête de parcours.ts (« une seule étape bloque aujourd'hui ») au lieu du corps de peutValider.</dd>
+<dt>Durée de sommeil = réveil − endormissement, zéro si le réveil précède.</dt><dd><em>Sommeil</em> — Réfutation retenue. sleep.utils.ts:50-52 rend aussi zéro quand le réveil ÉGALE l'endormissement, et quand une date ou une heure est illisible. Les trois cas sont maintenant écrits.</dd>
+</dl>
+<h4>questionnaire</h4>
+<dl class="inventions">
+<dt>Le questionnaire V1 écrira un jour le profil, les journaux et les modules.</dt><dd><em>Questionnaire d'accueil V1</em> — SPEC-FONCTIONNELLE §11 le liste comme point ouvert ; le code calcule ce qu'il allumerait (onboarding.outcome.ts) sans rien écrire. La V2 a repris l'onboarding de zéro.</dd>
+</dl>
+<h4>transversal</h4>
+<dl class="inventions">
+<dt>La V1 livre trois versions de l'interface sous une seule sauvegarde, aiguillées par le fragment d'adresse.</dt><dd><em>Aiguillage des versions</em> — Vrai dans le code (VersionRouter.tsx, versions.ts : initiale, cartes, mixte ; src/versions/ contient les trois dossiers), et c'est ce qui donne son poids à « une seule personne par installation ». Écarté du chapitre parce que la consigne pose que Initiale et Cartes n'existent pas ; le chapitre ne nomme donc aucune version et parle de « la V1 ».</dd>
+</dl>
+<h3 id="inv-compte">Le compte et les données</h3>
+<h4>Avertissement médical</h4>
+<dl class="inventions">
+<dt>Redemander l'acceptation quand le texte légal change.</dt><dd><em>Version de l'acceptation</em> — Le suffixe _v1 de la clé hasAcceptedMedicalDisclaimer_v1 le suggère ; aucun mécanisme ne compare une version.</dd>
+<dt>Ouvrir l'avertissement médical depuis un bouton de la home.</dt><dd><em>Porte depuis l'accueil</em> — Les deux boutons de la home menaient à onOpenLegalModal ; ils sont retirés depuis le 2026-08-26 (MaisonSections.tsx:4849-4855, Maison.tsx:1148-1154). La prop est encore reçue, plus jamais câblée. Mention « ou depuis l'accueil » retirée du chapitre.</dd>
+</dl>
+<h4>Connexion</h4>
+<dl class="inventions">
+<dt>Un lien « Mot de passe oublié » enverrait un e-mail de réinitialisation.</dt><dd><em>Mot de passe oublié</em> — Réflexe de toute page de connexion ; LoginPage.tsx n'en a pas et auth.ts n'appelle jamais sendPasswordResetEmail.</dd>
+<dt>Dire que la création de compte dans l'onboarding V2 contredit « Les comptes sont créés par l'administratrice — pas d'inscription libre. »</dt><dd><em>Opposition V1 / V2 sur l'inscription libre</em> — Commentaire éditorial sans appui : la phrase décrit la politique de la V1, aucune décision V2 ne la reprend. Retiré du chapitre.</dd>
+<dt>Dire que la suppression ramène toujours sur la page de connexion.</dt><dd><em>Fermeture de session à la suppression sans Firebase</em> — Vrai seulement si isAuthConfigured ; sans configuration, AuthGate laisse passer et le rechargement rouvre l'application sur le profil d'usine et l'avertissement médical (DeleteAccountBlock.tsx:124-137, AuthGate.tsx:16-17). Phrase corrigée dans le chapitre.</dd>
+</dl>
+<h4>Données sur l'appareil</h4>
+<dl class="inventions">
+<dt>Chiffrer un plafond (environ 5 Mo) et prévenir avant saturation.</dt><dd><em>Quota du stockage</em> — dataBackup.ts évoque ~5 Mo en commentaire ; aucun écran ne mesure ni n'avertit, l'écriture échoue en silence.</dd>
+<dt>Décrire le mécanisme de copies horodatées (clé glp1_app_companion_data__secours-AAAA-MM-JJ-HHMMSS, index trié, copie vérifiée par relecture, restauration qui met d'abord l'état courant à l'abri) et son garde-fou de stockage plein (« La sauvegarde de secours n’a PAS pu être écrite… », ok faux : l'appelant ne doit rien écrire).</dt><dd><em>Copies de secours horodatées</em> — Paragraphe retiré du chapitre : les seuls appelants de backUpCurrentSave, listBackups et restoreBackup sont DataGeneratorPage.tsx, la page d'administration, hors périmètre. Aucun écran d'utilisatrice ne voit ce mécanisme, y compris après une sauvegarde illisible.</dd>
+<dt>Dire qu'après une sauvegarde illisible l'application repart de journaux vides.</dt><dd><em>Journal vide après une sauvegarde illisible</em> — Faux pour les pesées : le catch retombe sur le return final de l'initialiseur, qui sème la pesée de départ à 95 kg de la veille 08:00 (useAppData.ts:127-155, startingWeighIn.ts:158-164). Corrigé dans le chapitre et dans l'exemple.</dd>
+</dl>
+<h4>Sauvegarde</h4>
+<dl class="inventions">
+<dt>Proposer à l'utilisatrice de restaurer la copie de secours au lancement suivant.</dt><dd><em>Restauration à l'écran d'une sauvegarde illisible</em> — Le message du bloc dit où est la copie mais aucun écran utilisateur ne la remet ; dataBackup.ts ne sert que la page d'administration (hors périmètre).</dd>
+<dt>Faire une copie horodatée avant clearAll pour offrir un retour en arrière.</dt><dd><em>Copie de secours avant suppression du compte</em> — La mise en garde promet l'inverse (« Rien n'est gardé en réserve ») et clearAll efface aussi les copies existantes.</dd>
+</dl>
+<h4>Session</h4>
+<dl class="inventions">
+<dt>Un bouton « Se déconnecter » dans Mon compte ou dans Configuration &amp; Plus.</dt><dd><em>Déconnexion volontaire</em> — Le seul appel à signOutUser est le bouton « Se reconnecter » du bloc de suppression, visible seulement après un refus auth/requires-recent-login.</dd>
+<dt>Dire que Firebase exige une connexion de moins de cinq minutes pour supprimer le compte.</dt><dd><em>Délai de connexion récente</em> — Comportement du SDK Firebase, pas du code lu ; auth.ts ne fixe aucun délai, il ne fait que prévoir le code d'erreur.</dd>
+<dt>Redemander le mot de passe après une période d'inactivité ou à chaque lancement.</dt><dd><em>Verrou après inactivité</em> — Attente naturelle sur des données de santé ; la session est gardée sans limite de durée (auth.ts, persistance locale du SDK).</dd>
+</dl>
+<h4>Suppression</h4>
+<dl class="inventions">
+<dt>Supprimer aussi les documents Firestore liés au compte (retours, sondage, courriers).</dt><dd><em>Effacement des données distantes</em> — DeleteAccountBlock n'appelle que deleteCurrentUser puis clearAll ; rien n'est écrit ni effacé en base.</dd>
+<dt>Énumérer les clés que la suppression efface, comme une garantie de complétude.</dt><dd><em>Liste écrite des clés effacées</em> — clearAll appelle localStorage.clear() : storage.ts:80-91 refuse justement la liste écrite à la main, qui vieillirait mal. Les clés citées dans le chapitre sont des exemples relevés dans le code, pas un inventaire exhaustif.</dd>
+</dl>
+<h4>V2</h4>
+<dl class="inventions">
+<dt>Le bouton du dernier écran créerait le compte et ouvrirait une session.</dt><dd><em>Création effective du compte</em> — GUIDELINES.md § 5 : le bouton ne mène nulle part, aucune réponse n'est enregistrée, pas de Firebase. Phrase « le compte se crée sur le dernier écran de l'onboarding » retirée du chapitre après réfutation : useParcours.ts:108 borne avancer() à la dernière étape, aucun stockage dans src/.</dd>
+<dt>Vérifier la forme de l'adresse e-mail avant d'avancer.</dt><dd><em>Format de l'adresse e-mail</em> — Le champ est type=email sans règle dans domaine/compte.ts ; la longueur du mot de passe est la seule contrainte (2026-09-08).</dd>
+</dl>
+<h3 id="inv-onboarding">L'arrivée : l'onboarding</h3>
+<h4>accessibilité</h4>
+<dl class="inventions">
+<dt>Les roues se parcourent aux flèches du clavier.</dt><dd><em>Roues</em> — GUIDELINES §5 : non fait.</dd>
+<dt>Le nom du thème s'affiche sous son cadre.</dt><dd><em>Thème</em> — Un choix nommé se lit mieux ; le nom n'est qu'en aria-label depuis le 2026-09-07, le cadre EST le thème.</dd>
+</dl>
+<h4>avatar</h4>
+<dl class="inventions">
+<dt>L'avatar est enregistré avec le profil et affiché dans l'entête de l'application.</dt><dd><em>Avatar</em> — Commentaires de domaine/avatar.ts (« sera enregistré avec son profil ») ; rien n'existe après l'onboarding.</dd>
+<dt>Le créateur d'avatar est celui de la V1 en périmètre, repris tel quel.</dt><dd><em>Avatar</em> — GUIDELINES §4 l'écrit ainsi, mais dans la version Mixte le visage est un émoji depuis le 2026-08-09, la forme du visage, les yeux et les lunettes ne changent plus le dessin et l'expression ne se choisit plus ; le créateur dessiné à huit réglages vient d'une version hors périmètre. La provenance a donc été retirée du chapitre.</dd>
+</dl>
+<h4>cohérence</h4>
+<dl class="inventions">
+<dt>Le poids visé est borné par le poids actuel quand on veut perdre, ou proposé à partir de lui.</dt><dd><em>Poids visé</em> — Refusé explicitement le 2026-09-07 (reponses.ts : « ne sont pas les memes valeurs ») ; les deux champs ne se touchent jamais.</dd>
+</dl>
+<h4>décompte</h4>
+<dl class="inventions">
+<dt>Les billes ne comptent que les écrans à partir du traitement (quatre pour Camille).</dt><dd><em>Le parcours et ses boutons</em> — ETAPE_DEBUT_DECOMPTE le laissait croire ; useParcours compte toutes les étapes visibles (neuf billes, cinq allumées sur l'écran du traitement).</dd>
+<dt>Les billes s'accompagnent d'un compte lisible, « 5 sur 9 ».</dt><dd><em>Le parcours et ses boutons</em> — Un décompte appelle un chiffre ; Progression.tsx n'affiche aucun texte, le compte n'existe que dans role=&quot;progressbar&quot; et ses aria-value.</dd>
+</dl>
+<h4>enregistrement</h4>
+<dl class="inventions">
+<dt>À l'appui sur le mot-symbole, les réponses sont écrites dans un profil et une pesée de départ (96 kg pour Camille).</dt><dd><em>Dernière étape</em> — GUIDELINES §5 dit qu'aucune réponse n'est enregistrée ; l'inventaire V1 (startingWeighIn.ts) attend que l'onboarding écrive le poids de départ. Rien de tel dans le code.</dd>
+<dt>L'onboarding ne se rejoue pas au second lancement.</dt><dd><em>Le parcours et ses boutons</em> — Un onboarding se fait une fois ; App.tsx ne monte que &lt;Onboarding&gt; et rien ne retient que le parcours a été fait.</dd>
+</dl>
+<h4>langue</h4>
+<dl class="inventions">
+<dt>Choisir English fait passer les textes en anglais dès l'écran suivant.</dt><dd><em>Langue et unités</em> — Maquette assumée (EtapeLangueUnites) ; useTextes lit seulement la langue du navigateur.</dd>
+<dt>Le séparateur décimal suit la langue choisie à l'écran : point après « English », virgule après « Français ».</dt><dd><em>Poids actuel</em> — separateurDecimal existe bien dans les deux dictionnaires, mais useTextes lit la langue du navigateur : le choix de l'écran ne change pas la virgule affichée.</dd>
+</dl>
+<h4>navigation</h4>
+<dl class="inventions">
+<dt>Le bouton final ouvre la page d'accueil, puis invite à un premier enregistrement (une injection, un comprimé, un repas) et félicite.</dt><dd><em>Dernière étape</em> — Principes d'onboarding de TIPS-UX-UI repris dans GUIDELINES §4 ; il n'y a pas de page d'accueil, avancer sur le dernier écran ne fait rien (useParcours.avancer).</dd>
+</dl>
+<h4>parcours</h4>
+<dl class="inventions">
+<dt>Un bouton « Passer cette étape » comme dans la V1, qui efface les réponses de l'étape.</dt><dd><em>Le parcours et ses boutons</em> — onboarding.steps.ts de la V1 ; en V2, passer se fait par « Suivant » avec la valeur d'avance, et rien ne s'efface.</dd>
+<dt>Si une réponse changée en arrière raccourcit la liste sous l'étape courante, le parcours retombe sur la dernière étape visible.</dt><dd><em>Le parcours et ses boutons</em> — Garde-fou réel de useParcours (rang borné), mais inatteignable par les gestes de l'écran : reculer abaisse toujours le rang avant qu'une réponse change. Laissé à la spec technique.</dd>
+</dl>
+<h4>saisie</h4>
+<dl class="inventions">
+<dt>Une saisie libre au clavier en plus des roues, avec message de refus hors bornes.</dt><dd><em>Poids actuel</em> — NumberField de la V1 ; la V2 n'a que les roues et GUIDELINES §4 dit le message « Poids saisi incorrect » supprimé.</dd>
+</dl>
+<h4>thème</h4>
+<dl class="inventions">
+<dt>Le thème choisi est mémorisé d'un lancement à l'autre.</dt><dd><em>Thème</em> — La V1 mémorisait le thème (getSelectedTheme) ; en V2 rien n'est persisté.</dd>
+<dt>Le liseré du cadre retenu prend une teinte différente selon le thème actif.</dt><dd><em>Thème</em> — On attend d'un accent qu'il varie d'un thème à l'autre ; --accent vaut #5fc0ff dans ciel.css comme dans ciel-fonce.css, le liseré est donc le même bleu partout.</dd>
+<dt>Toucher un cadre repeint aussi les deux cadres aux couleurs du thème retenu.</dt><dd><em>Thème</em> — Réfutation retenue : chaque cadre porte sa propre classe de thème (EtapeTheme.tsx:32, page.css .carte-theme { background: var(--fond) }), son fond et son encre ne changent jamais avec la page.</dd>
+</dl>
+<h4>traitement</h4>
+<dl class="inventions">
+<dt>La date de début, la dose (0,25 mg pour Camille) et la semaine de cure sont demandées avec la spécialité.</dt><dd><em>Quel traitement</em> — Les chiffres de Camille invitaient à les placer ici ; la V1 demandait « depuis quand » ; la V2 ne demande que la forme et la spécialité.</dd>
+<dt>Choisir « Autre » ouvre un champ pour écrire le nom de sa spécialité.</dt><dd><em>Quel traitement</em> — « Autre » appelle une précision ; traitements.ts n'a que les identifiants autre-injection et autre-comprime, aucun champ libre, et GUIDELINES §3 interdit la saisie d'un traitement à la main.</dd>
+</dl>
+<h4>unités</h4>
+<dl class="inventions">
+<dt>Un poids saisi en livres est converti en kilogrammes au stockage, et la valeur se convertit quand on revient changer d'unités.</dt><dd><em>Poids actuel et Poids visé</em> — Règle « stockage toujours métrique » de GUIDELINES §3 ; reponses.ts garde la chaîne de la roue telle quelle et remet la conversion « là où on les enregistrera ».</dd>
+</dl>
+<h4>validation</h4>
+<dl class="inventions">
+<dt>L'adresse e-mail est vérifiée (forme nom@domaine) et le prénom borné en longueur.</dt><dd><em>Dernière étape</em> — EtapeProfil ne pose que type=email et autoComplete ; compte.ts ne connaît que la longueur du mot de passe.</dd>
+</dl>
+<h3 id="inv-maison">La Maison</h3>
+<h4>amélioration</h4>
+<dl class="inventions">
+<dt>Corriger le message « elle vous attend en haut de l'accueil », faux sur la home standard (dernier bloc) et sur la home sections (deuxième section).</dt><dd><em>Fête « Dynamique débloquée »</em> — Constat de lecture (CelebrationDynamique.tsx vs Maison.tsx) ; une correction serait une décision, pas un fait de code. La remarque a été retirée du corps du chapitre : elle y était un commentaire éditorial, pas une description d'écran.</dd>
+</dl>
+<h4>comportement</h4>
+<dl class="inventions">
+<dt>Dire quel template la personne voit réellement sur GLP1LOW (standard par défaut, mais une valeur enregistrée depuis la page des thèmes peut imposer sections ou blocs).</dt><dd><em>Templates d'accueil</em> — La page qui écrit le choix (thèmes) est hors périmètre et n'a pas été lue ; le chapitre ne décrit que le défaut de homeChoice.ts et la relecture des valeurs anciennes « carre » et « fines-lignes ».</dd>
+<dt>Décrire le contenu détaillé des couches Pas, Menus, IMC, Paliers de dose, Activité physique, Un temps pour soi et Sommeil (grandeurs, périodes, formats).</dt><dd><em>Couches vitrées</em> — SurimpressionPas, SurimpressionRepas, SurimpressionImc, SurimpressionDoses, SurimpressionSport, SurimpressionNuits et BlocMesMoments n'ont pas été lus ; seuls leurs titres, liens et les mentions de l'inventaire sont rapportés.</dd>
+<dt>Décrire la mise en page fine du bloc (dimensions, aplats, position des deux paliers dans le panneau).</dt><dd><em>Bloc palier d'IMC franchi</em> — BmiMilestoneBlock.tsx a été lu pour les textes, les deux régimes (au-dessus et en dessous de 18,5) et le libellé du bouton, qui sont désormais dans le chapitre ; la mise en page elle-même ne porte aucune donnée et n'est pas décrite.</dd>
+<dt>Décrire le menu simplifié lui-même et la manière de le choisir.</dt><dd><em>Tiroirs Journal et Tendance</em> — App.tsx dit seulement que ces tiroirs n'existent qu'en menu simplifié (getSelectedMenu) ; le réglage du menu n'a pas été lu et relève d'un autre chapitre.</dd>
+<dt>Dire d'où le widget s'ouvre aujourd'hui : une page d'essai qui liste les douze types et tire un contenu simulé.</dt><dd><em>Widget de félicitation</em> — Réfutation acceptée : cette page (FelicitationsPage) n'est atteignable que depuis AdminSettings, domaine administration, hors périmètre. Le chapitre se borne à constater qu'aucun écran de ce périmètre n'ouvre le widget.</dd>
+<dt>Décrire la coquille de calendrier commune (grille lundi→dimanche, bulle par jour, ajout sur jour vide, navigation par chevrons ou glissé).</dt><dd><em>Bloc calendrier</em> — L'inventaire la range dans ce chapitre mais précise qu'aucune home ne la monte : elle n'appartient à aucun écran de la Maison, et la décrire ici inventerait une présence.</dd>
+<dt>Aligner les deux homes sur les prises datées du futur : la home standard les compte, la home sections les écarte.</dt><dd><em>Carré traitement</em> — Réfutation acceptée, l'écart est vérifié (currentTreatmentInjections vs currentTreatmentSeries) et décrit tel quel dans le chapitre ; le corriger serait une décision.</dd>
+</dl>
+<h4>exemple</h4>
+<dl class="inventions">
+<dt>Donner une valeur « Actif » (concentration encore active) pour Camille, par exemple « Actif 1.2 mg ».</dt><dd><em>Carré traitement</em> — La pharmacocinétique (calculateCumulativeConcentration, PK par traitement) n'a pas été lue ; le chiffre aurait été deviné. La figure dit « Actif … mg ».</dd>
+<dt>Le métabolisme au repos de Camille (≈ 1 533 kcal/jour) est calculé avec Mifflin-St Jeor (femme, 48 ans, 168 cm, 88,4 kg).</dt><dd><em>Section Dynamique — le verdict</em> — computeMetabolismSummary n'a pas été lu ; l'inventaire prend la formule telle que les commentaires la décrivent. Le chiffre de l'exemple repose sur cette hypothèse.</dd>
+<dt>L'exemple « 30 % de l'objectif — Encore 0,6 kg de moins, 6,3 kg depuis le début » suppose un déclenchement au jalon 30 % par une pesée de Camille.</dt><dd><em>Widget de félicitation</em> — Aucun déclenchement n'existe (DECLENCHEMENTS.md) ; l'exemple illustre le message d'un type, pas un parcours réel.</dd>
+<dt>Donner les glucides et les lipides de Camille pour compléter les cinq colonnes du bilan du jour.</dt><dd><em>Bloc « Aujourd'hui »</em> — Seuls les kcal, les protéines et les fibres de sa journée sont posés par les exemples des autres chapitres ; deux macros de plus auraient été inventées. La figure nomme les colonnes sans les chiffrer toutes.</dd>
+<dt>Chiffrer les kcal dépensées par les 6 240 pas de Camille.</dt><dd><em>Bloc Mes pas</em> — getStepsCaloriesForLog et calculateStepCalories n'ont pas été lues. Le pourcentage, la distance et la durée, eux, sont désormais calculés depuis les constantes du module (8 000 pas, 0,00076 km/pas, 95 pas/minute) et écrits dans l'exemple.</dd>
+</dl>
+<h4>règle</h4>
+<dl class="inventions">
+<dt>Dire ce que devient l'objectif du bloc Salut quand la personne a choisi « Stabiliser mon poids » (V2) et n'a pas de poids visé.</dt><dd><em>Bloc « Salut »</em> — La V2 rend le poids visé conditionnel (GUIDELINES § 4), mais elle n'a pas de home ; la V1 suppose toujours un targetWeight. Rien ne le fonde.</dd>
+<dt>Dire ce que la personne voit quand aucune tuile ne passe ses conditions : un titre de section et une grille vides.</dt><dd><em>Section « Progrès » / « Évolution »</em> — Le code rend le séparateur et la grille sans condition sur le nombre de tuiles, mais ce rendu n'a pas été observé ; affirmer ce qui s'affiche alors dépasserait la lecture.</dd>
+</dl>
+<h3 id="inv-traitement">Le traitement</h3>
+<h4>amélioration</h4>
+<dl class="inventions">
+<dt>Le mode d'ouverture (palier ou « Autre dose ») se décide sur les paliers de la fiche du traitement, pas sur la liste générique 0,25 / 0,5 / 1 / 1,7 / 2,4.</dt><dd><em>Modifier une prise</em> — startEdit lit DEFAULT_DOSE_PRESETS : une prise Mounjaro 5 mg s'ouvre en saisie libre bien que 5 soit un palier Mounjaro. Intention non établie.</dd>
+<dt>Annuler le formulaire ramène la dose au premier palier du traitement et la zone à la suggestion, pas à 0,25 mg et abdomen gauche.</dt><dd><em>Saisir une prise (injection ou comprimé)</em> — cancelEdit fixe 0.25 et abdomen_gauche quel que soit le traitement ; l'ouverture suivante corrige la zone mais pas la dose si elle n'est pas dans les paliers. Comportement observé, intention non établie.</dd>
+<dt>La zone proposée se calcule à la date et à l'heure saisies dans le formulaire : une prise ajoutée au 12 août se juge parmi ses voisines du 12 août.</dt><dd><em>Proposer la zone d'injection</em> — suggestInjectionSite accepte un instant <code>at</code>, mais InjectionsTracker l'appelle à maintenant (arbitrage consigné dans le code, marqué dans le chapitre).</dd>
+<dt>Le clic sur « Actif » du carré et sur la tuile « En direct » sans surimpression fait défiler la page Injections jusqu'au graphe.</dt><dd><em>Résumer le traitement en cours sur la home</em> — La cible 'plot' met autoOpenPkPlot à vrai, que BloodLevelPlot ne lit pas ; seul handleGraphNavigate (tiroir Tendances) fait défiler jusqu'à blood-level-plot-section.</dd>
+<dt>Le carré traitement de la home standard écarte les prises futures comme le fait la série de la home sections.</dt><dd><em>Résumer le traitement en cours sur la home</em> — Maison.tsx lit currentTreatmentInjections sans filtre hasOccurred ; MaisonSections lit currentTreatmentSeries (filtrée). Réfutation retenue : le chapitre disait qu'une prise future ne compte pas dans la série de la home, ce qui est faux pour la home standard ; la phrase est corrigée et le souhait passe ici. La V2 ne tranche pas.</dd>
+<dt>Une fenêtre fixe (7, 14, 30, 90 jours) borne aussi la droite du graphe : « 30 derniers jours » s'arrête à aujourd'hui.</dt><dd><em>Calculer et afficher le niveau sanguin actif</em> — filterByTimeWindow n'applique qu'une borne basse (timeWindow.utils.ts) : les dix jours de prévision restent affichés à droite d'aujourd'hui quelle que soit la période. Comportement observé, intention non établie ; le chapitre le dit désormais.</dd>
+<dt>Chaque ouverture du formulaire retire une zone au sort.</dt><dd><em>Proposer la zone d'injection</em> — suggestInjectionSite est mémoïsée sur l'historique (InjectionsTracker) : rouvrir le formulaire sans avoir touché au journal propose exactement la même zone. Le chapitre disait « tirée au sort » sans le préciser ; corrigé.</dd>
+<dt>La V2 conserve l'identifiant <code>orforglipron</code> de la V1 pour Foundayo, afin d'atteindre les données déjà enregistrées.</dt><dd><em>Déclarer ou changer le traitement</em> — Le catalogue V2 (src/domaine/traitements.ts) l'a renommé <code>foundayo</code>, alors que la V1 avait gelé l'identifiant pour cette raison exacte. Aucune décision de migration n'est écrite : le chapitre constate l'écart, sans le corriger.</dd>
+</dl>
+<h4>comportement supposé</h4>
+<dl class="inventions">
+<dt>L'application envoie une notification au jour et à l'heure réglés, ou tous les N jours à partir de la date choisie.</dt><dd><em>Configurer les rappels d'injection</em> — La carte Notifications l'annonce (« seront planifiés automatiquement ») ; aucun code de planification ni d'envoi n'existe dans src (recherche sur Notification, serviceWorker, LocalNotifications, PushNotifications). Le chapitre le marque « non implémenté ».</dd>
+</dl>
+<h4>détail non vérifié</h4>
+<dl class="inventions">
+<dt>Les gestes exacts de validation en place (Entrée, sortie de champ, Échap) dans la ligne du journal et la bulle du calendrier.</dt><dd><em>Modifier une prise</em> — Composants partagés (useInlineEditableLog, InlineEditableDate/Time/Note, NumberField) lus par extraits dans l'inventaire ; le chapitre dit « s'édite en place » sans nommer le geste.</dd>
+<dt>Le format exact des bornes « du … au … » (JJ/MM/AAAA ou JJ/MM) dans le bandeau du journal et du graphe.</dt><dd><em>Filtrer le journal par période</em> — InlineCustomDateRange et PeriodBounds non lus ; les légendes de capture évitent d'écrire ces bornes.</dd>
+<dt>Le nom « L'escalier des doses » comme titre d'écran.</dt><dd><em>Voir l'escalier des doses</em> — Réfutation retenue : la couche s'intitule « Paliers de dose » (MaisonSections) et le bloc « Parcours de doses · {nom} » (SurimpressionDoses) ; l'expression n'existe que dans le message d'état vide et les commentaires. Titre et renvois du chapitre corrigés.</dd>
+</dl>
+<h4>fonctionnalité supposée</h4>
+<dl class="inventions">
+<dt>Une tuile « Prochaine injection : Aujourd'hui / Demain / Dans N jours / En retard de N j ».</dt><dd><em>Résumer le traitement en cours sur la home</em> — App.tsx calcule nextDoseMessage (dernière prise passée + 7 jours) et lastDose, sans aucun affichage : code mort. Non rapporté comme écran.</dd>
+<dt>Une cartographie corporelle des zones et une zone « recommandée » (jamais utilisée, sinon la plus ancienne).</dt><dd><em>Proposer la zone d'injection</em> — getRecommendedSite, computeSiteStats.stats, BODY_MAP_SITES et showMap existent sans affichage en Mixte ; la cartographie a été retirée le 2026-08-09. Cités seulement dans le bloc repliable comme « calculés, plus affichés ».</dd>
+<dt>Un carré traitement sur la home sections, à côté des autres carrés de suivi, qui écrirait « 0 mg » pour une dose absente.</dt><dd><em>Résumer le traitement en cours sur la home</em> — MaisonSections garde ce carré sous <code>const CARRES_SUIVI = false;</code> : la branche n'est jamais rendue. Décrire ce qu'elle ferait relève du journal de code ; la phrase a été retirée du chapitre.</dd>
+<dt>Une bascule « concentration réelle / dose injectée » sous le graphe poids contre traitement.</dt><dd><em>Réutiliser les prises dans le tiroir Journal, le défilé, le PDF et le partage</em> — useWeightTreatmentChart tient showRealConcentration et toggleRealConcentration, mais le lien de bascule a été supprimé le 2026-08-22 : le graphe reste sur la concentration. Aucun écran ne montre la bascule ; le chapitre décrit la seule vue rendue.</dd>
+</dl>
+<h4>règle plausible</h4>
+<dl class="inventions">
+<dt>La modification par le formulaire conserve le traitement d'origine de la ligne.</dt><dd><em>Modifier une prise</em> — Le bloc « Traitement mis à jour » promet que les prises gardent leur traitement, mais useInjectionForm.handleSubmit réécrit brand avec le traitement du profil du moment, alors que l'édition en place (journal, bulle) le conserve. L'écart n'est pas documenté ; le chapitre décrit le code.</dd>
+<dt>La troisième prise d'un même jour est refusée plutôt que d'écraser la dernière.</dt><dd><em>Saisir une prise (injection ou comprimé)</em> — Le sommeil et les repas refusent (règle du 2026-08-17 citée dans useAppData : « RIEN AU MONDE ne devrait détruire la donnée ») ; les injections écrasent encore via addLogWithinDailyCap(cap 2).</dd>
+<dt>Une dose au-delà de la « Dose max » de la fiche déclenche un avertissement.</dt><dd><em>Valider la dose</em> — Le suffixe « (Dose max) » le suggère ; seule RULE_DOSE (0,001–1 000 000 mg) refuse. Le chapitre dit que le suffixe informe.</dd>
+<dt>L'écart « ≈ x j entre 2 injections » du bilan se calcule sur tout l'historique des prises.</dt><dd><em>Réutiliser les prises dans le tiroir Journal, le défilé, le PDF et le partage</em> — Réfutation retenue : MedicalReportExport passe <code>filteredInjections</code> — les prises de la période exportée — à injectionIntervalDays ; l'historique complet ne sert qu'à la première prise de la série. La phrase a été corrigée, le souhait est consigné ici.</dd>
+<dt>Les textes d'explication ne contiennent aucune durée écrite en dur et ne promettent aucun effet.</dt><dd><em>Expliquer la cinétique</em> — Repris du commentaire d'en-tête de treatmentCurveExplainer.ts : c'est une règle de rédaction du module, pas une chose qu'un écran montre. La phrase a été retirée du chapitre, qui dit déjà que chaque durée est calculée depuis la fiche.</dd>
+</dl>
+<h4>règle V2 supposée</h4>
+<dl class="inventions">
+<dt>La certification d'essai clinique est aussi demandée dans l'onboarding V2 pour le rétatrutide.</dt><dd><em>Certifier un essai clinique</em> — Le catalogue V2 (src/domaine/traitements.ts) n'a pas de drapeau requiresTrialCertification et l'écran « Quel traitement » valide le rétatrutide comme les autres. Le chapitre décrit la V2 telle quelle.</dd>
+</dl>
+<h3 id="inv-poids">Le poids</h3>
+<h4>Cadence</h4>
+<dl class="inventions">
+<dt>Le bandeau écrit « depuis le début » à la place de l'intervalle, sans « et aujourd'hui ».</dt><dd><em>Lire la cadence de perte</em> — Le code concatène toujours « et {periodEndLabel} » : la phrase lue est « … depuis le début et aujourd'hui ». La retoucher serait une décision, pas une correction.</dd>
+</dl>
+<h4>Confirmation</h4>
+<dl class="inventions">
+<dt>Le poids de la carte de confirmation écrit avec un point comme le reste du site.</dt><dd><em>Confirmer et fêter une pesée</em> — La carte écrit « 84,5 kg » (toFixed(1).replace('.', ',')) alors que format1Dec écrit un point partout ailleurs ; constaté dans l'inventaire, non tranché.</dd>
+</dl>
+<h4>Courbe de poids</h4>
+<dl class="inventions">
+<dt>Le message de données insuffisantes sans la mention du « tramage de dose de GLP-1 ».</dt><dd><em>Visualiser la courbe de poids</em> — Le texte cite encore le GLP-1 alors que MONTRER_GLP1 = false ; le chapitre le signale comme un fait, la correction serait une décision.</dd>
+<dt>La fenêtre « Depuis le début » s'arrête à aujourd'hui.</dt><dd><em>Visualiser la courbe de poids</em> — endMs = max(dernière donnée, aujourd'hui) : une pesée ou une injection datée du futur étire l'axe au-delà. Le commentaire du code assume ce cas ; le plafonner serait une décision.</dd>
+</dl>
+<h4>Home sections</h4>
+<dl class="inventions">
+<dt>La tuile « dernière perte » de la rangée Progrès se tait quand elle égale la perte totale au dixième.</dt><dd><em>Suivre la progression vers l'objectif</em> — Phrase retirée du chapitre : lossesEqual n'existe que dans Maison.tsx (home standard) et WeighInSubmissionCard ; showLastLoss de MaisonSections ne compare jamais les deux pertes. Seul le commentaire du code le laissait croire.</dd>
+<dt>Une durée sous chacune des quatre mini-tuiles de la rangée Progrès.</dt><dd><em>Suivre la progression vers l'objectif</em> — Phrase retirée du chapitre : seules les deux tuiles de perte appellent lossSpanLabel ; l'hebdomadaire porte « /semaine » en unité de repli, celle d'IMC un picto en sous-libellé.</dd>
+</dl>
+<h4>IMC</h4>
+<dl class="inventions">
+<dt>Une seule table de libellés de catégories d'IMC.</dt><dd><em>Calculer et afficher l'IMC</em> — Deux jeux coexistent : bmiCategoryLabel (« Obésité I ») sur la ligne IMC du carré, getBmiTierInfo (« Obésité modérée (Classe I) ») dans le bloc palier ; l'unifier serait une amélioration.</dd>
+</dl>
+<h4>Mensurations</h4>
+<dl class="inventions">
+<dt>Une courbe des tours de poitrine, taille et hanches sous la courbe de poids.</dt><dd><em>Saisir des mensurations</em> — useWeightTreatmentChart porte ces trois mesures dans ses points à midi, mais aucun rendu lu ne les affiche.</dd>
+</dl>
+<h4>Menu +</h4>
+<dl class="inventions">
+<dt>La perte du menu « + » calculée sur la pesée la plus récente par date.</dt><dd><em>Suivre la progression vers l'objectif</em> — PlusMenu prend weightHistory[length − 1] ; l'ordre stocké cesse de suivre les dates après une modification (updateWeighIn ne retrie pas). Le chapitre décrit le comportement réel.</dd>
+</dl>
+<h4>Onboarding V2</h4>
+<dl class="inventions">
+<dt>Le poids actuel saisi à l'onboarding V2 devient la pesée de départ du journal.</dt><dd><em>Tenir le poids de départ</em> — keepStartingOnOldest fait de la première pesée d'un historique vide le départ, mais rien n'enregistre les réponses de l'onboarding (GUIDELINES § 5) : le lien n'est écrit nulle part.</dd>
+</dl>
+<h4>Poids de départ</h4>
+<dl class="inventions">
+<dt>Demander la date de la première pesée à l'onboarding.</dt><dd><em>Tenir le poids de départ</em> — La V1 simulait cette question (OnboardingPage) ; la V2 ne la pose pas ; la date par défaut (la veille) reste un arbitrage non validé.</dd>
+</dl>
+<h4>Poids visé</h4>
+<dl class="inventions">
+<dt>Un poids visé supérieur au poids actuel ou au poids de départ est refusé.</dt><dd><em>Fixer le poids visé</em> — Les arcs et la barre affichent ce cas avec un « + » ou 0 % ; aucun refus n'existe, et la V2 dit seulement que les deux valeurs ne sont jamais liées.</dd>
+</dl>
+<h4>Rappels</h4>
+<dl class="inventions">
+<dt>Un rappel de pesée hebdomadaire.</dt><dd><em>Enregistrer une pesée</em> — Aucun rappel de pesée n'existe ; seuls les rappels d'injection et de rendez-vous se configurent.</dd>
+</dl>
+<h4>Surimpression IMC</h4>
+<dl class="inventions">
+<dt>Nommer les bandes insuffisance pondérale, corpulence normale et obésité III sur l'échelle.</dt><dd><em>Calculer et afficher l'IMC</em> — Trois bandes sur six sont sans mot depuis le retrait de la ligne de classe ; l'arbitrage est consigné dans SurimpressionImc, pas décidé.</dd>
+</dl>
+<h4>Tiroir Tendances</h4>
+<dl class="inventions">
+<dt>La carte « Balance » du tiroir Tendances emmène à la page Balance.</dt><dd><em>Consulter la tendance du poids</em> — Phrase retirée du chapitre : weight figure dans GRAPHES_EN_SURIMPRESSION, la carte ouvre donc le graphe par-dessus le tiroir. Le commentaire de TrendDrawer qui annonce la navigation est périmé ; seul « Ajouter une saisie » mène à la page.</dd>
+</dl>
+<h4>Unités</h4>
+<dl class="inventions">
+<dt>Affichage des pesées en livres quand le système impérial est choisi.</dt><dd><em>Consulter le journal des pesées</em> — UserProfile.measurementSystem existe sans interface en V1 ; la V2 fixe la règle (stockage métrique, affichage selon le système) mais n'a pas d'écran de pesée.</dd>
+</dl>
+<h3 id="inv-effets">Les effets secondaires</h3>
+<h4>Ajout rapide</h4>
+<dl class="inventions">
+<dt>Un formulaire d'ajout rapide propre (12 effets courants + « Autre », intensité 2 par défaut, « Effet indésirable » si le nom est vide).</dt><dd><em>Ouvrir le formulaire d'ajout par les raccourcis</em> — useSideEffectQuickForm et COMMON_EFFECTS existent dans la logique partagée mais ne sont importés que par la version Initiale, hors périmètre ; la Mixte ouvre le formulaire complet de la page. Non décrit.</dd>
+</dl>
+<h4>Bulle du calendrier</h4>
+<dl class="inventions">
+<dt>Retirer du code le mode lecture seule des lignes de bulle, aujourd'hui inatteignable.</dt><dd><em>Consulter et modifier les effets d'un jour</em> — <code>modifiable = !!onUpdateSideEffect</code> (SideEffectCalendar.tsx:338) ; seul SideEffectsTracker monte le calendrier, et il passe toujours le gestionnaire. Le chapitre le signale, la suppression est une décision de code, pas de spécification.</dd>
+</dl>
+<h4>Calendrier</h4>
+<dl class="inventions">
+<dt>Le calendrier des effets serait aussi monté en lecture seule dans une couche vitrée de la home, valeurs figées, sans Modifier ni Supprimer.</dt><dd><em>Consulter le calendrier des effets</em> — DayEffectLines porte un garde-fou « sans écrivain » écrit pour un montage dans la couche vitrée de la home (2026-08-30), mais la home ouvre aujourd'hui la matrice, pas le calendrier. Je n'ai trouvé aucun montage de SideEffectCalendar sans onUpdateSideEffect ; le chapitre dit maintenant que ce mode existe dans le code et ne s'atteint pas.</dd>
+</dl>
+<h4>Formulaire</h4>
+<dl class="inventions">
+<dt>Le plafond quotidien remplacerait le ressenti le plus récent par l'heure, et non la dernière ligne saisie du jour.</dt><dd><em>Ajouter un ressenti</em> — addLogWithinDailyCap écrase la dernière ligne du tableau portant la date, c'est-à-dire la dernière saisie, quelle que soit son heure (logbook.ts:83-86). Le chapitre dit maintenant explicitement « la dernière ligne saisie de ce jour, quelle que soit son heure ».</dd>
+<dt>L'intensité reviendrait à 0 à chaque ouverture du formulaire d'ajout, quel que soit le chemin.</dt><dd><em>Ajouter un ressenti</em> — openAddForm réinitialise l'effet, la date et l'heure mais pas la sévérité (useSideEffectForm.ts:119-127) ; seul resetForm remet DEFAULT_SEVERITY. Rouvrir l'ajout depuis le titre de page sur un formulaire déjà ouvert conserve donc la valeur poussée. Le chapitre décrit ce que fait le code, l'homogénéisation n'est pas décidée.</dd>
+</dl>
+<h4>Graphique Impact</h4>
+<dl class="inventions">
+<dt>Donner à l'exemple de Camille un jour d'injection précis avec sa dose (par exemple « Injection · 0,5 mg · abdomen gauche » le 11/09).</dt><dd><em>Consulter le graphique d'impact</em> — L'infobulle affiche la dose et le site, et un chiffre rendrait l'exemple plus parlant ; mais le jour d'injection et la dose de septembre relèvent du chapitre Traitement et je ne les connais pas. L'exemple reste sans dose.</dd>
+</dl>
+<h4>Home</h4>
+<dl class="inventions">
+<dt>Une tuile de bilan « n effets sur 7 jours » ou « n effets par semaine depuis le début » sur la home.</dt><dd><em>Résumer les effets du jour sur la home</em> — homeOverview.ts définit sideEffectsCountLast7Days et sideEffectsWeeklyAverage, mais aucun composant de la version Mixte ne les rend (grep). Non décrit dans le chapitre.</dd>
+<dt>La tuile « ressentis du jour » de la home Sections/Blocs disparaîtrait quand le module est éteint et masqué.</dt><dd><em>Résumer les effets du jour sur la home</em> — Un commentaire de MaisonSections.tsx dit que le module « n'a pas de drapeau » et que la tuile est « toujours là », antérieur au passage en module du 2026-08-29 ; le code lu ne conditionne que le clic (surimpression ou page), pas la présence de la tuile. Je n'ai pas vérifié le rendu de la rangée.</dd>
+</dl>
+<h4>Journal</h4>
+<dl class="inventions">
+<dt>La note d'une ligne du journal serait tronquée à l'affichage (« … ») quand elle dépasse la largeur.</dt><dd><em>Ligne du journal (JournalEntryCard)</em> — Levée : InlineEditableNote rend la note avec <code>truncate</code> (shared/ui/InlineEditableNote.tsx:41) et le placeholder d'édition en place est « Notes (facultatif) » (JournalEntryCard.tsx:214). Les deux sont désormais écrits dans le chapitre ; entrée conservée pour mémoire.</dd>
+<dt>L'édition en place du journal accepterait 0/5, comme celle de la bulle du calendrier.</dt><dd><em>Éditer une ligne en place</em> — Les deux éditeurs divergent (1 à 5 au journal, 0 à 5 dans la bulle) ; le chapitre le marque « non implémenté » mais aligner les deux échelles n'a pas été décidé.</dd>
+</dl>
+<h4>Ligne d'outils</h4>
+<dl class="inventions">
+<dt>Un libellé « Calendrier » / « Journal » sous les deux carreaux, pour lever l'ambiguïté du dessin seul.</dt><dd><em>Basculer entre journal et calendrier</em> — Écarté d'office : la demande du 2026-08-25 interdit toute explication textuelle du basculement (« tout doit decouler du graphisme, aucune explication textuel de switch »). Consigné pour éviter qu'on le repropose.</dd>
+</dl>
+<h4>Module</h4>
+<dl class="inventions">
+<dt>Le module éteint conserverait ses données et les réafficherait au rallumage.</dt><dd><em>Activer, désactiver, masquer le module Effets secondaires</em> — Plausible puisque handleToggleSideEffects ne touche que les deux drapeaux du profil, mais je n'ai pas lu de règle explicite sur la conservation de sideEffectHistory à l'extinction. Non écrit.</dd>
+</dl>
+<h4>Rapport PDF</h4>
+<dl class="inventions">
+<dt>Sans donnée, la section « III Tolérance » afficherait « Aucun effet secondaire déclaré sur cette période. »</dt><dd><em>Exporter le rapport médical</em> — Réfutation retenue : la phrase existe dans le code (medicalReportPdf.ts:2537) mais est inatteignable — <code>include.sideEffects</code> exige déjà <code>filteredSideEffects.length &gt; 0</code> (MedicalReportExport.tsx:1440, 1465, 1677) et ces mêmes lignes alimentent seStats. La phrase a été retirée du chapitre : c'est un état d'écran qui n'existe pas.</dd>
+</dl>
+<h4>Tendance</h4>
+<dl class="inventions">
+<dt>Le titre du tiroir dirait « 14 derniers jours », en accord avec la fenêtre calculée.</dt><dd><em>Voir l'évolution des effets sur la quinzaine</em> — Le tiroir s'intitule « Tendance des 15 derniers jours » alors que TREND_DAYS vaut 14, aujourd'hui compris. Le chapitre constate l'écart sans le corriger.</dd>
+</dl>
+<h3 id="inv-alimentation">L'alimentation</h3>
+<h4>Calendrier</h4>
+<dl class="inventions">
+<dt>Une tuile de jour plus foncée quand le total kcal est plus élevé.</dt><dd><em>Intensité de couleur par kcal</em> — Attente d'un calendrier de suivi ; MealCalendar n'affiche que le nombre entier, sans nuance.</dd>
+</dl>
+<h4>Code-barres</h4>
+<dl class="inventions">
+<dt>Chaque échec de lecture serait journalisé anonymement.</dt><dd><em>Journalisation anonyme des échecs de scan</em> — Consigne V2 pour la conversion native (GUIDELINES § 1), aucun code correspondant dans la V1 ni la V2.</dd>
+</dl>
+<h4>Composition par créneau</h4>
+<dl class="inventions">
+<dt>« La base est la masse, non l'énergie. »</dt><dd><em>Redite sur la base de la part</em> — Phrase supprimée : « Part = masse du nutriment / masse totale du créneau » dit déjà la même chose dans la puce précédente.</dd>
+</dl>
+<h4>Formulaire repas</h4>
+<dl class="inventions">
+<dt>Une prise datée après aujourd'hui serait refusée.</dt><dd><em>Refus d'une prise datée du futur</em> — Règle plausible, aucun garde-fou trouvé dans useMealForm ni useAppData ; hasOccurred existe dans date.local sans appel vu pour les repas.</dd>
+<dt>Un repas ne pourrait pas dépasser un certain nombre de lignes.</dt><dd><em>Plafond de lignes d'aliments par prise</em> — Tous les autres plafonds sont posés (30 prises/jour, 50 favoris, 50 aliments, 20 recettes) ; aucun plafond par composition n'existe dans le code.</dd>
+</dl>
+<h4>Graphiques</h4>
+<dl class="inventions">
+<dt>Une lecture en toutes lettres sous chaque bloc : « vos kcal sont très régulières », écart net entre faim avant et après, créneau dominant, composition qui change selon l'heure.</dt><dd><em>Analyses textuelles sous les graphiques</em> — Le moteur chartAnalysis.ts (analyzeNutrition, analyzeHunger, analyzeTimeSlotShare, analyzeTimeSlotComposition) existe avec ses seuils, mais aucun écran de la page Menus ne le monte ; je n'ai pu décrire aucune phrase affichée.</dd>
+<dt>« Les axes de chaque graphe suivent ses propres données » portait la marque « arbitrage non validé ».</dt><dd><em>Axes indépendants d'un graphe à l'autre</em> — Réfutation retenue : la marque est retirée. mealCharts.utils.ts:149-152 attribue le choix à l'utilisatrice (« C'est son choix — la règle prime sur la comparabilité des deux graphes »). La phrase reste, sans marque.</dd>
+</dl>
+<h4>Journal</h4>
+<dl class="inventions">
+<dt>Le nombre entre parenthèses compte les repas de la période affichée.</dt><dd><em>Nombre du bandeau « Journal (N) »</em> — Tentation de lecture : le bandeau porte la période juste à côté. Le code passe savedMeals.length, c'est-à-dire tous les repas enregistrés (MealTracker.tsx:1254). Le chapitre le dit désormais explicitement.</dd>
+<dt>Le total kcal d'une journée pourrait différer d'une unité entre le journal et le calendrier.</dt><dd><em>Écart d'une unité entre journal et calendrier</em> — Vérifié et retenu, donc écrit dans le chapitre : MealDayGroup.tsx:336 somme des kcal arrondis par prise, mealCalendar.ts:37 arrondit la somme. Ce n'est pas une invention mais un comportement que la version précédente du chapitre taisait.</dd>
+</dl>
+<h4>Navigation</h4>
+<dl class="inventions">
+<dt>La page s'appelle « Menus » sur sa bande de titre et dans le tiroir ; l'onglet du menu bas s'appelle « Repas ».</dt><dd><em>Nom de la page du domaine</em> — Réfutation partiellement écartée : l'onglet du menu bas s'appelle bien « Repas » (src/app/navigation.ts:49) et la phrase a été corrigée, mais l'affirmation « « Menus » n'est le libellé de cette page que DANS LES TIROIRS » est fausse — src/versions/mixte/App.tsx:1213 pose PAGE_TITLES.meals = 'Menus' pour la bande de titre. Le commentaire de mixte/app/navigation.ts:201-209 cité en preuve est périmé sur ce point.</dd>
+</dl>
+<h4>Objectifs</h4>
+<dl class="inventions">
+<dt>Une félicitation quand les kcal du jour atteignent l'objectif de 1400.</dt><dd><em>Palier kcal</em> — L'objectif kcal existe (dailyNutritionGoals), mais paliersNutritifs.ts ne connaît que protéines et fibres ; tentation de symétrie.</dd>
+<dt>La félicitation une fois par jour et par nutriment portait la marque V2.</dt><dd><em>Paliers protéines et fibres marqués V2</em> — Réfutation retenue : la marque est retirée. Le seul « palier » de GUIDELINES.md V2 est « les objectifs de poids à paliers », rangé parmi les choses à ne pas réintroduire ; le comportement décrit est purement V1 (paliersNutritifs.ts).</dd>
+</dl>
+<h4>Onboarding</h4>
+<dl class="inventions">
+<dt>L'onboarding se terminerait par la saisie d'un premier repas et une félicitation.</dt><dd><em>Premier repas en fin d'onboarding</em> — Principe consigné dans GUIDELINES V2 § 4 ; la V2 n'a pas encore d'accueil ni de saisie de repas, la V1 ne le fait pas.</dd>
+</dl>
+<h4>Repas vs en-cas</h4>
+<dl class="inventions">
+<dt>« La forme a été choisie par Claude sur délégation. »</dt><dd><em>Origine de la forme du bloc</em> — Phrase supprimée : elle décrit la fabrication du bloc, pas ce que l'écran fait, et la marque « arbitrage non validé » qui la suivait porte déjà l'information. Le fait lui-même vit dans mealVsSnack.ts:6-8, qui relève de l'historique.</dd>
+</dl>
+<h4>Saisie</h4>
+<dl class="inventions">
+<dt>Saisir « une cuillère à soupe », « un verre », « une tranche » et laisser l'application convertir en g ou ml.</dt><dd><em>Quantité en portions usuelles</em> — La table src/data/portionsUsuelles.ts existe mais n'est importée par aucun écran ; seule la saisie en g / ml est câblée.</dd>
+</dl>
+<h4>Suggestions</h4>
+<dl class="inventions">
+<dt>Les aliments créés par l'utilisatrice porteraient une icône dans les suggestions.</dt><dd><em>Marque visuelle des aliments personnels dans la liste</em> — Seul le score +2000 les place en tête ; FoodSuggestionList ne montre que la coche de sélection et le badge /100g ou /100ml.</dd>
+<dt>La coche « N fois sélectionné » reflète exactement les validations de l'aliment.</dt><dd><em>Cohérence du compteur de sélection</em> — Doute de l'inventaire : la liste lit le compteur par libellé officiel alors que l'incrément passe par le nom court affiché ; non vérifié à l'exécution, donc non affirmé.</dd>
+</dl>
+<h4>Suppression</h4>
+<dl class="inventions">
+<dt>Les boutons « Supprimer définitivement tous les repas » n'apparaissent que si un drapeau du profil ne les a pas éteints.</dt><dd><em>Boutons de suppression totale conditionnels</em> — Retiré du chapitre : le drapeau deleteAllButtonsEnabled ne s'écrit que depuis l'écran Administration (AdminSettings.tsx:64 et :234), hors périmètre. Seule la confirmation dans la page, visible par l'utilisatrice, est conservée.</dd>
+</dl>
+<h4>Unités</h4>
+<dl class="inventions">
+<dt>Une personne en système impérial verrait ses quantités en oz et fl oz.</dt><dd><em>Affichage impérial</em> — food.units.ts porte les conversions, mais tous les appels lus passent sans système, donc métrique ; aucun réglage vu dans le périmètre.</dd>
+<dt>Le stockage est toujours en g ou ml, l'affichage suit le système choisi — marqué V2.</dt><dd><em>Stockage des quantités d'aliments en g et ml (V2)</em> — Réfutation écartée : GUIDELINES.md V2, § « Données, unités, nombres, dates », énonce « Stockage toujours métrique (kg, cm, g, ml), affichage et saisie selon le système choisi ». La règle V2 nomme explicitement le gramme et le millilitre, même si aucun domaine alimentaire n'est encore écrit ; la marque V2 reste. La phrase est conservée telle quelle.</dd>
+</dl>
+<h3 id="inv-pas">Les pas</h3>
+<h4>Amélioration</h4>
+<dl class="inventions">
+<dt>Un objectif réglable par la personne au lieu des 8 000 fixes.</dt><dd><em>Objectif quotidien de pas</em> — StepsTracker et StepsJournalRow acceptent une prop dailyGoalSteps que rien ne passe ; aucun réglage n'existe dans l'application lue.</dd>
+<dt>Diviser la moyenne en Kpas/j par les journées relevées, comme les kcal/j de la même carte.</dt><dd><em>Tendance des pas (tiroir Tendances)</em> — stepsTrend met 0 les jours sans relevé et informedTrendMean divise par 14, alors que stepsTrendKcalPerDay divise par les journées relevées ; c'est le code tel quel, aucune décision ne le tranche.</dd>
+<dt>Fixer l'échelle de l'axe vertical à 1,25 × le maximum de la fenêtre.</dt><dd><em>Graphe des pas</em> — Réfutation retenue, phrase retirée du chapitre : dans StepsTrendChart, le facteur 1,25 ne sert qu'à mesurer la largeur de la colonne d'étiquettes (yAxisWidth) ; le YAxis n'a aucun domain et le traceur choisit son échelle.</dd>
+<dt>Dérouler le journal en entier au lieu de le contenir dans une boîte de 160 px.</dt><dd><em>Journal des pas</em> — StepsJournal borne sa liste à max-h-[160px] ; le compte du bandeau annonce bien plus de lignes qu'il n'en montre. Aucune décision lue ne fixe cette hauteur.</dd>
+</dl>
+<h4>Comportement supposé</h4>
+<dl class="inventions">
+<dt>Que les relevés semés portent le drapeau isSimulated et montrent la mention dans la bulle du calendrier.</dt><dd><em>Mention « Journée simulée »</em> — Seuls src/types.ts et StepsCalendar citent isSimulated ; aucun producteur lu ne le pose, la mention n'a donc pas été observée.</dd>
+<dt>Le libellé et la place de l'entrée des pas dans le menu du bas.</dt><dd><em>Navigation vers la page</em> — Le menu n'a pas été lu (doute de l'inventaire) ; seul le titre de bande « Marche » (PAGE_TITLES) est établi.</dd>
+<dt>Le fonctionnement de la bascule « Nombre de Pas » sur la page Modules et l'effet du masquage stepsModuleHidden.</dt><dd><em>Réglage du module</em> — La page Modules n'a pas été lue par l'inventaire ; seuls la cible module-steps-tracking et les drapeaux du profil sont établis.</dd>
+<dt>Que la tuile des pas prenne toute la largeur quand le module des repas est éteint.</dt><dd><em>Tuiles de l'accueil</em> — Réfutation retenue, phrase retirée du chapitre : le col-span-2 de MaisonSections vit dans la branche où le module des PAS est éteint et s'applique aux deux tuiles restantes. L'arbitrage de Claude porte sur « repas coupés ET pas coupés », hors périmètre des pas.</dd>
+<dt>Qu'une carte n'existe que pour les modules allumés.</dt><dd><em>Tiroir Tendances</em> — Réfutation retenue, phrase corrigée : la ligne est dans le tableau quoi qu'il arrive (enabled: Boolean(profile.stepsTrackingEnabled)) et la carte d'un module éteint est seulement voilée, avec son message d'activation.</dd>
+<dt>Que toucher la carte « Pas » du tiroir mène à la page des pas.</dt><dd><em>Navigation depuis le tiroir Tendances</em> — Réfutation retenue, chemin retiré de la liste : GRAPHES_EN_SURIMPRESSION['steps'] ouvre le graphe par-dessus ; seul le lien « Voir mes pas » d'une carte sans donnée navigue.</dd>
+<dt>Que le titre du graphe disparaisse dans le bandeau de la surimpression.</dt><dd><em>Graphe des pas en surimpression</em> — Formulation du manque signalé ; EnteteGraphe fait redescendre l'intitulé en texte simple de 11 px dans le bloc — il change de place, il ne disparaît pas.</dd>
+</dl>
+<h4>Fonctionnalité supposée</h4>
+<dl class="inventions">
+<dt>Un carrousel d'une carte par jour (date, pas, calories, pourcentage atteint) sous les cartes de tête.</dt><dd><em>Cartes journalières défilables</em> — computeDailySwipeList est calculé par useStepsStats (au moins 14 cartes) mais aucun composant Mixte ne le monte.</dd>
+<dt>Corriger le nombre de pas d'une journée depuis le journal.</dt><dd><em>Modification d'un relevé</em> — handleUpdateStep est passé à StepsTracker (onUpdateStep) mais la page ne l'utilise nulle part.</dd>
+<dt>D'où viennent les pas en usage réel de la V1 (import, saisie cachée, générateur).</dt><dd><em>Source des relevés</em> — Aucune source de pas hors le jeu de données semé n'a été lue ; le générateur est administratif, hors périmètre du chapitre.</dd>
+</dl>
+<h4>Règle plausible</h4>
+<dl class="inventions">
+<dt>Une suppression douce qui garde la ligne et la filtre à la lecture.</dt><dd><em>Suppression d'un relevé</em> — Le commentaire de StepLog dans src/types.ts l'annonce (« l'utilisateur ne supprime jamais vraiment »), mais l'interface n'a pas le champ et removeLogById supprime franchement.</dd>
+<dt>Que l'application refuse deux relevés à la même date.</dt><dd><em>Un relevé par jour</em> — La SPEC V1 § 4.6 dit « une entrée par jour », mais le code additionne plusieurs relevés d'une date (calendrier, moyennes de l'accueil) et rien ne l'interdit.</dd>
+<dt>Un plafond à aujourd'hui pour les moyennes, le cumul, le journal et les tuiles de l'accueil.</dt><dd><em>Relevés datés dans le futur</em> — Tous ces calculs ne posent qu'un prédicat bas (log.date &gt;= borne) ; seul computeStepsChartData s'arrête à aujourd'hui. Rien dans le code ni dans les décisions lues ne dit ce que devient un relevé futur.</dd>
+</dl>
+<h3 id="inv-activite">L'activité physique</h3>
+<h4>amélioration</h4>
+<dl class="inventions">
+<dt>L'envie d'écrire « un bouton Partager sur chaque séance ». buildSportShareConfig et useShareSport ne sont montés que dans les versions Initiale, Cartes et deux thèmes de la Mixte (sideral, test), tous hors périmètre ; la Mixte de base n'a aucun bouton.</dt><dd><em>Partage d'une séance</em> — Fonctionnalité 12 de l'inventaire ; réfutation acceptée : le paragraphe « le contenu de partage existe dans le code, mais aucun écran de la Mixte ne le monte » est retiré du chapitre — il était faux au pied de la lettre (les thèmes sideral et test l'importent) et hors sujet pour une spec fonctionnelle.</dd>
+<dt>Écrire que la page et la couche partagent le même composant de confirmation. MessageActiviteEnregistree est écrit pour être adopté par la page, mais SportTracker garde son bandeau propre (minuterie de 3 s et effacement à la sortie d'écran, que la couche n'a pas) : point laissé ouvert dans le code.</dt><dd><em>Bandeau de confirmation</em> — Arbitrage 6 de l'inventaire (MessageActiviteEnregistree.tsx), relu : la couche ne ferme sa confirmation qu'à la croix, et son action est toujours « added ».</dd>
+<dt>computeIntensityBreakdown calcule séances, minutes et calories pour intensif, modéré et doux ; seul totalCalories est affiché depuis le retrait des trois tuiles le 11/08/2026. Le chapitre le dit maintenant ; les remonter à l'écran serait une décision, pas une correction.</dt><dd><em>Graphe « Suivi » — répartition par intensité</em> — Manque signalé, vérifié dans sport.utils.ts:134-151 et SportChart.tsx:105 (seul intensityBreakdown.totalCalories est lu).</dd>
+</dl>
+<h4>cohérence</h4>
+<dl class="inventions">
+<dt>J'aurais voulu écrire qu'un étage vaut 0,5 minute partout. Le code additionne les durées brutes dans sportMinutesLast7Days et sportTrend : les étages de Montée escaliers y comptent comme des minutes, contrairement au calendrier, aux moyennes hebdomadaires et à la répartition par activité. Le chapitre dit le fait ; l'harmonisation est une suggestion.</dt><dd><em>Tuile « 7 derniers jours » (home) et tiroir Tendances</em> — Doute 6 de l'inventaire, confirmé à la lecture de homeOverview.ts et trends.ts.</dd>
+<dt>Le chapitre a renommé le h3 « Bloc De quoi c'est fait » en « Répartition par activité » : le bandeau a été supprimé le 31/08/2026 et l'écran ne porte plus ce nom. Le nom de capture, lui, reste celui de l'inventaire (bloc-de-quoi-c-est-fait-blocdequoicestfait), et les infobulles de la home disent encore « voir de quoi c'est fait » — divergence de vocabulaire à trancher pour tout le document.</dt><dd><em>Répartition par activité</em> — Réfutation acceptée, vérifiée dans BlocDeQuoiCestFait.tsx:13-19 et son rendu l.280-311.</dd>
+</dl>
+<h4>comportement supposé</h4>
+<dl class="inventions">
+<dt>Le bloc « Limite atteinte » est désormais décrit : NoticeBlock lu, il s'écrit en tête de la page en cours et n'a qu'un bouton « OK ». Ce qui reste sans fondement, et n'est donc pas écrit, c'est une durée d'affichage : le bloc ne s'efface pas tout seul.</dt><dd><em>Plafond quotidien</em> — useAppData.ts pose le texte (ligne 334) ; App.tsx:2041 le monte dans NoticeBlock, lu depuis.</dd>
+<dt>Dire que l'onglet « Activité physique » est dans le menu du bas. Le libellé existe dans App.tsx (sports : « Activité physique ») mais le montage du menu n'a pas été lu ; le chemin certain est handleNavigate('sports') depuis la home, les tiroirs et l'ajout rapide.</dt><dd><em>Navigation vers la page</em> — Doute 9 de l'inventaire.</dd>
+<dt>Écrire que la tuile affiche « En hausse de l'activité physique ». Elle ne porte qu'un picto d'haltère et une flèche ; la phrase n'est que l'attribut title, invisible au doigt. Ce que ferait lire un utilisateur d'écran, ou ce qu'un survol affiche exactement sur mobile, n'est pas décrit.</dt><dd><em>Tuile Dynamique de l'activité physique</em> — Réfutation acceptée, vérifiée dans MaisonSections.tsx:2689-2724 : le contenu du bouton est un picto plus TrendArrowIcon, rien d'autre.</dd>
+<dt>Ranger « Calories » parmi les champs éditables en place de la bulle. La ligne est en lecture seule : valeur dérivée, sans champ ni clic, elle suit les champs qu'on modifie à l'enregistrement.</dt><dd><em>Bulle du calendrier</em> — Réfutation acceptée, vérifiée dans SportCalendar.tsx:355-370 : un simple span, sans setEditingField, quand les cinq autres lignes en passent par lui.</dd>
+<dt>Écrire qu'un bouton « Annuler » referme la couche. Le mot vient d'un commentaire de SurimpressionSport.tsx (onCancel={onFermer}) ; le formulaire n'a qu'un bouton de soumission, et sa croix de bandeau est justement supprimée sous la couche. Ce qui reste vrai — la croix de la couche, le clic hors carte — est écrit ; l'existence d'un libellé d'abandon, non.</dt><dd><em>Couche vitrée « Activité physique »</em> — Réfutation acceptée, vérifiée dans SportForm.tsx (seuls boutons : croix du bandeau rendue si !sousCouche, les trois crans d'effort, le submit) et useFormPressOutside.</dd>
+</dl>
+<h4>exemple</h4>
+<dl class="inventions">
+<dt>Le poids de Camille au 12/09/2026 (90 kg) est posé pour rendre l'arithmétique lisible ; il n'est fixé nulle part. Le chapitre Poids fait foi sur sa trajectoire, et le rédacteur doit y aligner ce chiffre.</dt><dd><em>Calories d'une séance</em> — Les calories dépendent du poids à la date de la séance (getWeightAtDate) ; aucune valeur commune aux chapitres n'était donnée.</dd>
+<dt>Dater les bornes du journal de Camille au 20/08 (sa première séance). Sur la fenêtre par défaut de 30 jours, la borne affichée au 12/09/2026 est le 14/08 ; le 20/08 ne s'y lit qu'en « Depuis le début » ou en « Choisir ». La légende de capture est corrigée.</dt><dd><em>Journal d'activité physique</em> — Réfutation acceptée, vérifiée dans timeWindow.utils.ts (cutoff = aujourd'hui − (WINDOW_DAYS − 1)) et SportTracker.tsx:347-360.</dd>
+</dl>
+<h4>organisation du code</h4>
+<dl class="inventions">
+<dt>Écrire que le formulaire et le plafond de la couche sont « montés et non recopiés ». C'est vrai (SurimpressionSport importe SportForm, useSportForm et refusSaisieSport) mais c'est une propriété du code, invisible à l'écran : la règle ne garde que « ce sont ceux de la page ».</dt><dd><em>Couche vitrée « Activité physique »</em> — Réfutation de style acceptée.</dd>
+</dl>
+<h4>règle plausible</h4>
+<dl class="inventions">
+<dt>Faire dire aux félicitations une régularité (« trois jours d'affilée », « aujourd'hui »). Le code précise qu'aucune notion de série n'existe dans features/sport et que les phrases l'évitent à dessein.</dt><dd><em>Encouragement après une activité</em> — Commentaire de sportEncouragements.ts.</dd>
+</dl>
+<h4>règle supposée</h4>
+<dl class="inventions">
+<dt>Présenter le seuil de 78 minutes pondérées comme une décision de l'utilisatrice. La légende du graphe dit « 10 vaut pour 1h d'activité physique intensive », ce qui donne 60 × 1,3 = 78, mais aucun commentaire lu ne cite une dictée fixant ce seuil.</dt><dd><em>Score d'activité</em> — Doute 12 de l'inventaire ; sportScore.ts documente la formule, pas l'origine du seuil.</dd>
+<dt>Affirmer que le refus d'une saisie en place affiche mot pour mot le message de la règle (« Une durée entre 1 et 480 minutes est attendue. ») et remet la valeur enregistrée. NumberField et useInlineEditableLog n'ont pas été lus ; seul numberRules.ts (pur) l'a été.</dt><dd><em>Édition en place du journal et de la bulle</em> — Doute 11 de l'inventaire.</dd>
+<dt>Détailler le pas d'échantillonnage au-delà de 60 jours (« un jour sur deux à 90 jours »). Le code calcule pas = floor((jours + 1) / 60) ; 90 jours donnent un pas de 1, donc tous les jours ; le seuil de 60 points n'est documenté par aucune décision.</dt><dd><em>Graphe « Suivi »</em> — computeSportChartData dans sport.utils.ts ; doute 12 de l'inventaire. Réfutation acceptée : la phrase « au-delà de 60 jours, un jour sur n » est corrigée en « au-delà d'environ 120 jours, un jour sur deux ».</dd>
+<dt>Écrire « carte présente si le module est activé ». C'est le masquage (isModuleHidden), pas l'extinction, qui retire la carte ; un module éteint la laisse, grisée, avec son seul titre et un clic qui écrit le message d'activation. Ce qu'affiche exactement ce message, et combien de temps il reste, n'a pas été lu et n'est pas écrit.</dt><dd><em>Carte du tiroir Tendances</em> — Réfutation acceptée, vérifiée dans TrendDrawer.tsx:947-985 et renderCell l.788-803 (setMessageInactif).</dd>
+</dl>
+<h4>style</h4>
+<dl class="inventions">
+<dt>« Le journal … de la personne sous GLP-1 » : formule creuse, toute l'application s'adresse à elle et les autres chapitres ne le répètent pas. Retirée.</dt><dd><em>Ouverture du chapitre</em> — Réfutation de style acceptée.</dd>
+</dl>
+<h3 id="inv-sommeil">Le sommeil</h3>
+<h4>Code mis de côté</h4>
+<dl class="inventions">
+<dt>Trois graphes « Éveil et nutrition », « Nuit précédente et nutrition », « Qualité de la nuit et nutrition » : courbe de sommeil à gauche, kcal du jour à droite, « Rien à croiser sur cette période. », accordéon d'analyse par corrélation de Pearson (moins de 7 paires : trop peu ; |r| &lt; 0,3 : aucun lien ; ≥ 0,5 : net ; sinon modéré ; réserve « pas une cause à effet » ; « L'échantillon reste modeste » sous 14 paires). Le temps d'éveil d'une journée (du réveil de la nuit datée J à l'endormissement de la nuit datée J+1, siestes déduites, absent si une borne manque ou si les siestes dépassent le temps disponible, journée en cours retirée) n'existe que pour eux. Rien de cela n'est visible.</dt><dd><em>Graphes croisés sommeil × nutrition</em> — Code complet dans SleepNutritionChart.tsx, sleep.utils.ts (awakeMinutesOn, dropCurrentDay) et shared/analysis/analysis.ts ; non monté : <code>false &amp;&amp; croiseAlimentation</code> dans SleepTracker.tsx:498 (2026-08-22 : « tout les graphs sauf le premier graph »). Les définitions du temps d'éveil sont un arbitrage de Claude du 2026-08-18. Le chapitre en dit désormais l'existence dans un h3 « mis de côté » (manque signalé) ; le détail des textes et de l'analyse reste ici, faute d'écran.</dd>
+<dt>Accordéon « Analyse » sous le graphe : textes d'attente sous trois journées dormies, puis moyenne, min–max, régularité (écart-type &lt; 45 min « régulières », &lt; 90 min « assez régulières », sinon « varient sensiblement »), qualité moyenne des journées notées, tendance dès 7 journées (écart des moyennes des deux moitiés ≥ 30 min), « restent indicatifs » en deçà. Les seuils 45/90/30 min et 7 journées sont des choix de Claude non validés.</dt><dd><em>Analyse sans IA du graphe Durée et qualité</em> — sleepAnalysis.ts, calculé à chaque rendu de SleepChart.tsx (analyzeSleepEvolution) mais affiché sous <code>false &amp;&amp;</code> (2026-08-22 : « supprimer les analyses de la page sommeil »).</dd>
+<dt>Bandeau collant de boutons « Durée et qualité », « Éveil et nutrition », « Nuit précédente et nutrition », « Qualité de la nuit et nutrition » (les trois derniers seulement si le module repas est allumé), chacun défilant vers son bloc.</dt><dd><em>Menu des raccourcis de graphes</em> — GRAPH_SHORTCUTS dans SleepTracker.tsx:55, rendu sous <code>false &amp;&amp;</code> (ligne 461) depuis qu'un seul graphe reste. Mentionné en une phrase dans le h3 « mis de côté » ; le détail reste ici.</dd>
+<dt>Bouton « Ajouter » centré en tête de page, sous le bandeau de confirmation.</dt><dd><em>Grand bouton « Ajouter » de la page</em> — SleepTracker.tsx:258, sous <code>false &amp;&amp;</code> (2026-08-22 : l'ajout passe par « ajouter », le calendrier et le « + » flottant).</dd>
+</dl>
+<h4>Détail non retenu</h4>
+<dl class="inventions">
+<dt>La bulle écrit « de 8h » et non « de 8h00 » : la durée de tête passe par un remplacement de « h00 » final. Le chapitre le donne en exemple sans énoncer la règle, qui n'a pas de nom dans l'inventaire.</dt><dd><em>Bulle du calendrier, heure ronde</em> — SleepCalendar.tsx:327 <code>formatCalendarDuration(duree).replace(/h00$/, 'h')</code>.</dd>
+</dl>
+<h4>Écart avec la commande</h4>
+<dl class="inventions">
+<dt>La consigne du chapitre parle d'une qualité 1–5 ; le code compte six crans de 0 (« Très mauvaise ») à 5 (« Excellente »), le curseur part de 0 et le journal écrit « 0/5 ». Le chapitre suit le code.</dt><dd><em>Échelle de qualité « 1–5 »</em> — SLEEP_QUALITY_LABELS dans sleep.constants.ts ; SleepForm min=0, max=5.</dd>
+</dl>
+<h4>Écart constaté, non corrigé</h4>
+<dl class="inventions">
+<dt>J'aurais voulu écrire « moyenne par journée renseignée » comme sur la home et le graphe ; le code divise par les 14 jours de la fenêtre, zéros compris. Le chapitre décrit ce que fait le code.</dt><dd><em>Carte Sommeil du tiroir Tendances</em> — trends.ts : sleepTrend met 0 les jours sans entrée, informedTrendMean n'écarte que les null ; doute consigné dans l'inventaire.</dd>
+<dt>Deux écarts, tous deux écrits au chapitre plutôt que corrigés : le numérateur somme les entrées filtrées (fenêtre sans borne haute pour les périodes fixes — une saisie datée du futur y entre) tandis que le dénominateur compte les jours tracés, bornés à aujourd'hui ; et au-delà de 119 jours d'écart, le graphe ne trace plus qu'un jour sur n alors que le total reste complet, si bien que la moyenne grandit avec la période.</dt><dd><em>Moyenne « ≈ … /j » du graphe et fenêtres très larges</em> — SleepChart.tsx:163 (<code>hasFilteredLogs &amp;&amp; daysWithSleep &gt; 0</code>), useSleepChart (totalMinutes sur filteredLogs, filterByTimeWindow), computeSleepDays (maxPoints 60, step = plancher de (jours+1)/60).</dd>
+</dl>
+<h4>Fait vérifié, entré au chapitre</h4>
+<dl class="inventions">
+<dt>L'invention « si TimeSelect ne propose que des minutes rondes, l'arrondi ne change jamais rien » est levée : TimeSelect ne propose QUE les huit minutes de ROUNDED_MINUTES, et une valeur héritée hors de cet ensemble reste affichée en champ désactivé. L'arrondi à l'enregistrement ne mord donc que sur des données héritées ou déplacées. Le chapitre le dit.</dt><dd><em>Sélecteur d'heure du formulaire</em> — src/shared/ui/TimeSelect.tsx (MINUTES = ROUNDED_MINUTES), src/shared/date/date.local.ts:41 et 78 (snapToRoundedMinutes), snapSleepTimes dans sleep.utils.ts:97.</dd>
+<dt>L'invention « accès par le menu bas, non fondé » est levée : BOTTOM_MENU_ORDER contient 'sleep', bottomMenuTabs filtre par isModuleOn, allTabs donne le libellé « Sommeil » et l'icône BedsideLampIcon, et App.tsx rend cette table dans la barre du bas. Le tiroir « + » porte 'sleep' dans ADD_DRAWER_ORDER, libellé « Ajouter un sommeil ». Les deux portes sont désormais dans le chapitre.</dt><dd><em>Accès par le menu du bas et par le tiroir « + »</em> — src/versions/mixte/app/navigation.ts:30-52 et 119, src/app/navigation.ts:80, src/versions/mixte/App.tsx:2682 et 361.</dd>
+</dl>
+<h4>Hors chapitre</h4>
+<dl class="inventions">
+<dt>nightMinutesDailyAverage et sa jumelle à 7 jours existent (nuits seules, nuits de zéro minute écartées du numérateur et du dénominateur — arbitrage de Claude du 2026-08-23) mais aucune surface de ce chapitre ne les affiche ; elles servent au rapport PDF.</dt><dd><em>Durée moyenne d'une nuit (nuits seules)</em> — sleep.utils.ts ; consommateur MedicalReportExport (chapitre rapport) non lu ici.</dd>
+</dl>
+<h4>Non fondé (code non lu)</h4>
+<dl class="inventions">
+<dt>Le libellé de la ligne « module-sleep-tracking » et la place de sa case « Masquer dans l'application ». Lus : la cible de l'ancre, le nom « Sommeil », le texte de la vitre, l'interrupteur <code>handleToggleSleep</code> et la case de masquage — pas la page Modules elle-même, ni son ordre.</dt><dd><em>Réglage du module sur la page Modules</em> — App.tsx PAGES_MODULE et NotificationsSettings.tsx (handleToggleSleep, masquerModule) ; la page Modules reste hors des chemins lus.</dd>
+<dt>Le chapitre dit que le refus du plafond s'écrit en tête de la page en cours dans un bloc titré « Limite atteinte ». Ce qui n'a pas été lu : NoticeBlock lui-même (forme, croix, durée d'affichage) et ce qui se passe si un refus de plafond et un refus de formulaire coexistent.</dt><dd><em>Rendu du bloc « Limite atteinte »</em> — App.tsx:2041-2050 (limitNotice → NoticeBlock) et useAppData.ts:395-398 lus ; src/shared/ui NoticeBlock non lu.</dd>
+</dl>
+<h4>Réfutation écartée</h4>
+<dl class="inventions">
+<dt>Les douze réfutations ont toutes été vérifiées dans le code et retenues : aucune phrase n'a été gardée contre une réfutation.</dt><dd><em>Aucune</em> — Vérifications faites une par une : App.tsx handleNavigate/handleQuickAddNavigate (meals, steps, sports), computeSleepDays (maxPoints/step), SleepTracker durationRefusal et setDate/setBedDate nus, DaySleepLines sans notes, HistoryToolbar (carreaux, « ajouter »), formatSleepAverage vs formatCalendarDuration, SleepCalendar (sleepDayMinutes seul), TrendDrawer (GRAPHES_EN_SURIMPRESSION), rendu exclusif bandeau/formulaire, condition du « ≈ /j », infobulle de SurimpressionNuits, useHistoryView.</dd>
+</dl>
+<h3 id="inv-temps-pour-soi">Un temps pour soi</h3>
+<h4>Accueil</h4>
+<dl class="inventions">
+<dt>La fonction meTimeMinutesLast7Days existe sans appelant (arbitrage de Claude, gardée « le temps que le sujet se pose ») ; rien à l'écran, donc rien dans le chapitre.</dt><dd><em>Minutes des 7 derniers jours</em> — src/features/home/homeOverview.ts ; arbitrages_de_claude de l'inventaire.</dd>
+<dt>Je décris la couche telle que MaisonSections la monte (titre, picto, BlocMesMoments sur le journal entier, lien unique « Voir la page »). Je n'affirme rien du geste de fermeture propre à SurimpressionVitree — croix, clic hors du panneau — faute d'avoir lu le composant.</dt><dd><em>Couche vitrée</em> — MaisonSections.tsx:5221-5231 lu ; SurimpressionVitree non lu.</dd>
+</dl>
+<h4>Formulaire</h4>
+<dl class="inventions">
+<dt>J'aurais écrit que le champ « Autre » avance par pas de 5 minutes (RULE_DURATION porte step: 5), mais je n'ai pas lu NumberField : je ne sais pas si ce pas se voit à l'écran ou s'il sert seulement de règle interne.</dt><dd><em>Durée « Autre »</em> — src/versions/mixte/app/form.rules.ts déclare step: 5 ; l'inventaire le reprend (« pas 5 ») sans dire son effet.</dd>
+<dt>J'aurais aimé dire qu'un moment ne peut pas être daté dans le futur ; aucun code ne le refuse — la date est libre.</dt><dd><em>Date d'un moment</em> — Attente naturelle d'un journal ; rien dans useMeTimeForm, MeTimeForm ni logbook.ts.</dd>
+<dt>Aucune longueur maximale des notes n'est visible dans le code lu ; je n'ai rien pu affirmer.</dt><dd><em>Notes</em> — NotesField (shared/ui) non lu.</dd>
+<dt>J'avais écrit qu'une durée illisible ou nulle passe sans message. Faux sur cette page : MeTimeTracker juge le refus avant le hook et affiche le message même pour un champ vide. La branche silencieuse de useMeTimeForm (:119) existe mais n'est plus atteignable depuis la page Mixte — je ne dis pas si un autre appelant l'atteint.</dt><dd><em>Durée « Autre » — refus silencieux</em> — Réfutation retenue : MeTimeTracker.tsx:63-82 ; useMeTimeForm.ts:14 (DURATION_PRESETS) et :119.</dd>
+</dl>
+<h4>Graphe « Suivi »</h4>
+<dl class="inventions">
+<dt>Amélioration qui m'est venue : quand le graphe ne trace qu'un jour sur deux ou trois, les minutes des jours sautés disparaissent au lieu d'être regroupées ; une somme par pas rendrait le total et les barres cohérents. Non demandé, non implémenté.</dt><dd><em>Échantillonnage des longues périodes</em> — computeMeTimeChartData (step &gt; 1 filtre log.date === dateStr du seul jour tracé).</dd>
+<dt>J'avais écrit qu'un second clic ferme la bulle. Faux : la croix ferme, un clic sur le graphe réarme, et tout le reste — survol, sortie de zone, re-rendu — est sans effet. Corrigé dans le chapitre. Ce que je ne dis pas, faute d'avoir lu DismissableCursor : si le trait de curseur disparaît lui aussi quand la bulle est fermée.</dt><dd><em>Infobulle</em> — Réfutation retenue : src/shared/charts/tooltipDismiss.ts:39-71 (bug du 2026-08-16) ; DismissableCursor monté par MeTimeChart.tsx:146-148, non lu.</dd>
+</dl>
+<h4>Navigation</h4>
+<dl class="inventions">
+<dt>Le geste d'activation est maintenant décrit (carte « module-metime-tracking », pastille, bascule, case « Masquer dans l'application. »). Ce que je ne dis toujours pas : ce que le masquage retire exactement, écran par écran — je ne l'ai pas suivi hors de la page Modules.</dt><dd><em>Activation du module</em> — NotificationsSettings.tsx:420-457 et masquerModule (:156-183) lus ; les consommateurs de meTimeModuleHidden ne l'ont pas été.</dd>
+<dt>Je dis que l'onglet paraît au menu bas quand le module est allumé et que l'ajout rapide existe (« Ajouter un temps pour soi ») en me fondant sur navigation.ts et App.tsx ; le composant du menu et le tiroir « + » du menu simplifié n'ont pas été lus.</dt><dd><em>Menu bas et tiroir « + »</em> — src/versions/mixte/app/navigation.ts (BOTTOM_MENU_ORDER, ADD_DRAWER_ORDER) ; doute de l'inventaire.</dd>
+</dl>
+<h4>Périmètre</h4>
+<dl class="inventions">
+<dt>J'avais écrit « la V2 ne touche pas à ce domaine ». Supprimé : rien ne le décide, c'est une absence que j'avais présentée comme une décision consignée. Le temps pour soi n'est ni gardé ni supprimé par la V2 — il n'y est simplement pas question.</dt><dd><em>Décisions V2</em> — Réfutation retenue. GUIDELINES.md § 4 (l.321-359) ne cite pas le domaine ; src/screens/onboarding n'a aucune étape le concernant.</dd>
+</dl>
+<h4>Rapport médical</h4>
+<dl class="inventions">
+<dt>Je nomme le carreau « Sur cette période » et la case d'export, tous deux lus dans MedicalReportExport. Ce que contient la section V du PDF (« Sommeil et temps pour soi ») — colonnes, tri, agrégats — n'a pas été lu : c'est l'affaire du chapitre du rapport.</dt><dd><em>Section « Un temps pour soi » du PDF</em> — MedicalReportExport.tsx:1435, 1598-1599, 1686, 1749 lus ; le rendu PDF ne l'a pas été.</dd>
+</dl>
+<h4>Tiroir Journal</h4>
+<dl class="inventions">
+<dt>Dans le tiroir Journal, la ligne du temps pour soi ne reçoit pas onUpdateMeTime : l'édition en place y semble inactive. Je ne l'ai pas affirmé dans le chapitre faute d'avoir lu useInlineEditableLog et le comportement sans callback.</dt><dd><em>Édition en place</em> — JournalDrawer.tsx, case 'metime' : seuls onDeleteMeTime, onStartEdit, onOpenManageModal sont passés (versLaPage).</dd>
+</dl>
+<h3 id="inv-metabolisme">Le métabolisme</h3>
+<h4>Accueil</h4>
+<dl class="inventions">
+<dt>Aligner la dépense totale de l'accueil sur celle de la page, avec un seul arrondi.</dt><dd><em>Calculer et consulter le bilan métabolique des 7 derniers jours</em> — divination.ts:351-356 recompose la dépense en round(ΣMB) + round(Σpas) + round(Σsport), là où metabolism.utils.ts:191 fait round(ΣMB + Σactif) : les deux écrans peuvent différer de quelques kcal le même jour. Tentation de corriger plutôt que de décrire.</dd>
+</dl>
+<h4>Affichage</h4>
+<dl class="inventions">
+<dt>Écrire « estimées à partir de la composition des repas » à la place d'« estimées par IA ».</dt><dd><em>Calculer et consulter le bilan métabolique des 7 derniers jours</em> — Le bloc « Dépenses &amp; Apports Actifs » annonce des calories « estimées par IA » ; computeIngestedCalories somme le champ calories des SavedMealLog, recalculé depuis leurs aliments à chaque écriture. Aucune estimation par IA n'existe dans ce calcul.</dd>
+</dl>
+<h4>Données manquantes</h4>
+<dl class="inventions">
+<dt>Signaler les journées sans repas saisi, comptées 0 kcal ingérée, qui creusent la balance.</dt><dd><em>Calculer et consulter le bilan métabolique des 7 derniers jours</em> — Une journée sans saisie vaut 0 kcal ingérée et aucun signal n'existe à l'écran. Supposition d'un comportement souhaitable.</dd>
+<dt>Avertir qu'un bilan de carnet neuf repose sur la seule pesée de départ et sur zéro repas.</dt><dd><em>Calculer et consulter le bilan métabolique des 7 derniers jours</em> — Sur un carnet neuf, la page annonce « Perte de poids » et un déficit de 11 403 kcal qui ne viennent que de l'absence de saisies. Rien à l'écran ne le dit ; j'ai eu envie d'un avertissement qu'aucune décision n'établit.</dd>
+</dl>
+<h4>Fenêtre</h4>
+<dl class="inventions">
+<dt>Exclure du bilan les repas et séances saisis à une heure encore à venir.</dt><dd><em>Calculer et consulter le bilan métabolique des 7 derniers jours</em> — La projection de l'accueil (divination.ts:337-340) filtre par hasOccurred avant d'appeler computeMetabolismSummary ; la page ne le fait pas. Tentation d'aligner les deux.</dd>
+</dl>
+<h4>Formats</h4>
+<dl class="inventions">
+<dt>Homogénéiser l'écriture des milliers entre les blocs de synthèse et le tableau journalier.</dt><dd><em>Calculer et consulter le bilan métabolique des 7 derniers jours</em> — Les totaux passent par formatNumber (espace insécable) ; MetabolismDailyTable et la ligne « MB (N) + Activités (N) » écrivent les nombres bruts. Tentation de décrire un format unique.</dd>
+<dt>Faire passer la balance positive par le formateur, comme la balance négative.</dt><dd><em>Calculer et consulter le bilan métabolique des 7 derniers jours</em> — MetabolismSummaryBlocks.tsx:83 écrit <code>+${Math.round(netBalance)}</code> en dur pour un surplus et n'appelle formatNumber que dans l'autre branche : « +5147 » face à « -5 147 ». Le chapitre le décrit ; l'envie de l'appeler un défaut à corriger n'y a pas sa place.</dd>
+<dt>Écrire le poids moyen (7j) à une décimale fixe (« 86.0 »).</dt><dd><em>Calculer et consulter le bilan métabolique des 7 derniers jours</em> — MetabolismBreakdownDetails.tsx:36 arrondit à une décimale au plus et l.65 rend la valeur brute, hors formateur : un poids moyen rond s'affiche « 86 ». Envie d'un format stable, non décidée.</dd>
+</dl>
+<h4>Navigation</h4>
+<dl class="inventions">
+<dt>Écrire par quelle entrée de menu la page s'ouvre.</dt><dd><em>Calculer et consulter le bilan métabolique des 7 derniers jours</em> — Aucun menu ni lien de la Mixte ne mène à l'onglet metabolism : la table partagée allTabs porte une entrée « Métabolisme », mais ni BOTTOM_MENU_ORDER (navigation.ts:30) ni le menu Paramètres ne la reprennent, et aucun setActiveTab('metabolism') n'existe hors du montage dans App.tsx. J'aurais voulu décrire un chemin d'accès.</dd>
+</dl>
+<h4>Pas simulés</h4>
+<dl class="inventions">
+<dt>Dire si les relevés de pas marqués isSimulated comptent dans le bilan.</dt><dd><em>Calculer et consulter le bilan métabolique des 7 derniers jours</em> — StepLog porte un champ isSimulated ; computeMetabolismSummary somme tous les relevés de la date sans le lire. Je ne sais pas ce que ce champ signifie pour ce domaine.</dd>
+</dl>
+<h4>Poids</h4>
+<dl class="inventions">
+<dt>Trancher entre deux pesées du même jour par leur heure.</dt><dd><em>Calculer et consulter le bilan métabolique des 7 derniers jours</em> — bodyMetrics.utils.ts:18-26 trie sur la seule date et ignore WeightLog.time (types.ts:20), pourtant renseigné : l'ordre du tableau décide. Une règle « la plus tardive gagne » serait plausible mais n'est écrite nulle part.</dd>
+</dl>
+<h4>Profil (V2)</h4>
+<dl class="inventions">
+<dt>Dériver l'âge de l'année de naissance pour la formule de Mifflin-St Jeor.</dt><dd><em>Calculer et consulter le bilan métabolique des 7 derniers jours</em> — La V2 recueille anneeNaissance (screens/onboarding/reponses.ts, défaut 1980) ; la formule V1 lit profile.age en années. Aucun code ne fait la conversion.</dd>
+</dl>
+<h4>Tendance</h4>
+<dl class="inventions">
+<dt>Justifier les seuils 4 000 / 8 000 / 14 000 kcal par une équivalence en kilos (0.5 / 1 / 1.75 kg à 8 000 kcal par kilo).</dt><dd><em>Calculer et consulter le bilan métabolique des 7 derniers jours</em> — getEnergyTrend ne documente pas ses seuils ; l'équivalence 8 000 kcal = 1 kg n'est écrite que pour la projection de l'accueil (KCAL_PER_KILO).</dd>
+</dl>
+<h4>Unités (V2)</h4>
+<dl class="inventions">
+<dt>Afficher le bilan en livres et pouces quand la V2 est réglée en anglais.</dt><dd><em>Calculer et consulter le bilan métabolique des 7 derniers jours</em> — GUIDELINES § 4 : « English » bascule sur inch · pound ; la page V1 n'écrit que kg et cm.</dd>
+</dl>
+<h3 id="inv-badges">Les badges</h3>
+<h4>amélioration</h4>
+<dl class="inventions">
+<dt>Date d'obtention et historique des paliers d'un badge (« argent depuis le 12 septembre »). Seul le dernier palier observé est mémorisé, sans date, sous glp1_badge_tiers_connus.</dt><dd><em>Célébrer un palier décroché</em> — Envie de lecteur ; aucune date dans BadgeTiersConnus.</dd>
+<dt>Notice « copié dans le presse-papier » dans le bloc de célébration comme sur la page Badges. Le bloc appelle shareBadgeItem sans rappel de notice ; le chapitre décrit cette absence telle quelle.</dt><dd><em>Partager un badge</em> — Lecture de UnlockedBadgeBlock.tsx (appel sans onNotice).</dd>
+</dl>
+<h4>comportement supposé</h4>
+<dl class="inventions">
+<dt>Écrire que les badges pas et activité physique suivent l'état du module tel que la navigation le lit. Le badge est actif dès que le drapeau n'est pas explicitement faux (stepsTrackingEnabled !== false), alors que la navigation (isModuleOn) tient ces modules pour éteints quand le drapeau est absent : un profil sans drapeau a le badge actif et le module éteint. Non tranché, donc non écrit.</dt><dd><em>Évaluer le palier de chaque badge</em> — Comparaison de badgeSystem.ts (categoryEnabled) et src/versions/mixte/app/navigation.ts (MODULES_ALLUMES_PAR_DEFAUT).</dd>
+<dt>Supprimé : « ses pas ont continué d'être enregistrés » pendant que le module était éteint, et « s'il était passé or entre-temps, une seule fête s'ouvre ». Aucune passerelle santé n'existe dans le code (aucune occurrence de healthkit, pedometer, google fit, health connect) : rien n'enregistre de pas tout seul, et un module éteint n'offre pas sa page de saisie. Le commentaire de badgeCelebration.ts qui parle d'enregistrement « quel que soit l'état des interrupteurs » décrit le modèle de données, pas une saisie qui continuerait. L'exemple se limite au rallumage au même palier.</dt><dd><em>Célébrer un palier décroché</em> — Réfutation retenue ; grep sur les passerelles santé dans REPO-GIT-LOCAL/src.</dd>
+</dl>
+<h4>convention</h4>
+<dl class="inventions">
+<dt>Les data-capture reprennent désormais le nom des fichiers réellement présents dans docs/captures/metabolisme-rapport-badges/, et non le slug de la consigne : l'outil de capture SUPPRIME les apostrophes au lieu de les remplacer par un tiret (« Bloc de célébration d'un badge débloqué » → bloc-de-celebration-dun-badge-debloque), et réduit toute suite de caractères non alphanumériques à un seul tiret (« Pavé de badges / badge mystère du bloc Salut » → pave-de-badges-badge-mystere-du-bloc-salut). La consigne de slug donnerait « d-un » et la figure ne se résoudrait pas.</dt><dd><em>Consulter les badges, leurs règles et le badge en grand</em> — Réfutation retenue ; ls docs/captures/metabolisme-rapport-badges/ et recoupement avec pdf-bandeau-encart-didentite-… (« d'identité » → « didentite »).</dd>
+<dt>Les libellés d'écran qui contiennent un emoji sont décrits, non recopiés : le texte de partage est dit « ouvert d'un emoji trophée », les pastilles de célébration « chacune précédée de son emoji », la phrase de félicitations « précédée d'un emoji de fête ». La consigne de style interdit l'emoji dans le chapitre ; la citation exacte l'exigerait.</dt><dd><em>toutes</em> — Conflit entre la consigne « aucun emoji » et l'exactitude des libellés (badgeShare.ts:32, UnlockedBadgeBlock.tsx:41-72 et :147).</dd>
+</dl>
+<h4>donnée inventée</h4>
+<dl class="inventions">
+<dt>Supprimé : « Camille a deux badges débloqués — Hérisson Marcheur BRONZE, Lapin des Fibres ÉVEIL —, le Requin protéiné à débloquer et le Kangourou Musclé à activer, son module Activité Physique étant éteint. » Rien ne le fonde : la capture montre un seul badge débloqué (Hérisson Marcheur ARGENT, 4/7j), trois badges à débloquer et aucune section « Badges à activer ». La légende décrit désormais la capture.</dt><dd><em>Consulter les badges, leurs règles et le badge en grand</em> — Réfutation retenue ; lecture de docs/captures/metabolisme-rapport-badges/page-badges.png.</dd>
+<dt>Supprimé : « Camille pèse 89,4 kg, objectif 134 g de protéines », et « sur les sept derniers jours elle ne l'a atteint que le 8 septembre : 1/7j ». Le jeu de référence donne 85,9 kg et 129 g ; le détail « 1/7j » et la date du 8 septembre ne sont attestés nulle part.</dt><dd><em>Évaluer le palier de chaque badge</em> — Réfutation retenue ; capture pave-de-badges-badge-mystere-du-bloc-salut.png (pesée 12/09 85.9 kg, cible protéines 129 g) et graine Camille de TODO-CLAUDE.md.</dd>
+<dt>Supprimé : « Camille saisit 8 400 pas ». La capture ne montre ni la saisie ni le nombre de pas, seulement « 4/7j à ≥ 8 000 pas ».</dt><dd><em>Célébrer un palier décroché</em> — Réfutation retenue ; capture bloc-de-celebration-dun-badge-debloque.png.</dd>
+</dl>
+<h4>écran supposé</h4>
+<dl class="inventions">
+<dt>Non écrit : un bouton retour vers l'Accueil sur la page Badges. Le rappel onBack est bien passé par App.tsx (setActiveTab('maison')), mais BadgesPage ne l'appelle jamais — il est déclaré, déstructuré, et inutilisé, comme onNavigateToTab. Aucun bouton retour n'existe donc à l'écran, et la capture n'en montre aucun.</dt><dd><em>Consulter les badges, leurs règles et le badge en grand</em> — Manque signalé, écarté après lecture : grep onBack sur BadgesPage.tsx ne rend que la déclaration et la déstructuration.</dd>
+</dl>
+<h4>hors périmètre</h4>
+<dl class="inventions">
+<dt>Non écrit : le bouton « Info Santé &amp; Confidentialité » visible en pied de page-badges-suite.png. Il n'appartient pas à BadgesPage mais au cadre commun de l'application ; il relève du chapitre transversal.</dt><dd><em>Consulter les badges, leurs règles et le badge en grand</em> — Lecture de la capture puis recherche du libellé, absent de BadgesPage.tsx.</dd>
+</dl>
+<h4>règle supposée</h4>
+<dl class="inventions">
+<dt>Écrire que le « poids actuel » du Requin protéiné est la pesée la plus récente par date. Le code prend la dernière ligne de l'historique : l'ajout d'une pesée retrie par date, mais la modification d'une pesée ne retrie pas (updateWeighIn), donc après un changement de date la dernière ligne peut ne pas être la plus récente. Le chapitre dit « la dernière ligne de l'historique des pesées » sans trancher.</dt><dd><em>Évaluer le palier de chaque badge</em> — Doute de l'inventaire ; lecture de src/features/weight/weighInWrites.ts. Réfutation retenue : la formulation « dernière pesée » a été remplacée par « dernière ligne ».</dd>
+<dt>Signaler à l'utilisatrice un palier qui baisse (journées sorties de la fenêtre). Rien ne le signale : la page affiche le palier courant, la mémoire retient la baisse en silence.</dt><dd><em>Célébrer un palier décroché</em> — Question naturelle du lecteur ; badgeCelebration.ts ne fait que retenir la baisse.</dd>
+<dt>Non écrit : la carte « Afficher le badge mystère » n'existe que si la page reçoit le rappel d'écriture du profil (onSaveProfile ? … : null, BadgesPage.tsx:137). Le seul appelant du code le passe toujours (App.tsx:2500) : la condition n'a pas d'effet observable et n'a donc pas sa place dans une spécification fonctionnelle.</dt><dd><em>Consulter les badges, leurs règles et le badge en grand</em> — Manque signalé ; lecture de BadgesPage.tsx et de son unique montage dans App.tsx.</dd>
+</dl>
+<h4>renvoi</h4>
+<dl class="inventions">
+<dt>L'ancre du chapitre 20 est supposée « #partage » ; l'identifiant réel de ce chapitre n'est pas connu.</dt><dd><em>Partager un badge</em> — Consigne « renvoi chapitre 20 » sans identifiant.</dd>
+</dl>
+<h4>V2</h4>
+<dl class="inventions">
+<dt>Aucune décision V2 sur les badges : GUIDELINES.md § 4 et src/screens/onboarding n'en parlent pas ; le chapitre ne porte donc aucune marque V2.</dt><dd><em>toutes</em> — Recherche de « badge » et « TrackingEnabled » dans GIT-APP-V2/src et GUIDELINES.md, sans résultat.</dd>
+</dl>
+<h3 id="inv-ciel">Mon Ciel</h3>
+<h4>compte à rebours</h4>
+<dl class="inventions">
+<dt>Écrire que l'utilisateur peut régler la date cible depuis son profil.</dt><dd><em>Modification de la date cible par l'utilisateur</em> — countdownTargetDate est un champ de UserProfile (src/types.ts:232) avec un défaut dans useAppData.ts ; aucun écran du périmètre ne l'écrit.</dd>
+<dt>Affirmer que les jours sont bornés à 99.</dt><dd><em>Format à deux chiffres</em> — padStart(2, '0') complète à deux chiffres mais ne tronque pas ; au-delà de 99 jours le nombre s'affiche en entier. Écrit « deux chiffres au moins », sans prétendre à une borne.</dd>
+<dt>Écrire que le 15 novembre 2026 sert de repli quand la date cible est mal formée.</dt><dd><em>Repli sur la date par défaut</em> — Réfutation retenue : le repli ne joue que si la chaîne ne donne pas trois segments (MonCiel.tsx:210-222). « ab-cd-ef » affiche « NaN : NaN : NaN : NaN » et « 2026-13-45 » roule au 14/02/2027. Le chapitre décrit ces deux issues au lieu d'annoncer un repli général ; aucun message d'erreur ni garde-fou n'existe, et en inventer un serait une amélioration.</dd>
+<dt>Dire depuis quel écran la date cible se modifie.</dt><dd><em>Où se règle la date cible</em> — AdminSettings.tsx:598-599 l'écrit ; l'administration est hors périmètre. La formule « aucun écran du périmètre ne la modifie » a été retirée : elle laissait croire à une date immuable et faisait apparaître la mécanique du document.</dd>
+</dl>
+<h4>étoiles</h4>
+<dl class="inventions">
+<dt>Relier les dix étoiles aux badges, aux pesées ou à une progression quelconque (étoiles qui s'allument, citations qui changent).</dt><dd><em>Étoiles liées à la progression</em> — Les positions et l'affectation des citations sont fixes dans MonCiel.tsx ; aucune donnée d'appData n'entre dans le composant hormis la date cible.</dd>
+<dt>Présenter les quatre étoiles d'argent de l'entête comme un aperçu des dix étoiles de la scène.</dt><dd><em>Étoiles de l'entête et étoiles de la scène</em> — Ce sont les mêmes dessins (Star3D, type silver) mais quatre boutons de navigation distincts (App.tsx:1900-1936), sans citation ni lien avec les dix étoiles ; le rapprochement serait une lecture, pas un fait.</dd>
+</dl>
+<h4>hibou</h4>
+<dl class="inventions">
+<dt>Donner une action au hibou (message, secret, lien vers le jeu).</dt><dd><em>Action au clic du hibou</em> — SleepingOwl accepte une propriété onClick que MonCiel ne renseigne pas (MonCiel.tsx:459) ; seul l'effet d'appui (whileTap) joue.</dd>
+</dl>
+<h4>jeu</h4>
+<dl class="inventions">
+<dt>Dire ce qu'est la fonctionnalité cachée que le jeu invite à découvrir, ou qu'elle apparaît à l'échéance du compte à rebours.</dt><dd><em>Fonctionnalité cachée</em> — La phrase et le règlement en promettent une ; le code de MonCiel.tsx ne la nomme pas et ne déclenche rien quand l'écart atteint zéro (max(0, …) fige l'affichage).</dd>
+<dt>Décrire une preuve générée, une capture proposée ou une participation mémorisée par l'application.</dt><dd><em>Participation suivie dans l'application</em> — Le règlement demande une preuve ou capture ; aucun état, aucun stockage ni partage n'est écrit dans MonCiel.tsx.</dd>
+<dt>Écrire que le lien mène au compte Instagram de GLP1LOW.</dt><dd><em>Lien vers le compte Instagram officiel</em> — Le règlement parle d'un « compte Instagram officiel » ; le lien du panneau pointe vers https://www.instagram.com sans identifiant de compte (MonCiel.tsx:483-490).</dd>
+<dt>Retirer le jeu, ou le reformuler en clin d'œil sans lot.</dt><dd><em>Décision sur le jeu-concours</em> — L'audit de sincérité du 2026-08-20 (TODO-CLAUDE-V1.md:989) propose l'un ou l'autre ; aucune décision n'est prise et le code affiche toujours le règlement complet. Le chapitre se contente de marquer la promesse « non implémenté ».</dd>
+<dt>Illustrer « Message Étoilé », « Ciel ! » et « Règlement du jeu ».</dt><dd><em>Captures des trois panneaux</em> — Manque retenu : le dossier docs/captures/metabolisme-rapport-badges/ ne contient que mon-ciel.png. Les trois figures sont posées avec leurs noms de capture (mon-ciel-message-etoile, mon-ciel-ciel, mon-ciel-reglement-du-jeu) ; les légendes décrivent ce que les captures montreront et restent à prendre.</dd>
+</dl>
+<h4>scène</h4>
+<dl class="inventions">
+<dt>Écrire que la scène est la même pour tous les utilisateurs.</dt><dd><em>Scène identique pour tous</em> — Réfutation retenue : l'invariance décidée le 2026-08-16 porte sur les thèmes (MonCiel.tsx:7-15), pas sur les utilisateurs, et la date cible du compte à rebours vient du profil, donc varie d'un utilisateur à l'autre. Les thèmes étant hors périmètre, la phrase est retirée sans être remplacée.</dd>
+<dt>Dire que les panneaux déclarent leur propre ambre de barre de défilement au lieu d'hériter du thème actif.</dt><dd><em>Jetons de défilement propres aux panneaux</em> — Fondé (CIEL_SCROLL_TOKENS, MonCiel.tsx:12-15), mais relève des thèmes, hors périmètre du document.</dd>
+<dt>Écrire qu'on quitte la scène par le bouton retour.</dt><dd><em>Sortie par le bouton retour</em> — Aucun bouton retour n'est rendu sur Mon Ciel (l'entête est masquée, MonCiel ne reçoit pas d'onBack) et l'application ne gère pas popstate. La phrase est supprimée : seule la barre du bas fait sortir.</dd>
+</dl>
+<h3 id="inv-insolites">Les équivalences insolites</h3>
+<h4>amélioration</h4>
+<dl class="inventions">
+<dt>Afficher les poids de 1 kg et plus avec leur décimale (« 3.6 kg ») plutôt que le kilo arrondi.</dt><dd><em>Revoir le catalogue des objets insolites</em> — InsolitesPage.tsx appelle formatNumber(item.weight) sans décimales : 3,6 kg s'affiche « 4 kg » et se copie « 4kg » ; rien ne dit si c'est voulu. La page étant sortie du chapitre (hors périmètre), le point n'y est plus décrit.</dd>
+<dt>Minusculer le nom avant de redériver la clé de dessin dans LudicComposition, comme le fait getLudicDecomposition.</dt><dd><em>Traduire un poids en objets (équivalence insolite)</em> — LudicComposition.tsx:1824 appelle getLudicIllustrationKey(item.name) sans toLowerCase, alors que ludicWeight.ts:688 minuscule ; la branche ludicWeight.ts:616 teste &quot;funko pop&quot;. Une assignation ancienne portant « une figurine Funko Pop » reste donc en émoji. Le chapitre signale la divergence sans la corriger.</dd>
+<dt>Retirer le second repli du moteur (ludicWeight.ts:418-437), code mort.</dt><dd><em>Traduire un poids en objets (équivalence insolite)</em> — bestCombo ne peut jamais être vide : un objet seul de catégorie 'objet' passe toujours isValidCombo. Même remarque pour la garde <code>insolites.length &gt; 2</code> (ludicWeight.ts:379), inatteignable puisque <code>combo.length &gt; 2</code> la précède.</dd>
+</dl>
+<h4>arbitrage supposé</h4>
+<dl class="inventions">
+<dt>La carte de confirmation porterait des arbitrages encore ouverts : fêter « Depuis le début » le jour d'une reprise partielle, et l'édition du poids de départ.</dt><dd><em>Conditions d'affichage de la carte de confirmation</em> — réfutation partiellement écartée : la marque « arbitrage non validé » posée sur l'assignation vide est bien retirée (garde codée et commentée, ludicUsage.ts:105-127), mais les scénarios proposés en remplacement sont clos — TODO-CLAUDE-V1.md:333-352, « Le dossier des scénarios de confirmation de pesée est CLOS » (2026-08-31), reprise partielle « on félicite quand même », départ « corrigé ». La section « À arbitrer » citée (l. 826-871) est antérieure et périmée. Aucune marque ajoutée.</dd>
+</dl>
+<h4>comportement supposé</h4>
+<dl class="inventions">
+<dt>Un lien en bas de « Mon profil » mènerait à la page Objets Insolites.</dt><dd><em>Revoir le catalogue des objets insolites</em> — App.tsx passe onViewInsolitesList à ProfileSettings et un commentaire y cite « le lien vers la bibliothèque d'insolites juste au-dessus », mais ProfileSettings.tsx (Mixte) déclare la prop sans jamais la rendre.</dd>
+<dt>Le PDF reprendrait les objets assignés, ceux de la home, plutôt qu'un calcul nu.</dt><dd><em>Équivalence insolite dans le PDF</em> — Toutes les autres surfaces lisent l'assignation depuis le 2026-08-16 ; le PDF appelle getLudicEquivalence(−delta) sur la variation de la période, qui n'est pas une perte de l'assignation.</dd>
+<dt>Un widget de félicitation « Une équivalence insolite » annoncerait l'équivalence de la perte totale après une pesée.</dt><dd><em>Traduire un poids en objets (équivalence insolite)</em> — celebrations.ts a un type « autre » avec ce texte ; dans la Mixte, seule la page d'essai des félicitations (administration, hors périmètre) le déclenche.</dd>
+</dl>
+<h4>hors périmètre</h4>
+<dl class="inventions">
+<dt>La page Objets Insolites aurait son écran dans le chapitre (liste des 151 insolites par poids, recherche, renommage, poids en grammes, suppression, marquage OK / Attente / PAS OK, copie de la revue).</dt><dd><em>Revoir le catalogue des objets insolites</em> — Outil de revue interne : aucun écran utilisateur de la Mixte n'y mène — ProfileSettings.tsx:37, 42, 55 déclare onViewInsolitesList sans jamais le rendre ; les seules portes vivantes sont les thèmes test/sideral et la version Cartes, hors périmètre. Section retirée du chapitre. Elle ne calcule d'ailleurs aucune équivalence (seul import du moteur : LUDIC_ITEMS et getLudicIllustrationKey), et la mention « le PDF et la page Objets Insolites emploient le calcul nu » recopiait un commentaire périmé de ludicWeight.ts:326.</dd>
+<dt>Les cartes de partage auraient un écran dans ce chapitre : elles montrent le même bloc image + phrase et lisent l'assignation.</dt><dd><em>Traduire un poids en objets (équivalence insolite)</em> — shareTemplates.tsx:315, 319, 338 (useLudicAssignment) — mais leur seul consommateur est ShareTemplatesPage, atteinte depuis l'onglet admin (App.tsx:2326, retour vers 'admin') : administration hors périmètre. L'intro ne les cite donc pas parmi les lieux où l'équivalence paraît.</dd>
+</dl>
+<h4>règle plausible</h4>
+<dl class="inventions">
+<dt>Sur la home sections, la tuile de la dernière perte se tairait quand les deux pertes sont égales au dixième, comme sur la home standard et la carte de confirmation.</dt><dd><em>Assigner et compter les objets insolites à chaque pesée</em> — Le commentaire de MaisonSections.tsx l'affirme (« ne paraît que si elle diffère de la perte totale ») et l'inventaire le reprend, mais showLastLoss (MaisonSections.tsx:1391) n'a pas ce test : les deux tuiles s'affichent.</dd>
+<dt>Les compteurs d'usage seraient plafonnés ou remis à zéro.</dt><dd><em>Assigner et compter les objets insolites à chaque pesée</em> — Rien dans ludicUsage.ts ne les borne ni ne les réinitialise ; ils croissent avec les pesées et ne se lisent nulle part.</dd>
+<dt>Le bouton OK fermerait la carte de confirmation dans tous les cas.</dt><dd><em>Conditions d'affichage de la carte de confirmation</em> — WeighInSubmissionCard.tsx:115-183 : le bouton est écrit à l'intérieur du bloc <code>insolite &amp;&amp;</code>. Sans équivalence (IMC &lt; 19, poids de départ, pesée non la plus récente, aucune perte), il n'y a que la croix. Rien ne dit si c'est voulu ; le chapitre décrit le code tel quel.</dd>
+</dl>
+<h3 id="inv-rapport">Le rapport médical</h3>
+<h4>amélioration</h4>
+<dl class="inventions">
+<dt>Sur mobile, proposer le partage natif du fichier (feuille de partage) plutôt qu'un seul téléchargement via doc.save.</dt><dd><em>Génération et téléchargement du PDF</em> — Envie venue de la conversion React Native mentionnée dans les commentaires ; rien dans le code ne le prévoit.</dd>
+<dt>Retirer la mention « thème : … » du bandeau avant toute remise à un médecin.</dt><dd><em>PDF — bandeau</em> — Le code la marque provisoire et explique comment la retirer ; la décision de la retirer n'est pas prise. La phrase du chapitre qui la décrivait a été supprimée comme hors périmètre (machinerie de thèmes V1).</dd>
+<dt>En noir et blanc, les cinq paliers de teinte des barres de sommeil disparaissent (une seule encre hachurée) ; on pourrait rendre le palier par la densité de hachure, comme la texture rend déjà la distinction des deux séries du graphique des doses.</dt><dd><em>PDF — V. Sommeil, graphique</em> — Constat en lisant le peintre de barres (palette.patterned court-circuite sleepBarTier) ; aucune demande ni décision ne porte là-dessus.</dd>
+<dt>L'axe des durées ne descend jamais sous 5 h : une période où seules des siestes sont relevées dessine des barres écrasées au bas du cadre. Un plancher calé sur la plus longue durée relevée serait plus lisible.</dt><dd><em>PDF — V. Sommeil, graphique</em> — Constat de code (Math.max(5, …)) ; la valeur 5 n'est justifiée nulle part comme une décision, et l'amélioration n'a été ni demandée ni évaluée.</dd>
+</dl>
+<h4>comportement supposé</h4>
+<dl class="inventions">
+<dt>Avec un profil sans poids visé (V2 : objectif « Stabiliser mon poids »), l'encart imprimerait vraisemblablement « undefined kg » en Objectif et « NaN kg » en Reste à l'objectif, le code écrivant <code>${profile.targetWeight} kg</code> sans garde.</dt><dd><em>PDF — encart d'identité</em> — La V2 ne demande le poids visé que si l'objectif est « Perdre » (GUIDELINES § 4) ; le comportement du PDF V1 sur un champ absent n'a pas été exécuté ni lu dans un test.</dd>
+<dt>En V2, la valeur imprimée sous « Genre » serait celle de l'avatar (masculin/féminin) ; le libellé « Non précisé » ne pourrait plus apparaître.</dt><dd><em>PDF — encart d'identité</em> — La V2 supprime la question du genre à part et le porte sur l'avatar ; aucune liaison avatar → profile.gender n'a été lue.</dd>
+<dt>La capture d'écran du panneau d'attente suppose de figer une animation CSS de quelques secondes ; l'état montré dépendra du moment de la prise de vue.</dt><dd><em>Panneau d'attente</em> — Le panneau n'existe que pendant la génération ; sa capture n'a pas été tentée.</dd>
+<dt>Les deux paragraphes de repli du générateur — « Aucune pesée enregistrée sur cette période. » et « Aucun effet secondaire déclaré sur cette période. » — ne peuvent pas s'imprimer depuis la page « Export » : le masque de runExport n'inclut une section que si la période porte la donnée. Ils ne s'afficheraient que par un autre appelant du générateur.</dt><dd><em>PDF — II. Poids et doses, III. Tolérance</em> — Réfutation retenue : les deux phrases étaient présentées dans le chapitre comme un comportement visible. Elles existent bien dans le code (medicalReportPdf.ts:2516 et :2547) mais aucun chemin de l'écran ne les atteint ; l'existence d'un futur appelant qui les atteindrait est une supposition.</dd>
+</dl>
+<h4>règle plausible</h4>
+<dl class="inventions">
+<dt>La valeur « ≈ 0.4 % » de l'exemple de Camille (Perdus / sem.) est illustrative : elle dépend de l'interpolation de computeWeeklyLoss et du découpage en 5 semaines d'une période de 30 jours, non recalculés à la main.</dt><dd><em>PDF — I. Synthèse</em> — L'inventaire signale computeWeeklyLoss comme lu partiellement ; le chiffre exact n'a pas été vérifié par exécution.</dd>
+<dt>« Depuis le début » devrait aussi remonter jusqu'à la plus ancienne nuit ou au plus ancien temps pour soi ; le scan de la plus ancienne entrée ignore ces deux journaux, ce qui pourrait tronquer le début effectif si un sommeil précède toute autre donnée.</dt><dd><em>Bloc « Rapport médical » — période</em> — Constat de code (oldestEntryDate ne scanne pas sleepLogs ni meTimeLogs) ; le chapitre décrit le fait, l'idée de correction est une supposition.</dd>
+<dt>Le carreau « Les effets secondaires ressentis » devrait suivre la règle des cinq carreaux de module (module allumé et données sur la période) ; il est rendu sans garde, donc cochable alors que la section ne sera jamais dessinée. hasSideEffectsData est calculée mais n'est employée qu'au masque.</dt><dd><em>Sous-bloc « Export détaillé sur mesure »</em> — Réfutation retenue : le chapitre affirmait la garde. Le fait est écrit dans le chapitre ; l'idée que ce soit un oubli à corriger, plutôt qu'un choix, est une supposition — les effets secondaires sont devenus un module le 2026-08-29, après la grille.</dd>
+</dl>
+<h3 id="inv-modules">Modules et rappels</h3>
+<h4>Modules</h4>
+<dl class="inventions">
+<dt>Sur l'accueil, les tuiles et couches vitrées d'un module masqué disparaîtraient aussi.</dt><dd><em>Masquage complet</em> — La demande du 2026-08-27 dit que les blocs « n'apparaitront plus du tout » dans « menus tiroirs et pages » ; vérifié pour le menu du bas, les trois tiroirs et la page Badges seulement — l'accueil relève du chapitre Accueil.</dd>
+<dt>Les tuiles de l'accueil qui mènent aux repas, aux pas ou à l'activité physique allumeraient le module au passage.</dt><dd><em>Activation automatique par la navigation</em> — HomeTemplate reçoit handleNavigate et handleQuickAddNavigate, qui allument ces trois modules ; je n'ai pas vérifié quelles tuiles de l'accueil visent ces pages ni si elles passent par ces deux fonctions.</dd>
+<dt>La vitre du module éteint épouserait le bord haut de la barre du bas dans les deux menus.</dt><dd><em>Page vitrée</em> — Phrase retirée du chapitre après réfutation : le commentaire du code l'affirme (« les deux barres font la même hauteur »), mais la vitre est ancrée à bottom-16 (64 px) alors que la barre standard fait h-12 (48 px) — il reste 16 px de page nette. App.tsx:2770, 2609, 2681 ; la seule capture existante est prise en menu simplifié.</dd>
+<dt>La carte « Actif sanguin » et la carte « Effets secondaires » du tiroir Tendances se griseraient et porteraient la phrase d'activation comme les cinq autres quand leur module est éteint.</dt><dd><em>Tiroir Tendances — état du module</em> — Phrase généralisée à tort dans le chapitre, corrigée : les deux cartes sont rendues avec enabled codé en dur à true (TrendDrawer.tsx:413-424 et 988-998) et MODULES_TENDANCE ne connaît que meals, sport, metime, sleep, steps. La demande du 2026-08-29 (« propager bien partout les affichages et comportements de module desactivé ») le voudrait, et TODO-CLAUDE-V1.md:667-671 laisse le point ouvert.</dd>
+<dt>Un module Effets secondaires masqué quitterait aussi le tiroir Tendances.</dt><dd><em>Masquage complet</em> — Phrase corrigée après réfutation : le filtre !isModuleHidden ne s'applique qu'à la liste rows, et la huitième case est rendue après le .map (TrendDrawer.tsx:955 et 988-998). Les tiroirs Ajouter et Journal, eux, tiennent la règle (navigation.ts:225).</dd>
+<dt>La capture de la page Modules montrerait qui a allumé quoi (modules activés d'office contre modules allumés par l'utilisatrice).</dt><dd><em>Page Modules — état des cartes</em> — Légende retirée après réfutation : la capture appelée montre les sept cartes « ACTIVÉ » (données de la graine) et rien à l'écran ne distingue un défaut d'un choix. L'écran ne porte aucune trace de l'origine d'un état.</dd>
+<dt>La V2 garderait les sept modules et leur page.</dt><dd><em>Modules en V2</em> — Présupposé de la phrase « L'onboarding V2 ne pose aucune question de module », reformulée : GUIDELINES.md et les deux TODO du dépôt V2 ne disent rien de la page Modules (aucune occurrence du mot), et parcours.ts:29-65 ne compte que neuf étapes, aucune de module. Seules « de VRAIES notifications du téléphone » sont décidées.</dd>
+</dl>
+<h4>Notifications</h4>
+<dl class="inventions">
+<dt>Le rappel sonnerait le jour et à l'heure choisis, ou tous les N jours à partir de la date de départ.</dt><dd><em>Rappel d'injections</em> — Le récapitulatif dit « seront planifiés automatiquement » ; aucun planificateur, aucune Notification API, aucun consommateur de reminderEnabled hors l'affichage « Rappels : … » de l'accueil (grep sur src, hors thèmes).</dd>
+<dt>L'application calculerait l'instant du rappel : date et heure du rendez-vous moins le délai choisi (1 heure à 1 semaine).</dt><dd><em>Rappel de rendez-vous médical</em> — Le champ « Combien de temps avant notifier ? » le suggère ; rien dans le code ne lit medicalReminderNotifyBefore ni ne soustrait quoi que ce soit.</dd>
+<dt>Dans un fuseau à l'ouest de Greenwich, la date du récapitulatif reculerait d'un jour (« 02/05/2026 » pour une date de départ du 03/05/2026).</dt><dd><em>Récapitulatifs des deux cartes</em> — Les deux phrases construisent new Date('AAAA-MM-JJ'), lu en UTC, puis toLocaleDateString('fr-FR') en heure locale ; comportement non observé, signalé en doute par l'inventaire.</dd>
+<dt>Pour un traitement en comprimé, la carte s'appellerait « Comprimé », comme la carte du module sur la page Modules.</dt><dd><em>Carte Injections</em> — Amélioration venue du contraste entre la page Modules (treatmentSectionLabel) et la page Notifications (libellé « Injections » écrit en dur, ligne 524 de NotificationsSettings.tsx).</dd>
+<dt>La page Notifications perdrait son second titre « Notifications », comme la page Modules a perdu le sien.</dt><dd><em>Titre de la page</em> — Symétrie venue de la demande du 2026-08-27 « supprimer le 2eme titre module », appliquée à la seule page Modules (NotificationsSettings.tsx:216-227) ; le doublon subsiste page Notifications (lignes 499-510) et le chapitre le décrit désormais tel quel.</dd>
+<dt>Un rendez-vous nommé (« Dr Lefèvre », 06/10/2026, 10:30) figurerait sur une capture.</dt><dd><em>Carte Prochain rendez-vous médical</em> — Légende retirée après réfutation : aucune capture ne porte de nom de médecin ni de date de rendez-vous — la capture dépliée montre le champ vide sur son placeholder et « JJ/MM/AAAA ». Ces valeurs ne subsistent que dans l'exemple rédactionnel, qui suit le format réel du récapitulatif.</dd>
+</dl>
+<h3 id="inv-profil">Profil, avatar, compte, avis, sondage, FAQ, légal</h3>
+<h4>avatar</h4>
+<dl class="inventions">
+<dt>Le stockage du navigateur plafonne autour de 5 Mo pour toute l'application, d'où le plafond de 300 Ko.</dt><dd><em>Importer une photo d'avatar</em> — Commentaire d'avatarPhoto.ts, non vérifié ; j'ai gardé les seuils sans leur justification.</dd>
+<dt>Le refus de poids écrit « Cette photo pèse 18,4 Mo », avec une virgule décimale.</dt><dd><em>Importer une photo d'avatar</em> — Réfutation retenue. formatBytes passe par formatNumber, dont le contrat depuis le 2026-08-28 est un point à l'affichage. J'avais francisé une citation ; le chapitre écrit « 18.4 Mo ».</dd>
+<dt>« Au-delà de 1 Mo », et une décimale garantie.</dt><dd><em>Écriture des octets</em> — Réfutation retenue. Le seuil est un « supérieur ou égal », et formatNumber laisse tomber le zéro de queue — d'où « 12 Mo » dans le message de refus.</dd>
+</dl>
+<h4>avis</h4>
+<dl class="inventions">
+<dt>La corbeille retire aussi le document en base.</dt><dd><em>Supprimer un message de l'historique des retours</em> — handleDeleteFeedback ne filtre que le stockage local ; le chapitre l'écrit tel quel, mais l'intention n'est consignée nulle part.</dd>
+<dt>Une file locale qui rejouerait l'alerte plafond à la prochaine connexion.</dt><dd><em>Plafonner les envois quotidiens et alerter</em> — Arbitrage listé dans l'inventaire : possibilité non écrite. Le chapitre dit que l'alerte hors connexion est perdue.</dd>
+<dt>Le contexte se limite à la page d'origine, la version, le thème, le cadre, la langue et le fuseau.</dt><dd><em>Contexte d'envoi d'un retour</em> — Réfutation retenue. La parenthèse se lisait comme exhaustive et laissait de côté l'agent utilisateur, la taille d'écran, toutes les langues annoncées, le mode de compilation, l'instant en trois formes, la home, le menu et l'ensemble de polices. Rien de tout cela n'est une donnée de santé, mais l'inventaire était incomplet de moitié.</dd>
+</dl>
+<h4>compte</h4>
+<dl class="inventions">
+<dt>La suppression du compte efface aussi les documents en base (feedbacks/{uid}, surveys/{uid}) et les courriers en attente.</dt><dd><em>Supprimer le compte et les données</em> — DeleteAccountBlock ne supprime que le compte Firebase et le stockage local ; rien ne dit si l'effacement en base est voulu, oublié ou délégué au serveur.</dd>
+</dl>
+<h4>connexion</h4>
+<dl class="inventions">
+<dt>Une réinitialisation de mot de passe, ou une création de compte depuis la page.</dt><dd><em>Page de connexion</em> — Le pied de page dit explicitement qu'il n'y a pas d'inscription libre, et aucun lien « mot de passe oublié » n'existe. L'absence est délibérée côté inscription, muette côté oubli.</dd>
+</dl>
+<h4>exemples</h4>
+<dl class="inventions">
+<dt>Objectif final 80 kg ; dernière pesée 91,4 kg le 12 septembre 2026 ; dernière injection 1 mg ; e-mail camille@example.com ; formulaire ouvert depuis la Balance ; deux messages dans l'historique ; rappel d'injection le lundi à 20:00.</dt><dd><em>Camille</em> — Valeurs choisies pour les exemples, hors des chiffres imposés (née en 1978, 168 cm, 96 kg en mai 2026, Ozempic 0,25 mg en semaine 1) ; à aligner avec les autres chapitres.</dd>
+</dl>
+<h4>légal</h4>
+<dl class="inventions">
+<dt>Une nouvelle version du texte redemande l'acceptation.</dt><dd><em>Accepter / consulter l'avertissement médical</em> — La clé de stockage finit par _v1, ce qui suggère un versionnage ; rien ne l'implémente.</dd>
+</dl>
+<h4>navigation</h4>
+<dl class="inventions">
+<dt>Un bouton de retour vers l'onglet quitté.</dt><dd><em>Mon Profil</em> — App.tsx retient previousTab et passe onBack à ProfileSettings, qui ne le rend pas ; j'aurais voulu écrire qu'un retour existe. Le chapitre dit seulement qu'aucun bouton ne s'en sert.</dd>
+<dt>La perte de poids s'écrit toujours avec une décimale, gabarit « -X.X kg ».</dt><dd><em>Aperçu profil du menu Configuration &amp; Plus</em> — Réfutation retenue. Le parseFloat autour du toFixed(1) fait tomber le zéro de queue : une perte de 5 kg s'écrit « -5 kg ». Le gabarit annonçait une forme que l'écran ne tient pas.</dd>
+<dt>L'avatar du header est présent sur toutes les pages sauf Mon Profil.</dt><dd><em>Bouton avatar du header</em> — Réfutation retenue. Sur Mon ciel, l'entête entier n'est pas rendu (App.tsx, !isMonCiel), donc l'avatar non plus. Le chapitre nomme les deux exceptions.</dd>
+<dt>« Sécurité » et « Avertissements &amp; Confidentialité » comme deux entrées, et une liste de cartes donnée pour complète.</dt><dd><em>Page Configuration &amp; Plus</em> — Réfutation retenue. Le libellé est d'un seul tenant, chaque carte porte en plus une phrase de description, et la liste rendue compte une carte de plus qui est hors périmètre. Le chapitre ne présente donc plus l'énumération comme exhaustive.</dd>
+</dl>
+<h4>profil</h4>
+<dl class="inventions">
+<dt>Un réglage des unités (métrique / impérial) sur la page profil.</dt><dd><em>Modifier le profil</em> — UserProfile.measurementSystem existe sans interface ; la V2 le choisit à l'onboarding seulement.</dd>
+<dt>La V2 a décidé de supprimer la certification d'essai clinique du rétatrutide.</dt><dd><em>Choisir le médicament prescrit</em> — Le catalogue V2 n'a pas ce champ et l'onboarding ne la demande pas ; aucune décision ne l'écrit — le chapitre dit seulement ce que la V2 porte.</dd>
+<dt>L'âge et la taille sont arrondis à l'entier le plus proche : taper « 47,6 » dans Âge enregistre 48.</dt><dd><em>Modifier le profil</em> — Réfutation retenue. sanitizeInteger appelle bien Math.round, mais aucun chemin d'interface ne lui passe jamais une décimale : dès qu'une case porte une règle, NumberField tronque à chaque frappe (decimals = 0 pour l'âge et la taille). J'avais décrit du code mort comme un comportement ; le chapitre écrit maintenant la troncature et l'exemple donne 47.</dd>
+<dt>Une saisie refusée n'est jamais enregistrée : la case revient à la valeur enregistrée.</dt><dd><em>Modifier le profil</em> — Réfutation retenue. C'est la doctrine annoncée par le commentaire de ProfileInlineField, et c'est vrai du seul champ de texte. Les quatre cases chiffrées reviennent à la dernière valeur valable traversée et la remontent à la case, qui l'enregistre si elle diffère du profil. Le chapitre décrit maintenant les deux comportements séparément.</dd>
+<dt>« Thank you for trusting GLP1LOW — Together we all can make it happen », cité entre guillemets avec un tiret.</dt><dd><em>Bloc de remerciement de Mon Profil</em> — Réfutation retenue. Citation reconstruite : l'écran affiche trois lignes centrées, sans tiret, le mot-symbole dessiné seul sur sa ligne et une étoile en fin de dernière ligne.</dd>
+</dl>
+<h4>rappels</h4>
+<dl class="inventions">
+<dt>Les rappels réglés sur cette page déclenchent une notification à l'heure dite.</dt><dd><em>Notifications</em> — Aucun appel à l'API Notification, à requestPermission ni à un service worker dans src : la page n'écrit que des champs du profil. Le chapitre le dit ; reste à savoir si l'envoi est prévu, abandonné ou délégué à une application native.</dd>
+</dl>
+<h4>sondage</h4>
+<dl class="inventions">
+<dt>Retirer la proposition « Suivi hydratation » du sondage.</dt><dd><em>Répondre au sondage / modifier ses réponses</em> — GUIDELINES § 4 écarte le suivi hydrique de la V2 ; c'est une amélioration, pas un fait — le chapitre signale seulement la contradiction.</dd>
+<dt>L'alerte sondage part au 11e envoi du jour.</dt><dd><em>Alerte de mises à jour du sondage</em> — Réfutation retenue. updateCount est un cumul serveur sur toute la vie du compte, qui ne redescend jamais ; la phrase, posée juste après le plafond quotidien, faisait lire un décompte de journée. Le chapitre le dit maintenant en propre.</dd>
+<dt>Le journal des envois garde les deux dernières journées locales.</dt><dd><em>Journal des envois du sondage</em> — Réfutation retenue. C'est une fenêtre glissante de 48 heures en millisecondes, qui ne coïncide pas avec les journées locales dont le plafond se compte — précisément autour d'un changement d'heure ou en fin de soirée.</dd>
+</dl>
+<h4>V2</h4>
+<dl class="inventions">
+<dt>Ce que la V2 garde de l'envoi en base, des courriers, de la connexion Firebase, de la suppression de compte et de la page légale.</dt><dd><em>Avis, sondage, compte, information médicale</em> — GUIDELINES § 1 : socle sans Firebase, ajouts au fur et à mesure ; § 4 ne tranche rien sur ces fonctions. Le chapitre ne les marque donc ni V2 ni non implémenté.</dd>
+<dt>La V2 stocke le poids en kilogrammes quelle que soit l'unité de saisie.</dt><dd><em>Onboarding — poids et taille</em> — Réfutation retenue. GUIDELINES et unites.ts n'affirment le stockage métrique que de la taille (tailleCm) ; reponses.poids garde la chaîne rendue par la roue, donc des livres en système impérial. J'avais généralisé une règle affichée comme « à venir » dans les commentaires. À trancher : c'est peut-être une décision manquante plutôt qu'un choix.</dd>
+<dt>L'onboarding V2 recueille tout le profil par roues bornées, sans aucune saisie libre.</dt><dd><em>Onboarding — profil</em> — Réfutation retenue. Le prénom, l'e-mail et le mot de passe sont des champs texte libres sur le même écran ; seules l'année de naissance, la taille et les deux poids passent par des roues.</dd>
+</dl>
+<h3 id="inv-partage">Le partage</h3>
+<h4>Carte d'injection</h4>
+<dl class="inventions">
+<dt>La dose s'écrirait avec deux décimales quand elle en a (« 0.25 mg »).</dt><dd><em>Dose à deux décimales</em> — dec1 arrondit à une décimale et écrit « 0.3 » pour 0,25 mg ; un affichage à deux décimales serait une amélioration, pas le code.</dd>
+</dl>
+<h4>Cartes de partage</h4>
+<dl class="inventions">
+<dt>Chaque carte produirait une image, comme la carte du badge, et partirait par la feuille de partage du système depuis un bouton Partager sur la page de la donnée (pesée, injection, repas…).</dt><dd><em>Fabrication de l'image et partage des cartes</em> — Les en-têtes du code annoncent que « la fabrication de l'image viendra quand l'apparence sera validée » ; rien ne l'écrit, et aucun bouton Partager n'existe dans la Mixte hors des badges.</dd>
+<dt>La personne choisirait l'entrée à partager (une pesée passée, un repas précis) plutôt que la dernière.</dt><dd><em>Choix de l'entrée à partager</em> — Chaque carte ne lit que la dernière entrée par date et heure ; aucun mécanisme de choix n'est écrit. Réfutation retenue : « la dernière entrée » est d'ailleurs faux pour cinq des quinze cartes (recette = aliment personnalisé le plus récemment créé, badges = palier courant sur toute la sauvegarde, équivalences = poids de départ moins poids courant, graphe = trente jours de points, journée d'alimentation = tous les repas du jour).</dd>
+<dt>Une carte remplie par l'exemple figé porterait une mention, pour ne pas être partagée comme une vraie donnée.</dt><dd><em>Mention « exemple » sur une carte remplie par l'exemple figé</em> — Le code refuse explicitement cette mention (« la maquette ne dit rien ») ; le partage réel n'existant pas, le risque n'a pas été tranché. Réfutation retenue : la page qui montre la maquette le signale déjà deux fois (pastille « Exemple », message « Aucune donnée réelle pour cet élément… »), la carte elle-même non.</dd>
+<dt>Le graphe partagé pourrait être n'importe quel graphe de l'application (poids, pas, effets).</dt><dd><em>Graphe partagé au choix</em> — Seul le graphe du sommeil est maquetté, parce que son analyse se branche sur les mêmes points que le tracé ; l'extension aux autres graphes n'est pas écrite.</dd>
+<dt>Les quinze maquettes de cartes de partage, leur cadre commun, le faux QR code et les dix-neuf entrées de liste seraient décrits comme une fonction du carnet.</dt><dd><em>Présence des maquettes dans la spec fonctionnelle</em> — Réfutation retenue : elles ne vivent que dans la page d'administration « Templates des partages » (ShareTemplatesPage), hors périmètre. Trois h3, le tableau des quinze cartes et la section du QR code ont été retirés, ainsi que les trois figures qui les illustraient — captures inexistantes, rangées par TODO-CLAUDE.md parmi les absentes « par construction ».</dd>
+<dt>La carte « Ma dernière perte » écrit un moins en dur (« --1.1 kg » pour une reprise, « -0 » pour une pesée identique) ; la carte « Ma collection de badges » annonce « 4 badges sur 4 » quand aucun badge n'est décroché ; le graphe « Mon sommeil sur 30 jours » se calcule à partir d'aujourd'hui et se videra passé trente jours après l'exemple figé du 18/08/2026 ; les maquettes lisent les journaux sans filtrer les lignes marquées supprimées.</dt><dd><em>Défauts relevés sur les maquettes (hors périmètre, non écrits)</em> — Constatés dans shareTemplates.tsx et signalés par le vérificateur, mais portant sur une page d'administration : rien n'en est écrit dans le chapitre.</dd>
+</dl>
+<h4>Partage</h4>
+<dl class="inventions">
+<dt>La V2 reprendrait le partage de badge et les cartes tels quels.</dt><dd><em>Position de la V2 sur le partage</em> — GUIDELINES.md § 4 et src/screens/onboarding de la V2 ne mentionnent pas le partage (vérifié : aucune occurrence utile de « partage » ou « share » dans le src/ de la V2) ; rien ne permet de l'affirmer ni de l'infirmer.</dd>
+<dt>Le partage viserait des destinations nommées : messagerie, réseau social.</dt><dd><em>Destinations du partage</em> — Phrase retirée du chapitre (réfutation retenue) : l'application remet un objet à la feuille de partage du système, qui décide seule des applications proposées ; aucune destination n'est nommée dans le code.</dd>
+<dt>Le partage d'un badge serait décrit deux fois, au chapitre Badges et ici.</dt><dd><em>Répartition entre le chapitre Badges et le chapitre Partage</em> — Réfutation retenue en partie : le chapitre Badges en donne le résumé et renvoie ici pour le détail. Le détail reste dans ce chapitre, qui n'a plus d'autre contenu ; à l'assemblage, décider si le résumé du chapitre Badges se réduit au renvoi.</dd>
+</dl>
+<h4>Partage d'un badge</h4>
+<dl class="inventions">
+<dt>Le repli presse-papier copierait aussi l'adresse de la page, comme la notice l'annonce.</dt><dd><em>Lien dans le presse-papier</em> — La notice dit « Lien et texte de partage copiés » alors que seul le texte est écrit dans le presse-papier ; corriger l'un ou l'autre est une décision à prendre.</dd>
+<dt>Le partage de badge passerait par shared/platform/share (shareNative) comme le prévoit la règle « aucune API web hors de shared/platform ».</dt><dd><em>Partage unifié sur la couche de plateforme</em> — Le code le note comme à faire « à la conversion » native ; l'auteur du code a choisi de ne pas l'aligner maintenant parce que le contrat diffère (URL jointe au fichier, retrait des fichiers refusés). Réfutation retenue : la phrase du chapitre disait à tort que la couche de plateforme n'est utilisée par aucun écran (ShareBlock l'appelle, monté hors périmètre), et elle décrit une architecture de code — retirée du chapitre, marque « arbitrage non validé » comprise.</dd>
+<dt>Le repli presse-papier serait le comportement des navigateurs de bureau.</dt><dd><em>Détection de la plateforme</em> — Parenthèse retirée du chapitre (réfutation retenue) : badgeShare.ts ne teste que la présence de navigator.share, sans détection de plateforme ; des navigateurs de bureau l'exposent, et des contextes mobiles ne l'exposent pas.</dd>
+<dt>Un échec de la copie dans le presse-papier s'annoncerait à l'écran.</dt><dd><em>Avis quand la copie échoue</em> — Le code n'écrit qu'une trace en console : la personne touche Partager et rien ne se passe. Aucun message d'erreur n'est décidé ; le chapitre se borne à constater le silence.</dd>
+<dt>Le bloc de célébration afficherait la même notice que la page Badges quand le partage retombe sur le presse-papier.</dt><dd><em>Notice au bloc de célébration</em> — Il appelle le partage sans lui passer de fonction de notice ; l'écart avec la page Badges est dans le code, aucune décision ne le tranche.</dd>
+</dl>
+<h4>QR code</h4>
+<dl class="inventions">
+<dt>Le QR encoderait l'adresse d'une page qui redirige vers l'App Store ou le Play Store.</dt><dd><em>QR code réel vers les magasins d'applications</em> — La demande du 2026-08-19 cite « un qrcode vers l'app sur les stores » ; ni l'adresse ni l'encodeur n'existent. Réfutation retenue : le faux motif ne figure que sur les maquettes de la page d'administration ; la carte JPEG du badge, seul partage branché, n'en porte aucun.</dd>
+</dl>
+<h3 id="inv-non-implemente">Décidé mais non implémenté, arbitrages non validés</h3>
+<h4>Accueil</h4>
+<dl class="inventions">
+<dt>Marquer comme arbitrage de Claude, « à défaire d'un mot », le fait que la tuile des pas prenne toute la largeur quand le module repas est éteint.</dt><dd><em>Tuile des pas pleine largeur quand les repas sont coupés</em> — Retiré du chapitre. Le col-span-2 existe bien quand foodTrackingEnabled est faux, mais aucun commentaire d'arbitrage ne l'accompagne : la formule « à défaire d'un mot » n'apparaît qu'une fois dans le fichier, et elle couvre l'autre cas — repas et pas coupés tous les deux —, déjà consigné. La marque était de moi.</dd>
+<dt>Consacrer un écran entier du chapitre au bloc de palier d'IMC franchi, présenté comme le plus riche des chemins morts.</dt><dd><em>Bloc « Nouveau palier IMC atteint » comme écran mort</em> — Manque écarté après vérification. Le bloc est vivant : la home standard l'ouvre au clic sur la ligne IMC, et App.tsx l'ouvre seul dès qu'une pesée fait descendre d'une classe, avec mémoire du dernier palier notifié. Seuls l'œil et le clic de la home à sections sont éteints par CARRES_SUIVI, et le chapitre le dit maintenant en ces termes.</dd>
+<dt>Ranger injectionRecency parmi les fonctions de homeOverview sans lecteur dans les homes.</dt><dd><em>injectionRecency sans lecteur</em> — Retiré du chapitre. La home standard de la Mixte l'importe et l'appelle pour la ligne de fraîcheur de la dernière prise. Les cinq autres noms de la ligne restent sans appelant.</dd>
+</dl>
+<h4>Alimentation</h4>
+<dl class="inventions">
+<dt>Refuser le ré-enregistrement d'une recette dont un ingrédient est introuvable, ou l'écrire sous le formulaire à l'accent du thème avant que la valeur baisse.</dt><dd><em>Avertissement sur une recette amputée</em> — Le code qualifie le défaut de « connu, non traité » : rien ne dit ce qu'il faudra faire, et refuser plutôt qu'avertir change le comportement d'un écran sans décision.</dd>
+</dl>
+<h4>Dette</h4>
+<dl class="inventions">
+<dt>Supprimer d'un même lot nextDoseMessage, lastDose, currentTime, TimeOfDayChart, la branche page de BlocSuiviPoids, mealCountsLast7Days, meTimeMinutesLast7Days, TIER_TILE_CLASS et JournalViewMode, plutôt que de les garder chacun « le temps que le sujet se pose ».</dt><dd><em>Nettoyage du code mort</em> — Chaque point est constaté séparément dans l'inventaire, souvent avec la mention « gardée avec ses tests » ; les regrouper en un lot est une proposition d'organisation, pas un fait du code, et plusieurs de ces gardes sont explicitement voulues. JournalViewMode y est en outre mal placé : le type est consommé par useMealJournal, que la page Menus monte.</dd>
+</dl>
+<h4>Documentation</h4>
+<dl class="inventions">
+<dt>Illustrer la variante « page » du bloc Suivi du poids, les cartes journalières des pas et les analyses textuelles des graphes repas par des captures, comme les autres écrans du chapitre.</dt><dd><em>Captures des écrans non montés</em> — Ces trois-là ne figurent pas parmi les écrans de l'inventaire et rien ne les rend : aucun nom de capture existant ne leur correspond, et en inventer un ferait échouer l'insertion. Ils sont donc décrits sans figure.</dd>
+</dl>
+<h4>Félicitations</h4>
+<dl class="inventions">
+<dt>Une passe unique au chargement qui compte les journées remplies depuis les sept journaux, mémorise le dernier jalon fêté et ne rejoue rien, sur le modèle de badgeCelebration.ts (glp1_badge_tiers_connus). DECLENCHEMENTS.md décrit les jalons, pas la mécanique.</dt><dd><em>Calcul des jalons de félicitation</em> — La célébration des badges compare un palier courant à un palier connu persisté ; l'analogie est tentante pour les jalons de calendrier, mais aucune ligne de code ne la propose et le fichier dit explicitement de ne rien arbitrer avant l'implémentation.</dd>
+<dt>Donner au widget une porte dans l'application — un déclenchement au chargement de la home, comme la fête « Dynamique débloquée » — plutôt que de le laisser sans chemin le jour où les jalons seront calculés.</dt><dd><em>Point d'entrée du widget de félicitation</em> — Le seul écran qui ouvre le widget est la page d'essai « Félicitations », qui relève de l'administration et sort du périmètre. Ce que le chapitre peut dire est qu'aucun écran de l'application ne l'ouvre ; où la porte devra se poser n'est écrit nulle part.</dd>
+</dl>
+<h4>Métabolisme</h4>
+<dl class="inventions">
+<dt>Ajouter au chapitre une ligne ou un écran sur le bilan métabolique, pour que le titre de la section tienne sa promesse.</dt><dd><em>Une entrée du bilan métabolique dans ce chapitre</em> — Manque écarté : aucune règle décidée absente du code ni aucun arbitrage de Claude n'a été trouvé sur MetabolismTracker. La correction retenue est l'inverse — le titre de la section est devenu « Rapport, badges, partage ».</dd>
+</dl>
+<h4>Modèle de données</h4>
+<dl class="inventions">
+<dt>Comment convertir un historique où SideEffectLog.type est un nom libre vers un typeId référencé : créer une entrée de table par nom distinct rencontré, en slug pour les entrées livrées et en UUID pour celles créées, puis réécrire chaque ligne. CONVENTIONS.md pose la décision, aucun code n'écrit ce chemin de conversion.</dt><dd><em>Migration des types vers des tables</em> — L'inventaire dit que les interfaces sont déclarées sans table et que la règle « référence par identifiant » demande typeId ; il ne dit nulle part comment passer de l'un à l'autre, et rien dans le dépôt ne l'esquisse.</dd>
+<dt>Accompagner le passage de mysteryBadgeHidden à un nom positif d'une conversion des sauvegardes existantes.</dt><dd><em>Conversion des sauvegardes au renommage de mysteryBadgeHidden</em> — Retiré du chapitre. types.ts consigne la décision inverse, mot pour mot : « aucune sauvegarde n'est à ménager et aucune migration n'est à écrire ».</dd>
+</dl>
+<h4>Retours et sondage</h4>
+<dl class="inventions">
+<dt>Ranger l'alerte non partie dans le stockage local avec son horodatage, la rejouer au prochain envoi réussi, et purger la file comme le journal des envois du sondage le fait déjà à deux jours.</dt><dd><em>File d'attente hors connexion</em> — Le commentaire de remoteSubmit.ts dit qu'une file serait possible et qu'elle n'est pas écrite ; la forme qu'elle prendrait — clé, purge, moment du rejeu — est de moi seul. Le vérificateur a eu raison sur un point : le cas décrit par le code n'est pas la coupure réseau mais le mode local ou l'absence de compte ; le chapitre le dit désormais ainsi.</dd>
+</dl>
+<h4>Traitement</h4>
+<dl class="inventions">
+<dt>Garder le nom saisi de l'ancien « Autre traitement » dans un champ de notes de la première prise, pour ne pas le perdre à la conversion.</dt><dd><em>Conservation du nom libre à la migration</em> — Le commentaire du catalogue dit que le nom est perdu « faute d'endroit où le conserver » ; désigner cet endroit est une décision de modèle que personne n'a prise.</dd>
+</dl>
+</section>
+</main>
+</body>
+</html>
