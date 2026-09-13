@@ -127,20 +127,41 @@ function reunir(cotes) {
   }
 }
 
-const mode = process.argv[2] ?? 'brouillons'
-if (mode !== 'spec' && mode !== 'brouillons') {
-  console.error('Emploi : node scripts/assembler-chapitres.mjs spec|brouillons')
-  process.exit(1)
+// L'ordre de la spécification abstraite : elle ne suit pas les domaines
+// d'écran, elle va du modèle vers ses limites.
+const ORDRE_ABSTRAITE = [
+  'domaine', 'entites', 'grandeurs', 'temps', 'capacites', 'derivations',
+  'etats', 'persistance', 'invariants', 'hors-modele',
+]
+
+// Chaque mode dit d'où il lit ses fragments et où il écrit.
+const MODES = {
+  spec: { prefixe: 'chapitre', ordre: ORDRE },
+  brouillons: { prefixe: 'chapitre', ordre: ORDRE },
+  technique: { prefixe: 'technique', ordre: ORDRE },
+  abstraite: { prefixe: 'abstraite', ordre: ORDRE_ABSTRAITE },
 }
 
+const mode = process.argv[2] ?? 'brouillons'
+if (!MODES[mode]) {
+  console.error(`Emploi : node scripts/assembler-chapitres.mjs ${Object.keys(MODES).join('|')}`)
+  process.exit(1)
+}
+const { prefixe, ordre } = MODES[mode]
+
 const index = indexerCaptures()
-const ids = ORDRE.filter((id) => existsSync(join(BROUILLONS, `chapitre-${id}.html`)))
+const ids = ordre.filter((id) => existsSync(join(BROUILLONS, `${prefixe}-${id}.html`)))
+if (!ids.length) {
+  console.error(`Aucun fragment ${prefixe}-*.html dans ${BROUILLONS} : rien à assembler.`)
+  process.exit(1)
+}
 
 const manquantes = []
 const rapprochees = []
 const chapitres = ids.map((id) => {
-  const brut = readFileSync(join(BROUILLONS, `chapitre-${id}.html`), 'utf8')
-  const cote = JSON.parse(readFileSync(join(BROUILLONS, `chapitre-${id}.json`), 'utf8'))
+  const brut = readFileSync(join(BROUILLONS, `${prefixe}-${id}.html`), 'utf8')
+  const fichierCote = join(BROUILLONS, `${prefixe}-${id}.json`)
+  const cote = existsSync(fichierCote) ? JSON.parse(readFileSync(fichierCote, 'utf8')) : {}
   return {
     id,
     titre: titreDu(brut) ?? id,
@@ -154,7 +175,8 @@ const figures = chapitres.reduce((n, c) => n + (c.html.match(/data-capture=/g) ?
 const absentes = [...new Set(manquantes)].sort()
 const rapprochementsFaits = [...new Map(rapprochees).entries()].sort()
 
-const LIRE = readFileSync(join(BROUILLONS, 'section-lire.html'), 'utf8').trim()
+const fichierLire = join(BROUILLONS, 'section-lire.html')
+const LIRE = existsSync(fichierLire) ? readFileSync(fichierLire, 'utf8').trim() : ''
 
 const etatFigures = `<h2 id="figures">État des figures <a class="retour" href="#sommaire">↑ sommaire</a></h2>
 <p>${figures} figures appelées par les chapitres, ${absentes.length} sans capture${rapprochementsFaits.length ? `, ${rapprochementsFaits.length} retrouvées à un tiret près` : ''}.</p>
@@ -236,6 +258,61 @@ ${idxResolu.map(([t, ancres]) => `<dt>${echapper(t)}</dt><dd>${ancres.map((a) =>
   corps = [LIRE, ...chapitres.map((c) => c.html), tableEcrans, pageGlossaire, pageIndex, etatFigures].join('\n\n')
   annexes = '<ul class="annexes">\n<li><a href="#ecrans">Table des écrans</a></li>\n<li><a href="#glossaire">Glossaire</a></li>\n<li><a href="#index">Index</a></li>\n<li><a href="#figures">État des figures</a></li>\n</ul>'
   debutSommaire = ' start="0"'
+} else if (mode === 'technique' || mode === 'abstraite') {
+  // Les deux documents pour qui développe : mêmes annexes que la fonctionnelle
+  // moins la table des écrans, qui n'a de sens que là où il y a des captures.
+  const { glossaire, index: idx } = reunir(chapitres.map((c) => c.cote))
+  const estTechnique = mode === 'technique'
+
+  sortie = estTechnique ? 'spec-technique.html' : 'spec-abstraite.html'
+  titre = estTechnique ? 'Spécification technique' : 'Spécification abstraite'
+  sousTitre = estTechnique
+    ? 'Les entités, les formules, les seuils et les cas limites : comment les chiffres se font.'
+    : "Les données et les capacités, sans un mot d'interface."
+  bandeau = `<a href="index.html">Sommaire général</a>
+  <a href="spec-fonctionnelle.html">Fonctionnelle</a>
+  <a href="spec-technique.html"${estTechnique ? ' aria-current="page"' : ''}>Technique</a>
+  <a href="spec-abstraite.html"${estTechnique ? '' : ' aria-current="page"'}>Abstraite</a>
+  <a href="inspirations.html">Inspirations</a>`
+  etat = `<p class="etat">Les ${chapitres.length} chapitres sont écrits depuis le code de la V1 et les décisions de la V2, puis réfutés un à un contre le code, puis corrigés d'après ces réfutations. Ce que le code ne fondait pas en a été retiré et rangé dans <a href="inspirations.html">Inspirations</a>.${estTechnique ? ' Les ancres de ce document sont celles que la <a href="spec-fonctionnelle.html">spécification fonctionnelle</a> lui promet : un id manquant y serait un lien mort.' : " Ce document ne nomme aucun écran : il s'adresse à qui réimplémentera l'application ailleurs."}</p>`
+
+  sommaire = chapitres.map((c) => `<li><a href="#${c.id}">${c.titre}</a></li>`).join('\n')
+
+  // Mêmes ancres résolues que pour la fonctionnelle : un renvoi vers une ancre
+  // absente est retiré plutôt que publié cassé.
+  const ancresPresentes = new Set()
+  for (const c of chapitres) {
+    for (const m of c.html.matchAll(/id="([^"]+)"/g)) ancresPresentes.add(m[1])
+  }
+  const ancresNues = new Map([...ancresPresentes].map((a) => [a.replaceAll('-', ''), a]))
+  let retires = 0
+  const idxResolu = idx
+    .map(([terme, ancres]) => {
+      const bonnes = [...ancres]
+        .map((a) => ancresPresentes.has(a) ? a : ancresNues.get(a.replaceAll('-', '')))
+        .filter(Boolean)
+      retires += ancres.size - bonnes.length
+      return [terme, [...new Set(bonnes)]]
+    })
+    .filter(([, ancres]) => ancres.length)
+
+  const pageGlossaire = glossaire.length ? `<h2 id="glossaire">Glossaire <a class="retour" href="#sommaire">↑ sommaire</a></h2>
+<p>${glossaire.length} termes.</p>
+<dl class="index">
+${glossaire.map(([g, d]) => `<dt>${echapper(g)}</dt><dd>${echapper(d)}</dd>`).join('\n')}
+</dl>` : ''
+  const pageIndex = idxResolu.length ? `<h2 id="index">Index <a class="retour" href="#sommaire">↑ sommaire</a></h2>
+<p>${idxResolu.length} entrées${retires ? `, ${retires} renvois retirés faute d'ancre` : ''}.</p>
+<dl class="index">
+${idxResolu.map(([g, ancres]) => `<dt>${echapper(g)}</dt><dd>${ancres.map((a) => `<a href="#${a}">${a.split('-')[0]}</a>`).join(', ')}</dd>`).join('\n')}
+</dl>` : ''
+
+  corps = [...chapitres.map((c) => c.html), pageGlossaire, pageIndex].filter(Boolean).join('\n\n')
+  annexes = [
+    glossaire.length ? '<li><a href="#glossaire">Glossaire</a></li>' : '',
+    idxResolu.length ? '<li><a href="#index">Index</a></li>' : '',
+  ].filter(Boolean).join('\n')
+  if (annexes) annexes = `<ul class="annexes">\n${annexes}\n</ul>`
 } else {
   sortie = 'brouillons.html'
   titre = 'Les chapitres écrits — brouillons'
