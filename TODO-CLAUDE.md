@@ -11,6 +11,48 @@ que de te faire lire le fichier. Le TODO de la V1 est importé tel quel dans
 
 ---
 
+## NOTE DE REPRISE — CLEAR DU 2026-09-13 (spécifications en cours)
+
+**Elle a demandé un clear avant de relancer ; à la reprise, LUI REPOSER LA
+QUESTION : « je relance les deux chantiers de la spec fonctionnelle ? »** Ne
+rien relancer sans son oui — elle a refusé le lancement automatique le 13/09
+justement pour faire ce clear.
+
+Contexte : docs en cours dans `docs/` (servi sur http://localhost:3003/ par
+`python3 -m http.server 3003 --bind 127.0.0.1 --directory docs`, à relancer
+s'il est tombé). Table des matières validée par elle (21 chapitres, ordre :
+traitement, poids, effets secondaires, alimentation…), `docs/spec-fonctionnelle.html`
+est un squelette « à venir ». Périmètre : V1 Mixte + décisions V2, sans admin
+ni thèmes, sans les TODO ; aucune maquette inventée ; captures V1 en Nostalgic.
+
+**Ce qui est fait :**
+- Inventaire de la V1 par 9 lecteurs : `scratchpad/inventaire-v1.json`
+  (scratchpad = `/private/tmp/claude-501/-Users-beauty-Desktop-GLOW/4f237620-7356-4a0e-861c-339563e2ef7b/scratchpad`).
+- Banc de capture V1 : `scratchpad/rig-v1` (apiKey vidée, build servi sur le
+  port 3011 par `rig-v1/scripts/servir-dist.sh rig-v1/dist 3011`), outil
+  `scratchpad/outil-capture/capturer.mjs` + `MODE-EMPLOI.md`, graine
+  `scratchpad/graine.json` (Camille, 1978, 168 cm, 96 → 85,9 kg, 122 jours).
+- 371 captures dans `docs/captures/<domaine>/` (8 domaines V1 + onboarding-v2) ;
+  MANQUENT : `metabolisme-rapport-badges` et `transversal` (coupés par le
+  plafond d'usage).
+- 20 chapitres ÉCRITS mais NON VÉRIFIÉS (les réfutateurs ont été coupés) ;
+  seuls `compte` et `onboarding` ont leur réfutation, sans correction ; le
+  chapitre 21 (`non-implemente`) n'est pas écrit. Résultats dans
+  `/private/tmp/claude-501/-Users-beauty-Desktop-GLOW-GIT-APP-V2/4f237620-7356-4a0e-861c-339563e2ef7b/tasks/w17twnc87.output`
+  et le journal du workflow.
+
+**Comment reprendre (après son oui) — les deux workflows se REPRENNENT, les
+agents finis rejouent depuis le cache :**
+- Captures : `Workflow({scriptPath: "/Users/beauty/.claude/projects/-Users-beauty-Desktop-GLOW-GIT-APP-V2/4f237620-7356-4a0e-861c-339563e2ef7b/workflows/scripts/captures-v1-mixte-wf_02a1fb56-16e.js", resumeFromRunId: "wf_02a1fb56-16e"})`
+- Rédaction : `Workflow({scriptPath: "/Users/beauty/.claude/projects/-Users-beauty-Desktop-GLOW-GIT-APP-V2/4f237620-7356-4a0e-861c-339563e2ef7b/workflows/scripts/redaction-spec-fonctionnelle-wf_ec85ca17-0ff.js", resumeFromRunId: "wf_ec85ca17-0ff"})`
+- Ensuite : assembler les chapitres vérifiés dans `docs/spec-fonctionnelle.html`
+  (insérer les figures par `data-capture` → `captures/<domaine>/<slug>.png`),
+  puis glossaire, index, table des écrans ; puis spec technique, abstraite,
+  inspirations (mêmes méthodes). Ne publier un chapitre qu'une fois réfuté et
+  corrigé.
+- Piège : les plafonds d'usage coupent les agents (« session limit ») ; les
+  workflows se relancent à l'identique après la remise à zéro.
+
 ## À arbitrer (décisions à toi)
 
 - [ ] **Le déploiement de la V2** : nouveau projet Firebase, canal de
