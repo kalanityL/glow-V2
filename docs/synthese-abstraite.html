@@ -1,0 +1,180 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>GLP1LOW — Le modèle en bref</title>
+<link rel="stylesheet" href="style.css">
+<style>
+/* Quatre pages A4 au plus : la contrainte est un format, elle se vérifie donc
+   à l'impression et non au nombre de mots. Mesuré à trois pages le
+   2026-09-13 ; toute addition se remesure. */
+main { max-width: 820px; }
+h1 { margin-bottom: 4px; }
+h2 { font-size: 19px; margin: 26px 0 8px; padding-top: 12px; }
+h3 { font-size: 15px; margin: 16px 0 4px; }
+p, li { max-width: none; margin: 6px 0; }
+ul, ol { margin: 6px 0; padding-left: 20px; }
+li { margin: 3px 0; }
+table { margin: 8px 0; font-size: 13.5px; }
+th, td { padding: 5px 8px; }
+.cartouche { border-left: 3px solid var(--accent); background: var(--accent-doux); padding: 10px 16px; border-radius: 0 10px 10px 0; margin: 12px 0; }
+.cartouche p:first-child { margin-top: 0; }
+.cartouche p:last-child { margin-bottom: 0; }
+.serre { columns: 2; column-gap: 28px; font-size: 13.5px; }
+.serre li { break-inside: avoid; }
+.faille { border-left: 3px solid #b45309; background: #fff7ed; padding: 8px 14px; border-radius: 0 8px 8px 0; margin: 10px 0; font-size: 14px; }
+@media print {
+  body { font-size: 11.5px; }
+  main { padding: 0; max-width: none; }
+  h1 { font-size: 24px; }
+  h2 { font-size: 15px; margin: 14px 0 6px; padding-top: 8px; break-after: avoid; }
+  h3 { font-size: 12.5px; break-after: avoid; }
+  table { font-size: 10.5px; break-inside: avoid; }
+  .serre { font-size: 10.5px; }
+  @page { size: A4; margin: 14mm 13mm; }
+}
+</style>
+</head>
+<body>
+<main>
+<div class="bandeau">
+  <a href="index.html">Sommaire général</a>
+  <a href="spec-abstraite.html">La version longue</a>
+</div>
+
+<h1>GLP1LOW — le modèle en bref</h1>
+<p class="sous-titre">Ce que l'application enregistre, ce qu'elle permet, ce qu'elle calcule, et ce qu'elle refuse de faire. Sans un mot d'interface.</p>
+
+<p class="etat">Synthèse de la <a href="spec-abstraite.html">spécification abstraite</a>, qui fait dix chapitres et 493&nbsp;ko. Tout ce qui suit y est développé, avec les preuves prises dans le code. Rien n'est ajouté ici qui n'y soit.</p>
+
+<h2>1. Ce que le produit est</h2>
+
+<p>Un carnet de suivi personnel pour une personne sous traitement GLP-1, en injection ou en comprimé. Il enregistre ce qui se passe pendant la cure, le restitue en totaux, moyennes, séries et échéances, et produit un document destiné à un professionnel de santé. Une seule personne par installation. Toutes les données de suivi vivent sur l'appareil.</p>
+
+<p>Le modèle tient en trois pièces. Un <strong>profil</strong> : qui est la personne, ce qu'elle prend, ce qu'elle vise, ce qu'elle suit. Des <strong>journaux</strong> : des collections de lignes datées, une ligne par fait relevé. Des <strong>référentiels</strong> : les listes que la personne compose elle-même, et auxquelles ses lignes renvoient par identifiant.</p>
+
+<p>Le profil et les journaux forment un document unique, sous une clé de stockage unique. Les référentiels vivent à côté, une clé chacun. Aucune structure ne porte plus d'un profil, et aucune ligne ne porte d'identifiant de personne : l'appartenance des données est celle de l'appareil, pas celle d'un compte.</p>
+
+<h3>Les six non-buts</h3>
+<table>
+<tr><th>Non-but</th><th>Ce qu'il exclut</th></tr>
+<tr><td>Pas de diagnostic</td><td>Aucun état de santé n'est déduit d'un relevé. Une seule exception, nommée : l'indice de masse corporelle est rangé en six catégories cliniques. C'est la seule qualification de normalité du modèle.</td></tr>
+<tr><td>Pas de posologie</td><td>Aucune dose n'est corrigée ni prescrite. Le catalogue porte cependant des paliers de dose destinés à la saisie, et l'un d'eux est retenu d'avance.</td></tr>
+<tr><td>Pas de conseil</td><td>Aucune recommandation nutritionnelle, sportive ou médicamenteuse n'est engendrée. Les objectifs quotidiens sont des valeurs modifiables, pas des prescriptions.</td></tr>
+<tr><td>Pas de comparaison</td><td>Aucune donnée d'une autre personne n'entre dans le modèle. Ni classement, ni moyenne de population, ni réseau.</td></tr>
+<tr><td>Pas de synchronisation</td><td>Aucun compte partagé, aucun accès soignant, aucune copie distante des journaux.</td></tr>
+<tr><td>Pas de capteur</td><td>Aucune connexion à un objet connecté ni à une plateforme de santé. Tout relevé est écrit par la personne.</td></tr>
+</table>
+
+<h2>2. Ce qu'il enregistre</h2>
+
+<p>Huit domaines de relevé. Sept portent un drapeau d'activation ; le poids n'en a pas et ne se désactive pas. Chaque ligne porte un identifiant, un jour, et le plus souvent une heure.</p>
+
+<table>
+<tr><th>Domaine</th><th>Ce qu'une ligne enregistre</th><th>Par jour</th></tr>
+<tr><td>Poids</td><td>Poids en kilogrammes, jusqu'à neuf mensurations en centimètres, un drapeau de départ.</td><td>une seule, les suivantes fusionnent</td></tr>
+<tr><td>Traitement</td><td>Dose en milligrammes, zone d'administration, note, identifiant du traitement.</td><td>deux</td></tr>
+<tr><td>Effets secondaires</td><td>Type d'effet, sévérité entière de 1 à 5, note.</td><td>quinze</td></tr>
+<tr><td>Alimentation</td><td>Famille du repas, composition en quantités d'aliments, faim avant et après de 0 à 5.</td><td>trente, au-delà c'est refusé</td></tr>
+<tr><td>Pas</td><td>Un nombre de pas. Pas d'heure.</td><td>sans plafond ni unicité</td></tr>
+<tr><td>Activité physique</td><td>Nom de l'activité, intensité ressentie, durée en minutes, distance facultative.</td><td>quinze</td></tr>
+<tr><td>Sommeil</td><td>Deux bords, coucher et réveil, nature nuit ou sieste, qualité de 0 à 5.</td><td>sans plafond, sans recouvrement</td></tr>
+<tr><td>Temps pour soi</td><td>Nom du moment, durée en minutes.</td><td>quinze</td></tr>
+</table>
+
+<p>Les référentiels sont au nombre de six : les aliments personnalisés, les compteurs de choix, les repas favoris, les types d'effets actifs, les activités actives et les moments actifs. Une recette n'est pas un type à part : c'est un aliment personnalisé qui porte sa composition et une marque. La création d'aliments est plafonnée par jour, cinquante aliments et vingt recettes, quotas indépendants.</p>
+
+<h2>3. Ce qu'on peut faire</h2>
+
+<p>Quatre familles de verbes, et rien d'autre.</p>
+
+<ul>
+<li><strong>Enregistrer</strong> : créer, modifier et supprimer une ligne dans l'un des huit journaux, créer, modifier et supprimer une entrée de référentiel, modifier le profil.</li>
+<li><strong>Dériver</strong> : calculer des totaux, des moyennes, des séries, des échéances, des paliers et des projections à partir des lignes, sans jamais rien réécrire.</li>
+<li><strong>Importer</strong> : verser dans les référentiels une fiche nutritionnelle obtenue d'une base ouverte à partir d'un code-barres, et une photographie choisie sur l'appareil.</li>
+<li><strong>Rendre transmissible</strong> : produire, sur une période choisie, un document destiné à un professionnel de santé.</li>
+</ul>
+
+<p>Trois écritures seulement n'ont pas pour cause un geste de la personne : la pesée de départ semée à l'installation, le jeu de données de démonstration, et les conversions de forme rejouées à chaque chargement d'une sauvegarde.</p>
+
+<h2>4. Ce qu'il calcule</h2>
+
+<p>Rien de ce qui suit n'est stocké. Chaque grandeur est recalculée depuis les journaux, et chacune dit ce qu'elle rend quand ses entrées manquent — ce qui fait la moitié de sa définition.</p>
+
+<ul class="serre">
+<li>Le poids actif à une date, et l'indice de masse corporelle avec ses six catégories.</li>
+<li>Le métabolisme de base, par la formule de Mifflin-St Jeor.</li>
+<li>Les dépenses actives, celles des pas et celles des séances.</li>
+<li>La balance énergétique et sa tendance.</li>
+<li>La projection de poids et la cadence de perte.</li>
+<li>Les deux pertes, depuis le début et depuis la dernière pesée, et leurs durées.</li>
+<li>L'avancement vers la cible.</li>
+<li>La concentration sanguine du traitement, depuis les demi-vies du catalogue.</li>
+<li>Les objectifs nutritionnels du jour, fibres comprises.</li>
+<li>Les paliers des quatre distinctions, sur des fenêtres comptées.</li>
+<li>Les équivalences insolites d'un poids perdu, en objets.</li>
+</ul>
+
+<h2>5. Les règles qui tiennent l'ensemble</h2>
+
+<h3>Grandeurs</h3>
+<p>Une valeur se conserve en unité métrique de base, sans étiquette : kilogrammes, centimètres, grammes ou millilitres, milligrammes, minutes, mètres. Le système d'unités choisi ne décide que de l'unité vers l'extérieur. Les bornes n'écartent que l'absurde et ne disent jamais à quelqu'un quel corps il a le droit d'avoir.</p>
+
+<div class="faille">
+<p>Cette doctrine n'est réellement tenue que pour la taille, seule grandeur à disposer de fonctions de conversion. Pour le poids, aucun code ne la tient : la V2 le conserve sous forme de chaîne, dans l'unité affichée, sans conversion. C'est la principale faille du modèle, et elle est nommée comme telle.</p>
+</div>
+
+<h3>Temps</h3>
+<p>Tout est daté par un jour local et, le plus souvent, par une heure murale. Jamais d'UTC : une date universelle recule d'un jour en soirée. Le fuseau et la langue sont indépendants. Les heures retenues tombent sur des minutes rondes. L'instant de référence est toujours injecté par l'appelant, jamais lu par la fonction qui calcule.</p>
+
+<h3>Les dix-neuf invariants</h3>
+<p>Ils priment sur toute règle particulière : une capacité qui les contredirait n'est pas une capacité du produit.</p>
+<ol class="serre">
+<li>Rien de dérivable n'est stocké.</li>
+<li>On référence par identifiant, jamais par nom.</li>
+<li>L'identifiant d'une ligne est unique et stable.</li>
+<li>Supprimer supprime.</li>
+<li>Un journal absent vaut le journal vide.</li>
+<li>Une valeur absente se tait.</li>
+<li>Aucune suite ne se décide sur un silence.</li>
+<li>Les unités stockées sont canoniques.</li>
+<li>Les bornes n'écartent que l'absurde.</li>
+<li>Les dates sont locales.</li>
+<li>L'ordre est celui des dates.</li>
+<li>Les heures tombent sur des minutes rondes.</li>
+<li>Une seule pesée par jour.</li>
+<li>Le poids de départ est la pesée la plus ancienne.</li>
+<li>Le poids de départ ne se supprime pas.</li>
+<li>Deux plages de sommeil ne se recouvrent pas.</li>
+<li>Les fibres comptent partout.</li>
+<li>Une seule personne par installation.</li>
+<li>Une sauvegarde ancienne reste lisible.</li>
+</ol>
+
+<h2>6. Où vivent les données, et ce qui en sort</h2>
+
+<p>Tout tient sur l'appareil, dans un magasin de paires clé-valeur. Une sauvegarde illisible n'est jamais écrasée : sa chaîne brute est recopiée sous une clé de secours. Quand la place manque, l'écriture échoue. Changer d'appareil ne transporte rien, et effacer le stockage local efface l'historique.</p>
+
+<table>
+<tr><th>Ce qui sort</th><th>Vers où</th></tr>
+<tr><td>Le bilan de suivi, document paginé borné à une période</td><td>l'appareil lui-même : il est produit localement, il n'est envoyé nulle part</td></tr>
+<tr><td>Une image de progression et sa légende</td><td>l'appareil, le partage du système, ou un service tiers si la personne le choisit</td></tr>
+<tr><td>Une réponse au questionnaire, un retour écrit</td><td>une base distante, rangés sous l'identifiant du compte</td></tr>
+</table>
+
+<p>Ne sortent jamais : les journaux eux-mêmes. Il n'existe aucune remontée du carnet, aucun rétablissement depuis un serveur, aucun partage entre appareils.</p>
+
+<div class="cartouche">
+<p><strong>Le compte ne porte rien.</strong> Il ouvre l'accès quand il est configuré, et c'est tout. La sauvegarde n'est pas indexée par compte : deux comptes ouverts tour à tour sur le même appareil lisent et écrivent le même document. Sans configuration d'authentification, l'accès est ouvert sans compte.</p>
+</div>
+
+<h2>7. Ce que le modèle ne fait pas</h2>
+
+<p>Des limites vérifiées dans le code, pas des regrets. Une collection est déclarée et morte : elle ne porte qu'un identifiant et une date, aucun geste n'y écrit. Plusieurs types sont déclarés sans qu'aucune donnée soit derrière. Quatre endroits dérogent au premier principe et référencent par un nom là où il faut un identifiant — le type d'un effet, le nom d'un sport, celui d'un moment pour soi, et le libellé d'une famille de repas conservé alors qu'il se recalcule. La conséquence est mesurée : renommer une entrée de catalogue impose de réécrire l'historique. Le système d'unités, enfin, est déclaré dans le profil sans être ni lu ni écrit nulle part.</p>
+
+<p>Ce qui attend une décision plutôt qu'un constat — 105 arbitrages pris sans validation et 348 idées que le code ne fonde pas — est rassemblé dans le document <em>Inspirations</em>.</p>
+
+</main>
+</body>
+</html>
