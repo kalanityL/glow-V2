@@ -305,6 +305,15 @@ thèmes ne repeignent pas, et qui ne sont pas dans les templates non plus.
   jamais saisi à la main ; chaque famille finit par « Autre ».
 
 ### Écriture
+- **`VOCABULAIRE.md` dit les mots** (2026-09-13) : les termes qu'elle a tranchés
+  (« activité physique » jamais « sport » ni « séance », « Balance » pour la
+  page du poids, « Préférences » jamais « Paramètres »…), son vocabulaire à
+  elle dont le sens n'est pas l'évident (« home carré » = l'habit en blocs),
+  les règles de ton — **vouvoiement de tout le site, accords au féminin**,
+  sobre, sans point d'exclamation ni promesse de résultat — et les questions de
+  mots restées sans réponse. Chaque entrée porte sa citation exacte et sa
+  source. **Un mot d'interface se cherche là avant de s'écrire** : une
+  directive de vocabulaire non respectée coûte un travail refait.
 - Code, identifiants, commentaires, messages de commit : **en français**.
 - Les commentaires disent le **pourquoi**, et datent les décisions de
   l'utilisatrice (« demande du 2026-09-07 »). Un commentaire qui décrit un

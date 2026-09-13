@@ -3,10 +3,13 @@
 1. Lis **`GUIDELINES.md` en entier** — c'est la mémoire du projet : ce qu'il
    est, comment on y travaille, ce qui a été décidé. Rien ne se rend avant de
    l'avoir lu, et rien ne s'y contredit sans le dire.
-2. Lis **`TODO.md`** (le sien — sa lecture ne déclenche aucun travail),
+2. Lis **`VOCABULAIRE.md`** avant d'écrire le moindre mot d'interface : les
+   termes tranchés, son vocabulaire à elle, le ton, et ce qui reste sans
+   réponse.
+3. Lis **`TODO.md`** (le sien — sa lecture ne déclenche aucun travail),
    **`TODO-CLAUDE.md`** (le tien) et l'entrée la plus récente de
    **`SUIVI-PUSHS.md`**.
-3. Relance le serveur de développement, en arrière-plan :
+4. Relance le serveur de développement, en arrière-plan :
    `npm run dev -- --port 3002 --strictPort`.
 
 Quand une décision nouvelle est prise en session, elle s'ajoute à
