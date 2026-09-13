@@ -1,16 +1,28 @@
 {
  "inventions": [
   {
+   "categorie": "session",
+   "fonctionnalite": "Bascule automatique vers la page de connexion sur compte supprimé côté console",
+   "texte": "Le compte supprimé côté console pendant que l'onglet est ouvert : onAuthStateChanged repasse en signedOut et la page de connexion revient sans rechargement.",
+   "origine": "Réfutation retenue et phrase supprimée. useAuth.ts ne s'abonne qu'à onAuthStateChanged, sans sondage ni renouvellement ; le SDK ne constate l'invalidation qu'au renouvellement d'un jeton, et son rafraîchissement proactif n'est démarré que s'il existe un écouteur interne. Le chapitre ne dit plus que la bascule a lieu ; il dit ce que l'application fait, c'est-à-dire rien."
+  },
+  {
+   "categorie": "connexion",
+   "fonctionnalite": "Chemin d'écran menant à auth/invalid-email",
+   "texte": "Camille tape « camille@ » : Firebase rejette auth/invalid-email, l'écran affiche « L'adresse e-mail n'est pas valide. »",
+   "origine": "Réfutation retenue et exemple supprimé. LoginPage.tsx:87 rend un <form> sans noValidate autour d'un <input type=\"email\"> : la validation native bloque la soumission d'une adresse mal formée et handlePasswordSubmit n'est pas appelé. Le message reste documenté dans la table, avec la mention qu'il est pratiquement injoignable depuis ce formulaire ; l'exemple porte désormais sur auth/invalid-credential, lui joignable."
+  },
+  {
    "categorie": "stockage",
    "fonctionnalite": "Nombre exact de clés du stockage local",
    "texte": "La liste exhaustive et commentée des clés que clearAll emporte, avec le rôle de chacune.",
-   "origine": "Un grep sur src rend 42 chaînes littérales 'glp1_*', 'glow_*' et 'hasAcceptedMedicalDisclaimer_v1', mais certaines sont administratives (glow_ciqual_admin_*, glp1_test_data) et d'autres ne sont plus écrites (glp1_meals_cleared). Un compte fiable demanderait de lire les 42 sites d'usage un par un ; j'ai écrit « une quarantaine » et laissé le détail dehors."
+   "origine": "Le compte est désormais mesuré : 42 chaînes littérales distinctes 'glp1_*', 'glow_*' et 'hasAcceptedMedicalDisclaimer_v1', déclarées dans 32 fichiers hors tests. Ce que je laisse dehors est le rôle de chacune : certaines sont administratives (glow_ciqual_admin_*, glp1_test_data), d'autres ne sont plus écrites (glp1_meals_cleared), et le vérifier demanderait de lire les 42 sites d'usage un par un."
   },
   {
    "categorie": "sortie de données",
    "fonctionnalite": "Ce qui quitte l'appareil malgré tout (Firestore)",
    "texte": "Un paragraphe sur les écritures distantes signées de l'uid et de l'e-mail du compte : sondage, retours, courrier, journal des échecs d'export.",
-   "origine": "isDatabaseConfigured = isAuthConfigured est vérifié à la ligne (firestore.ts:37), mais je n'ai pas lu remoteSubmit.ts moi-même, aucune ancre imposée ne le couvre, et le sujet relève des chapitres retours et partage."
+   "origine": "isDatabaseConfigured = isAuthConfigured est vérifié à la ligne (firestore.ts:37), mais je n'ai pas lu remoteSubmit.ts en entier, aucune ancre imposée ne le couvre, et le sujet relève des chapitres retours et partage."
   },
   {
    "categorie": "récupération",
@@ -45,80 +57,52 @@
  ],
  "glossaire": [
   {
-   "terme": "Verrou",
-   "definition": "Le garde-barrière d'accès à l'application (AuthGate). Actif dès que FIREBASE_CONFIG.apiKey n'est pas la chaîne vide ; inactif, il rend ses enfants sans demander de compte."
-  },
-  {
-   "terme": "isAuthConfigured",
-   "definition": "Booléen dérivé de la clé d'API. Commande le verrou, le montage du hook d'authentification, l'accès à Firestore (isDatabaseConfigured en est un alias) et l'étape Firebase de la suppression de compte."
-  },
-  {
-   "terme": "Session mémorisée",
-   "definition": "L'état de connexion persisté par le SDK Firebase, sans durée limite, dans IndexedDB (repli : localStorage, puis sessionStorage). L'application n'y accède que par subscribeToAuth et currentAuthUser."
-  },
-  {
-   "terme": "AuthState",
-   "definition": "Union à trois branches — loading, signedOut, signedIn { user } — rendue par useAuth. loading dure le temps de la restauration de la session."
+   "terme": "AppData",
+   "definition": "Objet racine du suivi, écrit en un seul JSON sous glp1_app_companion_data : profil, pesées, journaux quotidiens, injections, repas enregistrés, effets secondaires, pas, sport, temps pour soi, sommeil."
   },
   {
    "terme": "Chaîne nue",
-   "definition": "Valeur stockée telle quelle par setString/getString, sans encodage JSON : un drapeau 'true', un identifiant de thème, un nombre. Passer par setItem la ré-encoderait et rendrait illisibles les valeurs déjà écrites."
-  },
-  {
-   "terme": "Couche de stockage",
-   "definition": "src/shared/platform/storage.ts, seul fichier autorisé à appeler localStorage. Six fonctions, toutes muettes en cas d'erreur : lecture ratée → null, écriture ratée → rien."
-  },
-  {
-   "terme": "AppData",
-   "definition": "L'objet racine du suivi — profil et neuf journaux — sérialisé en un seul JSON sous 'glp1_app_companion_data' et réécrit en entier à chaque changement d'état."
-  },
-  {
-   "terme": "Chaîne de conversion",
-   "definition": "Les sept fonctions pures et idempotentes appliquées au chargement, dans l'ordre dropSeedData → migrateTreatmentIds → purgeDeleted → mergeSideEffectNotes → mergeTableTennisSport → fillMealHunger → ensureStartingWeighIn."
-  },
-  {
-   "terme": "Idempotente",
-   "definition": "Se dit d'une conversion qu'on peut rejouer sans effet sur des données déjà converties. Exigence de toute la chaîne, faute de numéro de version dans le document."
-  },
-  {
-   "terme": "Garde-fou du chargement",
-   "definition": "La règle posée après l'effacement du 2026-08-17 : une lecture ratée met la chaîne brute à l'abri, gèle l'écriture de la clé principale pour la session, et le dit à l'écran."
-  },
-  {
-   "terme": "mayPersist",
-   "definition": "!loadFailed. Un seul appelant : l'effet qui écrit STORAGE_KEY. Les autres clés continuent d'être écrites même après un échec de chargement."
+   "definition": "Valeur écrite dans localStorage sans passer par JSON.stringify, par setString, et relue par getString. S'oppose au couple getItem/setItem, qui encode et décode en JSON."
   },
   {
    "terme": "Clé de secours",
-   "definition": "rescueKeyFor(k) = `${k}__secours`. Reçoit la sauvegarde illisible telle quelle, et une seule fois — la condition est « clé absente » (=== null), pas « clé vide »."
+   "definition": "glp1_app_companion_data__secours : copie brute d'une sauvegarde qui n'a pas pu être analysée, écrite une seule fois par le catch du chargement. Aucun écran ne la relit."
+  },
+  {
+   "terme": "Garde-fou du chargement",
+   "definition": "Gel de l'écriture de la sauvegarde principale après un échec de lecture : loadFailed.current passe à true et mayPersist rend false, ce qui bloque l'unique effet de persistance pour toute la session."
   },
   {
    "terme": "Profil d'usine",
-   "definition": "INITIAL_PROFILE : le profil d'une installation neuve, et le socle sur lequel tout profil lu est fusionné (avatar compris) à chaque chargement."
-  },
-  {
-   "terme": "Pesée semée",
-   "definition": "La pesée de départ créée sans sauvegarde : 95,0 kg, veille locale, 08:00, isStartingWeight à true, id 'starting-weight-log'."
+   "definition": "INITIAL_PROFILE : le profil rendu sans sauvegarde, et le socle sur lequel un profil existant est fusionné à chaque chargement."
   },
   {
    "terme": "Pesée de départ",
-   "definition": "La ligne du journal des pesées qui sert de référence à la perte totale, aux badges et au rapport médical. Reconnue à son drapeau isStartingWeight, jamais à sa valeur."
+   "definition": "Ligne de weightHistory portant isStartingWeight à true, d'identifiant starting-weight-log. Le poids de départ n'est pas un champ du profil : il se lit à ce drapeau."
+  },
+  {
+   "terme": "Pesée semée",
+   "definition": "Pesée de départ créée à 95,0 kg, à la veille du jour d'installation, 08:00, quand il n'y a aucune sauvegarde."
+  },
+  {
+   "terme": "Migration idempotente",
+   "definition": "Fonction de conversion qui, rejouée sur des données déjà converties, ne les change pas. La sauvegarde ne portant pas de numéro de version, les sept migrations s'exécutent à chaque chargement."
+  },
+  {
+   "terme": "isAuthConfigured",
+   "definition": "Booléen dérivé de FIREBASE_CONFIG.apiKey !== ''. Il n'existe pas de réglage du verrou : sa valeur décide à elle seule si AuthGate exige une connexion."
+  },
+  {
+   "terme": "AuthGate",
+   "definition": "Composant qui monte useAuth quand le verrou est actif et choisit, selon AuthState, entre l'écran d'attente, LoginPage et l'application."
+  },
+  {
+   "terme": "deleteCurrentUser",
+   "definition": "Encapsulation du deleteUser du SDK ; lève l'objet nu { code: 'auth/no-current-user' } quand personne n'est connecté. Le SDK termine par un signOut()."
   },
   {
    "terme": "clearAll",
-   "definition": "localStorage.clear(). Efface l'origine entière plutôt qu'une liste de clés. N'atteint ni IndexedDB, ni sessionStorage, ni les cookies."
-  },
-  {
-   "terme": "auth/requires-recent-login",
-   "definition": "Code Firebase rejeté quand la session est trop ancienne pour une suppression de compte. Cas courant ici, la session n'expirant pas : c'est le seul code qui fait apparaître le bouton « Se reconnecter »."
-  },
-  {
-   "terme": "auth/no-current-user",
-   "definition": "Code maison, levé par deleteCurrentUser comme objet nu { code } quand currentUser est null. N'existe pas dans le SDK."
-  },
-  {
-   "terme": "reloadApp",
-   "definition": "window.location.reload(). Redémarrage complet après une suppression de compte, distinct à dessein de reloadForThemeChange."
+   "definition": "localStorage.clear() enveloppé d'un try/catch muet. Vide l'origine entière plutôt qu'une liste de clés, et n'atteint ni IndexedDB, ni sessionStorage, ni les cookies."
   }
  ],
  "index": [
@@ -127,7 +111,11 @@
    "ancre": "compte-entites"
   },
   {
-   "terme": "AuthState",
+   "terme": "glp1_user_custom_foods",
+   "ancre": "compte-entites"
+  },
+  {
+   "terme": "glp1_favorite_meals",
    "ancre": "compte-entites"
   },
   {
@@ -135,7 +123,11 @@
    "ancre": "compte-entites"
   },
   {
-   "terme": "UserProfile (identité)",
+   "terme": "AuthState",
+   "ancre": "compte-entites"
+  },
+  {
+   "terme": "Chaîne nue (clés)",
    "ancre": "compte-entites"
   },
   {
@@ -143,11 +135,7 @@
    "ancre": "compte-connexion-champs-requis"
   },
   {
-   "terme": "Trim de l'e-mail",
-   "ancre": "compte-connexion-champs-requis"
-  },
-  {
-   "terme": "Connexion Google (fenêtre surgissante)",
+   "terme": "Validation native du champ e-mail",
    "ancre": "compte-connexion-champs-requis"
   },
   {
@@ -155,15 +143,7 @@
    "ancre": "compte-messages-d-echec-de-connexion"
   },
   {
-   "terme": "auth/invalid-email",
-   "ancre": "compte-messages-d-echec-de-connexion"
-  },
-  {
    "terme": "auth/invalid-credential",
-   "ancre": "compte-messages-d-echec-de-connexion"
-  },
-  {
-   "terme": "auth/unauthorized-domain",
    "ancre": "compte-messages-d-echec-de-connexion"
   },
   {
@@ -175,10 +155,6 @@
    "ancre": "compte-verrou-actif"
   },
   {
-   "terme": "FIREBASE_CONFIG",
-   "ancre": "compte-verrou-actif"
-  },
-  {
    "terme": "AuthGate",
    "ancre": "compte-verrou-et-session-firebase"
   },
@@ -187,15 +163,7 @@
    "ancre": "compte-verrou-et-session-firebase"
   },
   {
-   "terme": "Session mémorisée",
-   "ancre": "compte-verrou-et-session-firebase"
-  },
-  {
-   "terme": "indexedDBLocalPersistence",
-   "ancre": "compte-verrou-et-session-firebase"
-  },
-  {
-   "terme": "signOutUser",
+   "terme": "Persistance de la session",
    "ancre": "compte-verrou-et-session-firebase"
   },
   {
@@ -203,32 +171,12 @@
    "ancre": "compte-acceptation-legale"
   },
   {
-   "terme": "isFirstLaunchLegal",
-   "ancre": "compte-acceptation-legale"
-  },
-  {
    "terme": "openLegalModal",
-   "ancre": "compte-acceptation-legale"
+   "ancre": "compte-avertissement-medical"
   },
   {
    "terme": "LegalPrivacyPage",
    "ancre": "compte-premier-lancement-legal"
-  },
-  {
-   "terme": "hasCheckedNotice",
-   "ancre": "compte-premier-lancement-legal"
-  },
-  {
-   "terme": "Onglet Cadre (disclaimer)",
-   "ancre": "compte-premier-lancement-legal"
-  },
-  {
-   "terme": "Données 100 % locales",
-   "ancre": "compte-avertissement-medical"
-  },
-  {
-   "terme": "glp1_app_companion_data",
-   "ancre": "compte-cle-et-format-de-la-sauvegarde"
   },
   {
    "terme": "STORAGE_KEY",
@@ -271,10 +219,6 @@
    "ancre": "compte-ordre-de-conversion-au-chargement"
   },
   {
-   "terme": "Idempotence des migrations",
-   "ancre": "compte-ordre-de-conversion-au-chargement"
-  },
-  {
    "terme": "INITIAL_PROFILE",
    "ancre": "compte-profil-d-usine-et-pesee-semee"
   },
@@ -287,11 +231,7 @@
    "ancre": "compte-profil-d-usine-et-pesee-semee"
   },
   {
-   "terme": "getStartingWeight",
-   "ancre": "compte-profil-d-usine-et-pesee-semee"
-  },
-  {
-   "terme": "isStartingWeight",
+   "terme": "dateDeDepartParDefaut",
    "ancre": "compte-profil-d-usine-et-pesee-semee"
   },
   {
@@ -301,18 +241,6 @@
   {
    "terme": "getString / setString",
    "ancre": "compte-couche-de-stockage"
-  },
-  {
-   "terme": "removeItem",
-   "ancre": "compte-couche-de-stockage"
-  },
-  {
-   "terme": "Erreurs avalées",
-   "ancre": "compte-couche-de-stockage"
-  },
-  {
-   "terme": "loadGuard",
-   "ancre": "compte-garde-fou-du-chargement"
   },
   {
    "terme": "mayPersist",
@@ -327,11 +255,7 @@
    "ancre": "compte-garde-fou-du-chargement"
   },
   {
-   "terme": "glp1_app_companion_data__secours",
-   "ancre": "compte-garde-fou-du-chargement"
-  },
-  {
-   "terme": "limitNotice",
+   "terme": "loadFailed",
    "ancre": "compte-garde-fou-du-chargement"
   },
   {
@@ -343,15 +267,7 @@
    "ancre": "compte-ordre-de-la-suppression-de-compte"
   },
   {
-   "terme": "needsFreshLogin",
-   "ancre": "compte-ordre-de-la-suppression-de-compte"
-  },
-  {
    "terme": "deleteCurrentUser",
-   "ancre": "compte-suppression-du-compte-firebase"
-  },
-  {
-   "terme": "auth/no-current-user",
    "ancre": "compte-suppression-du-compte-firebase"
   },
   {
@@ -367,15 +283,11 @@
    "ancre": "compte-stockage-local"
   },
   {
-   "terme": "Clés glp1_* et glow_*",
-   "ancre": "compte-stockage-local"
-  },
-  {
-   "terme": "LONGUEUR_MOT_DE_PASSE",
+   "terme": "motDePasseValide",
    "ancre": "compte-dans-la-v2"
   },
   {
-   "terme": "motDePasseValide",
+   "terme": "LONGUEUR_MOT_DE_PASSE",
    "ancre": "compte-dans-la-v2"
   },
   {
@@ -383,11 +295,7 @@
    "ancre": "compte-dans-la-v2"
   },
   {
-   "terme": "bornesAnneeNaissance",
-   "ancre": "compte-dans-la-v2"
-  },
-  {
-   "terme": "TAILLE_BORNES",
+   "terme": "useParcours",
    "ancre": "compte-dans-la-v2"
   }
  ],

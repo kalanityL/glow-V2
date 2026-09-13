@@ -35,84 +35,180 @@
    "fonctionnalite": "Ajout rapide d'un effet",
    "texte": "Décrire useSideEffectQuickForm (type par défaut « Nausée », sévérité 2, COMMON_EFFECTS de 12 effets + « Autre », repli « Effet indésirable »).",
    "origine": "La règle existe bien dans src/features/quick-add/useSideEffectQuickForm.ts, mais aucune des 50 ancres ne la couvre et la fonctionnelle indique que la V2 ne reprend pas les saisies rapides comme modèle. Rien n'a été écrit dans le chapitre."
+  },
+  {
+   "categorie": "ordre d'apparition non fondé",
+   "fonctionnalite": "Plafond quotidien de 15 ressentis",
+   "texte": "« L'avis paraît APRÈS l'écrasement, puisque onCapReached est appelé dans la même passe. » — supprimé.",
+   "origine": "Réfutation retenue, vérifiée : dans addLogWithinDailyCap (src/shared/model/logbook.ts), `onCapReached()` précède les lignes d'écrasement, et `setLimitNotice`/`setAppData` sont groupés dans le même rendu React. Aucune antériorité observable ni dans le code ni à l'écran. Remplacé par l'ordre réel et la simultanéité d'affichage."
+  },
+  {
+   "categorie": "champ lu non fondé",
+   "fonctionnalite": "Graphique d'impact",
+   "texte": "« Le graphique d'impact lit en plus InjectionLog (date, time, dose en mg, site, notes, brand). » — le champ `time` a été retiré de la liste.",
+   "origine": "Réfutation retenue, vérifiée dans buildTrendData (src/features/side-effects/sideEffects.utils.ts) : seuls `inj.date`, `inj.dose`, `injection.site`, `injection.notes` et `injection.brand` sont lus. Aucun `inj.time`. L'agrégation est journalière."
+  },
+  {
+   "categorie": "portée d'une affirmation",
+   "fonctionnalite": "Grille de mois",
+   "texte": "« c'est le seul usage de Date ici » — supprimé.",
+   "origine": "Réfutation retenue, vérifiée dans src/shared/calendar.ts : monthGrid construit trois `new Date` de plus et shiftMonth un quatrième. La phrase ne valait que pour dateStrOf ; remplacée par l'inventaire exact, en gardant le seul fait vérifiable (aucun de ces Date ne part d'une chaîne)."
+  },
+  {
+   "categorie": "usage d'un tri non fondé",
+   "fonctionnalite": "Entités",
+   "texte": "« [l'ordre du tableau] ne sert qu'au plafond quotidien, jamais à l'affichage. » — supprimé.",
+   "origine": "Réfutation retenue, vérifiée : les tris de JavaScript étant stables, l'ordre du tableau départage le journal (byDateTimeDesc), sideEffectsByDate (repli de temps vide) et seStats du PDF (Map puis tri par count). Remplacé par l'énoncé des trois égalités qu'il tranche."
+  },
+  {
+   "categorie": "condition d'affichage non fondée",
+   "fonctionnalite": "PDF : inclusion",
+   "texte": "« available.sideEffects = hasSideEffectsData // la case n'est proposée qu'alors » — le commentaire a été supprimé.",
+   "origine": "Réfutation retenue, vérifiée dans MedicalReportExport.tsx : la ToggleOption `sideEffects` est rendue sans garde, contrairement aux cinq cases de module. `available.sideEffects` ne sert qu'au masque d'export (`effective`). Le code porte pourtant un commentaire affirmant la règle inverse : c'est le JSX qui tranche."
+  },
+  {
+   "categorie": "raisonnement inversé",
+   "fonctionnalite": "Soulignement de « Tout cocher » / « Tout décocher »",
+   "texte": "« sur une liste vide, every rend true pour la seconde et allVisibleChecked serait faux sans elle » — supprimé.",
+   "origine": "Réfutation retenue, vérifiée dans ManageSideEffectsBlock.tsx : sans la garde, `every` sur une liste vide rendrait `allVisibleChecked` VRAI. C'est la garde qui le force à faux, et c'est pourquoi `restsToCheck` doit reprendre la même garde. Le raisonnement a été refait dans ce sens."
+  },
+  {
+   "categorie": "formule incomplète",
+   "fonctionnalite": "PDF : jauge de la section III",
+   "texte": "« remplissage = clamp(avg / 5, 0, 1) × (largeur du rail − 2 × 0,45 mm) dessiné seulement si le remplissage dépasse 0,2 mm » — la largeur dessinée manquait.",
+   "origine": "Réfutation retenue, vérifiée à medicalReportPdf.ts:1459-1462 : la largeur peinte est `Math.max(plein, railH − 2 × pad)`, soit 2,5 mm au minimum. `plein` n'est que le seuil et la fraction théorique. Les deux nombres sont maintenant distingués."
+  },
+  {
+   "categorie": "condition incomplète",
+   "fonctionnalite": "Bornes affichées « du … au … »",
+   "texte": "« invalidPeriod = effectiveStart > effectiveEnd » — la condition manquait ses deux gardes de non-vacuité.",
+   "origine": "Réfutation retenue, vérifiée dans InlineCustomDateRange.tsx : `Boolean(effectiveStart && effectiveEnd && effectiveStart > effectiveEnd)`. La formule abrégée aurait rendu vrai avec une borne de fin vide."
+  },
+  {
+   "categorie": "compte faux",
+   "fonctionnalite": "Coquille CalendarBlock",
+   "texte": "« commune aux sept calendriers du site » — corrigé en huit.",
+   "origine": "Réfutation retenue, vérifiée par grep : huit montages de CalendarBlock hors thèmes (poids, sommeil, sport, pas, injections, repas, temps pour soi, effets secondaires)."
+  },
+  {
+   "categorie": "comportement inversé",
+   "fonctionnalite": "Validation à la soumission du formulaire",
+   "texte": "« Mode édition sans onUpdateSideEffect fourni : la branche else n'est pas prise non plus (la condition porte sur editingId seul dans le if) — rien n'est écrit » — supprimé.",
+   "origine": "Réfutation retenue, vérifiée dans useSideEffectForm.ts : la condition est `editingId && onUpdateSideEffect` ; sans le gestionnaire, la branche `else` s'exécute et `onAddSideEffect` (prop obligatoire) crée une ligne neuve, doublon de la ligne éditée. Le cas limite dit maintenant cela."
+  },
+  {
+   "categorie": "effet de bord d'un geste",
+   "fonctionnalite": "Échelle et défaut d'intensité du formulaire",
+   "texte": "« rouvrir le formulaire alors qu'il est déjà ouvert garde l'intensité en place » — supprimé.",
+   "origine": "Réfutation retenue, vérifiée : les quatre déclencheurs d'openAddForm sont hors de la carte du formulaire, et useFormPressOutside écoute `mousedown` (pressOutside.ts:50) avec `onClose = form.resetForm`, qui pose `setSeverity(DEFAULT_SEVERITY)`. Le geste remet donc l'intensité à 0 avant l'ouverture. Seule la fonction, isolée, ne la touche pas."
+  },
+  {
+   "categorie": "geste impossible",
+   "fonctionnalite": "Heure arrondie vers le bas",
+   "texte": "« Elle la corrige à 08:44 dans l'horloge : la ligne enregistrée porte 08:40. » — supprimé.",
+   "origine": "Réfutation retenue, vérifiée dans TimeSelect.tsx : la colonne des minutes est ROUNDED_MINUTES, et une minute héritée non ronde n'y paraît qu'en `disabled`. Aucun champ du domaine ne permet de saisir 08:44. L'exemple a été refait sur le seul chemin réel — une ligne héritée réécrite par une modification en place."
   }
  ],
  "glossaire": [
   {
    "terme": "SideEffectLog",
-   "definition": "L'unique objet stocké du domaine : id, date (YYYY-MM-DD locale), time (HH:MM, minutes rondes), type (libellé), severity (entier), notes facultative. Rangé dans AppData.sideEffectHistory, dans l'ordre de création."
+   "definition": "Seul objet stocké du domaine : id, date (YYYY-MM-DD local), time (HH:MM, minutes rondes), type (libellé), severity (entier), notes (facultatif). Rangé dans AppData.sideEffectHistory, dans l'ordre de création."
   },
   {
    "terme": "severity (intensité)",
-   "definition": "Entier sans dimension porté par une ligne. Le formulaire écrit 0 à 5, l'édition en place du journal 1 à 5, celle du calendrier 0 à 5 ; le champ est typé number, jamais SeverityLevel."
+   "definition": "Entier sans dimension écrit par le formulaire de 0 à 5, par la bulle du calendrier de 0 à 5, par la ligne du journal de 1 à 5 seulement. Le type SeverityLevel = 1|2|3|4|5 existe mais n'est appliqué nulle part."
   },
   {
-   "terme": "minutes rondes",
-   "definition": "L'ensemble ROUNDED_MINUTES = [0, 10, 15, 20, 30, 40, 45, 50]. Toute heure enregistrée y est ramenée VERS LE BAS par snapToRoundedMinutes, à la saisie comme à l'écriture."
+   "terme": "ROUNDED_MINUTES",
+   "definition": "[0, 10, 15, 20, 30, 40, 45, 50] — l'ensemble irrégulier des minutes admises. Seules valeurs proposées par TimeSelect."
+  },
+  {
+   "terme": "snapToRoundedMinutes",
+   "definition": "Arrondi d'une heure HH:MM à la minute ronde immédiatement inférieure ; jamais vers le haut, pour ne pas produire d'heure future."
+  },
+  {
+   "terme": "snapLogTime",
+   "definition": "Passe le champ time d'une ligne par snapToRoundedMinutes au moment d'écrire. Traverse les trois gestes d'écriture : ajout, écrasement au plafond, fusion de modification."
   },
   {
    "terme": "plafond quotidien",
-   "definition": "Quinze lignes par date. Au-delà, addLogWithinDailyCap écrase la dernière ligne du tableau portant cette date — la dernière CRÉÉE, pas la plus tardive — en conservant son identifiant."
+   "definition": "Quinze lignes par DATE DE LA LIGNE (cap = 15). Au-delà, la dernière ligne du jour dans l'ordre du tableau est écrasée, son id conservé, et l'avis « Limite atteinte » s'affiche."
   },
   {
-   "terme": "effets actifs",
-   "definition": "Le sous-ensemble des 36 libellés proposé par les sélecteurs. Persisté sous glp1_active_side_effects ; vide ou absent, il vaut les 12 libellés de DEFAULT_CHECKED_SIDE_EFFECTS."
-  },
-  {
-   "terme": "libellé court",
-   "definition": "shortSideEffectLabel : le libellé privé de sa parenthèse explicative FINALE, avec repli sur le libellé entier. Employé au seul champ fermé du sélecteur du formulaire."
-  },
-  {
-   "terme": "type nettoyé",
-   "definition": "cleanSideEffectLabel (alias cleanType dans le PDF) : le type privé de son préfixe non alphabétique (^[^a-zA-ZÀ-ÿ]+), puis rogné. C'est le nom affiché partout, jamais ce qui est stocké."
+   "terme": "limitNotice",
+   "definition": "Avis de plafond, état de l'application et non de la page : rendu en tête du contenu quel que soit l'onglet, effacé uniquement par sa croix."
   },
   {
    "terme": "fenêtre temporelle",
-   "definition": "PeriodWindow ∈ {7days, 14days, 30days, 90days, all, custom}. Une fenêtre fixe est inclusive et compte aujourd'hui : sa coupure vaut aujourd'hui − (n − 1) jours."
+   "definition": "7days, 14days, 30days, 90days, all, custom. Une fenêtre fixe de n jours a pour coupure aujourd'hui − (n − 1) : elle est inclusive et sans borne de fin."
   },
   {
-   "terme": "coupure (cutoff)",
-   "definition": "La date de début effective d'une fenêtre, rendue par getCutoffDateStr en YYYY-MM-DD local ; null pour « all » et pour un « custom » sans borne de début."
+   "terme": "cutoff",
+   "definition": "Date ISO de début d'une fenêtre fixe, calculée par getCutoffDateStr ; toutes les comparaisons de fenêtre sont des comparaisons de chaînes YYYY-MM-DD."
   },
   {
-   "terme": "borne de repli (fallback)",
-   "definition": "La date affichée quand une borne est vide : la plus ancienne entrée du bloc pour le début, aujourd'hui pour la fin. Une borne égale à son repli s'écrit « début » ou « aujourd'hui »."
+   "terme": "impactScore",
+   "definition": "Somme des intensités d'une journée, en « pts ». Ordonnée du graphique d'impact ; vaut 0 sur un jour de prise sans effet."
   },
   {
-   "terme": "score d'impact",
-   "definition": "impactScore : la somme des intensités d'une journée, exprimée en « pts ». Zéro pour un jour de prise sans effet déclaré."
+   "terme": "avgSeverity",
+   "definition": "Moyenne des intensités d'une journée, Number(x.toFixed(1)), null si la journée ne porte aucun effet. Affichée telle quelle dans l'infobulle, sans formatNumber."
   },
   {
-   "terme": "palier (DaySeverityTier)",
-   "definition": "leger, modere ou severe, décidé par le MAXIMUM des intensités : > 3 sévère, > 1 modéré, sinon léger. Le 0 tombe dans « léger »."
+   "terme": "palier (daySeverityTier)",
+   "definition": "leger / modere / severe, décidés par le MAXIMUM des intensités : max > 3 → severe, max > 1 → modere, sinon leger."
   },
   {
-   "terme": "mot de palier",
-   "definition": "daySeverityWord : le mot du palier, suffixé d'un « s » dès que la journée compte plus d'un effet. Employé par la seule annexe C du PDF."
+   "terme": "daySeverityWord",
+   "definition": "Le mot du palier, accordé au nombre d'effets du jour : le mot dit le pire, le pluriel dit le nombre. Employé par la seule annexe C du PDF."
   },
   {
-   "terme": "humeur (MoodTone)",
-   "definition": "serein, modere ou difficile, calculé sur les seuls effets du jour : somme nulle → serein ; somme > 8 ou une intensité ≥ 4 → difficile ; sinon modéré."
+   "terme": "severityTierCounts",
+   "definition": "Décompte des paliers effet par effet, chaque ligne passée seule à daySeverityTier : la somme des trois est un nombre d'effets, jamais de journées."
   },
   {
-   "terme": "cran",
-   "definition": "L'échelle à quatre valeurs de la matrice par moment : 0 rien, 1 légère (1–2), 2 modérée (3), 3 marquée (4–5). Une case garde le maximum des crans de son moment."
+   "terme": "cran (matrice par moment)",
+   "definition": "0 rien, 1 légère (s ≤ 2), 2 modérée (s = 3), 3 marquée (s ≥ 4). Une case garde le maximum des crans de son moment."
   },
   {
    "terme": "moment de la journée",
-   "definition": "Matin [0, 12), après-midi [12, 18), soir [18, 24), sur l'heure ENTIÈRE portée par la ligne."
+   "definition": "matin [0, 12), après-midi [12, 18), soir [18, 24), bornes portant sur l'heure entière de la ligne ; les minutes n'entrent pas."
   },
   {
-   "terme": "quinzaine (TREND_DAYS)",
-   "definition": "La fenêtre de 14 jours, aujourd'hui compris, du tiroir Tendance. Coupée en deux moitiés de 7 jours par sideEffectShift."
+   "terme": "DayMood / ton",
+   "definition": "serein, modere ou difficile, décidés par sideEffectsMood sur la somme des intensités du jour : 0 → serein ; > 8 ou une intensité ≥ 4 → difficile ; sinon modere."
   },
   {
-   "terme": "journée documentée",
-   "definition": "Une date présente dans le Set dayCount du rapport PDF. Un jour portant au moins un effet inclus y compte une fois, quel que soit le nombre d'effets."
+   "terme": "SideEffectShift",
+   "definition": "{before, after, changed} : les tons des deux moitiés de la quinzaine, chaque moitié réduite à une journée moyenne (somme / 7) plus une ligne factice à 4 s'il y a eu un effet intense."
   },
   {
-   "terme": "brouillon d'édition en place",
-   "definition": "Le draft de useInlineEditableLog : une copie en chaînes des champs de la ligne, lue par draftRef (et non par l'état) pour que les sélecteurs qui choisissent et referment dans le même geste voient la valeur choisie."
+   "terme": "isModuleOn / isModuleHidden",
+   "definition": "isModuleOn('symptoms') : le drapeau absent vaut allumé. isModuleHidden : éteint ET sideEffectsModuleHidden — le masquage ne mord que sur un module éteint."
+  },
+  {
+   "terme": ".glow-sel",
+   "definition": "Contrat des surfaces qu'un formulaire porte hors de sa carte par createPortal (calendriers, horloges, listes maison) : elles ne sont pas « dehors » pour le clic à côté."
+  },
+  {
+   "terme": "pressStart",
+   "definition": "Geste d'appui (mousedown) du clic à côté, par opposition au clic complet : le formulaire se ferme avant que le clic n'agisse ailleurs."
+  },
+  {
+   "terme": "available / include / effective (export PDF)",
+   "definition": "available = ce que la période et les modules permettent ; include = l'état des cases du panneau, mémorisé ; effective = include ET available, ce que le PDF dessine. La case des effets secondaires est rendue sans condition, contrairement aux cinq cases de module."
+  },
+  {
+   "terme": "cleanSideEffectLabel / cleanType",
+   "definition": "Retrait d'un préfixe non alphabétique du type (émoji, chiffre, ponctuation). Même expression sous deux noms ; ne modifie pas ce qui est stocké."
+  },
+  {
+   "terme": "shortSideEffectLabel",
+   "definition": "Retrait d'une parenthèse FINALE d'un libellé, pour le seul état fermé du sélecteur du formulaire ; repli sur le libellé entier s'il ne reste rien."
+  },
+  {
+   "terme": "formatNumber",
+   "definition": "Formatage maison : decimals est un maximum, zéros de queue supprimés, séparateur de milliers U+00A0, séparateur décimal le point ; aucune dépendance à toLocaleString."
   }
  ],
  "index": [
@@ -125,23 +221,23 @@
    "ancre": "effets-entites"
   },
   {
+   "terme": "severity",
+   "ancre": "effets-echelle-et-defaut-d-intensite-du-formulaire"
+  },
+  {
    "terme": "SeverityLevel",
    "ancre": "effets-entites"
   },
   {
-   "terme": "SideEffectType",
+   "terme": "InjectionLog (champs lus)",
    "ancre": "effets-entites"
   },
   {
-   "terme": "TrendDataPoint",
-   "ancre": "effets-points-du-graphique-d-impact"
+   "terme": "ordre du tableau",
+   "ancre": "effets-entites"
   },
   {
    "terme": "useHistoryView",
-   "ancre": "effets-vue-d-historique-par-defaut"
-  },
-  {
-   "terme": "glp1_side_effects_history_view",
    "ancre": "effets-vue-d-historique-par-defaut"
   },
   {
@@ -149,19 +245,11 @@
    "ancre": "effets-ouverture-par-le-flottant-et-le-titre"
   },
   {
-   "terme": "floatingAddRequest",
-   "ancre": "effets-ouverture-par-le-flottant-et-le-titre"
-  },
-  {
-   "terme": "armFloatingAdd",
+   "terme": "floatingAddArmedTabs",
    "ancre": "effets-ouverture-par-le-flottant-et-le-titre"
   },
   {
    "terme": "useDismissWhenHidden",
-   "ancre": "effets-effacement-du-bandeau-de-confirmation"
-  },
-  {
-   "terme": "MIN_READABLE_MS",
    "ancre": "effets-effacement-du-bandeau-de-confirmation"
   },
   {
@@ -173,23 +261,11 @@
    "ancre": "effets-migration-description-notes"
   },
   {
-   "terme": "dropSeedData",
-   "ancre": "effets-migration-description-notes"
-  },
-  {
    "terme": "isModuleOn",
    "ancre": "effets-etat-du-module-effets-secondaires"
   },
   {
    "terme": "isModuleHidden",
-   "ancre": "effets-etat-du-module-effets-secondaires"
-  },
-  {
-   "terme": "sideEffectsTrackingEnabled",
-   "ancre": "effets-etat-du-module-effets-secondaires"
-  },
-  {
-   "terme": "sideEffectsModuleHidden",
    "ancre": "effets-etat-du-module-effets-secondaires"
   },
   {
@@ -209,10 +285,6 @@
    "ancre": "effets-valeurs-par-defaut-du-formulaire"
   },
   {
-   "terme": "getLocalDateStr",
-   "ancre": "effets-valeurs-par-defaut-du-formulaire"
-  },
-  {
    "terme": "ROUNDED_MINUTES",
    "ancre": "effets-heure-arrondie-vers-le-bas-aux-minutes-rondes"
   },
@@ -221,20 +293,16 @@
    "ancre": "effets-heure-arrondie-vers-le-bas-aux-minutes-rondes"
   },
   {
-   "terme": "getRoundedLocalTimeStr",
+   "terme": "snapLogTime",
    "ancre": "effets-heure-arrondie-vers-le-bas-aux-minutes-rondes"
   },
   {
-   "terme": "snapLogTime",
+   "terme": "TimeSelect",
    "ancre": "effets-heure-arrondie-vers-le-bas-aux-minutes-rondes"
   },
   {
    "terme": "handleSubmit",
    "ancre": "effets-validation-a-la-soumission-du-formulaire"
-  },
-  {
-   "terme": "ajouter-gerer",
-   "ancre": "effets-options-affichees-dans-un-selecteur-d-effet"
   },
   {
    "terme": "NOTE_MAX_LENGTH",
@@ -273,7 +341,11 @@
    "ancre": "effets-fermeture-du-formulaire-au-clic-a-cote"
   },
   {
-   "terme": "glow-sel",
+   "terme": ".glow-sel",
+   "ancre": "effets-fermeture-du-formulaire-au-clic-a-cote"
+  },
+  {
+   "terme": "pressStart",
    "ancre": "effets-fermeture-du-formulaire-au-clic-a-cote"
   },
   {
@@ -297,11 +369,7 @@
    "ancre": "effets-gestion-des-effets-actifs"
   },
   {
-   "terme": "restsToCheck",
-   "ancre": "effets-soulignement-de-tout-cocher-tout-decocher"
-  },
-  {
-   "terme": "restsToUncheck",
+   "terme": "allVisibleChecked",
    "ancre": "effets-soulignement-de-tout-cocher-tout-decocher"
   },
   {
@@ -309,11 +377,15 @@
    "ancre": "effets-options-affichees-dans-un-selecteur-d-effet"
   },
   {
+   "terme": "ajouter-gerer",
+   "ancre": "effets-options-affichees-dans-un-selecteur-d-effet"
+  },
+  {
    "terme": "glp1_active_side_effects",
    "ancre": "effets-stockage-local"
   },
   {
-   "terme": "getItem / setItem",
+   "terme": "glp1_side_effects_history_view",
    "ancre": "effets-stockage-local"
   },
   {
@@ -325,19 +397,11 @@
    "ancre": "effets-ordre-du-journal"
   },
   {
-   "terme": "orderKey",
-   "ancre": "effets-ordre-du-journal"
-  },
-  {
-   "terme": "getCutoffDateStr",
-   "ancre": "effets-fenetre-temporelle-inclusive"
-  },
-  {
    "terme": "filterByTimeWindow",
    "ancre": "effets-fenetre-temporelle-inclusive"
   },
   {
-   "terme": "WINDOW_DAYS",
+   "terme": "getCutoffDateStr",
    "ancre": "effets-fenetre-temporelle-inclusive"
   },
   {
@@ -349,15 +413,11 @@
    "ancre": "effets-memoire-et-defaut-des-periodes"
   },
   {
-   "terme": "DEFAULT_PERIOD",
-   "ancre": "effets-memoire-et-defaut-des-periodes"
-  },
-  {
-   "terme": "boundLabel",
+   "terme": "invalidPeriod",
    "ancre": "effets-bornes-affichees-du-au"
   },
   {
-   "terme": "InlineCustomDateRange",
+   "terme": "boundLabel",
    "ancre": "effets-bornes-affichees-du-au"
   },
   {
@@ -373,10 +433,6 @@
    "ancre": "effets-edition-en-place-dans-le-journal-severite-1-a-5"
   },
   {
-   "terme": "draftRef",
-   "ancre": "effets-edition-en-place-dans-le-journal-severite-1-a-5"
-  },
-  {
    "terme": "sideEffectsByDate",
    "ancre": "effets-rangement-des-effets-par-jour"
   },
@@ -389,10 +445,6 @@
    "ancre": "effets-formatage-des-nombres-a-l-ecran"
   },
   {
-   "terme": "NBSP",
-   "ancre": "effets-formatage-des-nombres-a-l-ecran"
-  },
-  {
    "terme": "CalendarBlock",
    "ancre": "effets-coquille-calendarblock-bornes-gestes-titres"
   },
@@ -401,19 +453,7 @@
    "ancre": "effets-coquille-calendarblock-bornes-gestes-titres"
   },
   {
-   "terme": "side-effect-calendar-block",
-   "ancre": "effets-bulle-du-calendrier-deux-effets-voir-plus-ajout"
-  },
-  {
-   "terme": "side-effect-chart-section",
-   "ancre": "effets-bulle-du-calendrier-deux-effets-voir-plus-ajout"
-  },
-  {
    "terme": "monthGrid",
-   "ancre": "effets-grille-de-mois"
-  },
-  {
-   "terme": "WEEKDAY_INITIALS",
    "ancre": "effets-grille-de-mois"
   },
   {
@@ -421,19 +461,15 @@
    "ancre": "effets-grille-de-mois"
   },
   {
+   "terme": "WEEKDAY_INITIALS",
+   "ancre": "effets-grille-de-mois"
+  },
+  {
    "terme": "renderBubble",
    "ancre": "effets-bulle-du-calendrier-deux-effets-voir-plus-ajout"
   },
   {
-   "terme": "detailDate",
-   "ancre": "effets-bulle-du-calendrier-deux-effets-voir-plus-ajout"
-  },
-  {
    "terme": "DayEffectLines",
-   "ancre": "effets-edition-en-place-dans-le-calendrier-severite-0-a-5-note-pres"
-  },
-  {
-   "terme": "modifiable",
    "ancre": "effets-edition-en-place-dans-le-calendrier-severite-0-a-5-note-pres"
   },
   {
@@ -449,19 +485,7 @@
    "ancre": "effets-points-du-graphique-d-impact"
   },
   {
-   "terme": "isOralLog",
-   "ancre": "effets-points-du-graphique-d-impact"
-  },
-  {
-   "terme": "formatDayMonthStr",
-   "ancre": "effets-points-du-graphique-d-impact"
-  },
-  {
    "terme": "yAxisWidth",
-   "ancre": "effets-axes-et-pastilles-du-graphique"
-  },
-  {
-   "terme": "renderCustomTrendDot",
    "ancre": "effets-axes-et-pastilles-du-graphique"
   },
   {
@@ -473,10 +497,6 @@
    "ancre": "effets-fermeture-de-l-infobulle"
   },
   {
-   "terme": "closedTooltipKey",
-   "ancre": "effets-fermeture-de-l-infobulle"
-  },
-  {
    "terme": "sideEffectsMood",
    "ancre": "effets-humeur-du-jour-home"
   },
@@ -485,11 +505,7 @@
    "ancre": "effets-humeur-du-jour-home"
   },
   {
-   "terme": "moodCaptionCarre",
-   "ancre": "effets-humeur-du-jour-home"
-  },
-  {
-   "terme": "aDeQuoiMontrerLesEffets",
+   "terme": "surimpression effets",
    "ancre": "effets-ouverture-de-la-surimpression-depuis-la-tuile-home"
   },
   {
@@ -501,32 +517,28 @@
    "ancre": "effets-matrice-par-moment-de-la-journee-moments-et-crans"
   },
   {
-   "terme": "CRAN_NOMS",
-   "ancre": "effets-matrice-par-moment-de-la-journee-moments-et-crans"
-  },
-  {
-   "terme": "GRAPHES_EN_SURIMPRESSION",
-   "ancre": "effets-affichage-de-la-carte-tendance"
-  },
-  {
    "terme": "typeCourant",
    "ancre": "effets-matrice-ordre-des-effets-et-semaine-montree"
-  },
-  {
-   "terme": "sideEffectShift",
-   "ancre": "effets-evolution-des-effets-sur-la-quinzaine"
-  },
-  {
-   "terme": "trendDates",
-   "ancre": "effets-evolution-des-effets-sur-la-quinzaine"
   },
   {
    "terme": "TREND_DAYS",
    "ancre": "effets-evolution-des-effets-sur-la-quinzaine"
   },
   {
-   "terme": "MoodFace",
+   "terme": "sideEffectShift",
+   "ancre": "effets-evolution-des-effets-sur-la-quinzaine"
+  },
+  {
+   "terme": "GRAPHES_EN_SURIMPRESSION",
    "ancre": "effets-affichage-de-la-carte-tendance"
+  },
+  {
+   "terme": "TrendDrawer",
+   "ancre": "effets-affichage-de-la-carte-tendance"
+  },
+  {
+   "terme": "sideEffectEntries",
+   "ancre": "effets-entrees-recentes-et-tiroir-journal"
   },
   {
    "terme": "recentJournalEntries",
@@ -537,19 +549,11 @@
    "ancre": "effets-entrees-recentes-et-tiroir-journal"
   },
   {
-   "terme": "RECENT_JOURNAL_MAX",
-   "ancre": "effets-entrees-recentes-et-tiroir-journal"
-  },
-  {
-   "terme": "ENTREES_PAR_JOURNAL",
-   "ancre": "effets-entrees-recentes-et-tiroir-journal"
-  },
-  {
-   "terme": "dayCount",
+   "terme": "available.sideEffects",
    "ancre": "effets-pdf-inclusion-et-synthese"
   },
   {
-   "terme": "hasSideEffectsData",
+   "terme": "dayCount",
    "ancre": "effets-pdf-inclusion-et-synthese"
   },
   {
@@ -561,11 +565,11 @@
    "ancre": "effets-pdf-section-iii-tolerance"
   },
   {
-   "terme": "sideEffectCellLines",
+   "terme": "groupReportDays",
    "ancre": "effets-pdf-annexe-c-et-detail-des-journees"
   },
   {
-   "terme": "groupReportDays",
+   "terme": "sideEffectCellLines",
    "ancre": "effets-pdf-annexe-c-et-detail-des-journees"
   },
   {
@@ -585,20 +589,15 @@
    "ancre": "effets-decompte-des-paliers-par-effet"
   },
   {
-   "terme": "SAMPLE_SIDE_EFFECT",
-   "ancre": "effets-partage-dernier-ressenti"
-  },
-  {
    "terme": "SEVERITY_WORDS",
    "ancre": "effets-partage-dernier-ressenti"
   },
   {
-   "terme": "latest",
+   "terme": "SAMPLE_SIDE_EFFECT",
    "ancre": "effets-partage-dernier-ressenti"
   }
  ],
  "ancres_traitees": [
-  "effets-entites",
   "effets-vue-d-historique-par-defaut",
   "effets-ouverture-par-le-flottant-et-le-titre",
   "effets-effacement-du-bandeau-de-confirmation",

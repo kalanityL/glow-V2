@@ -22,19 +22,25 @@
    "categorie": "garde-fou",
    "fonctionnalite": "Récupération d'une sauvegarde mise à l'abri",
    "texte": "Comment une sauvegarde illisible recopiée sous glp1_app_companion_data__secours est reprise, et par quel écran.",
-   "origine": "Aucun code ne relit ni ne propose cette clé : seul le message la nomme. La restauration outillée n'existe que pour les copies horodatées de dataBackup, sous une clé différente."
+   "origine": "Aucun code ne restaure cette clé : le bloc catch la relit uniquement pour ne pas recouvrir une copie antérieure, et seul le message la nomme. La restauration outillée n'existe que pour les copies horodatées de dataBackup, sous une clé différente. (Réfutation retenue : la formulation « jamais relue » était fausse et a été corrigée en « relue seulement pour ne pas recouvrir ».)"
   },
   {
    "categorie": "dates",
    "fonctionnalite": "Décompte exact des lectures de date en UTC",
-   "texte": "Le nombre de calculs qui construisent encore une date depuis une chaîne, tel que la spécification fonctionnelle l'annonce (« trois calculs »).",
-   "origine": "J'en ai relevé cinq hors thèmes — formatDateRelative, le message de prochaine prise, le calendrier des pas, l'écart de jours par zone d'injection et la dose active de la courbe poids/traitement. Je les ai listés plutôt que de reprendre le compte de trois, que le code ne soutient pas."
+   "texte": "Le nombre total de calculs qui construisent encore une date depuis une chaîne AAAA-MM-JJ, tel que la spécification fonctionnelle l'annonce (« trois calculs »).",
+   "origine": "Le décompte de cinq annoncé dans la version précédente était faux : la vérification en a relevé huit hors thèmes (formatDateRelative, le message de prochaine prise, l'ancienneté de la dernière prise sur l'accueil, le calendrier des pas, l'écart de jours par zone d'injection, la dose active de la courbe poids/traitement, et les deux dates affichées par la page Notifications — début des rappels de prise et rendez-vous médical). Le chapitre les liste et dit que le relevé n'est pas exhaustif : un grep sur `new Date(<variable>)` remonte encore des tris et des lectures de timestamps numériques qu'il faudrait qualifier un par un pour donner un total sûr."
   },
   {
    "categorie": "modules",
    "fonctionnalite": "Liste des surfaces réduites par un module éteint",
    "texte": "Une énumération complète des endroits qui disparaissent quand un module s'éteint : entrées de menu, raccourcis, cases de tiroirs, cartes de tendance, tuiles de l'accueil.",
-   "origine": "Quatre points sont vérifiés (menu du bas, ajout rapide, trois tiroirs, page Badges, tiroir Tendance). Les tuiles de l'accueil et les blocs de page n'ont pas été ouverts : les affirmer relèverait de la spécification fonctionnelle, non du code lu."
+   "origine": "Cinq points sont vérifiés à la ligne (menu du bas, ajout rapide, les deux tiroirs bâtis par drawerItems, le tiroir Tendance, la page Badges). Les tuiles de l'accueil et les blocs de page n'ont pas été ouverts : les affirmer relèverait de la spécification fonctionnelle, non du code lu. (Réfutation retenue : « les trois tiroirs » comptait Tendance deux fois ; drawerItems n'a que deux appelants, addDrawerItems et journalDrawerItems.)"
+  },
+  {
+   "categorie": "navigation",
+   "fonctionnalite": "Portée réelle des renommages de tiroir",
+   "texte": "Une règle générale disant où « Balance » et « Menus » remplacent « Pesée » et « Repas ».",
+   "origine": "Le commentaire de DRAWER_LABELS affirme que la bande de titre dit « Pesée » et « Repas » ; PAGE_TITLES dit le contraire (history : 'Balance', meals : 'Menus'). Le chapitre décrit désormais les deux tables et signale que le commentaire est périmé, mais je n'ai pas parcouru toutes les surfaces d'affichage pour énoncer une règle générale."
   }
  ],
  "glossaire": [
@@ -43,108 +49,88 @@
    "definition": "L'unique agrégat stocké : un profil et neuf journaux, sérialisé en JSON sous la clé glp1_app_companion_data."
   },
   {
-   "terme": "Journal",
-   "definition": "Un tableau de lignes datées d'un même domaine (pesées, prises, effets secondaires, repas, pas, séances, temps pour soi, sommeil, jours marqués)."
+   "terme": "Pesée semée",
+   "definition": "La ligne de poids créée à l'installation faute de sauvegarde : id 'starting-weight-log', 95 kg, la veille à 08:00, marquée poids de départ."
   },
   {
-   "terme": "Pesée de départ",
-   "definition": "La ligne de weightHistory portant isStartingWeight à true. Référence de la perte totale, des paliers d'IMC, des badges et du rapport médical ; épargnée par le vidage du journal, et non supprimable depuis son menu."
+   "terme": "Poids de départ",
+   "definition": "La pesée portant isStartingWeight. Ce n'est plus un champ du profil ; l'invariant est qu'elle soit la plus ancienne du journal, tenu par keepStartingOnOldest à chaque écriture."
   },
   {
-   "terme": "Drapeau de départ",
-   "definition": "Le champ isStartingWeight, obligatoire sur toute pesée. Le départ se reconnaît à lui et jamais à sa valeur en kilos."
-  },
-  {
-   "terme": "Module",
-   "definition": "Un des sept suivis qu'un drapeau du profil allume ou éteint. L'absence du drapeau vaut allumé pour le traitement et les effets secondaires, éteint pour les cinq autres."
-  },
-  {
-   "terme": "Masquage complet",
-   "definition": "Un second drapeau par module, qui ne mord que module éteint : le module quitte alors les tiroirs au lieu d'y paraître grisé. Rallumer le module l'efface."
+   "terme": "Minutes rondes",
+   "definition": "L'ensemble irrégulier [0, 10, 15, 20, 30, 40, 45, 50] auquel snapToRoundedMinutes ramène vers le bas toute heure enregistrée."
   },
   {
    "terme": "Plafond qui écrase",
-   "definition": "Un plafond quotidien qui, une fois atteint, fusionne la nouvelle saisie dans la dernière ligne du jour, laquelle garde son identifiant. Prises (2), effets secondaires, séances et temps pour soi (15)."
+   "definition": "addLogWithinDailyCap : au-delà de cap lignes à la date visée, la nouvelle saisie est fusionnée dans la dernière ligne du jour, qui garde son identifiant."
   },
   {
    "terme": "Plafond qui refuse",
-   "definition": "Un plafond quotidien qui rejette la saisie sans rien écrire. Repas (30 par date visée), sommeil (15 par date de réveil)."
+   "definition": "Repas (30/jour) et sommeil (15/jour) : le contrôle précède setAppData et rien n'est écrit, un message est posé dans limitNotice."
   },
   {
-   "terme": "Minute ronde",
-   "definition": "Une des huit minutes qu'une heure enregistrée peut porter : 0, 10, 15, 20, 30, 40, 45, 50. L'arrondi est appliqué à l'enregistrement, et toujours vers le bas."
-  },
-  {
-   "terme": "Fenêtre de temps",
-   "definition": "Une des six durées de filtrage (7, 14, 30, 90 jours, depuis le début, choisir). La coupure est inclusive et compte le jour en cours ; le choix est mémorisé par bloc sous glp1_period_<clé>."
-  },
-  {
-   "terme": "Conversion au chargement",
-   "definition": "Une des sept fonctions pures et idempotentes appliquées à la sauvegarde entre le stockage et l'écran, dans un ordre fixe."
-  },
-  {
-   "terme": "Ligne d'exemple",
-   "definition": "Une ligne de démonstration livrée jusqu'au 5 août 2026, reconnue au début de son identifiant (se-seed-, dl-s-, step-seed-, sport-seed-, meal-seed-) et retirée des neuf journaux au chargement."
-  },
-  {
-   "terme": "Suppression franche",
-   "definition": "La ligne quitte la sauvegarde. Aucun deletedAt n'est plus écrit, et les lignes qui en portaient un sont purgées au chargement sur sept journaux."
+   "terme": "Garde-fou du chargement",
+   "definition": "Le catch autour de JSON.parse : il recopie la chaîne illisible sous la clé de secours et coupe toute écriture de la session (mayPersist)."
   },
   {
    "terme": "Clé de secours",
-   "definition": "glp1_app_companion_data__secours : la copie d'une sauvegarde qui n'a pas pu être analysée. Écrite une seule fois, pour qu'un second échec ne recouvre pas le premier sauvetage."
+   "definition": "clé + '__secours' : l'abri d'une sauvegarde illisible. Relue seulement pour ne pas recouvrir une copie antérieure ; aucun écran ne la restaure."
   },
   {
    "terme": "Copie de secours horodatée",
-   "definition": "Une copie de la sauvegarde sous glp1_app_companion_data__secours-AAAA-MM-JJ-HHMMSS, déclarée bonne seulement après relecture à l'identique, et référencée dans un index trié du plus récent au plus ancien."
+   "definition": "clé + '__secours-' + AAAA-MM-JJ-HHMMSS, écrite par dataBackup avec relecture obligatoire et un index JSON trié du plus récent au plus ancien."
   },
   {
-   "terme": "Écriture protégée",
-   "definition": "Une écriture qui n'a lieu que si la mise à l'abri de l'existant a réussi, et qui se relit pour se vérifier."
+   "terme": "Module",
+   "definition": "Un onglet gouverné par un drapeau du profil. Absent, le drapeau vaut allumé pour le traitement et les effets secondaires, éteint pour les cinq autres."
   },
   {
-   "terme": "Session en lecture seule",
-   "definition": "L'état d'une session dont le chargement a échoué : mayPersist rend faux et plus rien n'est enregistré jusqu'au rechargement."
-  },
-  {
-   "terme": "Pile de retour",
-   "definition": "La pile d'onglets que le bouton de retour du bas dépile. L'onglet quitté y est empilé à chaque changement, sauf quand le changement vient du retour lui-même."
+   "terme": "Masquage",
+   "definition": "Un second drapeau par module, qui ne mord que si le module est éteint : isModuleHidden = !isModuleOn && Boolean(drapeau de masquage)."
   },
   {
    "terme": "Tiroir",
-   "definition": "Une des cinq couches vitrées du menu simplifié (ajout, journal, tendance, paramètres, divination). Une seule est ouverte à la fois ; divination s'ouvre aussi en menu standard."
+   "definition": "Une des cinq couches du menu simplifié (ajout, journal, tendance, parametres, divination) ; un seul état openDrawer, un seul tiroir à la fois."
   },
   {
-   "terme": "Fermeture des couches",
-   "definition": "Une diffusion sans contenu, appelée avant chaque geste des barres du bas et du bouton de retour, à laquelle chaque couche ouverte s'abonne."
+   "terme": "Pile de retour",
+   "definition": "navStack : les onglets quittés, empilés à chaque changement sauf quand le changement vient du bouton retour. Non dédouplonnée, non plafonnée, vidée par un rechargement."
   },
   {
-   "terme": "Vitre",
-   "definition": "La couche floutée d'un tiroir ou d'une page de module éteint. Elle s'arrête au bord haut de la barre du bas et coupe ses événements de pointeur dès le début de sa sortie."
-  },
-  {
-   "terme": "Identifiant de traitement",
-   "definition": "La seule valeur de traitement enregistrée dans les données. Treize plus 'aucun' ; un identifiant inconnu retombe sur 'aucun'."
-  },
-  {
-   "terme": "Libellé hérité",
-   "definition": "Un nom de traitement enregistré avant l'arrivée des identifiants, converti une fois par toTreatmentId."
-  },
-  {
-   "terme": "Unité canonique",
-   "definition": "L'unité de stockage d'une grandeur, jamais accompagnée d'une étiquette en base : kg, cm, g ou ml, mg, minute, mètre, année."
+   "terme": "Fenêtre de temps",
+   "definition": "Une des six valeurs de TimeWindow. La coupure vaut aujourd'hui − (n − 1) jours et se compare en chaînes AAAA-MM-JJ."
   },
   {
    "terme": "UUID v7",
-   "definition": "Identifiant de 16 octets dont les six premiers portent les millisecondes Unix : triable à la milliseconde et sans collision pratique. Employé pour les repas seuls."
+   "definition": "L'identifiant des repas : 48 bits de millisecondes Unix en tête, 74 bits d'aléatoire, triable lexicographiquement à la milliseconde."
   },
   {
-   "terme": "Cache nutritionnel",
-   "definition": "Les cinq valeurs nutritionnelles d'un repas, recalculées depuis sa composition à chaque écriture et conservées avec la ligne. Seule exception tolérée au principe « rien de dérivable n'est stocké »."
+   "terme": "doseScale",
+   "definition": "Le facteur du catalogue qui ramène une forme orale à une exposition comparable à l'injection (0,008 pour Rybelsus et Wegovy oral), ce qui rend l'addition des courbes légitime."
   },
   {
-   "terme": "Contexte d'un envoi",
-   "definition": "Les réglages d'affichage et l'état du navigateur joints à un formulaire envoyé. Aucune donnée de santé n'y figure."
+   "terme": "moleculeKeyOf",
+   "definition": "La clé de cumul d'un traitement : sa molécule, ou son propre identifiant quand elle est null."
+  },
+  {
+   "terme": "Ligne d'exemple",
+   "definition": "Une ligne de démonstration reconnue au début de son identifiant (se-seed-, dl-s-, step-seed-, sport-seed-, meal-seed-) et retirée des neuf journaux au chargement."
+  },
+  {
+   "terme": "Purge",
+   "definition": "Le retrait unique, au chargement, des lignes portant encore un deletedAt de l'ancien modèle, et du champ lui-même sur les autres. Sept journaux sur neuf."
+  },
+  {
+   "terme": "Suppression franche",
+   "definition": "removeLogById : la ligne quitte la sauvegarde. Plus aucune marque de suppression n'est écrite, et il n'existe plus de vue filtrée."
+  },
+  {
+   "terme": "NBSP",
+   "definition": "U+00A0, l'espace insécable posée par formatNumber tous les trois chiffres — et non l'espace fine U+202F de toLocaleString."
+  },
+  {
+   "terme": "Date locale",
+   "definition": "getLocalDateStr : AAAA-MM-JJ construit par getFullYear/getMonth/getDate. Le motif toISOString rendrait la date UTC, décalée d'un jour selon le fuseau."
   }
  ],
  "index": [
@@ -153,31 +139,55 @@
    "ancre": "produit-entites"
   },
   {
-   "terme": "Aliments personnalisés (base)",
-   "ancre": "produit-ecriture-d-un-repas"
+   "terme": "addLogWithinDailyCap",
+   "ancre": "produit-plafonds-quotidiens-qui-ecrasent"
   },
   {
-   "terme": "Arrondi du poids",
-   "ancre": "produit-entites"
+   "terme": "allTabs",
+   "ancre": "produit-ordre-et-libelles-des-menus"
   },
   {
-   "terme": "Avertissement médical (clé)",
+   "terme": "applyLogUpdate",
+   "ancre": "produit-plafonds-quotidiens-qui-ecrasent"
+  },
+  {
+   "terme": "Avertissement médical",
    "ancre": "produit-avertissement-medical"
   },
   {
-   "terme": "Bornes numériques (catalogue)",
+   "terme": "Badges (filtre de masquage)",
+   "ancre": "produit-masquage-complet-d-un-module"
+  },
+  {
+   "terme": "Bornes numériques",
    "ancre": "produit-bornes-des-champs-numeriques-de-la-mixte"
   },
   {
-   "terme": "Calendrier (grille de 42 cases)",
+   "terme": "Calendrier",
    "ancre": "produit-calendrier-maison"
+  },
+  {
+   "terme": "canAddMealOn",
+   "ancre": "produit-plafonds-qui-refusent"
+  },
+  {
+   "terme": "canAddSleepOn",
+   "ancre": "produit-sommeil-duree-plage-plafond"
   },
   {
    "terme": "Catalogue des traitements",
    "ancre": "produit-catalogue-des-traitements"
   },
   {
-   "terme": "Clé de la sauvegarde",
+   "terme": "cleanNumericInput",
+   "ancre": "produit-nettoyage-et-validation-d-une-saisie-numerique"
+  },
+  {
+   "terme": "clearAll",
+   "ancre": "produit-couche-de-stockage"
+  },
+  {
+   "terme": "Clé de sauvegarde",
    "ancre": "produit-cle-et-format-de-la-sauvegarde"
   },
   {
@@ -185,8 +195,16 @@
    "ancre": "produit-garde-fou-du-chargement"
   },
   {
-   "terme": "Conventions du modèle (points 1 à 11)",
+   "terme": "Contexte d'envoi",
+   "ancre": "produit-contexte-d-un-envoi-de-formulaire"
+  },
+  {
+   "terme": "Conventions du modèle",
    "ancre": "produit-conventions-du-modele-conventions-md"
+  },
+  {
+   "terme": "Conversion au chargement",
+   "ancre": "produit-ordre-de-conversion-au-chargement"
   },
   {
    "terme": "Copies de secours horodatées",
@@ -197,60 +215,60 @@
    "ancre": "produit-dates-locales-jamais-utc"
   },
   {
-   "terme": "Demi-vies par molécule",
-   "ancre": "produit-catalogue-des-traitements"
-  },
-  {
    "terme": "doseScale",
    "ancre": "produit-catalogue-des-traitements"
   },
   {
-   "terme": "Drapeau de départ",
-   "ancre": "produit-vider-les-pesees-epargne-le-depart"
+   "terme": "dropSeedData",
+   "ancre": "produit-retrait-des-lignes-d-exemple"
   },
   {
-   "terme": "Faim déduite d'un repas",
+   "terme": "easyReadingMode",
+   "ancre": "produit-entites"
+  },
+  {
+   "terme": "ensureStartingWeighIn",
    "ancre": "produit-ordre-de-conversion-au-chargement"
   },
   {
-   "terme": "Fenêtres de temps",
-   "ancre": "produit-fenetres-de-temps"
+   "terme": "fillMealHunger",
+   "ancre": "produit-ordre-de-conversion-au-chargement"
   },
   {
-   "terme": "Fermeture des couches",
-   "ancre": "produit-tiroirs-du-menu-simplifie"
-  },
-  {
-   "terme": "Firebase (verrou)",
+   "terme": "Firebase (verrou et session)",
    "ancre": "produit-verrou-et-session-firebase"
+  },
+  {
+   "terme": "formatNumber",
+   "ancre": "produit-ecriture-des-nombres"
   },
   {
    "terme": "Formats de date",
    "ancre": "produit-formats-de-date"
   },
   {
+   "terme": "FormRefusals",
+   "ancre": "produit-affichage-des-refus-de-formulaire"
+  },
+  {
    "terme": "Garde-fou du chargement",
    "ancre": "produit-garde-fou-du-chargement"
+  },
+  {
+   "terme": "hasOccurred",
+   "ancre": "produit-dates-locales-jamais-utc"
   },
   {
    "terme": "Home (choix)",
    "ancre": "produit-choix-du-menu-et-de-la-home"
   },
   {
-   "terme": "IMC (palier fêté)",
-   "ancre": "produit-palier-d-imc-fete"
-  },
-  {
    "terme": "Identifiants des lignes",
    "ancre": "produit-identifiants-des-lignes"
   },
   {
-   "terme": "INITIAL_PROFILE",
-   "ancre": "produit-profil-d-usine-et-pesee-semee"
-  },
-  {
-   "terme": "InjectionLog",
-   "ancre": "produit-entites"
+   "terme": "IMC (palier fêté)",
+   "ancre": "produit-palier-d-imc-fete"
   },
   {
    "terme": "isModuleHidden",
@@ -261,48 +279,40 @@
    "ancre": "produit-etat-d-un-module-defaut-compris"
   },
   {
-   "terme": "Libellés hérités de traitement",
-   "ancre": "produit-conversion-des-traitements-en-identifiants"
+   "terme": "isOralMedication",
+   "ancre": "produit-catalogue-des-traitements"
   },
   {
-   "terme": "Lignes d'exemple",
-   "ancre": "produit-retrait-des-lignes-d-exemple"
+   "terme": "keepStartingOnOldest",
+   "ancre": "produit-profil-d-usine-et-pesee-semee"
   },
   {
-   "terme": "Menu du bas (ordre)",
-   "ancre": "produit-ordre-et-libelles-des-menus"
+   "terme": "localStorage (couche)",
+   "ancre": "produit-couche-de-stockage"
   },
   {
-   "terme": "Menu (choix standard ou simplifié)",
+   "terme": "Menu (choix)",
    "ancre": "produit-choix-du-menu-et-de-la-home"
+  },
+  {
+   "terme": "Menus (ordre et libellés)",
+   "ancre": "produit-ordre-et-libelles-des-menus"
   },
   {
    "terme": "Minutes rondes",
    "ancre": "produit-minutes-rondes"
   },
   {
-   "terme": "Nombres (écriture)",
-   "ancre": "produit-ecriture-des-nombres"
+   "terme": "moleculeKeyOf",
+   "ancre": "produit-catalogue-des-traitements"
   },
   {
-   "terme": "Ordre de conversion au chargement",
-   "ancre": "produit-ordre-de-conversion-au-chargement"
-  },
-  {
-   "terme": "Ordre des lignes par date puis heure",
-   "ancre": "produit-conventions-du-modele-conventions-md"
-  },
-  {
-   "terme": "Pesée semée à 95 kg",
-   "ancre": "produit-profil-d-usine-et-pesee-semee"
+   "terme": "newId (UUID v7)",
+   "ancre": "produit-identifiants-des-lignes"
   },
   {
    "terme": "Pile de retour",
    "ancre": "produit-pile-de-retour"
-  },
-  {
-   "terme": "Ping-pong / Tennis de table (fusion)",
-   "ancre": "produit-ordre-de-conversion-au-chargement"
   },
   {
    "terme": "Plafonds qui écrasent",
@@ -313,36 +323,32 @@
    "ancre": "produit-plafonds-qui-refusent"
   },
   {
-   "terme": "Purge des lignes marquées",
-   "ancre": "produit-purge-des-lignes-marquees-supprimees"
+   "terme": "Poids de départ",
+   "ancre": "produit-vider-les-pesees-epargne-le-depart"
   },
   {
-   "terme": "Refus de formulaire (affichage)",
-   "ancre": "produit-affichage-des-refus-de-formulaire"
+   "terme": "Profil d'usine",
+   "ancre": "produit-profil-d-usine-et-pesee-semee"
+  },
+  {
+   "terme": "purgeDeleted",
+   "ancre": "produit-purge-des-lignes-marquees-supprimees"
   },
   {
    "terme": "Repas (écriture)",
    "ancre": "produit-ecriture-d-un-repas"
   },
   {
-   "terme": "Repas d'avant la bascule",
-   "ancre": "produit-retrait-des-lignes-d-exemple"
+   "terme": "resolveTreatmentId",
+   "ancre": "produit-catalogue-des-traitements"
   },
   {
-   "terme": "Saisie numérique (nettoyage et validation)",
+   "terme": "sanitizeNumber",
    "ancre": "produit-nettoyage-et-validation-d-une-saisie-numerique"
-  },
-  {
-   "terme": "SleepLog",
-   "ancre": "produit-entites"
   },
   {
    "terme": "Sommeil (durée, plage, plafond)",
    "ancre": "produit-sommeil-duree-plage-plafond"
-  },
-  {
-   "terme": "Stockage (couche)",
-   "ancre": "produit-couche-de-stockage"
   },
   {
    "terme": "Suppression du compte",
@@ -353,7 +359,7 @@
    "ancre": "produit-suppression-franche"
   },
   {
-   "terme": "Tiroirs du menu simplifié",
+   "terme": "Tiroirs",
    "ancre": "produit-tiroirs-du-menu-simplifie"
   },
   {
@@ -365,24 +371,16 @@
    "ancre": "produit-conversion-des-traitements-en-identifiants"
   },
   {
-   "terme": "UserProfile",
-   "ancre": "produit-entites"
+   "terme": "treatmentSectionLabel",
+   "ancre": "produit-catalogue-des-traitements"
   },
   {
-   "terme": "UUID v7",
-   "ancre": "produit-identifiants-des-lignes"
+   "terme": "usePeriodWindow",
+   "ancre": "produit-fenetres-de-temps"
   },
   {
    "terme": "Vider les pesées",
    "ancre": "produit-vider-les-pesees-epargne-le-depart"
-  },
-  {
-   "terme": "WeightLog",
-   "ancre": "produit-entites"
-  },
-  {
-   "terme": "Contexte d'un envoi",
-   "ancre": "produit-contexte-d-un-envoi-de-formulaire"
   }
  ],
  "ancres_traitees": [

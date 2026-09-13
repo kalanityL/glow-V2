@@ -3,7 +3,7 @@
   <p>Ce chapitre donne les drapeaux qui commandent les sept modules, la fonction qui les lit défaut compris, le masquage et les surfaces qu'il modifie. Il donne aussi les champs des deux rappels, leurs valeurs par défaut, l'arrondi appliqué à l'enregistrement et la composition des deux récapitulatifs.</p>
 
   <h3 id="modules-entites">Entités</h3>
-  <p>Aucun objet propre : tout tient dans <code>UserProfile</code>, écrit en entier dans le JSON unique de l'application (clé <code>glp1_app_companion_data</code>, champ <code>profile</code>). Sept drapeaux d'activation, sept drapeaux de masquage, huit champs de rappel.</p>
+  <p>Aucun objet propre : tout tient dans <code>UserProfile</code>, écrit en entier dans le JSON unique de l'application (clé <code>glp1_app_companion_data</code>, champ <code>profile</code>). Sept drapeaux d'activation, sept drapeaux de masquage, onze champs de rappel.</p>
   <table>
     <thead><tr><th>Champ</th><th>Type</th><th>Facultatif</th><th>Absent vaut</th></tr></thead>
     <tbody>
@@ -28,6 +28,7 @@
       <tr><td><code>medicalReminderNotifyBefore</code></td><td>string, codes <code>1h 2h 1d 2d 3d 7d</code></td><td>oui</td><td><code>'1d'</code></td></tr>
     </tbody>
   </table>
+  <p>Trois drapeaux d'activation sont requis par le type (<code>foodTrackingEnabled</code>, <code>stepsTrackingEnabled</code>, <code>sportTrackingEnabled</code>) ; les quatre autres sont facultatifs. La colonne « Absent vaut » décrit ce que produit une sauvegarde antérieure à l'ajout du champ, que la fusion au chargement ou la lecture par défaut rattrape.</p>
   <p>Dérivés, donc non stockés : l'état réel d'un module (<code>isModuleOn</code>), son masquage effectif (<code>isModuleHidden</code>), les listes de menus et de tiroirs, les deux phrases de récapitulatif, la mention « Rappels : … » de l'accueil, la vitre d'une page éteinte. La pesée (<code>history</code>) n'a aucun drapeau : elle n'est pas un module.</p>
   <p class="ancre">src/types.ts · src/app/useAppData.ts · src/versions/mixte/app/navigation.ts</p>
 
@@ -45,7 +46,7 @@ isModuleOn(profile, tabId):
 INITIAL_PROFILE : foodTrackingEnabled = stepsTrackingEnabled = sportTrackingEnabled
                 = meTimeTrackingEnabled = sleepTrackingEnabled = false
                 (treatmentTrackingEnabled et sideEffectsTrackingEnabled : non écrits)</code></pre>
-  <p>Au chargement, le profil enregistré est fusionné par-dessus le profil d'usine : <code>{ ...INITIAL_PROFILE, ...parsed.profile }</code>. Une sauvegarde sans les cinq drapeaux facultatifs reçoit donc <code>false</code> à la lecture ; les deux drapeaux de tête, absents des deux côtés, restent <code>undefined</code> et sont lus comme allumés.</p>
+  <p>Au chargement, le profil enregistré est fusionné par-dessus le profil d'usine : <code>{ ...INITIAL_PROFILE, ...parsed.profile }</code>. Une sauvegarde sans les cinq drapeaux hors tête reçoit donc <code>false</code> à la lecture ; les deux drapeaux de tête, absents des deux côtés, restent <code>undefined</code> et sont lus comme allumés.</p>
   <p class="ancre">src/versions/mixte/app/navigation.ts · src/app/useAppData.ts</p>
   <details><summary>Cas limites</summary>
     <p><code>isModuleOn(profil, 'history')</code> → <code>true</code> : la pesée n'est pas dans <code>MODULE_FLAGS</code>.</p>
@@ -94,36 +95,43 @@ isModuleHidden(profile, tabId):
   <div class="exemple"><p>Camille a masqué Repas et en-cas. Une navigation vers la page des repas rallume <code>foodTrackingEnabled</code> sans toucher <code>foodModuleHidden</code>, resté vrai : le module reparaît. Si elle l'éteint ensuite depuis la page Modules, il redisparaît des tiroirs aussitôt, sans recocher la case.</p></div>
 
   <h3 id="modules-masquage-complet-d-un-module">Masquage complet d'un module</h3>
-  <p>Six surfaces lisent l'état d'un module, chacune à sa façon. <span class="marque">arbitrage non validé</span></p>
+  <p>Sept surfaces lisent l'état d'un module, chacune à sa façon. <span class="marque">arbitrage non validé</span></p>
   <table>
     <thead><tr><th>Surface</th><th>Module éteint</th><th>Module masqué</th></tr></thead>
     <tbody>
       <tr><td>Menu du bas — <code>bottomMenuTabs</code></td><td>entrée retirée (<code>filter(isModuleOn)</code>)</td><td>retirée</td></tr>
       <tr><td>Bloc « Ajout rapide » — <code>quickAddMenuTabs</code></td><td>entrée retirée (<code>filter(isModuleOn)</code>)</td><td>retirée</td></tr>
       <tr><td>Menu « + » de l'accueil</td><td>entrée retirée (bâti sur <code>bottomMenuTabs</code>)</td><td>retirée</td></tr>
-      <tr><td>Tiroir Ajouter — <code>addDrawerItems</code></td><td>case grisée, <code>disabled</code></td><td>case retirée</td></tr>
-      <tr><td>Tiroir Journal — <code>journalDrawerItems</code></td><td>case grisée, clic → page vitrée</td><td>case retirée</td></tr>
+      <tr><td>Tiroir Ajouter — <code>addDrawerItems</code></td><td>case grisée, <code>disabled</code>, à sa place dans l'ordre</td><td>case retirée</td></tr>
+      <tr><td>Tiroir Journal — <code>journalDrawerItems</code></td><td>case grisée, rejetée en fin de liste, clic → page vitrée</td><td>case retirée</td></tr>
       <tr><td>Tiroir Tendances</td><td>carte grisée, clic → phrase d'activation</td><td>carte retirée (sept premières cartes)</td></tr>
       <tr><td>Page Badges</td><td>badge « à activer » présent</td><td>badge « à activer » retiré</td></tr>
     </tbody>
   </table>
-  <p>Les deux tiroirs partagent <code>drawerItems(profile, order)</code>. Il construit la liste sur un profil dont les cinq drapeaux facultatifs sont forcés à <code>true</code> — sans quoi <code>allTabs</code>, qui filtre déjà sur eux, rendrait la liste amputée —, retire les masqués, puis rend l'état réel à part.</p>
+  <p>Les deux tiroirs partagent <code>drawerItems(profile, order)</code>. Il construit la liste sur un profil dont les cinq drapeaux hors tête sont forcés à <code>true</code> — sans quoi <code>allTabs</code>, qui filtre déjà sur eux, rendrait la liste amputée —, retire les masqués, puis rend l'état réel à part. Chaque entrée garde l'objet <code>MenuTab</code> entier (<code>id</code>, <code>label</code>, <code>icon</code>), seul le libellé étant substitué : les deux tiroirs ont besoin de <code>tab.id</code> pour naviguer et de <code>tab.icon</code> pour le picto.</p>
   <pre><code>drawerItems(profile, order):
   base = { ...profile, foodTrackingEnabled: true, stepsTrackingEnabled: true,
            sportTrackingEnabled: true, meTimeTrackingEnabled: true, sleepTrackingEnabled: true }
   pickTabs(base, order)                              // ordre imposé par `order`
     .filter(tab -> !isModuleHidden(profile, tab.id))
-    .map(tab -> { tab: DRAWER_LABELS[tab.id] ?? tab.label, enabled: isModuleOn(profile, tab.id) })
+    .map(tab -> {
+       flag  = MODULE_FLAGS[tab.id]
+       label = DRAWER_LABELS[tab.id]
+       return { tab: label ? { ...tab, label } : tab,
+                enabled: flag ? isModuleOn(profile, tab.id) : true }   // history : true
+    })
 
 ADD_DRAWER_ORDER     = injection, history, symptoms, sports, meals, sleep, metime
 JOURNAL_DRAWER_ORDER = ADD_DRAWER_ORDER + steps
 DRAWER_LABELS        = { history: 'Balance', meals: 'Menus' }</code></pre>
-  <p>Les deux tiroirs affichent ensuite <code>[...items.filter(enabled), ...items.filter(!enabled)]</code> : tri stable, les éteints ferment la liste sans que l'ordre de chaque groupe change. Dans le tiroir Ajouter la case éteinte porte <code>disabled</code> ; dans le tiroir Journal elle reste cliquable et appelle <code>onNavigateEteinte</code>. Sur la page Badges, la correspondance catégorie → onglet ne couvre que trois catégories (« Nombre de Pas » → <code>steps</code>, « Activité Physique » → <code>sports</code>, « Repas et En-cas » → <code>meals</code>) ; toute autre catégorie reçoit <code>''</code>, pour lequel <code>isModuleHidden</code> rend <code>false</code>.</p>
-  <p class="ancre">src/versions/mixte/app/navigation.ts · src/versions/mixte/App.tsx · src/versions/mixte/components/JournalDrawer.tsx · src/versions/mixte/components/BadgesPage.tsx</p>
+  <p>Seul le tiroir Journal réordonne : il rend <code>[...items.filter(enabled), ...items.filter(!enabled)]</code> — tri stable, les éteints ferment la liste sans que l'ordre de chaque groupe change. Le tiroir Ajouter ne trie pas : il parcourt <code>addDrawerItems(profile)</code> tel quel, dans l'ordre d'<code>ADD_DRAWER_ORDER</code>, et une case éteinte garde sa place au milieu de la grille à trois colonnes. Dans le tiroir Ajouter la case éteinte porte <code>disabled</code> ; dans le tiroir Journal elle reste cliquable et appelle <code>onNavigateEteinte</code>.</p>
+  <p>La page Badges ne lit ni <code>isModuleOn</code> ni <code>Boolean(drapeau)</code> : chaque définition porte son propre <code>categoryEnabled(profile)</code>, et deux formes coexistent — <code>p.sportTrackingEnabled !== false</code> et <code>p.stepsTrackingEnabled !== false</code> d'un côté, <code>p.foodTrackingEnabled === true</code> de l'autre. Une catégorie <em>non</em> activée alimente la liste « à activer », sauf module masqué : <code>inactiveCategoryBadges = ALL_BADGE_DEFINITIONS.filter(def -&gt; !categoryEnabled(profile) &amp;&amp; !isModuleHidden(profile, ongletDeCategorie(def)))</code>. Les quatre définitions couvrent trois catégories, toutes trois présentes dans la correspondance (« Nombre de Pas » → <code>steps</code>, « Activité Physique » → <code>sports</code>, « Repas et En-cas » → <code>meals</code>) ; une catégorie ajoutée hors table recevrait <code>''</code>, pour lequel <code>isModuleHidden</code> rend <code>false</code>.</p>
+  <p class="ancre">src/versions/mixte/app/navigation.ts · src/versions/mixte/App.tsx · src/versions/mixte/components/JournalDrawer.tsx · src/versions/mixte/components/BadgesPage.tsx · src/utils/badgeSystem.ts</p>
   <details><summary>Cas limites</summary>
     <p>Les pas ne sont ni dans le menu du bas, ni dans l'ajout rapide, ni dans le tiroir Ajouter : masquer ce module n'agit que sur le tiroir Journal, le tiroir Tendances et la page Badges.</p>
     <p>Le traitement et les effets secondaires sont listés sans condition par <code>allTabs</code> ; leur retrait vient du <code>filter(isModuleOn)</code> propre à la Mixte, jamais de la table partagée.</p>
-    <p>La pesée reste dans les deux tiroirs quels que soient les drapeaux.</p>
+    <p>La pesée reste dans les deux tiroirs quels que soient les drapeaux : sans entrée dans <code>MODULE_FLAGS</code>, son <code>enabled</code> vaut <code>true</code> sans passer par <code>isModuleOn</code>.</p>
+    <p><code>sportTrackingEnabled</code> ou <code>stepsTrackingEnabled</code> à <code>undefined</code> : le test <code>!== false</code> compte la catégorie comme active — l'inverse de <code>isModuleOn</code>, qui la lit éteinte. Le cas ne se produit qu'avant fusion : <code>INITIAL_PROFILE</code> écrit les deux à <code>false</code>.</p>
   </details>
   <div class="exemple"><p>Camille éteint Nombre de pas et coche « Masquer dans l'application. » : <code>isModuleHidden(profil, 'steps')</code> devient vrai, la case Pas quitte le tiroir Journal, la carte Pas quitte Tendances et les badges de pas quittent la liste « à activer ». <a href="spec-fonctionnelle.html#modules-page-modules">→ fonctionnelle</a></p></div>
 
@@ -194,7 +202,7 @@ cadre : absolute inset-x-0 top-0 bottom-16 (64 px), z-30</code></pre>
   <div class="exemple"><p>Camille, module Repas et en-cas éteint, ouvre la case « Menus » du tiroir Journal : <code>naviguerVersPageEteinte('meals')</code>, la page s'ouvre vitrée, <code>foodTrackingEnabled</code> reste <code>false</code>. La même page atteinte par <code>handleNavigate('meals')</code> aurait écrit <code>true</code> et se serait ouverte nette. <a href="spec-fonctionnelle.html#modules-page-d-un-module-eteint">→ fonctionnelle</a></p></div>
 
   <h3 id="modules-defauts-du-rappel-d-injections">Défauts du rappel d'injections</h3>
-  <p>La carte lit cinq champs, chacun avec son repli. Le repli n'est pas écrit : il ne sert qu'à l'affichage tant que l'utilisatrice n'a rien choisi.</p>
+  <p>La carte lit six champs, dont cinq avec un repli. Le repli n'est pas écrit : il ne sert qu'à l'affichage tant que l'utilisatrice n'a rien choisi.</p>
   <pre><code>isInjectionEnabled = profile.reminderEnabled                       // pas de repli : le profil d'usine l'écrit à false
 injectionType      = profile.injectionReminderType ?? 'weekly'
 reminderDay        = profile.reminderDay ?? 0                      // 0 = dimanche
@@ -203,7 +211,7 @@ intervalDays       = profile.injectionReminderDaysInterval ?? 7
 startDate          = profile.injectionReminderStartDate ?? getLocalDateStr()   // date locale du jour
 
 INITIAL_PROFILE : reminderEnabled = false, reminderDay = 0, reminderTime = '20:00'</code></pre>
-  <p><code>reminderTime</code> est le même champ dans les deux planifications : le sélecteur d'heure de la branche hebdomadaire et celui de la branche personnalisée écrivent tous deux <code>reminderTime</code>. Changer de type de planification ne change donc jamais l'heure. La bascule de la carte n'écrit que <code>reminderEnabled: !isInjectionEnabled</code> ; les réglages dépliés restent en base quand la carte se referme.</p>
+  <p>Le bloc dépliable — sélecteur de type, jour, heure, intervalle, date de départ, encadré récapitulatif — n'est monté que sous <code>isInjectionEnabled</code>. <code>reminderTime</code> est le même champ dans les deux planifications : le sélecteur d'heure de la branche hebdomadaire et celui de la branche personnalisée écrivent tous deux <code>reminderTime</code>. Changer de type de planification ne change donc jamais l'heure. La bascule de la carte n'écrit que <code>reminderEnabled: !isInjectionEnabled</code> ; les réglages dépliés restent en base quand la carte se referme.</p>
   <p class="ancre">src/versions/mixte/components/NotificationsSettings.tsx · src/app/useAppData.ts · src/shared/date/date.local.ts</p>
   <details><summary>Cas limites</summary>
     <p><code>injectionReminderStartDate</code> absente : la carte affiche la date du jour, mais rien n'est écrit tant que l'utilisatrice ne choisit pas de date.</p>
@@ -230,7 +238,7 @@ fréquence : [...Array(30)] -> valeurs 1 à 30
   <div class="exemple"><p>Camille passe en Personnalisé et choisit « Tous les 7 jours » : <code>injectionReminderDaysInterval: 7</code>, un nombre. Son <code>reminderDay: 0</code> reste écrit et cesse d'être lu.</p></div>
 
   <h3 id="modules-defauts-du-rappel-medical">Défauts du rappel médical</h3>
-  <p>Cinq champs, cinq replis, et un récapitulatif conditionné à la seule date.</p>
+  <p>Cinq champs, cinq replis. Le bloc dépliable entier — champs et récapitulatif — n'est monté que sous <code>isMedicalEnabled</code> ; à l'intérieur, le récapitulatif est conditionné à la date.</p>
   <pre><code>isMedicalEnabled    = profile.medicalReminderEnabled ?? false
 medicalDoctor       = profile.medicalReminderDoctor ?? ''
 medicalDate         = profile.medicalReminderDate ?? ''
@@ -240,11 +248,12 @@ medicalNotifyBefore = profile.medicalReminderNotifyBefore ?? '1d'
 notificationBeforeOptions = 1h « 1 heure avant » · 2h « 2 heures avant » · 1d « 1 jour avant »
                             2d « 2 jours avant » · 3d « 3 jours avant » · 7d « 1 semaine avant »
 
-récapitulatif rendu si medicalDate non vide :
+récapitulatif rendu si isMedicalEnabled ET medicalDate non vide :
 « Rappel programmé pour votre rdv avec {medicalDoctor || 'le médecin'} le {date} à {medicalTime}. »</code></pre>
   <p>Le nom est un champ texte libre, écrit à chaque frappe (<code>onChange → onSaveProfile</code>), sans normalisation ni longueur maximale. Le délai choisi n'entre dans aucun calcul : il est stocké et jamais relu ailleurs que par son propre sélecteur.</p>
   <p class="ancre">src/versions/mixte/components/NotificationsSettings.tsx</p>
   <details><summary>Cas limites</summary>
+    <p>Carte refermée avec une date en base : aucun récapitulatif rendu, le bloc entier étant démonté.</p>
     <p>Nom vide ou composé d'espaces seuls : <code>medicalDoctor || 'le médecin'</code> ne remplace que la chaîne vide ; une chaîne d'espaces passe telle quelle.</p>
     <p>Date vide : aucun récapitulatif, quelle que soit l'heure ou le délai.</p>
     <p>La date du rendez-vous n'est pas bornée : une date passée est acceptée et écrite.</p>
@@ -279,19 +288,20 @@ handleSaveProfile(p):
   <div class="exemple"><p>Camille choisit 20:37 comme heure de rappel : le sélecteur ne le permet pas — il n'offre que les huit minutes rondes. Une sauvegarde importée portant <code>reminderTime: '20:37'</code> est ramenée à <code>'20:30'</code> au premier enregistrement du profil, même déclenché par une bascule de module.</p></div>
 
   <h3 id="modules-recapitulatif-du-rappel-personnalise">Récapitulatif du rappel personnalisé</h3>
-  <p>Les deux récapitulatifs composent la même date de la même façon : <code>new Date(valeur).toLocaleDateString('fr-FR')</code>, soit JJ/MM/AAAA.</p>
-  <pre><code>injections (branche personnalisée, toujours rendue) :
+  <p>Les deux récapitulatifs composent la même date de la même façon : <code>new Date(valeur).toLocaleDateString('fr-FR')</code>, soit JJ/MM/AAAA. Chacun vit sous la bascule de sa carte.</p>
+  <pre><code>injections — rendu si reminderEnabled ET injectionReminderType === 'custom' :
 « Vos rappels d'injections seront planifiés automatiquement tous les {intervalDays} jours
   à compter du {new Date(startDate).toLocaleDateString('fr-FR')} à {reminderTime}. »
 
-rendez-vous médical (rendu si medicalDate non vide) :
+rendez-vous médical — rendu si medicalReminderEnabled ET medicalDate non vide :
 « Rappel programmé pour votre rdv avec {medicalDoctor || 'le médecin'}
   le {new Date(medicalDate).toLocaleDateString('fr-FR')} à {medicalTime}. »</code></pre>
   <p>Le récapitulatif des injections n'existe que sous la planification personnalisée : la branche hebdomadaire n'en a aucun. Le nombre de jours est écrit tel quel, sans accord conditionnel : « tous les 1 jours ».</p>
   <p class="ancre">src/versions/mixte/components/NotificationsSettings.tsx</p>
   <details><summary>Cas limites</summary>
     <p><code>new Date('2026-05-03')</code> est interprété en UTC ; <code>toLocaleDateString</code> rend la date <em>locale</em> : dans un fuseau à décalage négatif, la veille s'affiche.</p>
-    <p><code>startDate</code> ne peut pas être vide : son repli est la date du jour. <code>medicalDate</code>, lui, conditionne l'affichage du bloc, donc la phrase ne rend jamais « Invalid Date ».</p>
+    <p><code>injectionReminderStartDate: ''</code> venu d'une sauvegarde modifiée : le repli <code>??</code> ne rattrape que <code>undefined</code> et <code>null</code>, la chaîne vide passe, <code>new Date('')</code> donne <code>Invalid Date</code> et la phrase l'affiche. Aucune validation au chargement ne l'écarte.</p>
+    <p><code>medicalDate</code> vide, en revanche, retire le bloc : cette phrase-là ne rend jamais « Invalid Date ».</p>
     <p>L'heure est reprise brute du profil, sans reformatage : elle s'affiche telle qu'elle est stockée, en <code>HH:MM</code>.</p>
   </details>
   <div class="exemple"><p>Camille, en Personnalisé, tous les 7 jours à partir du 03/05/2026 à 20:00 : « Vos rappels d'injections seront planifiés automatiquement tous les 7 jours à compter du 03/05/2026 à 20:00. » <a href="spec-fonctionnelle.html#modules-page-notifications">→ fonctionnelle</a></p></div>

@@ -22,18 +22,19 @@ WALKING_SPEED_KMH        = 4.2       // km/h, valeur d'affichage
 DEFAULT_DAILY_GOAL_STEPS = 8000      // pas par jour</code></pre>
   <p>Types de calcul, jamais persistés : <code>LastMonthStepsStats</code> (alias <code>StepsPeriodStats</code>) — <code>avgSteps</code>, <code>avgProgress</code> (%), <code>avgDistance</code> (km), <code>avgDuration</code> (min), <code>avgSpeed</code> (km/h), <code>avgCalories</code> ; <code>CumulativeStepsStats</code> — <code>totalSteps</code>, <code>totalKm</code>, <code>totalMinutes</code>, <code>avgSpeed</code>, <code>firstDate</code> (JJ/MM/AAAA), <code>rawFirstDate</code> (AAAA-MM-JJ) ; <code>StepsChartPoint</code> — <code>date</code> (JJ/MM), <code>fullDate</code> (AAAA-MM-JJ), <code>steps</code>. <code>DailySwipeCard</code> est calculé par <code>useStepsStats</code> mais aucune vue Mixte ne le monte.</p>
   <p>Quatre clés de stockage local pour le domaine : <code>steps_custom_start_date</code>, <code>glp1_steps_history_view</code>, <code>glp1_period_steps_journal</code>, <code>glp1_period_steps_chart</code>.</p>
-  <p>Écritures : <code>handleDeleteStep</code> (<code>removeLogById</code>, suppression franche), <code>handleClearAllSteps</code> (journal remplacé par <code>[]</code>), <code>handleUpdateStep</code> (<code>applyLogUpdate</code>). <code>handleAddStep</code> existe dans <code>useAppData</code> et est destructuré par <code>App.tsx</code> de la version Mixte, mais n'est passé à aucun composant : <strong>la version Mixte n'a aucun chemin d'ajout de pas</strong>. <code>useStepsQuickForm</code> (qui refuse <code>count &lt;= 0</code>) n'est monté que par les versions gelées.</p>
-  <p class="ancre">src/types.ts · src/app/useAppData.ts · src/features/steps/steps.constants.ts · src/features/steps/steps.utils.ts</p>
+  <p>Écritures : deux chemins vivants seulement — <code>handleDeleteStep</code> (<code>removeLogById</code>, suppression franche) et <code>handleClearAllSteps</code> (journal remplacé par <code>[]</code>). <code>handleUpdateStep</code> (<code>applyLogUpdate</code>) est bien passé par <code>App.tsx</code> (<code>onUpdateStep={handleUpdateStep}</code>) et <code>StepsTracker</code> déclare la prop <code>onUpdateStep?:</code>, mais sa signature ne la déstructure pas et le nom n'apparaît nulle part ailleurs dans le fichier : <strong>aucun écran de la version Mixte ne modifie un <code>StepLog</code></strong>. <code>handleAddStep</code> existe dans <code>useAppData</code> et est destructuré par <code>App.tsx</code>, mais n'est passé à aucun composant : <strong>la version Mixte n'a ni chemin d'ajout ni chemin de modification</strong>. <code>useStepsQuickForm</code> (qui refuse <code>count &lt;= 0</code>) n'est monté que par les versions gelées.</p>
+  <p class="ancre">src/types.ts · src/app/useAppData.ts · src/features/steps/steps.constants.ts · src/features/steps/steps.utils.ts · src/versions/mixte/features/steps/StepsTracker.tsx</p>
 
   <h3 id="pas-objectif-quotidien-de-pas">Objectif quotidien de pas</h3>
   <p>Valeur unique, 8 000 pas, portée par la constante <code>DEFAULT_DAILY_GOAL_STEPS</code>. Aucun réglage ne l'atteint : le profil n'a pas de champ correspondant, et <code>App.tsx</code> monte <code>StepsTracker</code> sans passer <code>dailyGoalSteps</code> — c'est le défaut de la prop qui s'applique.</p>
   <pre><code>StepsTracker({ dailyGoalSteps = DEFAULT_DAILY_GOAL_STEPS, … })
-TrendGraphOverlay, JournalDrawer : dailyGoalSteps={DEFAULT_DAILY_GOAL_STEPS}
-StepsJournalRow : dailyGoalSteps || DEFAULT_DAILY_GOAL_STEPS</code></pre>
-  <p>L'objectif sert à quatre endroits : le pourcentage du jour, le pourcentage et la barre d'une ligne de journal, la moyenne des progressions journalières, la ligne de référence du graphe et sa légende « Seuil objectif (8 000) ».</p>
-  <p class="ancre">src/features/steps/steps.constants.ts · src/versions/mixte/features/steps/StepsTracker.tsx</p>
+TrendGraphOverlay, JournalDrawer, SurimpressionPas : dailyGoalSteps={DEFAULT_DAILY_GOAL_STEPS}
+HomeStepsProgress : const objectif = DEFAULT_DAILY_GOAL_STEPS
+StepsJournalRow, computeStepsStatsSince : dailyGoalSteps || DEFAULT_DAILY_GOAL_STEPS</code></pre>
+  <p>L'objectif sert à sept endroits : le pourcentage de la carte « Aujourd'hui » et son dénominateur écrit « / 8 000 » ; le pourcentage et le « / 8 000 » du bloc « Mes pas » de l'accueil ; la barre et le texte d'une ligne de journal ; la moyenne des progressions journalières (<code>avgProgress</code>) ; la ligne de référence du graphe et sa légende « Seuil objectif (8 000) » ; la troisième ligne de l'infobulle du graphe (« … pas restants ») ; le pourcentage des cartes journalières de <code>computeDailySwipeList</code>, qu'aucune vue Mixte ne monte.</p>
+  <p class="ancre">src/features/steps/steps.constants.ts · src/versions/mixte/features/steps/StepsTracker.tsx · src/versions/mixte/features/steps/StepsHeroCards.tsx · src/versions/mixte/features/steps/StepsTrendChart.tsx · src/versions/mixte/features/home/HomeStepsProgress.tsx</p>
   <details><summary>Cas limites</summary>
-    <p>Un objectif à 0 passé en prop : <code>useStepsStats</code> ne se protège pas et rend <code>NaN</code> pour <code>percentReached</code> ; <code>StepsJournalRow</code> et <code>computeStepsStatsSince</code>, eux, retombent sur 8 000 par <code>|| DEFAULT_DAILY_GOAL_STEPS</code>. Aucun appelant du dépôt ne passe 0.</p>
+    <p>Un objectif à 0 passé en prop : <code>useStepsStats</code> ne se protège pas, mais le résultat dépend des pas du jour. Avec des pas &gt; 0, <code>pas / 0 × 100</code> vaut <code>Infinity</code>, <code>Math.round(Infinity)</code> aussi, et <code>Math.min(100, Infinity)</code> rend 100 : la carte affiche 100 %. Avec 0 pas, <code>0 / 0</code> rend <code>NaN</code>. <code>StepsJournalRow</code> et <code>computeStepsStatsSince</code>, eux, retombent sur 8 000 par <code>|| DEFAULT_DAILY_GOAL_STEPS</code>. Aucun appelant du dépôt ne passe 0.</p>
   </details>
 
   <h3 id="pas-activation-automatique-des-modules-pas-et-sport">Activation automatique des modules pas et sport</h3>
@@ -43,7 +44,7 @@ if (tab === 'steps'  &amp;&amp; !profile.stepsTrackingEnabled) { stepsTrackingEn
 if (tab === 'sports' &amp;&amp; !profile.sportTrackingEnabled) { sportTrackingEnabled = true; hasChanges = true; }
 if (hasChanges) handleSaveProfile(updatedProfile);
 setActiveTab(tab);</code></pre>
-  <p><code>'metime'</code> et <code>'sleep'</code> n'ont pas de branche : leur module reste éteint. La troisième voie, <code>naviguerVersPageEteinte(tab)</code>, pose seulement <code>setActiveTab</code> : elle n'allume rien, ce qui permet à la page vitrée d'exister. Le montage reste conditionné au drapeau — <code>activeTab === 'steps' &amp;&amp; profile.stepsTrackingEnabled</code> —, si bien qu'une page atteinte par cette voie n'affiche que la vitre d'activation du module « Nombre de Pas », cible <code>module-steps-tracking</code>. <a href="spec-fonctionnelle.html#pas-page-pas-stepstracker">→ fonctionnelle</a></p>
+  <p><code>'metime'</code> et <code>'sleep'</code> n'ont pas de branche : leur module reste éteint. La troisième voie, <code>naviguerVersPageEteinte(tab)</code>, remet d'abord à zéro les trois demandes d'ouverture automatique — <code>setAutoOpenTab(null)</code>, <code>setAutoOpenChangeTreatment(false)</code>, <code>setAutoOpenPkPlot(false)</code> — puis appelle <code>setActiveTab</code> : elle n'allume aucun module, ce qui permet à la page vitrée d'exister. Le montage reste conditionné au drapeau — <code>activeTab === 'steps' &amp;&amp; profile.stepsTrackingEnabled</code> —, si bien qu'une page atteinte par cette voie n'affiche que la vitre d'activation du module « Nombre de Pas », cible <code>module-steps-tracking</code>. <a href="spec-fonctionnelle.html#pas-page-pas-stepstracker">→ fonctionnelle</a></p>
   <p class="ancre">src/versions/mixte/App.tsx</p>
   <details><summary>Cas limites</summary>
     <p>Le profil est sauvegardé même si la navigation échoue ensuite : l'écriture précède <code>setActiveTab</code>. Un module déjà allumé ne déclenche aucune écriture (<code>hasChanges</code> reste faux).</p>
@@ -56,24 +57,26 @@ switchView(next) : setView(next) ; setItem(storageKey, next)</code></pre>
   <p>La page des pas appelle <code>useHistoryView('glp1_steps_history_view')</code> — clé écrite telle quelle, sans le préfixe <code>glp1_period_</code> des sélecteurs de période. <code>HistoryToolbar</code> ne dessine son bouton « + ajouter » que si un geste <code>onAdd</code> lui est passé ; la page des pas n'en passe pas.</p>
   <p class="ancre">src/versions/mixte/components/HistoryToolbar.tsx · src/versions/mixte/features/steps/StepsTracker.tsx</p>
   <details><summary>Cas limites</summary>
-    <p>Clé absente, valeur corrompue, valeur d'un autre type : le curseur ouvre sur « calendrier ». Le calendrier et le journal ne sont jamais montés ensemble : la face cachée ne calcule rien.</p>
+    <p>Clé absente, valeur corrompue, valeur d'un autre type : le curseur ouvre sur « calendrier ».</p>
+    <p>Le calendrier et le journal ne sont jamais montés ensemble, mais les deux calculs tournent dans tous les cas : <code>StepsTracker</code> appelle <code>useStepsStats</code> puis <code>useStepsJournal</code> — tri complet de l'historique, puis <code>filterByTimeWindow</code> — hors de toute condition, avant le rendu. Seul le JSX est conditionné.</p>
   </details>
 
   <h3 id="pas-formats-communs-des-nombres-et-dates">Formats communs des nombres et des dates</h3>
-  <p>Tout nombre affiché passe par <code>formatNumber(valeur, décimales = 0)</code> : milliers groupés par trois avec U+00A0 (espace insécable, jamais U+202F), décimales après un point, zéros de queue supprimés, signe collé au nombre, chaîne vide pour <code>NaN</code> et <code>±∞</code>. <code>decimals</code> est un maximum, pas une longueur. <code>formatNumber1Dec</code> — réexporté sous le nom <code>format1Dec</code> — en est l'appel à une décimale.</p>
+  <p>Tout nombre affiché passe par <code>formatNumber(valeur, décimales = 0)</code> : milliers groupés par trois avec U+00A0 (espace insécable, jamais U+202F), décimales après un point, zéros de queue supprimés, signe collé au nombre, chaîne vide pour <code>NaN</code> et <code>±∞</code>. <code>decimals</code> est un maximum, pas une longueur. <code>formatNumber1Dec</code> en est l'appel à une décimale.</p>
   <pre><code>formatNumber(7300)      → "7 300"      (U+00A0)
 formatNumber(82.4, 1)   → "82.4"
 formatNumber(82, 1)     → "82"
 formatNumber(9.68, 1)   → "9.7"
 formatNumber(NaN)       → ""</code></pre>
+  <p><code>format1Dec</code>, qu'emploie le bloc du cumul, n'est pas un réexport du module de nombres : <code>src/shared/number/index.ts</code> n'exporte que <code>formatNumber</code>, <code>formatNumber1Dec</code> et <code>NBSP</code>. C'est une fonction distincte, définie dans <code>src/features/home/homeOverview.ts</code>, qui enveloppe <code>formatNumber1Dec</code> sans rien y ajouter.</p>
   <p>Les dates : <code>getLocalDateStr(date)</code> écrit AAAA-MM-JJ en heure locale (jamais UTC) et c'est la forme stockée ; une ligne de journal ou le bandeau du cumul retournent les trois segments en JJ/MM/AAAA ; les axes de graphe emploient <code>formatDayMonth(date)</code>, soit JJ/MM avec zéros de tête. Les durées s'écrivent par <code>formatCalendarDuration(minutes)</code>.</p>
   <pre><code>formatCalendarDuration(m) :
   total = Math.max(0, Math.round(m))
   total &lt; 60 → `${total}min`
   sinon      → `${Math.floor(total/60)}h${String(total%60).padStart(2,'0')}`</code></pre>
-  <p class="ancre">src/shared/number/number.format.ts · src/shared/date/date.local.ts · src/shared/date/date.utils.ts · src/shared/calendar.ts</p>
+  <p class="ancre">src/shared/number/number.format.ts · src/features/home/homeOverview.ts · src/shared/date/date.local.ts · src/shared/date/date.utils.ts · src/shared/calendar.ts</p>
   <details><summary>Cas limites</summary>
-    <p>La distance des deux cartes du haut n'est pas passée par <code>formatNumber</code> : elle est rendue comme nombre brut (<code>parseFloat(x.toFixed(1))</code>), donc sans séparateur de milliers. Le cumul, lui, emploie <code>format1Dec</code> et sépare.</p>
+    <p>La distance des deux cartes du haut et celle du bloc « Mes pas » ne passent pas par <code>formatNumber</code> : elles sont rendues comme nombre brut (<code>parseFloat(x.toFixed(1))</code>), donc sans séparateur de milliers. Le cumul emploie <code>format1Dec</code> et le rapport médical <code>formatNumber(km, 1)</code> : ces deux-là séparent.</p>
     <p><code>formatCalendarDuration(59.5)</code> arrondit d'abord : 60 → « 1h00 ». Une durée négative est ramenée à « 0min ».</p>
   </details>
 
@@ -111,8 +114,8 @@ pour curr = startMs ; curr &lt;= endMs &amp;&amp; compteur &lt; 1000 ; curr += 2
   <pre><code>todayStr        = getLocalDateStr()
 todayTotalSteps = stepHistory.find(log =&gt; log.date === todayStr)?.steps ?? 0
 percentReached  = Math.min(100, Math.round(todayTotalSteps / dailyGoalSteps × 100))</code></pre>
-  <p>La tuile « En direct » de l'accueil emploie la fonction jumelle <code>stepsOn(stepLogs, todayStr)</code>, de même corps : <code>find(...)?.steps || 0</code>. La barre et le nombre écrit de la carte « Aujourd'hui » partagent la même valeur plafonnée. <a href="spec-fonctionnelle.html#pas-carte-aujourd-hui">→ fonctionnelle</a></p>
-  <p class="ancre">src/features/steps/useStepsStats.ts · src/features/home/homeOverview.ts</p>
+  <p>Trois autres surfaces refont le même corps : la tuile « En direct » de l'accueil par <code>stepsOn(stepLogs, todayStr)</code> (<code>find(...)?.steps || 0</code>), et le bloc « Mes pas » de l'accueil, qui recalcule sur place <code>find(...)?.steps || 0</code> puis le même <code>Math.min(100, Math.round(…))</code> plutôt que de remonter la valeur de la page. La barre et le nombre écrit de la carte « Aujourd'hui » partagent la valeur plafonnée. <a href="spec-fonctionnelle.html#pas-carte-aujourd-hui">→ fonctionnelle</a></p>
+  <p class="ancre">src/features/steps/useStepsStats.ts · src/features/home/homeOverview.ts · src/versions/mixte/features/home/HomeStepsProgress.tsx</p>
   <details><summary>Cas limites</summary>
     <p>Deux relevés datés d'aujourd'hui : la carte n'en montre qu'un, la tuile du calendrier montre leur somme, le journal montre les deux lignes. Les trois surfaces divergent.</p>
     <p>Plus de 8 000 pas : la carte plafonne à 100 %, la ligne de journal du même jour écrit le pourcentage réel — 121 %, par exemple.</p>
@@ -123,19 +126,19 @@ percentReached  = Math.min(100, Math.round(todayTotalSteps / dailyGoalSteps × 1
   <h3 id="pas-distance-par-pas">Distance par pas</h3>
   <p>Longueur de pas unique pour tout le module, appliquée à un nombre de pas, arrondie à une décimale dès le calcul.</p>
   <pre><code>distanceKm = parseFloat((pas × KM_PER_STEP).toFixed(1))   // KM_PER_STEP = 0.00076</code></pre>
-  <p>Trois appels : la carte « Aujourd'hui » (<code>todayTotalSteps × KM_PER_STEP</code>), la carte « Statistiques/j » (<code>avgSteps × KM_PER_STEP</code>, arrondi dans <code>computeStepsStatsSince</code>), le cumul (<code>totalSteps × KM_PER_STEP</code>, arrondi seulement à l'affichage par <code>format1Dec</code>). Cette longueur de 76 cm est indépendante de la taille du profil ; la foulée qui sert aux calories, elle, en dépend — les deux distances ne coïncident pas.</p>
-  <p class="ancre">src/features/steps/steps.constants.ts · src/features/steps/steps.utils.ts · src/versions/mixte/features/steps/StepsHeroCards.tsx</p>
+  <p>Cinq appels dans la version Mixte : la carte « Aujourd'hui » (<code>todayTotalSteps × KM_PER_STEP</code>) ; la carte « Statistiques/j » (<code>avgSteps × KM_PER_STEP</code>, arrondi dans <code>computeStepsStatsSince</code>) ; le bloc « Mes pas » de l'accueil (<code>todaySteps × KM_PER_STEP</code>, même expression recalculée sur place) ; le cumul (<code>totalSteps × KM_PER_STEP</code>, arrondi seulement à l'affichage par <code>format1Dec</code>) ; le carreau des pas du rapport médical (<code>total × KM_PER_STEP</code>, écrit par <code>formatNumber(km, 1)</code>). Cette longueur de 76 cm est indépendante de la taille du profil ; la foulée qui sert aux calories, elle, en dépend — les deux distances ne coïncident pas.</p>
+  <p class="ancre">src/features/steps/steps.constants.ts · src/features/steps/steps.utils.ts · src/versions/mixte/features/steps/StepsHeroCards.tsx · src/versions/mixte/features/home/HomeStepsProgress.tsx · src/versions/mixte/components/MedicalReportExport.tsx</p>
   <details><summary>Cas limites</summary>
     <p>Le cumul stocke <code>totalKm</code> non arrondi : la vitesse moyenne se calcule sur la valeur pleine, pas sur les 64.3 km affichés.</p>
-    <p>Sous 658 pas, la distance arrondie vaut 0.5 km ou moins ; sous 66 pas elle s'écrit « 0 ».</p>
+    <p>Charnières basses de l'affichage : 65 pas → « 0 », 66 pas → « 0.1 ». La valeur reste « 0.5 » de 658 à 723 pas et ne passe à « 0.6 » qu'à 724.</p>
   </details>
   <div class="exemple"><p>Camille, 6 480 pas : 6 480 × 0,00076 = 4,9248 → 4.9 km.</p></div>
 
   <h3 id="pas-duree-de-marche-estimee">Durée de marche estimée</h3>
   <p>Cadence unique de 95 pas par minute, jamais mesurée ; le résultat est un nombre de minutes entières, l'écriture est le travail de <code>formatCalendarDuration</code>.</p>
   <pre><code>stepsWalkingMinutes(pas) = Math.round(Math.max(0, pas) / STEPS_PER_MINUTE)   // 95</code></pre>
-  <p>Appelée par la carte du jour, la carte des moyennes (sur <code>avgSteps</code>, donc la durée du <em>pas moyen</em>, pas la moyenne des durées), la bulle du calendrier et le cumul. La durée ne se combine pas avec la distance de 0,00076 km/pas : 95 pas/min à 76 cm donnent 4,332 km/h, et non les 4,2 km/h affichés.</p>
-  <p class="ancre">src/features/steps/steps.utils.ts · src/features/steps/steps.constants.ts</p>
+  <p>Cinq appelants : la carte du jour, la carte des moyennes (sur <code>avgSteps</code>, donc la durée du <em>pas moyen</em>, pas la moyenne des durées), le bloc « Mes pas » de l'accueil, la bulle du calendrier et le cumul. La durée ne se combine pas avec la distance de 0,00076 km/pas : 95 pas/min à 76 cm donnent 4,332 km/h, et non les 4,2 km/h affichés.</p>
+  <p class="ancre">src/features/steps/steps.utils.ts · src/features/steps/steps.constants.ts · src/versions/mixte/features/home/HomeStepsProgress.tsx</p>
   <details><summary>Cas limites</summary>
     <p>Un compte négatif est ramené à 0 avant division : 0 minute.</p>
     <p>Charnière d'écriture : 5 653 pas → 60 min → « 1h00 » ; 5 652 pas → 59 min → « 59min ».</p>
@@ -143,11 +146,11 @@ percentReached  = Math.min(100, Math.round(todayTotalSteps / dailyGoalSteps × 1
   <div class="exemple"><p>Camille, 6 480 pas : 6 480 / 95 = 68,2 → 68 min → « 1h08 ». Le 10/09, 9 680 pas → 102 min → « 1h42 ».</p></div>
 
   <h3 id="pas-vitesse-de-marche-de-reference">Vitesse de marche de référence</h3>
-  <p><code>WALKING_SPEED_KMH = 4.2</code> est affichée telle quelle, sans calcul, à trois endroits : la carte « Aujourd'hui », la carte « Statistiques/j », la bulle du calendrier. Elle est aussi le repli de la vitesse du cumul quand la durée est nulle, et la valeur d'<code>avgSpeed</code> rendue par <code>computeStepsStatsSince</code> — y compris sur une fenêtre vide. Elle entre enfin dans le calcul des calories, en dur dans <code>calculateStepCalories</code> (<code>durationHours = distanceKm / 4.2</code>) et non par la constante.</p>
+  <p><code>WALKING_SPEED_KMH = 4.2</code> est affichée telle quelle, sans calcul, à quatre endroits : la carte « Aujourd'hui », la carte « Statistiques/j », la bulle du calendrier et le bloc « Mes pas » de l'accueil. Elle est aussi le repli de la vitesse du cumul quand la durée est nulle, et la valeur d'<code>avgSpeed</code> rendue par <code>computeStepsStatsSince</code> — y compris sur une fenêtre vide. Elle entre enfin dans le calcul des calories, en dur dans <code>calculateStepCalories</code> (<code>durationHours = distanceKm / 4.2</code>) et non par la constante.</p>
   <p>Le seul endroit où une vitesse est vraiment calculée est le cumul depuis une date.</p>
-  <p class="ancre">src/features/steps/steps.constants.ts · src/shared/body-metrics/bodyMetrics.utils.ts</p>
+  <p class="ancre">src/features/steps/steps.constants.ts · src/versions/mixte/features/steps/StepsHeroCards.tsx · src/versions/mixte/features/steps/StepsCalendar.tsx · src/versions/mixte/features/home/HomeStepsProgress.tsx · src/shared/body-metrics/bodyMetrics.utils.ts</p>
   <details><summary>Cas limites</summary>
-    <p>Le nombre est rendu brut (<code>{WALKING_SPEED_KMH}</code>), donc écrit « 4.2 » — cohérent avec la règle du point décimal, mais sans passer par <code>formatNumber</code>.</p>
+    <p>Le nombre est rendu brut (<code>{WALKING_SPEED_KMH}</code>) aux quatre endroits, donc écrit « 4.2 » — cohérent avec la règle du point décimal, mais sans passer par <code>formatNumber</code>.</p>
   </details>
 
   <h3 id="pas-calories-des-pas">Calories des pas</h3>
@@ -167,7 +170,7 @@ getStepsCaloriesForLog(pas, date, weightHistory, profile) :
   <details><summary>Cas limites</summary>
     <p>Taille absente, nulle ou 0 : <code>profile?.height || 170</code> → 170 cm.</p>
     <p>Compte négatif : <code>Math.max(0, …)</code> ramène la dépense à 0, mais la distance et la durée, elles, sont calculées ailleurs.</p>
-    <p>La ligne de journal écrit la valeur brute (« -336 kcal ») sans <code>formatNumber</code> : au-delà de 999 kcal, pas de séparateur de milliers.</p>
+    <p>La ligne de journal écrit la valeur brute (« -336 kcal ») sans <code>formatNumber</code> : au-delà de 999 kcal, pas de séparateur de milliers. Le bandeau du bloc « Mes pas », lui, passe par <code>formatNumber(kcal)</code>.</p>
   </details>
   <div class="exemple"><p>Camille, 168 cm, pesée à 89,4 kg le 10/09, 6 480 pas le 12/09 : foulée 0,00069552 km ; 6 480 × 0,00069552 = 4,507 km ; 4,507 / 4,2 = 1,0731 h ; 3,5 × 89,4 × 1,0731 = 335,8 → 336 kcal.</p></div>
 
@@ -249,7 +252,7 @@ valeur de tuile :
   <div class="exemple"><p>Camille, le 10/09 : 9 680 pas → 9 680 / 1 000 = 9,68 → <code>formatNumber(9.68, 1)</code> = « 9.7 » → tuile « 9.7k ». Bulle : « 9 680 pas », « 1h42 », « 4.2 km/h ».</p></div>
 
   <h3 id="pas-coquille-commune-des-calendriers">Coquille commune des calendriers</h3>
-  <p><code>CalendarBlock</code> porte la grille, la navigation et la bulle pour les sept calendriers du site ; le domaine ne fournit que la carte des entrées et les deux rendus.</p>
+  <p><code>CalendarBlock</code> porte la grille, la navigation et la bulle pour les huit calendriers de la version Mixte — injections, poids, repas, effets secondaires, sommeil, sport, temps pour soi, pas ; le domaine ne fournit que la carte des entrées et les deux rendus.</p>
   <pre><code>grille       = monthGrid(année, mois), lundi → dimanche, semaines complétées
 minKey       = min(mois courant, mois de la plus ancienne clé de entriesByDate)
 maxKey       = mois courant
@@ -276,8 +279,8 @@ bulle ouverte :
   <p>La barre et le texte d'une ligne emploient le même quotient, mais un seul des deux est plafonné.</p>
   <pre><code>largeur de barre = `${Math.min(100, Math.round(log.steps / (objectif || 8000) × 100))}%`
 texte            = `${Math.round(log.steps / (objectif || 8000) × 100)}%`   // sans plafond</code></pre>
-  <p>La ligne écrit aussi <code>-{getStepsCaloriesForLog(...)} kcal</code> et, si <code>log.date === todayStr</code>, la mention « (en cours) ». La date est reconstruite sur place à partir des trois segments, en JJ/MM/AAAA, sans passer par <code>formatDateShort</code>. Le composant <code>StepsJournalRow</code> est monté à l'identique par la page et par la surimpression du tiroir Journal. <a href="spec-fonctionnelle.html#pas-journal-des-pas">→ fonctionnelle</a></p>
-  <p class="ancre">src/versions/mixte/features/steps/StepsJournalRow.tsx</p>
+  <p>La ligne écrit aussi <code>-{getStepsCaloriesForLog(...)} kcal</code> et, si <code>log.date === todayStr</code>, la mention « (en cours) ». La date est reconstruite sur place à partir des trois segments, en JJ/MM/AAAA, sans passer par <code>formatDateShort</code>. <code>StepsJournalRow</code> est monté par la page et par la surimpression du tiroir Journal avec la même mise en page, mais pas avec le même geste : la page passe <code>onDeleteStep={onDeleteStep}</code>, c'est-à-dire le vrai <code>handleDeleteStep</code> ; le tiroir passe <code>onDeleteStep={versLaPage}</code>, où <code>versLaPage = () =&gt; onNavigate(tabId)</code> — le « Supprimer » de son menu à trois points ne supprime rien, il ouvre la page des pas. <a href="spec-fonctionnelle.html#pas-journal-des-pas">→ fonctionnelle</a></p>
+  <p class="ancre">src/versions/mixte/features/steps/StepsJournalRow.tsx · src/versions/mixte/features/steps/StepsJournal.tsx · src/versions/mixte/components/JournalDrawer.tsx</p>
   <details><summary>Cas limites</summary>
     <p>Une date qui n'a pas trois segments est affichée telle quelle.</p>
     <p>La barre sature à 100 % pendant que le texte continue de monter : c'est le seul endroit du module où les deux divergent volontairement.</p>
@@ -293,11 +296,11 @@ sortedHistory = [...stepHistory].sort((a, b) =&gt; b.date.localeCompare(a.date))
 period      = usePeriodWindow('steps_journal')      // clé glp1_period_steps_journal
 listHistory = filterByTimeWindow(sortedHistory, period.window,
                                  log =&gt; log.date, period.rangeForFilter)</code></pre>
-  <p>Le tri est fait sur la seule date, par <code>localeCompare</code> de chaînes AAAA-MM-JJ : deux relevés de la même date gardent leur ordre d'insertion (tri stable). Le compte du bandeau, « Journal (N) », est <code>sortedHistory.length</code> du composant, c'est-à-dire la longueur de la liste <em>filtrée</em> qui lui est passée ; <code>totalCount</code>, séparé, ne sert qu'à choisir entre les deux messages de liste vide. La liste défile dans une boîte de 160 px de haut.</p>
+  <p>Le tri est fait sur la seule date, par <code>localeCompare</code> de chaînes AAAA-MM-JJ : deux relevés de la même date gardent leur ordre d'insertion (tri stable). Le compte du bandeau, « Journal (N) », est <code>sortedHistory.length</code> du composant, c'est-à-dire la longueur de la liste <em>filtrée</em> qui lui est passée ; <code>totalCount</code>, séparé, ne sert qu'à choisir entre les deux messages de liste vide. La liste vit dans une boîte de 160 px de haut <em>au plus</em> (<code>max-h-[160px] overflow-y-auto</code>) : une liste courte prend sa hauteur naturelle et ne défile pas.</p>
   <p class="ancre">src/features/steps/useStepsStats.ts · src/features/steps/useStepsJournal.ts · src/versions/mixte/features/steps/StepsJournal.tsx</p>
   <details><summary>Cas limites</summary>
     <p><code>totalCount === 0</code> → « Aucun pas enregistré pour l'instant. Commencez à marcher ! » ; sinon → « Aucun pas enregistré sur cette période. ».</p>
-    <p>La surimpression du tiroir Journal monte les mêmes lignes sans filtre de période ni boîte de défilement : elle lit <code>sortedHistory</code>, pas <code>listHistory</code>.</p>
+    <p>La surimpression du tiroir Journal ne lit ni <code>listHistory</code> ni <code>sortedHistory</code> : elle ne monte pas <code>useStepsStats</code> et retrie <code>appData.stepLogs</code> elle-même, par <code>b.date.localeCompare(a.date)</code>. Ni filtre de période, ni boîte de défilement.</p>
   </details>
 
   <h3 id="pas-selecteur-de-periode-commun">Sélecteur de période commun</h3>
@@ -470,7 +473,7 @@ ligne 3 = point.steps &gt;= dailyGoalSteps
 trendDates(days, today) : les 14 dates locales, de J−13 à aujourd'hui
 
 stepsTrend(stepLogs, days = 14, today) :
-    si stepLogs vide → []                        // série vide, pas de carte
+    si stepLogs vide → []                        // série vide
     return trendDates(...).map(date =&gt;
         stepLogs.find(log =&gt; log.date === date)?.steps ?? 0)
 
@@ -485,10 +488,12 @@ stepsTrendKcalPerDay(stepLogs, weightHistory, profile, days = 14, today) :
     si journees vide → null
     return Σ getStepsCaloriesForLog(log.steps, log.date, …) / journees.length
 affichage : si kcalJ !== null &amp;&amp; kcalJ &gt;= 1 → `−${Math.round(kcalJ)} kcal/j`</code></pre>
-  <p>Les deux valeurs de la même carte n'ont pas le même dénominateur : la moyenne en Kpas divise par 14 puisque les jours sans relevé valent 0, la dépense ne divise que par les journées relevées. La carte n'est pas dessinée si la série est vide (« Pas encore de données ») ni si elle est plate (« Pas encore de tendance » : il faut deux valeurs connues et différentes). <a href="spec-fonctionnelle.html#pas-tiroir-tendances">→ fonctionnelle</a></p>
+  <p>Les deux valeurs de la même carte n'ont pas le même dénominateur : la moyenne en Kpas divise par 14 puisque les jours sans relevé valent 0, la dépense ne divise que par les journées relevées.</p>
+  <p>La carte est <strong>toujours dessinée</strong> ; c'est sa seule zone de courbe qui change. <code>hasShape(series)</code> — au moins deux valeurs non nulles, et un minimum différent du maximum — décide entre la sparkline et une invite. L'invite écrit « Pas encore de tendance » si la série porte au moins une valeur connue, « Pas encore de données » sinon, puis un lien cliquable, « Voir mes pas », qui mène à la page des pas et arrête la propagation du clic. <a href="spec-fonctionnelle.html#pas-tiroir-tendances">→ fonctionnelle</a></p>
   <p class="ancre">src/features/trends/trends.ts · src/versions/mixte/components/TrendDrawer.tsx</p>
   <details><summary>Cas limites</summary>
     <p><code>stepsTrend</code> ne pose jamais <code>null</code> : la distinction « journée non relevée / journée immobile » n'existe plus dans cette série, elle vit dans les journaux.</p>
+    <p>Journal totalement vide : <code>stepsTrend</code> rend <code>[]</code>, aucune valeur connue → « Pas encore de données ». Journal non vide mais série plate (une seule journée relevée, ou 14 journées à la même valeur) → « Pas encore de tendance ».</p>
     <p>Une dépense inférieure à 1 kcal/j n'est pas affichée : le test est <code>kcalJ &gt;= 1</code>.</p>
     <p>Les relevés futurs ne sont pas dans la fenêtre : <code>trendDates</code> s'arrête à aujourd'hui.</p>
     <p>Les journées simulées comptent comme les autres.</p>

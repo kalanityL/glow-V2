@@ -4,13 +4,19 @@
    "categorie": "chiffre",
    "fonctionnalite": "Base alimentaire",
    "texte": "« La table Ciqual compte 3 479 entrées » — le commentaire de src/data/mealConstants.ts et celui de food.resolve.ts l'affirment tous les deux, mais le fichier src/data/ciqual.json en contient 3 258. J'ai écrit 3 258 (+ 2 entrées manuelles = 3 260), qui est le compte réel et celui de la spec fonctionnelle ; les deux commentaires du dépôt sont périmés.",
-   "origine": "Écart entre les commentaires du code et le contenu du fichier de données."
+   "origine": "Écart entre les commentaires du code et le contenu du fichier de données. Recompté cette fois par lecture de ciqual.json : 3 258."
   },
   {
    "categorie": "valeur",
    "fonctionnalite": "Exemple chiffré des fiches Ciqual",
-   "texte": "Les valeurs pour 100 g attribuées à « Lentille cuite à l'eau » (125 kcal, 10 g de protéines, 16 g de glucides, 0,5 g de lipides, 8,5 g de fibres), à « Tomate crue » (19 kcal) et à « Huile d'olive vierge extra » (900 kcal) sont reconstituées à rebours des totaux de la spec fonctionnelle, pas relevées dans ciqual.json.",
-   "origine": "Besoin d'un exemple chiffré cohérent avec Camille sans avoir relevé les lignes exactes de la table."
+   "texte": "CORRIGÉ. Les valeurs pour 100 g étaient reconstituées à rebours des totaux de la spec fonctionnelle. Elles sont désormais relevées dans src/data/ciqual.json : « Lentille cuite à l'eau » (alim_code 20360) = 125 / 10,1 / 16,2 / 0,6 / 8,4 ; « Tomate crue » (20385) = 19,2 kcal ; « Huile d'olive vierge extra » (17270) = 899 kcal, isLiquid. Les exemples « Apport d'une quantité » et « Valeurs d'une recette pour 100 g » sont recalculés sur ces valeurs.",
+   "origine": "Réfutation retenue : un exemple qui cite une entrée par son nom doit citer ses vraies valeurs. Plus d'invention sur ce point."
+  },
+  {
+   "categorie": "valeur",
+   "fonctionnalite": "Exemple de tri des suggestions",
+   "texte": "L'exemple citait « Sauce tomate », qui n'est le nom affiché d'aucune entrée. Remplacé par « Jus de tomate » et « Sauce tomate aux olives », deux noms affichés réels, ce qui inverse au passage l'ordre annoncé (le plus court d'abord).",
+   "origine": "Vérification des noms affichés dans ciqual.json au moment de corriger l'exemple des lentilles."
   },
   {
    "categorie": "valeur",
@@ -41,157 +47,139 @@
    "fonctionnalite": "Barre floutée du verrou de comparaison",
    "texte": "Les parts 27 / 41 / 28 / 4 de la barre bidon sont reprises du commentaire de mealSurimpression.ts et de la spec fonctionnelle ; je n'ai pas ouvert le gabarit qui les dessine pour les vérifier ligne à ligne.",
    "origine": "Valeurs citées dans un commentaire, non relues dans le JSX."
+  },
+  {
+   "categorie": "comportement",
+   "fonctionnalite": "Chargement des favoris",
+   "texte": "SUPPRIMÉ : « Deux lecteurs partagent cette fonction : la page Menus… et la couche vitrée ». Faux. loadFavoriteMeals/saveFavoriteMeals n'ont qu'un appelant, FormulaireRepasEnSurimpression.tsx:187 et :198 ; la page Menus recopie les deux filtres dans son initialiseur d'état (MealTracker.tsx:127-138) et persiste par setItem (ligne 636). Le chapitre décrit maintenant la duplication et la marque « arbitrage non validé ».",
+   "origine": "Réfutation retenue, vérifiée par grep."
+  },
+  {
+   "categorie": "comportement",
+   "fonctionnalite": "Refus de validation du formulaire de repas",
+   "texte": "SUPPRIMÉ : l'ordre d'évaluation présenté comme celui du seul submit du crochet. Le onSubmit du gabarit (MealForm.tsx:674-687) juge avant et appelle preventDefault() : titre de favori vide et lignes non résolues bloquent avant tout le reste. Conséquences ajoutées en cas limites : « Ajoutez au moins un aliment » est inatteignable sur une ligne unique non reconnue, et un titre vide ne fait pas monter les compteurs de sélection.",
+   "origine": "Réfutation retenue, vérifiée à la ligne."
+  },
+  {
+   "categorie": "comportement",
+   "fonctionnalite": "Ligne de saisie valide",
+   "texte": "SUPPRIMÉ : « Le foodId n'est posé que par draftItemFromFood ». Un second chemin le pose, resolveItemWithNewFood (useMealForm.ts:241-244), appelé quand l'aliment vient d'être créé depuis la ligne (MealTracker.tsx:383).",
+   "origine": "Réfutation retenue."
+  },
+  {
+   "categorie": "comportement",
+   "fonctionnalite": "Total kcal d'un jour",
+   "texte": "SUPPRIMÉ : « deux blocs qui disent le même total ne peuvent pas se contredire », appuyé sur une fonction unique. Le carré « Aujourd'hui » (DailyNutritionSummary.tsx:20-29 et :104) a son propre réducteur sumMeals, qui somme les cinq champs ; il n'importe pas nutritionTotalsOn. La liste réelle des appelants a été relevée par grep (calendrier, couche vitrée, MaisonSections, moyennes, tendances, sommeil, rapport) et l'exception est marquée « arbitrage non validé ».",
+   "origine": "Réfutation retenue."
+  },
+  {
+   "categorie": "comportement",
+   "fonctionnalite": "Pourcentage d'objectif",
+   "texte": "SUPPRIMÉ : « la valeur passée est le total NON ARRONDI de nutritionTotalsOn ». La valeur vient de sumMeals(todayMeals), réducteur local du composant. Le pseudo-code et l'infobulle exacte (`${label} ${Math.round(valeur)} g / ${objectif} g (${pct} %)`) sont rétablis d'après DailyNutritionSummary.tsx:104 et :198.",
+   "origine": "Réfutation retenue."
+  },
+  {
+   "categorie": "texte",
+   "fonctionnalite": "Suppression d'un aliment personnalisé",
+   "texte": "SUPPRIMÉ : la chaîne lissée « des recettes « A », « B » et « C ». ». Le code (customFood.utils.ts:157-159) concatène `de ${accord}` sans contraction et produit littéralement « … est un ingrédient de les recettes « A », « B » et « C ». ». La faute d'accord est désormais citée telle quelle et marquée « arbitrage non validé ».",
+   "origine": "Réfutation retenue."
+  },
+  {
+   "categorie": "comportement",
+   "fonctionnalite": "Titre d'un favori",
+   "texte": "SUPPRIMÉ de la première ligne du tableau : le repli formatItemNames(...).slice(0,30) présenté comme actif depuis le formulaire de repas. Il est écrit dans useMealForm.ts:454-455 mais inatteignable, le gabarit refusant le titre vide avant submit. La colonne le dit maintenant, et signale que le repli ne sert qu'au menu « … » du journal.",
+   "origine": "Réfutation retenue."
+  },
+  {
+   "categorie": "texte",
+   "fonctionnalite": "Recherche par code-barres",
+   "texte": "SUPPRIMÉ : la mention « Valeurs préremplies via code-barres (Open Food Facts) » attribuée au scanner de la page Menus. MealTracker.tsx:983 écrit « Valeurs préremplies via code-barres » sans le lien ; seul CustomFoodPage.tsx:133-141 ajoute « (Open Food Facts) ». Les deux libellés sont maintenant distingués.",
+   "origine": "Réfutation retenue."
+  },
+  {
+   "categorie": "comportement",
+   "fonctionnalite": "Fenêtres de période — histogramme par créneau",
+   "texte": "CORRIGÉ : « non monté » était écrit sans borne. useTimeOfDayChart existe et est monté ailleurs dans la version Mixte ; la mention est ramenée à ce qui est vérifiable dans le périmètre : la page Menus ne le monte pas. Les écrans de thème restent hors périmètre et ne sont donc pas cités.",
+   "origine": "Réfutation retenue, tempérée par la règle de périmètre (thèmes exclus)."
   }
  ],
  "glossaire": [
   {
    "terme": "SavedMealLog",
-   "definition": "Ligne de journal d'une prise alimentaire : date locale, heure HH:MM, type, composition en items, cache des cinq valeurs nutritionnelles, faim avant et après."
+   "definition": "Ligne stockée d'une prise (repas ou en-cas) : date, heure, type, composition, cinq valeurs nutritionnelles en cache, deux faims facultatives."
   },
   {
    "terme": "FoodQuantity",
-   "definition": "Quantité d'un aliment dans une composition : référence par identifiant (foodId + isCustomFood) et quantité en grammes ou millilitres."
+   "definition": "Élément d'une composition : référence d'aliment (foodId, isCustomFood) et quantité en grammes ou millilitres."
   },
   {
    "terme": "ResolvedFood",
    "definition": "Fiche d'aliment normalisée, construite à la lecture depuis Ciqual ou la base personnelle ; jamais stockée."
   },
   {
-   "terme": "fullCiqualDb",
-   "definition": "Base alimentaire de référence : les 3 258 entrées de ciqual.json plus les 2 entrées écrites à la main, soit 3 260 aliments."
+   "terme": "DraftItem",
+   "definition": "Ligne de saisie du formulaire : quantité sous forme de chaîne, nom d'affichage transitoire ; convertie en FoodQuantity à l'enregistrement."
   },
   {
-   "terme": "nom affiché",
-   "definition": "Résultat de foodDisplayName : nom court de l'entrée, à défaut nom court de l'entrée dont le libellé officiel est identique, à défaut le libellé officiel."
+   "terme": "computeItemsNutrition",
+   "definition": "Somme des apports d'une composition ; les items dont l'aliment ne se résout pas sont ignorés, pas comptés zéro."
   },
   {
-   "terme": "facteurs d'Atwater",
-   "definition": "4 kcal par gramme de protéines et de glucides, 9 pour les lipides, 2 pour les fibres ; base des parts caloriques du dépôt."
+   "terme": "nutritionTotalsOn",
+   "definition": "Cumul des calories, protéines et fibres des prises d'une date donnée ; source commune du calendrier, de la couche vitrée, des moyennes, des tendances et du rapport — le carré « Aujourd'hui » fait exception avec son réducteur local sumMeals."
   },
   {
-   "terme": "part de masse",
-   "definition": "Part d'un nutriment dans la somme des quatre masses en grammes d'un créneau ; base de la composition par créneau, distincte de la part calorique."
+   "terme": "mealTypeLabel / mealFamilyLabel",
+   "definition": "Seules autorités du libellé d'un type de prise et de sa famille ; tout type inconnu est un en-cas."
   },
   {
-   "terme": "méthode des plus forts restes",
-   "definition": "Répartition d'un total de 100 en entiers : chaque part prend sa troncature, puis les points manquants vont aux plus grandes parties décimales."
+   "terme": "Facteurs d'Atwater",
+   "definition": "Conversion masse → énergie employée pour les parts caloriques : protéines 4, glucides 4, lipides 9, fibres 2 kcal/g."
   },
   {
-   "terme": "créneau",
-   "definition": "Tranche de trois heures indexée par floor(heure / 3) ; huit créneaux de 0-3h à 21-24h, toujours tous rendus."
+   "terme": "Plus fort reste",
+   "definition": "Méthode d'arrondi d'un jeu de pourcentages : planchers entiers, puis les points restants aux plus fortes parties décimales, pour que la somme fasse exactement 100."
   },
   {
-   "terme": "withoutTime",
-   "definition": "Nombre de prises écartées d'un bloc par créneau faute d'heure exploitable ; annoncé par une note quand il est non nul."
+   "terme": "Créneau",
+   "definition": "Tranche de trois heures, huit par jour, indexée par floor(heure / 3) ; unité commune des tableaux et graphes par heure."
   },
   {
-   "terme": "journée renseignée",
-   "definition": "Journée portant au moins une prise ; dénominateur de toutes les moyennes par jour du domaine."
+   "terme": "Fenêtre de période",
+   "definition": "Choix 7 / 14 / 30 / 90 jours, tout, ou bornes libres ; une clé de stockage et un défaut par bloc, comparaison sur les chaînes AAAA-MM-JJ."
   },
   {
-   "terme": "moyenne par prise",
-   "definition": "Somme divisée par le nombre de prises, et non par le nombre de journées ; employée par la couche vitrée, les créneaux et « Repas vs en-cas »."
+   "terme": "Couche vitrée",
+   "definition": "Surimpression Menus de l'accueil : lecture des prises du jour et de la moyenne par prise, saisie possible, sans quitter l'accueil."
   },
   {
-   "terme": "fenêtre de période",
-   "definition": "Sélection 7 / 14 / 30 / 90 derniers jours (jour courant inclus), Depuis le début ou Choisir, retenue par bloc sous glp1_period_<bloc>."
+   "terme": "Palier nutritif",
+   "definition": "Franchissement, une fois par jour et par nutriment, de la recommandation en protéines ou en fibres ; mémorisé sous glp1_paliers_nutritifs_fetes."
   },
   {
-   "terme": "coupure",
-   "definition": "Date de début d'une fenêtre fixe : aujourd'hui moins (n − 1) jours, en chaîne AAAA-MM-JJ locale."
-  },
-  {
-   "terme": "plafond quotidien",
-   "definition": "Borne de création par jour local qui refuse sans jamais écraser : 30 prises par date, 50 favoris, 50 aliments, 20 recettes."
-  },
-  {
-   "terme": "createdAt",
-   "definition": "Instant de création en millisecondes, posé à la création seule ; sert aux plafonds quotidiens. Une entrée qui n'en porte pas n'est comptée dans aucun quota."
-  },
-  {
-   "terme": "palier nutritif",
-   "definition": "Franchissement d'une recommandation du jour en protéines ou en fibres, félicité une seule fois par jour et par nutriment."
-  },
-  {
-   "terme": "objectif du jour",
-   "definition": "Triplet calories / protéines / fibres, issu du profil ou de ses défauts : 1400 kcal, poids actuel × 1,5 g, 25 g."
-  },
-  {
-   "terme": "BarcodeLookupError",
-   "definition": "Erreur typée d'une recherche Open Food Facts, portant sa cause dans failure : injoignable (rien n'est revenu) ou service (réponse fautive)."
-  },
-  {
-   "terme": "modules EAN",
-   "definition": "Suite de 95 (EAN-13) ou 67 (EAN-8) caractères 0/1 décrivant les barres et les espaces d'un code, calculée localement depuis son numéro."
-  },
-  {
-   "terme": "recette",
-   "definition": "Aliment personnalisé marqué isRecipe, portant sa composition dans recipeIngredients et ses valeurs ramenées à 100 g."
-  },
-  {
-   "terme": "favori (menu)",
-   "definition": "Composition nommée, avec son type, sans date ni heure ni faim ; recopiée avec de nouveaux identifiants dans les deux sens."
+   "terme": "Plafond quotidien",
+   "definition": "Refus de création au-delà d'un compte du jour : 30 prises, 50 menus favoris, 50 aliments, 20 recettes. Refuse, n'écrase jamais."
   }
  ],
  "index": [
   {
-   "terme": "Anses / Ciqual (mention)",
-   "ancre": "alimentation-base-alimentaire-et-recherche"
-  },
-  {
-   "terme": "Apport d'une composition",
-   "ancre": "alimentation-apport-d-une-composition"
-  },
-  {
-   "terme": "Apport d'une quantité",
-   "ancre": "alimentation-apport-d-une-quantite"
-  },
-  {
-   "terme": "Arrondi de l'heure",
-   "ancre": "alimentation-heure-arrondie-vers-le-bas"
+   "terme": "Aliment personnalisé",
+   "ancre": "alimentation-aliment-personnalise-validation-et-identite"
   },
   {
    "terme": "Atwater (facteurs)",
    "ancre": "alimentation-parts-caloriques-des-nutriments"
   },
   {
-   "terme": "Axe des grammes",
-   "ancre": "alimentation-graphe-des-apports-par-jour"
-  },
-  {
-   "terme": "Axe des kcal",
-   "ancre": "alimentation-graphe-des-apports-par-jour"
-  },
-  {
-   "terme": "Bandeau de confirmation",
-   "ancre": "alimentation-page-menus-repas-et-en-cas"
-  },
-  {
-   "terme": "Barres (parts entières)",
-   "ancre": "alimentation-parts-entieres-des-barres"
-  },
-  {
-   "terme": "Cellule de pourcentage",
-   "ancre": "alimentation-ecriture-d-une-cellule-de-pourcentage"
-  },
-  {
-   "terme": "Chargement de la sauvegarde",
-   "ancre": "alimentation-chargement-de-la-sauvegarde-des-repas"
-  },
-  {
-   "terme": "Chargement des favoris",
-   "ancre": "alimentation-chargement-des-favoris"
-  },
-  {
-   "terme": "Clé de contrôle EAN",
-   "ancre": "alimentation-dessin-du-code-barres"
+   "terme": "Base Ciqual",
+   "ancre": "alimentation-base-alimentaire-et-recherche"
   },
   {
    "terme": "Code-barres (chemin)",
    "ancre": "alimentation-recherche-par-code-barres-chemin"
   },
   {
-   "terme": "Code-barres (dessin)",
+   "terme": "Code-barres (dessin EAN)",
    "ancre": "alimentation-dessin-du-code-barres"
   },
   {
@@ -199,51 +187,39 @@
    "ancre": "alimentation-erreurs-de-recherche-par-code-barres"
   },
   {
-   "terme": "Comparaison (déblocage)",
-   "ancre": "alimentation-deblocage-de-la-comparaison"
+   "terme": "Compteur de sélection",
+   "ancre": "alimentation-compteur-de-selection"
+  },
+  {
+   "terme": "Composition (apport)",
+   "ancre": "alimentation-apport-d-une-composition"
+  },
+  {
+   "terme": "Composition (texte)",
+   "ancre": "alimentation-texte-d-une-composition"
   },
   {
    "terme": "Composition par créneau",
    "ancre": "alimentation-composition-par-creneau"
   },
   {
-   "terme": "Compteur de sélection",
-   "ancre": "alimentation-compteur-de-selection"
-  },
-  {
-   "terme": "Copie d'un favori",
-   "ancre": "alimentation-contenu-et-copie-d-un-favori"
-  },
-  {
-   "terme": "Correspondance repas / favori",
-   "ancre": "alimentation-correspondance-repas-favori"
-  },
-  {
-   "terme": "Créneaux hauts",
-   "ancre": "alimentation-creneaux-hauts-et-surlignage"
+   "terme": "Couche vitrée (ouverture)",
+   "ancre": "alimentation-ouverture-de-la-couche-menus-en-saisie-ou-en-lecture"
   },
   {
    "terme": "Créneaux horaires",
    "ancre": "alimentation-creneaux-horaires"
   },
   {
-   "terme": "Date et heure par défaut",
-   "ancre": "alimentation-date-et-heure-par-defaut-du-formulaire"
-  },
-  {
-   "terme": "Diaporama (ordre des vues)",
-   "ancre": "alimentation-ordre-des-vues-du-diaporama"
-  },
-  {
-   "terme": "Éditions en place du journal",
-   "ancre": "alimentation-editions-en-place-du-journal"
+   "terme": "Créneaux hauts",
+   "ancre": "alimentation-creneaux-hauts-et-surlignage"
   },
   {
    "terme": "Entités du domaine",
    "ancre": "alimentation-entites"
   },
   {
-   "terme": "Faim (défauts 2 et 0)",
+   "terme": "Faim avant / après",
    "ancre": "alimentation-faim-avant-apres"
   },
   {
@@ -259,12 +235,56 @@
    "ancre": "alimentation-famille-repas-en-cas"
   },
   {
+   "terme": "Favori (chargement)",
+   "ancre": "alimentation-chargement-des-favoris"
+  },
+  {
+   "terme": "Favori (copie)",
+   "ancre": "alimentation-contenu-et-copie-d-un-favori"
+  },
+  {
+   "terme": "Favori (correspondance)",
+   "ancre": "alimentation-correspondance-repas-favori"
+  },
+  {
+   "terme": "Favori (reprise comme base)",
+   "ancre": "alimentation-reprise-d-un-favori-comme-base"
+  },
+  {
+   "terme": "Favori (titre)",
+   "ancre": "alimentation-titre-d-un-favori"
+  },
+  {
    "terme": "Fenêtres de période",
    "ancre": "alimentation-fenetres-de-periode"
   },
   {
+   "terme": "Graphe des apports",
+   "ancre": "alimentation-graphe-des-apports-par-jour"
+  },
+  {
+   "terme": "Heure arrondie",
+   "ancre": "alimentation-heure-arrondie-vers-le-bas"
+  },
+  {
+   "terme": "Journal (tri, pagination)",
+   "ancre": "alimentation-tri-et-pagination-du-journal"
+  },
+  {
+   "terme": "Journal (éditions en place)",
+   "ancre": "alimentation-editions-en-place-du-journal"
+  },
+  {
+   "terme": "Journée (totaux du journal)",
+   "ancre": "alimentation-totaux-d-une-journee-dans-le-journal"
+  },
+  {
    "terme": "Ligne de saisie valide",
    "ancre": "alimentation-ligne-de-saisie-valide"
+  },
+  {
+   "terme": "Migration des repas",
+   "ancre": "alimentation-chargement-de-la-sauvegarde-des-repas"
   },
   {
    "terme": "Mode modification (rappel)",
@@ -275,12 +295,12 @@
    "ancre": "alimentation-moyenne-par-prise-sur-une-periode"
   },
   {
-   "terme": "Moyennes depuis le début",
-   "ancre": "alimentation-moyennes-depuis-le-debut"
-  },
-  {
    "terme": "Moyennes 7 derniers jours",
    "ancre": "alimentation-moyennes-des-7-derniers-jours"
+  },
+  {
+   "terme": "Moyennes depuis le début",
+   "ancre": "alimentation-moyennes-depuis-le-debut"
   },
   {
    "terme": "Nom affiché d'un aliment",
@@ -291,19 +311,11 @@
    "ancre": "alimentation-objectifs-nutritionnels-du-jour"
   },
   {
-   "terme": "Open Food Facts (vérification)",
+   "terme": "Open Food Facts (fiche)",
    "ancre": "alimentation-fiche-open-food-facts-verification"
   },
   {
-   "terme": "Ouverture de la couche Menus",
-   "ancre": "alimentation-ouverture-de-la-couche-menus-en-saisie-ou-en-lecture"
-  },
-  {
-   "terme": "Pagination du journal",
-   "ancre": "alimentation-tri-et-pagination-du-journal"
-  },
-  {
-   "terme": "Paliers protéines et fibres",
+   "terme": "Paliers protéines / fibres",
    "ancre": "alimentation-paliers-proteines-et-fibres"
   },
   {
@@ -311,19 +323,23 @@
    "ancre": "alimentation-parts-caloriques-des-nutriments"
   },
   {
+   "terme": "Parts entières des barres",
+   "ancre": "alimentation-parts-entieres-des-barres"
+  },
+  {
    "terme": "Phrase de moyenne",
    "ancre": "alimentation-phrase-de-moyenne"
   },
   {
-   "terme": "Plafond de 30 prises par jour",
+   "terme": "Plafond 30 prises / jour",
    "ancre": "alimentation-plafond-de-30-repas-ou-en-cas-par-jour"
   },
   {
-   "terme": "Plafond de 50 favoris par jour",
+   "terme": "Plafond 50 favoris / jour",
    "ancre": "alimentation-plafond-de-50-favoris-crees-par-jour"
   },
   {
-   "terme": "Plafonds de la bibliothèque",
+   "terme": "Plafonds bibliothèque",
    "ancre": "alimentation-plafonds-de-creation-de-la-bibliotheque"
   },
   {
@@ -335,11 +351,15 @@
    "ancre": "alimentation-pourcentage-de-la-recommandation-accueil"
   },
   {
-   "terme": "Prises du jour (couche vitrée)",
+   "terme": "Prises du jour (couche)",
    "ancre": "alimentation-prises-du-jour-dans-la-couche-vitree"
   },
   {
-   "terme": "Quantité d'un item",
+   "terme": "Quantité (apport)",
+   "ancre": "alimentation-apport-d-une-quantite"
+  },
+  {
+   "terme": "Quantité (bornes de saisie)",
    "ancre": "alimentation-quantite-d-un-item"
   },
   {
@@ -351,35 +371,23 @@
    "ancre": "alimentation-recette-validation-et-identite"
   },
   {
-   "terme": "Recherche d'aliments (score)",
-   "ancre": "alimentation-base-alimentaire-et-recherche"
-  },
-  {
-   "terme": "Refus du formulaire de repas",
+   "terme": "Refus de validation",
    "ancre": "alimentation-refus-de-validation-du-formulaire-de-repas"
-  },
-  {
-   "terme": "Repartition par créneau",
-   "ancre": "alimentation-repartition-par-creneau"
   },
   {
    "terme": "Repas vs en-cas",
    "ancre": "alimentation-composition-repas-vs-en-cas"
   },
   {
-   "terme": "Reprise d'un favori",
-   "ancre": "alimentation-reprise-d-un-favori-comme-base"
+   "terme": "Répartition par créneau",
+   "ancre": "alimentation-repartition-par-creneau"
   },
   {
    "terme": "Suppression d'un aliment",
    "ancre": "alimentation-suppression-d-un-aliment-personnalise"
   },
   {
-   "terme": "Surlignage de colonne",
-   "ancre": "alimentation-ecriture-d-une-cellule-de-pourcentage"
-  },
-  {
-   "terme": "Tableau / barres (bascule)",
+   "terme": "Tableau / barres (présentation)",
    "ancre": "alimentation-presentation-tableau-barres"
   },
   {
@@ -387,20 +395,8 @@
    "ancre": "alimentation-tendance-des-kcal"
   },
   {
-   "terme": "Texte d'une composition",
-   "ancre": "alimentation-texte-d-une-composition"
-  },
-  {
-   "terme": "Titre d'un favori",
-   "ancre": "alimentation-titre-d-un-favori"
-  },
-  {
    "terme": "Total kcal d'un jour",
    "ancre": "alimentation-total-kcal-d-un-jour-calendrier-couche-tuiles"
-  },
-  {
-   "terme": "Totaux d'une journée (journal)",
-   "ancre": "alimentation-totaux-d-une-journee-dans-le-journal"
   },
   {
    "terme": "Unités et conversions",
@@ -411,11 +407,32 @@
    "ancre": "alimentation-valeurs-nutritionnelles-d-un-repas-ecrit"
   },
   {
-   "terme": "Validation d'un aliment personnalisé",
-   "ancre": "alimentation-aliment-personnalise-validation-et-identite"
+   "terme": "Verrou de comparaison",
+   "ancre": "alimentation-deblocage-de-la-comparaison"
+  },
+  {
+   "terme": "Vues du diaporama",
+   "ancre": "alimentation-ordre-des-vues-du-diaporama"
+  },
+  {
+   "terme": "Cellule de pourcentage",
+   "ancre": "alimentation-ecriture-d-une-cellule-de-pourcentage"
+  },
+  {
+   "terme": "Bandeau de confirmation",
+   "ancre": "alimentation-page-menus-repas-et-en-cas"
+  },
+  {
+   "terme": "Date et heure par défaut",
+   "ancre": "alimentation-date-et-heure-par-defaut-du-formulaire"
+  },
+  {
+   "terme": "Compte repas / snacks",
+   "ancre": "alimentation-compte-repas-snacks-d-un-jour"
   }
  ],
  "ancres_traitees": [
+  "alimentation-entites",
   "alimentation-page-menus-repas-et-en-cas",
   "alimentation-base-alimentaire-et-recherche",
   "alimentation-chargement-de-la-sauvegarde-des-repas",

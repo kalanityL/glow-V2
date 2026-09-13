@@ -3,7 +3,17 @@
   <p>Ce chapitre décrit le verrou d'accès, la sauvegarde locale et leur effacement : entités, clés de stockage, ordre des conversions au chargement, codes d'erreur et messages, ordre de la suppression de compte. Les écrans correspondants sont décrits dans la spécification fonctionnelle <a href="spec-fonctionnelle.html#compte">→ fonctionnelle</a>.</p>
 
   <h3 id="compte-entites">Entités</h3>
-  <p>Un seul objet du domaine est stocké : <code>AppData</code>, sérialisé en JSON sous une clé unique. Les objets d'authentification ne sont jamais écrits par l'application : le SDK Firebase les détient.</p>
+  <p>Trois objets du domaine sont stockés, chacun sérialisé en JSON sous sa propre clé. Les objets d'authentification ne sont jamais écrits par l'application : le SDK Firebase les détient.</p>
+
+  <table>
+    <thead><tr><th>Clé</th><th>Contenu</th><th>Écrit par</th></tr></thead>
+    <tbody>
+      <tr><td><code>glp1_app_companion_data</code></td><td><code>AppData</code> — le suivi entier</td><td><code>useAppData</code></td></tr>
+      <tr><td><code>glp1_user_custom_foods</code></td><td><code>UserCustomFood[]</code>, alias de <code>CiqualFood</code> : <code>alim_code</code>, <code>alim_nom_fr</code>, <code>calories</code>, <code>protein</code>, <code>carbs</code>, <code>fat</code>, <code>fiber</code></td><td>un effet d'<code>App</code></td></tr>
+      <tr><td><code>glp1_favorite_meals</code></td><td><code>FavoriteMealItem[]</code> : <code>id</code>, <code>title</code>, <code>type</code>, <code>items</code>, <code>createdAt?</code></td><td><code>saveFavoriteMeals</code></td></tr>
+    </tbody>
+  </table>
+  <p>Les deux dernières ne passent pas par <code>AppData</code> et ne subissent aucune des conversions décrites plus bas ; leur contenu relève du chapitre repas. La mise en garde de la suppression de compte les nomme (« favoris, recettes, aliments »). Ce chapitre décrit <code>AppData</code>.</p>
 
   <table>
     <thead><tr><th>Champ d'<code>AppData</code></th><th>Type</th><th>Facultatif</th><th>Remarque</th></tr></thead>
@@ -20,7 +30,7 @@
       <tr><td><code>sleepLogs</code></td><td><code>SleepLog[]</code></td><td>oui</td><td></td></tr>
     </tbody>
   </table>
-  <p>Les neuf listes sont matérialisées à <code>[]</code> par <code>dropSeedData</code> au chargement : après conversion, aucune n'est absente, quel que soit l'état de la sauvegarde lue.</p>
+  <p><code>dropSeedData</code> matérialise les neuf listes à <code>[]</code>, mais seulement quand la chaîne de conversion s'exécute — c'est-à-dire sur une sauvegarde lue et analysée. L'état initial rendu sans sauvegarde, ou après un échec de lecture, ne porte que sept clés : <code>sportLogs</code>, <code>meTimeLogs</code> et <code>sleepLogs</code> y sont absentes. D'où le <code>appData.sportLogs || []</code> écrit chez chaque appelant.</p>
 
   <p>Les champs d'identité de <code>UserProfile</code>, unités canoniques comprises — le reste du profil relève du chapitre profil.</p>
   <table>
@@ -42,10 +52,22 @@ type AuthState =
   | { status: 'signedIn'; user: AuthUser }</code></pre>
   <p><code>id</code> est l'<code>uid</code> Firebase, <code>name</code> le <code>displayName</code>. Les deux derniers champs valent <code>null</code> sur un compte créé sans eux.</p>
 
-  <p>Deux clés du domaine portent une chaîne nue et non du JSON : <code>hasAcceptedMedicalDisclaimer_v1</code> (valeur <code>'true'</code>, ou absente) et <code>glp1_app_companion_data__secours</code> (la sauvegarde illisible, recopiée telle quelle).</p>
+  <p>Plusieurs clés portent une chaîne nue et non du JSON, lues et écrites par <code>getString</code>/<code>setString</code>. Hors administration et thèmes :</p>
+  <table>
+    <thead><tr><th>Clé</th><th>Valeur écrite</th></tr></thead>
+    <tbody>
+      <tr><td><code>hasAcceptedMedicalDisclaimer_v1</code></td><td><code>'true'</code>, ou absente</td></tr>
+      <tr><td><code>glp1_app_companion_data__secours</code></td><td>la sauvegarde illisible, recopiée telle quelle</td></tr>
+      <tr><td><code>glp1_first_open_date</code></td><td>une date <code>AAAA-MM-JJ</code></td></tr>
+      <tr><td><code>glp1_dynamique_celebrated</code></td><td><code>'true'</code></td></tr>
+      <tr><td><code>glp1_notified_bmi_tier_index</code></td><td><code>String(index)</code> du palier d'IMC déjà signalé</td></tr>
+      <tr><td><code>glp1_meal_edit_notice_dismissed</code></td><td><code>'true'</code></td></tr>
+      <tr><td><code>glp1_send_cap_alert</code></td><td>un marqueur d'envoi déjà signalé</td></tr>
+    </tbody>
+  </table>
 
   <p>Dérivé, donc non stocké : le poids de départ (lu au drapeau dans <code>weightHistory</code>), l'état du verrou (dérivé de la clé d'API), la session (détenue par le SDK), et l'échec de chargement (une <code>ref</code> de la durée de la session).</p>
-  <p class="ancre">src/types.ts, src/app/useAppData.ts, src/shared/platform/auth.ts, src/features/auth/useAuth.ts</p>
+  <p class="ancre">src/types.ts, src/app/useAppData.ts, src/data/mealConstants.ts, src/features/meal-form/mealFormStores.ts, src/shared/platform/auth.ts, src/features/auth/useAuth.ts</p>
 
   <h3 id="compte-connexion-champs-requis">Connexion : champs requis</h3>
   <p>Le formulaire e-mail/mot de passe refuse localement avant tout appel réseau. Le test porte sur l'e-mail <em>trimé</em> et sur le mot de passe <em>brut</em>.</p>
@@ -61,17 +83,19 @@ void run(() =&gt; signInWithPassword(email, password));
 //   finally { setIsBusy(false) }
 
 // signInWithPassword : signInWithEmailAndPassword(auth, email.trim(), password)</code></pre>
-  <p>Le trim n'a lieu qu'à deux endroits : le test ci-dessus et l'envoi. Le champ affiché n'est pas modifié. Le mot de passe part tel quel, espaces compris. Les deux boutons portent <code>disabled={isBusy}</code> pendant l'appel.</p>
+  <p>Deux filtres du navigateur précèdent ce test. Le champ est un <code>&lt;input type="email"&gt;</code> : l'algorithme de normalisation de valeur du HTML retire les sauts de ligne puis les espaces de tête et de queue avant que <code>onChange</code> ne lise <code>e.target.value</code> — l'état ne contient donc jamais les espaces que <code>trim()</code> est censé écarter, et les deux <code>trim()</code> (le test, l'envoi) ne mordent que sur une valeur déjà normalisée. Le <code>&lt;form&gt;</code> n'a pas <code>noValidate</code> : la validation native refuse une adresse mal formée et <code>handlePasswordSubmit</code> n'est alors pas appelé.</p>
+  <p>Le mot de passe part tel quel, espaces compris. Les deux boutons portent <code>disabled={isBusy}</code> pendant l'appel.</p>
   <p class="ancre">src/features/auth/LoginPage.tsx, src/shared/platform/auth.ts</p>
   <details><summary>Cas limites</summary>
     <ul>
-      <li>E-mail composé d'espaces : <code>''.trim()</code> est faux → message local, aucun appel.</li>
+      <li>E-mail composé d'espaces : la normalisation du champ le vide, l'état vaut <code>''</code> → message local, aucun appel.</li>
       <li>Mot de passe d'un seul espace : chaîne non vide → l'appel part et Firebase répond <code>auth/invalid-credential</code>.</li>
-      <li>Bouton Google : aucun champ n'est testé, <code>run(signInWithGoogle)</code> part directement — le message des champs requis ne le concerne pas.</li>
+      <li>Adresse syntaxiquement invalide : la validation native bloque la soumission — ni message de l'application, ni appel.</li>
+      <li>Bouton Google : hors du <code>&lt;form&gt;</code>, aucun champ n'est testé, <code>run(signInWithGoogle)</code> part directement.</li>
       <li>Succès : aucune redirection n'est écrite ici ; c'est <code>AuthGate</code> qui repasse en <code>signedIn</code> et rend l'application.</li>
     </ul>
   </details>
-  <div class="exemple"><p>Camille saisit «  camille@exemple.fr  » et son mot de passe : le test passe, et c'est « camille@exemple.fr » qui part à Firebase.</p></div>
+  <div class="exemple"><p>Camille colle «  camille@exemple.fr  » : le navigateur retire les espaces avant React, l'état porte déjà « camille@exemple.fr », et le <code>trim()</code> du code n'a plus rien à retirer.</p></div>
 
   <h3 id="compte-messages-d-echec-de-connexion">Messages d'échec de connexion</h3>
   <p><code>authErrorMessage(code)</code> traduit le code <code>auth/…</code> rejeté par le SDK. Fonction pure, un <code>switch</code>, sans repli sur le code anglais.</p>
@@ -93,11 +117,12 @@ void run(() =&gt; signInWithPassword(email, password));
   <p class="ancre">src/shared/platform/auth.errors.ts</p>
   <details><summary>Cas limites</summary>
     <ul>
+      <li><code>auth/invalid-email</code> est pratiquement injoignable depuis ce formulaire : la validation native n'y laisse passer qu'une adresse syntaxiquement valide. Le message existe pour un appelant qui contournerait le <code>&lt;form&gt;</code>.</li>
       <li>Erreur sans champ <code>code</code> : l'appelant passe <code>''</code>, qui tombe sur le message par défaut.</li>
       <li>Le message est effacé (<code>setMessage('')</code>) au début de chaque tentative, pas à la saisie : il reste affiché tant qu'on ne renvoie pas le formulaire.</li>
     </ul>
   </details>
-  <div class="exemple"><p>Camille tape « camille@ » : Firebase rejette <code>auth/invalid-email</code>, l'écran affiche « L'adresse e-mail n'est pas valide. » Une lettre fausse dans le mot de passe donne <code>auth/invalid-credential</code>, donc « E-mail ou mot de passe incorrect. »</p></div>
+  <div class="exemple"><p>Camille se trompe d'une lettre dans son mot de passe : Firebase rejette <code>auth/invalid-credential</code> et l'écran affiche « E-mail ou mot de passe incorrect. » — le même message que si son adresse était inconnue.</p></div>
 
   <h3 id="compte-verrou-actif">Verrou actif</h3>
   <p>Le verrou n'a pas de réglage : il se déduit de la clé d'API de la configuration.</p>
@@ -125,7 +150,7 @@ export const isDatabaseConfigured = isAuthConfigured;   // firestore.ts</code></
   <details><summary>Cas limites</summary>
     <ul>
       <li>IndexedDB indisponible (navigation privée de certains navigateurs) : le SDK retombe sur <code>localStorage</code>, puis sur <code>sessionStorage</code> — dans ce dernier cas la session ne survit pas à la fermeture de l'onglet.</li>
-      <li>Le compte supprimé côté console pendant que l'onglet est ouvert : <code>onAuthStateChanged</code> repasse en <code>signedOut</code> et la page de connexion revient sans rechargement.</li>
+      <li>L'application ne sonde ni ne renouvelle rien : <code>useAuth</code> ne fait que s'abonner à <code>onAuthStateChanged</code>. Un compte supprimé ou désactivé depuis la console ne fait donc pas revenir la page de connexion par ce seul fait ; le SDK ne constate l'invalidation qu'au renouvellement d'un jeton.</li>
       <li><code>currentAuthUser()</code> ne s'abonne pas : il lit <code>currentUser</code> à l'instant et rendrait <code>null</code> s'il était appelé avant la fin de la restauration.</li>
     </ul>
   </details>
@@ -179,7 +204,7 @@ bouton « J'accepte et j'accède » : disabled={!hasCheckedNotice}</code></pre>
   <details><summary>Cas limites</summary>
     <ul>
       <li><code>openLegalModal()</code> relit la clé : si elle a été effacée entre-temps dans ce même onglet, l'ouverture repasse en mode premier lancement, croix comprise.</li>
-      <li>Un seul appelant réel de <code>openLegalModal</code> est joignable : le bouton du pied de page. L'entrée « Sécurité, Avertissements &amp; Confidentialité » de « Configuration &amp; Plus » existe, mais aucun menu ne mène à l'onglet <code>'plus'</code>. La prop <code>onOpenLegalModal</code> reçue par la home n'est jamais appelée. <span class="marque non">non implémenté</span></li>
+      <li><code>openLegalModal</code> est passé à quatre endroits, un seul le joint réellement : le bouton du pied de page. <code>PlusMenu</code> l'appelle sur l'entrée « Sécurité, Avertissements &amp; Confidentialité », mais aucun menu ne mène à l'onglet <code>'plus'</code>. Les deux props restantes sont mortes : la home et <code>ProfileSettings</code> — page « Mon profil », elle bel et bien joignable — reçoivent <code>onOpenLegalModal</code> et ne l'appellent jamais. <span class="marque non">non implémenté</span></li>
     </ul>
   </details>
 
@@ -190,7 +215,7 @@ bouton « J'accepte et j'accède » : disabled={!hasCheckedNotice}</code></pre>
   setItem(STORAGE_KEY, appData);      // localStorage.setItem(key, JSON.stringify(value))
 }, [appData]);</code></pre>
   <p>L'effet s'exécute aussi au montage, avant toute modification : c'est cette écriture initiale que le garde-fou du chargement doit bloquer. Il n'y a ni écriture différée, ni fusion, ni numéro de version dans le document : la valeur écrite remplace la précédente en entier.</p>
-  <p>Le reste de ce que l'application retient vit sous d'autres clés — une quarantaine de chaînes <code>glp1_*</code>, <code>glow_*</code> et <code>hasAcceptedMedicalDisclaimer_v1</code>, déclarées dans autant de fichiers — qui ne passent pas par <code>AppData</code>.</p>
+  <p>Le reste de ce que l'application retient vit sous d'autres clés — un <code>grep</code> sur <code>src</code> rend 42 chaînes littérales distinctes <code>glp1_*</code>, <code>glow_*</code> et <code>hasAcceptedMedicalDisclaimer_v1</code>, déclarées dans 32 fichiers hors tests, administration et thèmes compris. Deux d'entre elles portent du domaine (aliments créés, menus favoris) ; les autres sont des réglages, des drapeaux et des compteurs. Aucune ne passe par <code>AppData</code>.</p>
   <p class="ancre">src/app/useAppData.ts, src/shared/platform/storage.ts</p>
   <details><summary>Cas limites</summary>
     <ul>
@@ -238,7 +263,8 @@ return ensureStartingWeighIn(
     <li><code>fillMealHunger</code> — pose <code>hungerBefore</code> et <code>hungerAfter</code> sur les repas qui n'ont pas les deux en <code>number</code> ; un repas complet n'est jamais retouché.</li>
     <li><code>ensureStartingWeighIn</code> — pose <code>isStartingWeight</code> sur toutes les lignes (<code>w.isStartingWeight ?? w.id === 'starting-weight-log'</code>) ; si une ligne le porte, s'arrête là ; sinon, et seulement si l'ancien profil porte un <code>startingWeight &gt; 0</code>, crée la pesée de départ et retrie par <code>byDateTimeAsc</code>.</li>
   </ol>
-  <p>Les sept fonctions sont pures et idempotentes : les rejouer sur des données déjà converties ne change rien. La conversion n'est pas réécrite au chargement — elle ne devient définitive qu'à la première écriture de la sauvegarde.</p>
+  <p>Les sept fonctions sont idempotentes : les rejouer sur des données déjà converties ne change rien. Six sont pures ; la septième ne l'est pas — <code>ensureStartingWeighIn(data, now = new Date())</code> est appelée sans <code>now</code> par la chaîne de chargement, et lit donc l'horloge de la machine par <code>dateDeDepartParDefaut</code> quand elle doit fabriquer une pesée de départ.</p>
+  <p>Le résultat de la conversion est réécrit dans le stockage immédiatement : l'effet de persistance dépend de <code>appData</code> et s'exécute au premier rendu, sans aucun geste. La sauvegarde convertie remplace donc l'ancienne dès le chargement — sauf gel du garde-fou.</p>
   <p class="ancre">src/app/useAppData.ts, src/shared/model/appData.ts, src/shared/model/purgeDeleted.ts, src/shared/model/startingWeighIn.ts</p>
   <details><summary>Cas limites</summary>
     <ul>
@@ -267,7 +293,7 @@ INITIAL_PROFILE = {
   countdownTargetDate: '2026-11-15', glp1Brand: DEFAULT_TREATMENT_ID,
 }
 
-état initial = {
+état initial = {                 // SEPT clés : ni sportLogs, ni meTimeLogs, ni sleepLogs
   profile: INITIAL_PROFILE,
   weightHistory: setStartingWeight([], 95.0),
   dailyLogs: [], injectionHistory: [], savedMeals: [], sideEffectHistory: [], stepLogs: [],
@@ -278,8 +304,8 @@ INITIAL_PROFILE = {
   <details><summary>Cas limites</summary>
     <ul>
       <li>Le drapeau, jamais la valeur : repasser par 95 kg ou le dépasser ne fait pas d'une pesée ordinaire un départ.</li>
-      <li>Le poids de départ n'est pas modifié par <code>setStartingWeight</code> quant à sa date ni à ses mensurations : seule <code>weight</code> est remplacée si la ligne existe déjà.</li>
-      <li>Une installation le 1<sup>er</sup> d'un mois sème la pesée au dernier jour du mois précédent — l'arithmétique passe par <code>Date.setDate(-1)</code>, donc par le calendrier local.</li>
+      <li><code>setStartingWeight</code> ne touche ni à la date ni aux mensurations : seule <code>weight</code> est remplacée si la ligne existe déjà.</li>
+      <li>Une installation le 1<sup>er</sup> d'un mois sème la pesée au dernier jour du mois précédent — l'arithmétique est <code>reference.setDate(reference.getDate() - 1)</code>, donc le calendrier local.</li>
     </ul>
   </details>
   <div class="exemple"><p>Camille est réellement partie de 96 kg en mai 2026. Sur une installation neuve, l'application n'affiche pas un écran vide mais 95,0 kg à la veille du jour d'installation, 08:00 : une valeur d'usine que rien ne distingue visuellement d'une saisie.</p></div>
@@ -298,7 +324,7 @@ INITIAL_PROFILE = {
     </tbody>
   </table>
   <p>Les deux familles ne sont pas interchangeables : <code>setItem</code> ré-encoderait un drapeau <code>true</code> en <code>"true"</code> et rendrait illisibles les valeurs déjà écrites en chaîne nue. La sauvegarde principale n'emprunte pas <code>getItem</code> à la lecture : elle passe par <code>getString</code> puis <code>JSON.parse</code>, précisément parce que <code>getItem</code> confond absence et illisibilité — distinction dont dépend le garde-fou.</p>
-  <p><code>clearAll</code> efface en bloc plutôt que clé par clé : la liste des clés est éparpillée dans une vingtaine de fichiers, et une liste écrite à la main laisserait survivre la première clé ajoutée ailleurs.</p>
+  <p><code>clearAll</code> efface en bloc plutôt que clé par clé : la liste des clés est éparpillée dans 32 fichiers, et une liste écrite à la main laisserait survivre la première clé ajoutée ailleurs. Le commentaire du fichier dit « une vingtaine » ; le compte s'est fait depuis.</p>
   <p class="ancre">src/shared/platform/storage.ts</p>
   <details><summary>Cas limites</summary>
     <ul>
@@ -325,7 +351,7 @@ unreadableSaveNotice(k) = 'La sauvegarde n’a pas pu être lue. Elle a été mi
   sous la clé « &lt;clé&gt;__secours » et RIEN ne sera enregistré tant que cet écran
   n’aura pas été rechargé : vos données ne sont pas effacées.'</code></pre>
   <p>La condition de mise à l'abri est <code>=== null</code>, donc « clé absente » : une clé de secours présente mais vide empêche le sauvetage. Le message est posé par un effet à montage unique dans <code>limitNotice</code>, l'état qui sert aussi aux refus de plafond ; le bloc qui l'affiche porte donc le titre « Limite atteinte » et se ferme par <code>dismissLimitNotice</code>.</p>
-  <p>La portée du gel est exactement d'une écriture : <code>mayPersist</code> n'a qu'un appelant, l'effet qui écrit <code>STORAGE_KEY</code>. Les autres clés — acceptation médicale, menu, thème, vues d'historique, compteurs — continuent d'être écrites pendant la session.</p>
+  <p>La portée du gel est exactement d'une écriture : <code>mayPersist</code> n'a qu'un appelant, l'effet qui écrit <code>STORAGE_KEY</code>. Les autres clés — acceptation médicale, aliments créés, menus favoris, menu, thème, vues d'historique, compteurs — continuent d'être écrites pendant la session.</p>
   <p class="ancre">src/shared/model/loadGuard.ts, src/app/useAppData.ts, src/versions/mixte/App.tsx</p>
   <details><summary>Cas limites</summary>
     <ul>
@@ -336,7 +362,7 @@ unreadableSaveNotice(k) = 'La sauvegarde n’a pas pu être lue. Elle a été mi
       <li><code>loadFailed</code> est une <code>ref</code> de la durée du montage : un rechargement rejoue le chargement, qui échouera de nouveau si la sauvegarde n'a pas été réparée.</li>
     </ul>
   </details>
-  <div class="exemple"><p>La sauvegarde de Camille est tronquée par un onglet fermé pendant l'écriture. Au lancement suivant : sa chaîne brute passe sous <code>glp1_app_companion_data__secours</code>, l'écran affiche 95,0 kg de départ à la veille, et rien de ce qu'elle saisirait dans cette session ne serait écrit sous la clé principale — mais l'acceptation médicale, elle, s'écrirait normalement.</p></div>
+  <div class="exemple"><p>La sauvegarde de Camille est tronquée par un onglet fermé pendant l'écriture. Au lancement suivant : sa chaîne brute passe sous <code>glp1_app_companion_data__secours</code>, l'écran affiche 95,0 kg de départ à la veille, et rien de ce qu'elle saisirait dans cette session ne serait écrit sous la clé principale — mais l'acceptation médicale et ses menus favoris, eux, s'écriraient normalement.</p></div>
 
   <h3 id="compte-ordre-de-la-suppression-de-compte">Ordre de la suppression de compte</h3>
   <p>Trois états locaux : <code>step</code> (<code>'idle' | 'confirming' | 'working'</code>), <code>message</code>, <code>needsFreshLogin</code>. Le geste de confirmation supprime le compte avant les données ; un échec du compte laisse tout en place.</p>
@@ -410,7 +436,7 @@ reconnect() :                    // bouton « Se reconnecter »
   <div class="exemple"><p>Camille, connectée depuis mai 2026, confirme : Firebase rejette <code>auth/requires-recent-login</code>, l'écran revient à la mise en garde avec le message et le bouton « Se reconnecter ». Après reconnexion et seconde tentative, <code>deleteUser</code> passe, <code>clearAll()</code> efface le stockage et la page se recharge sur la connexion.</p></div>
 
   <h3 id="compte-stockage-local">Stockage local</h3>
-  <p><code>clearAll()</code> est <code>localStorage.clear()</code> : il vide l'origine entière, sans liste de clés. Il emporte donc <code>glp1_app_companion_data</code>, sa clé de secours si elle existe, <code>hasAcceptedMedicalDisclaimer_v1</code>, et la quarantaine de clés <code>glp1_*</code> et <code>glow_*</code> — menu, thème, sports et effets suivis, vues d'historique, paliers de badges, retours et sondage locaux, date de première ouverture.</p>
+  <p><code>clearAll()</code> est <code>localStorage.clear()</code> : il vide l'origine entière, sans liste de clés. Il emporte donc <code>glp1_app_companion_data</code>, sa clé de secours si elle existe, <code>glp1_user_custom_foods</code>, <code>glp1_favorite_meals</code>, <code>hasAcceptedMedicalDisclaimer_v1</code>, et les 42 clés <code>glp1_*</code> et <code>glow_*</code> — menu, thème, sports et effets suivis, vues d'historique, paliers de badges, retours et sondage locaux, date de première ouverture.</p>
   <p>Il n'emporte en revanche pas la session Firebase par lui-même : le SDK persiste d'abord dans IndexedDB, que <code>localStorage.clear()</code> ne touche pas. La session disparaît parce que <code>deleteUser</code> appelle <code>signOut()</code>. Le commentaire de <code>storage.ts</code> qui attribue la disparition de la session à <code>clearAll</code> est inexact ; il ne le serait pas dans le cas de repli où IndexedDB est indisponible et où le SDK écrit dans <code>localStorage</code>.</p>
   <p class="ancre">src/shared/platform/storage.ts, @firebase/auth 1.13.4</p>
   <details><summary>Cas limites</summary>

@@ -39,10 +39,11 @@ label = noTreatment            ? 'Indiquer un changement de traitement'
       :                          'Ajouter une injection'
 clic : noTreatment ? navigate('injection') + autoOpenChangeTreatment = true
                    : quickAddNavigate('injection')   // autoOpenAdd = true</code></pre>
-  <p><code>autoOpenAdd</code> est l'état initial de <code>showAddForm</code> dans le hook du formulaire, pas un effet : le formulaire est déjà ouvert à la première peinture.</p>
+  <p><code>autoOpenAdd</code> agit deux fois. Il est l'état initial de <code>showAddForm</code> — <code>useState(autoOpenAdd ?? false)</code> —, si bien que la première peinture porte déjà le formulaire ouvert. Et il est la dépendance d'un effet qui appelle <code>openAddForm()</code>, effet qui s'exécute aussi au montage : la date repart à aujourd'hui, l'heure à maintenant, la zone sur la suggestion, et la page défile en haut. L'effet reste en place pour le cas où la demande arrive après le montage.</p>
   <p class="ancre">src/versions/mixte/App.tsx · src/app/navigation.ts · src/features/injections/useInjectionForm.ts</p>
   <details><summary>Cas limites</summary>
     <p><code>isNoTreatment</code> teste <code>id === 'aucun'</code> exactement : un profil dont <code>glp1Brand</code> est la chaîne vide n'est pas « aucun » pour ce test, et l'entrée dit « Ajouter une injection » — la migration au chargement écrit pourtant <code>'aucun'</code> dans ce cas, l'état est donc inatteignable après un chargement.</p>
+    <p>Les effets de bord de <code>openAddForm()</code> au montage sont ce que l'ajout depuis le calendrier doit ensuite défaire : il repose la date <em>après</em> l'appel.</p>
   </details>
   <p><a href="spec-fonctionnelle.html#traitement-menu-plus-entree-traitement">→ fonctionnelle</a></p>
 
@@ -178,12 +179,13 @@ getTreatment(id?) : id absent ou inconnu → fiche 'aucun'
 getDosePresetsForBrand(id) = getTreatment(id).dosePresets
 TREATMENT_GROUPS = [ { 'Stylos Injectables', form === 'injection' },
                      { 'Comprimés Oraux',    form === 'oral' } ]</code></pre>
-  <p><span class="marque v2">V2</span> Le catalogue V2 (<code>src/domaine/traitements.ts</code>) porte les mêmes treize entrées, réduites à trois champs : <code>id</code>, <code>nom</code>, <code>forme: 'injection' | 'comprime'</code>. Ni paliers, ni cinétique, ni molécule, ni certification. Douze identifiants sur treize sont repris ; <code>orforglipron</code> devient <code>foundayo</code>. Chaque fin de famille s'appelle « Autre », et il n'y a pas d'entrée « Pas de traitement » : l'absence est la réponse « non » à <code>traitementCommence</code>. La sélection se fait par <code>traitementsDeLaForme(forme)</code>, jamais par saisie libre ; l'écran ne se valide que si <code>formeTraitement</code> et <code>traitement</code> sont tous deux renseignés, et changer de forme efface la spécialité.</p>
-  <p class="ancre">src/shared/medication/treatment.catalog.ts · src/shared/medication/medication.utils.ts · GIT-APP-V2 : src/domaine/traitements.ts, src/screens/onboarding/reponses.ts, src/screens/onboarding/parcours.ts</p>
+  <p><span class="marque v2">V2</span> Le catalogue V2 (<code>src/domaine/traitements.ts</code>) porte les mêmes treize entrées, réduites à trois champs : <code>id</code>, <code>nom</code>, <code>forme: 'injection' | 'comprime'</code>. Ni paliers, ni cinétique, ni molécule, ni certification. Douze identifiants sur treize sont repris ; <code>orforglipron</code> devient <code>foundayo</code>. Chaque fin de famille s'appelle « Autre », et il n'y a pas d'entrée « Pas de traitement » : l'absence est la réponse « non » à <code>traitementCommence</code>. La sélection se fait par <code>traitementsDeLaForme(forme)</code>, jamais par saisie libre ; l'écran ne se valide que si <code>formeTraitement</code> et <code>traitement</code> sont tous deux renseignés (<code>peutValider</code>), et le réducteur du parcours efface la spécialité dès que la forme change : <code>traitement: forme === precedentes.formeTraitement ? precedentes.traitement : null</code>.</p>
+  <p class="ancre">src/shared/medication/treatment.catalog.ts · src/shared/medication/medication.utils.ts · GIT-APP-V2 : src/domaine/traitements.ts, src/screens/onboarding/reponses.ts, src/screens/onboarding/parcours.ts, src/app/useParcours.ts</p>
   <details><summary>Cas limites</summary>
     <p>Identifiant inconnu : la fiche <code>'aucun'</code> est rendue, donc le nom « Pas de traitement » et la cinétique du sémaglutide. Aucun nom de médicament n'est inventé.</p>
     <p>Wegovy figure deux fois, une par forme, avec le même <code>name</code> : le sélecteur les distingue par leur <code>label</code>, la ligne de graphe les dédoublonne par <code>name</code> et n'en montre qu'un.</p>
     <p><code>orforglipron</code> garde son identifiant historique alors que la fiche s'appelle « Foundayo » : le changer aurait rendu les données déjà enregistrées introuvables.</p>
+    <p><span class="marque v2">V2</span> Répondre « non » à <code>traitementCommence</code> remet <code>formeTraitement</code> et <code>traitement</code> à <code>null</code> tous les deux.</p>
   </details>
   <div class="exemple"><p>Camille est sous <code>ozempic</code> : ses paliers sont 0,25 / 0,5 / 1 / 1,7 / 2 / 2,4 mg, sa demi-vie 168 h, sa demi-vie d'absorption 15 h, sa biodisponibilité relative 1, son rythme 7 jours.</p></div>
   <p><a href="spec-fonctionnelle.html#traitement-selecteur-de-traitement">→ fonctionnelle</a></p>
@@ -274,6 +276,7 @@ openAddForm() :
   date ← getLocalDateStr() ; time ← getRoundedLocalTimeStr()
   si !isOral &amp;&amp; defaultSite → selectedSite ← defaultSite
   showAddForm ← true ; défilement en haut
+  (appelé aussi par un effet quand autoOpenAdd est vrai, montage compris)
 
 au changement de `brand` (effet) :
   si isOral → selectedSite ← 'prise_orale'
@@ -407,15 +410,16 @@ cancelEdit() :
   </details>
 
   <h3 id="traitement-rotation-d-ordre-fixe-ancienne-regle-toujours-presente">Rotation d'ordre fixe (ancienne règle, toujours présente)</h3>
-  <p><code>nextRotationSite</code> propose la zone suivante dans l'ordre de <code>SITE_LABELS</code> après celle de la dernière prise passée. Elle est exportée, testée, et <strong>aucun écran de la Mixte ne l'appelle</strong> : la suggestion de voisinage aléatoire l'a remplacée.</p>
+  <p><code>nextRotationSite</code> propose la zone suivante dans l'ordre de <code>SITE_LABELS</code> après celle de la dernière prise passée.</p>
   <pre><code>nextRotationSite(history, now = maintenant) :
   passees = history filtré sur site ∈ ROTATION_SITES et instant lisible ≤ now,
             trié croissant sur la chaîne `date + 'T' + (time || '12:00')`
   derniere = passees.at(-1)
   sans derniere → ROTATION_SITES[0]   // abdomen_gauche
   sinon → ROTATION_SITES[(index(derniere.site) + 1) % 6]</code></pre>
-  <p>Le défaut qu'elle avait : en saisissant une prise <em>entre</em> deux autres, la zone suivante pouvait tomber sur celle de la prise d'après.</p>
-  <p class="ancre">src/features/injections/injections.utils.ts</p>
+  <p>L'écran par défaut de la Mixte ne l'appelle pas : son <code>InjectionsTracker</code> pose <code>defaultSite</code> par <code>suggestInjectionSite</code>, le voisinage aléatoire l'ayant remplacée. Elle reste appelée par les <code>InjectionsTracker</code> propres aux thèmes <code>sideral</code> et <code>test</code>, qui posent <code>defaultSite = React.useMemo(() =&gt; nextRotationSite(history), [history])</code> — les thèmes sont hors du périmètre de cette spécification, mais la fonction n'est donc pas du code mort.</p>
+  <p>Le défaut de cette règle : en saisissant une prise <em>entre</em> deux autres, la zone suivante pouvait tomber sur celle de la prise d'après.</p>
+  <p class="ancre">src/features/injections/injections.utils.ts · src/versions/mixte/themes/sideral/features/injections/InjectionsTracker.tsx · src/versions/mixte/themes/test/features/injections/InjectionsTracker.tsx</p>
   <details><summary>Cas limites</summary>
     <p>Dernière prise en <code>bras_droit</code> → <code>abdomen_gauche</code> : la liste boucle.</p>
     <p>Le tri se fait par comparaison de chaînes, pas d'instants : correct puisque le format est <code>AAAA-MM-JJTHH:MM</code>.</p>
@@ -437,23 +441,31 @@ cancelEdit() :
   <p><a href="spec-fonctionnelle.html#traitement-selecteur-de-dose">→ fonctionnelle</a></p>
 
   <h3 id="traitement-edition-en-place-de-la-dose-journal-bulle">Édition en place (journal, bulle du calendrier)</h3>
-  <p>Chaque champ d'une ligne s'édite en place ; le brouillon est validé par une seule fonction de commit.</p>
-  <pre><code>brouillon = { dose: log.dose.toString(), site: log.site, date: log.date,
-              time: log.time || '12:00', notes: log.notes || '' }
+  <p>Chaque champ d'une ligne s'édite en place par <code>useInlineEditableLog</code>. Deux fonctions de commit, une par surface : elles partagent le brouillon et les gardes, et diffèrent d'un champ.</p>
+  <pre><code>brouillon, identique des deux côtés =
+  { dose: log.dose.toString(), site: log.site, date: log.date,
+    time: log.time || '12:00', notes: log.notes || '' }
 
-commit(d, l) :
+commit du journal (JournalEntryCard) :
   dVal = parseFloat(d.dose)
   si isNaN(dVal) || dVal &lt; 0 || !d.date → return          // rien n'est écrit
   si dVal === l.dose &amp;&amp; d.site === l.site &amp;&amp; d.date === l.date
      &amp;&amp; d.time === (l.time || '12:00') &amp;&amp; d.notes === (l.notes || '') → return
   onUpdateInjection({ ...l, dose: dVal, site: d.site, date: d.date,
                       time: d.time || '12:00',
-                      notes: d.notes.trim() ? d.notes : undefined })</code></pre>
-  <p>Le <code>brand</code> de la ligne est conservé par le <code>...l</code> : l'édition en place ne rattache pas la ligne au traitement du profil. La zone n'est éditable que si la ligne n'est pas orale (<code>logTreatment.form === 'oral' || log.site === 'prise_orale'</code>) ; sa liste porte les sept entrées de <code>SITE_LABELS</code>. La dose passe par le champ numérique avec <code>RULE_DOSE</code>, dont le refus s'écrit sous la ligne.</p>
-  <p class="ancre">src/versions/mixte/features/injections/JournalEntryCard.tsx</p>
+                      notes: d.notes.trim() ? d.notes : undefined })
+
+commit de la bulle (InjectionCalendar, DayLogLines) : mêmes gardes,
+  mais les notes ne figurent NI dans le test d'inchangé NI dans l'écriture
+  si dVal === l.dose &amp;&amp; d.site === l.site &amp;&amp; d.date === l.date
+     &amp;&amp; d.time === (l.time || '12:00') → return
+  onUpdateInjection({ ...l, dose: dVal, site: d.site, date: d.date,
+                      time: d.time || '12:00' })          // aucun champ notes</code></pre>
+  <p>La bulle n'a pas de ligne de notes : elle dit la prise, le journal reste l'endroit du texte libre. Les notes existantes survivent au commit de la bulle par le <code>...l</code>. Le <code>brand</code> est conservé des deux côtés : l'édition en place ne rattache pas la ligne au traitement du profil. La zone n'est éditable que si la ligne n'est pas orale (<code>logTreatment.form === 'oral' || log.site === 'prise_orale'</code>) ; sa liste porte les sept entrées de <code>SITE_LABELS</code>. La dose passe par le champ numérique avec <code>RULE_DOSE</code>, dont le refus s'écrit sous la ligne.</p>
+  <p class="ancre">src/shared/ui/useInlineEditableLog.ts · src/versions/mixte/features/injections/JournalEntryCard.tsx · src/versions/mixte/features/injections/InjectionCalendar.tsx</p>
   <details><summary>Cas limites</summary>
     <p>Le commit accepte une dose de 0 (test <code>&lt; 0</code>, pas <code>&lt;= 0</code>) alors que le formulaire la refuse ; <code>RULE_DOSE</code> l'aurait cependant refusée dans le champ.</p>
-    <p>Notes ramenées à des espaces : <code>trim()</code> les considère vides et le champ est effacé (<code>undefined</code>).</p>
+    <p>Notes ramenées à des espaces, journal : <code>trim()</code> les considère vides et le champ est effacé (<code>undefined</code>).</p>
     <p>Une ligne sans heure prend <code>12:00</code> au brouillon : la comparaison d'inchangé s'aligne sur cette valeur, un commit sans retouche n'écrit donc rien.</p>
     <p><code>applyLogUpdate</code> arrondit ensuite l'heure à la minute ronde inférieure.</p>
   </details>
@@ -601,17 +613,17 @@ doseScale  = fiche.doseScale ?? 1</code></pre>
   <table>
     <thead><tr><th>Traitement</th><th>ke (h⁻¹)</th><th>ka (h⁻¹)</th><th>tMax (h)</th><th>normFactor</th></tr></thead>
     <tbody>
-      <tr><td>Ozempic, Wegovy inj., Autre inj., aucun</td><td>0,004126</td><td>0,04621</td><td>57,4</td><td>1,392</td></tr>
-      <tr><td>Mounjaro, Zepbound</td><td>0,005776</td><td>0,05776</td><td>44,3</td><td>1,357</td></tr>
-      <tr><td>Saxenda, Victoza</td><td>0,05332</td><td>0,2773</td><td>7,4</td><td>1,532</td></tr>
-      <tr><td>Trulicity</td><td>0,006134</td><td>0,04951</td><td>48,1</td><td>1,406</td></tr>
-      <tr><td>Rétatrutide</td><td>0,004813</td><td>0,05776</td><td>46,9</td><td>1,374</td></tr>
+      <tr><td>Ozempic, Wegovy inj., Autre inj., aucun</td><td>0,004126</td><td>0,04621</td><td>57,41</td><td>1,392</td></tr>
+      <tr><td>Mounjaro, Zepbound</td><td>0,005776</td><td>0,05776</td><td>44,29</td><td>1,435</td></tr>
+      <tr><td>Saxenda, Victoza</td><td>0,05332</td><td>0,2773</td><td>7,36</td><td>1,833</td></tr>
+      <tr><td>Trulicity</td><td>0,006134</td><td>0,04951</td><td>48,14</td><td>1,534</td></tr>
+      <tr><td>Rétatrutide</td><td>0,004814</td><td>0,05776</td><td>46,93</td><td>1,367</td></tr>
       <tr><td>Rybelsus, Wegovy oral</td><td>0,004332</td><td>6,931</td><td>1,07</td><td>1,005</td></tr>
-      <tr><td>Foundayo</td><td>0,01926</td><td>0,9902</td><td>4,06</td><td>1,081</td></tr>
-      <tr><td>Autre comprimé</td><td>0,004332</td><td>0,4621</td><td>7,5</td><td>1,073</td></tr>
+      <tr><td>Foundayo</td><td>0,01925</td><td>0,9902</td><td>4,06</td><td>1,103</td></tr>
+      <tr><td>Autre comprimé</td><td>0,004332</td><td>0,4621</td><td>10,20</td><td>1,055</td></tr>
     </tbody>
   </table>
-  <p class="ancre">src/utils/pharmacokinetics.ts</p>
+  <p class="ancre">src/utils/pharmacokinetics.ts · src/shared/medication/treatment.catalog.ts</p>
   <details><summary>Cas limites</summary>
     <p>Si <code>ka ≤ ke</code> — absorption plus lente que l'élimination —, <code>tMax</code> devient négatif ou indéfini et <code>normFactor</code> part en <code>Infinity</code>. Aucune fiche du catalogue n'est dans ce cas ; rien ne le vérifie ici (le calcul du creux à l'équilibre, lui, le teste et rend <code>null</code>).</p>
     <p>Les paramètres ne sont pas mémoïsés : <code>getPKParameters</code> est rappelée pour chaque prise à chaque point de courbe, via le résolveur par ligne.</p>
@@ -698,7 +710,7 @@ peakStatus(points, nowMs, windowHours = 12) :
 
 PEAK_WINDOW_INJECTION_HOURS = 12
 PEAK_WINDOW_ORAL_HOURS      = 20 / 60      // vingt minutes</code></pre>
-  <p>La courbe fournie est <code>peakChartData</code> — bâtie sur les seules prises déjà faites : annoncer « prochain pic dans 3 jours » pour une piqûre qui n'est pas faite serait donner une prévision pour un fait. La demi-largeur du « pic en cours » suit la forme de la dernière prise faite : douze heures pour une injection, vingt minutes pour un comprimé, qui culmine environ une heure après la prise et se répète chaque jour.</p>
+  <p>La courbe fournie est <code>peakChartData</code> — bâtie sur les seules prises déjà faites : annoncer « prochain pic dans 3 jours » pour une piqûre qui n'est pas faite serait donner une prévision pour un fait. La demi-largeur du « pic en cours » suit la forme de la dernière prise faite : douze heures pour une injection, vingt minutes pour un comprimé.</p>
   <p class="ancre">src/features/blood-level/peakStatus.ts</p>
   <details><summary>Cas limites</summary>
     <p>Une courbe qui ne fait que descendre — une seule prise très ancienne — n'a aucun sommet : <code>null</code>, et la phrase ne s'affiche pas.</p>

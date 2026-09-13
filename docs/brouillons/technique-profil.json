@@ -41,325 +41,436 @@
    "fonctionnalite": "Thèmes et administration",
    "texte": "Je voulais préciser ce que getSelectedTheme rend et comment l'entrée Admin est filtrée.",
    "origine": "Administration et thèmes sont hors périmètre ; les composants dupliqués sous versions/mixte/themes/* (ProfileSettings, FeedbackSettings, Sondage, PlusMenu, NotificationsSettings) n'ont pas été lus et peuvent différer."
+  },
+  {
+   "categorie": "cas limite inventé",
+   "fonctionnalite": "Écart entre la borne du champ et celle du sanitize des poids",
+   "texte": "J'avais écrit : « La borne basse de la règle (0,1) et celle du sanitize (> 0) diffèrent : \"0.05\" passe la règle du champ et est refusé par le sanitize. »",
+   "origine": "Réfutation retenue, vérifiée : RULE_WEIGHT porte decimals: 1, et sanitizeNumber nettoie AVANT de comparer — cleanNumericInput('0.05', 1) rend '0.0', donc 0 < 0.1 → null. L'écart annoncé est vide : aucune valeur de ]0 ; 0,1[ ne survit à la troncature à une décimale, des deux côtés. Phrase supprimée, le cas limite corrigé en conséquence."
+  },
+  {
+   "categorie": "affirmation infirmée par le code",
+   "fonctionnalite": "Lignes de contexte des courriers",
+   "texte": "J'avais écrit : « contextRows(context) est commune aux cinq courriers. »",
+   "origine": "Réfutation retenue, vérifiée : contextRows n'est appelée qu'en quatre endroits de submissionMail.ts (surveyMailContent, feedbackMailContent, sendCapAlertMailContent, reportExportFailureMailContent). surveyUpdatesAlertMailContent compose ses propres lignes et recalcule le fuseau à la main. La phrase recopiait un commentaire du code que le code dément. Corrigée en « quatre des cinq », avec le détail du cinquième."
+  },
+  {
+   "categorie": "affirmation infirmée par le code",
+   "fonctionnalite": "Lecture de l'état d'un module",
+   "texte": "J'avais écrit : « l'état effectif se lit toujours par isModuleOn, jamais par le drapeau nu. »",
+   "origine": "Réfutation retenue, vérifiée : NotificationsSettings.tsx n'importe pas isModuleOn et relit les sept drapeaux nus avec leur défaut réécrit à la main (?? false, ?? true). Le résultat coïncide, la règle « toujours » est fausse. Phrase corrigée : isModuleOn est la lecture de référence, la page Modules duplique les défauts."
+  },
+  {
+   "categorie": "affirmation infirmée par le code",
+   "fonctionnalite": "Ordre du journal des pesées",
+   "texte": "J'avais écrit : « le tableau est tenu trié par date croissante à l'écriture ».",
+   "origine": "Réfutation retenue, vérifiée : updateWeighIn ne retrie pas (le fichier le documente), et addWeighIn trie sur date seule, sans l'heure. Le PlusMenu lit appData.weightHistory tel qu'il est stocké : une pesée antidatée reste en fin de tableau et devient à tort le poids courant. Phrase corrigée et le cas ajouté aux cas limites."
+  },
+  {
+   "categorie": "affirmation infirmée par le code",
+   "fonctionnalite": "Écriture de profile.gender",
+   "texte": "J'avais écrit : « C'est le seul écrit de profile.gender du domaine ».",
+   "origine": "Réfutation retenue, vérifiée : le commentaire du code dit « le seul endroit où il SE CHOISIT ». INITIAL_PROFILE écrit gender à l'installation et le générateur de données de la page Admin l'écrit dans le profil qu'il persiste sous la clé de sauvegarde. Phrase corrigée."
+  },
+  {
+   "categorie": "affirmation infirmée par le code",
+   "fonctionnalite": "Reprise après une sauvegarde illisible",
+   "texte": "J'avais écrit : « la session repart de journaux vides ».",
+   "origine": "Réfutation retenue, vérifiée : après le catch, useAppData retombe sur la branche d'installation neuve — INITIAL_PROFILE et setStartingWeight([], 95.0). La session repart d'un profil d'usine et d'un journal de pesées à une ligne. Cas limite corrigé."
+  },
+  {
+   "categorie": "type du modèle",
+   "fonctionnalite": "Optionalité des drapeaux de suivi",
+   "texte": "J'avais rangé les sept drapeaux de suivi sous « boolean (facultatifs) ».",
+   "origine": "Réfutation retenue, vérifiée dans src/types.ts : foodTrackingEnabled, stepsTrackingEnabled et sportTrackingEnabled sont déclarés obligatoires ; seuls meTimeTrackingEnabled, sleepTrackingEnabled, treatmentTrackingEnabled et sideEffectsTrackingEnabled portent le « ? ». Le tableau des entités a été scindé en trois lignes."
   }
  ],
  "glossaire": [
   {
-   "terme": "Pesée de départ",
-   "definition": "La seule ligne du journal des pesées qui porte isStartingWeight. Le poids de départ n'est pas un champ du profil : il se lit dans cette ligne et, à défaut, vaut 95 kg sur la page profil et 0 dans l'aperçu du PlusMenu."
-  },
-  {
-   "terme": "Sanitize",
-   "definition": "Fonction qui rend la CHAÎNE retenue pour une valeur saisie, ou null pour la refuser. Rendre une chaîne et non un nombre évite de réafficher 0.30000000000000004 à qui a tapé « 0,3 »."
+   "terme": "sanitize",
+   "definition": "Fonction qui juge une saisie et rend soit la valeur retenue, soit null. Les sanitize du profil rendent une CHAÎNE, jamais un nombre : c'est elle qui sera réaffichée."
   },
   {
    "terme": "NumberRule",
-   "definition": "Ce qu'un champ numérique accepte : min (inclus), max (inclus, facultatif), decimals (0 = entier, troncature), allowEmpty, unit, message, step. Les trois règles du profil sont RULE_AGE, RULE_HEIGHT et RULE_WEIGHT."
+   "definition": "Descripteur d'un champ numérique : min, max facultatif, decimals, step, unit, message, allowEmpty. Il porte à la fois le nettoyage de frappe, le jugement à la sortie et le pas des flèches."
   },
   {
-   "terme": "validateOnSubmit",
-   "definition": "Mode d'un NumberField où le jugement est reporté au bouton du formulaire : le champ ne dit rien à la sortie et ne revient pas à la dernière valeur valable, pour que le clic sur Valider ait encore quelque chose à refuser."
+   "terme": "cleanNumericInput",
+   "definition": "Nettoyage de frappe commun à tous les champs numériques du site : virgules en points, retrait de tout autre caractère, un seul point, troncature de la fraction à decimals chiffres. Il ne borne rien."
   },
   {
-   "terme": "Dernière valeur valable",
-   "definition": "La dernière saisie acceptable traversée depuis l'ouverture du champ, retenue dans une ref. C'est à elle qu'un champ refusé revient — jamais à une valeur d'usine."
+   "terme": "cleanDecimalInput",
+   "definition": "Nettoyage propre aux deux poids du profil, équivalent à cleanNumericInput avec une décimale."
   },
   {
-   "terme": "Minutes rondes",
-   "definition": "L'ensemble {0, 10, 15, 20, 30, 40, 45, 50}. Toute heure retenue est ramenée à la plus grande de ces minutes qui lui soit inférieure ou égale, pour ne jamais produire une heure future."
+   "terme": "pesée de départ",
+   "definition": "La ligne du journal des pesées qui porte isStartingWeight. Le poids de départ n'est pas un champ du profil : il se lit dans cette ligne."
   },
   {
-   "terme": "Drapeau de module",
-   "definition": "Champ booléen facultatif du profil qui commande un onglet. Son absence vaut activé pour le traitement et les effets secondaires, désactivé pour les cinq suivis ; l'état effectif se lit par isModuleOn."
+   "terme": "drapeau de module",
+   "definition": "Booléen du profil qui commande un des sept onglets modulables. Son absence ne vaut pas la même chose pour tous : activé pour le traitement et les effets secondaires, désactivé pour les cinq autres."
   },
   {
-   "terme": "Masquage complet",
-   "definition": "Second drapeau d'un module (xModuleHidden), qui ne mord que module éteint : ses blocs quittent alors les menus et les pages au lieu d'y paraître grisés. Rallumer le module le remet à faux."
+   "terme": "isModuleOn",
+   "definition": "Lecture de référence de l'état effectif d'un module, défaut compris. Un onglet absent de la table des drapeaux est toujours allumé."
   },
   {
-   "terme": "Plafond quotidien",
-   "definition": "Dix envois par journée LOCALE, comptés sur des instants d'envoi réellement enregistrés. Commun aux avis et au sondage."
+   "terme": "masquage",
+   "definition": "Second drapeau, qui retire un module éteint des tiroirs et des pages au lieu de l'y montrer grisé. Il ne mord que sur un module éteint."
   },
   {
-   "terme": "Journal des envois (sendLog)",
-   "definition": "Liste d'instants en millisecondes propre au sondage, qui ne garde qu'une réponse. Taillée à une fenêtre glissante de 48 heures à chaque écriture."
+   "terme": "minutes rondes",
+   "definition": "Les huit minutes retenues par l'application : 0, 10, 15, 20, 30, 40, 45, 50. Toute heure enregistrée est ramenée à la plus grande d'entre elles qui lui soit inférieure ou égale."
   },
   {
-   "terme": "Marqueur d'alerte de plafond",
-   "definition": "Chaîne « uid:AAAA-MM-JJ » écrite sous glp1_send_cap_alert AVANT l'envoi de l'alerte, pour qu'une insistance ne produise pas dix courriers identiques."
+   "terme": "data URL",
+   "definition": "Adresse data:image/jpeg;base64,… qui porte l'image elle-même. Une photo d'avatar est stockée sous cette forme ; son poids se calcule sur la charge base64."
   },
   {
-   "terme": "Contexte d'envoi",
-   "definition": "Objet joint à chaque envoi en base et à chaque courrier : réglages d'affichage, cadre, écran, langues, instant en trois formes, fuseau, agent utilisateur, mode de compilation. Aucune donnée de santé."
+   "terme": "plafond quotidien",
+   "definition": "Dix envois par journée locale, comptés sur les instants d'envoi. Il vaut pour les avis comme pour le sondage."
   },
   {
-   "terme": "Page d'origine",
-   "definition": "L'onglet quitté pour ouvrir un formulaire, tenu dans deux variables de module et lu au premier rendu du formulaire. Nulle après un rechargement."
+   "terme": "journal des envois",
+   "definition": "Le tableau sendLog du sondage : les instants des envois des 48 dernières heures. Il existe parce que le sondage ne garde qu'une réponse et ne dirait sinon pas combien de fois elle est partie."
+  },
+  {
+   "terme": "contexte d'envoi",
+   "definition": "L'objet joint à tout envoi en base et à tout courrier : version, page, thème, cadre, langue, deux heures et le fuseau. Aucune donnée de santé n'y entre."
+  },
+  {
+   "terme": "page d'origine",
+   "definition": "La page quittée pour arriver sur le formulaire, tenue dans deux variables de module remises à zéro au rechargement."
   },
   {
    "terme": "quietly",
-   "definition": "Enveloppe qui avale toute exception d'un envoi en base : la promesse rendue n'échoue jamais, n'écrit rien en console et ne change rien à l'écran."
+   "definition": "Enveloppe qui avale l'erreur d'un envoi en base ou d'un courrier : rien n'est levé, rien n'est tracé, rien ne s'affiche."
   },
   {
-   "terme": "mergeDocumentOnce / countUp",
-   "definition": "Écriture transactionnelle d'un document unique, l'incrément du compteur étant calculé côté serveur. Sert au document surveys/{uid} et au franchissement du seuil d'alerte."
+   "terme": "writableAuthor",
+   "definition": "L'auteur d'un envoi, ou null si la base n'est pas configurée ou si personne n'est connecté. Null fait rendre la main sans rien tenter."
   },
   {
-   "terme": "Verrou actif",
-   "definition": "isAuthConfigured — vrai quand la clé d'API Firebase est remplie. Faux, il n'y a ni page de connexion, ni compte, ni envoi en base."
+   "terme": "mergeDocumentOnce",
+   "definition": "Fusion transactionnelle d'un document qui a lu son état précédent. Elle porte la réponse unique du sondage et le franchissement du seuil de mises à jour."
   },
   {
-   "terme": "Data URL",
-   "definition": "Adresse data:image/jpeg;base64,… qui contient la photo elle-même. Seule forme affichable pour un avatar photo ; son poids se calcule sur la longueur de la charge base64, padding retiré."
+   "terme": "clé de secours",
+   "definition": "Clé sous laquelle une sauvegarde illisible est recopiée une seule fois avant que la session ne bascule en lecture seule."
   },
   {
-   "terme": "Glyphe émoji",
-   "definition": "Le visage de l'avatar : une personne selon le genre, un modificateur de teint et, par liaison ZWJ, une chevelure quand l'Unicode la connaît. Le blond a son propre émoji."
+   "terme": "verrou actif",
+   "definition": "isAuthConfigured : vrai quand la clé d'API Firebase n'est pas vide. Faux, ni connexion, ni envoi en base, ni suppression de compte distant."
   }
  ],
  "index": [
   {
-   "terme": "Âge (bornes 1–130)",
+   "terme": "âge (bornes 1–130)",
    "ancre": "profil-age"
   },
   {
-   "terme": "Alerte de plafond",
-   "ancre": "profil-alerte-plafond-une-par-compte-et-par-jour"
+   "terme": "taille (bornes 50–300 cm)",
+   "ancre": "profil-taille"
   },
   {
-   "terme": "Avatar aléatoire",
-   "ancre": "profil-avatar-aleatoire"
-  },
-  {
-   "terme": "boundsMessage",
-   "ancre": "profil-message-par-defaut-d-une-regle"
-  },
-  {
-   "terme": "cleanDecimalInput",
-   "ancre": "profil-nettoyage-decimal"
-  },
-  {
-   "terme": "cleanNumericInput",
-   "ancre": "profil-nettoyage-numerique-generique"
-  },
-  {
-   "terme": "Contexte d'envoi",
-   "ancre": "profil-contexte-d-envoi"
-  },
-  {
-   "terme": "Coupes de cheveux",
-   "ancre": "profil-coupes-proposees"
-  },
-  {
-   "terme": "Courrier (collection mail)",
-   "ancre": "profil-courrier-boite-et-reponse"
-  },
-  {
-   "terme": "Data URL (poids)",
-   "ancre": "profil-poids-d-une-data-url"
-  },
-  {
-   "terme": "Documents Firestore (feedbacks)",
-   "ancre": "profil-document-de-retour-en-base"
-  },
-  {
-   "terme": "Documents Firestore (surveys)",
-   "ancre": "profil-sondage-en-base-un-document-fusionne"
-  },
-  {
-   "terme": "Drapeaux de module",
-   "ancre": "profil-defauts-des-modules"
-  },
-  {
-   "terme": "Édition en place",
-   "ancre": "profil-edition-en-place-d-une-case-du-profil"
-  },
-  {
-   "terme": "Émoji de l'avatar",
-   "ancre": "profil-composition-du-glyphe-emoji"
-  },
-  {
-   "terme": "Expression happy",
-   "ancre": "profil-expression-toujours-happy"
-  },
-  {
-   "terme": "FAQ",
-   "ancre": "profil-faq-ouverture-exclusive"
-  },
-  {
-   "terme": "Flèches clavier (stepNumber)",
-   "ancre": "profil-fleches-clavier-sur-un-champ-numerique"
-  },
-  {
-   "terme": "formatBytes",
-   "ancre": "profil-ecriture-des-octets"
-  },
-  {
-   "terme": "Formulaire complet (validation)",
-   "ancre": "profil-validation-du-formulaire-complet"
-  },
-  {
-   "terme": "Genre",
-   "ancre": "profil-genre-du-profil-genre-de-l-avatar"
-  },
-  {
-   "terme": "isAuthConfigured",
-   "ancre": "profil-verrou-actif"
-  },
-  {
-   "terme": "isModuleHidden",
-   "ancre": "profil-masquage-complet"
-  },
-  {
-   "terme": "Jours de la semaine (0–6)",
-   "ancre": "profil-jours-et-frequences-proposes"
-  },
-  {
-   "terme": "Légal (acceptation)",
-   "ancre": "profil-acceptation-legale"
-  },
-  {
-   "terme": "Légal (premier lancement)",
-   "ancre": "profil-premier-lancement-legal"
-  },
-  {
-   "terme": "Libellés de page (courriers)",
-   "ancre": "profil-libelles-de-page"
-  },
-  {
-   "terme": "Messages d'échec de connexion",
-   "ancre": "profil-messages-d-echec-de-connexion"
-  },
-  {
-   "terme": "Messages d'échec de suppression",
-   "ancre": "profil-messages-d-echec-de-suppression"
-  },
-  {
-   "terme": "Minutes rondes",
-   "ancre": "profil-minutes-rondes"
-  },
-  {
-   "terme": "Modules (bascule)",
-   "ancre": "profil-bascule-d-un-module"
-  },
-  {
-   "terme": "NumberField (commit)",
-   "ancre": "profil-moment-du-jugement-et-retour-arriere-numberfield"
-  },
-  {
-   "terme": "Page d'origine",
-   "ancre": "profil-page-d-origine"
-  },
-  {
-   "terme": "Perte de poids affichée",
-   "ancre": "profil-apercu-profil-du-plusmenu"
-  },
-  {
-   "terme": "Photo (recadrage carré)",
-   "ancre": "profil-recadrage-carre"
-  },
-  {
-   "terme": "Photo (refus de format et de poids)",
-   "ancre": "profil-refus-d-une-photo-avant-lecture"
-  },
-  {
-   "terme": "Photo (réencodage JPEG)",
-   "ancre": "profil-reencodage-et-plafond-enregistre"
-  },
-  {
-   "terme": "Photo utilisable",
-   "ancre": "profil-photo-utilisable"
-  },
-  {
-   "terme": "Plafond quotidien (10 envois)",
-   "ancre": "profil-plafond-quotidien-des-envois"
-  },
-  {
-   "terme": "Poids (bornes 0,1–1000)",
+   "terme": "poids (bornes 0,1–1000 kg)",
    "ancre": "profil-poids-depart-et-objectif"
   },
   {
-   "terme": "Poids de départ (écriture)",
-   "ancre": "profil-poids-de-depart-depuis-le-profil"
-  },
-  {
-   "terme": "Poids de départ (lecture)",
-   "ancre": "profil-poids-de-depart-affiche"
-  },
-  {
-   "terme": "Prénom ou pseudo",
+   "terme": "prénom ou pseudo",
    "ancre": "profil-nom-ou-pseudo"
-  },
-  {
-   "terme": "Profil d'usine",
-   "ancre": "profil-profil-d-usine"
-  },
-  {
-   "terme": "Rappel d'injections (défauts)",
-   "ancre": "profil-defauts-du-rappel-d-injections"
-  },
-  {
-   "terme": "Rappel médical (défauts)",
-   "ancre": "profil-defauts-du-rappel-medical"
-  },
-  {
-   "terme": "Récapitulatif personnalisé",
-   "ancre": "profil-recapitulatif-du-rappel-personnalise"
-  },
-  {
-   "terme": "Refus d'un message vide",
-   "ancre": "profil-refus-d-un-message-vide"
   },
   {
    "terme": "sanitizeNumber",
    "ancre": "profil-validation-numerique-a-la-sortie"
   },
   {
-   "terme": "Sélecteur de traitement",
-   "ancre": "profil-selecteur-de-traitement"
+   "terme": "cleanNumericInput",
+   "ancre": "profil-nettoyage-numerique-generique"
   },
   {
-   "terme": "Sondage (journal des envois)",
-   "ancre": "profil-sondage-journal-des-envois"
+   "terme": "cleanDecimalInput",
+   "ancre": "profil-nettoyage-decimal"
   },
   {
-   "terme": "Sondage (notes 0–5)",
-   "ancre": "profil-sondage-notes-et-defauts"
+   "terme": "boundsMessage",
+   "ancre": "profil-message-par-defaut-d-une-regle"
   },
   {
-   "terme": "Sondage (stockage local)",
-   "ancre": "profil-sondage-stockage-local-et-repli"
+   "terme": "stepNumber (flèches clavier)",
+   "ancre": "profil-fleches-clavier-sur-un-champ-numerique"
   },
   {
-   "terme": "Stockage local (clés)",
+   "terme": "NumberField (moment du jugement)",
+   "ancre": "profil-moment-du-jugement-et-retour-arriere-numberfield"
+  },
+  {
+   "terme": "édition en place",
+   "ancre": "profil-edition-en-place-d-une-case-du-profil"
+  },
+  {
+   "terme": "formulaire complet (validation)",
+   "ancre": "profil-validation-du-formulaire-complet"
+  },
+  {
+   "terme": "fermeture par appui à côté",
+   "ancre": "profil-fermeture-d-un-formulaire-par-appui-a-cote"
+  },
+  {
+   "terme": "setStartingWeight",
+   "ancre": "profil-poids-de-depart-depuis-le-profil"
+  },
+  {
+   "terme": "getStartingWeight",
+   "ancre": "profil-poids-de-depart-affiche"
+  },
+  {
+   "terme": "INITIAL_STARTING_WEIGHT",
+   "ancre": "profil-poids-de-depart-affiche"
+  },
+  {
+   "terme": "INITIAL_PROFILE",
+   "ancre": "profil-profil-d-usine"
+  },
+  {
+   "terme": "handleSaveProfile",
+   "ancre": "profil-enregistrement-du-profil"
+  },
+  {
+   "terme": "roundWeight",
+   "ancre": "profil-enregistrement-du-profil"
+  },
+  {
+   "terme": "glp1_app_companion_data",
    "ancre": "profil-stockage-local"
   },
   {
-   "terme": "Sujets des courriers",
-   "ancre": "profil-sujets-des-courriers"
+   "terme": "clé de secours (sauvegarde illisible)",
+   "ancre": "profil-stockage-local"
   },
   {
-   "terme": "Suppression de compte (ordre)",
-   "ancre": "profil-ordre-de-la-suppression-de-compte"
-  },
-  {
-   "terme": "Taille (bornes 50–300)",
-   "ancre": "profil-taille"
-  },
-  {
-   "terme": "Titres de page",
-   "ancre": "profil-navigation-vers-mon-profil"
-  },
-  {
-   "terme": "Traitement (identifiant)",
+   "terme": "glp1Brand",
    "ancre": "profil-traitement-par-identifiant"
   },
   {
-   "terme": "Traitement (libellé et picto)",
+   "terme": "DEFAULT_TREATMENT_ID",
+   "ancre": "profil-traitement-par-identifiant"
+  },
+  {
+   "terme": "sélecteur de traitement",
+   "ancre": "profil-selecteur-de-traitement"
+  },
+  {
+   "terme": "forme du traitement (oral / injection)",
    "ancre": "profil-libelle-et-picto-selon-la-forme"
+  },
+  {
+   "terme": "genre du profil",
+   "ancre": "profil-genre-du-profil-genre-de-l-avatar"
+  },
+  {
+   "terme": "avatar : changement de genre",
+   "ancre": "profil-changement-de-genre-de-l-avatar"
+  },
+  {
+   "terme": "avatar aléatoire",
+   "ancre": "profil-avatar-aleatoire"
+  },
+  {
+   "terme": "expression 'happy'",
+   "ancre": "profil-expression-toujours-happy"
+  },
+  {
+   "terme": "coupes de cheveux",
+   "ancre": "profil-coupes-proposees"
+  },
+  {
+   "terme": "glyphe émoji de l'avatar",
+   "ancre": "profil-composition-du-glyphe-emoji"
+  },
+  {
+   "terme": "photo d'avatar : formats acceptés",
+   "ancre": "profil-refus-d-une-photo-avant-lecture"
+  },
+  {
+   "terme": "photo d'avatar : recadrage",
+   "ancre": "profil-recadrage-carre"
+  },
+  {
+   "terme": "photo d'avatar : réencodage",
+   "ancre": "profil-reencodage-et-plafond-enregistre"
+  },
+  {
+   "terme": "dataUrlBytes",
+   "ancre": "profil-poids-d-une-data-url"
+  },
+  {
+   "terme": "formatBytes",
+   "ancre": "profil-ecriture-des-octets"
+  },
+  {
+   "terme": "isUsablePhotoUrl",
+   "ancre": "profil-photo-utilisable"
+  },
+  {
+   "terme": "champ fichier vidé",
+   "ancre": "profil-champ-fichier-vide"
+  },
+  {
+   "terme": "isModuleOn",
+   "ancre": "profil-defauts-des-modules"
+  },
+  {
+   "terme": "MODULE_FLAGS",
+   "ancre": "profil-defauts-des-modules"
+  },
+  {
+   "terme": "bascule d'un module",
+   "ancre": "profil-bascule-d-un-module"
+  },
+  {
+   "terme": "isModuleHidden",
+   "ancre": "profil-masquage-complet"
+  },
+  {
+   "terme": "rappel d'injections",
+   "ancre": "profil-defauts-du-rappel-d-injections"
+  },
+  {
+   "terme": "jours et fréquences",
+   "ancre": "profil-jours-et-frequences-proposes"
+  },
+  {
+   "terme": "récapitulatif du rappel personnalisé",
+   "ancre": "profil-recapitulatif-du-rappel-personnalise"
+  },
+  {
+   "terme": "rappel médical",
+   "ancre": "profil-defauts-du-rappel-medical"
+  },
+  {
+   "terme": "snapToRoundedMinutes",
+   "ancre": "profil-minutes-rondes"
+  },
+  {
+   "terme": "connexion : champs requis",
+   "ancre": "profil-connexion-champs-requis"
+  },
+  {
+   "terme": "authErrorMessage",
+   "ancre": "profil-messages-d-echec-de-connexion"
+  },
+  {
+   "terme": "isAuthConfigured",
+   "ancre": "profil-verrou-actif"
+  },
+  {
+   "terme": "suppression de compte (ordre)",
+   "ancre": "profil-ordre-de-la-suppression-de-compte"
+  },
+  {
+   "terme": "accountDeletionErrorMessage",
+   "ancre": "profil-messages-d-echec-de-suppression"
+  },
+  {
+   "terme": "deleteCurrentUser",
+   "ancre": "profil-suppression-du-compte-firebase"
+  },
+  {
+   "terme": "aperçu profil du PlusMenu",
+   "ancre": "profil-apercu-profil-du-plusmenu"
+  },
+  {
+   "terme": "PAGE_TITLES",
+   "ancre": "profil-navigation-vers-mon-profil"
+  },
+  {
+   "terme": "pageLabel",
+   "ancre": "profil-libelles-de-page"
+  },
+  {
+   "terme": "message vide (refus)",
+   "ancre": "profil-refus-d-un-message-vide"
+  },
+  {
+   "terme": "DAILY_SEND_CAP",
+   "ancre": "profil-plafond-quotidien-des-envois"
+  },
+  {
+   "terme": "FeedbackItem (composition)",
+   "ancre": "profil-composition-d-un-message-de-retour"
+  },
+  {
+   "terme": "quietly",
+   "ancre": "profil-envoi-en-base-apres-le-local"
+  },
+  {
+   "terme": "feedbacks/{uid}/messages",
+   "ancre": "profil-document-de-retour-en-base"
+  },
+  {
+   "terme": "collection mail",
+   "ancre": "profil-courrier-boite-et-reponse"
+  },
+  {
+   "terme": "alerte plafond",
+   "ancre": "profil-alerte-plafond-une-par-compte-et-par-jour"
+  },
+  {
+   "terme": "sujets des courriers",
+   "ancre": "profil-sujets-des-courriers"
+  },
+  {
+   "terme": "contextRows",
+   "ancre": "profil-lignes-de-contexte-d-un-courrier"
+  },
+  {
+   "terme": "buildSubmissionContext",
+   "ancre": "profil-contexte-d-envoi"
+  },
+  {
+   "terme": "originOfPage",
+   "ancre": "profil-page-d-origine"
+  },
+  {
+   "terme": "sondage : notes",
+   "ancre": "profil-sondage-notes-et-defauts"
+  },
+  {
+   "terme": "glp1_user_survey_v2",
+   "ancre": "profil-sondage-stockage-local-et-repli"
+  },
+  {
+   "terme": "sondage : journal des envois",
+   "ancre": "profil-sondage-journal-des-envois"
+  },
+  {
+   "terme": "surveys/{uid}",
+   "ancre": "profil-sondage-en-base-un-document-fusionne"
+  },
+  {
+   "terme": "updateCount",
+   "ancre": "profil-sondage-en-base-un-document-fusionne"
+  },
+  {
+   "terme": "FAQ",
+   "ancre": "profil-faq-ouverture-exclusive"
+  },
+  {
+   "terme": "hasAcceptedMedicalDisclaimer_v1",
+   "ancre": "profil-acceptation-legale"
+  },
+  {
+   "terme": "premier lancement légal",
+   "ancre": "profil-premier-lancement-legal"
+  },
+  {
+   "terme": "UserProfile (champs)",
+   "ancre": "profil-entites"
   }
  ],
  "ancres_traitees": [
+  "profil-entites",
   "profil-connexion-champs-requis",
   "profil-messages-d-echec-de-connexion",
   "profil-verrou-actif",

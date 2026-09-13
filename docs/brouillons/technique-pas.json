@@ -21,8 +21,8 @@
   {
    "categorie": "Règle de saisie",
    "fonctionnalite": "Écriture d'un relevé de pas",
-   "texte": "Bornes de validation d'un nombre de pas (minimum, maximum, plafond de relevés par journée comme le 15 du sport et du sommeil). J'ai voulu en poser ; il n'y en a aucune : handleAddStep écrit sans contrôle, et la version Mixte ne câble même pas ce geste.",
-   "origine": "src/app/useAppData.ts, handleAddStep ; aucune règle dans form.rules.ts pour les pas."
+   "texte": "Bornes de validation d'un nombre de pas (minimum, maximum, plafond de relevés par journée comme le 15 du sport et du sommeil). J'ai voulu en poser ; il n'y en a aucune : handleAddStep écrit sans contrôle, et la version Mixte ne câble ni ce geste ni celui de modification (handleUpdateStep est passé à StepsTracker mais jamais déstructuré).",
+   "origine": "src/app/useAppData.ts, handleAddStep ; src/versions/mixte/features/steps/StepsTracker.tsx:24 et 29-36 ; aucune règle dans form.rules.ts pour les pas."
   },
   {
    "categorie": "Valeur d'exemple",
@@ -34,110 +34,70 @@
  "glossaire": [
   {
    "terme": "StepLog",
-   "definition": "Seule entité stockée du domaine : id, date (AAAA-MM-JJ locale), steps (nombre de pas), isSimulated facultatif. Ni heure, ni durée, ni calorie."
+   "definition": "Le seul objet stocké du domaine des pas : id, date (AAAA-MM-JJ, heure locale), steps (nombre de pas), isSimulated facultatif. Aucune distance, durée ni calorie n'y est écrite."
   },
   {
    "terme": "KM_PER_STEP",
-   "definition": "0,00076 km par pas. Sert à la distance affichée (cartes, cumul), jamais aux calories."
+   "definition": "0,00076 km par pas, soit 76 cm. Constante unique de conversion pas → distance, indépendante de la taille du profil. Cinq appels dans la version Mixte."
   },
   {
    "terme": "STEPS_PER_MINUTE",
-   "definition": "95 pas par minute. Cadence unique dont dérive toute durée de marche estimée."
+   "definition": "95 pas par minute. Cadence fixe dont dérive toute durée de marche : stepsWalkingMinutes(pas) = round(max(0, pas) / 95)."
   },
   {
    "terme": "WALKING_SPEED_KMH",
-   "definition": "4,2 km/h. Valeur affichée sans calcul, repli de la vitesse du cumul, et vitesse en dur dans le calcul des calories."
+   "definition": "4,2 km/h. Valeur d'affichage jamais calculée, montrée à quatre endroits, servant aussi de repli de la vitesse du cumul et d'avgSpeed de computeStepsStatsSince."
   },
   {
    "terme": "DEFAULT_DAILY_GOAL_STEPS",
-   "definition": "8 000 pas. Objectif quotidien unique du site ; aucun champ de profil ne le règle."
-  },
-  {
-   "terme": "stepsWalkingMinutes(pas)",
-   "definition": "round(max(0, pas) / 95). Rend des minutes entières ; l'écriture « 45min » / « 1h33 » est le travail de formatCalendarDuration."
-  },
-  {
-   "terme": "getWeightAtDate(date, pesées, profil)",
-   "definition": "Dernière pesée datée au plus tard de la date ; à défaut poids de départ, puis poids visé, puis pesée la plus ancienne, puis 80 kg."
+   "definition": "8 000 pas par jour. Objectif unique du module ; aucun champ du profil ne le règle, aucun appelant ne le remplace."
   },
   {
    "terme": "computeStepsStatsSince",
-   "definition": "Moyennes par jour sur les relevés datés ≥ une borne. Dénominateur : le nombre de lignes, pas de journées."
+   "definition": "Moyennes de la carte « Statistiques/j » depuis une borne basse, dénominateur = nombre de lignes de la fenêtre. avgDistance et avgDuration dérivent d'avgSteps, pas de la moyenne des journées."
   },
   {
    "terme": "computeCumulativeStepsStats",
-   "definition": "Cumul depuis une date effective : total de pas, km, minutes, vitesse réellement calculée. null sur un historique vide."
-  },
-  {
-   "terme": "rawFirstDate",
-   "definition": "Date effective du cumul : la date choisie, sinon celle du plus ancien relevé. Borne commune du bloc fusionné de la couche vitrée."
+   "definition": "Cumul depuis une date effective (date choisie, sinon plus ancien relevé) : totalSteps, totalKm non arrondi, totalMinutes, avgSpeed réellement calculée. Rend null sur historique vide."
   },
   {
    "terme": "stepsDailyAverage",
-   "definition": "Moyenne de l'accueil : pas additionnés par date, journées à 0 écartées, divisée par le nombre de journées relevées. null si aucune."
+   "definition": "Moyenne de pas par journée relevée, employée par les tuiles de l'accueil et le rapport médical : relevés d'une même date additionnés, journées à 0 écartées, null si aucune journée relevée."
   },
   {
-   "terme": "getCutoffDateStr",
-   "definition": "Date de coupure d'une fenêtre : aujourd'hui − (N − 1), jour en cours compris ; null pour « Depuis le début » et pour « Choisir » sans début."
+   "terme": "getStepsCaloriesForLog",
+   "definition": "Calories d'un relevé, recalculées à chaque lecture : MET 3,5, foulée = taille × 0,414, vitesse 4,2 km/h en dur, poids lu par getWeightAtDate à la date du relevé."
+  },
+  {
+   "terme": "getWeightAtDate",
+   "definition": "Poids en vigueur à une date, avec quatre replis en cascade : pesée marquée isStartingWeight, targetWeight du profil, première pesée triée, 80 kg."
   },
   {
    "terme": "filterByTimeWindow",
-   "definition": "Filtre par comparaison de chaînes AAAA-MM-JJ. Aucune borne haute hors mode « Choisir » ; en « Choisir », une borne vide est illimitée."
+   "definition": "Filtre commun des périodes : 'all' passe tout, 'custom' applique les bornes non vides, une fenêtre de N jours ne teste que date >= aujourd'hui − (N − 1). Aucune borne haute hors mode « Choisir »."
   },
   {
-   "terme": "usePeriodWindow(clé)",
-   "definition": "Fenêtre d'un bloc, persistée sous glp1_period_<clé>. setCustomWindow bascule en « Choisir » et écrit les bornes en une opération."
-  },
-  {
-   "terme": "useHistoryView(clé)",
-   "definition": "Curseur calendrier ↔ journal. Rend « journal » seulement si la valeur stockée vaut exactement 'journal'."
-  },
-  {
-   "terme": "formatNumber(valeur, décimales)",
-   "definition": "Milliers séparés par U+00A0, décimales après un point, zéros de queue supprimés, chaîne vide pour NaN et ±∞."
-  },
-  {
-   "terme": "formatCalendarDuration(minutes)",
-   "definition": "« Nmin » sous l'heure, « HhMM » au-delà, après max(0, round)."
-  },
-  {
-   "terme": "TREND_DAYS / trendDates",
-   "definition": "Fenêtre de tendance : 14 dates locales, de J−13 à aujourd'hui."
-  },
-  {
-   "terme": "informedTrendMean",
-   "definition": "Moyenne des valeurs non nulles d'une série de tendance. La série des pas n'en portant aucune, le diviseur y vaut 14."
+   "terme": "hasShape",
+   "definition": "Décide si une série de tendance a une forme à dessiner : au moins deux valeurs non nulles et un minimum différent du maximum. Faux, la carte reste dessinée mais sa zone de courbe est remplacée par une invite."
   },
   {
    "terme": "periodShift",
-   "definition": "Sens d'évolution : sommes des deux moitiés de la fenêtre, seuil de stabilité à 5 % de la moitié ancienne, moitiés à zéro tranchées par comparaison directe."
+   "definition": "Sens d'une série : somme de la première moitié contre somme de la seconde, écart relatif comparé à un seuil de 5 %, avec les moitiés nulles tranchées avant le rapport."
   },
   {
-   "terme": "stepsDayTotal / stepsByDate",
-   "definition": "Rangement du calendrier : une liste de relevés par date, et leur somme pour la tuile."
+   "terme": "format1Dec",
+   "definition": "Fonction de src/features/home/homeOverview.ts qui enveloppe formatNumber1Dec. Ce n'est pas un export du module de nombres ; c'est elle qu'emploie le bloc du cumul."
   },
   {
-   "terme": "CalendarBlock",
-   "definition": "Coquille commune des sept calendriers : grille lundi→dimanche, navigation bornée au mois courant, glissé ≥ 48 px, bulle fermée au clic ailleurs."
+   "terme": "formatCalendarDuration",
+   "definition": "Écriture d'une durée : arrondi puis borne à 0, « NNmin » sous une heure, « HhMM » au-delà avec minutes sur deux chiffres."
+  },
+  {
+   "terme": "rawFirstDate",
+   "definition": "Date effective du cumul au format AAAA-MM-JJ. Sert de borne aux moyennes de la couche vitrée et pré-remplit le champ d'édition de la date de départ."
   }
  ],
  "index": [
-  {
-   "terme": "0,00076 km par pas",
-   "ancre": "pas-distance-par-pas"
-  },
-  {
-   "terme": "95 pas par minute",
-   "ancre": "pas-duree-de-marche-estimee"
-  },
-  {
-   "terme": "4,2 km/h",
-   "ancre": "pas-vitesse-de-marche-de-reference"
-  },
-  {
-   "terme": "8 000 pas (objectif)",
-   "ancre": "pas-objectif-quotidien-de-pas"
-  },
   {
    "terme": "StepLog",
    "ancre": "pas-entites"
@@ -147,56 +107,36 @@
    "ancre": "pas-tuile-du-calendrier-des-pas"
   },
   {
-   "terme": "stepsTrackingEnabled",
-   "ancre": "pas-activation-automatique-des-modules-pas-et-sport"
+   "terme": "handleAddStep (chemin mort)",
+   "ancre": "pas-entites"
   },
   {
-   "terme": "naviguerVersPageEteinte",
-   "ancre": "pas-activation-automatique-des-modules-pas-et-sport"
+   "terme": "handleUpdateStep (chemin mort)",
+   "ancre": "pas-entites"
   },
   {
-   "terme": "glp1_steps_history_view",
-   "ancre": "pas-curseur-calendrier-journal"
+   "terme": "handleDeleteStep",
+   "ancre": "pas-pourcentage-d-une-ligne-de-journal"
   },
   {
-   "terme": "glp1_period_steps_journal",
-   "ancre": "pas-tri-et-filtre-du-journal-des-pas"
+   "terme": "handleClearAllSteps",
+   "ancre": "pas-bouton-tout-supprimer"
   },
   {
-   "terme": "glp1_period_steps_chart",
-   "ancre": "pas-points-du-graphe-des-pas"
+   "terme": "DEFAULT_DAILY_GOAL_STEPS",
+   "ancre": "pas-objectif-quotidien-de-pas"
   },
   {
-   "terme": "steps_custom_start_date",
-   "ancre": "pas-persistance-de-la-date-de-depart-du-cumul"
+   "terme": "KM_PER_STEP",
+   "ancre": "pas-distance-par-pas"
   },
   {
-   "terme": "formatNumber",
-   "ancre": "pas-formats-communs-des-nombres-et-dates"
+   "terme": "STEPS_PER_MINUTE",
+   "ancre": "pas-duree-de-marche-estimee"
   },
   {
-   "terme": "formatCalendarDuration",
-   "ancre": "pas-formats-communs-des-nombres-et-dates"
-  },
-  {
-   "terme": "getLocalDateStr",
-   "ancre": "pas-formats-communs-des-nombres-et-dates"
-  },
-  {
-   "terme": "computeStepsChartData",
-   "ancre": "pas-points-du-graphe-des-pas"
-  },
-  {
-   "terme": "relevé daté dans le futur",
-   "ancre": "pas-points-du-graphe-des-pas"
-  },
-  {
-   "terme": "percentReached",
-   "ancre": "pas-pourcentage-d-objectif-du-jour"
-  },
-  {
-   "terme": "stepsOn",
-   "ancre": "pas-pourcentage-d-objectif-du-jour"
+   "terme": "WALKING_SPEED_KMH",
+   "ancre": "pas-vitesse-de-marche-de-reference"
   },
   {
    "terme": "stepsWalkingMinutes",
@@ -211,15 +151,11 @@
    "ancre": "pas-calories-des-pas"
   },
   {
-   "terme": "foulée (taille × 0,414)",
-   "ancre": "pas-calories-des-pas"
-  },
-  {
    "terme": "getWeightAtDate",
    "ancre": "pas-poids-a-une-date"
   },
   {
-   "terme": "getStartingWeight",
+   "terme": "isStartingWeight",
    "ancre": "pas-poids-a-une-date"
   },
   {
@@ -227,20 +163,112 @@
    "ancre": "pas-moyennes-statistiques-j-depuis-une-date"
   },
   {
-   "terme": "avgProgress",
-   "ancre": "pas-moyennes-statistiques-j-depuis-une-date"
-  },
-  {
    "terme": "computeLastMonthStats",
-   "ancre": "pas-fenetre-des-statistiques-sur-la-page-vs-sous-la-couche"
-  },
-  {
-   "terme": "rawFirstDate",
    "ancre": "pas-fenetre-des-statistiques-sur-la-page-vs-sous-la-couche"
   },
   {
    "terme": "SurimpressionPas",
    "ancre": "pas-fenetre-des-statistiques-sur-la-page-vs-sous-la-couche"
+  },
+  {
+   "terme": "computeCumulativeStepsStats",
+   "ancre": "pas-cumul-depuis-une-date"
+  },
+  {
+   "terme": "rawFirstDate",
+   "ancre": "pas-cumul-depuis-une-date"
+  },
+  {
+   "terme": "steps_custom_start_date",
+   "ancre": "pas-persistance-de-la-date-de-depart-du-cumul"
+  },
+  {
+   "terme": "computeStepsChartData",
+   "ancre": "pas-points-du-graphe-des-pas"
+  },
+  {
+   "terme": "glp1_period_steps_chart",
+   "ancre": "pas-points-du-graphe-des-pas"
+  },
+  {
+   "terme": "glp1_period_steps_journal",
+   "ancre": "pas-tri-et-filtre-du-journal-des-pas"
+  },
+  {
+   "terme": "glp1_steps_history_view",
+   "ancre": "pas-curseur-calendrier-journal"
+  },
+  {
+   "terme": "useHistoryView",
+   "ancre": "pas-curseur-calendrier-journal"
+  },
+  {
+   "terme": "useStepsStats",
+   "ancre": "pas-pourcentage-d-objectif-du-jour"
+  },
+  {
+   "terme": "useStepsJournal",
+   "ancre": "pas-tri-et-filtre-du-journal-des-pas"
+  },
+  {
+   "terme": "StepsJournalRow",
+   "ancre": "pas-pourcentage-d-une-ligne-de-journal"
+  },
+  {
+   "terme": "JournalDrawer (surimpression Journal)",
+   "ancre": "pas-pourcentage-d-une-ligne-de-journal"
+  },
+  {
+   "terme": "StepsTrendChart",
+   "ancre": "pas-infobulle-du-graphe-des-pas"
+  },
+  {
+   "terme": "TrendGraphOverlay",
+   "ancre": "pas-points-du-graphe-des-pas"
+  },
+  {
+   "terme": "TrendDrawer",
+   "ancre": "pas-tendance-des-pas-tiroir-tendances"
+  },
+  {
+   "terme": "hasShape",
+   "ancre": "pas-tendance-des-pas-tiroir-tendances"
+  },
+  {
+   "terme": "stepsTrend",
+   "ancre": "pas-tendance-des-pas-tiroir-tendances"
+  },
+  {
+   "terme": "stepsTrendKcalPerDay",
+   "ancre": "pas-tendance-des-pas-tiroir-tendances"
+  },
+  {
+   "terme": "informedTrendMean",
+   "ancre": "pas-tendance-des-pas-tiroir-tendances"
+  },
+  {
+   "terme": "periodShift",
+   "ancre": "pas-sens-hausse-baisse-stable-tuiles-dynamique"
+  },
+  {
+   "terme": "stepsDailyAverage",
+   "ancre": "pas-moyenne-de-pas-par-jour-home-depuis-le-debut"
+  },
+  {
+   "terme": "stepsDailyAverageLast7Days",
+   "ancre": "pas-moyenne-de-pas-sur-7-jours-home"
+  },
+  {
+   "terme": "stepsOn",
+   "ancre": "pas-pourcentage-d-objectif-du-jour"
+  },
+  {
+   "terme": "HomeStepsProgress (bloc « Mes pas »)",
+   "ancre": "pas-pourcentage-d-objectif-du-jour"
+  },
+  {
+   "terme": "MedicalReportExport (carreau des pas)",
+   "ancre": "pas-distance-par-pas"
   },
   {
    "terme": "stepsByDate",
@@ -255,16 +283,8 @@
    "ancre": "pas-coquille-commune-des-calendriers"
   },
   {
-   "terme": "glissé de 48 px",
+   "terme": "monthGrid",
    "ancre": "pas-coquille-commune-des-calendriers"
-  },
-  {
-   "terme": "StepsJournalRow",
-   "ancre": "pas-pourcentage-d-une-ligne-de-journal"
-  },
-  {
-   "terme": "sortedHistory",
-   "ancre": "pas-tri-et-filtre-du-journal-des-pas"
   },
   {
    "terme": "filterByTimeWindow",
@@ -276,10 +296,6 @@
   },
   {
    "terme": "usePeriodWindow",
-   "ancre": "pas-selecteur-de-periode-commun"
-  },
-  {
-   "terme": "PERIOD_OPTIONS",
    "ancre": "pas-selecteur-de-periode-commun"
   },
   {
@@ -303,63 +319,44 @@
    "ancre": "pas-bouton-tout-supprimer"
   },
   {
-   "terme": "computeCumulativeStepsStats",
-   "ancre": "pas-cumul-depuis-une-date"
+   "terme": "formatNumber",
+   "ancre": "pas-formats-communs-des-nombres-et-dates"
   },
   {
-   "terme": "avgSpeed",
-   "ancre": "pas-cumul-depuis-une-date"
+   "terme": "format1Dec",
+   "ancre": "pas-formats-communs-des-nombres-et-dates"
   },
   {
-   "terme": "useCumulativeStepsStats",
-   "ancre": "pas-persistance-de-la-date-de-depart-du-cumul"
+   "terme": "formatCalendarDuration",
+   "ancre": "pas-formats-communs-des-nombres-et-dates"
   },
   {
-   "terme": "DateSelect",
-   "ancre": "pas-persistance-de-la-date-de-depart-du-cumul"
+   "terme": "getLocalDateStr",
+   "ancre": "pas-formats-communs-des-nombres-et-dates"
   },
   {
-   "terme": "closedTooltipKey",
-   "ancre": "pas-infobulle-du-graphe-des-pas"
+   "terme": "formatDayMonth",
+   "ancre": "pas-formats-communs-des-nombres-et-dates"
+  },
+  {
+   "terme": "handleNavigate",
+   "ancre": "pas-activation-automatique-des-modules-pas-et-sport"
+  },
+  {
+   "terme": "naviguerVersPageEteinte",
+   "ancre": "pas-activation-automatique-des-modules-pas-et-sport"
+  },
+  {
+   "terme": "module-steps-tracking",
+   "ancre": "pas-activation-automatique-des-modules-pas-et-sport"
   },
   {
    "terme": "yAxisWidth",
    "ancre": "pas-infobulle-du-graphe-des-pas"
-  },
-  {
-   "terme": "stepsDailyAverage",
-   "ancre": "pas-moyenne-de-pas-par-jour-home-depuis-le-debut"
-  },
-  {
-   "terme": "stepsDailyAverageLast7Days",
-   "ancre": "pas-moyenne-de-pas-sur-7-jours-home"
-  },
-  {
-   "terme": "periodShift",
-   "ancre": "pas-sens-hausse-baisse-stable-tuiles-dynamique"
-  },
-  {
-   "terme": "seuil de 5 %",
-   "ancre": "pas-sens-hausse-baisse-stable-tuiles-dynamique"
-  },
-  {
-   "terme": "stepsTrend",
-   "ancre": "pas-tendance-des-pas-tiroir-tendances"
-  },
-  {
-   "terme": "informedTrendMean",
-   "ancre": "pas-tendance-des-pas-tiroir-tendances"
-  },
-  {
-   "terme": "stepsTrendKcalPerDay",
-   "ancre": "pas-tendance-des-pas-tiroir-tendances"
-  },
-  {
-   "terme": "TREND_DAYS",
-   "ancre": "pas-tendance-des-pas-tiroir-tendances"
   }
  ],
  "ancres_traitees": [
+  "pas-entites",
   "pas-objectif-quotidien-de-pas",
   "pas-activation-automatique-des-modules-pas-et-sport",
   "pas-curseur-calendrier-journal",

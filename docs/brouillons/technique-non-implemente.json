@@ -10,7 +10,7 @@
    "categorie": "migration",
    "fonctionnalite": "Tables sideEffectTypes et sportTypes",
    "texte": "Le schéma des deux tables une fois créées, et la conversion de SideEffectLog.type (libellé) vers typeId, avec la règle de rapprochement des libellés existants.",
-   "origine": "src/types.ts déclare SideEffectType et SportType avec leurs champs, mais AppData ne les porte pas et aucune fonction de conversion n'existe. La règle de rapprochement libellé → identifiant n'est écrite nulle part."
+   "origine": "src/types.ts déclare SideEffectType et SportType avec leurs champs, mais AppData ne les porte pas (dix clés : profile, weightHistory, dailyLogs, injectionHistory, savedMeals, sideEffectHistory, stepLogs, sportLogs, meTimeLogs, sleepLogs) et aucune fonction de conversion n'existe. La règle de rapprochement libellé → identifiant n'est écrite nulle part."
   },
   {
    "categorie": "seuils",
@@ -22,122 +22,226 @@
    "categorie": "branchement",
    "fonctionnalite": "Accordéons d'analyse des graphes repas",
    "texte": "Où les quatre analyses de chartAnalysis.ts se monteraient dans la page Menus, et sous quel graphe chacune.",
-   "origine": "Le nom des fonctions dit à quel graphe elles correspondent, mais aucun composant de la Mixte ne les importe et aucun emplacement n'est réservé dans le JSX. ChartAnalysisAccordion n'est monté que par les deux graphes de sommeil."
+   "origine": "Le nom des fonctions dit à quel graphe elles correspondent, mais aucun composant de la Mixte ne les importe — le seul importateur est chartAnalysis.test.ts — et aucun emplacement n'est réservé dans le JSX. ChartAnalysisAccordion n'est monté que par les deux graphes de sommeil."
   },
   {
    "categorie": "correction",
    "fonctionnalite": "Cartes journalières — décalage UTC/local du compte de jours",
    "texte": "La correction du compte de jours (lecture de log.date à midi local plutôt qu'à minuit UTC) et son effet exact sur le nombre de cartes selon le fuseau.",
-   "origine": "Le décalage est lisible dans le code (new Date('AAAA-MM-JJ') contre new Date()), mais aucun test ne le couvre et aucun commentaire ne le reconnaît. Le sens du décalage dépend du fuseau du navigateur, que je ne peux pas fixer."
+   "origine": "Le décalage est lisible dans le code (new Date('AAAA-MM-JJ') contre new Date()), mais aucun test ne le couvre et aucun commentaire ne le reconnaît. Le sens du décalage dépend du fuseau du navigateur, que je ne peux pas fixer. Le chapitre corrigé n'énonce plus que le sens du décalage à l'est de Greenwich, et l'exemple de Camille est daté d'une heure précise (13 septembre 2026, 14 h à Paris) faute de quoi le nombre de cartes n'est pas déterminé."
   },
   {
    "categorie": "persistance",
    "fonctionnalite": "Onboarding V2 — enregistrement des réponses",
    "texte": "La conversion des réponses V2 (poids en texte à point décimal, tailleCm, anneeNaissance) vers les entités du domaine au moment où l'onboarding écrira quelque chose.",
    "origine": "GUIDELINES.md, « Non traité au 2026-09-09 » : « Aucune réponse n'est enregistrée : un rechargement perd tout. » Le commentaire de reponses.ts dit seulement « La conversion en nombre se fera là où on les enregistrera ». Il n'y a ni cible, ni fonction, ni format."
+  },
+  {
+   "categorie": "cas limite",
+   "fonctionnalite": "Onboarding V2 — effet du bornage du rang sur un changement d'objectif",
+   "texte": "Le scénario « changer d'objectif pour stabiliser alors qu'on est sur poids-cible raccourcit la liste sous les pieds du rang, qui retombe sur la dernière étape visible » a été retiré.",
+   "origine": "Réfutation retenue. useParcours.ts:34-36 borne par min(rang, visibles.length − 1) : sur une liste passant de 9 à 8 étapes, seul un rang supérieur à 7 est déplacé, et l'objectif se répond à l'étape objectif (rang 2), pas depuis poids-cible. Le commentaire du fichier annonce ce scénario, le calcul ne le produit pas. Le cas limite a été remplacé par la règle réelle du bornage ; le rang de fin de parcours après retour en arrière n'a pas été chiffré, faute de test le couvrant."
+  },
+  {
+   "categorie": "portee",
+   "fonctionnalite": "Cartes journalières et analyse du sommeil — affirmation d'absence totale d'écran",
+   "texte": "Les phrases « les cartes journalières des pas […] qu'aucun écran ne monte » et « Aucune de ces 136 cartes n'atteint un écran » ont été retirées, ainsi que « les moteurs d'analyse textuelle des graphes repas et sommeil » dans la liste de ce qu'aucun écran ne monte.",
+   "origine": "Réfutations retenues. computeDailySwipeList est lu par des composants hors du périmètre de cette spec (seule la Mixte y est décrite) : le chapitre n'énonce plus que le fait vérifiable, la page Pas de la Mixte ne lit pas la clé dailySwipeList (StepsTracker.tsx n'y prend que sortedHistory, sortedHistory.length, todayStr, todayTotalSteps, todayCalories, percentReached, lastMonthStats). analyzeSleepEvolution est bien appelée et ses paragraphes rendus en clair par shareTemplates.tsx:995 et 1013-1019, sur une fenêtre fixe de 30 jours : le chapitre le dit désormais sans nommer l'écran qui la porte, celui-ci relevant de l'administration, hors périmètre."
   }
  ],
  "glossaire": [
   {
-   "terme": "AppData",
-   "definition": "La sauvegarde du domaine, un unique objet JSON sous la clé glp1_app_companion_data : profil, historique de poids, journaux quotidiens, injections, repas, effets secondaires, pas, sport, temps pour soi, sommeil."
+   "terme": "shows",
+   "definition": "Prédicat facultatif d'une étape d'ONBOARDING_STEPS. Absent, l'étape est toujours visible ; présent, il décide au vu des réponses déjà données. Sept étapes en portent un."
   },
   {
-   "terme": "Branche (d'étape)",
-   "definition": "Prédicat shows porté par une étape du questionnaire, qui décide de son affichage au vu des seules réponses déjà données. Une branche ne se ferme que sur un booléen explicite."
-  },
-  {
-   "terme": "Coefficient de variation (CV)",
-   "definition": "Écart-type divisé par la moyenne. Mesure de régularité des calories dans analyzeNutrition, avec les crans 0,15 et 0,35."
-  },
-  {
-   "terme": "Corrélation de Pearson",
-   "definition": "r = Σ(x−x̄)(y−ȳ) / √(Σ(x−x̄)²·Σ(y−ȳ)²), calculée sur les paires complètes. Rend null en dessous de deux paires ou quand une série est constante."
-  },
-  {
-   "terme": "Créneau",
-   "definition": "Tranche de 3 h de la journée type. Les analyses par créneau fondent les dates : il n'y a plus de journée à écarter, donc plus de note de futur."
-  },
-  {
-   "terme": "CORRELATION_MIN_PAIRS",
-   "definition": "Garde-fou d'échantillon à 7 paires complètes. En dessous, aucun verdict n'est rendu, le coefficient n'est même pas calculé."
-  },
-  {
-   "terme": "Écart-type de population",
-   "definition": "√(moyenne des carrés des écarts à la moyenne) — dénominateur n, jamais n−1. Définition employée par standardDeviation dans tout le site."
-  },
-  {
-   "terme": "Éveil",
-   "definition": "Temps entre le réveil du matin du jour J et l'endormissement du soir (lu sur la nuit datée du lendemain), moins les siestes du jour J. Null si l'une des deux nuits manque ou si le résultat n'est pas strictement positif."
-  },
-  {
-   "terme": "getLocalDateStr",
-   "definition": "Rend une date au format AAAA-MM-JJ sur le calendrier local. Employé partout plutôt que toISOString, qui décalerait d'un jour en soirée."
-  },
-  {
-   "terme": "Journée datée du futur",
-   "definition": "Journée postérieure à aujourd'hui, retirée par splitFutureDays avant analyzeNutrition et signalée par futureDaysNote dans toutes les sorties de la fonction."
-  },
-  {
-   "terme": "localDateTime",
-   "definition": "Heure murale locale sans fuseau ni suffixe Z, 'AAAA-MM-JJTHH:MM', décidée le 2026-08-04 pour les journaux événementiels et jamais implémentée."
-  },
-  {
-   "terme": "ME_TIME_MAPPING",
-   "definition": "Table id de proposition de détente → activité du catalogue « Un temps pour soi », construite depuis ONBOARDING_CONTENT.meTime. Neuf entrées sur quatorze portent une activité."
-  },
-  {
-   "terme": "Paires complètes",
-   "definition": "Journées où la série de sommeil et les calories existent toutes les deux. Seul ensemble sur lequel la corrélation est calculée."
-  },
-  {
-   "terme": "percentReached",
-   "definition": "min(100, round(pas / objectif × 100)). Plafonné à 100 : le dépassement de l'objectif ne se voit pas."
-  },
-  {
-   "terme": "Point affiché",
-   "definition": "Élément de la série que le graphe dessine. Les moteurs d'analyse les lisent, jamais les journaux bruts : le texte ne peut donc pas contredire le dessin."
-  },
-  {
-   "terme": "Repas d'avant la bascule",
-   "definition": "Repas dont la composition tenait dans une phrase, sans tableau items. Écartés au chargement par dropPreMigrationMeals ; le critère est l'absence du champ, jamais une liste vide."
-  },
-  {
-   "terme": "skipped",
-   "definition": "Liste des étapes du questionnaire explicitement passées, tenue à part des réponses pour distinguer une étape refusée d'une étape pas encore vue."
+   "terme": "skippable",
+   "definition": "Drapeau d'étape du questionnaire V1. À false, l'étape ne porte pas de bouton « Passer » et sort du compteur « Question N sur M ». Seule bienvenue le porte."
   },
   {
    "terme": "STEP_ANSWER_KEYS",
-   "definition": "Table étape → clés de réponse. Passer une étape supprime toutes ses clés, de sorte qu'une branche ne reste jamais ouverte par une réponse retirée."
+   "definition": "Table associant à chaque étape du questionnaire V1 les clés de réponse qu'elle renseigne, et donc celles que clearStepAnswers efface quand l'étape est passée."
   },
   {
-   "terme": "Verdict de corrélation",
-   "definition": "'trop-peu', 'variance-nulle', 'aucun' (|r| < 0,3), 'modere' (0,3 ≤ |r| < 0,5), 'net' (|r| ≥ 0,5). Tout verdict de lien s'accompagne de la réserve de non-causalité."
+   "terme": "OnboardingOutcome",
+   "definition": "Objet dérivé des réponses du questionnaire : quatre drapeaux de module (repas, pas, sport, temps pour soi) et la liste des activités de catalogue tirées des préférences de détente."
+  },
+  {
+   "terme": "ME_TIME_MAPPING",
+   "definition": "Table id de proposition → activité de catalogue, construite depuis ONBOARDING_CONTENT.meTime. Quatorze propositions, neuf activités : les cinq autres sont retirées par le filter."
+  },
+  {
+   "terme": "ETAPE_DEBUT_DECOMPTE",
+   "definition": "Étape de l'onboarding V2 à partir de laquelle le décompte « étape N sur M » s'affiche : traitement."
+  },
+  {
+   "terme": "peutValider",
+   "definition": "Garde du bouton Suivant de l'onboarding V2. Deux étapes bloquent : quel-traitement (forme et spécialité exigées) et profil (mot de passe vide ou d'au moins huit signes)."
+  },
+  {
+   "terme": "dropPreMigrationMeals",
+   "definition": "Passe de chargement qui écarte les repas dépourvus du tableau items, c'est-à-dire ceux d'avant la bascule du modèle. Le critère est le type du champ, jamais la longueur du tableau."
+  },
+  {
+   "terme": "fillMealHunger",
+   "definition": "Passe de chargement qui déduit les deux niveaux de faim d'un repas quand l'un des deux n'est pas un nombre. Calcul déterministe fondé sur le type de repas, ses calories stockées et la parité de la somme des codes de son identifiant."
+  },
+  {
+   "terme": "purgeDeleted",
+   "definition": "Passe de chargement qui retire des sauvegardes anciennes les lignes marquées deletedAt, vestiges de la suppression douce renversée le 2026-08-06."
+  },
+  {
+   "terme": "localDateTime",
+   "definition": "Format d'horodatage décidé le 2026-08-04 pour les journaux événementiels : heure murale locale « AAAA-MM-JJTHH:MM », sans suffixe Z. Non appliqué : les journaux portent date et time séparés."
+  },
+  {
+   "terme": "coefficient de variation (CV)",
+   "definition": "Écart-type de population divisé par la moyenne. Sert de mesure de régularité des apports caloriques : seuils 0,15 et 0,35, complétés par un rapport max/min de 1,5 et 2,5."
+  },
+  {
+   "terme": "periodDayCount",
+   "definition": "Nombre de jours d'une fenêtre de graphe, ou null quand la fenêtre n'a pas de longueur connue (« Depuis le début », bornes personnalisées incomplètes). La phrase de couverture disparaît alors."
+  },
+  {
+   "terme": "splitFutureDays",
+   "definition": "Sépare des points de graphe les journées datées après aujourd'hui. Leur nombre est dit dans une note ajoutée à toutes les sorties d'analyzeNutrition, y compris aux retours précoces."
+  },
+  {
+   "terme": "readCorrelation",
+   "definition": "Juge de paix des deux moteurs d'analyse : applique le garde-fou de 7 paires puis les seuils 0,3 et 0,5 sur |r|, et rend pairCount, r, verdict et positive (boolean | null)."
+  },
+  {
+   "terme": "CORRELATION_MIN_PAIRS",
+   "definition": "Garde-fou de readCorrelation : 7 paires complètes en deçà desquelles aucun coefficient n'est calculé ni affiché, verdict 'trop-peu'."
+  },
+  {
+   "terme": "awakeMinutesOn",
+   "definition": "Temps d'éveil d'un jour J : du plus tardif des réveils datés de J au plus précoce des couchers datés du lendemain, siestes du jour déduites. Rendu seulement s'il est strictement positif."
+  },
+  {
+   "terme": "croiseAlimentation",
+   "definition": "Drapeau des graphes croisés sommeil × nutrition, égal à profile?.foodTrackingEnabled ?? false. Court-circuité par le false && qui le précède : les trois graphes ne sont jamais montés."
+  },
+  {
+   "terme": "DailySwipeCard",
+   "definition": "Carte journalière des pas, dérivée et non stockée : date, libellé JJ/MM/AA, pas, calories et pourcentage d'objectif plafonné à 100."
   }
  ],
  "index": [
   {
-   "terme": "advance (parcours du questionnaire)",
+   "terme": "ONBOARDING_STEPS",
    "ancre": "non-implemente-questionnaire-visibilite-et-effacement-des-etapes"
   },
   {
-   "terme": "analyzeHunger",
-   "ancre": "non-implemente-analyses-textuelles-des-graphes-moteur-non-branche"
+   "terme": "visibleSteps",
+   "ancre": "non-implemente-questionnaire-visibilite-et-effacement-des-etapes"
+  },
+  {
+   "terme": "questionPosition",
+   "ancre": "non-implemente-questionnaire-visibilite-et-effacement-des-etapes"
+  },
+  {
+   "terme": "clearStepAnswers",
+   "ancre": "non-implemente-questionnaire-visibilite-et-effacement-des-etapes"
+  },
+  {
+   "terme": "STEP_ANSWER_KEYS",
+   "ancre": "non-implemente-questionnaire-visibilite-et-effacement-des-etapes"
+  },
+  {
+   "terme": "advance",
+   "ancre": "non-implemente-questionnaire-visibilite-et-effacement-des-etapes"
+  },
+  {
+   "terme": "ETAPE_DEBUT_DECOMPTE",
+   "ancre": "non-implemente-questionnaire-visibilite-et-effacement-des-etapes"
+  },
+  {
+   "terme": "peutValider",
+   "ancre": "non-implemente-questionnaire-visibilite-et-effacement-des-etapes"
+  },
+  {
+   "terme": "LONGUEUR_MOT_DE_PASSE",
+   "ancre": "non-implemente-questionnaire-visibilite-et-effacement-des-etapes"
+  },
+  {
+   "terme": "etapesVisibles",
+   "ancre": "non-implemente-questionnaire-visibilite-et-effacement-des-etapes"
+  },
+  {
+   "terme": "outcomeFromAnswers",
+   "ancre": "non-implemente-questionnaire-ce-que-les-reponses-allumeraient"
+  },
+  {
+   "terme": "ME_TIME_MAPPING",
+   "ancre": "non-implemente-questionnaire-ce-que-les-reponses-allumeraient"
+  },
+  {
+   "terme": "INITIAL_PROFILE",
+   "ancre": "non-implemente-questionnaire-ce-que-les-reponses-allumeraient"
+  },
+  {
+   "terme": "bottomMenuTabs",
+   "ancre": "non-implemente-questionnaire-ce-que-les-reponses-allumeraient"
+  },
+  {
+   "terme": "quickAddEnabled",
+   "ancre": "non-implemente-questionnaire-ce-que-les-reponses-allumeraient"
+  },
+  {
+   "terme": "selectTheme",
+   "ancre": "non-implemente-questionnaire-ce-que-les-reponses-allumeraient"
+  },
+  {
+   "terme": "localDateTime",
+   "ancre": "non-implemente-conventions-du-modele-conventions-md"
+  },
+  {
+   "terme": "createdAt / updatedAt",
+   "ancre": "non-implemente-conventions-du-modele-conventions-md"
+  },
+  {
+   "terme": "UUIDv7",
+   "ancre": "non-implemente-conventions-du-modele-conventions-md"
+  },
+  {
+   "terme": "toResolvedFoods",
+   "ancre": "non-implemente-conventions-du-modele-conventions-md"
+  },
+  {
+   "terme": "mergeTableTennisSport",
+   "ancre": "non-implemente-conventions-du-modele-conventions-md"
+  },
+  {
+   "terme": "isCustomFood",
+   "ancre": "non-implemente-conventions-du-modele-conventions-md"
+  },
+  {
+   "terme": "purgeDeleted",
+   "ancre": "non-implemente-chargement-de-la-sauvegarde-des-repas"
+  },
+  {
+   "terme": "dropPreMigrationMeals",
+   "ancre": "non-implemente-chargement-de-la-sauvegarde-des-repas"
+  },
+  {
+   "terme": "fillMealHunger",
+   "ancre": "non-implemente-chargement-de-la-sauvegarde-des-repas"
+  },
+  {
+   "terme": "hungerOfSavedMeal",
+   "ancre": "non-implemente-chargement-de-la-sauvegarde-des-repas"
+  },
+  {
+   "terme": "ensureStartingWeighIn",
+   "ancre": "non-implemente-chargement-de-la-sauvegarde-des-repas"
   },
   {
    "terme": "analyzeNutrition",
    "ancre": "non-implemente-analyses-textuelles-des-graphes-moteur-non-branche"
   },
   {
-   "terme": "analyzeSleepEvolution",
-   "ancre": "non-implemente-analyse-duree-et-qualite-code-mis-de-cote"
-  },
-  {
-   "terme": "analyzeSleepNutrition",
-   "ancre": "non-implemente-analyse-croisee-sommeil-nutrition-code-mis-de-cote"
-  },
-  {
-   "terme": "analyzeTimeSlotComposition",
+   "terme": "analyzeHunger",
    "ancre": "non-implemente-analyses-textuelles-des-graphes-moteur-non-branche"
   },
   {
@@ -145,147 +249,15 @@
    "ancre": "non-implemente-analyses-textuelles-des-graphes-moteur-non-branche"
   },
   {
-   "terme": "awakeMinutesOn",
-   "ancre": "non-implemente-analyse-croisee-sommeil-nutrition-code-mis-de-cote"
-  },
-  {
-   "terme": "calculateStepCalories",
-   "ancre": "non-implemente-cartes-journalieres-defilables"
-  },
-  {
-   "terme": "clearStepAnswers",
-   "ancre": "non-implemente-questionnaire-visibilite-et-effacement-des-etapes"
-  },
-  {
-   "terme": "computeDailySwipeList",
-   "ancre": "non-implemente-cartes-journalieres-defilables"
-  },
-  {
-   "terme": "computeSleepDays",
-   "ancre": "non-implemente-analyse-duree-et-qualite-code-mis-de-cote"
-  },
-  {
-   "terme": "CORRELATION_MIN_PAIRS",
-   "ancre": "non-implemente-analyse-croisee-sommeil-nutrition-code-mis-de-cote"
-  },
-  {
-   "terme": "CORRELATION_MODERATE / CORRELATION_STRONG",
-   "ancre": "non-implemente-analyse-croisee-sommeil-nutrition-code-mis-de-cote"
-  },
-  {
-   "terme": "CorrelationReading",
-   "ancre": "non-implemente-entites"
-  },
-  {
-   "terme": "DailySwipeCard",
-   "ancre": "non-implemente-entites"
-  },
-  {
-   "terme": "DEFAULT_DAILY_GOAL_STEPS",
-   "ancre": "non-implemente-cartes-journalieres-defilables"
-  },
-  {
-   "terme": "dropCurrentDay",
-   "ancre": "non-implemente-analyse-croisee-sommeil-nutrition-code-mis-de-cote"
-  },
-  {
-   "terme": "dropPreMigrationMeals",
-   "ancre": "non-implemente-chargement-de-la-sauvegarde-des-repas"
-  },
-  {
-   "terme": "ETAPE_DEBUT_DECOMPTE (V2)",
-   "ancre": "non-implemente-questionnaire-visibilite-et-effacement-des-etapes"
-  },
-  {
-   "terme": "etapesVisibles (V2)",
-   "ancre": "non-implemente-questionnaire-visibilite-et-effacement-des-etapes"
-  },
-  {
-   "terme": "fillMealHunger",
-   "ancre": "non-implemente-chargement-de-la-sauvegarde-des-repas"
-  },
-  {
-   "terme": "HungerLevel",
-   "ancre": "non-implemente-entites"
-  },
-  {
-   "terme": "hungerOfSavedMeal",
-   "ancre": "non-implemente-chargement-de-la-sauvegarde-des-repas"
-  },
-  {
-   "terme": "isLiquid",
-   "ancre": "non-implemente-conventions-du-modele-conventions-md"
-  },
-  {
-   "terme": "localDateTime",
-   "ancre": "non-implemente-conventions-du-modele-conventions-md"
-  },
-  {
-   "terme": "ME_TIME_MAPPING",
-   "ancre": "non-implemente-questionnaire-ce-que-les-reponses-allumeraient"
-  },
-  {
-   "terme": "mergeTableTennisSport",
-   "ancre": "non-implemente-conventions-du-modele-conventions-md"
-  },
-  {
-   "terme": "ONBOARDING_STEPS",
-   "ancre": "non-implemente-questionnaire-visibilite-et-effacement-des-etapes"
-  },
-  {
-   "terme": "OnboardingAnswers",
-   "ancre": "non-implemente-entites"
-  },
-  {
-   "terme": "OnboardingOutcome",
-   "ancre": "non-implemente-entites"
-  },
-  {
-   "terme": "outcomeFromAnswers",
-   "ancre": "non-implemente-questionnaire-ce-que-les-reponses-allumeraient"
-  },
-  {
-   "terme": "pearson",
-   "ancre": "non-implemente-analyse-croisee-sommeil-nutrition-code-mis-de-cote"
-  },
-  {
-   "terme": "peutValider (V2)",
-   "ancre": "non-implemente-questionnaire-visibilite-et-effacement-des-etapes"
-  },
-  {
-   "terme": "purgeDeleted",
-   "ancre": "non-implemente-conventions-du-modele-conventions-md"
-  },
-  {
-   "terme": "questionPosition",
-   "ancre": "non-implemente-questionnaire-visibilite-et-effacement-des-etapes"
-  },
-  {
-   "terme": "readCorrelation",
-   "ancre": "non-implemente-analyse-croisee-sommeil-nutrition-code-mis-de-cote"
-  },
-  {
-   "terme": "Reponses (V2)",
-   "ancre": "non-implemente-entites"
-  },
-  {
-   "terme": "SeverityLevel",
-   "ancre": "non-implemente-entites"
-  },
-  {
-   "terme": "SideEffectType",
-   "ancre": "non-implemente-entites"
-  },
-  {
-   "terme": "SleepDayPoint",
-   "ancre": "non-implemente-entites"
-  },
-  {
-   "terme": "SportType",
-   "ancre": "non-implemente-entites"
+   "terme": "analyzeTimeSlotComposition",
+   "ancre": "non-implemente-analyses-textuelles-des-graphes-moteur-non-branche"
   },
   {
    "terme": "splitFutureDays",
+   "ancre": "non-implemente-analyses-textuelles-des-graphes-moteur-non-branche"
+  },
+  {
+   "terme": "periodDayCount",
    "ancre": "non-implemente-analyses-textuelles-des-graphes-moteur-non-branche"
   },
   {
@@ -293,16 +265,124 @@
    "ancre": "non-implemente-analyses-textuelles-des-graphes-moteur-non-branche"
   },
   {
-   "terme": "STEP_ANSWER_KEYS",
-   "ancre": "non-implemente-questionnaire-visibilite-et-effacement-des-etapes"
+   "terme": "computeDailySwipeList",
+   "ancre": "non-implemente-cartes-journalieres-defilables"
+  },
+  {
+   "terme": "DailySwipeCard",
+   "ancre": "non-implemente-cartes-journalieres-defilables"
   },
   {
    "terme": "useStepsStats",
    "ancre": "non-implemente-cartes-journalieres-defilables"
   },
   {
-   "terme": "visibleSteps",
-   "ancre": "non-implemente-questionnaire-visibilite-et-effacement-des-etapes"
+   "terme": "getStepsCaloriesForLog",
+   "ancre": "non-implemente-cartes-journalieres-defilables"
+  },
+  {
+   "terme": "getLocalDateStr",
+   "ancre": "non-implemente-cartes-journalieres-defilables"
+  },
+  {
+   "terme": "DEFAULT_DAILY_GOAL_STEPS",
+   "ancre": "non-implemente-cartes-journalieres-defilables"
+  },
+  {
+   "terme": "analyzeSleepEvolution",
+   "ancre": "non-implemente-analyse-duree-et-qualite-code-mis-de-cote"
+  },
+  {
+   "terme": "computeSleepDays",
+   "ancre": "non-implemente-analyse-duree-et-qualite-code-mis-de-cote"
+  },
+  {
+   "terme": "ChartAnalysisAccordion",
+   "ancre": "non-implemente-analyse-duree-et-qualite-code-mis-de-cote"
+  },
+  {
+   "terme": "analyzeSleepNutrition",
+   "ancre": "non-implemente-analyse-croisee-sommeil-nutrition-code-mis-de-cote"
+  },
+  {
+   "terme": "readCorrelation",
+   "ancre": "non-implemente-analyse-croisee-sommeil-nutrition-code-mis-de-cote"
+  },
+  {
+   "terme": "CorrelationReading",
+   "ancre": "non-implemente-entites"
+  },
+  {
+   "terme": "CORRELATION_MIN_PAIRS",
+   "ancre": "non-implemente-analyse-croisee-sommeil-nutrition-code-mis-de-cote"
+  },
+  {
+   "terme": "CORRELATION_MODERATE",
+   "ancre": "non-implemente-analyse-croisee-sommeil-nutrition-code-mis-de-cote"
+  },
+  {
+   "terme": "CORRELATION_STRONG",
+   "ancre": "non-implemente-analyse-croisee-sommeil-nutrition-code-mis-de-cote"
+  },
+  {
+   "terme": "pearson",
+   "ancre": "non-implemente-analyse-croisee-sommeil-nutrition-code-mis-de-cote"
+  },
+  {
+   "terme": "awakeMinutesOn",
+   "ancre": "non-implemente-analyse-croisee-sommeil-nutrition-code-mis-de-cote"
+  },
+  {
+   "terme": "dropCurrentDay",
+   "ancre": "non-implemente-analyse-croisee-sommeil-nutrition-code-mis-de-cote"
+  },
+  {
+   "terme": "nutritionTotalsOn",
+   "ancre": "non-implemente-analyse-croisee-sommeil-nutrition-code-mis-de-cote"
+  },
+  {
+   "terme": "croiseAlimentation",
+   "ancre": "non-implemente-analyse-croisee-sommeil-nutrition-code-mis-de-cote"
+  },
+  {
+   "terme": "OnboardingAnswers",
+   "ancre": "non-implemente-entites"
+  },
+  {
+   "terme": "OnboardingState",
+   "ancre": "non-implemente-entites"
+  },
+  {
+   "terme": "OnboardingOutcome",
+   "ancre": "non-implemente-entites"
+  },
+  {
+   "terme": "Reponses (V2)",
+   "ancre": "non-implemente-entites"
+  },
+  {
+   "terme": "SleepDayPoint",
+   "ancre": "non-implemente-entites"
+  },
+  {
+   "terme": "SideEffectType",
+   "ancre": "non-implemente-entites"
+  },
+  {
+   "terme": "SportType",
+   "ancre": "non-implemente-entites"
+  },
+  {
+   "terme": "HungerLevel",
+   "ancre": "non-implemente-entites"
+  },
+  {
+   "terme": "SeverityLevel",
+   "ancre": "non-implemente-entites"
+  },
+  {
+   "terme": "AppData",
+   "ancre": "non-implemente-entites"
   }
  ],
  "ancres_traitees": [

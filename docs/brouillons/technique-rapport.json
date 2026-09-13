@@ -29,129 +29,97 @@
    "fonctionnalite": "Langue du document",
    "texte": "Le PDF s'écrit dans la langue choisie à l'onboarding.",
    "origine": "Tous les libellés du document sont en français en dur, y compris les noms de mois et les mots de sévérité. GUIDELINES §4 dit que la langue de l'onboarding est recueillie et non branchée, et aucune décision ne concerne le rapport."
+  },
+  {
+   "categorie": "règle",
+   "fonctionnalite": "Fusion de février et mars 2027 dans une même carte",
+   "texte": "Février 2027 commence un lundi : une annexe de janvier à mars 2027 sort « Janvier 2027 » seul, puis « Février / Mars 2027 ».",
+   "origine": "Réfutation retenue et phrase corrigée : février 2027 commence un lundi ET n'a que 28 jours, sa grille tient en quatre semaines pleines, donc mars 2027 commence lui aussi un lundi et ne partage rien avec lui. Le test du dépôt (reportCalendar.test.ts, « le mois qui commence un LUNDI rompt la chaîne ») attend trois cartes d'un mois et `sharesWeekWithPrevious === false` pour février comme pour mars. La phrase reprenait une erreur du commentaire de `mergedCalendarGrids`."
+  },
+  {
+   "categorie": "règle",
+   "fonctionnalite": "Cinquième cartouche de la section IV",
+   "texte": "Trois cartouches au plus sont visibles si un seul domaine est actif ; au-delà de quatre, cells.slice(0, 4) tranche.",
+   "origine": "Réfutation retenue et phrase corrigée : les trois branches poussent au plus 1 (pas) + 2 (sport) + 1 (repas) = 4 cases, et un seul domaine actif en donne au plus deux (le sport). Le `slice(0, 4)` est un garde-fou qui ne peut jamais s'appliquer ; annoncer une coupe serait décrire un cas que le code ne peut pas produire."
   }
  ],
  "glossaire": [
   {
+   "terme": "Cartouche",
+   "definition": "Mini-tuile de la synthèse du PDF : 16 mm de haut, un nombre en gras et sa légende, cinq par rangée au plus. Une case n'existe pas quand le domaine rend `null` ; un compte à zéro imprime « 0 »."
+  },
+  {
    "terme": "Bornes effectives",
-   "definition": "Le couple (periodStart, periodEnd) réellement employé par le document, replis compris : la coupure ou la borne saisie d'un côté, la borne de fin saisie ou aujourd'hui de l'autre."
+   "definition": "`periodStart` et `periodEnd` après repli : la coupure de la fenêtre sinon la plus ancienne entrée, et la borne de fin saisie sinon aujourd'hui. Ce sont elles qui titrent le document, nomment le fichier et bornent les graphiques."
   },
   {
-   "terme": "Coupure (cutoff)",
-   "definition": "La date de début d'une fenêtre fixe : aujourd'hui − (N − 1), N valant 7, 14, 30 ou 90. La fenêtre est inclusive et compte le jour en cours."
+   "terme": "Masque effectif",
+   "definition": "Table `effective` : pour chacune des huit sections, la case cochée croisée avec la disponibilité des données. Montée hors du `try` pour que la fiche d'échec sache ce que le document tentait de dessiner."
   },
   {
-   "terme": "Fenêtre fixe",
-   "definition": "Une des quatre fenêtres à N jours du sélecteur commun, par opposition à « Depuis le début » (all) et « Choisir » (custom)."
-  },
-  {
-   "terme": "Masque des données disponibles",
-   "definition": "La table `available` : pour chaque journal, vrai si son module est actif et si la période porte des données. Croisée avec les cases cochées, elle donne `effective`."
-  },
-  {
-   "terme": "Section effective",
-   "definition": "Une section que le document dessine réellement : sa case est cochée et son masque est vrai."
-  },
-  {
-   "terme": "Tirage",
-   "definition": "Le choix de palette au moment du clic : noir et blanc, couleurs du thème, ou neutre. Jamais mémorisé."
-  },
-  {
-   "terme": "patterned",
-   "definition": "Drapeau de palette : les séries se distinguent par la texture (barres hachurées) et non par la couleur, et les encres nutritionnelles reviennent au gris."
-  },
-  {
-   "terme": "Cartouche (mini-tuile)",
-   "definition": "Une case de 16 mm de haut portant une valeur en gros, éventuellement une seconde valeur, et une légende en petites capitales. Cinq par rangée au plus."
-  },
-  {
-   "terme": "Rangée fermée",
-   "definition": "Une rangée de cartouches qu'aucun groupe suivant ne peut venir compléter. Seul le groupe poids ferme la sienne, pour tenir sa légende la plus longue."
-  },
-  {
-   "terme": "Jauge",
-   "definition": "La barre de progression du site portée au papier : un rail en pilule de 60 × 3,4 mm, rempli d'un dégradé, employé par la section III pour la sévérité moyenne d'un type d'effet."
-  },
-  {
-   "terme": "Grille fusionnée",
-   "definition": "Une carte d'annexe réunissant deux ou trois mois voisins sous un même bandeau, chacun gardant sa colonne."
+   "terme": "Palier de sévérité",
+   "definition": "`leger`, `modere`, `severe`, décidés par le maximum des intensités : max > 3 sévère, max > 1 modéré, sinon léger. Le calendrier classe une journée, la synthèse classe chaque effet."
   },
   {
    "terme": "Semaine partagée",
-   "definition": "La dernière ligne de la grille d'un mois quand elle est identique, date par date, à la première ligne du mois suivant. Elle reste au mois précédent."
+   "definition": "Semaine de calendrier portant les jours de deux mois consécutifs. Elle reste au mois précédent ; le mois suivant démarre au lundi d'après."
   },
   {
-   "terme": "Journée documentée",
-   "definition": "Une date portée par au moins une entrée de journal ; un relevé de pas à 0 n'en est pas une."
-  },
-  {
-   "terme": "Journée renseignée",
-   "definition": "Le dénominateur des moyennes alimentaires et de sommeil : une journée portant au moins une saisie du journal concerné, jamais un jour de la période."
-  },
-  {
-   "terme": "Journée dormie",
-   "definition": "Une journée dont la somme nuit + siestes est strictement positive ; le dénominateur de la moyenne de sommeil et le point du graphe."
-  },
-  {
-   "terme": "Pesée de départ",
-   "definition": "La pesée portant le drapeau `isStartingWeight`, cherchée sur l'historique complet et jamais reconnue à sa valeur."
-  },
-  {
-   "terme": "Série en cours",
-   "definition": "Les prises passées du traitement actuel, à partir du dernier changement de traitement ; sa première ligne donne la date de première prise de l'encart d'identité."
-  },
-  {
-   "terme": "Palier de dose",
-   "definition": "Le tracé en marches du graphique II : la dose de la dernière prise est tenue jusqu'à la suivante, puis jusqu'au bord droit du cadre. Rien avant la première prise."
-  },
-  {
-   "terme": "Palier de teinte",
-   "definition": "L'indice 1 à 5 d'une barre de sommeil, ceil(5 × durée / durée max), qui choisit son encre dans `palette.sleepTiers`."
-  },
-  {
-   "terme": "Sous-embarquement",
-   "definition": "La double réduction de la police : 349 points de code coupés dans le dépôt, puis les seuls glyphes employés par ce document-là embarqués par jsPDF."
-  },
-  {
-   "terme": "Plancher d'affichage",
-   "definition": "Les 450 ms pendant lesquelles le bouton reste « Génération… », comptés depuis le clic et tenus dans le `finally`. Le fichier, lui, n'est pas retardé."
-  },
-  {
-   "terme": "Seuil du panneau",
-   "definition": "Les 250 ms de délai d'apparition du sommaire d'attente ; sous ce temps, le panneau est retiré de l'affichage plutôt que de clignoter."
+   "terme": "Carte fusionnée",
+   "definition": "`MergedCalendarGrid` : deux ou trois mois côte à côte sous un seul bandeau, quand chacun partage une semaine avec le précédent. Un mois qui commence un lundi ouvre sa propre carte."
   },
   {
    "terme": "Fiche d'échec",
-   "definition": "L'objet `ReportExportFailure` : erreur, étape, période, cases, volumes, tirage, temps écoulé. Des comptes et des bornes, jamais des valeurs de santé."
+   "definition": "`ReportExportFailure` : l'étape, la période, les deux masques, onze comptes et la palette, envoyés sous `reportErrors/{uid}/failures` quand la génération lève. Aucune valeur de journal n'y figure."
   },
   {
-   "terme": "Étape (stage)",
-   "definition": "Le moment de l'export en cours : preparation, palette, construction, enregistrement. Elle distingue trois recherches différentes dans une fiche d'échec."
+   "terme": "Plancher d'affichage",
+   "definition": "Les 450 ms minimum du message « Génération… », tenus dans le `finally`. Ils retardent la remise à zéro du bouton, jamais l'enregistrement du fichier."
   },
   {
-   "terme": "Volumes",
-   "definition": "Les onze comptes d'entrées joints à une fiche d'échec, plus leur somme : la taille du travail, jamais son contenu."
+   "terme": "Journée documentée",
+   "definition": "Date portant au moins une ligne d'un journal. Sur la page, les huit journaux comptent ; dans le PDF, seuls les journaux inclus, les injections toujours."
   },
   {
-   "terme": "Réservation (ensure)",
-   "definition": "L'appel qui ouvre une page si les millimètres demandés ne tiennent pas sous BOTTOM. C'est lui qui empêche un titre orphelin et une grille coupée."
+   "terme": "Jours couverts",
+   "definition": "`daysBetween(periodStart, periodEnd) + 1`, bornes comprises. Diviseur de l'activité hebdomadaire et valeur du champ `periodDays` de la fiche d'échec."
   },
   {
-   "terme": "Colonne nutritionnelle (NUT_X)",
-   "definition": "L'abscisse 105 mm d'où partent toutes les valeurs nutritionnelles, alignées à gauche, pour qu'une ligne courte et une ligne longue commencent au même endroit."
+   "terme": "Poids d'entrée de période",
+   "definition": "Premier point de `computeWeeklyLoss`, reconstitué par interpolation. Référence du pourcentage hebdomadaire, à ne pas confondre avec le poids de départ de la cure."
+  },
+  {
+   "terme": "patterned",
+   "definition": "Drapeau de `BW_PALETTE` : barres de sommeil hachurées de traits horizontaux tous les 0,7 mm, et les cinq encres nutritionnelles ramenées au gris."
+  },
+  {
+   "terme": "REPORT_FONT",
+   "definition": "Plus Jakarta Sans embarquée en sous-ensemble (349 points de code, 3 graisses), versée dans le VFS de jsPDF avant le premier `setFont`. Elle permet ≈, − et le demi-cadratin."
   }
  ],
  "index": [
   {
-   "terme": "Bornes effectives",
-   "ancre": "rapport-periode-du-rapport-et-bornes-effectives"
+   "terme": "glp1_period_report",
+   "ancre": "rapport-entites"
   },
   {
-   "terme": "Coupure (cutoff)",
-   "ancre": "rapport-periode-du-rapport-et-bornes-effectives"
+   "terme": "glow_report_include_v2",
+   "ancre": "rapport-defauts-et-memorisation-des-choix-du-sur-mesure"
   },
   {
-   "terme": "filterByTimeWindow",
+   "terme": "MedicalReportSelection",
+   "ancre": "rapport-entites"
+  },
+  {
+   "terme": "ReportExportFailure",
+   "ancre": "rapport-fiche-d-echec-d-export"
+  },
+  {
+   "terme": "severity (0 à 5)",
+   "ancre": "rapport-entites"
+  },
+  {
+   "terme": "getCutoffDateStr",
    "ancre": "rapport-periode-du-rapport-et-bornes-effectives"
   },
   {
@@ -159,23 +127,19 @@
    "ancre": "rapport-periode-du-rapport-et-bornes-effectives"
   },
   {
+   "terme": "filterByTimeWindow",
+   "ancre": "rapport-periode-du-rapport-et-bornes-effectives"
+  },
+  {
    "terme": "Période invalide",
    "ancre": "rapport-refus-de-periode-invalide"
   },
   {
-   "terme": "Masque des données disponibles",
+   "terme": "hasStepsData",
    "ancre": "rapport-bascules-proposees-masque-des-donnees-disponibles"
   },
   {
-   "terme": "isModuleOn",
-   "ancre": "rapport-bascules-proposees-masque-des-donnees-disponibles"
-  },
-  {
-   "terme": "Section effective",
-   "ancre": "rapport-masque-des-sections-dessinees"
-  },
-  {
-   "terme": "available / effective",
+   "terme": "effective",
    "ancre": "rapport-masque-des-sections-dessinees"
   },
   {
@@ -183,20 +147,8 @@
    "ancre": "rapport-defauts-et-memorisation-des-choix-du-sur-mesure"
   },
   {
-   "terme": "glow_report_include_v2",
+   "terme": "DEFAULT_MEAL_DETAIL",
    "ancre": "rapport-defauts-et-memorisation-des-choix-du-sur-mesure"
-  },
-  {
-   "terme": "MealDetailLevel",
-   "ancre": "rapport-defauts-et-memorisation-des-choix-du-sur-mesure"
-  },
-  {
-   "terme": "Tirage",
-   "ancre": "rapport-tirage-trois-palettes"
-  },
-  {
-   "terme": "patterned",
-   "ancre": "rapport-tirage-trois-palettes"
   },
   {
    "terme": "BW_PALETTE",
@@ -211,39 +163,23 @@
    "ancre": "rapport-poids-de-repere-et-de-depart-du-document"
   },
   {
-   "terme": "Pesée de départ",
-   "ancre": "rapport-poids-de-repere-et-de-depart-du-document"
-  },
-  {
    "terme": "isStartingWeight",
    "ancre": "rapport-poids-de-repere-et-de-depart-du-document"
   },
   {
-   "terme": "Étape (stage)",
+   "terme": "stage",
    "ancre": "rapport-succes-et-echec-d-export"
   },
   {
-   "terme": "Fiche d'échec",
+   "terme": "describeError",
    "ancre": "rapport-fiche-d-echec-d-export"
   },
   {
-   "terme": "Volumes",
-   "ancre": "rapport-fiche-d-echec-d-export"
-  },
-  {
-   "terme": "reportErrors",
-   "ancre": "rapport-fiche-d-echec-d-export"
-  },
-  {
-   "terme": "Plancher d'affichage",
+   "terme": "terminerAttenteSommaire",
    "ancre": "rapport-attente-et-plancher-d-affichage"
   },
   {
-   "terme": "Seuil du panneau",
-   "ancre": "rapport-attente-et-plancher-d-affichage"
-  },
-  {
-   "terme": "playbackRate",
+   "terme": "PLANCHER_MESSAGE_MS",
    "ancre": "rapport-attente-et-plancher-d-affichage"
   },
   {
@@ -251,15 +187,15 @@
    "ancre": "rapport-panneau-d-attente-en-mouvement-reduit"
   },
   {
+   "terme": "periodStepsTotal",
+   "ancre": "rapport-pas-de-la-periode-avec-journee-en-cours-figee"
+  },
+  {
    "terme": "KM_PER_STEP",
    "ancre": "rapport-pas-de-la-periode-avec-journee-en-cours-figee"
   },
   {
-   "terme": "Journée en cours figée",
-   "ancre": "rapport-pas-de-la-periode-avec-journee-en-cours-figee"
-  },
-  {
-   "terme": "Journée documentée",
+   "terme": "daysCovered",
    "ancre": "rapport-journees-documentees-page-et-pdf"
   },
   {
@@ -271,15 +207,7 @@
    "ancre": "rapport-imc-et-reste-a-l-objectif"
   },
   {
-   "terme": "Reste à l'objectif",
-   "ancre": "rapport-imc-et-reste-a-l-objectif"
-  },
-  {
-   "terme": "Série en cours",
-   "ancre": "rapport-forme-du-traitement-et-premiere-prise"
-  },
-  {
-   "terme": "hasOccurred",
+   "terme": "currentTreatmentSeries",
    "ancre": "rapport-forme-du-traitement-et-premiere-prise"
   },
   {
@@ -287,27 +215,15 @@
    "ancre": "rapport-formats-de-nombres-du-document"
   },
   {
-   "terme": "round1",
-   "ancre": "rapport-formats-de-nombres-du-document"
-  },
-  {
    "terme": "cleanType",
    "ancre": "rapport-formats-de-nombres-du-document"
   },
   {
-   "terme": "Sous-embarquement",
+   "terme": "reportFontMissingChars",
    "ancre": "rapport-police-embarquee-en-sous-ensemble"
   },
   {
-   "terme": "REPORT_FONT",
-   "ancre": "rapport-police-embarquee-en-sous-ensemble"
-  },
-  {
-   "terme": "Réservation (ensure)",
-   "ancre": "rapport-sauts-de-page"
-  },
-  {
-   "terme": "BOTTOM",
+   "terme": "ensure(h)",
    "ancre": "rapport-sauts-de-page"
   },
   {
@@ -315,11 +231,7 @@
    "ancre": "rapport-jours-couverts"
   },
   {
-   "terme": "Cartouche (mini-tuile)",
-   "ancre": "rapport-rangees-de-cartouches-de-la-synthese"
-  },
-  {
-   "terme": "Rangée fermée",
+   "terme": "LIGNE_MAX",
    "ancre": "rapport-rangees-de-cartouches-de-la-synthese"
   },
   {
@@ -331,23 +243,11 @@
    "ancre": "rapport-pourcentage-de-poids-perdu-par-semaine"
   },
   {
-   "terme": "computeWeeklyLoss",
-   "ancre": "rapport-pourcentage-de-poids-perdu-par-semaine"
-  },
-  {
-   "terme": "Poids d'entrée de période",
-   "ancre": "rapport-pourcentage-de-poids-perdu-par-semaine"
-  },
-  {
    "terme": "mealDailyAverages",
    "ancre": "rapport-moyennes-alimentaires-et-part-de-la-recommandation"
   },
   {
    "terme": "dailyNutritionGoals",
-   "ancre": "rapport-moyennes-alimentaires-et-part-de-la-recommandation"
-  },
-  {
-   "terme": "Journée renseignée",
    "ancre": "rapport-moyennes-alimentaires-et-part-de-la-recommandation"
   },
   {
@@ -363,10 +263,6 @@
    "ancre": "rapport-sommeil-moyennes-et-graphe"
   },
   {
-   "terme": "Journée dormie",
-   "ancre": "rapport-sommeil-moyennes-et-graphe"
-  },
-  {
    "terme": "sleepChartPoints",
    "ancre": "rapport-sommeil-moyennes-et-graphe"
   },
@@ -379,10 +275,6 @@
    "ancre": "rapport-decoupage-d-une-valeur-de-mini-tuile"
   },
   {
-   "terme": "Palier de dose",
-   "ancre": "rapport-graphique-poids-doses"
-  },
-  {
    "terme": "selectionnerReperesPesee",
    "ancre": "rapport-graphique-poids-doses"
   },
@@ -391,16 +283,12 @@
    "ancre": "rapport-equivalence-insolite-dans-le-pdf"
   },
   {
-   "terme": "Jauge",
+   "terme": "gaugeRow",
    "ancre": "rapport-section-iii-statistiques-par-type-d-effet"
   },
   {
    "terme": "stepsDailyAverage",
    "ancre": "rapport-section-iv-moyennes"
-  },
-  {
-   "terme": "Palier de teinte",
-   "ancre": "rapport-teinte-des-barres-de-sommeil"
   },
   {
    "terme": "sleepBarTier",
@@ -415,15 +303,11 @@
    "ancre": "rapport-mois-dessines-par-une-annexe"
   },
   {
-   "terme": "Grille fusionnée",
-   "ancre": "rapport-fusion-des-grilles-mensuelles"
-  },
-  {
-   "terme": "Semaine partagée",
-   "ancre": "rapport-fusion-des-grilles-mensuelles"
-  },
-  {
    "terme": "monthsShareWeek",
+   "ancre": "rapport-fusion-des-grilles-mensuelles"
+  },
+  {
+   "terme": "mergedCalendarGrids",
    "ancre": "rapport-fusion-des-grilles-mensuelles"
   },
   {
@@ -451,10 +335,6 @@
    "ancre": "rapport-encres-nutritionnelles-du-pdf"
   },
   {
-   "terme": "Colonne nutritionnelle (NUT_X)",
-   "ancre": "rapport-encres-nutritionnelles-du-pdf"
-  },
-  {
    "terme": "groupReportDays",
    "ancre": "rapport-regroupement-des-journees-du-carnet"
   },
@@ -468,6 +348,7 @@
   }
  ],
  "ancres_traitees": [
+  "rapport-entites",
   "rapport-periode-du-rapport-et-bornes-effectives",
   "rapport-refus-de-periode-invalide",
   "rapport-bascules-proposees-masque-des-donnees-disponibles",

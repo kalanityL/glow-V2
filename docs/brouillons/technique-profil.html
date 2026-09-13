@@ -24,7 +24,8 @@
       <tr><td><code>medicalReminderEnabled</code></td><td>boolean</td><td></td></tr>
       <tr><td><code>medicalReminderDoctor</code>, <code>medicalReminderDate</code>, <code>medicalReminderTime</code>, <code>medicalReminderNotifyBefore</code></td><td>string (facultatifs)</td><td>défauts '', '', '10:00', '1d'</td></tr>
       <tr><td><code>treatmentTrackingEnabled</code>, <code>sideEffectsTrackingEnabled</code></td><td>boolean (facultatifs)</td><td>absent = activé</td></tr>
-      <tr><td><code>foodTrackingEnabled</code>, <code>stepsTrackingEnabled</code>, <code>sportTrackingEnabled</code>, <code>meTimeTrackingEnabled</code>, <code>sleepTrackingEnabled</code></td><td>boolean (facultatifs)</td><td>absent = désactivé</td></tr>
+      <tr><td><code>meTimeTrackingEnabled</code>, <code>sleepTrackingEnabled</code></td><td>boolean (facultatifs)</td><td>absent = désactivé</td></tr>
+      <tr><td><code>foodTrackingEnabled</code>, <code>stepsTrackingEnabled</code>, <code>sportTrackingEnabled</code></td><td>boolean (obligatoires)</td><td>déclarés sans « ? » ; les lectures posent tout de même <code>?? false</code>, pour les sauvegardes qui ne les portent pas</td></tr>
       <tr><td><code>treatmentModuleHidden</code>, <code>sideEffectsModuleHidden</code>, <code>foodModuleHidden</code>, <code>stepsModuleHidden</code>, <code>sportModuleHidden</code>, <code>meTimeModuleHidden</code>, <code>sleepModuleHidden</code></td><td>boolean (facultatifs)</td><td>absent = non masqué</td></tr>
       <tr><td><code>measurementSystem</code></td><td>'metric' | 'imperial' (facultatif)</td><td>aucune interface de réglage</td></tr>
     </tbody>
@@ -76,10 +77,10 @@ affichage      = '-' + parseFloat(weightLost.toFixed(1)) + ' kg'
 lastInjection  = getMostRecentPastInjection(injectionHistory)
                  // la plus récente d'instant ≤ maintenant ; à défaut, la plus récente de toutes
 affichage      = lastInjection ? lastInjection.dose + ' mg' : 'N/A'</code></pre>
-  <p>La « dernière pesée » est la dernière entrée du tableau, tenu trié par date croissante à l'écriture — pas un maximum recalculé.</p>
-  <p class="ancre">src/versions/mixte/components/PlusMenu.tsx · src/utils/pharmacokinetics.ts</p>
+  <p>La « dernière pesée » est la dernière ENTRÉE du tableau, pas la plus récente par date : aucun maximum n'est recalculé. L'ordre stocké ne suit les dates que si toutes les écritures le tiennent, et elles ne le tiennent pas — <code>addWeighIn</code> retrie à l'ajout sur <code>date</code> seule, sans l'heure, tandis que <code>updateWeighIn</code> ne retrie pas du tout. Le PlusMenu reçoit <code>appData.weightHistory</code> tel qu'il est stocké.</p>
+  <p class="ancre">src/versions/mixte/components/PlusMenu.tsx · src/features/weight/weighInWrites.ts · src/utils/pharmacokinetics.ts</p>
   <details><summary>Cas limites</summary>
-    <p>Historique vide : <code>current = starting = 0</code>, perte 0, rendu « -0 kg ». Poids repris depuis le départ : <code>weightLost</code> négatif, et le tiret est un préfixe littéral — 95 puis 96,2 rend « --1.2 kg ». Aucune injection : « N/A ». Injections toutes futures : la plus récente de toutes est affichée.</p>
+    <p>Historique vide : <code>current = starting = 0</code>, perte 0, rendu « -0 kg ». Poids repris depuis le départ : <code>weightLost</code> négatif, et le tiret est un préfixe littéral — 95 puis 96,2 rend « --1.2 kg ». Pesée existante antidatée par l'édition : elle garde son rang de fin de tableau et devient le poids courant de la carte, alors qu'elle n'est plus la plus récente. Deux pesées le même jour : le tri d'ajout ignore l'heure, leur ordre relatif dépend de l'ordre d'insertion. Aucune injection : « N/A ». Injections toutes futures : la plus récente de toutes est affichée.</p>
   </details>
   <div class="exemple"><p>Camille : départ 96, dernière pesée 91,4 → <code>parseFloat((4.6).toFixed(1))</code> = 4.6, la carte écrit « -4.6 kg » ; dernière injection à 1 mg → « 1 mg ».</p></div>
 
@@ -129,10 +130,10 @@ sondage → « Sondage »             faq → « FAQ »</code></pre>
   n = Number(cleaned)
   si cleaned === '' ou !Number.isFinite(n) ou n &lt;= 0 ou n &gt; 1000 → null
   sinon cleaned            // la chaîne nettoyée, jamais reformatée</code></pre>
-  <p>Refus : « Un poids entre 0,1 et 1000 kg est attendu. » <code>RULE_WEIGHT</code> : <code>min 0.1</code>, <code>max 1000</code>, <code>decimals 1</code>, <code>step 0.1</code>, unité « kg », même message. La borne basse de la règle (0,1) et celle du sanitize (&gt; 0) diffèrent : « 0.05 » passe la règle du champ et est refusé par le sanitize.</p>
+  <p>Refus : « Un poids entre 0,1 et 1000 kg est attendu. » <code>RULE_WEIGHT</code> : <code>min 0.1</code>, <code>max 1000</code>, <code>decimals 1</code>, <code>step 0.1</code>, unité « kg », même message. Les deux planchers écrits — 0,1 pour la règle du champ, « strictement positif » pour le sanitize du profil — décident pareil : les deux nettoyages tronquent à une décimale, et aucune valeur de ]0 ; 0,1[ n'y survit.</p>
   <p class="ancre">src/versions/mixte/components/profile.fields.ts · src/versions/mixte/app/form.rules.ts</p>
   <details><summary>Cas limites</summary>
-    <p>« 95,55 » → « 95.5 » (tronqué, pas arrondi). « 0 » → refus. « 1000.5 » → 1000.5 &gt; 1000 → refus. « 70. » → <code>Number('70.')</code> = 70 → accepté, la chaîne « 70. » est enregistrée telle quelle par cette fonction.</p>
+    <p>« 95,55 » → « 95.5 » (tronqué, pas arrondi). « 0.05 » → tronqué en « 0.0 » par les deux nettoyages, donc 0 : refusé des deux côtés. « 0 » → refus. « 1000.5 » → 1000.5 &gt; 1000 → refus. « 70. » → <code>Number('70.')</code> = 70 → accepté, la chaîne « 70. » est enregistrée telle quelle par cette fonction.</p>
   </details>
   <div class="exemple"><p>Camille tape « 96,35 » : le champ écrit « 96.3 », le sanitize le retient, <code>Number('96.3')</code> = 96,3 part à l'enregistrement.</p></div>
 
@@ -259,7 +260,7 @@ clearAll()    : localStorage.clear() — emporte la session Firebase</code></pre
   <p>Clés du domaine : <code>glp1_app_companion_data</code> (profil et journaux), <code>glp1_user_feedbacks</code>, <code>glp1_user_survey_v2</code>, <code>glp1_user_survey</code> (lecture seule), <code>glp1_send_cap_alert</code>, <code>hasAcceptedMedicalDisclaimer_v1</code>.</p>
   <p class="ancre">src/shared/platform/storage.ts · src/app/useAppData.ts</p>
   <details><summary>Cas limites</summary>
-    <p>Sauvegarde illisible : elle est recopiée une seule fois sous une clé de secours, la session repart de journaux vides et plus rien n'est écrit de la session.</p>
+    <p>Sauvegarde illisible : elle est recopiée une seule fois sous une clé de secours, <code>loadFailed</code> est armé et plus rien n'est écrit de la session. La session ne repart pas de rien : le <code>catch</code> retombe sur la branche d'installation neuve, donc profil d'usine (Chloé, 42 ans, 168 cm, objectif 72) et pesée de départ à 95,0 kg, les autres journaux vides.</p>
   </details>
 
   <h3 id="profil-validation-du-formulaire-complet">Validation du formulaire complet</h3>
@@ -313,8 +314,8 @@ avec max : « Une valeur entre {min} et {max}{ unité} est attendue. »</code></
   <pre><code>handleAvatarChange(newAvatar) :
   setAvatar(newAvatar)
   onSaveProfile({ ...profile, gender: newAvatar.gender, avatar: newAvatar })</code></pre>
-  <p>C'est le seul écrit de <code>profile.gender</code> du domaine ; il sert au métabolisme de base et à l'état civil du rapport médical.</p>
-  <p class="ancre">src/versions/mixte/components/ProfileSettings.tsx</p>
+  <p>C'est le seul endroit du domaine où <code>profile.gender</code> se CHOISIT. Deux autres écritures existent, qui ne relèvent d'aucun choix de l'utilisatrice : <code>INITIAL_PROFILE</code> pose 'femme' à l'installation, et le générateur de données de la page Admin écrit <code>gender</code> dans le profil complet qu'il persiste sous la clé de sauvegarde. <code>profile.gender</code> sert au métabolisme de base et à l'état civil du rapport médical.</p>
+  <p class="ancre">src/versions/mixte/components/ProfileSettings.tsx · src/app/useAppData.ts</p>
 
   <h3 id="profil-changement-de-genre-de-l-avatar">Changement de genre de l'avatar</h3>
   <p>Changer le genre repose la coupe et efface la photo.</p>
@@ -442,7 +443,7 @@ après les trois → TOO_HEAVY_REFUSAL</code></pre>
   <p class="ancre">src/versions/mixte/components/AvatarCreator.tsx</p>
 
   <h3 id="profil-defauts-des-modules">Défauts des modules</h3>
-  <p>Sept onglets sont commandés par un drapeau ; l'état effectif se lit toujours par <code>isModuleOn</code>, jamais par le drapeau nu.</p>
+  <p>Sept onglets sont commandés par un drapeau, dont l'absence ne vaut pas la même chose pour tous. <code>isModuleOn</code> est la lecture de référence : la navigation, la home et l'export du rapport médical y passent.</p>
   <pre><code>MODULE_FLAGS : injection → treatmentTrackingEnabled
                symptoms  → sideEffectsTrackingEnabled
                meals     → foodTrackingEnabled
@@ -457,6 +458,7 @@ isModuleOn(profile, tabId) :
                                        // { injection, symptoms }
   sinon                              → Boolean(valeur)</code></pre>
   <p>Traitement et effets secondaires valent donc activés en l'absence de drapeau ; repas, pas, activité, temps pour soi et sommeil valent désactivés.</p>
+  <p>La page Modules, elle, n'importe pas <code>isModuleOn</code> : elle relit les sept drapeaux nus en réécrivant leur défaut à la main — <code>profile.foodTrackingEnabled ?? false</code> pour les cinq, <code>profile.treatmentTrackingEnabled ?? true</code> et <code>profile.sideEffectsTrackingEnabled ?? true</code> pour les deux autres. Les deux lectures rendent aujourd'hui le même résultat ; le défaut est écrit à deux endroits.</p>
   <p class="ancre">src/versions/mixte/app/navigation.ts · src/versions/mixte/components/NotificationsSettings.tsx</p>
 
   <h3 id="profil-bascule-d-un-module">Bascule d'un module</h3>
@@ -666,7 +668,7 @@ puis queueMail(author, 'feedback', feedbackMailContent({...}))</code></pre>
   <div class="exemple"><p>Camille envoie une idée le 12 septembre 2026 à 10:42:07 : « [GLP1LOW] Idée — camille@example.com — 12 septembre 2026 à 10:42:07 ».</p></div>
 
   <h3 id="profil-lignes-de-contexte-d-un-courrier">Lignes de contexte d'un courrier</h3>
-  <p><code>contextRows(context)</code> est commune aux cinq courriers.</p>
+  <p><code>contextRows(context)</code> est commune à QUATRE des cinq courriers : sondage, retour, alerte plafond, échec d'export.</p>
   <pre><code>Date locale     : {sentAtLocal} ({timeZone}, UTC{±}{|round(offsetMinutes / 60)|})
 Page d'origine  : {originPageLabel}
 Version du site : {version}
@@ -675,6 +677,7 @@ Home / Menu / Polices : seulement si le champ est renseigné
 Cadre           : {frame.width} × {frame.height} (×{frame.pixelRatio})
 Langue          : {browserLanguage} si égale à appLanguage,
                   sinon « navigateur {X} — application {fr} »</code></pre>
+  <p>Le cinquième — l'alerte « sondage repris trop souvent » — ne l'appelle pas : il compose ses propres lignes (Alerte, auteur, Mises à jour, Première réponse, Dernière réponse, Version du site, Page d'origine) et recalcule le fuseau à la main, <code>{timeZone}, UTC{±}{|round(offsetMinutes / 60)|}</code>, en suffixe des deux dates. Ni Date locale, ni Thème, ni Cadre, ni Langue, ni Home/Menu/Polices.</p>
   <p>Le courrier de retour ajoute Ressenti (libellé : Content, Neutre, Pas content), Catégorie si elle existe, et « Accepte d'être recontactée : oui | non », puis le message en bloc de texte à retours conservés. Le courrier de sondage ajoute « Mises à jour : Nᵉ envoi de cette réponse » et une ligne « {libellé} : {note} / 5 » par proposition.</p>
   <p class="ancre">src/features/feedback/submissionMail.ts</p>
 
@@ -787,7 +790,7 @@ si !Number.isFinite(Number(cleaned)) → null
 si valeur &lt; rule.min                 → null
 si rule.max défini et valeur &gt; max   → null
 sinon cleaned, moins un point final orphelin</code></pre>
-  <p>La chaîne n'est jamais reformatée : « 70 » reste « 70 » et ne devient pas « 70.0 ». <code>isAcceptable(raw, rule)</code> est <code>sanitizeNumber(raw, rule) !== null</code>.</p>
+  <p>Le nettoyage précède le jugement : la troncature à <code>decimals</code> chiffres est déjà faite quand les bornes sont comparées. La chaîne n'est jamais reformatée : « 70 » reste « 70 » et ne devient pas « 70.0 ». <code>isAcceptable(raw, rule)</code> est <code>sanitizeNumber(raw, rule) !== null</code>.</p>
   <p class="ancre">src/shared/ui/numberRules.ts</p>
   <details><summary>Cas limites</summary>
     <p>'70.' → '70'. '' avec <code>allowEmpty</code> → '' (accepté) ; sans → <code>null</code>. Les bornes sont inclusives des deux côtés.</p>

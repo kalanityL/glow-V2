@@ -19,7 +19,7 @@
       <tr><td><code>WeightLog</code></td><td><code>date</code>, <code>time?</code>, <code>weight</code>, <code>isStartingWeight</code>, et neuf mensurations facultatives : <code>chest</code>, <code>waist</code>, <code>hips</code>, <code>arm</code>, <code>underbust</code>, <code>buttocks</code>, <code>thigh</code>, <code>knee</code>, <code>calf</code></td><td>kg ; cm</td></tr>
       <tr><td><code>InjectionLog</code></td><td><code>date</code>, <code>time</code>, <code>dose</code>, <code>site</code>, <code>notes?</code>, <code>brand?</code></td><td>mg</td></tr>
       <tr><td><code>SavedMealLog</code></td><td><code>date</code>, <code>time</code>, <code>type</code>, <code>items</code>, <code>calories</code>, <code>protein</code>, <code>carbs</code>, <code>fat</code>, <code>fiber</code></td><td>kcal ; g</td></tr>
-      <tr><td><code>SideEffectLog</code></td><td><code>date</code>, <code>time</code>, <code>type</code>, <code>severity</code> (1 à 5), <code>notes?</code></td><td>—</td></tr>
+      <tr><td><code>SideEffectLog</code></td><td><code>date</code>, <code>time</code>, <code>type</code>, <code>severity</code> (0 à 5 : le curseur de saisie va de <code>min="0"</code> à <code>SEVERITY_LABELS.length − 1</code>, défaut 0 ; le commentaire <code>// 1 to 5</code> de <code>types.ts</code> n’a pas suivi), <code>notes?</code></td><td>—</td></tr>
       <tr><td><code>StepLog</code></td><td><code>date</code>, <code>steps</code></td><td>pas</td></tr>
       <tr><td><code>SportLog</code></td><td><code>date</code>, <code>time</code>, <code>sport</code>, <code>intensity</code>, <code>duration</code>, <code>distance?</code>, <code>notes?</code></td><td>minutes — <em>étages</em> pour « Montée escaliers »</td></tr>
       <tr><td><code>SleepLog</code></td><td><code>bedDate</code>, <code>bedTime</code>, <code>date</code> (réveil), <code>time</code>, <code>kind</code> (<code>nuit</code> | <code>sieste</code>), <code>quality</code> (0 à 5), <code>notes?</code></td><td>—</td></tr>
@@ -28,7 +28,7 @@
   </table>
   <p>Dérivé et donc jamais stocké : la durée d’une entrée de sommeil (déduite de <code>bedDate</code>+<code>bedTime</code> et <code>date</code>+<code>time</code> par <code>sleepLogMinutes</code>), les calories d’une séance, les totaux d’une journée, toute moyenne, l’IMC, le nombre de journées documentées, les bornes effectives de la période.</p>
   <p>Structures du seul document, montées à la volée : <code>MedicalReportSelection</code> (huit booléens : <code>weights</code>, <code>meals</code>, <code>sideEffects</code>, <code>steps</code>, <code>sport</code>, <code>sleep</code>, <code>meTime</code>, <code>insolites</code>) ; <code>ReportPalette</code> (une trentaine de couleurs RVB plus le drapeau <code>patterned</code>) ; <code>ReportDay</code> (une date, les lignes de chaque journal, le total de pas) ; <code>MergedCalendarGrid</code> (une carte d’annexe, ses mois et leurs semaines) ; <code>ReportExportFailure</code> (la fiche d’échec).</p>
-  <p class="ancre">src/versions/mixte/components/MedicalReportExport.tsx, src/versions/mixte/features/report/medicalReportPdf.ts, src/types.ts</p>
+  <p class="ancre">src/versions/mixte/components/MedicalReportExport.tsx, src/versions/mixte/features/report/medicalReportPdf.ts, src/types.ts, src/features/side-effects/useSideEffectForm.ts</p>
 
   <h3 id="rapport-periode-du-rapport-et-bornes-effectives">Période du rapport et bornes effectives</h3>
   <p>La page appelle <code>usePeriodWindow('report')</code>, qui lit et écrit <code>glp1_period_report</code> ; une valeur relue qui n’est plus une fenêtre connue retombe sur <code>30days</code>. Deux chaînes en sortent, qui commandent le titre du document, le nom du fichier et l’axe des abscisses.</p>
@@ -408,12 +408,14 @@ pousser(groupe, fermee = false) :
     si derniere existe et non fermée et derniere.cells.length + morceau.length ≤ 5
        → derniere.cells.push(...morceau)
     sinon → rangées.push({ cells: morceau, fermee })</code></pre>
-  <p>Seul le groupe poids est poussé avec <code>fermee = true</code> : sa légende la plus longue, « PERDUS / SEM. (POIDS D’ENTRÉE) », mesure 38,3 mm à 6,5 pt, ce qui tient dans une case de quatre par rangée (39,3 mm) et pas dans une case de cinq (30,2 mm) — <code>fit</code> la couperait par des points de suite. Une grandeur nulle ne produit pas de case. Chaque case fait 16 mm de haut, la gouttière 3 mm, la largeur se répartit également.</p>
+  <p>Seul le groupe poids est poussé avec <code>fermee = true</code> : sa légende la plus longue, « PERDUS / SEM. (POIDS D’ENTRÉE) », mesure 38,3 mm à 6,5 pt, ce qui tient dans une case de quatre par rangée (39,3 mm) et pas dans une case de cinq (30,2 mm) — <code>fit</code> la couperait par des points de suite. Chaque case fait 16 mm de haut, la gouttière 3 mm, la largeur se répartit également.</p>
+  <p>Ce qui supprime une case est un <code>null</code> du domaine — une moyenne sans objet : <code>intervalle</code>, <code>pctSemaine</code>, <code>nuit</code>, <code>qualite</code>, <code>pas</code> sont chacun poussés sous une garde <code>!== null</code>. Un compte à zéro, lui, produit sa case et écrit « 0 » : les trois paliers de sévérité sont poussés sans garde.</p>
   <p class="ancre">src/versions/mixte/features/report/medicalReportPdf.ts</p>
   <details><summary>Cas limites</summary>
     <ul>
       <li>Un groupe de plus de cinq cases se coupe en morceaux de cinq ; le cas ne se présente pas avec les groupes actuels.</li>
       <li>Une case peut porter deux valeurs empilées (« Par jour », « Fibres / jour », « Protéines / jour ») : la hauteur ne change pas, les deux valeurs sont écrites à 9 pt au lieu de 13.</li>
+      <li>Un groupe entièrement vide ne pousse aucune rangée : <code>pousser</code> sort sur une liste vide.</li>
     </ul>
   </details>
 
@@ -488,7 +490,7 @@ goalPercent(valeur, objectif) = objectif fini et &gt; 0 ? Math.round(valeur / ob
   <div class="exemple"><p>Camille, 85,6 kg, sans objectif protéique au profil : <code>round(85,6 × 1,5) = 128 g</code>. Moyenne 92 g → <code>round(92 / 128 × 100) = 72</code> → « 72 % de la reco ».</p></div>
 
   <h3 id="rapport-paliers-de-severite-d-un-effet">Paliers de sévérité d’un effet <span class="marque">arbitrage non validé</span></h3>
-  <pre><code>daySeverityTier(logs) : max = plus grande severity de la liste
+  <pre><code>daySeverityTier(logs) : max = plus grande severity de la liste (initialisée à 0)
                         → max &gt; 3 ? 'severe' : max &gt; 1 ? 'modere' : 'leger'
 
 severityTierCounts(history) : compteurs { leger, modere, severe }
@@ -499,7 +501,7 @@ daySeverityWord(logs) = mot du palier du jour, au pluriel si logs.length &gt; 1<
   <p class="ancre">src/features/side-effects/sideEffectCalendar.ts, src/versions/mixte/features/report/medicalReportPdf.ts</p>
   <details><summary>Cas limites</summary>
     <ul>
-      <li>Une sévérité de 0 tombe dans « léger » avec le 1 : l’échelle réelle part de 0.</li>
+      <li>Une sévérité de 0 tombe dans « léger » avec le 1 : l’échelle de saisie part de 0 (« Imperceptible »), les seuils 1 et 3 ne bougent pas pour autant.</li>
       <li>Le groupe tolérance n’est poussé que si <code>include.sideEffects</code> et au moins un effet.</li>
       <li>Le pluriel du mot dit le nombre d’effets, pas leur intensité : deux effets légers donnent « légers ».</li>
     </ul>
@@ -652,6 +654,7 @@ par type : jauge remplie à clamp(avg / 5, 0, 1), note écrite `${round1(avg)}/5
       <li>Section incluse mais aucun effet : la phrase de repli « Aucun effet secondaire déclaré sur cette période. » remplace les jauges.</li>
       <li>Deux types à même nombre : l’ordre est celui de première rencontre dans la <code>Map</code>, le tri étant stable.</li>
       <li>Un type entièrement composé de caractères non alphabétiques devient une chaîne vide après <code>cleanType</code>.</li>
+      <li>La phrase annonce « de 1 (léger) à 5 (sévère) », en dur, alors que le curseur de saisie descend à 0 (« Imperceptible ») : une déclaration à 0 est comptée dans la moyenne sans que la phrase l’annonce.</li>
     </ul>
   </details>
 
@@ -662,11 +665,11 @@ showSport = include.sport et sports.length &gt; 0
 showMeals = include.meals et meals.length &gt; 0
 section dessinée si showSteps ou showSport ou showMeals
 
-cartouches (les quatre premiers seulement) :
-  Pas / jour   = frNumber(moyenne des steps de stepsWithData)   // par LIGNE, non par date
-  Séances      = sports.length
-  Durée totale = `${Σ duration} min`                            // sans séparateur
-  kcal / jour  = Math.round(moyenne des totaux de calories par date)
+cartouches, dans cet ordre :
+  si showSteps  Pas / jour   = frNumber(moyenne des steps de stepsWithData)  // par LIGNE
+  si showSport  Séances      = sports.length
+                Durée totale = `${Σ duration} min`                           // sans séparateur
+  si showMeals  kcal / jour  = Math.round(moyenne des totaux de calories par date)
 
 ligne secondaire :
   `meilleure journée ${frNumber(max steps)} pas`
@@ -678,7 +681,8 @@ ligne secondaire :
   <p class="ancre">src/versions/mixte/features/report/medicalReportPdf.ts</p>
   <details><summary>Cas limites</summary>
     <ul>
-      <li>Trois cartouches au plus sont visibles si un seul domaine est actif ; au-delà de quatre, <code>cells.slice(0, 4)</code> tranche.</li>
+      <li>Un seul domaine actif donne au plus deux cartouches — le sport, qui en pousse deux ; les pas seuls ou les repas seuls n’en donnent qu’un.</li>
+      <li>Les trois branches ne peuvent pousser que quatre cases en tout (1 + 2 + 1) : le <code>cells.slice(0, 4)</code> qui précède le dessin ne tranche jamais rien.</li>
       <li>« Durée totale » additionne des minutes et des <em>étages</em> pour « Montée escaliers », dont le champ <code>duration</code> compte des étages.</li>
       <li>Les fibres n’ont pas de cartouche ici ; elles sont dans la synthèse et dans les lignes nutritionnelles des annexes.</li>
     </ul>
@@ -769,7 +773,9 @@ mergedGridLabel = titleParts joints par ' / '</code></pre>
   <p class="ancre">src/versions/mixte/features/report/reportCalendar.ts</p>
   <details><summary>Cas limites</summary>
     <ul>
-      <li>Février 2027 commence un lundi : une annexe de janvier à mars 2027 sort « Janvier 2027 » seul, puis « Février / Mars 2027 ».</li>
+      <li>Février 2027 commence un lundi et n’a que 28 jours : sa grille tient en quatre semaines pleines, sans un seul jour voisin. Il ne partage donc rien, ni avec janvier ni avec mars — une annexe de janvier à mars 2027 sort trois cartes d’un mois.</li>
+      <li>Février 2026, 28 jours mais commençant un dimanche : sa dernière semaine porte le 1er mars, la carte est « Février / Mars 2026 » et mars démarre au 2.</li>
+      <li>Quatre mois qui se chaînent : la carte se ferme à trois (« Juin / Juillet / Août 2026 »), et septembre, qui partage tout de même sa première semaine avec août, la laisse au bas d’août et démarre au 7.</li>
       <li>Changement d’année dans une carte : « Décembre 2026 / Janvier 2027 » — l’année suit le dernier mois de son année.</li>
       <li>Une carte d’un seul mois garde exactement le bandeau d’avant, « Août 2026 ».</li>
     </ul>
@@ -807,9 +813,9 @@ mergedGridLabel = titleParts joints par ' / '</code></pre>
   <pre><code>hasMeasurements(weights) = ∃ pesée portant l'une des neuf mesures :
     chest, waist, hips, arm, underbust, buttocks, thigh, knee, calf
 si hasMeasurements(sortedWeights) → tableau ; sinon → vue calendrier</code></pre>
-  <p>Les neuf mesures comptent, pas seulement les trois qui ont leur colonne : une période où l’on n’aurait relevé que ses cuisses garde son tableau, sans quoi la mesure disparaîtrait du document. Le test est une véracité JavaScript, donc une mesure à 0 ne compte pas. Le tableau a six colonnes de largeurs fixes (24, 20, 20, 20, 20, 74 mm, somme 178) : Date, Poids, Poitrine, Taille, Hanches, Autres mesures (cm) — les six mesures restantes y sont écrites « bras 32, sous-poitrine 84, fesses 102, cuisses 58, genoux 38, mollets 36 », dans cet ordre, chacune par <code>round1</code>. Une colonne vide s’écrit « - ». L’annexe n’existe que si <code>include.weights</code> et au moins une pesée.</p>
+  <p>Les neuf mesures comptent, pas seulement les trois qui ont leur colonne : une période où l’on n’aurait relevé que ses cuisses garde son tableau, sans quoi la mesure disparaîtrait du document. Le test est une véracité JavaScript, donc une mesure à 0 ne compte pas. Le tableau a six colonnes de largeurs fixes (24, 20, 20, 20, 20, 74 mm, somme 178) : Date, Poids, Poitrine, Taille, Hanches, Autres mesures (cm) — les six mesures restantes y sont écrites « bras 32, sous-poitrine 84, fesses 102, cuisses 58, genoux 38, mollets 36 », dans cet ordre, chacune par <code>round1</code>. Poitrine, Taille et Hanches écrivent « - » quand la mesure manque ; la sixième colonne, elle, est un <code>others.join(', ')</code> qui reste vide — jamais de tiret. L’annexe n’existe que si <code>include.weights</code> et au moins une pesée.</p>
   <p class="ancre">src/versions/mixte/features/report/reportCalendar.ts, src/versions/mixte/features/report/medicalReportPdf.ts</p>
-  <div class="exemple"><p>Camille : sa pesée du 01/09 porte un tour de taille, l’annexe B sort donc en tableau et non en calendrier.</p></div>
+  <div class="exemple"><p>Camille : sa pesée du 01/09 porte un tour de taille, l’annexe B sort donc en tableau et non en calendrier ; ses lignes sans mensuration ont trois tirets et une dernière cellule vide.</p></div>
 
   <h3 id="rapport-ordre-des-repas-et-libelles">Ordre des repas et libellés</h3>
   <pre><code>MEAL_ORDER = { breakfast: 0, lunch: 1, repas: 1, snacks: 2, snack: 2, dinner: 3 }

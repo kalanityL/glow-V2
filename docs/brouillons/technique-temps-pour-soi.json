@@ -23,84 +23,118 @@
    "fonctionnalite": "Domaine entier en V2",
    "texte": "Décisions V2 propres au temps pour soi.",
    "origine": "Aucune occurrence de « meTime » ni « temps pour soi » dans /Users/beauty/Desktop/GLOW/GIT-APP-V2/src ni dans GUIDELINES.md : tout le chapitre est fondé sur la V1."
+  },
+  {
+   "categorie": "affirmation retirée du chapitre",
+   "fonctionnalite": "Tendance du temps pour soi (tiroir)",
+   "texte": "« La carte n'est montée que si meTimeTrackingEnabled. »",
+   "origine": "Réfutation retenue, vérifiée à la ligne : TrendDrawer.tsx:955-956 rend toutes les rangées et n'en retire que les modules MASQUÉS (isModuleHidden) ; :976 et :981 privent seulement la carte éteinte de son dessin et de ses valeurs, :984 lui donne le message d'activation, :777 la garde cliquable. La phrase est remplacée par la description du grisé et du masquage."
+  },
+  {
+   "categorie": "affirmation retirée du chapitre",
+   "fonctionnalite": "Tendance du temps pour soi (tiroir)",
+   "texte": "« Le zéro est un arbitrage du domaine […] à la différence des calories, du sommeil et des pas, qui posent null. »",
+   "origine": "Réfutation retenue, vérifiée à la ligne : trends.ts:148-150 (caloriesTrend), :202 (stepsTrend), :220-222 (sleepTrend) posent tous zéro depuis l'arbitrage du 2026-08-29 cité en commentaire (:126, :193-197, :211-214). Le zéro n'est pas une singularité du temps pour soi ; la phrase est remplacée par la règle commune."
+  },
+  {
+   "categorie": "affirmation retirée du chapitre",
+   "fonctionnalite": "Plafond quotidien (sport et temps pour soi)",
+   "texte": "« La ligne écrasée garde ses notes si la nouvelle saisie n'en porte pas — notes: undefined n'est pas transmis quand le champ est vide. »",
+   "origine": "Réfutation retenue, vérifiée à la ligne : useMeTimeForm.ts:130 écrit toujours la clé notes (valeur undefined si le champ est vide) et logbook.ts:84 fait { ...updated[index], ...log } — le spread copie la clé undefined et efface la note. La phrase est remplacée par son inverse."
+  },
+  {
+   "categorie": "imprécision corrigée",
+   "fonctionnalite": "Refus de la durée « Autre » d'un moment",
+   "texte": "« Il s'efface à quatre gestes : […] » suivi de cinq gestes.",
+   "origine": "Réfutation retenue : MeTimeTracker.tsx:86-118 porte six appelants de setDurationRefusal('') — changeCustomDuration, selectDuration, resetForm, openAddForm, startEdit, openAddFormAt. Le compte et la liste sont corrigés dans le chapitre."
+  },
+  {
+   "categorie": "imprécision corrigée",
+   "fonctionnalite": "Moments pour soi sur la home",
+   "texte": "« affichage : format1Dec(valeur) + pluriel(valeur, 'moment') » pour les deux tuiles.",
+   "origine": "Réfutation retenue : MaisonSections.tsx:4762 format1Dec pour la moyenne, :4773 String pour le compte. Le pseudo-code distingue désormais les deux portes."
+  },
+  {
+   "categorie": "imprécision corrigée",
+   "fonctionnalite": "Score quotidien du temps pour soi",
+   "texte": "« Moment daté du futur : jamais tracé, endMs s'arrêtant à la fin d'aujourd'hui. »",
+   "origine": "Réfutation retenue : meTime.utils.ts:38, branche 'custom', endMs = customEnd à 23:59:59 — une borne de fin future fait dépasser la boucle (:69). Le cas limite distingue désormais les fenêtres fixes du mode Choisir."
+  },
+  {
+   "categorie": "imprécision corrigée",
+   "fonctionnalite": "Tendance du temps pour soi (tiroir)",
+   "texte": "« la carte ne montre qu'une silhouette et un total. »",
+   "origine": "Réfutation retenue : trends.ts:471-474 (hasShape) et TrendDrawer.tsx:974-976 — une série plate ou à moins de deux valeurs connues n'a pas de silhouette, l'invite de saisie prend sa place tandis que la ligne de total demeure."
   }
  ],
  "glossaire": [
   {
    "terme": "MeTimeLog",
-   "definition": "Une ligne du journal « Un temps pour soi » : id, date (YYYY-MM-DD), time (HH:MM), activity, duration (minutes), notes facultatives. Rangée dans appData.meTimeLogs."
+   "definition": "Ligne du journal « Un temps pour soi » : id, date (YYYY-MM-DD locale), time (HH:MM, minute ronde), activity, duration (minutes entières), notes facultatif. Rangée dans appData.meTimeLogs."
   },
   {
    "terme": "MeTimePreset",
-   "definition": "Une activité du catalogue : { value, label }. La value est ce qui est stocké dans log.activity ; il n'y a pas de valeur MET, donc aucune calorie."
+   "definition": "Entrée du catalogue d'activités : { value, label }. Sans valeur MET — aucune calorie n'est calculée sur un moment pour soi."
   },
   {
-   "terme": "Minute ronde",
-   "definition": "Minute appartenant à ROUNDED_MINUTES = [0, 10, 15, 20, 30, 40, 45, 50]. Toute heure écrite est ramenée à la valeur inférieure de cet ensemble par snapToRoundedMinutes."
+   "terme": "minute ronde",
+   "definition": "Valeur de ROUNDED_MINUTES = [0, 10, 15, 20, 30, 40, 45, 50]. Toute heure écrite est ramenée à la plus grande de ces valeurs inférieure ou égale aux minutes saisies."
   },
   {
-   "terme": "Plafond quotidien",
-   "definition": "Nombre maximal de lignes acceptées pour une même date : 15 ici. Au-delà, addLogWithinDailyCap prévient et fusionne la nouvelle saisie dans la dernière ligne du jour, qui garde son id."
+   "terme": "snapLogTime",
+   "definition": "Applique l'arrondi des minutes rondes au champ time d'une ligne, quand ce champ est une chaîne. Appelé par addLogWithinDailyCap et applyLogUpdate — les deux portes d'écriture."
   },
   {
-   "terme": "Fenêtre inclusive",
-   "definition": "Fenêtre de n jours qui compte le jour en cours : la date de coupure vaut aujourd'hui − (n − 1). Le filtrage compare des chaînes YYYY-MM-DD locales."
-  },
-  {
-   "terme": "Fenêtre fixe",
-   "definition": "Fenêtre non paramétrable, écrite dans le composant : le bloc des moments n'a que « 7 derniers jours » et « Depuis le début », indépendantes du sélecteur de période de la page."
-  },
-  {
-   "terme": "Score Temps pour soi",
-   "definition": "min(minutes du jour ÷ 60 × 10, 10), arrondi au dixième. FULL_SCORE_MINUTES = 60 : une heure ou plus vaut 10."
-  },
-  {
-   "terme": "Échantillonnage du graphe",
-   "definition": "step = max(1, floor((diffDays + 1) / maxPoints)) avec maxPoints plafonné à 60. Le graphe ne trace qu'un jour sur step ; les jours sautés n'ont pas de point."
-  },
-  {
-   "terme": "dayCount",
-   "definition": "Nombre de dates distinctes portant au moins un moment dans la période filtrée — des journées, pas des entrées."
-  },
-  {
-   "terme": "Entrée (par opposition à journée)",
-   "definition": "Une ligne du journal. Les comptages du bloc des moments et des tuiles de l'accueil comptent des entrées : deux moments le même jour font deux."
-  },
-  {
-   "terme": "formatCalendarDuration",
-   "definition": "Écriture serrée d'une durée pour les tuiles et les cartes : « 45min » sous l'heure, « 1h15 » au-delà, minutes toujours sur deux chiffres."
-  },
-  {
-   "terme": "formatTotal",
-   "definition": "Écriture du total du graphe : « 45 min » sous l'heure (avec espace), « 2h » quand les minutes sont nulles, « 1h30 » sinon. Distinct de formatCalendarDuration."
-  },
-  {
-   "terme": "isModuleOn",
-   "definition": "État réel d'un module, défaut compris : drapeau absent = éteint pour les cinq suivis (dont le temps pour soi), allumé pour le traitement et les effets secondaires."
-  },
-  {
-   "terme": "Masquage d'un module",
-   "definition": "meTimeModuleHidden : retire le domaine des menus et des tiroirs, mais seulement tant que le module est éteint. Rallumer le module remet le drapeau à faux."
-  },
-  {
-   "terme": "Plancher de barre",
-   "definition": "LARGEUR_MIN_PCT = 6 : largeur minimale d'une barre du bloc des moments, pour qu'une activité rare reste visible."
-  },
-  {
-   "terme": "NumberRule",
-   "definition": "Bornes d'un champ numérique : min, max, step, decimals, allowEmpty, unit, message. RULE_DURATION vaut 1 à 480 minutes, pas de vide permis."
+   "terme": "addLogWithinDailyCap",
+   "definition": "Ajout borné : sous 15 lignes à la même date, la ligne est ajoutée ; au-delà, la dernière ligne de cette date dans l'ordre du tableau est fusionnée avec la nouvelle saisie."
   },
   {
    "terme": "applyLogUpdate",
-   "definition": "Fusionne une modification dans la ligne désignée (les champs absents sont conservés) et arrondit l'heure."
+   "definition": "Fusion pure d'une charge de modification dans la ligne de même id, suivie de snapLogTime. Les clés absentes de la charge sont conservées ; une clé présente à undefined efface la valeur."
   },
   {
-   "terme": "removeLogById",
-   "definition": "Suppression franche : la ligne quitte la sauvegarde, sans marque logique — c'est ce qui rend exact le décompte du plafond quotidien."
+   "terme": "isModuleOn / isModuleHidden",
+   "definition": "isModuleOn rend l'état réel d'un module, drapeau absent compris (metime : éteint par défaut). isModuleHidden n'est vrai que module éteint ET drapeau de masquage posé."
+  },
+  {
+   "terme": "filterByTimeWindow",
+   "definition": "Filtre une liste sur une fenêtre de période par comparaison de chaînes YYYY-MM-DD locales : all ne filtre rien, custom borne par startDate/endDate, les autres bornent par la coupure n − 1 jours."
+  },
+  {
+   "terme": "usePeriodWindow",
+   "definition": "État { window, customRange } persisté sous glp1_period_<clé>. Deux clés dans ce domaine : me_time_journal et me_time_chart, indépendantes."
+  },
+  {
+   "terme": "FULL_SCORE_MINUTES",
+   "definition": "60 : minutes du jour valant le score plein. score = min(minutes / 60 × 10, 10), arrondi au dixième."
+  },
+  {
+   "terme": "formatCalendarDuration",
+   "definition": "Format des tuiles de calendrier et du total de tendance : minutes arrondies et bornées à 0 ; « 45min » sous une heure, « 1h15 » au-delà."
+  },
+  {
+   "terme": "formatTotal",
+   "definition": "Format du total du graphe, distinct du précédent : « 45 min » avec espace, « 2h » quand les minutes sont nulles, « 6h30 » sinon."
   },
   {
    "terme": "meTimeTrend",
-   "definition": "Série des minutes par jour sur 14 jours, aujourd'hui compris, avec 0 les jours sans moment ; tableau vide si le journal est vide."
+   "definition": "Série des minutes par jour sur quatorze jours : [] si le journal est absent ou vide, zéro les jours sans moment — la règle commune des séries de tendance depuis le 2026-08-29."
+  },
+  {
+   "terme": "hasShape",
+   "definition": "Une série a du relief si elle porte au moins deux valeurs non nulles au sens de null et que leur minimum diffère de leur maximum. Sans relief, pas de silhouette."
+  },
+  {
+   "terme": "trendTotal",
+   "definition": "Somme d'une série de tendance, les null comptés zéro ; null si la série est vide."
+  },
+  {
+   "terme": "format1Dec",
+   "definition": "formatNumber(valeur, 1) : au plus une décimale, zéros de queue supprimés, milliers séparés par une espace insécable."
+  },
+  {
+   "terme": "momentsParActivite",
+   "definition": "Comptage des ENTRÉES par activité sur une fenêtre figée (7days ou all), trié par fréquence décroissante puis par nom, comparaison française."
   }
  ],
  "index": [
@@ -109,7 +143,11 @@
    "ancre": "temps-pour-soi-entites"
   },
   {
-   "terme": "meTimeLogs (stockage)",
+   "terme": "meTimeLogs",
+   "ancre": "temps-pour-soi-entites"
+  },
+  {
+   "terme": "MeTimePreset",
    "ancre": "temps-pour-soi-entites"
   },
   {
@@ -117,19 +155,11 @@
    "ancre": "temps-pour-soi-catalogue-et-defauts-du-temps-pour-soi"
   },
   {
-   "terme": "glp1_me_time_history_view",
-   "ancre": "temps-pour-soi-curseur-calendrier-journal"
-  },
-  {
-   "terme": "glp1_period_me_time_journal",
-   "ancre": "temps-pour-soi-selecteur-de-periode-commun"
-  },
-  {
-   "terme": "glp1_period_me_time_chart",
-   "ancre": "temps-pour-soi-selecteur-de-periode-commun"
-  },
-  {
    "terme": "meTimeTrackingEnabled",
+   "ancre": "temps-pour-soi-etat-d-un-module-defaut-compris"
+  },
+  {
+   "terme": "meTimeModuleHidden",
    "ancre": "temps-pour-soi-etat-d-un-module-defaut-compris"
   },
   {
@@ -141,7 +171,15 @@
    "ancre": "temps-pour-soi-etat-d-un-module-defaut-compris"
   },
   {
+   "terme": "MODULES_ALLUMES_PAR_DEFAUT",
+   "ancre": "temps-pour-soi-etat-d-un-module-defaut-compris"
+  },
+  {
    "terme": "handleNavigate",
+   "ancre": "temps-pour-soi-activation-automatique-des-modules-pas-et-sport"
+  },
+  {
+   "terme": "handleQuickAddNavigate",
    "ancre": "temps-pour-soi-activation-automatique-des-modules-pas-et-sport"
   },
   {
@@ -153,11 +191,15 @@
    "ancre": "temps-pour-soi-plafond-quotidien-sport-et-temps-pour-soi"
   },
   {
-   "terme": "Plafond de 15 par jour",
+   "terme": "plafond quotidien (15)",
    "ancre": "temps-pour-soi-plafond-quotidien-sport-et-temps-pour-soi"
   },
   {
    "terme": "useHistoryView",
+   "ancre": "temps-pour-soi-curseur-calendrier-journal"
+  },
+  {
+   "terme": "glp1_me_time_history_view",
    "ancre": "temps-pour-soi-curseur-calendrier-journal"
   },
   {
@@ -166,6 +208,10 @@
   },
   {
    "terme": "snapToRoundedMinutes",
+   "ancre": "temps-pour-soi-minutes-rondes"
+  },
+  {
+   "terme": "snapLogTime",
    "ancre": "temps-pour-soi-minutes-rondes"
   },
   {
@@ -182,10 +228,14 @@
   },
   {
    "terme": "isAcceptable",
+   "ancre": "temps-pour-soi-bornes-numeriques-du-sport-et-du-temps-pour-soi"
+  },
+  {
+   "terme": "durationRefusal",
    "ancre": "temps-pour-soi-refus-de-la-duree-autre-d-un-moment"
   },
   {
-   "terme": "boundsMessage",
+   "terme": "useMeTimeForm",
    "ancre": "temps-pour-soi-refus-de-la-duree-autre-d-un-moment"
   },
   {
@@ -202,10 +252,6 @@
   },
   {
    "terme": "PERIOD_OPTIONS",
-   "ancre": "temps-pour-soi-selecteur-de-periode-commun"
-  },
-  {
-   "terme": "DEFAULT_PERIOD",
    "ancre": "temps-pour-soi-selecteur-de-periode-commun"
   },
   {
@@ -253,23 +299,23 @@
    "ancre": "temps-pour-soi-coquille-commune-des-calendriers"
   },
   {
-   "terme": "monthKey (bornes de navigation)",
+   "terme": "premiereSaisie",
    "ancre": "temps-pour-soi-coquille-commune-des-calendriers"
-  },
-  {
-   "terme": "computeMeTimeChartData",
-   "ancre": "temps-pour-soi-score-quotidien-du-temps-pour-soi"
   },
   {
    "terme": "FULL_SCORE_MINUTES",
    "ancre": "temps-pour-soi-score-quotidien-du-temps-pour-soi"
   },
   {
-   "terme": "Échantillonnage (step, maxPoints)",
+   "terme": "computeRangeBounds",
    "ancre": "temps-pour-soi-score-quotidien-du-temps-pour-soi"
   },
   {
-   "terme": "totalMinutes",
+   "terme": "computeMeTimeChartData",
+   "ancre": "temps-pour-soi-score-quotidien-du-temps-pour-soi"
+  },
+  {
+   "terme": "formatTotal",
    "ancre": "temps-pour-soi-total-et-journees-du-graphe-temps-pour-soi"
   },
   {
@@ -277,15 +323,11 @@
    "ancre": "temps-pour-soi-total-et-journees-du-graphe-temps-pour-soi"
   },
   {
-   "terme": "formatTotal",
-   "ancre": "temps-pour-soi-total-et-journees-du-graphe-temps-pour-soi"
-  },
-  {
    "terme": "momentsParActivite",
    "ancre": "temps-pour-soi-comptage-mes-moments"
   },
   {
-   "terme": "LARGEUR_MIN_PCT",
+   "terme": "BlocMesMoments",
    "ancre": "temps-pour-soi-comptage-mes-moments"
   },
   {
@@ -305,6 +347,10 @@
    "ancre": "temps-pour-soi-moments-pour-soi-sur-la-home"
   },
   {
+   "terme": "meTimeMinutesLast7Days",
+   "ancre": "temps-pour-soi-moments-pour-soi-sur-la-home"
+  },
+  {
    "terme": "meTimeTrend",
    "ancre": "temps-pour-soi-tendance-du-temps-pour-soi-tiroir"
   },
@@ -313,12 +359,23 @@
    "ancre": "temps-pour-soi-tendance-du-temps-pour-soi-tiroir"
   },
   {
+   "terme": "trendDates",
+   "ancre": "temps-pour-soi-tendance-du-temps-pour-soi-tiroir"
+  },
+  {
    "terme": "trendTotal",
+   "ancre": "temps-pour-soi-tendance-du-temps-pour-soi-tiroir"
+  },
+  {
+   "terme": "hasShape",
+   "ancre": "temps-pour-soi-tendance-du-temps-pour-soi-tiroir"
+  },
+  {
+   "terme": "MODULES_TENDANCE",
    "ancre": "temps-pour-soi-tendance-du-temps-pour-soi-tiroir"
   }
  ],
  "ancres_traitees": [
-  "temps-pour-soi-entites",
   "temps-pour-soi-etat-d-un-module-defaut-compris",
   "temps-pour-soi-activation-automatique-des-modules-pas-et-sport",
   "temps-pour-soi-plafond-quotidien-sport-et-temps-pour-soi",

@@ -11,9 +11,9 @@
       <tr><td><code>plural</code></td><td>string</td><td>Pluriel sans article : « boules de bowling ».</td></tr>
       <tr><td><code>weight</code></td><td>number</td><td>Unité canonique : le kilogramme.</td></tr>
       <tr><td><code>category</code></td><td><code>'objet' | 'insolite'</code></td><td>Pilote la validité d'une combinaison.</td></tr>
-      <tr><td><code>prefix</code></td><td>string</td><td>« un » / « une » / « des », pour la phrase.</td></tr>
+      <tr><td><code>prefix</code></td><td>string</td><td>« un » (122 entrées) ou « une » (100) — les 222. Aucune entrée ne porte « des », que seul le commentaire d'exemple de l'interface cite.</td></tr>
       <tr><td><code>emoji</code></td><td>string</td><td>Repli de dessin.</td></tr>
-      <tr><td><code>isAnimal</code></td><td>boolean, facultatif</td><td>Déclaré, jamais renseigné ni lu. <span class="marque non">non implémenté</span></td></tr>
+      <tr><td><code>isAnimal</code></td><td>boolean, facultatif</td><td>Déclaré ; aucune des 222 entrées ne le porte, et aucun code du périmètre ne le lit. <span class="marque non">non implémenté</span></td></tr>
       <tr><td rowspan="4"><code>DecomposedLudicItem</code><br>(stocké dans l'assignation)</td><td><code>name</code></td><td>string</td><td>Le nom du <code>LudicItem</code>.</td></tr>
       <tr><td><code>count</code></td><td>number</td><td>1 ou 2 — le même objet peut être pris deux fois.</td></tr>
       <tr><td><code>emoji</code></td><td>string</td><td>Recopié du catalogue au moment de l'assignation.</td></tr>
@@ -51,7 +51,7 @@ passe 2 (repli) — seulement si bestCombo est vide : même énumération
   sans isValidCombo
 
 regroupement : les deux entrées de même nom fusionnent en { item, count: 2 }</code></pre>
-  <p>Le seuil <code>1e-5</code> sur les paires est le départage qui fait qu'<strong>un objet seul l'emporte sur une paire à justesse égale</strong> : la paire doit être meilleure d'au moins un centième de gramme pour passer devant. Entre deux objets seuls, ou entre deux paires, la comparaison est stricte (<code>&lt;</code>) : le premier rencontré dans l'ordre du catalogue gagne.</p>
+  <p>La boucle des paires n'a qu'un seul test, <code>diff &lt; bestDiff − 1e-5</code>, et il sert deux départages. Contre un objet seul déjà retenu : <strong>l'objet seul l'emporte à justesse égale</strong>, la paire devant être meilleure d'au moins un centième de gramme. Contre une paire déjà retenue : le même seuil s'applique, donc une paire meilleure de moins de 1e-5 ne détrône pas la précédente — la comparaison n'est pas stricte. Entre deux objets seuls, elle l'est (<code>&lt;</code>). Dans les trois cas, à écart indépartageable, le premier rencontré dans l'ordre du catalogue reste.</p>
   <p class="ancre">src/utils/ludicWeight.ts</p>
   <details><summary>Cas limites</summary>
     <ul>
@@ -59,8 +59,9 @@ regroupement : les deux entrées de même nom fusionnent en { item, count: 2 }</
       <li>Un insolite de 1 kg ou plus seul → combinaison invalide, jamais énumérée. 112 des 151 insolites sont dans ce cas ; il reste 110 objets seuls valides sur 222.</li>
       <li>Deux insolites de moins de 1 kg → valide (chacun satisfait la clause).</li>
       <li>Le repli de la passe 2 <strong>ne peut jamais s'exécuter</strong> : les 71 objets de catégorie <code>objet</code> passent seuls <code>isValidCombo</code>, donc <code>bestCombo</code> n'est jamais vide à la sortie de la passe 1. <span class="marque non">non implémenté</span> en pratique — le code est mort.</li>
-      <li>Un poids que le catalogue n'approche pas à 200 g près (quelques tonnes) est rendu quand même : la combinaison la plus juste sort, si fausse soit-elle. Le seuil de 200 g ne filtre que le chemin à options.</li>
-      <li>Sans options, la liste <code>candidates</code> n'est jamais remplie : le coût du choix par exclusion et turn-over n'est payé que par les blocs de la home.</li>
+      <li>La combinaison valide la plus lourde pèse 220 kg : deux « réfrigérateur américain » de 110 kg. Le piano droit (200 kg) est de catégorie <code>insolite</code> : seul il est invalide, et une paire de deux pianos aussi, faute d'un insolite sous 1 kg. Au-delà de 220,2 kg, plus aucun candidat n'est vrai à 200 g près.</li>
+      <li>Un poids que le catalogue n'approche pas à 200 g près est rendu quand même : la combinaison la plus juste sort, si fausse soit-elle. Le seuil de 200 g ne filtre que le chemin à options.</li>
+      <li>Sans options, la liste <code>candidates</code> n'est jamais remplie. Le coût de l'énumération complète (10 583 candidats) n'est payé que par le chemin à options : <code>resolveLudicAssignment</code>, qui passe toujours <code>{ usage: counts }</code> et que <code>useAppData</code> déclenche à chaque changement du journal, et le repli de la dernière perte de la home sections quand son <code>exclude</code> est non vide.</li>
     </ul>
   </details>
   <div class="exemple"><p>Camille, 96,0 kg au départ, 88,6 kg le 12 septembre 2026 : perte totale 7,4 kg. Le moteur nu retient « une manette de console rétro » (0,4 kg) et « une boule de bowling » (7,0 kg), écart 0. La perte de 0,6 kg contre la pesée du 5 septembre (89,2 kg) donne « une bougie parfumée en pot » (0,6 kg), écart 0.</p></div>
@@ -90,7 +91,7 @@ sinon, réduction sur pool, dans cet ordre :
   <div class="exemple"><p>Le 19 septembre 2026, Camille pèse encore 88,6 kg. Les compteurs valent 1 pour la manette, la boule et la bougie. Pour 7,4 kg, la manette + boule (usage 2) cède à « un globe terrestre » (0,9 kg) + « une paire de skis avec fixations » (6,5 kg), usage 0, écart 0.</p></div>
 
   <h3 id="insolites-assignation-des-objets-a-la-pesee">L'assignation des objets à la pesée</h3>
-  <p>Trois fonctions, un seul appelant. <code>useLudicAssignment(weightHistory)</code> est appelé par <code>useAppData</code>, donc à chaque changement du journal quel que soit l'écran ouvert ; les homes et la carte de confirmation ne font que lire son résultat.</p>
+  <p><code>useLudicAssignment(weightHistory)</code> est appelé par <code>useAppData</code> : le journal qui change suffit à assigner, quel que soit l'écran ouvert. Quatre écrans du périmètre l'appellent à leur tour pour lire le résultat — <code>App.tsx</code> (carte de confirmation posée par le tiroir Journal), <code>WeightTracker</code>, la home standard, la home sections. Ces appels supplémentaires sont sans effet : <code>resolveLudicAssignment</code> ne fait que lire tant que la signature et les deux pertes n'ont pas bougé, et <code>commitLudicAssignment</code> n'incrémente qu'au changement de signature.</p>
   <pre><code>latestWeighInSignature(history) :
   la plus récente = max sur `${date}T${time ?? '00:00'}` (comparaison de chaînes,
                     strictement supérieur : à égalité, la première rencontrée reste)
@@ -115,7 +116,7 @@ commitLudicAssignment(assignment) :   // appelée sous useEffect si isNew
   écriture systématique de { counts, assignment } sous glow_ludic_usage</code></pre>
   <p>Deux identités distinctes : la <strong>signature</strong> (la ligne la plus récente) commande les compteurs ; la signature <em>et</em> les deux pertes au dixième commandent la conservation. Une correction sur une pesée passée change les pertes sans changer la signature : elle réassigne sans compter.</p>
   <p>« Depuis le début » est résolu en premier et sert d'<code>exclude</code> à la dernière perte : c'est la dernière perte qui cède.</p>
-  <p class="ancre">src/utils/ludicUsage.ts, src/utils/useLudicAssignment.ts, src/app/useAppData.ts</p>
+  <p class="ancre">src/utils/ludicUsage.ts, src/utils/useLudicAssignment.ts, src/app/useAppData.ts, src/versions/mixte/App.tsx, src/versions/mixte/features/weight/WeightTracker.tsx, src/versions/mixte/components/Maison.tsx, src/versions/mixte/homes/sections/MaisonSections.tsx</p>
   <details><summary>Cas limites</summary>
     <ul>
       <li>Journal vide → signature <code>'aucune-pesee'</code>, pertes 0, deux listes vides, aucun compteur touché (les boucles ne parcourent rien).</li>
@@ -215,7 +216,7 @@ jonction              : parts.join(', ') + ' et ' + dernier</code></pre>
     <ul>
       <li>Objets assignés dont le nom a disparu du catalogue → sautés : la phrase peut être plus courte que le dessin, qui, lui, lit l'émoji conservé.</li>
       <li>Tous sautés → <code>parts.length === 0</code> → <code>null</code>, aucune phrase.</li>
-      <li>Le retrait de l'article est un remplacement de préfixe insensible à la casse ; un nom qui ne commence pas par un article reste entier.</li>
+      <li>Le retrait de l'article est un remplacement de préfixe insensible à la casse ; un nom qui ne commence pas par un article reste entier. La branche <code>des</code> de la regex ne sert jamais : aucun nom du catalogue ne commence par cet article.</li>
     </ul>
   </details>
   <div class="exemple"><p>Pour Camille : <code>[{manette, 1}, {boule, 1}]</code> donne « une manette de console rétro et une boule de bowling » ; <code>[{bougie, 1}]</code> donne « une bougie parfumée en pot ».</p></div>
@@ -303,12 +304,13 @@ ordre de rendu, home standard :
 ludicLast  = (ludic.last.length &gt; 0 OU lastLoss ≤ 0)
              ? ludic.last
              : getLudicDecomposition(lastLoss, {
-                 exclude: noms de ludicTotal })              // avec options</code></pre>
-  <p>Le repli de la perte totale part sans options : ni filtre à 200 g, ni turn-over, la combinaison la plus juste sort. Le repli de la dernière perte porte un <code>exclude</code> non vide, ce qui active <code>pickByExclusionAndTurnover</code> : le filtre des 200 g s'applique, le turn-over est neutre puisque <code>usage</code> est absent et que tous les cumuls valent 0 — le départage tombe donc sur l'écart, puis sur le rang.</p>
+                 exclude: noms de ludicTotal })</code></pre>
+  <p>Le repli de la perte totale part sans options : ni filtre à 200 g, ni turn-over, la combinaison la plus juste sort. Le repli de la dernière perte passe pour <code>exclude</code> les noms de <code>ludicTotal</code>, dont la longueur décide seule du chemin. <code>exclude</code> non vide : <code>pickByExclusionAndTurnover</code> s'active, le filtre des 200 g s'applique, le turn-over est neutre puisque <code>usage</code> est absent et que tous les cumuls valent 0 — le départage tombe donc sur l'écart, puis sur le rang. <code>exclude</code> vide : <code>withOptions</code> vaut faux et ce repli se comporte comme celui de la perte totale.</p>
   <p>Le repli ne choisit jamais à la place de l'assignation : tant qu'elle porte des objets, c'est elle qui est lue, et rien n'est écrit en retour.</p>
   <p class="ancre">src/versions/mixte/homes/sections/MaisonSections.tsx</p>
   <details><summary>Cas limites</summary>
     <ul>
+      <li><code>totalLoss ≤ 0</code> et <code>lastLoss &gt; 0</code> → <code>ludicTotal</code> vide → <code>exclude</code> vide → aucun filtre à 200 g sur le repli de la dernière perte. La tuile est de toute façon masquée, <code>hasOnlyStartingWeight</code> étant vrai.</li>
       <li>Assignation vide et perte nulle ou négative → liste vide gardée, <code>LudicComposition</code> ne rend rien, mais la tuile est de toute façon masquée par <code>showLastLoss</code> / <code>showTotalLoss</code>.</li>
       <li>Les objets du repli ne sont ni comptés ni mémorisés : ils changent au prochain rendu si l'assignation, elle, se répare.</li>
       <li>La garde de <code>resolveLudicAssignment</code> couvre déjà ce cas ; ce repli est le second filet, indépendant de ce qui est écrit sur l'appareil.</li>
@@ -416,14 +418,16 @@ effective = {
   meTime:  selection.meTime ET hasMeTimeData,
   insolites: selection.insolites,        // AUCUN masque
 }</code></pre>
-  <p>La bascule <code>insolites</code> est rendue sans garde, à la différence des modules, dont la bascule disparaît quand le module est éteint ou la période muette. <code>available.insolites</code> n'entre donc dans aucun calcul : c'est un reliquat de l'export rapide, <strong>supprimé le 2026-08-25</strong> — il n'existe plus qu'un seul chemin, l'export sur mesure.</p>
-  <p>La ligne « Les équivalences insolites » entre dans le sommaire de l'écran d'attente dès que la case est cochée, sans autre condition.</p>
+  <p><code>available.insolites</code> n'entre donc dans aucun calcul : c'est un reliquat de l'export rapide, <strong>supprimé le 2026-08-25</strong> — il n'existe plus qu'un seul chemin, l'export sur mesure.</p>
+  <p><strong>Trois cases sont rendues sans garde</strong> : <code>weights</code>, <code>sideEffects</code> et <code>insolites</code>. Les cinq autres — repas, pas, sport, sommeil, temps pour soi — ne paraissent que si leur booléen de disponibilité est vrai (module allumé <em>et</em> période porteuse). Les effets secondaires sont pourtant un module depuis le 2026-08-29 : <code>hasSideEffectsData</code> est calculé, mais il ne figure pas dans <code>CustomBlockProps</code> et n'est jamais passé à <code>ReportCustomBlock</code> ; il ne sert qu'à <code>available.sideEffects</code>, donc au masque de <code>effective</code>, pas à l'affichage de la case.</p>
+  <p>Le sommaire de l'écran d'attente suit les mêmes gardes que la grille : les lignes du poids, des effets secondaires et des insolites y entrent dès que leur case est cochée, les cinq autres restent conditionnées par leur booléen de disponibilité.</p>
   <p class="ancre">src/versions/mixte/components/MedicalReportExport.tsx</p>
   <details><summary>Cas limites</summary>
     <ul>
       <li>Case cochée et « Le poids et les mensurations » décoché → <code>effective.insolites</code> vrai mais aucune section II : rien n'est écrit.</li>
       <li>Case cochée et période sans pesée → <code>effective.weights</code> faux (masque), section II absente : rien n'est écrit.</li>
       <li>Le sommaire d'attente liste la ligne insolites même dans les deux cas ci-dessus : il relit <code>include</code>, pas <code>effective</code>.</li>
+      <li>Module des symptômes éteint ou période sans effet → la case « Les effets secondaires » reste proposée et cochable, mais <code>effective.sideEffects</code> est faux : aucune section.</li>
     </ul>
   </details>
 

@@ -15,8 +15,8 @@
   {
    "categorie": "compte à rebours",
    "fonctionnalite": "Validation de countdownTargetDate à l'écriture",
-   "texte": "J'ai voulu donner la règle de validation du format AAAA-MM-JJ à la saisie. Le seul point d'écriture est un champ d'administration (hors périmètre) qui affecte la valeur telle quelle ; aucune validation n'a été trouvée dans le domaine.",
-   "origine": "Attendu par le champ ; seul écrivain hors périmètre, non relu."
+   "texte": "J'ai voulu donner la règle de validation du format AAAA-MM-JJ à la saisie. Le seul point d'écriture est un champ d'administration (hors périmètre) : un DateSelect maison qui ne compose que des chaînes bien formées, sans pour autant valider une valeur déjà stockée. Aucune validation dans le domaine.",
+   "origine": "Attendu par le champ ; écrivain hors périmètre, relu seulement pour établir que les chaînes mal formées sont hors d'atteinte par l'application (src/shared/ui/DateSelect.tsx:216-231)."
   },
   {
    "categorie": "compte à rebours",
@@ -29,44 +29,48 @@
    "fonctionnalite": "Sens des paires or/argent qui partagent une citation",
    "texte": "Le décalage de 3 fait que trois citations sont servies par deux étoiles et qu'aucune n'est inatteignable. Rien dans le code n'indique si ce décalage est un choix ou un reste.",
    "origine": "Interprétation ; le code ne porte ni commentaire ni test sur ce point."
+  },
+  {
+   "categorie": "mise en scène",
+   "fonctionnalite": "Recouvrement de l'entête et du pied de page par la scène",
+   "texte": "Le chapitre affirmait que le conteneur absolute inset-0 recouvre l'entête et le pied de page. Les deux moitiés étaient fausses : l'entête et la bande de titre ne sont pas rendues sur cet onglet (garde isMonCiel), et le menu du bas est un frère postérieur en z-30 ou z-50 qui passe devant le conteneur en z-10. Phrase supprimée et remplacée par la description vérifiée.",
+   "origine": "Déduit de la classe inset-0 sans lire l'empilement ; réfutation retenue, vérifiée dans src/versions/mixte/App.tsx:1206, 1828, 1962, 2510, 2609, 2681."
+  },
+  {
+   "categorie": "structure du module",
+   "fonctionnalite": "Emplacement des constantes de Mon Ciel",
+   "texte": "Le chapitre situait starQuotes, goldStars et silverStars au niveau du module. Les trois tableaux sont déclarés dans le corps du composant et reconstruits à chaque rendu ; seules leurs valeurs sont constantes. Phrases corrigées.",
+   "origine": "Supposé d'après leur nature de données figées ; réfutation retenue, vérifiée dans src/versions/mixte/components/MonCiel.tsx:192, 246-254, 262-276."
   }
  ],
  "glossaire": [
   {
    "terme": "countdownTargetDate",
-   "definition": "Champ facultatif de UserProfile, chaîne au format AAAA-MM-JJ, non validée. Seule donnée stockée que Mon Ciel lit. Valeur du profil initial : '2026-11-15'."
+   "definition": "Champ facultatif de UserProfile, chaîne AAAA-MM-JJ, date cible du compte à rebours de Mon Ciel. Seul champ stocké lu par la scène ; écrit uniquement depuis l'écran d'administration."
   },
   {
    "terme": "Repli du compte à rebours",
-   "definition": "Cible codée en dur new Date(2026, 10, 15, 0, 0, 0), soit le 15 novembre 2026 à 00:00 locale, utilisée uniquement quand la chaîne ne se découpe pas en exactement trois segments sur le tiret."
+   "definition": "Deux branches du calcul qui posent la cible au 15 novembre 2026 à 00:00 en dur : valeur falsy, ou découpage sur le tiret ne donnant pas trois segments."
   },
   {
-   "terme": "diff",
-   "definition": "Écart en millisecondes entre la cible et l'instant courant, borné par max(0, …) ; consommé par soustractions successives lors de la décomposition en jours, heures, minutes, secondes."
+   "terme": "timeLeft",
+   "definition": "État de composant {days, hours, minutes, seconds}, entiers, recalculé toutes les 1 000 ms depuis l'écart absolu en millisecondes. Non stocké."
   },
   {
-   "terme": "padStart(2, '0')",
-   "definition": "Cadrage d'affichage sur deux chiffres au minimum ; il complète à gauche mais n'ampute jamais, donc une valeur à trois chiffres (jours ≥ 100) ou la chaîne NaN passent telles quelles."
+   "terme": "activeStarQuote",
+   "definition": "État de composant portant la phrase déjà composée du panneau d'une étoile, ou null. Non stocké, perdu à la sortie de l'onglet."
   },
   {
    "terme": "starQuotes",
-   "definition": "Tableau constant de sept citations du module MonCiel, indexé de 0 à 6."
-  },
-  {
-   "terme": "handleStarClick(type, index)",
-   "definition": "Fonction qui choisit la citation — index (index + décalage) mod 7, décalage 0 pour l'or et 3 pour l'argent — et compose le libellé du panneau « Message Étoilé »."
+   "definition": "Tableau de sept citations en dur déclaré dans le corps du composant. L'index servi est (index de l'étoile + 0 pour l'or, + 3 pour l'argent) modulo 7."
   },
   {
    "terme": "Star3D",
-   "definition": "Composant SVG de l'étoile à cinq branches : viewBox 100 × 100, centre (50, 50), rayon externe 44, rayon interne 18, dix sommets et dix facettes triangulaires à éclairage alterné. Porte le onClick."
+   "definition": "Composant de dessin d'une étoile : dix sommets dans un viewBox 100 × 100 (R = 44, r = 18) rendus en dix path triangulaires ; le onClick est porté par le motion.div enveloppant, de taille size × size."
   },
   {
-   "terme": "Particules (tinyStars)",
-   "definition": "45 points blancs dont position, taille, durée et retard sont tirés au sort une seule fois par useMemo sans dépendance, donc à chaque montage de la scène."
-  },
-  {
-   "terme": "Panneau amarré",
-   "definition": "Bloc positionné en absolute inset-x-3 bottom-3 dans la scène, sans voile ni blocage de l'arrière-plan ; plan z-40 pour le jeu et le message étoilé, z-50 pour le règlement."
+   "terme": "Particules",
+   "definition": "45 points de fond tirés au sort une fois par useMemo sans dépendance : position en %, taille 1 à 3 px, durée 2 à 5 s, retard 0 à 3 s."
   }
  ],
  "index": [
@@ -75,35 +79,23 @@
    "ancre": "ciel-entites"
   },
   {
-   "terme": "Profil (champ lu par Mon Ciel)",
+   "terme": "Compte à rebours de Mon Ciel",
+   "ancre": "ciel-compte-a-rebours-de-mon-ciel"
+  },
+  {
+   "terme": "Repli 15 novembre 2026",
+   "ancre": "ciel-compte-a-rebours-de-mon-ciel"
+  },
+  {
+   "terme": "timeLeft",
    "ancre": "ciel-entites"
   },
   {
-   "terme": "Positions des dix étoiles",
-   "ancre": "ciel-entites"
-  },
-  {
-   "terme": "Particules de fond (45)",
-   "ancre": "ciel-entites"
-  },
-  {
-   "terme": "Compte à rebours",
+   "terme": "padStart des cases du compte à rebours",
    "ancre": "ciel-compte-a-rebours-de-mon-ciel"
   },
   {
-   "terme": "Repli 15/11/2026",
-   "ancre": "ciel-compte-a-rebours-de-mon-ciel"
-  },
-  {
-   "terme": "Décomposition jours/heures/minutes/secondes",
-   "ancre": "ciel-compte-a-rebours-de-mon-ciel"
-  },
-  {
-   "terme": "padStart",
-   "ancre": "ciel-compte-a-rebours-de-mon-ciel"
-  },
-  {
-   "terme": "Heure locale et changement d'heure",
+   "terme": "DateSelect (seul écrivain du champ)",
    "ancre": "ciel-compte-a-rebours-de-mon-ciel"
   },
   {
@@ -111,16 +103,28 @@
    "ancre": "ciel-citations-des-etoiles"
   },
   {
-   "terme": "Décalage argent (+3)",
+   "terme": "starQuotes",
    "ancre": "ciel-citations-des-etoiles"
   },
   {
-   "terme": "Message Étoilé",
+   "terme": "handleStarClick",
    "ancre": "ciel-citations-des-etoiles"
   },
   {
    "terme": "Star3D",
    "ancre": "ciel-citations-des-etoiles"
+  },
+  {
+   "terme": "Positions des dix étoiles",
+   "ancre": "ciel-entites"
+  },
+  {
+   "terme": "Particules de fond",
+   "ancre": "ciel-entites"
+  },
+  {
+   "terme": "Empilement de la scène et du menu du bas",
+   "ancre": "ciel-entites"
   }
  ],
  "ancres_traitees": [

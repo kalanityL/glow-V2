@@ -59,7 +59,7 @@ switchView(v) → setView(v) puis setItem(clé, v)</code></pre>
 
   <h3 id="sommeil-flottant-et-ouverture-automatique">« + » flottant et ouverture automatique</h3>
   <p>Trois mécanismes distincts ouvrent le formulaire.</p>
-  <p><strong>Armement du « + » flottant.</strong> <code>useOnScreen</code> pose un <code>IntersectionObserver</code> sur le bandeau de <code>HistoryToolbar</code> et appelle <code>onAddButtonOffScreenChange(!visible)</code>. L'App n'arme que dans un sens :</p>
+  <p><strong>Armement du « + » flottant.</strong> <code>useOnScreen</code> pose un <code>IntersectionObserver</code> sur le <em>curseur segmenté</em> de <code>HistoryToolbar</code> — le carreau Calendrier / Journal, seul porteur de <code>bandRef</code>, et non la ligne d'outils entière ni le « + ajouter » qui la termine — et appelle <code>onAddButtonOffScreenChange(!visible)</code>. Le déclenchement suit donc la sortie d'écran de ce carreau. L'App n'arme que dans un sens :</p>
   <pre><code>armFloatingAdd(tab, offScreen) {
   si offScreen → floatingAddArmedTabs[tab] = true   // jamais remis à false
 }</code></pre>
@@ -68,10 +68,10 @@ switchView(v) → setView(v) puis setItem(clé, v)</code></pre>
   <pre><code>si (openAddRequest ?? 0) === lastAddRequest → ne rien faire
 sinon lastAddRequest = openAddRequest ; openAddForm()</code></pre>
   <p><strong>Ajout rapide.</strong> <code>autoOpenAdd</code> sert de valeur initiale à l'état d'ouverture — <code>useState(autoOpenAdd ?? false)</code> — donc le formulaire est déjà là à la première peinture ; un <code>useEffect</code> sur <code>autoOpenAdd</code> couvre le cas où la demande arrive après le montage.</p>
-  <p class="ancre">src/versions/mixte/features/sleep/SleepTracker.tsx · src/versions/mixte/App.tsx · src/shared/ui/useOnScreen.ts</p>
+  <p class="ancre">src/versions/mixte/features/sleep/SleepTracker.tsx · src/versions/mixte/App.tsx · src/versions/mixte/components/HistoryToolbar.tsx · src/shared/ui/useOnScreen.ts</p>
   <details><summary>Cas limites</summary>
     <p>Élément de référence détaché (<code>el === null</code>) : <code>useOnScreen</code> rappelle <code>onChange(true)</code> — considéré visible, donc pas d'armement.</p>
-    <p>Vue Journal ou vue Calendrier : la poignée vit sur la ligne d'outils, présente dans les deux — le « + » s'arme identiquement.</p>
+    <p>Vue Journal ou vue Calendrier : le curseur vit sur la ligne d'outils, présente dans les deux — le « + » s'arme identiquement.</p>
   </details>
 
   <h3 id="sommeil-bouton-tout-supprimer">Bouton « Tout supprimer »</h3>
@@ -130,10 +130,10 @@ formatSleepAverage(m)    // sleep.utils.ts
 formatCalendarDuration(m) // shared/calendar.ts
   total &lt; 60 → « total min » collé (« 45min »)
   sinon      → « ⌊total/60⌋ h rr » (« 7h35 », « 8h00 »)</code></pre>
-  <p>Répartition constatée : <code>formatSleepDuration</code> dans le formulaire, la ligne du journal et l'infobulle du graphe ; <code>formatSleepAverage</code> dans les tuiles « Côte à côte », la moyenne du graphe, la frise des nuits et le message des 12 h ; <code>formatCalendarDuration</code> dans les tuiles du calendrier, la bulle, les tiroirs Journal et Tendances.</p>
+  <p>Surfaces vivantes de <code>formatSleepDuration</code> : le formulaire (<code>SleepForm</code>), la ligne du journal (<code>JournalEntryCard</code>), l'infobulle du graphe « Durée et qualité » et la durée en tête de la carte de partage d'un sommeil (<code>shareTemplates</code>). Ses deux autres appelants sont du code mort : <code>sleepAnalysis.ts</code>, servi par un accordéon sous <code>{false &amp;&amp; …}</code>, et <code>SleepNutritionChart.tsx</code>, sous le même verrou. <code>formatSleepAverage</code> : tuiles « Côte à côte », moyenne du graphe, frise des nuits, message des 12 h. <code>formatCalendarDuration</code> : tuiles du calendrier, bulle, tiroirs Journal et Tendances.</p>
   <p>Une seule surface retouche le résultat : la ligne de tête de la bulle du calendrier applique <code>formatCalendarDuration(duree).replace(/h00$/, 'h')</code>, d'où « de 8h » au lieu de « de 8h00 ».</p>
-  <p class="ancre">src/features/sleep/sleep.utils.ts · src/shared/calendar.ts · src/versions/mixte/features/sleep/SleepCalendar.tsx</p>
-  <div class="exemple"><p>455 min chez Camille : « 7 h 35 » dans le formulaire, « 7h35 » dans la tuile du 11/09 et sur la frise. 480 min : « 8 h », « 8h00 », et « de 8h » en tête de bulle. 40 min : « 40 min », « 0h40 », « 40min ».</p></div>
+  <p class="ancre">src/features/sleep/sleep.utils.ts · src/shared/calendar.ts · src/versions/mixte/features/sleep/SleepCalendar.tsx · src/versions/mixte/components/share/shareTemplates.tsx</p>
+  <div class="exemple"><p>455 min chez Camille : « 7 h 35 » dans le formulaire, sur la carte de partage et dans l'infobulle ; « 7h35 » dans la tuile du 11/09 et sur la frise. 480 min : « 8 h », « 8h00 », et « de 8h » en tête de bulle. 40 min : « 40 min », « 0h40 », « 40min ».</p></div>
 
   <h3 id="sommeil-valeurs-par-defaut-du-formulaire-de-sommeil">Valeurs par défaut du formulaire de sommeil</h3>
   <pre><code>DEFAULT_TIMES = { nuit:   { bedTime: '23:00', wakeTime: '07:00' },
@@ -282,7 +282,7 @@ snapToRoundedMinutes(t) :
   → `HH:arrondi`                                    // l'heure ne change jamais
 
 snapSleepTimes(log) = { ...log, time: snap(log.time), bedTime: snap(log.bedTime) }</code></pre>
-  <p>Toujours vers le bas — l'application ne produit jamais une heure future. Appliqué dans <code>handleAddSleep</code> et dans <code>handleUpdateSleep</code>, donc à l'écriture et non à la saisie : la durée affichée par le formulaire est calculée sur les heures brutes, la durée relue après enregistrement sur les heures arrondies. Le sélecteur d'heure maison ne propose que ces huit minutes ; une valeur héritée d'une autre minute reste affichée telle quelle, en champ désactivé.</p>
+  <p>Toujours vers le bas — l'application ne produit jamais une heure future. Appliqué dans <code>handleAddSleep</code> et dans <code>handleUpdateSleep</code>, donc à l'écriture et non à la saisie : la durée affichée par le formulaire est calculée sur les heures brutes, la durée relue après enregistrement sur les heures arrondies. Le sélecteur d'heure maison ne propose que ces huit minutes ; une minute héritée non ronde est <em>insérée à sa place</em> dans la colonne des minutes, en option désactivée (<code>{ label: minute, disabled: true }</code>) : elle s'affiche, elle ne se re-choisit pas. Le champ, lui, reste ouvrable et modifiable.</p>
   <p class="ancre">src/shared/date/date.local.ts · src/features/sleep/sleep.utils.ts · src/app/useAppData.ts · src/shared/ui/TimeSelect.tsx</p>
   <details><summary>Cas limites</summary>
     <p>06:47 → 06:45 ; 07:37 → 07:30 ; 22:58 → 22:50 ; 06:05 → 06:00 ; 06:45 inchangé.</p>
@@ -401,7 +401,7 @@ bornes :
   maxPoints = diffDays &gt; 60 ? 60 : max(diffDays + 1, 1)
   step      = max(1, ⌊(diffDays + 1) / maxPoints⌋)
   boucle : t = startMs ; t &lt;= endMs ; t += 86 400 000 × step</code></pre>
-  <p><code>step</code> ne dépasse 1 que si <code>⌊(diffDays + 1) / 60⌋ &gt;= 2</code>, c'est-à-dire <code>diffDays &gt;= 119</code>. Une fenêtre de 90 jours donne <code>diffDays = 90</code>, <code>step = ⌊91 / 60⌋ = 1</code>, donc 90 points ; 119 jours donnent <code>step = 2</code> et 60 points ; 180 jours donnent <code>step = ⌊181 / 60⌋ = 3</code> et 61 points.</p>
+  <p><code>step</code> ne dépasse 1 que si <code>⌊(diffDays + 1) / 60⌋ &gt;= 2</code>, c'est-à-dire <code>diffDays &gt;= 119</code>. Le nombre de points vaut <code>⌊(endMs − startMs) / (86 400 000 × step)⌋ + 1</code>, et non <code>⌊diffDays / step⌋ + 1</code> : <code>endMs</code> tombe à 23:59:59.999 (fenêtre fixe) ou 23:59:59 (mode <code>custom</code>), donc l'écart est toujours strictement inférieur à <code>diffDays</code> jours entiers et le dernier pas peut manquer. Une fenêtre de 90 jours donne <code>diffDays = 90</code>, <code>step = ⌊91 / 60⌋ = 1</code> et 90 points ; 119 jours donnent <code>step = 2</code> et 60 points ; 180 jours donnent <code>step = ⌊181 / 60⌋ = 3</code> et 60 points (<code>⌊179,96 / 3⌋ + 1</code>), pas 61.</p>
   <p>Contenu d'un point (<code>SleepDayPoint</code>), avec <code>toHours(m) = round(m / 60 × 10) / 10</code> :</p>
   <pre><code>dateFormatted = « JJ/MM »          date = YYYY-MM-DD       timestamp
 Sommeil        = toHours(sleepMinutesOn(logs, jour))          // toujours un nombre
@@ -454,7 +454,7 @@ affiché si hasFilteredLogs && daysWithSleep &gt; 0 :
   <p class="ancre">src/versions/mixte/features/sleep/SleepChart.tsx · src/features/sleep/useSleepChart.ts</p>
   <details><summary>Cas limites</summary>
     <p>Entrée dans la fenêtre mais de durée nulle : <code>hasFilteredLogs</code> est vrai, <code>daysWithSleep</code> vaut 0 → la ligne n'est pas rendue.</p>
-    <p>Aucune entrée dans la fenêtre : « Aucun sommeil enregistré sur cette période. » à la place du tracé.</p>
+    <p>Aucune entrée dans la fenêtre : la phrase « Aucun sommeil enregistré sur cette période. » s'<em>ajoute</em> au-dessus du tracé ; le conteneur du graphe n'est enveloppé d'aucune condition et reste monté, grille et journées à zéro comprises.</p>
   </details>
   <div class="exemple"><p>Sur les 30 derniers jours, Camille a 27 entrées totalisant 12 460 min réparties sur 27 journées tracées : 12 460 / 27 = 461,48 → <code>formatSleepAverage</code> arrondit à 461 → « ≈ 7h41 /j de sommeil ».</p></div>
 
@@ -467,8 +467,9 @@ napMinutesOn(l, d)   = Σ des 'sieste'                               // 0 si auc
 dayQualityOn / nightQualityOn : voir la qualité pondérée
 sleepMinutesLast7Days(l, now) = Σ des entrées de date &gt;= aujourd'hui − 6</code></pre>
   <p>Asymétrie voulue : <code>nightMinutesOn</code> rend <code>null</code> sans nuit — pour ne pas tracer un zéro qui se lirait comme une nuit blanche — quand <code>napMinutesOn</code> rend 0. <code>sleepMinutesOn</code> rend toujours un nombre.</p>
-  <p>Emplois : le total sert la tuile du calendrier, la barre du graphe, la tendance et les tuiles de l'accueil ; la nuit seule sert la série « Nuit », la série « Qualité nuit », le temps d'éveil et la frise ; les siestes seules ne servent qu'à retrancher du temps d'éveil. Les séries « Nuit », « Qualité nuit » et « Éveil » sont calculées à chaque rendu du graphe visible mais ne sont pas dessinées : seules « Sommeil » et « Qualité » le sont.</p>
-  <p class="ancre">src/features/sleep/sleep.utils.ts</p>
+  <p>Appelants réels, hors tests. <code>sleepMinutesOn</code> : <code>computeSleepDays</code> (la barre « Sommeil » du graphe) et <code>sleepTrend</code> (<code>trends.ts</code>) — deux, pas davantage. <code>nightMinutesOn</code> : <code>computeSleepDays</code> (série « Nuit ») et <code>nightMinutesDailyAverage</code>. <code>napMinutesOn</code> : <code>awakeMinutesOn</code> seule. Les autres surfaces recomptent par leur propre chemin — la tuile du calendrier par <code>sleepDayMinutes</code>, les tuiles de l'accueil par <code>sleepDailyAverage</code> et <code>sleepDailyAverageLast7Days</code>, la série « Qualité nuit » par <code>nightQualityOn</code>, le temps d'éveil en refiltrant lui-même <code>kind === 'nuit'</code>, la frise en n'important que <code>minutesOfDay</code> et <code>sleepLogMinutes</code>. Toutes finissent sur <code>sleepLogMinutes</code>, seule fonction de durée du domaine.</p>
+  <p>Les séries « Nuit », « Qualité nuit » et « Éveil » sont calculées à chaque rendu du graphe visible mais ne sont pas dessinées : seules « Sommeil » et « Qualité » le sont.</p>
+  <p class="ancre">src/features/sleep/sleep.utils.ts · src/features/sleep/sleepCalendar.ts · src/features/trends/trends.ts</p>
   <div class="exemple"><p>Le 11/09 chez Camille : <code>sleepMinutesOn = 495</code>, <code>nightMinutesOn = 455</code>, <code>napMinutesOn = 40</code>, <code>dayQualityOn = 3,9</code>, <code>nightQualityOn = 4</code>.</p></div>
 
   <h3 id="sommeil-palier-de-teinte-d-une-barre-de-sommeil">Palier de teinte d'une barre de sommeil</h3>
@@ -487,7 +488,7 @@ sleepBarTier(minutes, maxMinutes) :
   <div class="exemple"><p>Sur 30 jours, la plus longue journée de Camille est le 12/09 avec 510 min. Le 11/09 (495 min) : ⌈5 × 495 / 510⌉ = ⌈4,85⌉ = 5. Une journée à 360 min : ⌈3,53⌉ = 4.</p></div>
 
   <h3 id="sommeil-analyse-croisee-sommeil-nutrition-code-mis-de-cote">Analyse croisée sommeil × nutrition (code mis de côté)</h3>
-  <p>Trois graphes — « Éveil et nutrition », « Nuit précédente et nutrition », « Qualité de la nuit et nutrition » — sont écrits, leurs quatre <code>useSleepChart</code> tournent à chaque rendu de la page, mais le JSX est sous <code>{false &amp;&amp; croiseAlimentation &amp;&amp; …}</code> : rien n'est monté. Le menu de raccourcis qui les desservait est également sous <code>{false &amp;&amp; …}</code>. <span class="marque non">non implémenté</span></p>
+  <p>Trois graphes — « Éveil et nutrition », « Nuit précédente et nutrition », « Qualité de la nuit et nutrition » — sont écrits, et leurs trois <code>useSleepChart</code> (<code>sleep_awake_chart</code>, <code>sleep_night_chart</code>, <code>sleep_quality_chart</code>) tournent à chaque rendu de la page, mais le JSX est sous <code>{false &amp;&amp; croiseAlimentation &amp;&amp; …}</code> : rien n'est monté. Le quatrième <code>useSleepChart</code> de la page, <code>evolution</code> (clé <code>sleep_chart</code>), n'appartient pas à ce lot : il alimente le seul graphe visible, « Durée et qualité ». Le menu de raccourcis qui desservait les trois est également sous <code>{false &amp;&amp; …}</code>. <span class="marque non">non implémenté</span></p>
   <p><strong>Temps d'éveil.</strong></p>
   <pre><code>awakeMinutesOn(logs, J) :
   nuitsJ    = entrées 'nuit' datées J
@@ -650,7 +651,7 @@ sleepDailyAverageLast7Days(logs, now) :
   retenus = logs filtrés sur log.date &gt;= borne
   journees = dates distinctes de retenus ; si 0 → null
   → Σ sleepLogMinutes(retenus) / journees</code></pre>
-  <p>Le dénominateur est le nombre de <em>dates de réveil distinctes</em> renseignées, pas le nombre de jours de la fenêtre ni le nombre d'entrées : une nuit et une sieste le même jour comptent pour une journée. Une journée sans saisie ne compte pas. La fenêtre 7 jours va d'aujourd'hui − 6 à aujourd'hui, sans borne haute.</p>
+  <p>Le dénominateur est le nombre de <em>dates de réveil distinctes</em> renseignées, pas le nombre de jours de la fenêtre ni le nombre d'entrées : une nuit et une sieste le même jour comptent pour une journée. Une journée sans saisie ne compte pas. La fenêtre 7 jours va d'aujourd'hui − 6 à aujourd'hui, sans borne haute. Les deux somment <code>sleepLogMinutes</code> directement sur l'historique : elles ne passent pas par <code>sleepMinutesOn</code>.</p>
   <p>Les tuiles « Côte à côte » affichent <code>formatSleepAverage(valeur)</code> et n'apparaissent qu'à valeur non nulle : la rangée entière est absente si <code>sommeilMoyenCure === null &amp;&amp; sleepAverage === null</code>, et chaque tuile est absente individuellement si sa propre valeur est <code>null</code>. Les quatre tuiles ouvrent la couche des sept dernières nuits.</p>
   <p>Variante réservée à la nuit seule, employée ailleurs : <code>nightMinutesDailyAverage</code> moyenne les <code>nightMinutesOn</code> par date de nuit et <strong>écarte les nuits de zéro minute</strong> du numérateur comme du dénominateur.</p>
   <p class="ancre">src/features/sleep/sleep.utils.ts · src/versions/mixte/homes/sections/MaisonSections.tsx</p>

@@ -4,13 +4,13 @@
    "categorie": "conversion",
    "fonctionnalite": "Stockage métrique du poids",
    "texte": "Le facteur livre → kilogramme (0,45359237) et la règle d'arrondi à appliquer le jour où le poids sera ramené en métrique, sur le modèle de CM_PAR_POUCE.",
-   "origine": "Aucune constante de masse n'existe dans src/domaine/unites.ts ni ailleurs : seul CM_PAR_POUCE = 2.54 y figure. Le facteur et l'arrondi seraient de mon cru."
+   "origine": "Aucune constante de masse n'existe dans src/domaine/unites.ts ni ailleurs : seul CM_PAR_POUCE = 2.54 y figure, et il n'est pas exporté. Le facteur et l'arrondi seraient de mon cru."
   },
   {
    "categorie": "format",
    "fonctionnalite": "Rien n'est enregistré",
    "texte": "La forme sous laquelle Reponses sera écrite le jour de la persistance : clé, schéma JSON, conversion des poids en nombre, version du format.",
-   "origine": "reponses.ts dit seulement « la conversion en nombre se fera là où on les enregistrera ». Aucun code d'écriture n'existe en V2, et la clé de la V1 ('glp1_app_companion_data') porte un autre objet, AppData."
+   "origine": "reponses.ts dit seulement « la conversion en nombre se fera là où on les enregistrera ». Aucun code d'écriture n'existe en V2, et la clé principale de la V1 ('glp1_app_companion_data') porte un autre objet, AppData — le profil et les journaux."
   },
   {
    "categorie": "validation",
@@ -34,75 +34,97 @@
    "categorie": "sortie",
    "fonctionnalite": "Dernière étape",
    "texte": "Ce que le bouton final déclenche : création du compte, écriture d'une pesée de départ, ouverture d'une page d'accueil.",
-   "origine": "onClick={avancer}, borné à la dernière étape visible : le clic ne change aucun état. App ne rend que Onboarding. La V1 semait une pesée de départ (setStartingWeight), la V2 n'en a rien repris."
+   "origine": "onClick={avancer}, borné à la dernière étape visible : le clic ne change aucun état. App ne rend que Onboarding. La V1 semait une pesée de départ (startingWeight / startingWeightDate dans onboarding.model.ts), la V2 n'en a rien repris."
+  },
+  {
+   "categorie": "reprise",
+   "fonctionnalite": "Étapes visibles selon les réponses",
+   "texte": "Un bouton « Passer cette étape » et l'effacement des réponses de l'étape passée, sur le modèle de la V1 (isSkippable, clearStepAnswers).",
+   "origine": "La V1 les a (onboarding.steps.ts : skippable, STEP_ANSWER_KEYS, clearStepAnswers) mais la V2 n'a ni bouton « Passer » ni effacement : parcours.ts n'expose que montre et peutValider, et tout champ de Reponses part d'une valeur. Rien n'est copié de la V1 sans demande explicite (GUIDELINES)."
   }
  ],
  "glossaire": [
   {
    "terme": "Étape visible",
-   "definition": "Entrée de ETAPES dont la fonction montre rend true pour les réponses courantes, ou qui n'en a pas. etapesVisibles en rend la liste ordonnée : 7, 8 ou 9 identifiants."
+   "definition": "Une entrée de ETAPES dont montre(reponses) rend true, ou qui n'a pas de montre. La liste des visibles est recalculée à chaque rendu par etapesVisibles."
   },
   {
    "terme": "Rang borné",
-   "definition": "Math.min(rang, visibles.length − 1), recalculé à chaque lecture. Il désigne l'étape courante dans la liste des étapes visibles et évite qu'une liste raccourcie laisse le rang dans le vide."
+   "definition": "rangBorne = Math.min(rang, visibles.length − 1). Le rang brut n'est jamais corrigé ; seule sa lecture est bornée, pour qu'une liste qui raccourcit ne pointe pas hors tableau."
   },
   {
    "terme": "Décompte",
-   "definition": "Objet dérivé { passees, total, montrer } : le rang borné, le nombre d'étapes visibles, et le fait que le rang ait atteint ETAPE_DEBUT_DECOMPTE ('traitement')."
-  },
-  {
-   "terme": "Cran",
-   "definition": "Une valeur d'une roue, rendue comme <button role=\"option\">. La roue est le <ul role=\"listbox\"> qui les contient."
-  },
-  {
-   "terme": "Séparateur stocké",
-   "definition": "Le point, employé dans la valeur gardée d'un poids ('96.0'), par opposition au séparateur affiché (textes.separateurDecimal), qui suit la langue."
-  },
-  {
-   "terme": "Système d'unités",
-   "definition": "'metrique' ou 'imperial'. Il ne décide que de l'unité d'affichage et de saisie ; UNITES_DU_SYSTEME en tire l'unité de poids et l'unité de taille."
-  },
-  {
-   "terme": "Unité canonique",
-   "definition": "L'unité de stockage, indépendante du système : le centimètre pour la taille (tailleCm). Le poids n'en a pas encore — il est gardé dans l'unité de saisie."
-  },
-  {
-   "terme": "Identifiant du catalogue",
-   "definition": "La chaîne id d'une entrée de TRAITEMENTS ('ozempic', 'wegovy-oral'), seule forme sous laquelle un traitement est recueilli ; le nom n'est qu'un affichage."
+   "definition": "L'objet { passees, total, montrer } calculé par useParcours. Rendu par Progression sous forme de billes, jamais de texte visible."
   },
   {
    "terme": "peutValider",
-   "definition": "Fonction du parcours qui dit si l'étape courante laisse passer. Elle décide de l'état disabled du bouton « Suivant » et ne vit dans aucun écran."
+   "definition": "Fonction du parcours qui dit si l'étape courante laisse passer. Deux étapes seulement la font échouer : quel-traitement et profil."
   },
   {
    "terme": "Geste dédié",
-   "definition": "Fonction qui écrit plusieurs champs liés dans une seule mise à jour d'état : choisirLangue, repondreTraitementCommence, repondreForme, et le choix du genre dans EtapeAvatar."
+   "definition": "Une fonction de useParcours qui écrit plusieurs champs liés en une seule mise à jour d'état : choisirLangue, repondreTraitementCommence, repondreForme."
   },
   {
-   "terme": "Zone qui défile",
-   "definition": ".page__defilant, seul élément en overflow-y: auto. L'entête, le portrait de l'avatar et la rangée des boutons sont hors d'elle et restent en place."
+   "terme": "Séparateur stocké",
+   "definition": "Le point, employé pour écrire un poids dans Reponses, indépendamment de textes.separateurDecimal qui, lui, ne sert qu'à l'affichage."
+  },
+  {
+   "terme": "Cran",
+   "definition": "Un <button role=\"option\"> d'une roue. Les crans d'une roue sont construits par Array.from, bornes incluses."
+  },
+  {
+   "terme": "Roue",
+   "definition": "Une colonne <ul role=\"listbox\"> de crans. SelecteurPoids en a deux, SelecteurNombre une seule ; useSelecteurOuvert tient leur ouverture commune."
+  },
+  {
+   "terme": "Forme et spécialité",
+   "definition": "Les deux réponses du traitement : formeTraitement ('injection' ou 'comprime') et traitement (un id du catalogue). Changer la forme efface la spécialité."
+  },
+  {
+   "terme": "Unité canonique",
+   "definition": "L'unité de stockage, indépendante du système d'affichage. Tenue pour la taille (centimètre) et non pour le poids, gardé dans son unité de saisie."
+  },
+  {
+   "terme": "Système",
+   "definition": "'metrique' ou 'imperial'. UNITES_DU_SYSTEME le traduit en unités de poids et de taille ; SYSTEME_PAR_LANGUE lui donne un défaut par langue."
+  },
+  {
+   "terme": "Simulation d'onboarding (V1)",
+   "definition": "Le questionnaire d'accueil de la V1, ouvert depuis l'espace d'administration, qui n'écrit ni profil ni journaux et garde son état sous glow_onboarding_sim_mixte. Hors périmètre."
   }
  ],
  "index": [
+  {
+   "terme": "AGE_MAX / AGE_MIN",
+   "ancre": "onboarding-bornes-de-l-annee-de-naissance-et-de-la-taille"
+  },
+  {
+   "terme": "aria-valuenow",
+   "ancre": "onboarding-le-decompte-se-dit-sans-s-ecrire"
+  },
   {
    "terme": "AVATAR_INITIAL",
    "ancre": "onboarding-avatar-de-depart"
   },
   {
-   "terme": "aria-describedby",
-   "ancre": "onboarding-regle-du-mot-de-passe"
+   "terme": "Avatar (entité)",
+   "ancre": "onboarding-entites"
+  },
+  {
+   "terme": "bille--allumee",
+   "ancre": "onboarding-decompte-des-ecrans"
   },
   {
    "terme": "bornesAnneeNaissance",
    "ancre": "onboarding-bornes-de-l-annee-de-naissance-et-de-la-taille"
   },
   {
-   "terme": "centrerDansSaListe",
-   "ancre": "onboarding-ouverture-et-fermeture-des-roues"
+   "terme": "ChoixUnique",
+   "ancre": "onboarding-une-reponse-orpheline-prend-toute-la-largeur"
   },
   {
-   "terme": "ChoixUnique (enGrille)",
-   "ancre": "onboarding-une-reponse-orpheline-prend-toute-la-largeur"
+   "terme": "choisirLangue",
+   "ancre": "onboarding-la-langue-repose-les-unites"
   },
   {
    "terme": "classeDuTheme",
@@ -118,6 +140,10 @@
   },
   {
    "terme": "COULEURS_PEAU / YEUX / CHEVEUX",
+   "ancre": "onboarding-avatar-de-depart"
+  },
+  {
+   "terme": "couleurs du dessin",
    "ancre": "onboarding-les-couleurs-sont-des-donnees"
   },
   {
@@ -129,12 +155,20 @@
    "ancre": "onboarding-langue-detectee"
   },
   {
+   "terme": "enGrille",
+   "ancre": "onboarding-une-reponse-orpheline-prend-toute-la-largeur"
+  },
+  {
    "terme": "ETAPE_DEBUT_DECOMPTE",
    "ancre": "onboarding-decompte-des-ecrans"
   },
   {
    "terme": "ETAPES",
    "ancre": "onboarding-etapes-visibles-selon-les-reponses"
+  },
+  {
+   "terme": "EtapePoids",
+   "ancre": "onboarding-poids-actuel-et-poids-vise-jamais-lies"
   },
   {
    "terme": "etapesVisibles",
@@ -157,6 +191,10 @@
    "ancre": "onboarding-poids-garde-en-texte-avec-un-point"
   },
   {
+   "terme": "peutRevenir",
+   "ancre": "onboarding-etapes-visibles-selon-les-reponses"
+  },
+  {
    "terme": "peutValider",
    "ancre": "onboarding-ce-qui-bloque-suivant"
   },
@@ -165,12 +203,20 @@
    "ancre": "onboarding-plafonds-du-poids-par-unite"
   },
   {
-   "terme": "progressbar",
+   "terme": "poidsCible",
+   "ancre": "onboarding-poids-actuel-et-poids-vise-jamais-lies"
+  },
+  {
+   "terme": "Progression (composant)",
    "ancre": "onboarding-le-decompte-se-dit-sans-s-ecrire"
   },
   {
    "terme": "rangBorne",
    "ancre": "onboarding-etapes-visibles-selon-les-reponses"
+  },
+  {
+   "terme": "Reponses",
+   "ancre": "onboarding-entites"
   },
   {
    "terme": "repondreForme",
@@ -181,12 +227,12 @@
    "ancre": "onboarding-les-reponses-du-traitement-se-defont-ensemble"
   },
   {
-   "terme": "Reponses",
-   "ancre": "onboarding-entites"
+   "terme": "SelecteurNombre",
+   "ancre": "onboarding-ouverture-et-fermeture-des-roues"
   },
   {
-   "terme": "REPONSES_INITIALES",
-   "ancre": "onboarding-rien-n-est-enregistre"
+   "terme": "SelecteurPoids",
+   "ancre": "onboarding-poids-garde-en-texte-avec-un-point"
   },
   {
    "terme": "SEPARATEUR_STOCKE",
@@ -194,15 +240,11 @@
   },
   {
    "terme": "separateurDecimal",
-   "ancre": "onboarding-poids-garde-en-texte-avec-un-point"
+   "ancre": "onboarding-la-langue-est-une-maquette"
   },
   {
-   "terme": "SelecteurNombre",
-   "ancre": "onboarding-ouverture-et-fermeture-des-roues"
-  },
-  {
-   "terme": "SelecteurPoids",
-   "ancre": "onboarding-plafonds-du-poids-par-unite"
+   "terme": "stockage (absence de)",
+   "ancre": "onboarding-rien-n-est-enregistre"
   },
   {
    "terme": "surClicDehors",
@@ -225,6 +267,10 @@
    "ancre": "onboarding-les-roues-se-nomment-a-qui-ecoute"
   },
   {
+   "terme": "textes.progression",
+   "ancre": "onboarding-le-decompte-se-dit-sans-s-ecrire"
+  },
+  {
    "terme": "TRAITEMENTS",
    "ancre": "onboarding-catalogue-des-traitements"
   },
@@ -238,7 +284,7 @@
   },
   {
    "terme": "useParcours",
-   "ancre": "onboarding-etapes-visibles-selon-les-reponses"
+   "ancre": "onboarding-rien-n-est-enregistre"
   },
   {
    "terme": "useSelecteurOuvert",
@@ -246,7 +292,19 @@
   },
   {
    "terme": "useTextes",
-   "ancre": "onboarding-la-langue-est-une-maquette"
+   "ancre": "onboarding-langue-detectee"
+  },
+  {
+   "terme": "V1 : questionnaire d'accueil",
+   "ancre": "onboarding"
+  },
+  {
+   "terme": "glow_onboarding_sim_mixte",
+   "ancre": "onboarding-rien-n-est-enregistre"
+  },
+  {
+   "terme": "glp1_app_companion_data",
+   "ancre": "onboarding-rien-n-est-enregistre"
   }
  ],
  "ancres_traitees": [

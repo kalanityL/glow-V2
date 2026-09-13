@@ -35,19 +35,19 @@
       <tr><td><code>FoodQuantity</code></td><td><code>id</code>, <code>foodId</code>, <code>isCustomFood</code>, <code>qty</code> (g ou ml)</td></tr>
     </tbody>
   </table>
-  <p><code>UserProfile</code> porte l'identité (<code>name</code>, <code>gender</code>, <code>age</code> en années, <code>height</code> en cm, <code>targetWeight</code> en kg, <code>silhouetteType</code>, <code>avatar</code>), le traitement (<code>glp1Brand</code> : un identifiant du catalogue), les deux rappels, les sept drapeaux de module, les sept drapeaux de masquage, les trois objectifs quotidiens facultatifs et <code>countdownTargetDate</code>. <code>measurementSystem</code> y est déclaré mais aucun affichage ne le lit. <code>easyReadingMode</code> subsiste, inerte.</p>
+  <p><code>UserProfile</code> porte l'identité (<code>name</code>, <code>gender</code>, <code>age</code> en années, <code>height</code> en cm, <code>targetWeight</code> en kg, <code>silhouetteType</code>, <code>avatar</code>), le traitement (<code>glp1Brand</code> : un identifiant du catalogue), les deux rappels, les sept drapeaux de module, les sept drapeaux de masquage, les trois objectifs quotidiens facultatifs et <code>countdownTargetDate</code>. <code>measurementSystem</code> y est déclaré mais aucun affichage ne le lit. <code>easyReadingMode</code> a été retiré de la Mixte le 27 août 2026 ; le champ reste dans le type pour les données déjà écrites et pour les versions gelées qui le lisent.</p>
   <p>Non stocké, parce que dérivable : la durée d'un sommeil (deux instants suffisent), l'IMC d'une pesée, les calories d'une séance, le total d'un journal, la perte de poids. Seule exception tolérée : les cinq valeurs nutritionnelles d'un <code>SavedMealLog</code>, recalculées depuis <code>items</code> à chaque écriture et conservées avec la ligne. <code>SideEffectType</code>, <code>SportType</code>, <code>HungerLevel</code> et <code>SeverityLevel</code> sont déclarés sans être employés. Le poids de départ n'est plus un champ du profil : <code>startingWeight</code>, <code>startingWeightDate</code> et <code>startingMeasurements</code> restent dans les sauvegardes anciennes, lus une seule fois par la conversion.</p>
   <p class="ancre">src/types.ts</p>
 
   <h3 id="produit-avertissement-medical">Avertissement médical</h3>
-  <p>Une clé dédiée, en chaîne nue, hors de la sauvegarde : <code>hasAcceptedMedicalDisclaimer_v1</code>. Deux états sont dérivés d'elle à l'initialisation, sans jamais être relus après : la page légale est ouverte et elle est en mode « premier lancement » tant que la clé ne vaut pas exactement <code>'true'</code>.</p>
+  <p>Une clé dédiée, en chaîne nue, hors de la sauvegarde : <code>hasAcceptedMedicalDisclaimer_v1</code>. Deux états en sont dérivés à l'initialisation : la page légale est ouverte et elle est en mode « premier lancement » tant que la clé ne vaut pas exactement <code>'true'</code>.</p>
   <pre><code>isLegalModalOpen   = getString(CLÉ) !== 'true'
 isFirstLaunchLegal = getString(CLÉ) !== 'true'
 acceptation → setString(CLÉ, 'true') ; les deux passent à faux</code></pre>
-  <p>Rouvrir la page depuis le pied recalcule <code>isFirstLaunchLegal</code> à partir de la clé : accepté, l'écran s'ouvre par-dessus le contenu et se ferme.</p>
+  <p>La clé n'est relue qu'à un seul autre endroit : <code>openLegalModal</code>, appelé depuis le pied de page, recalcule <code>isFirstLaunchLegal</code> à partir d'elle avant d'ouvrir. Accepté, l'écran s'ouvre par-dessus le contenu et se ferme.</p>
   <p class="ancre">src/versions/mixte/App.tsx</p>
   <details><summary>Cas limites</summary>
-    <p>Clé absente → premier lancement, la page occupe seul l'écran.</p>
+    <p>Clé absente → premier lancement, la page occupe seule l'écran.</p>
     <p>Clé à une autre valeur que <code>'true'</code> (résidu, <code>'1'</code>) → traitée comme absente.</p>
     <p>Stockage indisponible → <code>getString</code> rend <code>null</code>, la page se réaffiche à chaque lancement.</p>
     <p>Suppression du compte → <code>clearAll()</code> emporte la clé ; l'avertissement revient.</p>
@@ -75,10 +75,14 @@ acceptation → setString(CLÉ, 'true') ; les deux passent à faux</code></pre>
       <tr><td>aucun</td><td>Pas de traitement</td><td>injection</td><td><code>null</code></td><td>168</td><td>15</td><td>—</td><td>0,25 · 0,5 · 1 · 1,7 · 2,4</td></tr>
     </tbody>
   </table>
-  <p><code>doseIntervalDays</code> n'est porté que par Saxenda et Victoza (1 jour) ; <code>doseIntervalDaysOf</code> le remplace par 1 pour un comprimé et 7 pour une injection. <code>requiresTrialCertification</code> n'est vrai que pour le rétatrutide. Seul <code>id</code> est enregistré ; <code>name</code> et <code>label</code> sont du texte d'affichage. <code>moleculeKeyOf</code> regroupe les prises par <code>molecule</code>, et retombe sur l'identifiant du traitement quand elle est <code>null</code>.</p>
+  <p><code>doseIntervalDays</code> n'est porté que par Saxenda et Victoza (1 jour) ; <code>doseIntervalDaysOf</code> le remplace par 1 pour un comprimé et 7 pour une injection. <code>requiresTrialCertification</code> n'est vrai que pour le rétatrutide. Seul <code>id</code> est enregistré ; <code>name</code> et <code>label</code> sont du texte d'affichage.</p>
   <p class="ancre">src/shared/medication/treatment.catalog.ts</p>
-  <p>La forme décide des libellés et du picto : <code>isOralMedication(id)</code> = <code>getTreatment(id).form === 'oral'</code> ; <code>treatmentActionLabel</code> rend « Comprimé » ou « Injection », <code>treatmentSectionLabel</code> « Comprimé » ou « Injections », <code>treatmentIcon</code> la pilule ronde ou la seringue. <code>resolveTreatmentId(prise, profil)</code> = celui de la prise, sinon celui du profil, sinon <code>'aucun'</code>.</p>
+  <p><code>moleculeKeyOf(id)</code> = <code>getTreatment(id).molecule ?? id</code> : les prises se regroupent par molécule, et un traitement de molécule <code>null</code> (les deux « Autre ») reste seul dans son groupe.</p>
+  <p class="ancre">src/shared/medication/molecule.ts</p>
+  <p><code>isOralMedication(id)</code> = <code>getTreatment(id).form === 'oral'</code> ; <code>resolveTreatmentId(prise, profil)</code> = celui de la prise, sinon celui du profil, sinon <code>'aucun'</code>.</p>
   <p class="ancre">src/shared/medication/medication.utils.ts</p>
+  <p>La forme décide des libellés et du picto, dans un fichier à part : <code>treatmentActionLabel</code> rend « Comprimé » ou « Injection », <code>treatmentSectionLabel</code> « Comprimé » ou « Injections », <code>treatmentIcon</code> la pilule ronde ou la seringue.</p>
+  <p class="ancre">src/shared/medication/medication.labels.tsx</p>
   <p>Le catalogue de la V2 porte les mêmes treize identifiants — à ceci près que l'orforglipron y est <code>foundayo</code> — avec pour seuls champs <code>id</code>, <code>nom</code> et <code>forme</code> (<code>'injection' | 'comprime'</code>). Ni cinétique, ni palier, ni certification. <span class="marque v2">V2</span></p>
   <p class="ancre">src/domaine/traitements.ts</p>
   <details><summary>Cas limites</summary>
@@ -167,8 +171,8 @@ weightHistory = setStartingWeight([], 95.0)</code></pre>
   <p class="ancre">src/app/useAppData.ts · src/shared/model/startingWeighIn.ts</p>
   <details><summary>Cas limites</summary>
     <p>Un départ existe déjà → <code>setStartingWeight</code> ne change que <code>weight</code>, sans toucher date ni mensurations.</p>
-    <p>Plusieurs lignes marquées départ → la première trouvée par <code>find</code> l'emporte ; la première écriture suivante réécrit le drapeau sur la seule pesée la plus ancienne.</p>
-    <p>Une pesée antérieure à la semée est enregistrée → elle devient le départ (<code>keepStartingOnOldest</code>).</p>
+    <p>Plusieurs lignes marquées départ → la première trouvée par <code>find</code> l'emporte pour toute lecture. Le nettoyage n'a lieu qu'à une écriture où cette ligne n'est <em>pas</em> la plus ancienne : <code>keepStartingOnOldest</code> sort sans rien changer dès qu'elle l'est, ou qu'elle en partage la date. Des drapeaux en double peuvent donc survivre indéfiniment.</p>
+    <p>Une pesée antérieure à la semée est enregistrée → elle devient le départ, et le drapeau est réécrit sur toute la liste, ce qui nettoie les doublons.</p>
   </details>
   <div class="exemple"><p>Camille installe l'application le 4 mai 2026 : avant sa première saisie, le profil affiche Chloé et le journal porte une pesée de 95 kg datée du 3 mai à 08:00. Sa propre pesée de 96 kg du 4 mai, plus récente, ne prend pas le drapeau. <a href="spec-fonctionnelle.html#produit-l-etat-de-depart">→ fonctionnelle</a></p></div>
 
@@ -318,7 +322,7 @@ un effet au montage pose limitNotice = unreadableSaveNotice(clé)</code></pre>
     <p>Second échec → la clé de secours est déjà prise, la nouvelle chaîne est perdue et la première copie, qui porte les vraies données, est préservée.</p>
     <p>La mise à l'abri elle-même échoue (quota) → l'erreur est journalisée, la session reste en lecture seule.</p>
     <p>Une sauvegarde lisible mais incohérente n'est pas concernée : seul <code>JSON.parse</code> déclenche le garde-fou.</p>
-    <p>La clé de secours n'est jamais relue ni nettoyée par le code ; <code>clearAll()</code> l'emporte.</p>
+    <p>La clé de secours n'est relue que par le <code>catch</code> lui-même, pour ne pas recouvrir une copie antérieure. Aucun écran ne la restaure et rien ne la nettoie ; <code>clearAll()</code> l'emporte.</p>
   </details>
 
   <h3 id="produit-ordre-et-libelles-des-menus">Ordre et libellés des menus</h3>
@@ -337,11 +341,11 @@ BOTTOM_MENU_ORDER = maison, injection, history, symptoms, sports, meals,
 QUICK_ADD_ORDER   = injection, history, symptoms, sports, meals
 ADD_DRAWER_ORDER  = injection, history, symptoms, sports, meals, sleep, metime
 journal drawer    = ADD_DRAWER_ORDER + steps</code></pre>
-  <p>Deux renommages locaux : la Mixte réécrit <code>maison</code> en « Accueil » dans le menu du bas ; les tiroirs réécrivent <code>history</code> en « Balance » et <code>meals</code> en « Menus ». Ces deux derniers ne valent que dans les tiroirs — ailleurs les pages restent « Pesée » et « Repas ». Les cinq modules ajoutables sont filtrés dans <code>allTabs</code> ; le traitement et les effets secondaires le sont dans la version, par <code>isModuleOn</code>, pour ne pas amputer les autres versions.</p>
-  <p class="ancre">src/app/navigation.ts · src/versions/mixte/app/navigation.ts</p>
+  <p>Deux renommages locaux : la Mixte réécrit <code>maison</code> en « Accueil » dans le menu du bas ; <code>DRAWER_LABELS</code> réécrit <code>history</code> en « Balance » et <code>meals</code> en « Menus » dans les tiroirs. Ces deux derniers noms sont aussi ceux de la bande de titre, qui les tient de sa propre table (<code>PAGE_TITLES</code>) ; ce sont le menu du bas et le bloc d'ajout rapide qui gardent « Pesée » et « Repas » d'<code>allTabs</code>. Le commentaire de <code>DRAWER_LABELS</code> range la bande de titre du côté de « Pesée » et « Repas » : il est périmé. Les cinq modules ajoutables sont filtrés dans <code>allTabs</code> ; le traitement et les effets secondaires le sont dans la version, par <code>isModuleOn</code>, pour ne pas amputer les autres versions.</p>
+  <p class="ancre">src/app/navigation.ts · src/versions/mixte/app/navigation.ts · src/versions/mixte/App.tsx</p>
   <details><summary>Cas limites</summary>
     <p>Un identifiant de l'ordre absent d'<code>allTabs</code> (module éteint) disparaît du menu, sans trou.</p>
-    <p>Les tiroirs construisent <code>pickTabs</code> sur un profil dont les cinq drapeaux ajoutables sont forcés à <code>true</code>, pour que les entrées éteintes existent et puissent être grisées.</p>
+    <p>Les tiroirs d'ajout et de journal construisent <code>pickTabs</code> sur un profil dont les cinq drapeaux ajoutables sont forcés à <code>true</code>, pour que les entrées éteintes existent et puissent être grisées.</p>
     <p>Le « + » du menu du bas n'est pas dans la table : il est rendu après la boucle, donc toujours en dernier.</p>
   </details>
   <div class="exemple"><p>Profil nu de Camille → menu du bas : Accueil, Injections, Pesée, Effets secondaires, Rapport médical. <a href="spec-fonctionnelle.html#produit-menu-du-bas-standard">→ fonctionnelle</a></p></div>
@@ -356,8 +360,8 @@ journal drawer    = ADD_DRAWER_ORDER + steps</code></pre>
 isModuleHidden(profil, onglet) =
   !isModuleOn(profil, onglet) &amp;&amp; Boolean(profil[drapeau de masquage])</code></pre>
   <p><code>isModuleOn</code> est employé et non le drapeau nu : sans cela, un traitement dont le drapeau d'activation n'a jamais été écrit passerait pour éteint et son masquage mordrait. Rallumer un module écrit son drapeau de masquage à <code>false</code> dans le même enregistrement de profil.</p>
-  <p>Effets : le menu du bas et le bloc d'ajout rapide retirent les modules <em>éteints</em> (<code>isModuleOn</code>) ; les trois tiroirs montrent les éteints grisés (<code>enabled: false</code>) et retirent les <em>masqués</em> (<code>isModuleHidden</code>). La page Badges et le tiroir Tendance filtrent aussi sur <code>isModuleHidden</code>.</p>
-  <p class="ancre">src/versions/mixte/app/navigation.ts · src/versions/mixte/components/NotificationsSettings.tsx</p>
+  <p>Effets : le menu du bas et le bloc d'ajout rapide retirent les modules <em>éteints</em> (<code>isModuleOn</code>). Les deux tiroirs bâtis par <code>drawerItems</code> — Ajout et Journal, ses seuls appelants — retirent les <em>masqués</em> et montrent les éteints grisés (<code>enabled: false</code>). Le tiroir Tendance et la page Badges filtrent sur <code>isModuleHidden</code> sans rien griser.</p>
+  <p class="ancre">src/versions/mixte/app/navigation.ts · src/versions/mixte/components/TrendDrawer.tsx · src/versions/mixte/components/BadgesPage.tsx · src/versions/mixte/components/NotificationsSettings.tsx</p>
   <details><summary>Cas limites</summary>
     <p>Module allumé et masquage à <code>true</code> → le module paraît : le masquage est ignoré.</p>
     <p>La pesée n'a ni drapeau d'activation ni drapeau de masquage : <code>isModuleHidden</code> rend toujours <code>false</code>.</p>
@@ -376,7 +380,7 @@ isModuleHidden(profil, onglet) =
       <tr><td><code>divination</code></td><td><code>y: '-100vh'</code> (du haut)</td><td>0,46 s</td></tr>
     </tbody>
   </table>
-  <p>La vitre s'arrête au bord haut de la barre (<code>bottom-16</code>) et ne porte qu'un flou. Un clic sur elle remet <code>openDrawer</code> à <code>null</code>. Pendant la sortie, le conteneur coupe les événements de pointeur (<code>exit: pointerEvents 'none'</code>), sous-arbre compris, pour ne pas avaler les taps. Les tiroirs ne défilent pas : le contenu se réduit.</p>
+  <p>Le conteneur s'arrête au bord haut de la barre (<code>bottom-16</code>). La vitre qu'il porte cumule deux classes : <code>glow-drawer-glass</code>, le voile, et <code>glow-glass-fill</code>, un fond — sans lui, la règle de la vitre remonterait le voile de 64 px de plus et laisserait une bande nette en bas. Un clic sur elle remet <code>openDrawer</code> à <code>null</code>. Pendant la sortie, le conteneur coupe les événements de pointeur (<code>exit: pointerEvents 'none'</code>), sous-arbre compris, pour ne pas avaler les taps. Les tiroirs ne défilent pas : le contenu se réduit.</p>
   <p>La barre du bas est au-dessus de la vitre : un clic sur elle n'atteint jamais la couche. La fermeture passe donc par une diffusion sans contenu.</p>
   <pre><code>demanderFermetureCouches() : appelée AVANT chaque geste des barres du bas
   et du bouton retour ; parcourt une COPIE de l'ensemble des écoutes
@@ -552,7 +556,8 @@ boundsMessage(règle) :
       <tr><td><code>RULE_INSOLITE_WEIGHT</code></td><td>1</td><td>1000000</td><td>0</td><td>1</td><td>non</td><td>g</td></tr>
     </tbody>
   </table>
-  <p>Chaque règle porte son message, écrit en toutes lettres et genré : « Un âge entre 1 et 130 ans est attendu. », « Une taille entre 50 et 300 cm est attendue. », « Un poids entre 0,1 et 1000 kg est attendu. », « Une mesure entre 1 et 300 cm est attendue, ou rien. », « Une durée entre 1 et 480 minutes est attendue. », « Un nombre d'étages entre 1 et 480 est attendu. », « Une distance entre 0,1 et 1000 km est attendue, ou rien. », « Une distance entre 10 et 100000 m est attendue, ou rien. », « Une dose entre 0,001 et 1000000 mg est attendue. », « Une quantité entre 1 et 10000 est attendue. », « Une valeur entre 0 et 10000 est attendue, ou rien. », « Un poids entre 1 et 1000000 g est attendu. » Seules les bornes de l'âge, de la taille, du poids, de la durée et des deux distances préexistaient ; les autres sont proposées. <span class="marque">arbitrage non validé</span> Une treizième règle borne un filtre des outils internes de revue Ciqual, hors périmètre.</p>
+  <p>Chaque règle porte son message, écrit en toutes lettres et genré : « Un âge entre 1 et 130 ans est attendu. », « Une taille entre 50 et 300 cm est attendue. », « Un poids entre 0,1 et 1000 kg est attendu. », « Une mesure entre 1 et 300 cm est attendue, ou rien. », « Une durée entre 1 et 480 minutes est attendue. », « Un nombre d'étages entre 1 et 480 est attendu. », « Une distance entre 0,1 et 1000 km est attendue, ou rien. », « Une distance entre 10 et 100000 m est attendue, ou rien. », « Une dose entre 0,001 et 1000000 mg est attendue. », « Une quantité entre 1 et 10000 est attendue. », « Une valeur entre 0 et 10000 est attendue, ou rien. », « Un poids entre 1 et 1000000 g est attendu. »</p>
+  <p>Préexistaient : l'âge, la taille et le poids, déjà bornés dans <code>profile.fields.ts</code> ; la durée, 1 à 480 min, déjà écrite en <code>min</code>/<code>max</code> sur les champs ; la borne basse de la distance en kilomètres, écrite <code>min="0"</code> et relevée ici à 0,1 ; le pas de 10 m de la distance en mètres. Tout le reste est proposé — dont la borne haute des kilomètres et les deux bornes des mètres. <span class="marque">arbitrage non validé</span> Une treizième règle borne un filtre des outils internes de revue Ciqual, hors périmètre.</p>
   <p class="ancre">src/versions/mixte/app/form.rules.ts</p>
   <p>La V2 reprend l'âge 1–130 et la taille 50–300 cm, remplace l'âge par l'année de naissance — <code>bornesAnneeNaissance(annéeCourante) = { min: année − 130, max: année − 1 }</code>, l'horloge étant passée par l'appelant — et borne les roues de poids à 999 kg et 2 000 lb, deux plafonds ronds qui ne sont pas la conversion l'un de l'autre. En pouces, la fourchette de taille est la conversion arrondie : 20–118 in. <span class="marque v2">V2</span></p>
   <p class="ancre">src/domaine/mesures.ts</p>
@@ -733,8 +738,8 @@ hasOccurred(date, time?, now) :
   pas d'heure        → true (la journée en cours compte en entier)
   sinon              → time &lt;= heure locale</code></pre>
   <p><code>Date.UTC</code> est employé comme une arithmétique de triplets, jamais comme un fuseau : la date entre et sort en composantes, et le passage par UTC ne fait qu'éviter les heures d'été. La couche interdit de construire une date depuis une chaîne, ce qui la lirait en UTC.</p>
-  <p>Cinq endroits le font encore, en dehors des thèmes : <code>formatDateRelative</code>, qui construit <code>new Date(dateStr)</code> pour le libellé en toutes lettres ; le message de prochaine prise de l'accueil ; le calendrier des pas, qui cherche la plus ancienne date par <code>new Date(log.date)</code> ; l'écart en jours par zone d'injection ; et la dose active à une date de la courbe poids/traitement. Les tris de ces mêmes fichiers passent par <code>new Date('AAAA-MM-JJTHH:MM:00')</code>, qui est lu en heure locale et non en UTC.</p>
-  <p class="ancre">src/shared/date/date.local.ts · src/shared/date/date.relative.ts · src/features/steps/steps.utils.ts · src/features/injections/injections.utils.ts · src/versions/mixte/features/weight/useWeightTreatmentChart.ts</p>
+  <p>Huit lectures relevées le font encore, hors des thèmes : <code>formatDateRelative</code>, qui construit <code>new Date(dateStr)</code> pour le libellé en toutes lettres ; le message de prochaine prise de l'accueil ; l'ancienneté de la dernière prise, sur l'accueil également ; le calendrier des pas, qui cherche la plus ancienne date par <code>new Date(log.date)</code> ; l'écart en jours par zone d'injection ; la dose active à une date de la courbe poids/traitement ; et les deux dates affichées par la page Notifications — début des rappels de prise, et date du rendez-vous médical. Ce relevé n'est pas exhaustif. Les tris de ces mêmes fichiers passent par <code>new Date('AAAA-MM-JJTHH:MM:00')</code>, lu en heure locale, ou comparent deux <code>new Date(log.date)</code> : le même décalage des deux côtés ne change pas l'ordre.</p>
+  <p class="ancre">src/shared/date/date.local.ts · src/shared/date/date.relative.ts · src/versions/mixte/App.tsx · src/features/home/homeOverview.ts · src/features/steps/steps.utils.ts · src/features/injections/injections.utils.ts · src/versions/mixte/features/weight/useWeightTreatmentChart.ts · src/versions/mixte/components/NotificationsSettings.tsx</p>
   <details><summary>Cas limites</summary>
     <p><code>hasOccurred('2026-08-05', '14:31')</code> le 5 août à 14:30 → faux.</p>
     <p><code>daysBetween('2026-08-01', '2026-08-08')</code> = 7.</p>
@@ -797,7 +802,7 @@ purgeDeleted(data) : purge appliquée à weightHistory, dailyLogs,
   <p class="ancre">src/shared/model/startingWeighIn.ts · src/app/useAppData.ts</p>
   <details><summary>Cas limites</summary>
     <p>Aucune ligne marquée → le journal est entièrement vidé.</p>
-    <p>Plusieurs lignes marquées → toutes sont conservées ; la première écriture suivante n'en laisse qu'une.</p>
+    <p>Plusieurs lignes marquées → toutes sont conservées, et le vidage n'en supprime aucune. Elles ne sont ramenées à une seule que par une écriture où la ligne marquée trouvée en premier n'est pas la plus ancienne du journal ; sinon <code>keepStartingOnOldest</code> sort sans rien réécrire.</p>
     <p>Les huit autres journaux se vident sans exception : le geste écrit <code>[]</code>.</p>
   </details>
   <div class="exemple"><p>Camille vide son journal de pesées : sa ligne du 3 mai à 95 kg, marquée départ, reste seule ; celle du 4 mai à 96 kg part.</p></div>
@@ -844,7 +849,7 @@ dropSeedData : filtre appliqué aux NEUF journaux — weightHistory, dailyLogs,
   <p>Un UUID v7 est triable à la milliseconde — l'ordre lexicographique suit l'ordre de création tant que deux identifiants ne partagent pas la même milliseconde — et ses 74 bits d'aléatoire rendent la collision impossible en pratique, contrairement au motif <code>meal-${Date.now()}</code> qu'il remplace, où deux créations simultanées donnaient la même valeur. <code>crypto</code> n'est appelé que dans ce fichier.</p>
   <p class="ancre">src/app/useAppData.ts · src/shared/platform/id.ts · src/shared/model/startingWeighIn.ts</p>
   <details><summary>Cas limites</summary>
-    <p>Deux ajouts dans la même milliseconde sur un journal à préfixe → même identifiant ; la ligne suivante écrase la première sur toute opération par identifiant.</p>
+    <p>Deux ajouts dans la même milliseconde sur un journal à préfixe → même identifiant, et les deux lignes coexistent. Toute opération par identifiant les traite alors ensemble : <code>removeLogById</code> les supprime toutes les deux, <code>applyLogUpdate</code> fusionne la modification dans chacune.</p>
     <p>Le drapeau, et non l'identifiant, désigne le départ : <code>'starting-weight-log'</code> ne sert qu'à reconnaître les sauvegardes déjà converties.</p>
     <p>Dans une même milliseconde, l'ordre de deux UUID v7 est arbitraire.</p>
   </details>

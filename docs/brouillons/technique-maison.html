@@ -19,8 +19,8 @@
   </table>
   <p>Du profil : name, height (cm), targetWeight (kg), avatar, glp1Brand, reminderEnabled, reminderDay (0-6), injectionReminderType?, injectionReminderDaysInterval?, sept drapeaux de module et sept de masquage, homeCornerButtonsEnabled? (absent = désactivé), mysteryBadgeHidden?, dailyCaloriesGoal?, dailyProteinGoal?, dailyFiberGoal?.</p>
   <p>DÉRIVÉS, donc non stockés : WeightOverview, TreatmentSeries, ActiveConcentration, DayMood, CureWeek, DailyNutritionGoals, RecentJournalEntry, RecentStepEntry, les sept séries de tendance, DivinationResult, SideEffectShift, l'IMC et ses paliers, toutes les moyennes.</p>
-  <p>Quatre clés locales : glow_home_&lt;versionId&gt; (JSON), glp1_first_open_date, glp1_dynamique_celebrated ('true'), glp1_period_&lt;clé&gt;.</p>
-  <p class="ancre">src/types.ts</p>
+  <p>Six clés locales : glow_home_&lt;versionId&gt; (JSON, le template choisi), glp1_first_open_date (AAAA-MM-JJ), glp1_dynamique_celebrated ('true'), glp1_period_&lt;clé&gt; (JSON, fenêtre et bornes personnalisées d'un bloc), glow_trend_flips (JSON, la bascule titre ↔ valeurs par carte du tiroir Tendance), glow_home_equivalences (JSON { last_loss, total_loss }, l'état déplié des deux blocs d'équivalence insolite de la home sections).</p>
+  <p class="ancre">src/types.ts · src/versions/mixte/components/TrendDrawer.tsx · src/versions/mixte/homes/sections/MaisonSections.tsx</p>
   <h3 id="maison-vue-des-poids-weightoverview">Vue des poids (weightOverview)</h3>
   <pre><code>startingWeight = getStartingWeight(weightHistory)  // pesée marquée isStartingWeight, sinon 0
 sorted  = [...weightHistory].sort(byDateTimeDesc)
@@ -73,8 +73,8 @@ isModuleOn(profile, tabId) {
   if (v === undefined || v === null) return MODULES_ALLUMES_PAR_DEFAUT.has(tabId)
   return Boolean(v) }
 isModuleHidden = !isModuleOn(profile, tabId) &amp;&amp; Boolean(profile[MODULE_HIDDEN_FLAGS[tabId]])</code></pre>
-  <p>Le masquage ne mord que module éteint. Trois lecteurs de la home n'appellent PAS isModuleOn : le carré traitement et le smiley passent par isModuleOn('injection' | 'symptoms') (absent = allumé) ; le bloc « Aujourd'hui » et la bande kcal lisent profile.foodTrackingEnabled nu (absent = éteint) ; le bloc « Mes pas » et la tuile des pas lisent stepsTrackingEnabled !== false (absent = allumé). Les cartes du tiroir Tendance lisent aussi les drapeaux nus ; le sanguin et la balance y sont enabled: true en dur.</p>
-  <p class="ancre">src/versions/mixte/app/navigation.ts</p>
+  <p>Le masquage ne mord que module éteint. Le carré traitement, le smiley et le garde-fou de la matrice des effets appellent bien isModuleOn('injection' | 'symptoms') : drapeau absent = allumé. Deux lecteurs de la home lisent le drapeau NU, sans passer par la fonction : le bloc « Aujourd'hui » et la bande kcal lisent profile.foodTrackingEnabled (absent = éteint) ; le bloc « Mes pas » et la tuile des pas lisent stepsTrackingEnabled !== false (absent = allumé). Les cartes du tiroir Tendance lisent elles aussi les drapeaux nus, sous la forme Boolean(profile.&lt;flag&gt;) — absent = éteint pour les cinq cartes à module ; le sanguin et la balance y sont enabled: true en dur.</p>
+  <p class="ancre">src/versions/mixte/app/navigation.ts · src/versions/mixte/components/Maison.tsx · src/versions/mixte/components/TrendDrawer.tsx</p>
   <h3 id="maison-reste-a-perdre-bloc-salut">Reste à perdre (bloc Salut)</h3>
   <pre><code>resteAPerdre = parseFloat((currentWeight − profile.targetWeight).toFixed(1))
 affichage  = resteAPerdre &gt; 0 ? `-${resteAPerdre} kg` : '0 kg'</code></pre>
@@ -95,9 +95,9 @@ return currentWeight ≤ targetWeight ? 100 : 0</code></pre>
   ? (injectionReminderType === 'custom' ? `${injectionReminderDaysInterval ?? 7}j`
      : ['Dim','Lun','Mar','Mer','Jeu','Ven','Sam'][reminderDay ?? 0])
   : 'Non'</code></pre>
-  <p>La ligne entière n'est rendue que si un traitement est déclaré (!hasNoTreatment).</p>
+  <p>Deux gardes emboîtées. La ligne entière « Cure : &lt;nom&gt; • Rappels : … » est conditionnée au MODULE traitement, isModuleOn(profile, 'injection') : module éteint, elle disparaît, qu'un traitement soit déclaré ou non. À l'intérieur, !hasNoTreatment ne gouverne que le fragment « • Rappels : … » et le picto de forme posé devant le nom du traitement.</p>
   <p class="ancre">src/versions/mixte/components/SalutBlock.tsx</p>
-  <details><summary>Cas limites</summary><p>Rappel personnalisé sans intervalle : « 7j ». reminderDay absent : « Dim ». « Pas de traitement » : ni ligne de rappels, ni picto de forme à côté de « Cure : ».</p></details>
+  <details><summary>Cas limites</summary><p>Rappel personnalisé sans intervalle : « 7j ». reminderDay absent : « Dim ». « Pas de traitement » : le nom reste, sans picto de forme ni fragment de rappels. Module traitement éteint : ni « Cure : », ni rappels ; le reste du bloc — salutation, objectif, barre, badges — demeure.</p></details>
   <h3 id="maison-badges-du-bloc-salut">Badges du bloc Salut</h3>
   <pre><code>evalues  = ALL_BADGE_DEFINITIONS.map(def =&gt; ({ def, enabled: def.categoryEnabled(profile),
              tier: def.categoryEnabled(profile) ? def.getTier(appData).tier : 'aucun' }))
@@ -391,10 +391,10 @@ ouvrable  = Boolean(onOpenDetail) &amp;&amp; deverrouillee</code></pre>
   <thead><tr><th>Home</th><th>Dévoilée</th><th>Verrouillée</th></tr></thead>
   <tbody>
   <tr><td>standard</td><td>dernier bloc, avant le pied de page médical</td><td>même place</td></tr>
-  <tr><td>sections / blocs</td><td>deuxième section, juste après « En direct »</td><td>dernière section, après « Côte à côte »</td></tr>
+  <tr><td>sections / blocs</td><td>troisième section titrée, juste après « En direct »</td><td>dernière section, après « Côte à côte »</td></tr>
   </tbody>
   </table>
-  <p>Un seul morceau de JSX, posé à l'un ou l'autre bout. Verrouillée sur la home sections, la rangée des trois sens est enveloppée dans SectionVerrouillee SANS message ; le message est porté par le bloc du verdict, juste dessous — les deux zones se touchent et se lisent comme une seule surface masquée.</p>
+  <p>L'ordre des sections titrées de la home sections est : « Ajout rapide », « En direct », [Dynamique dévoilée], « Progrès », « Côte à côte », [Dynamique verrouillée]. Un seul morceau de JSX, posé à l'un ou l'autre bout. Verrouillée sur la home sections, la rangée des trois sens est enveloppée dans SectionVerrouillee SANS message ; le message est porté par le bloc du verdict, juste dessous — les deux zones se touchent et se lisent comme une seule surface masquée.</p>
   <p><span class="marque">arbitrage non validé</span> Les deux places sont des choix : la consigne laissait « en dernier ou en deuxième après En direct » ouvert, et la home standard n'a pas de section « En direct ».</p>
   <p class="ancre">src/versions/mixte/components/Maison.tsx · src/versions/mixte/homes/sections/MaisonSections.tsx</p>
   <h3 id="maison-tiroir-dynamique-valeurs-derivees">Tiroir Dynamique — valeurs dérivées</h3>
@@ -404,8 +404,8 @@ inclinaison = stable ? 0 : legere-hausse ? 9 : legere-baisse ? −9
 poidsSigne(g) = |g| ≥ 1000 ? `${signe}${formatNumber(|g|/1000, 2)} kg` : `${signe}${|g|} g`
 kcalSigne(n)  = (n &lt; 0 ? '−' : '+') + formatNumber(|n|)</code></pre>
   <p>La ligne « Métabolisme : {mbJour} × 7 » porte un « ≈ » pour couvrir l'arrondi ; la soustraction posée travaille sur les vrais totaux et retombe exactement sur le différentiel. Seul le fléau de la balance pivote : la colonne et le socle ne bougent jamais, et chaque plateau contre-pivote pour rester horizontal.</p>
-  <p class="ancre">src/versions/mixte/components/DivinationDrawer.tsx</p>
-  <details><summary>Cas limites</summary><p>−1 226 g → « −1,23 kg » (virgule, deux décimales) ; −373 g → « −373 g ». Le tiroir a son propre titre, « Dynamique », distinct de celui du bloc. <a href="spec-fonctionnelle.html#maison-tiroir-dynamique-calcul-de-la-projection">→ fonctionnelle</a></p></details>
+  <p class="ancre">src/versions/mixte/components/DivinationDrawer.tsx · src/shared/number/number.format.ts</p>
+  <details><summary>Cas limites</summary><p>−1 226 g → « −1.23 kg » : poidsSigne passe par formatNumber, dont le séparateur décimal est un POINT — le commentaire du code, qui écrit « −1,23 kg », est périmé. Les deux décimales sont un MAXIMUM, zéros de queue supprimés : −1 200 g → « −1.2 kg ». −373 g → « −373 g ». Le tiroir a son propre titre, « Dynamique », distinct de celui du bloc. <a href="spec-fonctionnelle.html#maison-tiroir-dynamique-calcul-de-la-projection">→ fonctionnelle</a></p></details>
   <h3 id="maison-rangee-ajout-rapide">Rangée « Ajout rapide »</h3>
   <p>La section entière — séparateur compris — est absente en menu simplifié.</p>
   <pre><code>BOTTOM_MENU_ORDER = [maison, injection, history, symptoms, sports, meals, sleep, metime, report]
@@ -495,9 +495,10 @@ ludicTotal = (ludic.total.length &gt; 0 || totalLoss ≤ 0) ? ludic.total
              : getLudicDecomposition(totalLoss)
 ludicLast  = (ludic.last.length &gt; 0 || lastLoss ≤ 0)  ? ludic.last
              : getLudicDecomposition(lastLoss, { exclude: ludicTotal.map(i =&gt; i.name) })</code></pre>
-  <p>Le repli ne choisit pas à la place de l'assignation : tant qu'elle a quelque chose à dire, c'est elle qui parle, et les règles de turn-over et de non-répétition restent les siennes. getLudicDecomposition est pure et déterministe, et n'admet que les combinaisons vraies à 200 g près. La home standard n'a PAS ce repli : elle lit ludic.total et ludic.last tels quels.</p>
+  <p>Le repli ne choisit pas à la place de l'assignation : tant qu'elle a quelque chose à dire, c'est elle qui parle, et les règles de turn-over et de non-répétition restent les siennes. getLudicDecomposition est pure et déterministe. Le seuil de vérité de 200 g (LUDIC_TRUE_WITHIN_KG) ne s'applique PAS à tous les appels : il vit dans pickByExclusionAndTurnover, qui n'est appelée que si l'option exclude ou usage est passée. Le repli de la perte TOTALE, appelé sans options, rend donc la meilleure combinaison quel que soit son écart ; celui de la DERNIÈRE perte, qui passe exclude, filtre bien à 200 g — mais si ce vivier est vide, la règle cède et bestCombo est rendue telle quelle.</p>
+  <p>La home standard n'a PAS ce repli : elle lit ludic.total et ludic.last tels quels.</p>
   <p class="ancre">src/versions/mixte/homes/sections/MaisonSections.tsx · src/utils/ludicWeight.ts</p>
-  <details><summary>Cas limites</summary><p>Perte nulle ou négative : la liste vide est légitime, aucun recalcul. Le recalcul de la dernière perte exclut les noms de la perte totale : jamais le même objet des deux côtés. <a href="spec-fonctionnelle.html#maison-surimpression-d-une-equivalence-insolite-home-sections">→ fonctionnelle</a></p></details>
+  <details><summary>Cas limites</summary><p>Perte nulle ou négative : la liste vide est légitime, aucun recalcul. Le recalcul de la dernière perte exclut les noms de la perte totale : jamais le même objet des deux côtés, sauf vivier vide. <a href="spec-fonctionnelle.html#maison-surimpression-d-une-equivalence-insolite-home-sections">→ fonctionnelle</a></p></details>
   <h3 id="maison-fenetre-7-derniers-jours-des-bilans">Fenêtre « 7 derniers jours » des bilans</h3>
   <pre><code>sevenDaysAgoStr = getLocalDateStr(new Date(now.getTime() − 6 × 86 400 000))
 retenus  = logs.filter(l =&gt; l.date ≥ sevenDaysAgoStr)</code></pre>
@@ -515,7 +516,7 @@ retenus  = logs.filter(l =&gt; l.date ≥ sevenDaysAgoStr)</code></pre>
   </tbody>
   </table>
   <p>Le filtre est un simple ≥ : une entrée datée du FUTUR est comptée par ces huit fonctions.</p>
-  <p class="ancre">src/features/home/homeOverview.ts · src/features/steps/steps.utils.ts</p>
+  <p class="ancre">src/features/home/homeOverview.ts · src/features/steps/steps.utils.ts · src/features/sleep/sleep.utils.ts</p>
   <h3 id="maison-moyennes-repas-sur-7-jours-revolus-mealcaloriesdailyaveragel">Moyennes repas sur 7 jours révolus (mealCaloriesDailyAverageLast7Days)</h3>
   <p>La seule fenêtre à sept jours du dépôt qui ÉCARTE le jour courant : la journée n'est pas finie, et la compter tirerait la moyenne vers le bas d'autant plus qu'il est tôt.</p>
   <pre><code>hier  = getLocalDateStr(now − 86 400 000)
@@ -689,8 +690,8 @@ DRAWER_LABELS = { history: 'Balance', meals: 'Menus' }  // ces deux noms ne vale
 // le tri allumés-d'abord est fait au RENDU, pas dans la table :
 [...items.filter(i =&gt; i.enabled), ...items.filter(i =&gt; !i.enabled)]  // tri stable</code></pre>
   <p>Un module éteint ne disparaît pas : il paraît grisé (opacity-45) en fin de liste, et son clic mène à la page vitrée du module au lieu d'ouvrir le journal. Un module masqué est retiré de la table.</p>
-  <p>Le tiroir Tendance n'a aucun tri : ses huit cartes sont rendues dans l'ordre fixe de la table — actif sanguin, balance, calories, activité physique, temps pour soi, sommeil, pas — la carte des effets secondaires étant ajoutée en huitième, hors table.</p>
-  <p class="ancre">src/versions/mixte/app/navigation.ts · src/versions/mixte/components/JournalDrawer.tsx</p>
+  <p>Le tiroir Tendance applique le MÊME tri au rendu, dans le même ordre d'opérations : les sept cartes de sa table sont d'abord réparties allumées puis éteintes (tri stable), et le masquage filtre ensuite — une carte dont le module est masqué est retirée, il n'y a alors plus huit cartes. L'ordre de la table est : actif sanguin, balance, calories, activité physique, temps pour soi, sommeil, pas. La carte des effets secondaires est rendue en huitième HORS de la table : ni triée, ni filtrée par le masquage, et enabled: true en dur.</p>
+  <p class="ancre">src/versions/mixte/app/navigation.ts · src/versions/mixte/components/JournalDrawer.tsx · src/versions/mixte/components/TrendDrawer.tsx</p>
   <h3 id="maison-series-de-tendance-trend-days-14">Séries de tendance (TREND_DAYS = 14)</h3>
   <p>Quatorze dates locales, de J−13 à aujourd'hui, du plus ancien au plus récent. Un journal vide rend une série VIDE, pas une série de zéros.</p>
   <table>
@@ -705,7 +706,7 @@ DRAWER_LABELS = { history: 'Balance', meals: 'Menus' }  // ces deux noms ne vale
   <tr><td>stepsTrend</td><td>stepLogs.find(l =&gt; l.date === date)?.steps</td><td>0</td></tr>
   </tbody>
   </table>
-  <p>Midi et non minuit pour la concentration : une prise faite dans la journée compte pour ce jour-là. Les journées simulées du jeu de démonstration comptent comme les vraies.</p>
+  <p>Midi et non minuit pour la concentration : une prise faite dans la journée compte pour ce jour-là. Les journées simulées du jeu de démonstration comptent comme les vraies. Aucune des sept séries ne produit de null : les cinq typées Array&lt;number | null&gt; écrivent 0 au jour vide, weightTrend et bloodLevelTrend sont des number[].</p>
   <p class="ancre">src/features/trends/trends.ts</p>
   <details><summary>Cas limites</summary><p>Aucune pesée : weightTrend rend [] — pas de courbe, pas de valeurs. weightTrend([90 le 22, 89 le 24], 4 jours, le 25) = [90, 90, 89, 89].</p></details>
   <h3 id="maison-forme-a-dessiner-hasshape">Forme à dessiner (hasShape)</h3>
@@ -713,7 +714,7 @@ DRAWER_LABELS = { history: 'Balance', meals: 'Menus' }  // ces deux noms ne vale
 return connues.length ≥ 2 &amp;&amp; Math.min(...connues) !== Math.max(...connues)</code></pre>
   <p>Deux valeurs connues au moins, et deux valeurs différentes. Une ligne parfaitement plate ne dit rien qu'un trait.</p>
   <p class="ancre">src/features/trends/trends.ts</p>
-  <details><summary>Cas limites</summary><p>[2,2,2] → faux ; [0,0,0,1] → vrai, un zéro est une valeur connue ; [] → faux. Depuis que les jours sans saisie valent 0, la coupure de courbe ne se produit plus que sur les séries qui portent encore des null.</p></details>
+  <details><summary>Cas limites</summary><p>[2,2,2] → faux ; [0,0,0,1] → vrai, un zéro est une valeur connue ; [] → faux. Le filtre sur null est aujourd'hui sans emploi : aucune série ne porte plus de null, et la coupure de courbe du tracé est donc inatteignable.</p></details>
   <h3 id="maison-valeurs-des-cartes-de-tendance">Valeurs des cartes de tendance</h3>
   <pre><code>lastTrendValue(s)  = dernière valeur non nulle, sinon null
 firstTrendValue(s)  = première valeur non nulle, sinon null
@@ -734,7 +735,7 @@ stepsTrendKcalPerDay = Σ kcal des journées RELEVÉES / nombre de journées rel
   <tr><td>Effets secondaires</td><td>aucune valeur : la carte n'a pas de bascule</td></tr>
   </tbody>
   </table>
-  <p>Une carte au module ÉTEINT ne montre que son titre : d'anciennes données donneraient sinon des valeurs à un module coupé. La bascule titre ↔ valeurs est mémorisée par carte dans le stockage local.</p>
+  <p>Une carte au module ÉTEINT ne montre que son titre : d'anciennes données donneraient sinon des valeurs à un module coupé. La bascule titre ↔ valeurs est mémorisée par carte sous la clé glow_trend_flips.</p>
   <p class="ancre">src/features/trends/trends.ts · src/versions/mixte/components/TrendDrawer.tsx</p>
   <details><summary>Cas limites</summary><p>informedTrendMean([1600, null, 1400, null]) = 1500. Dépense sous 1 kcal/j : le fragment « −… kcal/j » n'est pas écrit. Aucune journée relevée de pas : null. <a href="spec-fonctionnelle.html#maison-tiroir-tendance-des-15-derniers-jours">→ fonctionnelle</a></p></details>
   <h3 id="maison-evolution-des-effets-secondaires-sideeffectshift">Évolution des effets secondaires (sideEffectShift)</h3>
@@ -765,7 +766,7 @@ span  = (max + marge) − bas
 x = (index / (series.length − 1)) × 100
 y = BAS − ((value − bas) / span) × (BAS − HAUT)  // l'axe y du SVG descend</code></pre>
   <p>La marge de 20 % de chaque côté empêche la plus basse valeur de se poser sur le plancher, où l'aire sous le trait s'annulerait et se lirait comme un zéro ; le plancher à zéro garantit qu'une journée vide se lit bien comme un zéro.</p>
-  <p>Tracé par interpolation cubique MONOTONE (Fritsch–Carlson) : tangente = moyenne des deux pentes voisines, pente elle-même aux extrémités ; un segment plat force ses deux tangentes à zéro ; aucune tangente ne dépasse trois fois la pente du segment, et une tangente de signe opposé est ramenée à zéro. Un morceau continu ne se dessine qu'à partir de deux points ; les null coupent la courbe.</p>
+  <p>Tracé par interpolation cubique MONOTONE (Fritsch–Carlson) : tangente = moyenne des deux pentes voisines, pente elle-même aux extrémités ; un segment plat force ses deux tangentes à zéro ; aucune tangente ne dépasse trois fois la pente du segment, et une tangente de signe opposé est ramenée à zéro. Un morceau continu ne se dessine qu'à partir de deux points ; les null couperaient la courbe — aucune série n'en porte plus.</p>
   <p class="ancre">src/versions/mixte/components/TrendDrawer.tsx</p>
   <details><summary>Cas limites</summary><p>Série plate : brut vaut 1 par le || 1 — mais hasShape l'a déjà écartée. Série de poids 79,2 → 80,3 : la marge la décolle du fond, l'aire garde une épaisseur.</p></details>
   <h3 id="maison-cartes-du-tiroir-tendance-sans-forme">Cartes du tiroir Tendance sans forme</h3>
@@ -846,7 +847,7 @@ mois-additionnel  : titre « {mois ?? 2} mois complets ! »
 annee-additionnelle : titre « {annees ?? 2} années complètes ! »
 jours-cinquantaines : titre « {jours ?? 50} jours ! »
 augmentation-badge  : titre « Niveau {BADGE_TIER_LABELS[badgeTier ?? 'bronze']} ! »</code></pre>
-  <p>Les nombres sont écrits à la française, virgule décimale : c'est la seule fonction de ce périmètre à le faire — format1Dec, ailleurs, écrit un point.</p>
+  <p>Les nombres sont écrits à la française, virgule décimale : c'est la seule fonction de ce périmètre à le faire — format1Dec et formatNumber, partout ailleurs, écrivent un point.</p>
   <p><span class="marque">arbitrage non validé</span> Ces messages sont des PROPOSITIONS, à retoucher.</p>
   <p class="ancre">src/features/celebrations/celebrations.ts</p>
   <div class="exemple"><p>Camille à 30 % de son objectif, après 0,6 kg : « 30 % de l’objectif » / « Encore 0,6 kg de moins, 6,3 kg depuis le début. Le cap est bon. » <a href="spec-fonctionnelle.html#maison-widget-de-felicitation">→ fonctionnelle</a></p></div>

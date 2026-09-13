@@ -29,57 +29,95 @@
    "fonctionnalite": "Partage d'un badge",
    "texte": "Une durée d'effacement automatique de la notice de la page Badges.",
    "origine": "Aucun setTimeout dans BadgesPage : la notice n'est effacée que par setShareNotice(null) au clic sur le dessin d'un badge."
+  },
+  {
+   "categorie": "repli sans canShare",
+   "fonctionnalite": "Partage d'un badge",
+   "texte": "« navigator.canShare absent : le fichier est joint sans vérification et les deux tests sont sautés ; c'est la feuille de partage qui décide. »",
+   "origine": "Réfutation retenue, phrase supprimée : src/utils/badgeShare.ts:36 exige navigator.canShare comme condition d'attachement, donc sans elle shareFiles reste vide et la charge part sans files. Le cas limite est réécrit à l'inverse."
+  },
+  {
+   "categorie": "périmètre de ShareBlock",
+   "fonctionnalite": "Les autres sorties",
+   "texte": "« ShareBlock … montée seulement par les écrans de la version cartes, et buildSportShareConfig …, qui n'alimente que ShareBlock » (présentés comme sans montage vivant).",
+   "origine": "Réfutation retenue, phrase supprimée : ShareBlock est monté dans src/versions/mixte/themes/sideral et /test (WeightTracker:964, SportTracker:268, MealTracker:1205), avec déclencheurs vivants (setShareConfig:234, share.shareSport via useShareSport:83). Le chapitre dit désormais que ces montages sont des dossiers de thèmes, hors périmètre, et non des écrans du thème courant."
+  },
+  {
+   "categorie": "écart avec shareNative",
+   "fonctionnalite": "Partage d'un badge",
+   "texte": "« le contrat de shareNative … ne retire pas les fichiers refusés »",
+   "origine": "Réfutation retenue, formulation supprimée : src/shared/platform/share.ts:40-50 teste canShare({ files: [file] }) avant de partager et retombe sur { title, text, url } en cas de refus. Les écarts réels sont l'absence du second test sur la charge complète et l'adresse non jointe quand le fichier passe."
+  },
+  {
+   "categorie": "exhaustivité des sorties",
+   "fonctionnalite": "Les autres sorties",
+   "texte": "« Rien d'autre ne se partage. »",
+   "origine": "Réfutation retenue, titre supprimé : src/versions/mixte/components/InsolitesPage.tsx:384 copie la revue dans le presse-papier via copyToClipboard. Le paragraphe est réécrit en « Les autres sorties » et décrit cette copie."
+  },
+  {
+   "categorie": "couleur de la marque",
+   "fonctionnalite": "Partage d'un badge",
+   "texte": "« « G » et l'empilement L/P/1 en #14b8a6 », donnés au même ton.",
+   "origine": "Réfutation retenue : src/utils/badgeCardImage.ts:218 pose fill-opacity=\"0.85\" sur le groupe L/P/1, absent du « G » (ligne 215). Corrigé dans le tableau."
+  },
+  {
+   "categorie": "type MIME du blob SVG",
+   "fonctionnalite": "Partage d'un badge",
+   "texte": "« chargé en blob image/svg+xml »",
+   "origine": "Réfutation retenue : src/utils/badgeCardImage.ts:124 et :231 écrivent image/svg+xml;charset=utf-8 pour les deux SVG. Corrigé."
+  },
+  {
+   "categorie": "nombre de maquettes",
+   "fonctionnalite": "Les autres sorties",
+   "texte": "« Les quinze maquettes de share/shareTemplates.tsx »",
+   "origine": "Erreur trouvée en vérifiant : SHARE_TEMPLATES compte quinze entrées littérales plus une par badge (ALL_BADGE_DEFINITIONS en a quatre), soit dix-neuf au montage. Corrigé, et son seul lecteur, ShareTemplatesPage, s'ouvre depuis l'administration (mixte/App.tsx:2326)."
   }
  ],
  "glossaire": [
   {
-   "terme": "Feuille de partage",
-   "definition": "Panneau du système d'exploitation ouvert par navigator.share, qui choisit seul les applications de destination. L'application ne sait ni ce qui est proposé, ni ce qui est retenu."
+   "terme": "shareBadgeItem",
+   "definition": "Unique fonction de partage natif du carnet : compose le texte du badge, peint la carte, remet la charge à navigator.share, ou copie le texte dans le presse-papier."
   },
   {
-   "terme": "navigator.share",
-   "definition": "Appel du navigateur qui remet une charge (titre, texte, adresse, fichiers) à la feuille de partage. Son absence est le seul critère de bascule vers le presse-papier."
+   "terme": "renderBadgeCardFile",
+   "definition": "Peintre de la carte du badge : canvas de 600 × 600 unités mis à l'échelle 2, encodé en JPEG 1 200 × 1 200 px de qualité 0,95. Rend null en cas d'échec."
   },
   {
    "terme": "navigator.canShare",
-   "definition": "Test préalable qui dit si une charge donnée est partageable. Appelé deux fois : sur le fichier seul, puis sur la charge complète."
+   "definition": "Test de capacité du navigateur. Ici condition d'attachement : sans lui, aucun fichier n'est joint."
   },
   {
-   "terme": "AbortError",
-   "definition": "Nom d'erreur rendu par navigator.share quand la personne ferme la feuille de partage. Avalé sans trace ni message."
-  },
-  {
-   "terme": "Palier (BadgeTier)",
-   "definition": "Niveau d'un badge parmi aucun, eveil, bronze, argent, or, dans cet ordre croissant. Le partage n'en lit que le libellé et le critère correspondant."
-  },
-  {
-   "terme": "Critère de palier",
-   "definition": "Phrase de badge.criteria décrivant la condition du palier atteint. Écrite sur la carte ; le palier aucun retombe sur le critère bronze."
-  },
-  {
-   "terme": "Carte de partage",
-   "definition": "Image carrée peinte au canvas 2D par renderBadgeCardFile : 600 × 600 unités mises à l'échelle 2, exportées en JPEG 1 200 × 1 200 px."
-  },
-  {
-   "terme": "Rendu 2×",
-   "definition": "ctx.scale(2, 2) appliqué à un canvas de 1 200 px de côté : les coordonnées restent écrites dans un espace de 600, le fichier sort au double."
+   "terme": "BADGE_TIER_LABELS",
+   "definition": "Table des libellés de palier, accents compris (« ÉVEIL »), utilisée à la place de tier.toUpperCase()."
   },
   {
    "terme": "BadgeDrawing",
-   "definition": "Composant React qui dessine un badge, passé en argument par l'écran qui partage. Rasterisé en SVG puis en image pour la carte."
+   "definition": "Composant React qui dessine un badge, passé en argument par l'écran parce que chaque version du site a le sien."
   },
   {
-   "terme": "renderToStaticMarkup",
-   "definition": "Rendu du composant du badge en chaîne HTML hors du DOM, dont le SVG est extrait par expression régulière avant d'être chargé en blob."
+   "terme": "onNotice",
+   "definition": "Rappel facultatif qui affiche le message du repli presse-papier. Fourni par la page Badges seulement."
   },
   {
-   "terme": "Repli presse-papier",
-   "definition": "Chemin sans navigator.share : copie du texte seul par navigator.clipboard.writeText, plus une notice à l'écran quand l'appelant a fourni onNotice."
+   "terme": "shareNative",
+   "definition": "Couche shared/platform du partage natif : joint le fichier s'il est accepté, sinon retombe sur titre, texte et adresse. Non utilisée par le partage d'un badge."
+  },
+  {
+   "terme": "copyToClipboard",
+   "definition": "Couche shared/platform du presse-papier : rend true ou false, journalise l'échec, ne lève rien."
+  },
+  {
+   "terme": "ShareBlock",
+   "definition": "Bloc de partage à carte 1080 × 1920 (partage natif, PNG, Facebook, légende Instagram), monté seulement par les dossiers de thèmes sideral et test."
+  },
+  {
+   "terme": "SHARE_TEMPLATES",
+   "definition": "Liste de maquettes de partage dessinées en HTML, lue par la page d'administration ShareTemplatesPage ; ne produit ni fichier ni appel de partage."
   }
  ],
  "index": [
   {
-   "terme": "Partage d'un badge",
+   "terme": "partage d'un badge",
    "ancre": "partage-partage-d-un-badge"
   },
   {
@@ -87,15 +125,11 @@
    "ancre": "partage-partage-d-un-badge"
   },
   {
+   "terme": "carte du badge (image partagée)",
+   "ancre": "partage-partage-d-un-badge"
+  },
+  {
    "terme": "renderBadgeCardFile",
-   "ancre": "partage-partage-d-un-badge"
-  },
-  {
-   "terme": "Carte de partage (JPEG 1 200 × 1 200)",
-   "ancre": "partage-partage-d-un-badge"
-  },
-  {
-   "terme": "Qualité JPEG 0,95",
    "ancre": "partage-partage-d-un-badge"
   },
   {
@@ -107,39 +141,31 @@
    "ancre": "partage-partage-d-un-badge"
   },
   {
-   "terme": "AbortError",
+   "terme": "presse-papier (repli du partage)",
    "ancre": "partage-partage-d-un-badge"
   },
   {
-   "terme": "Presse-papier (repli)",
+   "terme": "JPEG 1 200 × 1 200",
    "ancre": "partage-partage-d-un-badge"
   },
   {
-   "terme": "Notice de partage",
+   "terme": "pastille de palier",
    "ancre": "partage-partage-d-un-badge"
   },
   {
-   "terme": "Couleurs des paliers sur la carte",
+   "terme": "BADGE_TIER_LABELS",
    "ancre": "partage-partage-d-un-badge"
   },
   {
-   "terme": "Critère écrit sur la carte",
+   "terme": "copie de la revue Insolites",
    "ancre": "partage-partage-d-un-badge"
   },
   {
-   "terme": "Exception du Kangourou Musclé (athlete)",
+   "terme": "ShareBlock",
    "ancre": "partage-partage-d-un-badge"
   },
   {
-   "terme": "Nom de fichier badge-{id}-{palier}.jpg",
-   "ancre": "partage-partage-d-un-badge"
-  },
-  {
-   "terme": "ShareBlock (surface non affichée)",
-   "ancre": "partage-partage-d-un-badge"
-  },
-  {
-   "terme": "buildSportShareConfig",
+   "terme": "SHARE_TEMPLATES",
    "ancre": "partage-partage-d-un-badge"
   },
   {
@@ -160,7 +186,6 @@
   }
  ],
  "ancres_traitees": [
-  "partage",
   "partage-entites",
   "partage-partage-d-un-badge"
  ],

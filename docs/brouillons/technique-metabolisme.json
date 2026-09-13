@@ -15,8 +15,8 @@
   {
    "categorie": "intention de conception",
    "fonctionnalite": "Accès à l'onglet Métabolisme",
-   "texte": "Que l'absence de tout lien vers l'onglet metabolism soit une mise en sommeil délibérée de la page.",
-   "origine": "Vérifiable : aucun appel ne pose activeTab = 'metabolism' dans src/versions/mixte. Mais aucune décision, aucun commentaire et aucune entrée de GUIDELINES.md n'en donne le motif."
+   "texte": "Que l'absence de tout lien de la Mixte vers l'onglet metabolism soit une mise en sommeil délibérée de la page.",
+   "origine": "Vérifiable : aucun appel ne pose activeTab = 'metabolism' dans src/versions/mixte, et BOTTOM_MENU_ORDER, QUICK_ADD_ORDER, ADD_DRAWER_ORDER de src/versions/mixte/app/navigation.ts ne le contiennent pas. Mais aucune décision, aucun commentaire et aucune entrée de GUIDELINES.md n'en donne le motif. Réfutation retenue : la phrase disait « aucun bouton ni lien » sans restriction, alors que l'entrée { id: 'metabolism' } figure sans condition dans allTabs de src/app/navigation.ts, table partagée par les versions ; le chapitre restreint désormais l'affirmation à la Mixte et cite src/app/navigation.ts."
   },
   {
    "categorie": "cohérence des chiffres",
@@ -35,101 +35,79 @@
    "fonctionnalite": "Couverture de tests",
    "texte": "Une affirmation sur la garantie des formules du bilan par des tests.",
    "origine": "sportCalories.test.ts et divination.test.ts existent ; il n'y a pas de metabolism.utils.test.ts ni de bodyMetrics.utils.test.ts. Dire que le bilan est « couvert » aurait été faux, dire l'inverse demandait un inventaire que je n'ai pas fait exhaustivement."
+  },
+  {
+   "categorie": "courbes allure → MET",
+   "fonctionnalite": "Calories d'une séance de sport",
+   "texte": "L'affirmation, reprise de l'en-tête de sportCalories.ts, que CHAQUE courbe contient un ancrage égal au MET du catalogue.",
+   "origine": "Réfutation retenue et vérifiée : l'en-tête du fichier généralise, mais ses propres commentaires de courbe disent le contraire pour deux sports. « Course à pied » (catalogue 8.0, sportPresets.constants.ts:54) a pour ancrages 6.0, 8.3, 9.8, 11.0, 11.8, 12.8, 14.5, 16.0, 19.0 ; « Rameur / Aviron » (catalogue 6.0, :81) a 4.8, 7.0, 8.5, 12.0. Le chapitre énumère désormais les six courbes qui vérifient la propriété et nomme les deux qui ne la vérifient pas. Réfutation retenue également sur la coïncidence des deux chemins : calculateSportCaloriesMET applique le multiplicateur d'intensité (const metMultiplier = sportPreset.met * multiplier) que le chemin par l'allure n'applique pas — les deux ne coïncident donc qu'à intensité 'moderee'."
   }
  ],
  "glossaire": [
   {
    "terme": "MB (métabolisme de base)",
-   "definition": "Énergie dépensée au repos, en kcal/jour, calculée par Mifflin-St Jeor à partir du poids du jour, de la taille, de l'âge et du genre. Recalculé pour chacun des 7 jours et cumulé non arrondi dans totalBmr."
+   "definition": "Dépense énergétique au repos d'une journée, en kcal, calculée par Mifflin-St Jeor à partir du poids du jour, de la taille, de l'âge et du genre."
   },
   {
    "terme": "Mifflin-St Jeor",
-   "definition": "Formule du MB employée : 10 × poids + 6.25 × taille − 5 × âge, + 5 pour un homme, − 161 pour une femme, la moyenne des deux pour un genre neutre. L'étiquette a dit « Harris-Benedict » à tort jusqu'au 2026-08-24."
+   "definition": "Formule du MB employée par le code : 10 × poids(kg) + 6.25 × taille(cm) − 5 × âge, +5 pour un homme, −161 pour une femme, moyenne des deux pour 'neutre'."
   },
   {
    "terme": "MET",
-   "definition": "Coût énergétique d'une activité, en multiples du métabolisme de repos. Une séance vaut MET × poids (kg) × heures. Le catalogue ALL_SPORTS en porte un par sport ; 4.5 pour un sport inconnu."
+   "definition": "Coût énergétique d'une activité, en multiples du métabolisme de repos. Chaque sport du catalogue porte un MET ; huit sports portent en plus une courbe allure → MET."
   },
   {
    "terme": "Courbe d'allure",
-   "definition": "Table d'ancrages allure (km/h) → MET, propre à un sport, interpolée linéairement et bloquée aux extrémités. Huit sports en ont une ; chacune contient un ancrage égal au MET du catalogue."
-  },
-  {
-   "terme": "Multiplicateur d'intensité",
-   "definition": "0.8 pour « douce », 1.0 pour « modérée », 1.3 pour « intensive ». Appliqué au MET du catalogue, jamais au MET lu sur une courbe d'allure."
-  },
-  {
-   "terme": "Foulée",
-   "definition": "Longueur d'un pas, en km : taille (cm) × 0.414 / 100 000. Sert à convertir un nombre de pas en distance."
+   "definition": "Table d'ancrages allure (km/h) → MET propre à un sport, interpolée linéairement entre deux ancrages et bloquée sur l'ancrage extrême au-delà des bornes."
   },
   {
    "terme": "activeBurn",
-   "definition": "Dépense active d'un jour : calories des séances plus calories des pas. Somme de valeurs déjà arrondies, donc entière."
+   "definition": "Dépense active d'un jour : somme des calories des séances et des calories des pas, chacune déjà arrondie."
   },
   {
    "terme": "totalBurn",
-   "definition": "Dépense totale d'un jour : arrondi de (MB non arrondi + activeBurn)."
-  },
-  {
-   "terme": "totalOutput",
-   "definition": "Dépense de la semaine : arrondi de (totalBmr + totalActiveBurn), avec totalBmr somme des MB non arrondis."
+   "definition": "Dépense totale d'un jour : round(MB non arrondi + activeBurn)."
   },
   {
    "terme": "netBalance",
-   "definition": "Balance énergétique de la semaine : totalIngested − totalOutput. Négative ou nulle = déficit, positive = surplus."
+   "definition": "Balance de la semaine : totalIngested − totalOutput. Négative, c'est un déficit ; positive, un surplus."
+  },
+  {
+   "terme": "totalOutput",
+   "definition": "Dépense de la semaine : round(totalBmr + totalActiveBurn), avec totalBmr somme des sept MB non arrondis."
   },
   {
    "terme": "dayBalance",
-   "definition": "Balance d'un jour, calculée dans le tableau à l'affichage : ingested − totalBurn. Jamais stockée, jamais renvoyée par le calcul."
+   "definition": "Balance d'un jour, ingested − totalBurn, calculée dans le tableau d'affichage et absente de MetabolismSummary."
   },
   {
    "terme": "EnergyTrend",
-   "definition": "Verdict de la balance : un libellé, une icône (minus, trending-down, trending-up) et une direction (loss, stable, gain) déduits des seuils 4 000 / 8 000 / 14 000 kcal."
-  },
-  {
-   "terme": "Pesée de départ",
-   "definition": "La pesée portant isStartingWeight = true. Se reconnaît à son drapeau et jamais à sa valeur ; premier repli du poids à une date."
+   "definition": "Structure rendue par getEnergyTrend : libellé, icône, direction (loss / stable / gain) et deux jeux de classes de couleur."
   },
   {
    "terme": "getWeightAtDate",
-   "definition": "Poids en vigueur à une date : dernière pesée de date ≤ la date cherchée, l'heure n'étant jamais lue ; à défaut pesée de départ, poids visé, première pesée triée, puis 80 kg."
-  },
-  {
-   "terme": "hasOccurred",
-   "definition": "Vrai si une entrée datée a déjà eu lieu à l'instant de référence. Une entrée sans heure compte pour toute la journée. Employée par la projection, jamais par la page du métabolisme."
-  },
-  {
-   "terme": "Divination (projection)",
-   "definition": "Bloc de l'accueil qui rappelle computeMetabolismSummary sur les journaux filtrés par hasOccurred et convertit la balance en grammes à raison de 8 000 kcal le kilo (KCAL_PER_KILO)."
+   "definition": "Résout le poids en vigueur à une date : dernière pesée de date ≤ la date demandée, sinon pesée de départ, poids visé, première pesée triée, sinon 80 kg."
   },
   {
    "terme": "formatNumber",
-   "definition": "Formateur unique du site : milliers séparés d'une espace insécable U+00A0, décimales après un point, décimales de queue supprimées, chaîne vide pour un non-fini."
+   "definition": "Formateur de nombres du projet : espace insécable aux milliers, point décimal, décimales de queue supprimées, chaîne vide pour un non-fini."
   },
   {
-   "terme": "Fenêtre du bilan",
-   "definition": "Les 7 dates locales AAAA-MM-JJ d'aujourd'hui − 6 à aujourd'hui, dans l'ordre. Le rattachement d'une saisie s'y fait par égalité de chaînes sur son champ date."
+   "terme": "KCAL_PER_KILO",
+   "definition": "Constante de la projection : 8 000 kcal pour un kilo de masse corporelle."
+  },
+  {
+   "terme": "referenceDate",
+   "definition": "« Aujourd'hui » injectable de computeMetabolismSummary ; l'instant présent par défaut, une date fournie par la projection de l'accueil."
   }
  ],
  "index": [
   {
-   "terme": "Mifflin-St Jeor",
-   "ancre": "metabolisme-metabolisme-de-base-mifflin-st-jeor"
+   "terme": "computeMetabolismSummary",
+   "ancre": "metabolisme-fenetre-du-bilan-metabolique"
   },
   {
-   "terme": "Métabolisme de base (MB)",
-   "ancre": "metabolisme-metabolisme-de-base-mifflin-st-jeor"
-  },
-  {
-   "terme": "Harris-Benedict (étiquette corrigée)",
-   "ancre": "metabolisme-metabolisme-de-base-mifflin-st-jeor"
-  },
-  {
-   "terme": "Genre neutre (moyenne homme/femme)",
-   "ancre": "metabolisme-metabolisme-de-base-mifflin-st-jeor"
-  },
-  {
-   "terme": "Fenêtre de 7 jours",
+   "terme": "fenêtre de 7 jours",
    "ancre": "metabolisme-fenetre-du-bilan-metabolique"
   },
   {
@@ -137,87 +115,79 @@
    "ancre": "metabolisme-fenetre-du-bilan-metabolique"
   },
   {
-   "terme": "getLocalDateStr",
+   "terme": "allTabs / onglet metabolism",
    "ancre": "metabolisme-fenetre-du-bilan-metabolique"
   },
   {
-   "terme": "INITIAL_PROFILE (femme, 42 ans, 168 cm)",
-   "ancre": "metabolisme-fenetre-du-bilan-metabolique"
+   "terme": "MetabolismSummary",
+   "ancre": "metabolisme-entites"
   },
   {
-   "terme": "Onglet metabolism",
-   "ancre": "metabolisme-fenetre-du-bilan-metabolique"
+   "terme": "DailyMetabolismStat",
+   "ancre": "metabolisme-entites"
   },
   {
-   "terme": "computeMetabolismSummary",
-   "ancre": "metabolisme-fenetre-du-bilan-metabolique"
+   "terme": "useMetabolismSummary",
+   "ancre": "metabolisme-entites"
+  },
+  {
+   "terme": "Mifflin-St Jeor",
+   "ancre": "metabolisme-metabolisme-de-base-mifflin-st-jeor"
+  },
+  {
+   "terme": "calculateBMR",
+   "ancre": "metabolisme-metabolisme-de-base-mifflin-st-jeor"
+  },
+  {
+   "terme": "genre neutre",
+   "ancre": "metabolisme-metabolisme-de-base-mifflin-st-jeor"
   },
   {
    "terme": "getWeightAtDate",
    "ancre": "metabolisme-poids-a-une-date"
   },
   {
-   "terme": "Pesée de départ (isStartingWeight)",
+   "terme": "getStartingWeight",
    "ancre": "metabolisme-poids-a-une-date"
   },
   {
-   "terme": "Repli 80 kg",
-   "ancre": "metabolisme-poids-a-une-date"
-  },
-  {
-   "terme": "Tri stable des pesées",
-   "ancre": "metabolisme-poids-a-une-date"
-  },
-  {
-   "terme": "SavedMealLog.calories",
+   "terme": "calories ingérées",
    "ancre": "metabolisme-calories-ingerees-d-un-jour"
-  },
-  {
-   "terme": "Calories ingérées",
-   "ancre": "metabolisme-calories-ingerees-d-un-jour"
-  },
-  {
-   "terme": "Foulée (0.414)",
-   "ancre": "metabolisme-calories-des-pas"
-  },
-  {
-   "terme": "Vitesse de marche 4.2 km/h",
-   "ancre": "metabolisme-calories-des-pas"
   },
   {
    "terme": "calculateStepCalories",
    "ancre": "metabolisme-calories-des-pas"
   },
   {
-   "terme": "MET",
-   "ancre": "metabolisme-calories-d-une-seance-de-sport"
-  },
-  {
-   "terme": "Courbe allure → MET",
-   "ancre": "metabolisme-calories-d-une-seance-de-sport"
+   "terme": "foulée 0.414",
+   "ancre": "metabolisme-calories-des-pas"
   },
   {
    "terme": "getSportCalories",
    "ancre": "metabolisme-calories-d-une-seance-de-sport"
   },
   {
-   "terme": "Multiplicateur d'intensité",
+   "terme": "getMetForSpeed",
    "ancre": "metabolisme-calories-d-une-seance-de-sport"
   },
   {
-   "terme": "Montée escaliers (étages)",
+   "terme": "isDistanceSport",
    "ancre": "metabolisme-calories-d-une-seance-de-sport"
   },
   {
-   "terme": "Sport inconnu (MET 4.5)",
+   "terme": "calculateSportCaloriesMET",
    "ancre": "metabolisme-calories-d-une-seance-de-sport"
   },
   {
-   "terme": "Distance en mètres",
+   "terme": "multiplicateur d'intensité",
    "ancre": "metabolisme-calories-d-une-seance-de-sport"
   },
   {
-   "terme": "activeBurn",
+   "terme": "Montée escaliers",
+   "ancre": "metabolisme-calories-d-une-seance-de-sport"
+  },
+  {
+   "terme": "netBalance",
    "ancre": "metabolisme-balance-energetique"
   },
   {
@@ -225,36 +195,20 @@
    "ancre": "metabolisme-balance-energetique"
   },
   {
-   "terme": "netBalance",
+   "terme": "divination / projection",
    "ancre": "metabolisme-balance-energetique"
   },
   {
-   "terme": "Divination (projection de l'accueil)",
+   "terme": "KCAL_PER_KILO",
    "ancre": "metabolisme-balance-energetique"
   },
   {
-   "terme": "hasOccurred",
-   "ancre": "metabolisme-balance-energetique"
-  },
-  {
-   "terme": "KCAL_PER_KILO (8 000)",
-   "ancre": "metabolisme-balance-energetique"
-  },
-  {
-   "terme": "Tendance (seuils 4 000 / 8 000 / 14 000)",
+   "terme": "getEnergyTrend",
    "ancre": "metabolisme-tendance-de-la-balance-7-jours"
   },
   {
    "terme": "EnergyDirection",
    "ancre": "metabolisme-tendance-de-la-balance-7-jours"
-  },
-  {
-   "terme": "Déficit / Surplus",
-   "ancre": "metabolisme-affichages-derives-du-bilan"
-  },
-  {
-   "terme": "Poids moyen (7j)",
-   "ancre": "metabolisme-affichages-derives-du-bilan"
   },
   {
    "terme": "formatNumber",
@@ -265,16 +219,8 @@
    "ancre": "metabolisme-affichages-derives-du-bilan"
   },
   {
-   "terme": "DailyMetabolismStat",
-   "ancre": "metabolisme-entites"
-  },
-  {
-   "terme": "MetabolismSummary",
-   "ancre": "metabolisme-entites"
-  },
-  {
-   "terme": "anneeNaissance / tailleCm (V2)",
-   "ancre": "metabolisme-entites"
+   "terme": "dayBalance",
+   "ancre": "metabolisme-affichages-derives-du-bilan"
   }
  ],
  "ancres_traitees": [

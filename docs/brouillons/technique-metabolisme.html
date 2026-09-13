@@ -32,7 +32,7 @@
       <tr><td><code>distance</code></td><td>nombre</td><td>mètres</td><td>facultative ; aucune étiquette d'unité en base</td></tr>
     </tbody>
   </table>
-  <p>Dérivé et donc <strong>non stocké</strong> : <code>DailyMetabolismStat</code> (<code>date</code>, <code>weight</code>, <code>bmr</code>, <code>ingested</code>, <code>sportCalories</code>, <code>stepCalories</code>, <code>activeBurn</code>, <code>totalBurn</code>), <code>MetabolismSummary</code> (les 7 dates, les 7 lignes, <code>totalBmr</code>, <code>totalIngested</code>, <code>totalActiveBurn</code>, <code>totalOutput</code>, <code>netBalance</code>, <code>trend</code>) et <code>EnergyTrend</code> (<code>label</code>, <code>icon</code>, <code>direction</code>, deux jeux de classes de couleur). Tout est recalculé par <code>useMetabolismSummary</code>, mémoïsé sur les cinq entrées.</p>
+  <p>Dérivé et donc <strong>non stocké</strong> : <code>DailyMetabolismStat</code> (<code>date</code>, <code>weight</code>, <code>bmr</code>, <code>ingested</code>, <code>sportCalories</code>, <code>stepCalories</code>, <code>activeBurn</code>, <code>totalBurn</code>), <code>MetabolismSummary</code> (<code>last7DaysDates</code>, <code>dailyStats</code>, <code>totalBmr</code>, <code>totalIngested</code>, <code>totalActiveBurn</code>, <code>totalOutput</code>, <code>netBalance</code>, <code>trend</code>) et <code>EnergyTrend</code> (<code>label</code>, <code>icon</code>, <code>direction</code>, deux jeux de classes de couleur). Tout est recalculé par <code>useMetabolismSummary</code>, mémoïsé sur les cinq entrées.</p>
   <p class="ancre">src/features/metabolism/metabolism.utils.ts, src/features/metabolism/useMetabolismSummary.ts, src/types.ts</p>
   <p>La V2 ne stocke aucune de ces entités : elle recueille <code>anneeNaissance</code> (nombre, défaut 1980) et <code>tailleCm</code> (nombre, cm, défaut 165) dans les réponses d'onboarding, tenues en état React par <code>useParcours</code> et écrites nulle part. <span class="marque v2">V2</span></p>
   <p class="ancre">src/screens/onboarding/reponses.ts, src/domaine/mesures.ts (V2)</p>
@@ -59,14 +59,14 @@
     activeBurn    = sportCalories + stepCalories
     ligne = { date, weight, bmr: round(bmr), ingested, sportCalories, stepCalories,
               activeBurn, totalBurn: round(bmr + activeBurn) }</code></pre>
-  <p>Les trois replis <code>?? 42</code>, <code>?? 170</code>, <code>?? 'femme'</code> ne se déclenchent que sur une valeur absente ou nulle. Ils sont inatteignables en pratique : au chargement, la sauvegarde est étalée sur <code>INITIAL_PROFILE</code> (<code>{ ...INITIAL_PROFILE, ...parsed.profile }</code>), qui porte femme, 42 ans, 168 cm. La taille de repli du calcul, 170 cm, ne s'affiche donc jamais.</p>
+  <p>Les trois replis <code>?? 42</code>, <code>?? 170</code>, <code>?? 'femme'</code> emploient l'opérateur de coalescence des nuls : ils ne se déclenchent que sur <code>undefined</code> ou <code>null</code>, jamais sur <code>0</code> ni sur une chaîne vide. Ils sont inatteignables en pratique : au chargement, la sauvegarde est étalée sur <code>INITIAL_PROFILE</code> (<code>{ ...INITIAL_PROFILE, ...parsed.profile }</code>), qui porte femme, 42 ans, 168 cm. La taille de repli du calcul, 170 cm, ne s'affiche donc jamais.</p>
   <p>La page compose quatre briques d'affichage — entête et pastille de tendance, trois blocs de synthèse, détail MB et actif, tableau journalier — et n'a aucune écriture. Les totaux des blocs passent par <code>formatNumber</code> (milliers séparés d'une espace insécable U+00A0, décimales après un point, décimales de queue supprimées, signe conservé sans espace derrière, chaîne vide pour un non-fini). Quatre valeurs ne passent pas par lui et s'écrivent brutes : la ligne <code>MB (N) + Activités (N)</code>, les six colonnes du tableau journalier, le poids moyen (7j) et la balance quand elle est strictement positive.</p>
-  <p>L'onglet est <code>metabolism</code> ; son titre et son icône figurent dans les tables d'onglets de <code>App.tsx</code>, mais aucun bouton ni lien ne pose <code>activeTab = 'metabolism'</code> : la page n'est atteignable que par un état déjà posé.</p>
-  <p class="ancre">src/features/metabolism/metabolism.utils.ts, src/app/useAppData.ts, src/versions/mixte/features/metabolism/MetabolismTracker.tsx, src/shared/number/number.format.ts</p>
+  <p>L'onglet est <code>metabolism</code>. Il figure <strong>sans condition</strong> dans la table d'onglets partagée par les versions, <code>allTabs</code> de <code>src/app/navigation.ts</code> : une version qui affiche cette table entière donne accès à la page. La Mixte, elle, ne la retient nulle part — ni <code>BOTTOM_MENU_ORDER</code>, ni <code>QUICK_ADD_ORDER</code>, ni <code>ADD_DRAWER_ORDER</code> ne contiennent <code>'metabolism'</code> —, et aucun de ses boutons ne pose <code>activeTab = 'metabolism'</code> : <strong>dans la Mixte</strong>, la page n'est atteignable que par un état déjà posé.</p>
+  <p class="ancre">src/features/metabolism/metabolism.utils.ts, src/app/useAppData.ts, src/app/navigation.ts, src/versions/mixte/app/navigation.ts, src/versions/mixte/features/metabolism/MetabolismTracker.tsx, src/shared/number/number.format.ts</p>
   <details><summary>Cas limites</summary>
     <ul>
       <li>Changement de mois ou d'année dans la fenêtre : <code>setDate</code> reporte, 1er septembre − 6 donne 26 août.</li>
-      <li>Journaux absents de la sauvegarde : <code>App.tsx</code> passe <code>[]</code>, les 7 lignes existent quand même, à 0.</li>
+      <li>Journaux absents de la sauvegarde : <code>App.tsx</code> passe <code>[]</code>, les 7 lignes existent quand même, avec <code>ingested</code>, <code>sportCalories</code>, <code>stepCalories</code> et <code>activeBurn</code> à 0 ; <code>weight</code>, <code>bmr</code> et <code>totalBurn</code> ne dépendent d'aucun journal et restent non nuls.</li>
       <li>Carnet neuf : ingéré 0 partout, poids du jour = pesée de départ (95 kg semés à l'installation), balance = −MB.</li>
       <li>Saisie datée après aujourd'hui : hors fenêtre, jamais lue.</li>
       <li>Repas supprimé : <code>removeLogById</code> le retire du tableau, il quitte la sauvegarde — rien à filtrer à la lecture.</li>
@@ -77,17 +77,18 @@
 
   <h3 id="metabolisme-metabolisme-de-base-mifflin-st-jeor">Métabolisme de base (Mifflin-St Jeor)</h3>
   <p>Le MB est recalculé <strong>chaque jour</strong>, avec le poids de ce jour-là et la taille, l'âge et le genre du profil. Aucun arrondi n'entre dans le cumul.</p>
-  <pre><code>bmrMale   = 10 × poids + 6.25 × taille − 5 × âge + 5
-bmrFemale = 10 × poids + 6.25 × taille − 5 × âge − 161
+  <pre><code>terme commun X = 10 × poids + 6.25 × taille − 5 × âge
+bmrMale   = X + 5
+bmrFemale = X − 161
 gender === 'homme' → bmrMale
 gender === 'femme' → bmrFemale
-sinon              → (bmrMale + bmrFemale) / 2      // soit … − 78</code></pre>
+sinon              → (bmrMale + bmrFemale) / 2 = X − 78</code></pre>
   <p>Unités : poids en kg, taille en cm, âge en années, résultat en kcal/jour. <code>totalBmr</code> accumule les sept valeurs <strong>non arrondies</strong> ; <code>DailyMetabolismStat.bmr</code> en porte l'arrondi, à seul usage d'affichage. Le bloc « Métabolisme Basal (MB) » écrit la formule selon le genre : la ligne « femme », la ligne « homme », et « Calcul : Moyenne homme et femme » pour <code>'neutre'</code>.</p>
   <p>L'étiquette a dit « Harris-Benedict » jusqu'au 2026-08-24 — nom faux sur un calcul juste. Le calcul n'a pas bougé ; seule l'étiquette a été corrigée.</p>
   <p class="ancre">src/features/metabolism/metabolism.utils.ts, src/versions/mixte/features/metabolism/MetabolismBreakdownDetails.tsx</p>
   <details><summary>Cas limites</summary>
     <ul>
-      <li>Genre <code>'neutre'</code> : la moyenne des deux, soit un écart constant de −78 par rapport au terme masculin ; l'étiquette n'écrit pas la formule chiffrée.</li>
+      <li>Genre <code>'neutre'</code> : la moyenne des deux, soit <strong>−78</strong> par rapport au terme commun X, <strong>−83</strong> par rapport à <code>bmrMale</code> et <strong>+83</strong> par rapport à <code>bmrFemale</code> ; l'étiquette n'écrit pas la formule chiffrée.</li>
       <li>Aucun plancher : un poids ou une taille absurdes produisent un MB négatif, affiché tel quel.</li>
       <li>Le MB du jour est recalculé même sans aucune saisie ce jour-là : le poids résolu suffit.</li>
     </ul>
@@ -97,19 +98,20 @@ sinon              → (bmrMale + bmrFemale) / 2      // soit … − 78</code><
   <h3 id="metabolisme-poids-a-une-date">Poids à une date</h3>
   <p><code>getWeightAtDate</code> rend le poids en vigueur à une date. Il est appelé une fois par jour de la fenêtre, puis une fois de plus pour chaque séance et chaque ligne de pas — l'historique est donc retrié à chaque appel.</p>
   <pre><code>depart = getStartingWeight(weightHistory)          // pesée portant isStartingWeight, sinon 0
-si historique vide      → depart || profile?.targetWeight || 80
+si historique vide      → retour anticipé : depart || profile?.targetWeight || 80
 sorted = [...weightHistory].sort((a, b) =&gt; new Date(a.date).getTime() - new Date(b.date).getTime())
 actif  = depart || profile?.targetWeight || sorted[0]?.weight || 80
 pour w de sorted :
   si w.date &lt;= dateStr  → actif = w.weight
-  sinon                 → arrêt
+  sinon                 → break
 rendre actif</code></pre>
   <p>La comparaison <code>w.date &lt;= dateStr</code> est une comparaison de chaînes, exacte sur le format <code>AAAA-MM-JJ</code>. Le champ <code>time</code> n'entre ni dans le tri ni dans la comparaison : deux pesées du même jour ont la même clé de tri, et <code>Array.prototype.sort</code> étant stable, c'est l'ordre du tableau — l'ordre du journal — qui décide laquelle est retenue en dernier.</p>
-  <p>La chaîne de replis emploie <code>||</code> et non <code>??</code> : une valeur nulle est franchie comme une valeur absente.</p>
+  <p>La chaîne de replis emploie <code>||</code> et non <code>??</code> : un <code>0</code> y est franchi comme une valeur absente, alors que le <code>??</code> du bilan (<code>profile.age ?? 42</code>) laisserait passer un <code>0</code>.</p>
   <p class="ancre">src/shared/body-metrics/bodyMetrics.utils.ts, src/shared/model/startingWeighIn.ts</p>
   <details><summary>Cas limites</summary>
     <ul>
-      <li>Date antérieure à toute pesée : la boucle ne s'exécute jamais, le repli initial est rendu.</li>
+      <li>Historique vide : retour anticipé <em>avant</em> la boucle, sur <code>depart || targetWeight || 80</code>.</li>
+      <li>Date antérieure à toute pesée, historique non vide : la boucle s'exécute, sa première itération prend la branche <code>else</code> et sort par le <code>break</code> ; le repli initial est rendu inchangé.</li>
       <li>Pesée de départ à 0 kg : <code>depart || …</code> la saute et passe au poids visé.</li>
       <li>Poids visé à 0 : sauté de même, on tombe sur la première pesée triée, sinon 80 kg.</li>
       <li>Pesée future : la boucle s'arrête dessus, elle n'est jamais retenue.</li>
@@ -152,7 +154,7 @@ kcal          = round(3.5 × weight × durationHours)</code></pre>
   <div class="exemple"><p>Camille, 9 septembre, 7 320 pas, 168 cm, 86.1 kg : foulée 0.00069552 km (69.55 cm), distance 5.0912 km, durée 1.2122 h, kcal = 3.5 × 86.1 × 1.2122 = 365.3 → <strong>365 kcal</strong>.</p></div>
 
   <h3 id="metabolisme-calories-d-une-seance-de-sport">Calories d'une séance de sport</h3>
-  <p><code>getSportCalories</code> a deux chemins et un seul point d'entrée. Le chemin par l'allure ne s'ouvre que si les cinq conditions suivantes sont vraies, évaluées dans cet ordre :</p>
+  <p><code>getSportCalories</code> a deux chemins et un seul point d'entrée. Le chemin par l'allure ne s'ouvre que si les six conditions suivantes sont vraies, évaluées dans cet ordre :</p>
   <pre><code>distance !== undefined
 &amp;&amp; Number.isFinite(distance) &amp;&amp; distance &gt; 0
 &amp;&amp; Number.isFinite(duration) &amp;&amp; duration &gt; 0
@@ -168,11 +170,13 @@ sport === 'Montée escaliers' → round(0.05 × multiplier × weight × duration
 sinon                        → met = (ALL_SPORTS.find(p =&gt; p.value === sport) ?? { met: 4.5 }).met
                                round(met × multiplier × weight × duration / 60)</code></pre>
   <p>Quand la distance est exploitée, l'intensité ressentie <strong>ne participe plus</strong> au calcul ; elle reste enregistrée et affichée. Le poids employé est celui de la date de la séance.</p>
-  <p><code>getMetForSpeed</code> lit une table d'ancrages allure → MET propre à chaque sport, interpole linéairement entre les deux ancrages qui encadrent l'allure, et bloque la valeur sur l'ancrage extrême en deçà du premier et au-delà du dernier. Huit sports ont une courbe : Marche, Randonnée, Course à pied, Vélo, Natation, Rameur / Aviron, Ski de fond, Patinage / Roller. Chaque courbe contient un ancrage dont le MET vaut exactement le MET du catalogue, si bien qu'à cette allure les deux chemins coïncident.</p>
+  <p><code>getMetForSpeed</code> lit une table d'ancrages allure → MET propre à chaque sport, interpole linéairement entre les deux ancrages qui encadrent l'allure, et bloque la valeur sur l'ancrage extrême en deçà du premier et au-delà du dernier. Huit sports ont une courbe : Marche, Randonnée, Course à pied, Vélo, Natation, Rameur / Aviron, Ski de fond, Patinage / Roller.</p>
+  <p><strong>Six</strong> de ces huit courbes contiennent un ancrage dont le MET vaut exactement le MET du catalogue : Marche 3.5 à 4.8 km/h, Randonnée 6.0 à 4.8 km/h, Vélo 6.0 à 17.6 km/h, Natation 7.0 à 2.5 km/h, Ski de fond 9.0 à 7.0 km/h, Patinage / Roller 5.5 à 10.0 km/h. À cette allure de référence, et <strong>à intensité <code>moderee</code> seulement</strong>, les deux chemins donnent le même nombre : le chemin par l'allure n'applique aucun multiplicateur, là où le chemin MET multiplie par 0.8, 1.0 ou 1.3. Les deux autres courbes n'ont pas cet ancrage : « Course à pied » (MET catalogue 8.0 ; ancrages 6.0, 8.3, 9.8, 11.0, 11.8, 12.8, 14.5, 16.0, 19.0) et « Rameur / Aviron » (MET catalogue 6.0 ; ancrages 4.8, 7.0, 8.5, 12.0) — le code le note lui-même, courbe par courbe.</p>
   <p class="ancre">src/shared/body-metrics/sportCalories.ts, src/shared/body-metrics/bodyMetrics.utils.ts, src/shared/body-metrics/sportPresets.constants.ts</p>
   <details><summary>Cas limites</summary>
     <ul>
       <li><code>duration = 0</code> : le chemin par l'allure est fermé, le chemin MET donne 0 (heures nulles) — pas de division par zéro visible.</li>
+      <li>Intensité <code>douce</code> ou <code>intensive</code> avec distance : le multiplicateur n'est pas appliqué, l'écart avec le chemin MET reste de 20 % ou 30 % même à l'allure d'ancrage.</li>
       <li>Distance sur un sport sans courbe (musculation, yoga) : <code>isDistanceSport</code> est faux, chemin MET.</li>
       <li>Allure absurde (200 km en 30 min) : bloquée sur le dernier ancrage, jamais extrapolée.</li>
       <li>Sport inconnu du catalogue (nom renommé, séance importée) : MET 4.5.</li>
@@ -181,7 +185,7 @@ sinon                        → met = (ALL_SPORTS.find(p =&gt; p.value === spor
       <li>Arrondi par séance : deux séances le même jour donnent une somme d'entiers.</li>
     </ul>
   </details>
-  <div class="exemple"><p>Camille n'a saisi aucune séance sur la semaine. Une sortie de 45 min sur 6 000 m en « Course à pied » à 86.1 kg donnerait : allure 8.0 km/h, ancrage exact 8.3 MET, 8.3 × 86.1 × 0.75 = 535.97 → <strong>536 kcal</strong>. La même séance sans distance, intensité modérée : 8.0 × 1.0 × 86.1 × 0.75 = 516.6 → <strong>517 kcal</strong>.</p></div>
+  <div class="exemple"><p>Camille n'a saisi aucune séance sur la semaine. Une sortie de 45 min sur 6 000 m en « Course à pied » à 86.1 kg donnerait : allure 8.0 km/h, ancrage 8.0 km/h → 8.3 MET, 8.3 × 86.1 × 0.75 = 535.97 → <strong>536 kcal</strong>. La même séance sans distance, intensité modérée : 8.0 × 1.0 × 86.1 × 0.75 = 516.6 → <strong>517 kcal</strong>. Les deux chemins diffèrent de 4 % : « Course à pied » est l'un des deux sports sans ancrage au MET catalogue.</p></div>
 
   <h3 id="metabolisme-balance-energetique">Balance énergétique</h3>
   <p>Deux niveaux, avec deux arrondis distincts : le jour et la semaine.</p>
@@ -242,7 +246,7 @@ differentielGrammes = round(differentielKcal / 8000 × 1000)</code></pre>
   <div class="exemple"><p>Camille : |−7 640| ≤ 8 000 et la balance est négative → <strong>« Légère perte de poids »</strong>, icône descendante, encre de la perte. Sur un carnet neuf, la balance vaut −11 403 kcal, donc « Perte de poids ».</p></div>
 
   <h3 id="metabolisme-affichages-derives-du-bilan">Affichages dérivés du bilan</h3>
-  <p>Quatre valeurs sont calculées dans les composants d'affichage et n'existent pas dans <code>MetabolismSummary</code>.</p>
+  <p>Cinq valeurs sont calculées dans les composants d'affichage et n'existent pas dans <code>MetabolismSummary</code> : la moyenne ingérée, le poids moyen, les deux totaux du détail actif, et la balance du jour, recalculée ligne par ligne dans le tableau.</p>
   <pre><code>moyenneIngeree = formatNumber(round(totalIngested / 7))            // toujours 7, jamais le nombre de jours saisis
 poidsMoyen7j   = round((Σ dailyStats.weight / 7) × 10) / 10        // écrit brut, sans formatNumber
 totalSport     = formatNumber(round(Σ dailyStats.sportCalories))
@@ -255,6 +259,7 @@ netBalance &lt;= 0 → « Déficit calorique (Perte de poids estimée) »
 sinon           → « Surplus calorique (Prise de poids estimée) »
 
 // tableau journalier, aucune valeur ne passe par formatNumber
+dayBalance      = d.ingested - d.totalBurn
 dayBalance &gt; 0  → `+${dayBalance}` sinon dayBalance
 encre : dayBalance &lt;= 0 → mtb-loss, sinon mtb-gain</code></pre>
   <p>Le poids moyen est arrondi à une décimale <em>au plus</em> par l'arithmétique elle-même — <code>Math.round(x × 10) / 10</code> rend un nombre, dont l'écriture par défaut supprime le zéro de queue : 86 s'écrit « 86 », pas « 86.0 ». <code>formatNumber</code> obtient le même résultat par la suppression des décimales de queue.</p>

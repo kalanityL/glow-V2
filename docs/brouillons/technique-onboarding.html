@@ -1,6 +1,8 @@
 <section id="onboarding">
   <h2>3. L'arrivée : l'onboarding <a class="retour" href="#sommaire">↑ sommaire</a></h2>
-  <p>Ce chapitre décrit l'objet que l'onboarding remplit, la liste d'étapes qui se recalcule à chaque réponse, et les règles de saisie des mesures : bornes, unités, arrondis, forme stockée. Tout ce qui suit est la <span class="marque v2">V2</span>, dans <code>GIT-APP-V2/src</code> ; la V1 n'a pas d'onboarding.</p>
+  <p>Ce chapitre décrit l'objet que l'onboarding remplit, la liste d'étapes qui se recalcule à chaque réponse, et les règles de saisie des mesures : bornes, unités, arrondis, forme stockée. Tout ce qui suit est la <span class="marque v2">V2</span>, dans <code>GIT-APP-V2/src</code>.</p>
+  <p>La V1 a son propre questionnaire d'accueil — <code>features/onboarding/</code> (model, steps, content, outcome, avec tests) et <code>OnboardingPage.tsx</code>, 945 lignes — mais il ne s'ouvre que depuis l'espace d'administration (<code>onOpenOnboarding</code> dans <code>AdminSettings</code>, puis <code>activeTab === 'onboarding'</code>), il est déclaré simulation et n'écrit ni le profil ni les journaux : seul le choix du thème agit vraiment, et l'état du questionnaire vit sous une clé à lui, <code>glow_onboarding_sim_mixte</code>. L'administration est hors périmètre, et la V2 n'en a rien repris : 24 étapes contre 9, six branches conditionnelles contre deux, un bouton « Passer » sur chaque question — qui efface les champs de l'étape passée, <code>clearStepAnswers</code> — contre aucun, tous les champs facultatifs contre aucun, des poids en kilogrammes contre une chaîne dans l'unité de saisie.</p>
+  <p class="ancre">REPO-GIT-LOCAL/src/features/onboarding/onboarding.steps.ts · REPO-GIT-LOCAL/src/features/onboarding/onboarding.model.ts · REPO-GIT-LOCAL/src/versions/mixte/components/onboarding/OnboardingPage.tsx · REPO-GIT-LOCAL/src/versions/mixte/App.tsx</p>
 
   <h3 id="onboarding-entites">Entités</h3>
   <p>Un seul objet du domaine, <code>Reponses</code>, tenu en mémoire par <code>useParcours</code> et jamais écrit nulle part (voir <a href="#onboarding-rien-n-est-enregistre">Rien n'est enregistré</a>). Aucun champ n'est facultatif : chacun part d'une valeur, et <code>null</code> est réservé aux deux réponses du traitement, où il veut dire « pas encore répondu ».</p>
@@ -43,7 +45,8 @@ etapesVisibles(r) = ETAPES.filter(e =&gt; e.montre?.(r) ?? true).map(e =&gt; e.i
   <p class="ancre">src/screens/onboarding/parcours.ts · src/app/useParcours.ts</p>
   <details><summary>Cas limites</summary>
     <p>Liste qui raccourcit sous un rang déjà avancé : <code>rangBorne</code> retombe sur la dernière étape visible, jamais sur <code>undefined</code> ; <code>rang</code> lui-même n'est pas corrigé.</p>
-    <p><code>avancer</code> et <code>reculer</code> sont bornés (<code>Math.min(rangBorne + 1, visibles.length - 1)</code>, <code>Math.max(rangBorne - 1, 0)</code>) : le bouton du dernier écran ne fait rien, le bouton « retour » du premier est désactivé.</p>
+    <p><code>avancer</code> et <code>reculer</code> sont bornés (<code>Math.min(rangBorne + 1, visibles.length - 1)</code>, <code>Math.max(rangBorne - 1, 0)</code>) : sur le dernier écran, le bouton d'avance ne change aucun état.</p>
+    <p>Deux boutons reculent, et ils ne se comportent pas pareil. « Précédent », dans la rangée de la page, n'est pas rendu à la première étape — <code>peutRevenir ? &lt;button/&gt; : null</code> — et « Suivant » occupe alors toute la rangée. Le bouton de la barre du téléphone, dans <code>App</code>, est toujours rendu et porte <code>disabled</code> et <code>aria-disabled</code> à <code>!peutRevenir</code>. <code>peutRevenir = rangBorne &gt; 0</code>.</p>
     <p>Le rang ne suit pas l'étape : reculer puis changer une réponse conditionnelle ne réinsère pas d'étape avant le rang courant, elle réapparaît à sa place dans l'ordre fixe.</p>
   </details>
   <div class="exemple"><p>Camille répond « perdre » puis <code>traitementCommence = true</code> : <code>etapesVisibles</code> rend les neuf <code>id</code>, et son écran « Dernière étape » est au rang 8.</p></div>
@@ -62,7 +65,7 @@ etapesVisibles(r) = ETAPES.filter(e =&gt; e.montre?.(r) ?? true).map(e =&gt; e.i
   <details><summary>Cas limites</summary>
     <p>Forme choisie, spécialité non : <code>false</code>. Les deux choisies : <code>true</code>. Aucune : <code>false</code>.</p>
     <p>Mot de passe vide : <code>true</code>. De 1 à 7 signes : <code>false</code>. À 8 : <code>true</code>.</p>
-    <p><code>avancer</code> ne revérifie pas <code>peutValider</code> : seul l'attribut <code>disabled</code> du bouton empêche le geste. Le bouton « retour » de la barre du téléphone ne passe jamais par cette règle — il ne fait que reculer.</p>
+    <p><code>avancer</code> ne revérifie pas <code>peutValider</code> : seul l'attribut <code>disabled</code> du bouton « Suivant » empêche le geste. Ni « Précédent » ni le bouton de la barre du téléphone ne passent par cette règle — ils ne font que reculer.</p>
     <p>« Avez-vous commencé » ne bloque rien : <code>traitementCommence</code> est un booléen valant <code>true</code> au départ, il n'y a pas d'état « sans réponse ».</p>
   </details>
 
@@ -74,11 +77,12 @@ etapesVisibles(r) = ETAPES.filter(e =&gt; e.montre?.(r) ?? true).map(e =&gt; e.i
   montrer: rangBorne &gt;= visibles.indexOf('traitement'),
 }
 bille n allumée ⟺ n &lt; passees        (n de 0 à total − 1)</code></pre>
-  <p><code>total</code> billes sont rendues, <code>passees</code> portent la classe <code>bille--allumee</code>. L'étape courante compte dans <code>total</code> mais pas dans <code>passees</code> : <code>passees</code> vaut au plus <code>total − 1</code>, la dernière bille ne s'allume donc jamais pendant le parcours. <code>ETAPE_DEBUT_DECOMPTE</code> vaut <code>'traitement'</code>, une étape sans <code>montre</code>, donc toujours présente dans <code>visibles</code>.</p>
-  <p class="ancre">src/app/useParcours.ts · src/screens/onboarding/Progression.tsx · src/screens/onboarding/parcours.ts</p>
+  <p><code>total</code> billes sont rendues, <code>passees</code> portent la classe <code>bille--allumee</code>. L'étape courante compte dans <code>total</code> mais pas dans <code>passees</code> : <code>passees</code> vaut au plus <code>total − 1</code>, la dernière bille ne s'allume donc jamais pendant le parcours. <code>ETAPE_DEBUT_DECOMPTE</code> vaut <code>'traitement'</code>, une étape sans <code>montre</code>, donc toujours présente dans <code>visibles</code>. <code>Onboarding</code> ne rend <code>Progression</code> que si <code>decompte.montrer</code> : les écrans d'avant n'ont pas de billes du tout.</p>
+  <p class="ancre">src/app/useParcours.ts · src/screens/onboarding/Progression.tsx · src/screens/onboarding/parcours.ts · src/screens/Onboarding.tsx</p>
   <details><summary>Cas limites</summary>
     <p>Parcours à 9 étapes, arrivée sur « traitement » : <code>indexOf('traitement') = 5</code>, donc 9 billes dont 5 allumées.</p>
     <p>Parcours à 7 étapes (« stabiliser » + « non ») : <code>indexOf('traitement') = 4</code>, donc 7 billes dont 4 allumées au même écran.</p>
+    <p>Le décompte n'apparaît donc jamais à zéro bille allumée : le premier écran qui le porte en a déjà 5 (ou 4).</p>
     <p>Changer une réponse conditionnelle en arrière change <code>total</code> et donc le nombre de billes rendues, sans toucher <code>passees</code>.</p>
   </details>
   <div class="exemple"><p>Camille sur « Quel traitement » : <code>rangBorne = 6</code>, <code>total = 9</code> — six billes allumées sur neuf.</p></div>
@@ -89,11 +93,11 @@ bille n allumée ⟺ n &lt; passees        (n de 0 à total − 1)</code></pre>
   <p><code>textes.progression</code> vaut « Avancement du questionnaire » en français, « Questionnaire progress » en anglais.</p>
   <p class="ancre">src/screens/onboarding/Progression.tsx · src/i18n/textes.ts</p>
   <details><summary>Cas limites</summary>
-    <p><code>aria-valuenow</code> vaut 0 au premier écran à décompte : la barre s'annonce à zéro sur neuf.</p>
+    <p><code>aria-valuenow</code> ne vaut jamais 0 : la barre n'est rendue qu'à partir du rang de <code>traitement</code>, donc elle s'annonce « 5 sur 9 » au premier écran qui la porte dans un parcours à neuf étapes, « 4 sur 7 » dans un parcours à sept.</p>
     <p><code>aria-valuemax</code> suit <code>total</code> et change donc si une réponse conditionnelle change.</p>
   </details>
 
-  <h3 id="onboarding-zones-figees-et-zone-qui-defile">Zones figées et zone qui défile <span class="marque non">non implémenté</span></h3>
+  <h3 id="onboarding-zones-figees-et-zone-qui-defile">Zones figées et zone qui défile</h3>
   <p><code>.page</code> est en <code>display: flex; flex-direction: column; overflow: hidden</code>. Dans <code>.page__colonne</code>, l'entête, le portrait de l'avatar et la rangée des boutons sont des enfants directs ; seul <code>.page__defilant</code> porte <code>flex: 1; min-height: 0; overflow-y: auto</code>. <code>min-height: 0</code> est posé sur la colonne <em>et</em> sur la zone : sans lui, la colonne grandit avec son contenu et la rangée des boutons sort de l'écran.</p>
   <p>L'exception est <code>EtapeLangueUnites</code> : dans <code>Onboarding</code>, il est rendu <strong>avant</strong> l'ouverture de <code>&lt;div className="page__defilant"&gt;</code>, au même niveau que le portrait de l'avatar. Son contenu est donc hors de la zone qui défile, et <code>overflow: hidden</code> de <code>.page</code> le coupe s'il dépasse. Les huit autres étapes sont rendues dans la zone.</p>
   <p class="ancre">src/screens/Onboarding.tsx · src/themes/page.css</p>
@@ -123,7 +127,7 @@ bille n allumée ⟺ n &lt; passees        (n de 0 à total − 1)</code></pre>
   <p class="ancre">src/app/useParcours.ts · src/App.tsx</p>
   <details><summary>Cas limites</summary>
     <p>Bouton du dernier écran : <code>onClick={avancer}</code>, et <code>avancer</code> est borné à <code>visibles.length - 1</code> ; le clic ne change donc aucun état.</p>
-    <p>La V1 écrivait tout sous la clé <code>localStorage</code> <code>'glp1_app_companion_data'</code> ; la V2 n'a repris ni la clé ni le format.</p>
+    <p>La V1 écrivait le profil et les journaux sous la clé <code>localStorage</code> <code>'glp1_app_companion_data'</code>, et le reste ailleurs — acceptation médicale, menu choisi, palier d'IMC notifié, sports et effets suivis, sondages : trente-quatre constantes <code>…_KEY</code> sont déclarées dans son <code>src</code>, dont celle de la simulation d'onboarding, <code>glow_onboarding_sim_mixte</code>. La V2 n'a repris ni clé ni format.</p>
   </details>
 
   <h3 id="onboarding-theme-applique-a-la-page">Thème appliqué à la page</h3>
@@ -149,10 +153,12 @@ choisirLangue(langue):
   <p><a href="spec-fonctionnelle.html#onboarding-langue-unites">→ fonctionnelle</a></p>
 
   <h3 id="onboarding-la-langue-est-une-maquette">La langue est une maquette <span class="marque non">non implémenté</span></h3>
-  <p><code>reponses.langue</code> est écrit et n'est lu par personne : <code>useTextes()</code> appelle <code>detecterLangue()</code> et ne reçoit aucun paramètre. Le dictionnaire anglais est pourtant complet — le type <code>Textes</code> exige les mêmes clés dans chaque langue, un oubli ne compilerait pas : questions des neuf étapes, libellés des groupes, unités, systèmes, noms de couleurs, coiffures, expressions, formes de visage, libellé du décompte, et <code>separateurDecimal</code> à <code>'.'</code>.</p>
+  <p><code>reponses.langue</code> est écrit et n'est lu par personne : <code>useTextes()</code> appelle <code>detecterLangue()</code> et ne reçoit aucun paramètre. Le dictionnaire anglais est pourtant complet — le type <code>Textes</code> exige les mêmes clés dans chaque langue, un oubli ne compilerait pas : les questions de huit des neuf étapes, les libellés des groupes, les unités, les systèmes, les noms de couleurs, de coiffures, d'expressions et de formes de visage, le libellé du décompte, et <code>separateurDecimal</code>.</p>
+  <p>La neuvième étape, <code>quel-traitement</code>, n'a pas de clé <code>question</code> : elle est délibérément sans titre et s'annonce par les deux intitulés de groupe, <code>textes.groupes.forme</code> et <code>textes.groupes.traitement</code>.</p>
   <p>Le branchement tient en un point : faire lire <code>reponses.langue</code> par <code>useTextes</code>, avec repli sur <code>detecterLangue()</code>. Aucun écran n'écrit de texte en dur.</p>
-  <p class="ancre">src/i18n/useTextes.ts · src/i18n/textes.ts · src/screens/onboarding/EtapeLangueUnites.tsx</p>
+  <p class="ancre">src/i18n/useTextes.ts · src/i18n/textes.ts · src/screens/onboarding/EtapeQuelTraitement.tsx · src/screens/onboarding/EtapeLangueUnites.tsx</p>
   <details><summary>Cas limites</summary>
+    <p><code>separateurDecimal</code> vaut <code>','</code> en français et <code>'.'</code> en anglais.</p>
     <p>Les noms des langues (« Français », « English ») sont identiques dans les deux dictionnaires, par choix : une langue se nomme dans sa propre langue.</p>
     <p>Les noms de spécialités ne sont pas dans le dictionnaire : ce sont des marques, elles vivent dans <code>domaine/traitements.ts</code>.</p>
   </details>
@@ -232,11 +238,15 @@ clic sur un cran :
   </details>
 
   <h3 id="onboarding-poids-actuel-et-poids-vise-jamais-lies">Poids actuel et poids visé jamais liés</h3>
-  <p>Deux champs distincts de <code>Reponses</code>, <code>poids</code> et <code>poidsCible</code>, tous deux à <code>'95.0'</code> au départ. <code>EtapePoids</code> est le même composant pour les deux écrans, sans état propre : il reçoit une valeur et un <code>onPoids</code>, et le parcours les branche sur deux champs différents.</p>
-  <pre><code>etape 'poids'       → EtapePoids valeur={reponses.poids}      onPoids=repondre('poids', …)
-etape 'poids-cible' → EtapePoids valeur={reponses.poidsCible} onPoids=repondre('poidsCible', …)</code></pre>
-  <p>Mêmes bornes (<code>POIDS_MAX</code>), même unité (<code>UNITES_DU_SYSTEME[systeme].poids</code>), aucune borne tirée de l'autre : rien n'empêche un poids visé supérieur au poids actuel, et rien ne recopie l'un dans l'autre.</p>
-  <p class="ancre">src/screens/onboarding/reponses.ts · src/screens/onboarding/EtapePoids.tsx · src/screens/Onboarding.tsx</p>
+  <p>Deux champs distincts de <code>Reponses</code>, <code>poids</code> et <code>poidsCible</code>, tous deux à <code>'95.0'</code> au départ. <code>EtapePoids</code> est le même composant pour les deux écrans, sans état propre : il reçoit <code>id</code>, <code>question</code>, <code>poids</code>, <code>onPoids</code> et <code>systeme</code>, et le parcours branche les deux emplois sur deux champs différents.</p>
+  <pre><code>etape 'poids'       → &lt;EtapePoids id="poids-actuel" question={textes.onboarding.poids.question}
+                                   poids={reponses.poids}      onPoids={(c) =&gt; repondre('poids', c)}
+                                   systeme={reponses.systeme} /&gt;
+etape 'poids-cible' → &lt;EtapePoids id="poids-cible"  question={textes.onboarding.poidsCible.question}
+                                   poids={reponses.poidsCible} onPoids={(c) =&gt; repondre('poidsCible', c)}
+                                   systeme={reponses.systeme} /&gt;</code></pre>
+  <p><code>EtapePoids</code> rend la question en <code>&lt;h1 class="titre"&gt;</code> puis passe <code>poids</code> à <code>SelecteurPoids</code> sous le nom <code>valeur</code>, avec <code>unite = UNITES_DU_SYSTEME[systeme].poids</code> et la même <code>question</code> comme nom parlé. Mêmes bornes (<code>POIDS_MAX</code>), même unité, aucune borne tirée de l'autre : rien n'empêche un poids visé supérieur au poids actuel, et rien ne recopie l'un dans l'autre.</p>
+  <p class="ancre">src/screens/onboarding/reponses.ts · src/screens/onboarding/EtapePoids.tsx · src/screens/onboarding/SelecteurPoids.tsx · src/screens/Onboarding.tsx</p>
   <div class="exemple"><p>Camille pose 96,0 au poids actuel ; l'écran suivant s'ouvre sur 95,0, son défaut, et elle y pose 78,0. <code>poids = '96.0'</code>, <code>poidsCible = '78.0'</code>.</p></div>
   <p><a href="spec-fonctionnelle.html#onboarding-poids-cible">→ fonctionnelle</a></p>
 
@@ -280,8 +290,8 @@ repondreForme(forme):
   <p><code>ChoixUnique</code> avec <code>enGrille</code> pose la classe <code>options--grille</code>. La règle est en CSS, sans compte dans le code.</p>
   <pre><code>.options--grille { display: grid; grid-template-columns: 1fr 1fr; }
 .options--grille .option:last-child:nth-child(odd) { grid-column: span 2; }</code></pre>
-  <p>Le dernier bouton s'étend sur les deux colonnes s'il occupe un rang impair — c'est-à-dire si le compte est impair. Cinq groupes emploient <code>enGrille</code> : les spécialités (9 en injection, 4 en comprimé), les coiffures (6), les formes de visage (4) et les expressions (4). Seules les neuf injections déclenchent la règle, et « Autre » est le neuvième.</p>
-  <p class="ancre">src/themes/page.css · src/screens/onboarding/ChoixUnique.tsx</p>
+  <p>Le dernier bouton s'étend sur les deux colonnes s'il occupe un rang impair — c'est-à-dire si le compte est impair. <code>enGrille</code> est passé à quatre endroits : les spécialités dans <code>EtapeQuelTraitement</code> (9 options en injection, 4 en comprimé), et les coiffures (6), les formes de visage (4) et les expressions (4) dans <code>EtapeAvatar</code>. Seules les neuf injections déclenchent la règle, et « Autre » est le neuvième.</p>
+  <p class="ancre">src/themes/page.css · src/screens/onboarding/ChoixUnique.tsx · src/screens/onboarding/EtapeAvatar.tsx · src/screens/onboarding/EtapeQuelTraitement.tsx</p>
   <details><summary>Cas limites</summary>
     <p>Quatre comprimés : le dernier est au rang 4, pair — deux colonnes pleines, pas d'étirement.</p>
     <p>Un seul élément en grille s'étirerait sur les deux colonnes (rang 1, impair et dernier) ; aucun groupe n'est dans ce cas.</p>
@@ -345,7 +355,7 @@ TAILLE_BORNES = { cm: { min: 50, max: 300 }, in: { min: 20, max: 118 } }</code><
   </details>
 
   <h3 id="onboarding-taille-stockee-en-centimetres">Taille stockée en centimètres</h3>
-  <p><code>tailleCm</code> est toujours en centimètres. La conversion se fait aux deux bouts, à l'affichage et à la saisie, jamais au stockage ; ces deux fonctions sont les seuls endroits du projet où le pouce existe.</p>
+  <p><code>tailleCm</code> est toujours en centimètres. La conversion se fait aux deux bouts, à l'affichage et à la saisie, jamais au stockage ; ces deux fonctions sont les seuls endroits du projet où l'on convertit centimètres et pouces, et <code>CM_PAR_POUCE</code> n'est pas exportée.</p>
   <pre><code>CM_PAR_POUCE = 2.54
 
 tailleAffichee(cm, unite)  = unite === 'in' ? Math.round(cm / 2.54) : cm
@@ -357,6 +367,7 @@ onValeur = (v) =&gt; onTailleCm(tailleEnCm(v, uniteTaille))</code></pre>
   <p><code>Math.round</code> aux deux bouts : la roue n'affiche et n'accepte que des entiers.</p>
   <p class="ancre">src/domaine/unites.ts · src/screens/onboarding/EtapeProfil.tsx</p>
   <details><summary>Cas limites</summary>
+    <p>Le pouce paraît ailleurs sans conversion : <code>UNITES_DU_SYSTEME.imperial.taille = 'in'</code>, <code>TAILLE_BORNES.in</code>, <code>textes.unites.in</code>, <code>textes.fractions.in</code>. Le commentaire de <code>unites.ts</code> — « les seuls endroits où le pouce existe » — désigne la conversion, pas l'unité.</p>
     <p>Aller-retour non idempotent : 166 cm s'affichent 65 in, et choisir ce cran de 65 in réécrit 165 cm. 165 et 168 cm, eux, reviennent inchangés.</p>
     <p>Tant qu'aucun cran n'est touché, la valeur en centimètres ne bouge pas : ouvrir la roue en pouces ne réécrit rien.</p>
     <p>La conversion est arithmétique, pas typée : rien n'empêche de passer une valeur hors bornes à <code>tailleEnCm</code>, seule la roue les impose.</p>

@@ -23,13 +23,14 @@
 
   <h3 id="activite-activation-automatique-des-modules-pas-et-sport">Activation automatique des modules pas et sport</h3>
   <p><code>handleNavigate(tab)</code> et <code>handleQuickAddNavigate(tab)</code> copient le profil, et si <code>tab === 'sports'</code> et que <code>sportTrackingEnabled</code> est faux, le passent à <code>true</code> puis appellent <code>handleSaveProfile</code> avant <code>setActiveTab</code>. Trois onglets seulement sont concernés : <code>'meals'</code> (<code>foodTrackingEnabled</code>), <code>'steps'</code> (<code>stepsTrackingEnabled</code>), <code>'sports'</code>. Rien de tel pour <code>'metime'</code> ni <code>'sleep'</code>.</p>
-  <p><code>naviguerVersPageEteinte(tab)</code> ne fait que <code>setActiveTab(tab)</code> : c'est le chemin des tuiles et tiroirs vers une page dont le module est éteint, et c'est ce qui rend la page vitrée possible. La page n'est montée que si <code>activeTab === 'sports' &amp;&amp; profile.sportTrackingEnabled</code> ; sinon c'est la couche d'activation qui s'affiche, avec le nom « Activité Physique » et la cible <code>module-sport-tracking</code>.</p>
+  <p><code>naviguerVersPageEteinte(tab)</code> remet trois drapeaux d'ouverture automatique à zéro — <code>setAutoOpenTab(null)</code>, <code>setAutoOpenChangeTreatment(false)</code>, <code>setAutoOpenPkPlot(false)</code> — puis appelle <code>setActiveTab(tab)</code>. Elle n'allume aucun module : c'est le chemin des tuiles et tiroirs vers une page dont le module est éteint, et c'est ce qui rend la page vitrée possible. La page n'est montée que si <code>activeTab === 'sports' &amp;&amp; profile.sportTrackingEnabled</code> ; sinon c'est la couche d'activation qui s'affiche, avec le nom « Activité Physique » et la cible <code>module-sport-tracking</code>.</p>
   <p><code>handleQuickAddNavigate</code> pose en plus <code>setAutoOpenTab(tab)</code>, qui devient le <code>autoOpenAdd</code> du tracker.</p>
   <p class="ancre">src/versions/mixte/App.tsx</p>
   <details><summary>Cas limites</summary>
     <p>Module déjà allumé : <code>hasChanges</code> reste faux, aucune écriture de profil.</p>
     <p>Module <em>masqué</em> (<code>sportModuleHidden</code>) : la navigation ne le lit pas ; c'est l'affichage des tuiles et des cartes qui l'écarte.</p>
     <p>Arrivée par <code>naviguerVersPageEteinte</code> puis clic sur la vitre : le passage par <code>handleNavigate('modules')</code> n'allume rien non plus.</p>
+    <p>Arrivée par <code>naviguerVersPageEteinte</code> après un ajout rapide : <code>autoOpenTab</code> est remis à <code>null</code>, aucun formulaire ne s'ouvre seul.</p>
   </details>
 
   <h3 id="activite-curseur-calendrier-journal">Curseur calendrier / journal</h3>
@@ -86,13 +87,13 @@ openAddForm();   // date = getLocalDateStr(), time = getRoundedLocalTimeStr(), s
   <pre><code>hasDistanceField = !!onDistanceChange &amp;&amp; isDistanceSport(sport)
 distanceCounts   = parseDistanceInput(distance, sport) !== undefined
 // distanceCounts → les trois crans d'effort sont disabled et à opacity-40</code></pre>
-  <p>L'effacement passe par <code>changeDistance</code> : <code>setDistance(value)</code>, puis <code>if (!value.trim()) setIntensity('douce')</code>. Le retour à « doux » n'a donc lieu que sur un champ vide ou blanc, pas sur une saisie devenue illisible.</p>
+  <p>L'effacement passe par <code>changeDistance</code> : <code>setDistance(value)</code>, puis <code>if (!value.trim()) setIntensity('douce')</code>. Le retour à « doux » n'a donc lieu que sur un champ vide ou blanc, pas sur une saisie non nulle que <code>parseDistanceInput</code> écarte.</p>
   <p>Au journal, <code>formatDistanceLabel(parseDistanceInput(brouillon, sport), sport)</code> décide de la seconde ligne : non nul → la distance s'affiche à la place de l'intensité ; nul → l'intensité. Une ligne sans distance n'expose donc aucun champ distance : elle ne s'ajoute que par « Modifier ».</p>
   <p>L'intensité reste écrite dans la ligne dans tous les cas : elle alimente encore la répartition par intensité du bloc de suivi et le partage.</p>
   <p class="ancre">src/versions/mixte/features/sport/SportForm.tsx · src/features/sport/useSportForm.ts · src/versions/mixte/features/sport/JournalEntryCard.tsx</p>
   <details><summary>Cas limites</summary>
     <p>Distance tapée sur un sport sans courbe : <code>parseDistanceInput</code> rend <code>undefined</code>, l'effort reste actif — mais le champ n'est pas dessiné pour ces sports.</p>
-    <p>Saisie illisible (« 0 », « abc ») : l'effort se rallume, sans revenir à « doux ».</p>
+    <p>« 0 » : <code>parseDistanceInput</code> rend <code>undefined</code>, l'effort se rallume, et l'intensité ne revient pas à « doux » puisque le champ n'est pas vide. Une saisie de lettres n'est pas un état atteignable : <code>cleanNumericInput</code> les retire à la frappe et le champ se vide.</p>
     <p>Édition en place où le sport change dans le même geste : le champ distance n'est pas relu — la valeur en mètres est conservée si le nouveau sport accepte une distance, supprimée sinon.</p>
   </details>
 
@@ -106,12 +107,13 @@ if (showCustomDuration &amp;&amp; !isAcceptable(customDuration, durationRule))
 if (isDistanceSport(sport) &amp;&amp; !isAcceptable(distance, distanceRule))
     refus.distance = boundsMessage(distanceRule)</code></pre>
   <p>Le tracker appelle cette fonction avant tout : si l'un des deux refus existe, il fait <code>e.preventDefault()</code>, mémorise les messages et sort — rien n'est enregistré, aucune félicitation n'est tirée. Sinon il vide les refus, tire la félicitation si ce n'est pas une correction, puis passe la main à <code>form.handleSubmit</code>.</p>
-  <p>Les messages s'affichent empilés juste avant le bouton, durée d'abord, distance ensuite. Effacement : retoucher la durée « Autre » efface <code>duration</code>, retoucher la distance efface <code>distance</code>, changer de sport ou de durée préréglée efface les deux, fermer ou rouvrir le formulaire aussi.</p>
+  <p>Les messages s'affichent empilés juste avant le bouton, durée d'abord, distance ensuite. Effacement, geste par geste : retoucher la durée « Autre » efface <code>duration</code> seul ; retoucher la distance efface <code>distance</code> seul ; <strong>choisir une durée préréglée efface <code>duration</code> seul</strong> — <code>selectDuration</code> ne touche pas au refus de distance ; changer de sport efface les deux (<code>setSubmitRefusals({})</code>) ; fermer, ouvrir ou rouvrir le formulaire aussi. <code>SurimpressionSport</code> écrit la même mécanique, à l'identique.</p>
   <p>Une durée <em>préréglée</em> n'est jamais jugée : seule la branche « Autre » l'est. En aval, <code>useSportForm.handleSubmit</code> refuse encore en silence si <code>parseInt</code> de la durée retenue est <code>NaN</code> ou ≤ 0.</p>
-  <p class="ancre">src/versions/mixte/features/sport/refusSaisieSport.ts · src/versions/mixte/features/sport/SportTracker.tsx</p>
+  <p class="ancre">src/versions/mixte/features/sport/refusSaisieSport.ts · src/versions/mixte/features/sport/SportTracker.tsx · src/versions/mixte/components/SurimpressionSport.tsx</p>
   <details><summary>Cas limites</summary>
     <p>Distance vide : <code>allowEmpty</code> est vrai sur les deux règles de distance, donc acceptée.</p>
-    <p>Distance illisible sur un sport à distance : refusée et dite, au lieu d'être enregistrée en silence comme « pas de distance ».</p>
+    <p>Distance <em>numérique</em> hors bornes sur un sport à distance (« 0 », « 0.05 » en km, « 2000 » en km) : refusée et dite. Une saisie de lettres, elle, est nettoyée à la frappe en chaîne vide, donc acceptée par <code>allowEmpty</code> et enregistrée en silence comme « pas de distance ».</p>
+    <p>Un refus de distance survit à un changement de durée préréglée : la distance n'ayant pas été retouchée, son message reste affiché, et le clic suivant la rejugera de toute façon.</p>
     <p>Les deux refus en même temps : les deux phrases s'empilent, l'enregistrement n'a pas lieu.</p>
     <p>Le même jugement est monté par la couche vitrée de la home : une seule écriture, deux écrans.</p>
   </details>
@@ -128,7 +130,7 @@ if (isDistanceSport(sport) &amp;&amp; !isAcceptable(distance, distanceRule))
   meters = unité === 'km' ? value * 1000 : value
   rounded = Math.round(meters)
   → rounded &gt; 0 ? rounded : undefined</code></pre>
-  <p>Les huit sports à distance, dans l'ordre du catalogue : Marche, Randonnée, Course à pied, Vélo, Natation, Rameur / Aviron, Ski de fond, Patinage / Roller. Ce sont exactement les clés de <code>SPEED_CURVES</code>.</p>
+  <p>Les huit sports à distance sont exactement les clés de <code>SPEED_CURVES</code> : <code>SPORTS_WITH_DISTANCE = Object.keys(SPEED_CURVES)</code>. Leur ordre est celui de la <em>déclaration</em> de <code>SPEED_CURVES</code> — Marche, Randonnée, Course à pied, Vélo, Natation, Rameur / Aviron, Ski de fond, Patinage / Roller — et non l'ordre alphabétique du catalogue <code>ALL_SPORTS</code>, qui les rangerait Course à pied, Marche, Natation, Patinage / Roller, Rameur / Aviron, Randonnée, Ski de fond, Vélo.</p>
   <p class="ancre">src/features/sport/sport.distance.ts · src/shared/body-metrics/sportCalories.ts</p>
   <details><summary>Cas limites</summary>
     <p>« 5,2 » à Vélo → 5200. « 1500 » en Natation → 1500. « 0.0001 » en Marche → 0,1 m arrondi à 0 → <code>undefined</code>. « 5 » en Yoga → <code>undefined</code>.</p>
@@ -240,7 +242,7 @@ fallbackEnd   = getLocalDateStr()</code></pre>
   </details>
 
   <h3 id="activite-affichage-d-une-distance">Affichage d'une distance</h3>
-  <p>Deux formateurs, une seule source en mètres.</p>
+  <p>Deux formateurs, une seule source en mètres. Tous deux commencent par les deux mêmes gardes.</p>
   <pre><code>formatDistanceLabel(m, sport)   // le journal, la bulle
   m absent / non fini / ≤ 0     → null
   !isDistanceSport(sport)       → null
@@ -248,15 +250,18 @@ fallbackEnd   = getLocalDateStr()</code></pre>
   sinon                         → `${parseFloat((m/1000).toFixed(1))} km`
 
 formatDistanceInput(m, sport)   // le champ de saisie
+  m absent / non fini / ≤ 0     → ''
+  !isDistanceSport(sport)       → ''
   unité === 'm'                 → Math.round(m)
   sinon                         → parseFloat((m/1000).toFixed(3))   // zéros de fin élagués</code></pre>
-  <p>Le séparateur décimal affiché est le point, partout. L'arrondi du journal est d'affichage seul : la valeur enregistrée garde son mètre.</p>
+  <p>Les deux gardes de <code>formatDistanceInput</code> sont ce qui fait qu'ouvrir « Modifier » sur une séance sans distance présente un champ vide et non « NaN ». Le séparateur décimal affiché est le point, partout. L'arrondi du journal est d'affichage seul : la valeur enregistrée garde son mètre.</p>
   <p class="ancre">src/features/sport/sport.distance.ts</p>
   <details><summary>Cas limites</summary>
     <p>42195 m en Course à pied → « 42.2 km » au journal, « 42.195 » dans le champ.</p>
     <p>400 m en Marche → « 400 m », jamais « 0.4 km ».</p>
     <p>1500 m en Natation → « 1500 m » : l'unité du sport l'emporte sur le seuil du kilomètre.</p>
     <p>5000 m → le champ affiche « 5 », pas « 5.000 ».</p>
+    <p><code>undefined</code>, ou une distance sur un sport sans courbe : le champ affiche la chaîne vide, le journal n'affiche pas la ligne de distance.</p>
   </details>
 
   <h3 id="activite-modification-et-suppression-d-une-ligne">Modification et suppression d'une ligne</h3>
@@ -330,7 +335,7 @@ met      = getMetForSpeed(sport, speedKmh)     // null si pas de courbe ou allur
 si met !== null → Math.round(met × weight × hours)
 sinon           → calculateSportCaloriesMET(…)</code></pre>
   <p><code>getMetForSpeed</code> interpole linéairement entre les deux ancrages qui encadrent l'allure, et <strong>bloque</strong> aux extrémités : sous le premier ancrage, le MET du premier ; au-dessus du dernier, le MET du dernier. L'intensité ressentie n'entre pas dans le calcul ; elle reste enregistrée.</p>
-  <p>Les courbes (allure km/h → MET), issues du Compendium of Physical Activities 2011 ; l'ancrage souligné vaut exactement le MET du catalogue.</p>
+  <p>Les courbes (allure km/h → MET), issues du Compendium of Physical Activities 2011, dans l'ordre de déclaration de <code>SPEED_CURVES</code> ; l'ancrage souligné vaut exactement le MET du catalogue.</p>
   <table>
     <thead><tr><th>Activité</th><th>Ancrages km/h → MET</th></tr></thead>
     <tbody>
@@ -354,25 +359,26 @@ sinon           → calculateSportCaloriesMET(…)</code></pre>
 
   <h3 id="activite-poids-a-une-date">Poids à une date</h3>
   <pre><code>getWeightAtDate(dateStr, weightHistory, profile):
-  depart = getStartingWeight(weightHistory)
+  depart = getStartingWeight(weightHistory)      // 0 quand il n'y a pas de pesée de départ
   si weightHistory vide → depart || profile?.targetWeight || 80
   trié = weightHistory trié par date croissante
   active = depart || profile?.targetWeight || trié[0]?.weight || 80
   pour w de trié : si w.date &lt;= dateStr → active = w.weight ; sinon arrêt
   → active</code></pre>
-  <p>La comparaison est faite sur des chaînes <code>AAAA-MM-JJ</code> : une pesée du jour même de la séance compte. La boucle s'arrête à la première pesée postérieure, ce qui suppose le tri chronologique fait juste avant.</p>
+  <p>La fonction ne rend jamais 0 : le dernier repli est 80 kg. La comparaison est faite sur des chaînes <code>AAAA-MM-JJ</code> : une pesée du jour même de la séance compte. La boucle s'arrête à la première pesée postérieure, ce qui suppose le tri chronologique fait juste avant.</p>
   <p>Chaque séance est valorisée au poids de <em>sa</em> date : ajouter une pesée aujourd'hui ne change pas les calories des séances antérieures.</p>
-  <p class="ancre">src/shared/body-metrics/bodyMetrics.utils.ts</p>
+  <p class="ancre">src/shared/body-metrics/bodyMetrics.utils.ts · src/shared/model/startingWeighIn.ts</p>
   <details><summary>Cas limites</summary>
     <p>Séance antérieure à toute pesée : le poids de départ ; à défaut le poids visé du profil ; à défaut la première pesée du tableau ; à défaut 80 kg.</p>
     <p>Deux pesées le même jour : la dernière du tableau trié l'emporte.</p>
+    <p>Historique de pesées vide et profil sans <code>targetWeight</code> : 80 kg.</p>
   </details>
   <div class="exemple"><p>Camille : 96 kg le 03/05/2026, 90 kg le 01/09/2026. Une séance du 20/08/2026 est calculée à 96 kg ; une séance du 12/09/2026 à 90 kg.</p></div>
 
   <h3 id="activite-score-d-activite-quotidien">Score d'activité quotidien</h3>
   <p>Le score ne regarde pas le MET du sport : seulement la durée et l'intensité — ressentie, ou déduite de l'allure sur la même échelle.</p>
   <pre><code>FACTOR_MIN = 0,8   FACTOR_MAX = 1,3
-SPORT_SCORE_WEIGHTED_MINUTES_FOR_MAX = 78     // 60 min × 1,3
+SPORT_SCORE_WEIGHTED_MINUTES_FOR_MAX = 78
 SPORT_SCORE_MAX = 10
 
 getSessionIntensity(log):
@@ -389,6 +395,7 @@ getWeightedMinutes(log):
   → minutes × factor
 
 getDailyActivityScore(logsDuJour) = min( Σ getWeightedMinutes / 78 × 10 , 10 )</code></pre>
+  <p>Le 78 est écrit en dur, sous le seul commentaire « les minutes pondérées qui valent le score plein sur une journée ». Le code ne le dérive de rien. <span class="marque">arbitrage non validé</span></p>
   <p>Le graphe arrondit ensuite à 0,1. Le plafond porte sur la journée entière, pas sur une séance : trois heures d'affilée ne valent pas trois journées.</p>
   <p class="ancre">src/shared/body-metrics/sportScore.ts</p>
   <details><summary>Cas limites</summary>
@@ -416,7 +423,7 @@ pour t de startMs à endMs par pas de step jours : un point</code></pre>
   <p class="ancre">src/features/sport/sport.utils.ts · src/features/sport/useSportChart.ts</p>
   <details><summary>Cas limites</summary>
     <p>« Depuis le début » sur un journal vide : les bornes retombent sur les sept derniers jours.</p>
-    <p>Poids absent (<code>weightHistory</code> par défaut vide) : la série de calories reste à zéro plutôt que d'inventer un poids.</p>
+    <p>Historique de pesées vide (<code>weightHistory = []</code> par défaut) : aucun court-circuit — <code>getCaloriesForLog</code> appelle <code>getWeightAtDate</code>, qui rend <code>profile.targetWeight</code>, à défaut 80 kg. La série de calories est donc calculée à ce poids de repli, pas laissée à zéro. Le commentaire du code (« Omis, la série de calories reste à zéro ») annonce l'inverse de ce que fait la fonction.</p>
     <p>Les minutes de la répartition par intensité additionnent <code>duration</code> sans convertir les étages : elles ne servent à aucun affichage.</p>
     <p>Un pas &gt; 1 saute des journées : les calories des jours sautés n'apparaissent dans aucun point, mais restent dans le total.</p>
   </details>
@@ -539,13 +546,14 @@ sportTrendKcalPerDay  = ( Σ sur les 14 dates de sportDayCalories(logs du jour, 
   </table>
   <p>La mécanique est commune. <code>cleanNumericInput</code> s'applique à chaque frappe : virgule → point, lettres et signe moins retirés, un seul point conservé, décimales tronquées au nombre autorisé. <code>sanitizeNumber</code> juge ensuite : vide accepté si <code>allowEmpty</code>, sinon refusé ; non fini refusé ; <code>&lt; min</code> ou <code>&gt; max</code> refusés ; la chaîne est rendue telle que nettoyée, sans reformatage, un point final orphelin retiré. <code>isAcceptable</code> est <code>sanitizeNumber(...) !== null</code>.</p>
   <p>Le <code>step</code> ne sert qu'aux flèches du clavier : il n'est pas vérifié à la validation. Les bornes hautes de distance et le plancher relevé à 0,1 km sont des propositions du code. <span class="marque">arbitrage non validé</span></p>
-  <p>Sur les champs de ce domaine, <code>validateOnSubmit</code> est posé : le champ garde la saisie fautive et ne dit rien lui-même — c'est le formulaire qui affiche le message. Dans une ligne de journal, le champ passe le message à la ligne par <code>onRefusal</code>.</p>
-  <p class="ancre">src/versions/mixte/app/form.rules.ts · src/shared/ui/numberRules.ts · src/shared/ui/NumberField.tsx</p>
+  <p>Deux comportements de sortie de champ, selon un opt-in. <code>validateOnSubmit</code> n'est posé que sur <strong>deux champs</strong> du domaine, tous deux dans <code>SportForm</code> : la durée « Autre » et la distance. Là, une saisie refusable <em>reste en place</em> à la sortie du champ, le champ ne dit rien, et c'est le clic sur Valider qui juge et écrit le message avant le bouton. Partout ailleurs — édition en place d'une ligne de journal, bulle du calendrier — le champ garde le comportement historique : à la sortie, il refuse et <strong>revient à la dernière valeur valable</strong>. Ces champs-là posent <code>showMessage={false}</code> et <code>onRefusal</code>, ce qui déplace seulement l'affichage du message vers la ligne, sans conserver la saisie fautive.</p>
+  <p class="ancre">src/versions/mixte/app/form.rules.ts · src/shared/ui/numberRules.ts · src/shared/ui/NumberField.tsx · src/versions/mixte/features/sport/SportForm.tsx · src/versions/mixte/features/sport/JournalEntryCard.tsx</p>
   <details><summary>Cas limites</summary>
     <p>47 minutes : accepté malgré le pas de 5.</p>
     <p>1505 m : accepté malgré le pas de 10.</p>
     <p>« 5,25 » en kilomètres : tronqué à « 5.2 » à la frappe, donc accepté.</p>
     <p>« 70. » en cours de frappe : le point final est retiré, la valeur retenue est « 70 ».</p>
+    <p>« 500 » tapé dans la durée d'une ligne de journal : à la sortie du champ, la ligne affiche le message et le champ retrouve sa valeur d'avant. Le même « 500 » dans le formulaire complet reste sous les yeux jusqu'au clic sur Valider.</p>
   </details>
 
   <h3 id="activite-bouton-tout-supprimer">Bouton « Tout supprimer »</h3>

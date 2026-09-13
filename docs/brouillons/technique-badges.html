@@ -34,18 +34,20 @@
   <p class="ancre">src/utils/badgeSystem.ts, src/utils/badgeCelebration.ts, src/types.ts</p>
 
   <h3 id="badges-ordre-des-paliers-de-badge">Ordre des paliers de badge</h3>
-  <p>Les cinq paliers sont une liste ordonnée unique ; le type <code>BadgeTier</code> en dérive et le rang est l'index dans cette liste. Aucun autre endroit du code ne réécrit cet ordre.</p>
+  <p>Les cinq paliers sont une liste ordonnée unique ; le type <code>BadgeTier</code> en dérive et le rang est l'index dans cette liste.</p>
   <pre><code>BADGE_TIERS_ASC = ['aucun', 'eveil', 'bronze', 'argent', 'or']
 badgeTierRank(t) = BADGE_TIERS_ASC.indexOf(t)      // 0 … 4
 isBadgeTier(v)   = typeof v === 'string' && BADGE_TIERS_ASC.includes(v)
 BADGE_TIER_LABELS = { aucun:'Aucun', eveil:'Éveil', bronze:'Bronze',
                       argent:'Argent', or:'Or' }</code></pre>
   <p>Deux paliers se comparent par leurs rangs. Les libellés servent à tout affichage : la pastille de la page écrit <code>BADGE_TIER_LABELS[tier].toUpperCase()</code>, ce qui donne « ÉVEIL » accentué. La bannière du dessin écrit le même libellé, sauf au palier <code>aucun</code> où elle écrit « NIVEAU ».</p>
-  <p class="ancre">src/utils/badgeSystem.ts, src/versions/mixte/components/badge/BadgeFrame.tsx</p>
+  <p>Cet ordre est écrit une fois, mais il n'est pas lu partout. La reprise du 2026-08-30 n'a converti que <code>src/versions/mixte/App.tsx</code> ; les thèmes sidéral et test de la version Mixte gardent chacun, dans leur propre <code>App.tsx</code>, une table de rangs locale antérieure au palier éveil : <code>or → 3, argent → 2, bronze → 1, sinon 0</code>. <code>eveil</code> y vaut donc 0 comme <code>aucun</code>, et une montée de <code>aucun</code> à <code>eveil</code> n'y fait monter aucun nombre : elle ne se fête pas. Des copies identiques de cette table existent hors du périmètre de la spécification.</p>
+  <p class="ancre">src/utils/badgeSystem.ts, src/versions/mixte/App.tsx, src/versions/mixte/themes/sideral/App.tsx, src/versions/mixte/themes/test/App.tsx, src/versions/mixte/components/badge/BadgeFrame.tsx</p>
   <details><summary>Cas limites</summary>
     <p>Valeur relue du stockage hors liste (<code>"bronze "</code>, une version antérieure) : <code>isBadgeTier</code> est faux, l'entrée est écartée à la lecture, le badge redevient « jamais observé ».</p>
     <p><code>badgeTierRank</code> d'une valeur hors liste rendrait −1 ; le filtre de lecture fait qu'aucun appel ne l'atteint.</p>
     <p>Le palier <code>aucun</code> a un libellé (« Aucun ») mais aucun écran ne l'emploie : un badge à <code>aucun</code> porte la pastille « À débloquer » ou « Inactif ».</p>
+    <p>Palier ajouté demain : il s'ordonne partout par la liste, sauf dans les deux tables locales des thèmes, qui le rangeraient à 0.</p>
   </details>
 
   <h3 id="badges-fenetres-et-donnees-comptees-par-les-badges">Fenêtres et données comptées par les badges</h3>
@@ -187,7 +189,7 @@ sinon aucun</code></pre>
   <div class="exemple"><p>Camille dépasse 8 000 pas quatre jours sur les sept derniers : argent, « 4/7j à ≥ 8 000 pas », l'objectif suivant étant l'or à cinq journées.</p></div>
 
   <h3 id="badges-sections-de-la-page-badges">Sections de la page Badges</h3>
-  <p>Les quatre définitions sont réparties en trois listes disjointes, calculées à chaque rendu de la page.</p>
+  <p>Trois listes disjointes sont calculées à chaque rendu de la page. Elles ne couvrent pas toujours les quatre définitions : un badge dont le module est éteint <em>et</em> masqué n'entre dans aucune.</p>
   <pre><code>actifs   = ALL_BADGE_DEFINITIONS filtrées par categoryEnabled(profile)
 debloques = actifs, évalués, dont tier !== 'aucun'
 aDebloquer = actifs, évalués, dont tier === 'aucun'
@@ -245,13 +247,16 @@ px = sizePxOverride || pixelSizes[size]
 conteneur : width = height = px
 svg : width = height = px, viewBox = "0 0 120 120"
 classe du svg : tier === 'aucun' ? 'drop-shadow-md saturate-[.65]' : 'drop-shadow-md'</code></pre>
-  <p>La désaturation à 65 % du palier <code>aucun</code> est appliquée à un seul endroit, sur le <code>&lt;svg&gt;</code> ; le conteneur ne la reprend pas. Emplois : <code>lg</code> (80) sur les cartes des trois sections, <code>xl</code> (112) pour le badge en grand, <code>sm</code> (36) sur le pavé du bloc Salut. Deux surcharges par <code>sizePxOverride</code> : 52 px pour un badge seul sur la home standard et 36 px à partir de deux, 460 px pour le dessin sérialisé de la carte de partage. Sur la home compacte, la surcharge est nulle et la taille vient de classes utilitaires — <code>clamp(30px, 11.2cqw, 51px)</code> à un badge, <code>clamp(26px, 11cqw, 50px)</code> à deux, <code>clamp(20px, 7.5cqw, 34px)</code> au-delà, le <code>&lt;svg&gt;</code> étant forcé à 100 % du conteneur.</p>
+  <p>La désaturation à 65 % du palier <code>aucun</code> est appliquée à un seul endroit, sur le <code>&lt;svg&gt;</code> ; le conteneur ne la reprend pas.</p>
+  <p>Emplois dans la version Mixte : <code>lg</code> (80) sur les cartes des trois sections de la page Badges ; <code>xl</code> (112) pour le badge en grand de cette page, pour le bloc de célébration, pour les deux dessins de la page Félicitations et pour la maquette de partage d'un badge seul ; <code>md</code> (56, la valeur par défaut) pour les quatre dessins de la maquette « Ma collection de badges » ; <code>sm</code> (36) sur le pavé du bloc Salut. <code>xs</code> (28) n'est employé nulle part.</p>
+  <p>Trois sites d'appel passent <code>sizePxOverride</code>. Sur la home standard : 52 px quand un seul badge est débloqué et 36 px à partir de deux ; 52 px pour le faux badge « ? », qui prend la place quand aucun badge n'est débloqué. Et 460 px pour le dessin sérialisé de la carte de partage. Sur la home compacte, la surcharge est nulle et la taille vient de classes utilitaires — <code>clamp(30px, 11.2cqw, 51px)</code> à un badge et pour le faux badge, <code>clamp(26px, 11cqw, 50px)</code> à deux, <code>clamp(20px, 7.5cqw, 34px)</code> au-delà, le <code>&lt;svg&gt;</code> étant forcé à 100 % du conteneur.</p>
   <p>Le dessin est choisi sur l'identifiant : <code>lapin</code>, <code>athlete</code> (kangourou), <code>kangourou</code> et <code>requin</code> (requin), <code>herisson</code>, <code>placeholder</code> (cocarde au point d'interrogation) ; tout autre identifiant rend l'emoji 🏆.</p>
-  <p class="ancre">src/versions/mixte/components/BadgeIcon.tsx, src/versions/mixte/components/badge/BadgeFrame.tsx, src/versions/mixte/components/SalutBlock.tsx</p>
+  <p class="ancre">src/versions/mixte/components/BadgeIcon.tsx, src/versions/mixte/components/badge/BadgeFrame.tsx, src/versions/mixte/components/SalutBlock.tsx, src/versions/mixte/components/BadgesPage.tsx, src/versions/mixte/components/UnlockedBadgeBlock.tsx, src/versions/mixte/components/FelicitationsPage.tsx, src/versions/mixte/components/share/shareTemplates.tsx, src/utils/badgeCardImage.ts</p>
   <details><summary>Cas limites</summary>
     <p><code>sizePxOverride = 0</code> : l'opérateur est <code>||</code> et non <code>??</code>, la table reprend la main.</p>
     <p>Les classes utilitaires de la home compacte s'appliquent par-dessus les attributs <code>width</code> / <code>height</code> du <code>&lt;svg&gt;</code> ; elles portent <code>!</code> pour l'emporter.</p>
     <p>Le pavé n'est dimensionné que pour un à quatre badges : le catalogue n'en définit que quatre.</p>
+    <p>Maquettes de partage : un badge à <code>aucun</code> y est dessiné en <code>bronze</code>, donc jamais désaturé.</p>
     <p>Le <code>&lt;svg&gt;</code> sérialisé pour la carte de partage sort du DOM : les classes de thème ne s'y appliquent pas, seules les couleurs écrites en attribut sont peintes.</p>
   </details>
 
@@ -270,18 +275,19 @@ classe du svg : tier === 'aucun' ? 'drop-shadow-md saturate-[.65]' : 'drop-shado
     aFeter.push({ badge: def, tier, progressText, nextTierDesc })
   → { connus: suivants, aFeter }</code></pre>
   <p>Mémoire : clé <code>glp1_badge_tiers_connus</code> du stockage local, en JSON, distincte de la sauvegarde des données. <code>lireBadgeTiersConnus</code> rend <code>null</code> si la clé est absente, si la valeur n'est pas un objet ou si c'est un tableau ; sinon elle ne garde que les entrées dont la valeur passe <code>isBadgeTier</code>.</p>
-  <p>Câblage : un effet dépendant de <code>appData</code> lit l'état connu dans une <code>ref</code> de session, ou dans le stockage au premier passage ; il réécrit ensuite la <code>ref</code> et le stockage à chaque passe, et empile les montées dans la file du bloc de célébration au lieu de la remplacer. <a href="spec-fonctionnelle.html#badges-celebration-d-un-palier">→ fonctionnelle</a></p>
-  <p class="ancre">src/utils/badgeCelebration.ts, src/versions/mixte/App.tsx</p>
+  <p>Câblage dans <code>src/versions/mixte/App.tsx</code> : un effet dépendant de <code>appData</code> lit l'état connu dans une <code>ref</code> de session, ou dans le stockage au premier passage ; il réécrit ensuite la <code>ref</code> et le stockage à chaque passe, et empile les montées dans la file du bloc de célébration au lieu de la remplacer. Les thèmes sidéral et test de la version Mixte gardent l'effet antérieur : mémoire de session seule, sans stockage, entièrement reconstruite à chaque passe, et comparaison par leur table de rangs locale. <a href="spec-fonctionnelle.html#badges-celebration-d-un-palier">→ fonctionnelle</a></p>
+  <p class="ancre">src/utils/badgeCelebration.ts, src/versions/mixte/App.tsx, src/versions/mixte/themes/sideral/App.tsx</p>
   <details><summary>Cas limites</summary>
     <p>Première ouverture, historique importé, jeu de démonstration : <code>connus</code> est <code>null</code>, chaque <code>connu</code> vaut <code>undefined</code>, rien n'est fêté et les paliers sont retenus.</p>
     <p>Module allumé pour la première fois : ses badges sont découverts, donc silencieux.</p>
     <p>Palier qui baisse (les journées sortent de la fenêtre) : <code>suivants</code> enregistre la baisse, <code>aFeter</code> reste vide ; le remonter dépasse alors le palier connu et se fête.</p>
     <p>Module éteint : la définition est sautée, son entrée survit dans <code>suivants</code> parce que la passe part de <code>connus</code>. Rallumé au même palier, les rangs sont égaux, rien ne se fête ; rallumé plus haut, la montée se fête une fois.</p>
-    <p>Stockage effacé ou autre appareil : la lecture rend <code>null</code>, la passe suivante est muette et réinscrit les quatre paliers.</p>
+    <p>Stockage effacé ou autre appareil : la lecture rend <code>null</code>, la passe suivante est muette et n'inscrit que les paliers des badges dont le module est actif. Le profil par défaut porte les trois drapeaux à <code>false</code> : sur un profil neuf, la passe écrit <code>{}</code>.</p>
     <p>Valeur abîmée sous la clé : écartée à la lecture, le badge redevient « jamais observé » et sa prochaine passe est muette.</p>
     <p><code>setItem</code> échoue silencieusement (navigation privée, quota) : la <code>ref</code> de session tient la comparaison jusqu'au rechargement, après quoi tout redevient découverte.</p>
     <p>Plusieurs badges montent dans la même passe : tous sont empilés, le bloc les enchaîne.</p>
     <p>La passe se relance à chaque écriture de <code>appData</code>, profil compris — allumer un module déclenche donc une passe.</p>
+    <p>Thèmes sidéral et test : leur mémoire ne part pas de l'état connu, un module éteint y perd son entrée ; rallumé, son badge repasse par <code>aucun</code> et se fête une seconde fois.</p>
   </details>
   <div class="exemple"><p>Le Hérisson Marcheur de Camille est argent, et <code>{"herisson":"argent"}</code> est en mémoire. Elle éteint le module Nombre de Pas : la définition est sautée, l'entrée reste. Elle le rallume : rang 3 contre rang 3, <code>&lt;=</code>, rien n'est fêté.</p></div>
 

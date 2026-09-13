@@ -16,7 +16,7 @@
    "categorie": "affichage",
    "fonctionnalite": "Zone recommandée et rotation d'ordre fixe",
    "texte": "L'écran signale la zone recommandée (la plus anciennement employée) et la prochaine zone de rotation.",
-   "origine": "`getRecommendedSite` et `nextRotationSite` sont exportées et testées, et `useInjectionSiteStats` calcule `recommendedSite` à chaque rendu, mais aucun composant de `src/versions/mixte` (hors thèmes, hors périmètre) ne les consomme. Seules l'Initiale et Cartes les affichaient, et ces versions n'existent pas."
+   "origine": "`getRecommendedSite` et `nextRotationSite` sont exportées et testées, et `useInjectionSiteStats` calcule `recommendedSite` à chaque rendu, mais aucun composant de `src/versions/mixte` (hors thèmes, hors périmètre) ne les consomme. Seules l'Initiale et Cartes les affichaient, et ces versions n'existent pas. Précision apportée par la réfutation, retenue : `nextRotationSite` est bien appelée par les `InjectionsTracker` des thèmes `sideral` et `test` (src/versions/mixte/themes/sideral/features/injections/InjectionsTracker.tsx:17 et :64-67) — le chapitre ne dit plus « aucun écran de la Mixte », mais « aucun écran hors thèmes »."
   },
   {
    "categorie": "affichage",
@@ -46,395 +46,381 @@
    "categorie": "seuil",
    "fonctionnalite": "Fenêtre du « pic en cours » d'un comprimé",
    "texte": "Les vingt minutes tiennent à la pente de la courbe orale, mesurée sur le modèle.",
-   "origine": "La constante `PEAK_WINDOW_ORAL_HOURS = 20 / 60` est posée en dur avec un commentaire de justification qualitative (« un comprimé culmine environ une heure après la prise »). Aucun calcul du code ne dérive cette valeur : je ne peux pas la présenter comme mesurée."
+   "origine": "La constante `PEAK_WINDOW_ORAL_HOURS = 20 / 60` est posée en dur avec un commentaire de justification qualitative (« un comprimé culmine environ une heure après la prise »). Aucun calcul du code ne dérive cette valeur : je ne peux pas la présenter comme mesurée. La phrase du chapitre qui reprenait cette justification (« qui culmine environ une heure après la prise et se répète chaque jour ») a été retirée."
+  },
+  {
+   "categorie": "règle",
+   "fonctionnalite": "Ouverture automatique du formulaire de prise",
+   "texte": "`autoOpenAdd` est l'état initial de `showAddForm`, pas un effet.",
+   "origine": "Réfutation retenue : `useInjectionForm.ts:55` pose bien `useState(autoOpenAdd ?? false)`, MAIS :107-111 garde `useEffect(() => { if (autoOpenAdd) openAddForm(); }, [autoOpenAdd])`, qui s'exécute aussi au montage et repose date, heure, zone et défilement. Le « pas un effet » masquait ces effets de bord ; le chapitre décrit désormais les deux mécanismes."
+  },
+  {
+   "categorie": "règle",
+   "fonctionnalite": "Édition en place d'une ligne de prise",
+   "texte": "Le brouillon est validé par une seule fonction de commit, commune au journal et à la bulle du calendrier.",
+   "origine": "Réfutation retenue : il y a deux fonctions. `InjectionCalendar.tsx:186-209` (bulle) n'écrit pas `notes` et ne les met pas dans son test d'inchangé, contrairement à `JournalEntryCard.tsx:63-85`. Le chapitre donne maintenant les deux."
+  },
+  {
+   "categorie": "seuil",
+   "fonctionnalite": "Table des paramètres pharmacocinétiques",
+   "texte": "normFactor : Mounjaro/Zepbound 1,357 ; Saxenda/Victoza 1,532 ; Trulicity 1,406 ; Rétatrutide 1,374 ; Foundayo 1,081 ; Autre comprimé 1,073 avec tMax 7,5 h.",
+   "origine": "Réfutations retenues, valeurs recalculées à partir de `getPKParameters` (src/utils/pharmacokinetics.ts:26-32) et des fiches du catalogue : 1,435 · 1,833 · 1,534 · 1,367 · 1,103 · 1,055 avec tMax 10,20 h. Deux `ke` étaient tronqués au lieu d'être arrondis (rétatrutide 0,004814, Foundayo 0,01925). Ces valeurs étaient reconstituées, pas calculées ; la table corrigée les tient de la formule appliquée aux demi-vies des fiches."
   }
  ],
  "glossaire": [
   {
-   "terme": "Fiche (Treatment)",
-   "definition": "Entrée du catalogue en dur : identifiant, nom, libellé, forme, molécule, paliers, demi-vies, biodisponibilité relative, rythme, drapeau de certification. Seul l'identifiant est enregistré dans les données."
-  },
-  {
-   "terme": "Identifiant de traitement (brand)",
-   "definition": "Clé du catalogue (`ozempic`, `wegovy-oral`, `aucun`…), unique valeur stockée pour désigner un traitement. Sur une ligne de journal, son absence signifie « le traitement du profil », pas « aucun »."
-  },
-  {
-   "terme": "Traitement résolu",
-   "definition": "Résultat de `resolveTreatmentId(log.brand, profile.glp1Brand)` : l'identifiant de la ligne, à défaut celui du profil, à défaut `'aucun'`."
-  },
-  {
-   "terme": "Forme (form)",
-   "definition": "`'injection'` ou `'oral'`. Lue dans la fiche, jamais devinée dans le nom. Commande les libellés, l'icône, la présence d'une zone et le rythme par défaut."
-  },
-  {
-   "terme": "Molécule",
-   "definition": "Principe actif de la fiche (`sémaglutide`, `tirzépatide`…), ou `null` pour les entrées génériques. Clé de cumul des courbes de concentration."
-  },
-  {
-   "terme": "Clé de molécule (moleculeKeyOf)",
-   "definition": "La molécule de la fiche quand elle est connue, sinon l'identifiant du traitement. Les entrées génériques restent donc chacune dans leur groupe."
-  },
-  {
-   "terme": "Groupe de molécule (MoleculeGroup)",
-   "definition": "Ensemble des prises partageant une clé de molécule, avec ses traitements, formes et noms rangés de la prise la plus récente à la plus ancienne."
-  },
-  {
-   "terme": "Molécule active (ActiveMolecule)",
-   "definition": "Groupe dont la concentration cumulée à l'instant présent dépasse 0,001 mg, enrichi de sa courbe, de sa cinétique représentante et de sa fenêtre de pic."
+   "terme": "Bateman (modèle de)",
+   "definition": "Modèle pharmacocinétique à un compartiment avec absorption du premier ordre : concentration proportionnelle à e^(−ke·t) − e^(−ka·t). Appliqué ici sur toute la courbe, montée et descente."
   },
   {
    "terme": "ke",
-   "definition": "Constante d'élimination, en h⁻¹ : ln 2 divisé par la demi-vie d'élimination."
+   "definition": "Constante d'élimination, en h⁻¹ : ln 2 / halfLifeHours."
   },
   {
    "terme": "ka",
-   "definition": "Constante d'absorption, en h⁻¹ : ln 2 divisé par la demi-vie d'absorption."
+   "definition": "Constante d'absorption, en h⁻¹ : ln 2 / absorptionHalfLifeHours."
   },
   {
    "terme": "tMax",
-   "definition": "Délai du pic d'une dose isolée, en heures : ln(ka / ke) / (ka − ke)."
+   "definition": "Instant du pic d'une dose isolée, en heures : ln(ka / ke) / (ka − ke)."
   },
   {
    "terme": "normFactor",
-   "definition": "Facteur de normalisation 1 / (e^(−ke·tMax) − e^(−ka·tMax)), qui fait que le pic d'une prise vaut exactement dose × doseScale."
+   "definition": "Facteur de normalisation 1 / (e^(−ke·tMax) − e^(−ka·tMax)), qui porte le maximum d'une dose isolée à exactement dose × doseScale."
   },
   {
    "terme": "doseScale",
-   "definition": "Biodisponibilité relative à l'injection, portée par la fiche. Défaut 1 ; 0,008 pour le sémaglutide oral. C'est ce qui rend légitime l'addition de deux formes sur une même courbe."
+   "definition": "Biodisponibilité relative de la fiche, défaut 1. Rend comparables les courbes d'un comprimé et d'une injection de la même molécule (0,008 pour le sémaglutide oral)."
   },
   {
-   "terme": "Modèle de Bateman à un compartiment",
-   "definition": "Contribution d'une prise à l'instant t : dose × doseScale × (e^(−ke·t) − e^(−ka·t)) × normFactor, nulle avant la prise. Appliqué sur toute la courbe, montée et descente."
+   "terme": "molécule (clé de groupe)",
+   "definition": "moleculeKeyOf(id) = fiche.molecule ?? id. Clé de cumul des courbes : deux marques de la même molécule tracent un seul graphe."
   },
   {
-   "terme": "PKDataPoint",
-   "definition": "Point de courbe : horodatage, étiquette de date, concentration arrondie à quatre décimales, drapeau de prise et dose cumulée sur ce point."
-  },
-  {
-   "terme": "Fenêtre du pic (peakWindowHours)",
-   "definition": "Demi-largeur du « pic en cours » : douze heures pour une injection, vingt minutes pour un comprimé, selon la forme de la dernière prise faite."
-  },
-  {
-   "terme": "Sommet local",
-   "definition": "Point intérieur de la courbe strictement plus haut que son voisin de gauche et au moins égal à celui de droite. Les extrémités ne comptent pas."
-  },
-  {
-   "terme": "Rapport creux / pic à l'équilibre",
-   "definition": "Rapport de la concentration juste avant la prise suivante à celle du pic, calculé sur la superposition de prises régulières et dit par paliers de langage."
-  },
-  {
-   "terme": "Série du traitement en cours",
-   "definition": "Suite finale des lignes du traitement résolu du profil, depuis le dernier changement de traitement. Sa version filtrée écarte d'abord les prises non survenues."
-  },
-  {
-   "terme": "Coupure au changement de traitement",
-   "definition": "Règle qui remonte le journal depuis la dernière ligne et s'arrête à la première ligne d'un autre traitement : revenir à un traitement déjà pris ne rouvre pas son ancien épisode."
+   "terme": "resolveTreatmentId",
+   "definition": "Repli en cascade log.brand || profil.glp1Brand || 'aucun', par lequel une ligne nomme son traitement."
   },
   {
    "terme": "hasOccurred",
-   "definition": "Prédicat « cette entrée a déjà eu lieu » : vrai avant aujourd'hui, faux après, et le jour même vrai sans heure ou si l'heure est atteinte."
+   "definition": "Prédicat « la prise est survenue » : date antérieure à aujourd'hui, ou date du jour avec une heure déjà passée ; une ligne sans heure compte pour toute la journée en cours."
   },
   {
-   "terme": "Palier de dose",
-   "definition": "Groupe de prises consécutives de même dose dans la série en cours ; sa fenêtre court jusqu'au début du palier suivant, ou jusqu'à aujourd'hui pour le dernier."
+   "terme": "série du traitement en cours",
+   "definition": "Suite des prises consécutives, en fin d'historique, résolvant vers le traitement du profil. Coupée dès qu'une ligne d'un autre traitement est rencontrée en remontant."
   },
   {
-   "terme": "Fenêtre temporelle (TimeWindow)",
-   "definition": "7, 14, 30, 90 derniers jours, « Depuis le début » ou « Choisir ». Coupure = aujourd'hui − (n − 1) jours, jour courant inclus, sans borne haute."
+   "terme": "palier",
+   "definition": "Suite de prises consécutives de même dose dans la série en cours. Sa fenêtre court de sa première prise au début du palier suivant, ou à aujourd'hui."
   },
   {
-   "terme": "Minutes rondes",
-   "definition": "0, 10, 15, 20, 30, 40, 45, 50. Toute heure enregistrée y est ramenée par arrondi vers le bas, au moment de l'écriture."
+   "terme": "rawChartData / peakChartData",
+   "definition": "Deux échantillonnages du même cumul : rawChartData inclut les prises à venir et alimente le tracé ; peakChartData n'inclut que les prises faites et alimente la phrase du pic."
+  },
+  {
+   "terme": "fenêtre temporelle",
+   "definition": "7days, 14days, 30days, 90days, all ou custom. Coupure calculée en chaîne de date locale, sans borne haute pour les fenêtres fixes."
+  },
+  {
+   "terme": "plafond quotidien",
+   "definition": "Deux prises par date de prise. La troisième écrase la dernière ligne du tableau portant cette date, avec un avis ; elle n'est pas refusée."
+  },
+  {
+   "terme": "snapToRoundedMinutes",
+   "definition": "Arrondi de l'heure vers le bas sur [0, 10, 15, 20, 30, 40, 45, 50] minutes, appliqué à l'écriture de toute ligne."
   },
   {
    "terme": "RULE_DOSE",
-   "definition": "Règle numérique de la dose : minimum 0,001 mg, maximum 1 000 000 mg, trois décimales, pas clavier 0,25, message unique."
+   "definition": "Règle numérique de la dose : min 0,001 mg, max 1 000 000 mg, 3 décimales, pas 0,25, unité mg."
   },
   {
-   "terme": "Zone (site)",
-   "definition": "Clé de SITE_LABELS : six zones corporelles latéralisées, plus `prise_orale`. Chaque zone porte un libellé, une zone anatomique et un côté."
+   "terme": "SITE_LABELS",
+   "definition": "Table canonique des zones : six zones corporelles (area + side) et prise_orale. Source unique des libellés et des initiales."
   },
   {
-   "terme": "Initiales de zone",
-   "definition": "Initiale de la zone anatomique suivie de celle du côté (« AG », « CD »), dérivées de SITE_LABELS. Chaîne vide pour un comprimé ou une zone sans côté."
+   "terme": "siteInitials",
+   "definition": "Deux lettres dérivées de la table (area[0] + side[0]) ; chaîne vide dès que side n'est ni « Gauche » ni « Droit », donc pour prise_orale."
   },
   {
-   "terme": "Module Traitement",
-   "definition": "Interrupteur de la page et de ses entrées de navigation, commandé par `treatmentTrackingEnabled` — dont l'absence vaut allumé — et masquable seulement une fois éteint."
+   "terme": "semaine de cure",
+   "definition": "floor(totalDays / 7) + 1, où totalDays est l'écart en jours entiers entre deux minuits locaux. Nulle si la date de départ est future."
+  },
+  {
+   "terme": "averageWeeklyChange",
+   "definition": "Pente hebdomadaire du poids sur une fenêtre : (dernier − premier) × 7 / jours, à une décimale ; null sous deux pesées ou sous sept jours."
+  },
+  {
+   "terme": "module éteint / masqué",
+   "definition": "treatmentTrackingEnabled absent vaut allumé ; treatmentModuleHidden ne mord que si le module est éteint."
   }
  ],
  "index": [
-  {
-   "terme": "Bateman (modèle de)",
-   "ancre": "traitement-concentration-d-une-prise-bateman-complet"
-  },
-  {
-   "terme": "Biodisponibilité relative (doseScale)",
-   "ancre": "traitement-catalogue-des-traitements"
-  },
-  {
-   "terme": "Calendrier des prises (arrondi des tuiles)",
-   "ancre": "traitement-calendrier-rangement-et-arrondi-des-tuiles"
-  },
-  {
-   "terme": "Catalogue des traitements",
-   "ancre": "traitement-catalogue-des-traitements"
-  },
-  {
-   "terme": "Certification d'essai clinique",
-   "ancre": "traitement-certification-d-essai-clinique"
-  },
-  {
-   "terme": "Changement de traitement",
-   "ancre": "traitement-changement-de-traitement"
-  },
-  {
-   "terme": "Concentration cumulée",
-   "ancre": "traitement-concentration-cumulee"
-  },
-  {
-   "terme": "Coupure au changement de traitement",
-   "ancre": "traitement-serie-du-traitement-en-cours"
-  },
-  {
-   "terme": "Creux à l'équilibre",
-   "ancre": "traitement-textes-evolution-du-niveau-sanguin"
-  },
-  {
-   "terme": "Demi-vie d'absorption",
-   "ancre": "traitement-parametres-pharmacocinetiques"
-  },
-  {
-   "terme": "Demi-vie d'élimination",
-   "ancre": "traitement-parametres-pharmacocinetiques"
-  },
-  {
-   "terme": "Dose (règle de saisie)",
-   "ancre": "traitement-regle-de-dose-rule-dose"
-  },
-  {
-   "terme": "Dose active à une date",
-   "ancre": "traitement-graphe-poids-vs-traitement-domaine-poids-donnees-de-traiteme"
-  },
-  {
-   "terme": "Dose initiale / actuelle",
-   "ancre": "traitement-doses-de-la-home"
-  },
-  {
-   "terme": "Édition en place",
-   "ancre": "traitement-edition-en-place-de-la-dose-journal-bulle"
-  },
-  {
-   "terme": "Enregistrement d'une prise",
-   "ancre": "traitement-enregistrement-d-une-prise"
-  },
-  {
-   "terme": "Entités du domaine",
-   "ancre": "traitement-entites"
-  },
-  {
-   "terme": "Équilibre (steady state)",
-   "ancre": "traitement-textes-comprendre-vos-sensations"
-  },
-  {
-   "terme": "Fenêtres temporelles",
-   "ancre": "traitement-fenetres-temporelles"
-  },
-  {
-   "terme": "Forme galénique",
-   "ancre": "traitement-forme-et-absence-de-traitement"
-  },
-  {
-   "terme": "Fréquence observée des prises",
-   "ancre": "traitement-frequence-observee-des-prises"
-  },
-  {
-   "terme": "getTreatment",
-   "ancre": "traitement-catalogue-des-traitements"
-  },
-  {
-   "terme": "Graphe de concentration (affichage)",
-   "ancre": "traitement-affichage-du-graphe-de-concentration"
-  },
-  {
-   "terme": "Graphe poids contre traitement",
-   "ancre": "traitement-graphe-poids-vs-traitement-domaine-poids-donnees-de-traiteme"
-  },
-  {
-   "terme": "hasOccurred",
-   "ancre": "traitement-serie-du-traitement-en-cours"
-  },
-  {
-   "terme": "Heure absente (repli à midi)",
-   "ancre": "traitement-tri-du-journal"
-  },
-  {
-   "terme": "Icône du traitement",
-   "ancre": "traitement-libelles-et-icone-selon-la-forme"
-  },
-  {
-   "terme": "Identifiant de ligne (inj-)",
-   "ancre": "traitement-plafond-quotidien-et-identifiant"
-  },
-  {
-   "terme": "Initiales de zone",
-   "ancre": "traitement-zones-d-injection-et-initiales"
-  },
   {
    "terme": "InjectionLog",
    "ancre": "traitement-entites"
   },
   {
-   "terme": "ka, ke, tMax, normFactor",
+   "terme": "Treatment (fiche du catalogue)",
+   "ancre": "traitement-catalogue-des-traitements"
+  },
+  {
+   "terme": "catalogue des traitements",
+   "ancre": "traitement-catalogue-des-traitements"
+  },
+  {
+   "terme": "doseScale",
    "ancre": "traitement-parametres-pharmacocinetiques"
   },
   {
-   "terme": "Libellés des paliers",
-   "ancre": "traitement-libelles-des-paliers"
+   "terme": "normFactor",
+   "ancre": "traitement-parametres-pharmacocinetiques"
   },
   {
-   "terme": "Libellé nettoyé du sélecteur",
-   "ancre": "traitement-nettoyage-du-libelle-dans-le-selecteur"
+   "terme": "ke",
+   "ancre": "traitement-parametres-pharmacocinetiques"
   },
   {
-   "terme": "Migration des identifiants",
-   "ancre": "traitement-conversion-des-valeurs-enregistrees-en-identifiants"
+   "terme": "ka",
+   "ancre": "traitement-parametres-pharmacocinetiques"
   },
   {
-   "terme": "Minutes rondes",
-   "ancre": "traitement-valeurs-par-defaut-du-formulaire"
+   "terme": "tMax",
+   "ancre": "traitement-parametres-pharmacocinetiques"
   },
   {
-   "terme": "Modification (ouverture en)",
-   "ancre": "traitement-ouverture-en-modification"
+   "terme": "Bateman (modèle)",
+   "ancre": "traitement-concentration-d-une-prise-bateman-complet"
   },
   {
-   "terme": "Module Traitement",
-   "ancre": "traitement-module-traitement"
+   "terme": "concentration cumulée",
+   "ancre": "traitement-concentration-cumulee"
   },
   {
-   "terme": "Molécules actives",
-   "ancre": "traitement-molecules-actives"
-  },
-  {
-   "terme": "Niveau en direct (home)",
-   "ancre": "traitement-niveau-en-direct-de-la-home"
-  },
-  {
-   "terme": "Ordre des graphes",
-   "ancre": "traitement-ordre-des-graphes"
-  },
-  {
-   "terme": "Paliers de dose",
-   "ancre": "traitement-paliers-de-dose"
-  },
-  {
-   "terme": "Partage d'une prise",
-   "ancre": "traitement-partage-d-une-injection"
-  },
-  {
-   "terme": "Pic (délai écrit)",
-   "ancre": "traitement-ecriture-du-delai-du-pic"
-  },
-  {
-   "terme": "Pic (statut)",
-   "ancre": "traitement-statut-du-pic"
-  },
-  {
-   "terme": "Plafond quotidien",
-   "ancre": "traitement-plafond-quotidien-et-identifiant"
-  },
-  {
-   "terme": "Points de la courbe",
+   "terme": "points de courbe",
    "ancre": "traitement-points-de-la-courbe"
   },
   {
-   "terme": "Rappels d'injection",
-   "ancre": "traitement-rappels-d-injection"
+   "terme": "statut du pic",
+   "ancre": "traitement-statut-du-pic"
   },
   {
-   "terme": "Rapport PDF (traitement)",
-   "ancre": "traitement-rapport-pdf-traitement"
+   "terme": "délai du pic (écriture)",
+   "ancre": "traitement-ecriture-du-delai-du-pic"
   },
   {
-   "terme": "Regroupement par molécule",
+   "terme": "molécules actives",
+   "ancre": "traitement-molecules-actives"
+  },
+  {
+   "terme": "regroupement par molécule",
    "ancre": "traitement-regroupement-par-molecule"
+  },
+  {
+   "terme": "ordre des graphes",
+   "ancre": "traitement-ordre-des-graphes"
+  },
+  {
+   "terme": "graphe de concentration",
+   "ancre": "traitement-affichage-du-graphe-de-concentration"
+  },
+  {
+   "terme": "Évolution du niveau sanguin (textes)",
+   "ancre": "traitement-textes-evolution-du-niveau-sanguin"
+  },
+  {
+   "terme": "Comprendre vos sensations (textes)",
+   "ancre": "traitement-textes-comprendre-vos-sensations"
+  },
+  {
+   "terme": "creux à l'équilibre",
+   "ancre": "traitement-textes-evolution-du-niveau-sanguin"
+  },
+  {
+   "terme": "niveau en direct",
+   "ancre": "traitement-niveau-en-direct-de-la-home"
+  },
+  {
+   "terme": "série du traitement en cours",
+   "ancre": "traitement-serie-du-traitement-en-cours"
+  },
+  {
+   "terme": "hasOccurred",
+   "ancre": "traitement-serie-du-traitement-en-cours"
+  },
+  {
+   "terme": "semaine de cure",
+   "ancre": "traitement-semaine-de-cure-et-compte-de-jours"
+  },
+  {
+   "terme": "doses de la home",
+   "ancre": "traitement-doses-de-la-home"
+  },
+  {
+   "terme": "paliers de dose",
+   "ancre": "traitement-paliers-de-dose"
+  },
+  {
+   "terme": "variation de poids par palier",
+   "ancre": "traitement-variation-de-poids-par-palier"
+  },
+  {
+   "terme": "fenêtres temporelles",
+   "ancre": "traitement-fenetres-temporelles"
+  },
+  {
+   "terme": "tri du journal",
+   "ancre": "traitement-tri-du-journal"
+  },
+  {
+   "terme": "plafond quotidien",
+   "ancre": "traitement-plafond-quotidien-et-identifiant"
+  },
+  {
+   "terme": "changement de traitement",
+   "ancre": "traitement-changement-de-traitement"
   },
   {
    "terme": "resolveTreatmentId",
    "ancre": "traitement-resolution-du-traitement-d-une-ligne"
   },
   {
-   "terme": "Rotation d'ordre fixe",
+   "terme": "certification d'essai clinique",
+   "ancre": "traitement-certification-d-essai-clinique"
+  },
+  {
+   "terme": "cleanTreatmentLabel",
+   "ancre": "traitement-nettoyage-du-libelle-dans-le-selecteur"
+  },
+  {
+   "terme": "toTreatmentId / migration",
+   "ancre": "traitement-conversion-des-valeurs-enregistrees-en-identifiants"
+  },
+  {
+   "terme": "isOralMedication",
+   "ancre": "traitement-forme-et-absence-de-traitement"
+  },
+  {
+   "terme": "isNoTreatment",
+   "ancre": "traitement-forme-et-absence-de-traitement"
+  },
+  {
+   "terme": "doseIntervalDaysOf",
+   "ancre": "traitement-forme-et-absence-de-traitement"
+  },
+  {
+   "terme": "valeurs par défaut du formulaire",
+   "ancre": "traitement-valeurs-par-defaut-du-formulaire"
+  },
+  {
+   "terme": "snapToRoundedMinutes",
+   "ancre": "traitement-valeurs-par-defaut-du-formulaire"
+  },
+  {
+   "terme": "suggestInjectionSite",
+   "ancre": "traitement-zone-proposee-voisinage-aleatoire"
+  },
+  {
+   "terme": "avertissement de même zone",
+   "ancre": "traitement-avertissement-de-meme-zone"
+  },
+  {
+   "terme": "RULE_DOSE",
+   "ancre": "traitement-regle-de-dose-rule-dose"
+  },
+  {
+   "terme": "enregistrement d'une prise",
+   "ancre": "traitement-enregistrement-d-une-prise"
+  },
+  {
+   "terme": "startEdit / cancelEdit",
+   "ancre": "traitement-ouverture-en-modification"
+  },
+  {
+   "terme": "nextRotationSite",
    "ancre": "traitement-rotation-d-ordre-fixe-ancienne-regle-toujours-presente"
   },
   {
-   "terme": "Semaine de cure",
-   "ancre": "traitement-semaine-de-cure-et-compte-de-jours"
+   "terme": "libellés des paliers",
+   "ancre": "traitement-libelles-des-paliers"
   },
   {
-   "terme": "Série du traitement en cours",
-   "ancre": "traitement-serie-du-traitement-en-cours"
+   "terme": "édition en place",
+   "ancre": "traitement-edition-en-place-de-la-dose-journal-bulle"
   },
   {
    "terme": "SITE_LABELS",
    "ancre": "traitement-zones-d-injection-et-initiales"
   },
   {
-   "terme": "Statistiques par zone",
-   "ancre": "traitement-statistiques-par-zone-et-zone-recommandee"
+   "terme": "siteInitials",
+   "ancre": "traitement-zones-d-injection-et-initiales"
   },
   {
-   "terme": "Textes « Comprendre vos sensations »",
-   "ancre": "traitement-textes-comprendre-vos-sensations"
+   "terme": "calendrier des prises",
+   "ancre": "traitement-calendrier-rangement-et-arrondi-des-tuiles"
   },
   {
-   "terme": "Textes « Évolution du niveau sanguin »",
-   "ancre": "traitement-textes-evolution-du-niveau-sanguin"
+   "terme": "formatCalendarDose",
+   "ancre": "traitement-calendrier-rangement-et-arrondi-des-tuiles"
   },
   {
-   "terme": "Tiroir Journal (ligne de traitement)",
-   "ancre": "traitement-ligne-de-traitement-du-tiroir-journal-et-du-defile"
+   "terme": "ajout depuis le calendrier",
+   "ancre": "traitement-ajout-a-une-date-depuis-le-calendrier"
   },
   {
-   "terme": "Titre de page et menu « + »",
-   "ancre": "traitement-entree-et-titre-de-page"
+   "terme": "rappels d'injection",
+   "ancre": "traitement-rappels-d-injection"
   },
   {
-   "terme": "Tri du journal",
-   "ancre": "traitement-tri-du-journal"
-  },
-  {
-   "terme": "Valeurs par défaut du formulaire",
-   "ancre": "traitement-valeurs-par-defaut-du-formulaire"
-  },
-  {
-   "terme": "Variation de poids par palier",
-   "ancre": "traitement-variation-de-poids-par-palier"
-  },
-  {
-   "terme": "Zone proposée (voisinage aléatoire)",
-   "ancre": "traitement-zone-proposee-voisinage-aleatoire"
-  },
-  {
-   "terme": "Zone (avertissement de répétition)",
-   "ancre": "traitement-avertissement-de-meme-zone"
-  },
-  {
-   "terme": "Zone recommandée",
-   "ancre": "traitement-statistiques-par-zone-et-zone-recommandee"
-  },
-  {
-   "terme": "Ancienneté de la dernière prise",
-   "ancre": "traitement-anciennete-de-la-derniere-prise-injectionrecency"
-  },
-  {
-   "terme": "Dernière prise passée",
+   "terme": "getMostRecentPastInjection",
    "ancre": "traitement-derniere-prise-passee"
   },
   {
-   "terme": "Ajout à une date (calendrier)",
-   "ancre": "traitement-ajout-a-une-date-depuis-le-calendrier"
+   "terme": "tiroir Journal",
+   "ancre": "traitement-ligne-de-traitement-du-tiroir-journal-et-du-defile"
+  },
+  {
+   "terme": "graphe poids contre traitement",
+   "ancre": "traitement-graphe-poids-vs-traitement-domaine-poids-donnees-de-traiteme"
+  },
+  {
+   "terme": "injectionIntervalDays",
+   "ancre": "traitement-frequence-observee-des-prises"
+  },
+  {
+   "terme": "rapport PDF",
+   "ancre": "traitement-rapport-pdf-traitement"
+  },
+  {
+   "terme": "carte de partage",
+   "ancre": "traitement-partage-d-une-injection"
+  },
+  {
+   "terme": "module Traitement",
+   "ancre": "traitement-module-traitement"
+  },
+  {
+   "terme": "statistiques par zone",
+   "ancre": "traitement-statistiques-par-zone-et-zone-recommandee"
+  },
+  {
+   "terme": "getRecommendedSite",
+   "ancre": "traitement-statistiques-par-zone-et-zone-recommandee"
+  },
+  {
+   "terme": "injectionRecency",
+   "ancre": "traitement-anciennete-de-la-derniere-prise-injectionrecency"
+  },
+  {
+   "terme": "entrée du menu « + »",
+   "ancre": "traitement-entree-et-titre-de-page"
+  },
+  {
+   "terme": "treatmentSectionLabel",
+   "ancre": "traitement-libelles-et-icone-selon-la-forme"
+  },
+  {
+   "terme": "onboarding V2 (traitement)",
+   "ancre": "traitement-catalogue-des-traitements"
   }
  ],
  "ancres_traitees": [

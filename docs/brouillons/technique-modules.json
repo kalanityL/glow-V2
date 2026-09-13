@@ -23,77 +23,79 @@
    "fonctionnalite": "Migration des drapeaux de masquage",
    "texte": "Une conversion au chargement nettoie les drapeaux <module>ModuleHidden restés vrais sur un module rallumé.",
    "origine": "La chaîne de conversion de useAppData.ts (dropSeedData, migrateTreatmentIds, purgeDeleted, mergeSideEffectNotes, mergeTableTennisSport, fillMealHunger, ensureStartingWeighIn) ne touche aucun drapeau de module ; seuls hydrationTrackingEnabled, dailyWaterGoalMl et weightGoalsEnabled sont supprimés du profil."
+  },
+  {
+   "categorie": "Modules",
+   "fonctionnalite": "Tri des cases du tiroir Ajouter",
+   "texte": "Le tiroir Ajouter range les modules éteints en fin de liste, comme le tiroir Journal.",
+   "origine": "Retiré après vérification : App.tsx rend addDrawerItems(appData.profile).map(…) sans tri, dans l'ordre d'ADD_DRAWER_ORDER ; seul JournalDrawer.tsx applique [...items.filter(i => i.enabled), ...items.filter(i => !i.enabled)]. La phrase généralisait à tort le tri du tiroir Journal aux deux tiroirs."
   }
  ],
  "glossaire": [
   {
-   "terme": "Module",
-   "definition": "Suivi activable, commandé par un drapeau booléen du profil et rattaché à un identifiant de page. Sept modules : injection, symptoms, meals, steps, sports, metime, sleep. La pesée (history) n'en est pas un."
+   "terme": "isModuleOn",
+   "definition": "Fonction de navigation.ts qui rend l'état réel d'un module : Boolean du drapeau quand il est écrit, sinon allumé pour injection et symptoms, éteint pour les cinq autres, allumé pour tout identifiant hors MODULE_FLAGS."
   },
   {
-   "terme": "Drapeau d'activation",
-   "definition": "Champ <module>TrackingEnabled du profil. Absent, il vaut allumé pour le traitement et les effets secondaires, éteint pour les cinq autres."
-  },
-  {
-   "terme": "Drapeau de masquage",
-   "definition": "Champ <module>ModuleHidden du profil. Il ne mord que module éteint ; rallumer le module l'écrit à false."
-  },
-  {
-   "terme": "isModuleOn(profile, tabId)",
-   "definition": "État réel d'un module, défaut compris. Rend true pour tout identifiant absent de MODULE_FLAGS."
-  },
-  {
-   "terme": "isModuleHidden(profile, tabId)",
-   "definition": "Conjonction !isModuleOn(profile, tabId) ET Boolean(profile[<module>ModuleHidden])."
+   "terme": "isModuleHidden",
+   "definition": "Masquage effectif d'un module : vrai seulement si isModuleOn est faux ET si le drapeau <module>ModuleHidden est vrai."
   },
   {
    "terme": "MODULE_FLAGS",
-   "definition": "Table identifiant de page → drapeau d'activation, propre à la version Mixte."
+   "definition": "Table associant les sept identifiants de page à module au champ booléen de UserProfile qui les commande."
   },
   {
-   "terme": "Page vitrée",
-   "definition": "Rendu d'une page dont le module est éteint : voile de verre (top-0 bottom-16, 64 px, z-30) portant la seule phrase d'activation, dont le clic ouvre la page Modules ancrée sur la carte du module."
+   "terme": "MODULES_ALLUMES_PAR_DEFAUT",
+   "definition": "Ensemble { injection, symptoms } : les deux modules dont l'absence de drapeau vaut allumé."
   },
   {
    "terme": "drawerItems",
-   "definition": "Constructeur commun aux tiroirs Ajouter et Journal : liste bâtie sur un profil aux cinq drapeaux facultatifs forcés à true, filtrée des masqués, chaque entrée portant son état réel dans enabled."
+   "definition": "Constructeur partagé des deux tiroirs : force les cinq drapeaux hors tête à true pour bâtir la liste, retire les modules masqués, et rend pour chaque entrée l'objet MenuTab entier plus son enabled réel."
+  },
+  {
+   "terme": "categoryEnabled",
+   "definition": "Prédicat porté par chaque définition de badge ; troisième lecture de l'état d'un module, en `!== false` pour le sport et les pas, en `=== true` pour les repas."
+  },
+  {
+   "terme": "naviguerVersPageEteinte",
+   "definition": "Navigation sans écriture, appelée par le seul tiroir Journal sur une case éteinte : la page s'ouvre vitrée et le drapeau reste faux."
   },
   {
    "terme": "snapToRoundedMinutes",
-   "definition": "Ramène une heure HH:MM à la plus grande valeur de ROUNDED_MINUTES ([0,10,15,20,30,40,45,50]) inférieure ou égale aux minutes ; chaîne non conforme rendue telle quelle."
+   "definition": "Arrondi vers le bas d'une heure HH:MM à la plus proche valeur inférieure de ROUNDED_MINUTES = [0, 10, 15, 20, 30, 40, 45, 50] ; laisse passer tout format non reconnu."
   },
   {
    "terme": "handleSaveProfile",
-   "definition": "Unique porte d'écriture du profil : arrondit targetWeight au dixième de kilogramme et applique snapToRoundedMinutes à reminderTime et, si présente, à medicalReminderTime."
+   "definition": "Point de passage unique de toute écriture du profil : arrondit targetWeight au dixième de kilo et ramène reminderTime et medicalReminderTime aux minutes rondes."
   },
   {
-   "terme": "Planification hebdomadaire / personnalisée",
-   "definition": "injectionReminderType : 'weekly' (reminderDay + reminderTime) ou 'custom' (injectionReminderDaysInterval + injectionReminderStartDate + reminderTime). L'heure est le même champ dans les deux."
+   "terme": "PAGES_MODULE",
+   "definition": "Table d'App.tsx qui, pour chaque page à module, donne le drapeau lu, le nom affiché, l'ancre visée sur la page Modules et le complément de la phrase d'activation."
   },
   {
    "terme": "MODULES_TENDANCE",
-   "definition": "Les cinq cartes du tiroir Tendances qui suivent l'état de leur module, avec le nom, l'ancre de carte et le complément employés par la phrase d'activation."
+   "definition": "Les cinq clés de carte du tiroir Tendances qui, module éteint, ouvrent la phrase d'activation au lieu du graphe : meals, sport, metime, sleep, steps."
   }
  ],
  "index": [
-  {
-   "terme": "Défauts des modules",
-   "ancre": "modules-defauts-des-modules"
-  },
-  {
-   "terme": "INITIAL_PROFILE (drapeaux de module)",
-   "ancre": "modules-defauts-des-modules"
-  },
   {
    "terme": "isModuleOn",
    "ancre": "modules-defauts-des-modules"
   },
   {
-   "terme": "Bascule d'un module",
+   "terme": "MODULES_ALLUMES_PAR_DEFAUT",
+   "ancre": "modules-defauts-des-modules"
+  },
+  {
+   "terme": "INITIAL_PROFILE",
+   "ancre": "modules-defauts-des-modules"
+  },
+  {
+   "terme": "bascule d'un module",
    "ancre": "modules-bascule-d-un-module"
   },
   {
-   "terme": "Masquer dans l'application (case)",
+   "terme": "masquer dans l'application",
    "ancre": "modules-bascule-d-un-module"
   },
   {
@@ -105,19 +107,23 @@
    "ancre": "modules-masquage-complet"
   },
   {
-   "terme": "Menu du bas (filtrage des modules)",
+   "terme": "drawerItems",
    "ancre": "modules-masquage-complet-d-un-module"
   },
   {
-   "terme": "Tiroir Ajouter",
+   "terme": "tiroir Ajouter",
    "ancre": "modules-masquage-complet-d-un-module"
   },
   {
-   "terme": "Tiroir Journal",
+   "terme": "tiroir Journal",
    "ancre": "modules-masquage-complet-d-un-module"
   },
   {
-   "terme": "Badge « à activer »",
+   "terme": "page Badges",
+   "ancre": "modules-masquage-complet-d-un-module"
+  },
+  {
+   "terme": "categoryEnabled",
    "ancre": "modules-masquage-complet-d-un-module"
   },
   {
@@ -125,23 +131,15 @@
    "ancre": "modules-etat-d-un-module-defaut-compris"
   },
   {
-   "terme": "Tiroir Tendances (état des cartes)",
+   "terme": "tiroir Tendances",
    "ancre": "modules-etat-d-un-module-defaut-compris"
   },
   {
-   "terme": "Actif sanguin (carte)",
-   "ancre": "modules-etat-d-un-module-defaut-compris"
-  },
-  {
-   "terme": "Phrase d'activation",
+   "terme": "MODULES_TENDANCE",
    "ancre": "modules-etat-d-un-module-defaut-compris"
   },
   {
    "terme": "handleNavigate",
-   "ancre": "modules-navigation-vers-meals-steps-sports-allume-le-module"
-  },
-  {
-   "terme": "handleQuickAddNavigate",
    "ancre": "modules-navigation-vers-meals-steps-sports-allume-le-module"
   },
   {
@@ -153,7 +151,7 @@
    "ancre": "modules-navigation-vers-meals-steps-sports-allume-le-module"
   },
   {
-   "terme": "Page vitrée",
+   "terme": "page vitrée",
    "ancre": "modules-navigation-vers-meals-steps-sports-allume-le-module"
   },
   {
@@ -165,15 +163,11 @@
    "ancre": "modules-defauts-du-rappel-d-injections"
   },
   {
-   "terme": "reminderTime",
-   "ancre": "modules-defauts-du-rappel-d-injections"
-  },
-  {
    "terme": "injectionReminderStartDate",
    "ancre": "modules-defauts-du-rappel-d-injections"
   },
   {
-   "terme": "reminderDay",
+   "terme": "daysOfWeek",
    "ancre": "modules-jours-et-frequences-proposes"
   },
   {
@@ -189,10 +183,6 @@
    "ancre": "modules-defauts-du-rappel-medical"
   },
   {
-   "terme": "medicalReminderDoctor",
-   "ancre": "modules-defauts-du-rappel-medical"
-  },
-  {
    "terme": "ROUNDED_MINUTES",
    "ancre": "modules-minutes-rondes"
   },
@@ -205,7 +195,7 @@
    "ancre": "modules-minutes-rondes"
   },
   {
-   "terme": "Récapitulatif du rappel personnalisé",
+   "terme": "récapitulatif des injections",
    "ancre": "modules-recapitulatif-du-rappel-personnalise"
   },
   {

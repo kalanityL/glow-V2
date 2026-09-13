@@ -29,80 +29,150 @@
    "fonctionnalite": "Carré poids de MaisonSections marqué « ÉTEINT (CARRES_SUIVI) »",
    "texte": "Je voulais dire si la variante du carré poids de la home sections est rendue ou non, et sous quel drapeau.",
    "origine": "Le commentaire signale l'extinction mais le drapeau CARRES_SUIVI n'a pas été lu. De même, BlocSuiviPoids n'est monté que par SurimpressionSuiviPoids : sa branche « page » n'est rendue nulle part, ce que j'ai laissé hors du chapitre faute d'ancre."
+  },
+  {
+   "categorie": "affirmation retirée",
+   "fonctionnalite": "Rang d'une pesée antidatée dans le tableau",
+   "texte": "« Le rang d'une ligne dans le tableau est son ordre de création : une ligne antidatée s'ajoute en fin de tableau. »",
+   "origine": "Réfutation acceptée, vérifiée à la ligne : weighInWrites.ts:161 — `[...entries, newLog].sort((a, b) => a.date.localeCompare(b.date))`. addWeighIn retrie par date, une pesée antidatée se range à sa place. La phrase recopiait le commentaire générique de logOrder.ts:8-11, écrit pour les journaux qui ajoutent en fin ; la table des pesées n'en est pas un. Remplacée par l'énoncé exact, avec renvoi à updateWeighIn, qui seul ne retrie pas."
+  },
+  {
+   "categorie": "affirmation retirée",
+   "fonctionnalite": "Nombre de graduations de l'axe de Cadence",
+   "texte": "« Trois à sept graduations. »",
+   "origine": "Réfutation acceptée. rawMin ≤ −1 et rawMax ≥ 2 donnent une amplitude ≥ 3 ; step = max(1, ceil(amplitude/4)) et l'arrondi des bornes au pas ajoutent moins d'un pas de chaque côté, d'où (max − min)/step ≤ 6 − 2/step < 6. Le compte tient entre 4 et 6, jamais 3 ni 7 — le fichier l'écrit lui-même. Corrigé en « Quatre à six graduations », avec le cas plancher ajouté aux cas limites."
+  },
+  {
+   "categorie": "affirmation retirée",
+   "fonctionnalite": "Plancher réel de sanitizeWeight (profil)",
+   "texte": "« Le plancher réel de sanitizeWeight est “strictement positif”, pas 0,1 : “0.05” est accepté par la fonction alors que le message annonce 0,1. »",
+   "origine": "Réfutation acceptée : cas limite inventé. profile.fields.ts:40-42 tronque la décimale à un chiffre avant tout test, donc « 0.05 » devient « 0.0 » → Number 0 → refusé par `n <= 0`. La plus petite valeur atteignable est 0,1 : le plancher coïncide avec le message au lieu de le contredire. Cas limite réécrit en ce sens."
+  },
+  {
+   "categorie": "affirmation retirée",
+   "fonctionnalite": "Écriture de la tuile « Perdus / sem. » du rapport",
+   "texte": "« La tuile s'écrit “≈ x,xx %” » — deux décimales, virgule.",
+   "origine": "Réfutation acceptée : la valeur porte bien deux décimales, mais la tuile passe par frDecimal = formatNumber(n, 1) (reportSummary.ts:69 ; medicalReportPdf.ts:2378), qui arrondit au dixième, écrit un POINT et retire les zéros de queue. « ≈ 0,44 % » n'existe pas ; c'est « ≈ 0.4 % ». Corrigé, avec le pseudo-code de la tuile."
+  },
+  {
+   "categorie": "affirmation retirée",
+   "fonctionnalite": "signedKg employé par le rapport PDF",
+   "texte": "« Seuls les arcs et la rangée d'IMC remplacent ensuite le tiret ASCII par U+2212. »",
+   "origine": "Réfutation acceptée : medicalReportPdf.ts:637 définit son propre signedKg — `${delta <= 0 ? '−' : '+'}${Math.abs(round1(delta))} kg` —, sans importer celui de homeOverview. Il écrit d'emblée U+2212, ajoute l'unité et bascule sur `<= 0`. Employé en 2224, 2373, 2383 et 2509. Le pseudo-code du rapport et l'exemple (« −11.5 kg ») sont corrigés, et la phrase du chapitre signedKg restreinte aux écrans."
+  },
+  {
+   "categorie": "affirmation retirée",
+   "fonctionnalite": "Titre du bloc palier sous 18,5",
+   "texte": "« Vrai : bandeau “VIGILANCE IMC • SOUS LA NORMALE”, titre “Information IMC”. »",
+   "origine": "Réfutation acceptée : BmiMilestoneBlock.tsx:154 teste customMessage AVANT isUnderweight. Le seul chemin capable d'ouvrir le bloc sous 18,5 est le clic sur l'IMC du carré poids, qui pose toujours un customMessage : le titre lu est « Nouveau Cap Franchi ! 🏆 » sous le bandeau d'alerte, et « Information IMC » est inatteignable. Paragraphe réécrit, ordre des conditions ajouté au pseudo-code, et libellés du bandeau, de l'accroche et du message relevés à la ligne (l.139-147, l.157-160, l.199-203)."
+  },
+  {
+   "categorie": "affirmation retirée",
+   "fonctionnalite": "Lectures du poids de départ",
+   "texte": "« Ce sont les deux seules lectures du départ dans tout le code. »",
+   "origine": "Réfutation acceptée : isStartingWeight est lu en direct une quinzaine de fois hors de ces deux fonctions — weighInWrites.ts:64, startingWeighIn.ts:107 et 180, homeOverview.ts:120, WeightTracker.tsx:357/373/694, WeighInSubmissionCard.tsx:64/80, InlineWeighInRow.tsx:77/115/182/259, WeightCalendar.tsx:81/85/122/169/202, shareTemplates.tsx:690, dataGenerator.ts:747. Phrase remplacée par l'inventaire de ces lecteurs."
+  },
+  {
+   "categorie": "affirmation retirée",
+   "fonctionnalite": "Tuile du calendrier des poids",
+   "texte": "« La tuile montre la première ligne du jour, la bulle les liste toutes. »",
+   "origine": "Réfutation acceptée : WeightCalendar.tsx:99-108 affiche « ×n » dès que logs.length > 1, et le poids de logs[0] seulement quand il n'y a qu'une ligne. La phrase recopiait un commentaire périmé de weightCalendar.ts:12-13 et contredisait le pseudo-code voisin. Corrigée."
+  },
+  {
+   "categorie": "affirmation retirée",
+   "fonctionnalite": "Garde des trois arcs du bloc suivi",
+   "texte": "« garde commune : startingWeight > 0 && targetWeight > 0, sinon null (pas d'arc) »",
+   "origine": "Réfutation acceptée : seuls arcDeltaKg (BlocSuiviPoids.tsx:326) et resteDeltaKg (:363) exigent targetWeight > 0. La bande du bas est gardée par `enSurimpression && startingWeight > 0 && (!reprise || resteDeltaKg !== null)` (:1005), et l'arc parcouru (:1009) comme ses pastilles (:1145) ne dépendent que de `!reprise`. Pseudo-code et paragraphe corrigés."
+  },
+  {
+   "categorie": "affirmation retirée",
+   "fonctionnalite": "Exemple de l'axe des poids de la courbe",
+   "texte": "« au pas de 0,5 il faudrait sept intervalles »",
+   "origine": "Réfutation acceptée : lo = floor((84,5 − 0,5)/0,5)×0,5 = 84 et hi = ceil((87,1 + 0,5)/0,5)×0,5 = 88, soit huit intervalles. La conclusion (axe 84–88 au pas de 1) était juste, le chiffre faux. Corrigé en huit."
+  },
+  {
+   "categorie": "affirmation retirée",
+   "fonctionnalite": "Bascule en période personnalisée depuis une borne éditée",
+   "texte": "« onCustomWindowChange, qui bascule en custom avec les deux bornes affichées »",
+   "origine": "Réfutation acceptée : hors custom, PeriodBounds.tsx:34-39 remet `{ startDate: getCutoffDateStr(w) ?? '', endDate: '' }`, et InlineCustomDateRange:118 renvoie `{ ...range, borne }`. La fenêtre custom naît donc avec endDate: '' — illimitée —, le mot « aujourd'hui » venant du repli d'affichage. Corrigé, avec le cas « Depuis le début » (getCutoffDateStr rend null) ajouté aux cas limites."
   }
  ],
  "glossaire": [
   {
-   "terme": "Pesée de départ (drapeau)",
-   "definition": "L'unique ligne de weightHistory portant isStartingWeight à true. Elle se cherche par findStartingWeighIn, jamais par sa valeur, et sert de référence à la perte totale, à la semaine de cure, aux pourcentages et au rapport."
+   "terme": "Pesée de départ",
+   "definition": "La ligne de weightHistory qui porte isStartingWeight: true. Une seule à la fois, toujours la plus ancienne (keepStartingOnOldest), jamais supprimable."
   },
   {
-   "terme": "Poids actuel",
-   "definition": "Le poids de la pesée la plus récente au sens de byDateTimeDesc (date puis heure), repli sur le poids de départ quand l'historique est vide. Ce n'est pas la dernière ligne du tableau."
+   "terme": "keepStartingOnOldest",
+   "definition": "Appelée en fin d'addWeighIn et d'updateWeighIn : replace le drapeau de départ sur la pesée la plus ancienne et nettoie un historique qui en porterait deux ou zéro."
   },
   {
-   "terme": "Perte (convention de signe)",
-   "definition": "Grandeur orientée perte : positive quand le poids a baissé (totalLoss, lastLoss, 'Perte moyenne (kg)'). S'oppose à la variation, négative quand le poids baisse (weeklyRate, pctOfStart, bmiPointsChange). signedKg attend une variation : une perte se passe niée."
+   "terme": "lastWeighInPerDay",
+   "definition": "Réduction de l'historique à une pesée par jour, la dernière du jour (heure absente = 12:00). Base de Cadence, de la courbe et d'averageWeeklyChange."
   },
   {
-   "terme": "Dernière du jour",
-   "definition": "Règle de dédoublonnage (lastWeighInPerDay) : un jour ne compte que par la pesée d'heure la plus tardive, 12:00 si l'heure manque, la dernière enregistrée à heure égale."
+   "terme": "Cadence",
+   "definition": "Le graphe des pertes hebdomadaires, construit par computeWeeklyLoss : tranches de sept jours depuis la borne basse de la période, poids interpolé linéairement, prolongé à plat hors des pesées."
   },
   {
-   "terme": "Heure absente = 12:00",
-   "definition": "Convention des tris et des calculs : une pesée sans time est traitée comme celle de midi. Seul weighInsByDate y déroge, triant sur la chaîne vide."
+   "terme": "Poids moyen (kg)",
+   "definition": "Malgré son nom, le poids de FIN de semaine dans un point de Cadence, pas une moyenne."
   },
   {
-   "terme": "Minute ronde",
-   "definition": "Une des huit valeurs 0, 10, 15, 20, 30, 40, 45, 50. Toute heure enregistrée y est ramenée vers le bas par snapToRoundedMinutes."
+   "terme": "Perte moyenne (kg)",
+   "definition": "La variation sur les sept jours d'une semaine de Cadence : poids au jour 7w moins poids au jour 7(w+1). Positive quand on a perdu."
   },
   {
-   "terme": "Jour occupé",
-   "definition": "Un jour portant déjà une pesée dans la liste affichée (isDayTaken). Le formulaire propose un remplacement après confirmation ; l'édition en place refuse et repose la date."
+   "terme": "getCutoffDateStr",
+   "definition": "Le premier jour d'une fenêtre bornée : aujourd'hui − (N − 1) jours, inclusif du jour en cours. null pour « Depuis le début », startDate pour « Choisir »."
   },
   {
-   "terme": "Fenêtre (PeriodWindow)",
-   "definition": "L'une de 7days, 14days, 30days, 90days, all, custom. Mémorisée par bloc sous glp1_period_<clé>, avec ses bornes personnalisées."
+   "terme": "byDateTimeAsc / byDateTimeDesc",
+   "definition": "Comparateurs de journal sur la clé `date + 'T' + (time || '12:00')`. L'heure y entre parce que le tri de JavaScript est stable."
   },
   {
-   "terme": "Coupure (cutoff)",
-   "definition": "Borne basse d'une fenêtre bornée. getCutoffDateStr compte N − 1 jours en arrière depuis aujourd'hui (journaux) ; computeChartWindow compte N jours pleins (courbe) ; filterWeeklyLoss compte N jours depuis la dernière semaine connue."
+   "terme": "signedKg",
+   "definition": "Écriture signée d'un écart. Deux fonctions homonymes : celle de homeOverview (« +1.1 » / « -2.4 », tiret ASCII, sans unité, bascule sur > 0) et celle, locale, du rapport PDF (« −11.5 kg », U+2212, unité incluse, bascule sur ≤ 0)."
   },
   {
-   "terme": "Semaine de Cadence",
-   "definition": "Tranche de sept jours issue de computeWeeklyLoss, ancrée sur la borne basse de la période, portant son poids de fin et sa variation début − fin."
+   "terme": "frDecimal",
+   "definition": "formatNumber(n, 1) : arrondi au dixième, point décimal, zéros de queue retirés. Forme d'écriture des tuiles chiffrées du rapport."
   },
   {
-   "terme": "Prolongement à plat",
-   "definition": "Hors des pesées connues, le poids retenu est celui de la pesée la plus proche : dans Cadence (getWeightAtDay) et sur la courbe entre la dernière pesée et aujourd'hui."
+   "terme": "bmiOf",
+   "definition": "IMC arrondi au dixième : round(kg / (cm/100)² × 10) / 10. Rend 0 quand la taille est inconnue, ce que chaque appelant lit comme « pas d'IMC »."
+  },
+  {
+   "terme": "bmiPointsChange",
+   "definition": "Points d'IMC gagnés ou perdus : (poids actuel − poids de départ) / m², arrondi au dixième APRÈS la différence. null sans taille ou sans départ."
+  },
+  {
+   "terme": "Palier d'IMC (getBmiTierInfo)",
+   "definition": "Index de 0 (insuffisance pondérale) à 5 (obésité III), 99 pour « Inconnu ». L'index décroît quand la corpulence baisse, ce qui autorise la comparaison par <."
+  },
+  {
+   "terme": "customMessage",
+   "definition": "Champ facultatif du bloc palier, posé par le seul clic sur l'IMC du carré poids. Il décide du titre du bloc avant même le test isUnderweight."
+  },
+  {
+   "terme": "insolite",
+   "definition": "Condition d'affichage des équivalences de la carte de confirmation : subBmi ≥ 19, perte depuis le début > 0, pesée la plus récente, et pas le départ."
+  },
+  {
+   "terme": "hasOnlyStartingWeight",
+   "definition": "Vrai sans pesée, avec la seule pesée de départ, OU dès que totalLoss ≤ 0 — donc aussi en cas de prise depuis le début."
+  },
+  {
+   "terme": "displayedEntries",
+   "definition": "L'historique trié par byDateTimeAsc, remis aux lignes de journal : c'est cette liste, et non l'historique brut, que isDayTaken interroge."
+  },
+  {
+   "terme": "MONTRER_GLP1",
+   "definition": "Constante de fichier valant false : elle masque courbe de concentration, axe des milligrammes et pastilles d'injection sur le graphe de poids. Les données restent calculées."
   },
   {
    "terme": "Spline monotone (Fritsch–Carlson)",
-   "definition": "Interpolation cubique de la courbe de poids qui passe exactement par chaque pesée sans jamais dépasser ses voisines, et rend null hors de l'intervalle des pesées."
-  },
-  {
-   "terme": "Semaine de cure",
-   "definition": "floor(jours ÷ 7) + 1, les jours étant l'écart arrondi entre le minuit local de la pesée de départ et celui d'aujourd'hui. Nulle sans départ ou si le départ est daté du futur."
-  },
-  {
-   "terme": "Palier d'IMC (tier)",
-   "definition": "Index de 0 à 5 rendu par getBmiTierInfo, décroissant avec la corpulence, plus 99 « Inconnu » pour un IMC nul ou négatif. À distinguer de bmiCategoryLabel, qui nomme les mêmes tranches autrement."
-  },
-  {
-   "terme": "Points d'IMC",
-   "definition": "(poids actuel − poids de départ) / taille², arrondi au dixième sur la différence. Nul sans taille ou sans départ."
-  },
-  {
-   "terme": "Cap franchi",
-   "definition": "Graduation d'IMC (18,5 · 25 · 30 · 35 · 40) strictement comprise entre l'IMC de départ et l'IMC actuel."
-  },
-  {
-   "terme": "Repli (fallback)",
-   "definition": "Valeur employée quand la donnée manque : 0 pour getStartingWeight, 95 pour INITIAL_STARTING_WEIGHT, 170 cm pour la détection de palier, 22 pour l'IMC de la carte de confirmation, 80 kg au bout de getWeightAtDate."
-  },
-  {
-   "terme": "Poids actif à une date",
-   "definition": "Le poids de la dernière pesée datée du jour visé ou avant, employé par les pas, l'activité physique et le métabolisme pour valoriser une dépense au poids du jour."
+   "definition": "Interpolation de la courbe de poids : elle passe exactement par chaque pesée, ne dépasse jamais ses voisines, et rend null hors de [première, dernière] pesée."
   }
  ],
  "index": [
@@ -111,235 +181,83 @@
    "ancre": "poids-une-seule-pesee-par-jour-a-l-ajout"
   },
   {
-   "terme": "arc départ → objectif",
-   "ancre": "poids-etiquettes-des-arcs-du-bloc-suivi"
-  },
-  {
-   "terme": "averageWeeklyChange",
-   "ancre": "poids-moyenne-hebdomadaire-de-la-home-weeklyrate"
-  },
-  {
-   "terme": "axe des kilos (courbe)",
-   "ancre": "poids-axe-des-poids-de-la-courbe"
-  },
-  {
-   "terme": "axe vertical (Cadence)",
-   "ancre": "poids-axe-vertical-de-cadence"
-  },
-  {
-   "terme": "bmiCategoryLabel",
-   "ancre": "poids-categories-et-paliers-d-imc"
-  },
-  {
-   "terme": "bmiOf",
-   "ancre": "poids-imc"
-  },
-  {
-   "terme": "bmiPointsChange",
-   "ancre": "poids-points-d-imc-gagnes-ou-perdus"
-  },
-  {
-   "terme": "bmiTransitionDate",
-   "ancre": "poids-date-du-cap-d-imc-franchi"
-  },
-  {
-   "terme": "bornes du … au …",
-   "ancre": "poids-bornes-du-au"
-  },
-  {
-   "terme": "byDateTimeAsc / byDateTimeDesc",
-   "ancre": "poids-ordre-des-lignes-de-journal"
-  },
-  {
-   "terme": "calendrier des poids",
-   "ancre": "poids-calendrier-rangement-et-tuiles"
-  },
-  {
-   "terme": "cap franchi",
-   "ancre": "poids-echelle-d-imc-de-la-surimpression"
-  },
-  {
-   "terme": "carte de confirmation",
-   "ancre": "poids-conditions-d-affichage-de-la-carte-de-confirmation"
-  },
-  {
-   "terme": "computeChartWindow",
-   "ancre": "poids-fenetre-temporelle-de-la-courbe-de-poids"
-  },
-  {
-   "terme": "computeLossAxis",
-   "ancre": "poids-axe-vertical-de-cadence"
-  },
-  {
-   "terme": "computeSubmissionInfo",
-   "ancre": "poids-contenu-de-la-confirmation-de-pesee"
-  },
-  {
-   "terme": "computeWeeklyLoss",
-   "ancre": "poids-decoupage-en-semaines-cadence"
-  },
-  {
-   "terme": "createMonotoneCurve",
-   "ancre": "poids-construction-de-la-courbe-de-poids"
-  },
-  {
-   "terme": "cureWeek",
-   "ancre": "poids-semaine-de-cure"
-  },
-  {
-   "terme": "dayTakenMessage",
-   "ancre": "poids-formulaire-sur-un-jour-occupe-confirmation-puis-remplacement"
-  },
-  {
-   "terme": "deleteAllButtonsEnabled",
-   "ancre": "poids-journal-liste-et-suppression-totale"
-  },
-  {
-   "terme": "ensureStartingWeighIn",
-   "ancre": "poids-conversion-de-l-ancien-profil-en-pesee-de-depart"
-  },
-  {
-   "terme": "estEnReprise",
-   "ancre": "poids-reprise-de-poids-dans-la-surimpression"
-  },
-  {
-   "terme": "filterByTimeWindow",
-   "ancre": "poids-periodes-options-defaut-memorisation"
-  },
-  {
-   "terme": "filterWeeklyLoss",
-   "ancre": "poids-filtrage-des-semaines"
-  },
-  {
-   "terme": "findStartingWeighIn",
-   "ancre": "poids-le-depart-se-reconnait-a-son-drapeau-jamais-a-sa-valeur"
-  },
-  {
-   "terme": "getBmiTierInfo",
-   "ancre": "poids-categories-et-paliers-d-imc"
-  },
-  {
-   "terme": "getCutoffDateStr",
-   "ancre": "poids-periodes-options-defaut-memorisation"
-  },
-  {
-   "terme": "getStartingWeight",
-   "ancre": "poids-le-depart-se-reconnait-a-son-drapeau-jamais-a-sa-valeur"
-  },
-  {
-   "terme": "getWeightAtDate",
-   "ancre": "poids-poids-actif-a-une-date-autres-modules"
-  },
-  {
-   "terme": "glp1_notified_bmi_tier_index",
-   "ancre": "poids-detection-automatique-d-un-palier-d-imc-franchi"
-  },
-  {
-   "terme": "glp1_weight_history_view",
-   "ancre": "poids-vue-historique-par-defaut-et-memorisation"
-  },
-  {
-   "terme": "goalProgressPercent",
-   "ancre": "poids-progression-vers-l-objectif-barre-du-bloc-salut"
-  },
-  {
-   "terme": "hasEnoughData",
-   "ancre": "poids-graphe-de-poids-donnees-insuffisantes"
-  },
-  {
-   "terme": "hasMeasurements",
-   "ancre": "poids-rapport-annexe-b-et-calendrier"
-  },
-  {
-   "terme": "hasOnlyStartingWeight",
-   "ancre": "poids-vue-d-ensemble-des-poids-home"
-  },
-  {
-   "terme": "history_weekly_loss",
-   "ancre": "poids-periodes-options-defaut-memorisation"
-  },
-  {
-   "terme": "history_weight_chart",
-   "ancre": "poids-periodes-options-defaut-memorisation"
-  },
-  {
-   "terme": "history_weight_list",
-   "ancre": "poids-journal-liste-et-suppression-totale"
-  },
-  {
-   "terme": "INITIAL_STARTING_WEIGHT",
-   "ancre": "poids-poids-de-depart-seme-a-l-installation"
-  },
-  {
-   "terme": "isDayTaken",
-   "ancre": "poids-edition-en-place-sur-un-jour-occupe-refus"
+   "terme": "updateWeighIn",
+   "ancre": "poids-modification-deux-ecarts-assumes-avec-l-ajout"
   },
   {
    "terme": "keepStartingOnOldest",
    "ancre": "poids-le-poids-de-depart-est-la-pesee-la-plus-ancienne"
   },
   {
-   "terme": "lastWeighInPerDay",
-   "ancre": "poids-une-pesee-par-jour-pour-les-calculs-la-derniere-du-jour"
-  },
-  {
-   "terme": "lossSpanLabel",
-   "ancre": "poids-duree-d-une-perte-home-sections"
-  },
-  {
-   "terme": "MEASUREMENT_FIELDS",
-   "ancre": "poids-ordre-et-libelles-des-neuf-mensurations"
-  },
-  {
-   "terme": "mergeMeasurements",
-   "ancre": "poids-fusion-des-mensurations"
-  },
-  {
-   "terme": "MONTRER_GLP1",
-   "ancre": "poids-glp-1-masque-sur-la-courbe"
-  },
-  {
-   "terme": "periodLossSummary",
-   "ancre": "poids-bilan-de-la-periode-bandeau-cadence"
-  },
-  {
-   "terme": "PERIOD_OPTIONS",
-   "ancre": "poids-periodes-options-defaut-memorisation"
-  },
-  {
-   "terme": "perte affichée dans le menu +",
-   "ancre": "poids-perte-affichee-dans-le-menu"
-  },
-  {
-   "terme": "POIDS_MAX (V2)",
-   "ancre": "poids-bornes-de-saisie"
-  },
-  {
-   "terme": "PROGRES_MAX / PROGRES_MIN",
-   "ancre": "poids-rangee-progres-candidates-et-plafond"
-  },
-  {
-   "terme": "rapport : annexe B",
-   "ancre": "poids-rapport-annexe-b-et-calendrier"
-  },
-  {
-   "terme": "rapport : encart d'identité",
-   "ancre": "poids-rapport-encart-et-synthese"
-  },
-  {
    "terme": "removeAllWeightsButStarting",
    "ancre": "poids-le-poids-de-depart-ne-se-supprime-pas"
   },
   {
-   "terme": "resteAPerdre",
-   "ancre": "poids-reste-a-perdre-bloc-salut"
+   "terme": "setStartingWeight",
+   "ancre": "poids-poids-de-depart-saisi-depuis-le-profil"
+  },
+  {
+   "terme": "ensureStartingWeighIn",
+   "ancre": "poids-conversion-de-l-ancien-profil-en-pesee-de-depart"
+  },
+  {
+   "terme": "findStartingWeighIn",
+   "ancre": "poids-le-depart-se-reconnait-a-son-drapeau-jamais-a-sa-valeur"
+  },
+  {
+   "terme": "getStartingWeight",
+   "ancre": "poids-le-depart-se-reconnait-a-son-drapeau-jamais-a-sa-valeur"
+  },
+  {
+   "terme": "INITIAL_STARTING_WEIGHT",
+   "ancre": "poids-poids-de-depart-seme-a-l-installation"
   },
   {
    "terme": "roundWeight",
    "ancre": "poids-arrondi-du-poids-a-l-ecriture"
   },
   {
-   "terme": "RULE_HEIGHT",
+   "terme": "snapToRoundedMinutes",
+   "ancre": "poids-heure-ramenee-aux-minutes-rondes"
+  },
+  {
+   "terme": "byDateTimeAsc",
+   "ancre": "poids-ordre-des-lignes-de-journal"
+  },
+  {
+   "terme": "byDateTimeDesc",
+   "ancre": "poids-ordre-des-lignes-de-journal"
+  },
+  {
+   "terme": "orderKey",
+   "ancre": "poids-ordre-des-lignes-de-journal"
+  },
+  {
+   "terme": "getCutoffDateStr",
+   "ancre": "poids-periodes-options-defaut-memorisation"
+  },
+  {
+   "terme": "filterByTimeWindow",
+   "ancre": "poids-periodes-options-defaut-memorisation"
+  },
+  {
+   "terme": "usePeriodWindow",
+   "ancre": "poids-periodes-options-defaut-memorisation"
+  },
+  {
+   "terme": "PeriodBounds",
+   "ancre": "poids-bornes-du-au"
+  },
+  {
+   "terme": "InlineCustomDateRange",
+   "ancre": "poids-bornes-du-au"
+  },
+  {
+   "terme": "useHistoryView",
+   "ancre": "poids-vue-historique-par-defaut-et-memorisation"
+  },
+  {
+   "terme": "RULE_WEIGHT",
    "ancre": "poids-bornes-de-saisie"
   },
   {
@@ -347,76 +265,316 @@
    "ancre": "poids-bornes-de-saisie"
   },
   {
-   "terme": "RULE_WEIGHT",
+   "terme": "RULE_HEIGHT",
    "ancre": "poids-bornes-de-saisie"
   },
   {
-   "terme": "sanitizeWeight (profil)",
+   "terme": "sanitizeNumber",
+   "ancre": "poids-bornes-de-saisie"
+  },
+  {
+   "terme": "POIDS_MAX (V2)",
+   "ancre": "poids-bornes-de-saisie"
+  },
+  {
+   "terme": "cleanNumericInput",
+   "ancre": "poids-nettoyage-de-la-saisie-du-poids"
+  },
+  {
+   "terme": "cleanDecimalInput",
    "ancre": "poids-edition-du-profil-poids-de-depart-et-objectif"
   },
   {
-   "terme": "selectionnerReperesPesee",
-   "ancre": "poids-reperes-de-pesee-sur-la-courbe"
+   "terme": "sanitizeWeight",
+   "ancre": "poids-edition-du-profil-poids-de-depart-et-objectif"
   },
   {
-   "terme": "setStartingWeight",
-   "ancre": "poids-poids-de-depart-saisi-depuis-le-profil"
+   "terme": "sanitizeHeight",
+   "ancre": "poids-edition-du-profil-poids-de-depart-et-objectif"
   },
   {
-   "terme": "signedKg",
-   "ancre": "poids-ecriture-signee-d-une-variation"
+   "terme": "measurementsToLog",
+   "ancre": "poids-fusion-des-mensurations"
   },
   {
-   "terme": "snapToRoundedMinutes",
-   "ancre": "poids-heure-ramenee-aux-minutes-rondes"
+   "terme": "mergeMeasurements",
+   "ancre": "poids-fusion-des-mensurations"
+  },
+  {
+   "terme": "keptMeasurements",
+   "ancre": "poids-fusion-des-mensurations"
+  },
+  {
+   "terme": "MEASUREMENT_FIELDS",
+   "ancre": "poids-ordre-et-libelles-des-neuf-mensurations"
+  },
+  {
+   "terme": "confirmingDate",
+   "ancre": "poids-formulaire-sur-un-jour-occupe-confirmation-puis-remplacement"
+  },
+  {
+   "terme": "dayTakenMessage",
+   "ancre": "poids-formulaire-sur-un-jour-occupe-confirmation-puis-remplacement"
+  },
+  {
+   "terme": "startingDayTakenMessage",
+   "ancre": "poids-formulaire-sur-un-jour-occupe-confirmation-puis-remplacement"
   },
   {
    "terme": "startingNotOldestMessage",
    "ancre": "poids-refus-le-depart-ne-peut-pas-etre-date-apres-une-autre-pesee"
   },
   {
-   "terme": "surimpression « Où en est l'IMC »",
-   "ancre": "poids-echelle-d-imc-de-la-surimpression"
+   "terme": "isDayTaken",
+   "ancre": "poids-edition-en-place-sur-un-jour-occupe-refus"
   },
   {
-   "terme": "tuiles de perte (homes)",
-   "ancre": "poids-affichage-des-tuiles-de-perte-homes"
+   "terme": "displayedEntries",
+   "ancre": "poids-journal-liste-et-suppression-totale"
   },
   {
-   "terme": "updateWeighIn",
-   "ancre": "poids-modification-deux-ecarts-assumes-avec-l-ajout"
+   "terme": "deleteAllButtonsEnabled",
+   "ancre": "poids-journal-liste-et-suppression-totale"
   },
   {
-   "terme": "usePeriodWindow",
-   "ancre": "poids-periodes-options-defaut-memorisation"
+   "terme": "computeSubmissionInfo",
+   "ancre": "poids-contenu-de-la-confirmation-de-pesee"
   },
   {
-   "terme": "VIGILANCE IMC",
-   "ancre": "poids-regime-d-alerte-du-bloc-palier"
+   "terme": "insolite",
+   "ancre": "poids-conditions-d-affichage-de-la-carte-de-confirmation"
   },
   {
-   "terme": "weeklyLossPercent",
-   "ancre": "poids-rapport-pourcentage-perdu-par-semaine"
+   "terme": "weighInsByDate",
+   "ancre": "poids-calendrier-rangement-et-tuiles"
+  },
+  {
+   "terme": "lastWeighInPerDay",
+   "ancre": "poids-une-pesee-par-jour-pour-les-calculs-la-derniere-du-jour"
+  },
+  {
+   "terme": "computeWeeklyLoss",
+   "ancre": "poids-decoupage-en-semaines-cadence"
+  },
+  {
+   "terme": "filterWeeklyLoss",
+   "ancre": "poids-filtrage-des-semaines"
+  },
+  {
+   "terme": "periodLossSummary",
+   "ancre": "poids-bilan-de-la-periode-bandeau-cadence"
+  },
+  {
+   "terme": "computeLossAxis",
+   "ancre": "poids-axe-vertical-de-cadence"
+  },
+  {
+   "terme": "gradientOffset",
+   "ancre": "poids-axe-vertical-de-cadence"
+  },
+  {
+   "terme": "computeChartWindow",
+   "ancre": "poids-fenetre-temporelle-de-la-courbe-de-poids"
+  },
+  {
+   "terme": "createMonotoneCurve",
+   "ancre": "poids-construction-de-la-courbe-de-poids"
+  },
+  {
+   "terme": "extendConstant",
+   "ancre": "poids-construction-de-la-courbe-de-poids"
+  },
+  {
+   "terme": "wStep / wMin / wMax",
+   "ancre": "poids-axe-des-poids-de-la-courbe"
+  },
+  {
+   "terme": "selectionnerReperesPesee",
+   "ancre": "poids-reperes-de-pesee-sur-la-courbe"
+  },
+  {
+   "terme": "hasEnoughData",
+   "ancre": "poids-graphe-de-poids-donnees-insuffisantes"
+  },
+  {
+   "terme": "MONTRER_GLP1",
+   "ancre": "poids-glp-1-masque-sur-la-courbe"
+  },
+  {
+   "terme": "cureWeek",
+   "ancre": "poids-semaine-de-cure"
+  },
+  {
+   "terme": "weeksSinceDate",
+   "ancre": "poids-semaine-de-cure"
+  },
+  {
+   "terme": "dayCountLabel",
+   "ancre": "poids-semaine-de-cure"
   },
   {
    "terme": "weeklyRate",
    "ancre": "poids-moyenne-hebdomadaire-de-la-home-weeklyrate"
   },
   {
+   "terme": "averageWeeklyChange",
+   "ancre": "poids-moyenne-hebdomadaire-de-la-home-weeklyrate"
+  },
+  {
+   "terme": "pctOfStart",
+   "ancre": "poids-pourcentage-du-poids-de-depart"
+  },
+  {
+   "terme": "arcDeltaKg",
+   "ancre": "poids-etiquettes-des-arcs-du-bloc-suivi"
+  },
+  {
+   "terme": "resteDeltaKg",
+   "ancre": "poids-etiquettes-des-arcs-du-bloc-suivi"
+  },
+  {
+   "terme": "estEnReprise",
+   "ancre": "poids-reprise-de-poids-dans-la-surimpression"
+  },
+  {
+   "terme": "signedKg",
+   "ancre": "poids-ecriture-signee-d-une-variation"
+  },
+  {
+   "terme": "format1Dec",
+   "ancre": "poids-ecriture-signee-d-une-variation"
+  },
+  {
+   "terme": "frDecimal / formatNumber",
+   "ancre": "poids-rapport-pourcentage-perdu-par-semaine"
+  },
+  {
    "terme": "weightOverview",
    "ancre": "poids-vue-d-ensemble-des-poids-home"
+  },
+  {
+   "terme": "totalLoss",
+   "ancre": "poids-vue-d-ensemble-des-poids-home"
+  },
+  {
+   "terme": "lastLoss",
+   "ancre": "poids-vue-d-ensemble-des-poids-home"
+  },
+  {
+   "terme": "hasOnlyStartingWeight",
+   "ancre": "poids-vue-d-ensemble-des-poids-home"
+  },
+  {
+   "terme": "bmiOf",
+   "ancre": "poids-imc"
+  },
+  {
+   "terme": "bmiCategoryLabel",
+   "ancre": "poids-categories-et-paliers-d-imc"
+  },
+  {
+   "terme": "getBmiTierInfo",
+   "ancre": "poids-categories-et-paliers-d-imc"
+  },
+  {
+   "terme": "handleBmiClick",
+   "ancre": "poids-clic-sur-l-imc-du-carre-poids"
+  },
+  {
+   "terme": "isBmiLow",
+   "ancre": "poids-affichage-des-tuiles-de-perte-homes"
+  },
+  {
+   "terme": "lossesEqual",
+   "ancre": "poids-affichage-des-tuiles-de-perte-homes"
+  },
+  {
+   "terme": "PROGRES_MAX / PROGRES_MIN",
+   "ancre": "poids-rangee-progres-candidates-et-plafond"
+  },
+  {
+   "terme": "bmiPointsChange",
+   "ancre": "poids-points-d-imc-gagnes-ou-perdus"
+  },
+  {
+   "terme": "lossSpanDates",
+   "ancre": "poids-duree-d-une-perte-home-sections"
+  },
+  {
+   "terme": "lossSpanLabel",
+   "ancre": "poids-duree-d-une-perte-home-sections"
+  },
+  {
+   "terme": "goalProgressPercent",
+   "ancre": "poids-progression-vers-l-objectif-barre-du-bloc-salut"
+  },
+  {
+   "terme": "resteAPerdre",
+   "ancre": "poids-reste-a-perdre-bloc-salut"
+  },
+  {
+   "terme": "IMC_MIN / IMC_MAX",
+   "ancre": "poids-echelle-d-imc-de-la-surimpression"
+  },
+  {
+   "terme": "GRADUATIONS_IMC",
+   "ancre": "poids-echelle-d-imc-de-la-surimpression"
+  },
+  {
+   "terme": "glp1_notified_bmi_tier_index",
+   "ancre": "poids-detection-automatique-d-un-palier-d-imc-franchi"
+  },
+  {
+   "terme": "isUnderweight",
+   "ancre": "poids-regime-d-alerte-du-bloc-palier"
+  },
+  {
+   "terme": "customMessage",
+   "ancre": "poids-regime-d-alerte-du-bloc-palier"
+  },
+  {
+   "terme": "bmiTransitionDate",
+   "ancre": "poids-date-du-cap-d-imc-franchi"
+  },
+  {
+   "terme": "JournalDrawer",
+   "ancre": "poids-ordre-d-affichage-du-journal-dans-le-tiroir"
+  },
+  {
+   "terme": "TREND_DAYS",
+   "ancre": "poids-tendance-du-poids-tiroir-tendances"
   },
   {
    "terme": "weightTrend",
    "ancre": "poids-tendance-du-poids-tiroir-tendances"
   },
   {
+   "terme": "PlusMenu",
+   "ancre": "poids-perte-affichee-dans-le-menu"
+  },
+  {
+   "terme": "weeklyLossPercent",
+   "ancre": "poids-rapport-pourcentage-perdu-par-semaine"
+  },
+  {
+   "terme": "hasMeasurements",
+   "ancre": "poids-rapport-annexe-b-et-calendrier"
+  },
+  {
+   "terme": "weightCellLines",
+   "ancre": "poids-rapport-annexe-b-et-calendrier"
+  },
+  {
+   "terme": "getWeightAtDate",
+   "ancre": "poids-poids-actif-a-une-date-autres-modules"
+  },
+  {
    "terme": "WeightLog",
    "ancre": "poids-entites"
   },
   {
-   "terme": "weighInsByDate",
-   "ancre": "poids-calendrier-rangement-et-tuiles"
+   "terme": "glp1_app_companion_data",
+   "ancre": "poids-entites"
   }
  ],
  "ancres_traitees": [

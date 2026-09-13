@@ -29,81 +29,115 @@
    "fonctionnalite": "Collision d'identifiants sleep-<Date.now()>",
    "texte": "L'absence de garde est lisible dans le code ; ce qui se passe ensuite côté React (clés dupliquées dans le journal, suppression qui retirerait les deux lignes) n'a pas été vérifié et n'est pas écrit.",
    "origine": "src/app/useAppData.ts"
+  },
+  {
+   "categorie": "décompte faux, corrigé",
+   "fonctionnalite": "Nombre de points d'une fenêtre de 180 jours",
+   "texte": "« 180 jours donnent step = ⌊181 / 60⌋ = 3 et 61 points » : faux. La boucle s'arrête à t <= endMs, et endMs vaut 23:59:59 (custom) ou 23:59:59.999 (fenêtre fixe), donc l'écart réel est de 179,96 jours et le compte tombe à 60 points. Le chapitre donne désormais la formule ⌊(endMs − startMs) / (86 400 000 × step)⌋ + 1 et le chiffre corrigé.",
+   "origine": "réfutation retenue — src/features/sleep/sleep.utils.ts:544-553 (dayEndMs = dayStartMs + 24h − 1 ; endMs custom à T23:59:59 ; for t <= endMs)"
+  },
+  {
+   "categorie": "aiguillage faux, corrigé",
+   "fonctionnalite": "Emplois de sleepMinutesOn / nightMinutesOn / napMinutesOn",
+   "texte": "La phrase attribuait à sleepMinutesOn la tuile du calendrier et les tuiles de l'accueil, et à nightMinutesOn la série « Qualité nuit », le temps d'éveil et la frise. Le grep des appelants dément : sleepMinutesOn n'est appelée que par computeSleepDays et sleepTrend, nightMinutesOn que par computeSleepDays et nightMinutesDailyAverage, napMinutesOn que par awakeMinutesOn. Le paragraphe a été réécrit sur les appels réels.",
+   "origine": "réfutation retenue — grep sur src hors tests : sleep.utils.ts:557-558, trends.ts:223, sleep.utils.ts:253 et :365 ; sleepCalendar.ts:36 ; MaisonSections.tsx:1314 et :1461 ; sleepNightBands.ts:3"
+  },
+  {
+   "categorie": "condition de rendu fausse, corrigée",
+   "fonctionnalite": "Message « Aucun sommeil enregistré sur cette période. »",
+   "texte": "« à la place du tracé » : faux. Le message est un <p> conditionné par !hasFilteredLogs, posé au-dessus ; le conteneur du graphe (h-44 glow-chart-bleed) est rendu sans condition. Le cas limite dit maintenant que la phrase s'ajoute et que le graphe reste monté.",
+   "origine": "réfutation retenue — src/versions/mixte/features/sleep/SleepChart.tsx:169-173 puis :203-206"
+  },
+  {
+   "categorie": "décompte faux, corrigé",
+   "fonctionnalite": "Nombre de useSleepChart des graphes croisés",
+   "texte": "« leurs quatre useSleepChart » : les trois graphes mis de côté n'en ont que trois (sleep_awake_chart, sleep_night_chart, sleep_quality_chart). Le quatrième, evolution (sleep_chart), alimente le graphe visible « Durée et qualité ». Corrigé, avec la distinction écrite.",
+   "origine": "réfutation retenue — src/versions/mixte/features/sleep/SleepTracker.tsx:191-201, bloc mort à :498"
+  },
+  {
+   "categorie": "relevé incomplet, corrigé",
+   "fonctionnalite": "Surfaces de formatSleepDuration",
+   "texte": "La liste présentée comme constatée omettait la carte de partage d'un sommeil, qui affiche sa durée héroïque avec formatSleepDuration. Ajoutée ; les deux autres appelants (sleepAnalysis.ts, SleepNutritionChart.tsx) sont nommés comme code mort, tous deux sous {false && …}.",
+   "origine": "réfutation retenue — src/versions/mixte/components/share/shareTemplates.tsx:28 et :1066 ; SleepChart.tsx:359 ; SleepTracker.tsx:498"
+  },
+  {
+   "categorie": "cible d'un ref fausse, corrigée",
+   "fonctionnalite": "Poignée useOnScreen du « + » flottant",
+   "texte": "« sur le bandeau de HistoryToolbar » : le bandRef est posé sur le seul curseur segmenté Calendrier / Journal, pas sur le conteneur flex de la ligne d'outils. Corrigé, et le cas limite reformulé en conséquence.",
+   "origine": "réfutation retenue — src/versions/mixte/components/HistoryToolbar.tsx:100-103 (commentaire), :112 (bandeau sans ref), :148 (ref={bandRef} sur le curseur)"
+  },
+  {
+   "categorie": "élément désactivé mal désigné, corrigé",
+   "fonctionnalite": "Minute héritée non ronde dans TimeSelect",
+   "texte": "« reste affichée telle quelle, en champ désactivé » : ce n'est pas le champ mais l'option. La minute non ronde est insérée à sa place dans la colonne des minutes avec disabled: true ; le champ reste ouvrable et modifiable. Corrigé.",
+   "origine": "réfutation retenue — src/shared/ui/TimeSelect.tsx:156-165"
   }
  ],
  "glossaire": [
   {
    "terme": "SleepLog",
-   "definition": "Objet stocké d'une entrée de sommeil : id, date et time (le réveil), bedDate et bedTime (l'endormissement), kind ('nuit' | 'sieste'), quality 0–5, notes facultatives. La durée n'y figure pas."
+   "definition": "Le seul objet stocké du domaine : deux instants complets (bedDate + bedTime, date + time), une nature, une qualité 0–5, des notes facultatives. La durée n'y figure pas."
   },
   {
-   "terme": "Jour du réveil",
-   "definition": "Le champ date d'une entrée. Convention du domaine : la nuit précédant le jour J porte la date J. Sert au tri, au calendrier, aux points de graphe, au plafond quotidien et à la tendance."
+   "terme": "Date d'une entrée",
+   "definition": "La date du RÉVEIL (champ date). Elle range la ligne partout : journal, calendrier, point de graphe, plafond quotidien, tendance."
+  },
+  {
+   "terme": "sleepLogMinutes",
+   "definition": "La seule fonction de durée du domaine : minutes entières entre les deux instants absolus, 0 si l'un des deux est illisible ou si le réveil n'est pas strictement postérieur."
+  },
+  {
+   "terme": "Qualité pondérée",
+   "definition": "Moyenne des qualités pondérée par les durées, arrondie au dixième ; les entrées de durée nulle sont écartées des deux côtés du quotient. null si le poids total est nul."
   },
   {
    "terme": "Plage (SleepRange)",
-   "definition": "Les quatre champs bedDate, bedTime, date, time pris ensemble — les deux instants complets qui bornent un sommeil. C'est l'objet du contrôle de recouvrement."
+   "definition": "Les quatre champs bedDate, bedTime, date, time pris ensemble — l'unité que testent le recouvrement et le contrôle « plage inchangée »."
   },
   {
-   "terme": "instantMinutes",
-   "definition": "Conversion d'un couple (date, heure) en minutes absolues, par Date.UTC champ par champ. Rend null sur un format invalide. Base de toutes les comparaisons du domaine."
+   "terme": "Recouvrement",
+   "definition": "Deux plages se recoupent si aDebut < bFin et bDebut < aFin, comparaisons strictes : le bout-à-bout passe. Une plage sans étendue ne recouvre rien."
   },
   {
-   "terme": "Qualité pondérée (weightedQuality)",
-   "definition": "Σ(durée × qualité) / Σ durée sur les entrées de durée > 0, arrondie au dixième ; null si la somme des durées est nulle."
+   "terme": "Arrondi ROUNDED_MINUTES",
+   "definition": "Les huit minutes admises (0, 10, 15, 20, 30, 40, 45, 50). Toute minute est ramenée vers le bas, à l'écriture seulement ; l'heure ne change jamais."
   },
   {
-   "terme": "Minute ronde (ROUNDED_MINUTES)",
-   "definition": "L'ensemble {00, 10, 15, 20, 30, 40, 45, 50}. Toute heure enregistrée y est ramenée vers le bas par snapToRoundedMinutes, à l'écriture et non à la saisie."
-  },
-  {
-   "terme": "Plafond quotidien (SLEEP_DAILY_CAP)",
-   "definition": "Quinze saisies au plus par jour de réveil. Contrairement au sport et au temps pour soi, le sommeil refuse la seizième au lieu d'écraser la dernière."
+   "terme": "Fenêtre de période",
+   "definition": "7/14/30/90 jours, « depuis le début » ou « choisir ». Inclusive, jour en cours compris ; une fenêtre fixe n'a pas de borne haute."
   },
   {
    "terme": "SleepDayPoint",
-   "definition": "Point de graphe d'une journée : Sommeil, Qualité, Nuit, Qualité nuit, Éveil et Kcal pour l'affichage, plus minutes, nightMinutes et awakeMinutes comme valeurs canoniques."
+   "definition": "Un point de graphe construit par computeSleepDays : durées en heures pour l'axe, minutes canoniques à côté, qualités et kcal, ou null quand la journée ne porte rien."
   },
   {
-   "terme": "Palier de teinte (sleepBarTier)",
-   "definition": "Entier de 1 à 5 valant ⌈5 × minutes / maxMinutes⌉ borné, relatif à la plus longue journée affichée ; commande les classes gc-sleep-t1 à t5."
+   "terme": "Journée renseignée",
+   "definition": "Une date de réveil portant au moins une entrée. Les moyennes de l'accueil divisent par ce nombre, jamais par la longueur de la fenêtre."
+  },
+  {
+   "terme": "Palier de teinte",
+   "definition": "Un entier de 1 à 5, ⌈5 × minutes / maxMinutes⌉ borné, relatif à la plus longue journée AFFICHÉE — l'échelle change avec la période."
+  },
+  {
+   "terme": "Temps d'éveil",
+   "definition": "Du réveil le plus tardif du jour J à l'endormissement le plus précoce du jour J+1, siestes du jour déduites ; null si une des deux nuits manque ou si le reste est ≤ 0."
   },
   {
    "terme": "Soirée d'une nuit",
-   "definition": "Jour de rattachement d'une nuit sur la frise : bedDate si l'endormissement tombe à 12:00 ou après, la veille sinon."
+   "definition": "La date à laquelle la frise rattache une nuit : bedDate si l'endormissement est à 12:00 ou après, la veille de bedDate sinon."
   },
   {
    "terme": "Axe depuis midi",
-   "definition": "Repère de la frise : depuisMidi(m) = ((m − 720) + 1440) mod 1440. Minuit vaut 720. reveilAxe = coucherAxe + durée peut dépasser 1 440, l'axe n'étant pas replié."
+   "definition": "Repère de la frise : depuisMidi(m) = ((m − 720) + 1440) mod 1440. Non replié, ce qui permet de dessiner une barre continue par-dessus minuit."
   },
   {
    "terme": "Moyenne circulaire",
-   "definition": "Moyenne d'heures traitées comme des angles sur 24 h (somme vectorielle, atan2). Rend null si la résultante est quasi nulle. Seule le coucher moyen l'emploie."
-  },
-  {
-   "terme": "Temps d'éveil (awakeMinutesOn)",
-   "definition": "Du réveil le plus tardif du jour J à l'endormissement le plus précoce du jour J+1, siestes du jour J déduites ; null si une borne manque ou si le résultat est ≤ 0."
-  },
-  {
-   "terme": "Fenêtre de période (PeriodWindow)",
-   "definition": "'7days' | '14days' | '30days' | '90days' | 'all' | 'custom'. Inclusive, jour en cours compris, sans borne haute hors mode custom. Défaut 30days, persistée sous glp1_period_<clé>."
-  },
-  {
-   "terme": "informedTrendMean",
-   "definition": "Moyenne d'une série de tendance qui n'écarte que les null. La série du sommeil ne contenant que des nombres (0 les jours vides), tous les jours comptent."
-  },
-  {
-   "terme": "Masquage complet",
-   "definition": "isModuleHidden = module éteint ET drapeau sleepModuleHidden vrai. Le rallumage remet le drapeau à false dans la même écriture de profil."
+   "definition": "Moyenne d'heures traitées comme des angles sur 1 440 minutes ; null quand la résultante est quasi nulle, c'est-à-dire quand les couchers sont trop dispersés."
   }
  ],
  "index": [
   {
-   "terme": "SleepLog",
-   "ancre": "sommeil-entites"
-  },
-  {
-   "terme": "sleepLogs (AppData)",
+   "terme": "SleepLog (champs)",
    "ancre": "sommeil-entites"
   },
   {
@@ -111,31 +145,15 @@
    "ancre": "sommeil-navigation-vers-meals-steps-sports-allume-le-module"
   },
   {
-   "terme": "handleNavigate",
-   "ancre": "sommeil-navigation-vers-meals-steps-sports-allume-le-module"
-  },
-  {
-   "terme": "naviguerVersPageEteinte",
-   "ancre": "sommeil-navigation-vers-meals-steps-sports-allume-le-module"
-  },
-  {
-   "terme": "isModuleHidden",
-   "ancre": "sommeil-masquage-complet-d-un-module"
-  },
-  {
    "terme": "sleepModuleHidden",
    "ancre": "sommeil-masquage-complet-d-un-module"
-  },
-  {
-   "terme": "useHistoryView",
-   "ancre": "sommeil-curseur-calendrier-journal"
   },
   {
    "terme": "glp1_sleep_history_view",
    "ancre": "sommeil-curseur-calendrier-journal"
   },
   {
-   "terme": "armFloatingAdd",
+   "terme": "useOnScreen / bandRef",
    "ancre": "sommeil-flottant-et-ouverture-automatique"
   },
   {
@@ -143,27 +161,11 @@
    "ancre": "sommeil-flottant-et-ouverture-automatique"
   },
   {
-   "terme": "autoOpenAdd",
-   "ancre": "sommeil-flottant-et-ouverture-automatique"
-  },
-  {
-   "terme": "useOnScreen",
-   "ancre": "sommeil-flottant-et-ouverture-automatique"
-  },
-  {
    "terme": "deleteAllButtonsEnabled",
    "ancre": "sommeil-bouton-tout-supprimer"
   },
   {
-   "terme": "handleClearSleepHistory",
-   "ancre": "sommeil-bouton-tout-supprimer"
-  },
-  {
-   "terme": "bedDate",
-   "ancre": "sommeil-conventions-d-une-entree-de-sommeil"
-  },
-  {
-   "terme": "jour du réveil",
+   "terme": "bedDate / bedTime",
    "ancre": "sommeil-conventions-d-une-entree-de-sommeil"
   },
   {
@@ -175,11 +177,7 @@
    "ancre": "sommeil-duree-d-un-sommeil"
   },
   {
-   "terme": "minutesOfDay",
-   "ancre": "sommeil-duree-d-un-sommeil"
-  },
-  {
-   "terme": "instantMinutes",
+   "terme": "instantMinutes / minutesOfDay",
    "ancre": "sommeil-duree-d-un-sommeil"
   },
   {
@@ -199,23 +197,15 @@
    "ancre": "sommeil-valeurs-par-defaut-du-formulaire-de-sommeil"
   },
   {
-   "terme": "DEFAULT_SLEEP_QUALITY",
-   "ancre": "sommeil-valeurs-par-defaut-du-formulaire-de-sommeil"
-  },
-  {
-   "terme": "handleKindChange",
-   "ancre": "sommeil-valeurs-par-defaut-du-formulaire-de-sommeil"
-  },
-  {
-   "terme": "startEdit",
-   "ancre": "sommeil-valeurs-par-defaut-du-formulaire-de-sommeil"
-  },
-  {
    "terme": "openAddFormAt",
    "ancre": "sommeil-valeurs-par-defaut-du-formulaire-de-sommeil"
   },
   {
    "terme": "SLEEP_QUALITY_LABELS",
+   "ancre": "sommeil-echelle-de-qualite"
+  },
+  {
+   "terme": "DEFAULT_SLEEP_QUALITY",
    "ancre": "sommeil-echelle-de-qualite"
   },
   {
@@ -231,14 +221,6 @@
    "ancre": "sommeil-confirmation-d-une-duree-12-h"
   },
   {
-   "terme": "longSleepConfirm",
-   "ancre": "sommeil-confirmation-d-une-duree-12-h"
-  },
-  {
-   "terme": "clearingRefusal",
-   "ancre": "sommeil-confirmation-d-une-duree-12-h"
-  },
-  {
    "terme": "sleepRangesOverlap",
    "ancre": "sommeil-interdiction-des-plages-qui-se-recouvrent"
   },
@@ -251,10 +233,6 @@
    "ancre": "sommeil-interdiction-des-plages-qui-se-recouvrent"
   },
   {
-   "terme": "originalRange",
-   "ancre": "sommeil-interdiction-des-plages-qui-se-recouvrent"
-  },
-  {
    "terme": "SLEEP_DAILY_CAP",
    "ancre": "sommeil-plafond-quotidien-du-sommeil"
   },
@@ -263,15 +241,7 @@
    "ancre": "sommeil-plafond-quotidien-du-sommeil"
   },
   {
-   "terme": "sleepCapRefusal",
-   "ancre": "sommeil-plafond-quotidien-du-sommeil"
-  },
-  {
    "terme": "ROUNDED_MINUTES",
-   "ancre": "sommeil-arrondi-des-heures-du-sommeil"
-  },
-  {
-   "terme": "snapToRoundedMinutes",
    "ancre": "sommeil-arrondi-des-heures-du-sommeil"
   },
   {
@@ -279,8 +249,8 @@
    "ancre": "sommeil-arrondi-des-heures-du-sommeil"
   },
   {
-   "terme": "useSleepJournal",
-   "ancre": "sommeil-tri-du-journal-du-sommeil-et-calendrier"
+   "terme": "TimeSelect",
+   "ancre": "sommeil-arrondi-des-heures-du-sommeil"
   },
   {
    "terme": "sleepsByDate",
@@ -291,11 +261,7 @@
    "ancre": "sommeil-tri-du-journal-du-sommeil-et-calendrier"
   },
   {
-   "terme": "daysBetween",
-   "ancre": "sommeil-deplacement-de-la-date-d-une-ligne-de-sommeil"
-  },
-  {
-   "terme": "addDays",
+   "terme": "daysBetween / addDays",
    "ancre": "sommeil-deplacement-de-la-date-d-une-ligne-de-sommeil"
   },
   {
@@ -307,26 +273,6 @@
    "ancre": "sommeil-nommage-d-une-nuit-par-ses-deux-bords"
   },
   {
-   "terme": "formatDayRangeStr",
-   "ancre": "sommeil-nommage-d-une-nuit-par-ses-deux-bords"
-  },
-  {
-   "terme": "formatSleepSpanWithWord",
-   "ancre": "sommeil-nommage-d-une-nuit-par-ses-deux-bords"
-  },
-  {
-   "terme": "PERIOD_OPTIONS",
-   "ancre": "sommeil-selecteur-de-periode-commun"
-  },
-  {
-   "terme": "DEFAULT_PERIOD",
-   "ancre": "sommeil-selecteur-de-periode-commun"
-  },
-  {
-   "terme": "getCutoffDateStr",
-   "ancre": "sommeil-selecteur-de-periode-commun"
-  },
-  {
    "terme": "filterByTimeWindow",
    "ancre": "sommeil-selecteur-de-periode-commun"
   },
@@ -335,8 +281,8 @@
    "ancre": "sommeil-selecteur-de-periode-commun"
   },
   {
-   "terme": "setCustomWindow",
-   "ancre": "sommeil-bornes-du-au-d-un-journal"
+   "terme": "getCutoffDateStr",
+   "ancre": "sommeil-selecteur-de-periode-commun"
   },
   {
    "terme": "InlineCustomDateRange",
@@ -348,18 +294,6 @@
   },
   {
    "terme": "CalendarBlock",
-   "ancre": "sommeil-coquille-commune-des-calendriers"
-  },
-  {
-   "terme": "monthGrid",
-   "ancre": "sommeil-coquille-commune-des-calendriers"
-  },
-  {
-   "terme": "onAddAt",
-   "ancre": "sommeil-coquille-commune-des-calendriers"
-  },
-  {
-   "terme": "nutritionTotalsOn",
    "ancre": "sommeil-coquille-commune-des-calendriers"
   },
   {
@@ -375,31 +309,15 @@
    "ancre": "sommeil-points-des-graphes-du-sommeil"
   },
   {
-   "terme": "useSleepChart",
-   "ancre": "sommeil-points-des-graphes-du-sommeil"
-  },
-  {
    "terme": "weightedQuality",
    "ancre": "sommeil-qualite-moyenne-ponderee"
   },
   {
-   "terme": "dayQualityOn",
-   "ancre": "sommeil-qualite-moyenne-ponderee"
-  },
-  {
-   "terme": "nightQualityOn",
-   "ancre": "sommeil-qualite-moyenne-ponderee"
-  },
-  {
-   "terme": "weightedQualityLast7Days",
+   "terme": "dayQualityOn / nightQualityOn",
    "ancre": "sommeil-qualite-moyenne-ponderee"
   },
   {
    "terme": "daysWithSleep",
-   "ancre": "sommeil-moyenne-affichee-du-graphe-duree-et-qualite"
-  },
-  {
-   "terme": "totalMinutes",
    "ancre": "sommeil-moyenne-affichee-du-graphe-duree-et-qualite"
   },
   {
@@ -415,15 +333,7 @@
    "ancre": "sommeil-cumuls-d-une-journee-de-sommeil"
   },
   {
-   "terme": "sleepMinutesLast7Days",
-   "ancre": "sommeil-cumuls-d-une-journee-de-sommeil"
-  },
-  {
    "terme": "sleepBarTier",
-   "ancre": "sommeil-palier-de-teinte-d-une-barre-de-sommeil"
-  },
-  {
-   "terme": "gc-sleep-t1..t5",
    "ancre": "sommeil-palier-de-teinte-d-une-barre-de-sommeil"
   },
   {
@@ -431,19 +341,7 @@
    "ancre": "sommeil-analyse-croisee-sommeil-nutrition-code-mis-de-cote"
   },
   {
-   "terme": "analyzeSleepNutrition",
-   "ancre": "sommeil-analyse-croisee-sommeil-nutrition-code-mis-de-cote"
-  },
-  {
-   "terme": "readCorrelation",
-   "ancre": "sommeil-analyse-croisee-sommeil-nutrition-code-mis-de-cote"
-  },
-  {
-   "terme": "pearson",
-   "ancre": "sommeil-analyse-croisee-sommeil-nutrition-code-mis-de-cote"
-  },
-  {
-   "terme": "CORRELATION_MIN_PAIRS",
+   "terme": "pearson / readCorrelation",
    "ancre": "sommeil-analyse-croisee-sommeil-nutrition-code-mis-de-cote"
   },
   {
@@ -451,27 +349,15 @@
    "ancre": "sommeil-mot-d-apres-saisie-du-sommeil"
   },
   {
-   "terme": "SLEEP_ENCOURAGEMENTS",
+   "terme": "GREAT_NIGHT_MINUTES / SHORT_NIGHT_MINUTES",
    "ancre": "sommeil-mot-d-apres-saisie-du-sommeil"
-  },
-  {
-   "terme": "GREAT_NIGHT_MINUTES",
-   "ancre": "sommeil-mot-d-apres-saisie-du-sommeil"
-  },
-  {
-   "terme": "SHORT_NIGHT_MINUTES",
-   "ancre": "sommeil-mot-d-apres-saisie-du-sommeil"
-  },
-  {
-   "terme": "depuisMidi",
-   "ancre": "sommeil-frise-des-nuits-axe-et-rattachement"
-  },
-  {
-   "terme": "versMinuit",
-   "ancre": "sommeil-frise-des-nuits-axe-et-rattachement"
   },
   {
    "terme": "soireeDeNuit",
+   "ancre": "sommeil-frise-des-nuits-axe-et-rattachement"
+  },
+  {
+   "terme": "depuisMidi / versMinuit",
    "ancre": "sommeil-frise-des-nuits-axe-et-rattachement"
   },
   {
@@ -479,19 +365,11 @@
    "ancre": "sommeil-frise-des-nuits-axe-et-rattachement"
   },
   {
-   "terme": "nuitsRetenuesParSoiree",
-   "ancre": "sommeil-frise-des-nuits-axe-et-rattachement"
-  },
-  {
-   "terme": "moyennesParSoirDeSemaine",
-   "ancre": "sommeil-frise-des-nuits-moyennes-par-soir-de-semaine"
-  },
-  {
    "terme": "moyenneCirculaireMinutes",
    "ancre": "sommeil-frise-des-nuits-moyennes-par-soir-de-semaine"
   },
   {
-   "terme": "heureLisible",
+   "terme": "moyennesParSoirDeSemaine",
    "ancre": "sommeil-frise-des-nuits-moyennes-par-soir-de-semaine"
   },
   {
@@ -519,19 +397,12 @@
    "ancre": "sommeil-tendance-du-sommeil-tiroir"
   },
   {
-   "terme": "TREND_DAYS",
-   "ancre": "sommeil-tendance-du-sommeil-tiroir"
-  },
-  {
    "terme": "informedTrendMean",
-   "ancre": "sommeil-tendance-du-sommeil-tiroir"
-  },
-  {
-   "terme": "trendDates",
    "ancre": "sommeil-tendance-du-sommeil-tiroir"
   }
  ],
  "ancres_traitees": [
+  "sommeil-entites",
   "sommeil-navigation-vers-meals-steps-sports-allume-le-module",
   "sommeil-masquage-complet-d-un-module",
   "sommeil-curseur-calendrier-journal",
@@ -564,8 +435,7 @@
   "sommeil-frise-des-nuits-moyennes-par-soir-de-semaine",
   "sommeil-frise-des-nuits-bornes-et-reperes",
   "sommeil-moyennes-de-sommeil-de-la-home",
-  "sommeil-tendance-du-sommeil-tiroir",
-  "sommeil-entites"
+  "sommeil-tendance-du-sommeil-tiroir"
  ],
  "ancres_sans_matiere": []
 }

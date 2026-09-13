@@ -29,71 +29,113 @@
    "fonctionnalite": "Cinquième badge",
    "texte": "Le pavé du bloc Salut et la page Badges accepteraient un cinquième badge sans changement de mise en page.",
    "origine": "Les commentaires de SalutBlock.tsx disent l'inverse — les tailles ne sont réglées que pour un à quatre badges — et aucun code ne traite ce cas."
+  },
+  {
+   "categorie": "hors code",
+   "fonctionnalite": "Ordre des paliers de badge",
+   "texte": "Aucun autre endroit du code ne réécrit l'ordre des paliers.",
+   "origine": "Réfutation retenue, phrase supprimée. src/versions/mixte/themes/sideral/App.tsx:221-226 et src/versions/mixte/themes/test/App.tsx:221 portent chacun `const tierToVal = (t: BadgeTier): number => { if (t === 'or') return 3; if (t === 'argent') return 2; if (t === 'bronze') return 1; return 0; };`, table antérieure au palier éveil où eveil vaut 0 comme aucun ; deux copies identiques existent hors périmètre. Le commentaire d'en-tête de badgeSystem.ts raconte une reprise qui n'a touché que src/versions/mixte/App.tsx. Le chapitre décrit désormais l'état réel."
+  },
+  {
+   "categorie": "hors code",
+   "fonctionnalite": "Célébration d'un badge",
+   "texte": "Stockage effacé ou autre appareil : la passe suivante réinscrit les quatre paliers.",
+   "origine": "Réfutation retenue, phrase corrigée. src/utils/badgeCelebration.ts:148-153 saute toute définition dont categoryEnabled est faux, sans écrire son entrée dans suivants ; avec le profil par défaut (src/app/useAppData.ts:66-68, les trois drapeaux à false) la passe écrit {}. Le chapitre dit maintenant « les paliers des badges dont le module est actif »."
+  },
+  {
+   "categorie": "hors code",
+   "fonctionnalite": "Sections de la page Badges",
+   "texte": "Les quatre définitions sont réparties en trois listes disjointes.",
+   "origine": "Réfutation retenue, phrase corrigée. src/versions/mixte/BadgesPage.tsx:78-80 exclut de la liste « à activer » tout badge dont le module est éteint et masqué (isModuleHidden, src/versions/mixte/app/navigation.ts:169-175) : les trois listes sont disjointes mais ne couvrent pas toujours les quatre définitions. Le mot « réparties » énonçait une partition que le code ne produit pas."
+  },
+  {
+   "categorie": "hors code",
+   "fonctionnalite": "Tailles des dessins de badge",
+   "texte": "Emplois : lg (80) sur les cartes des trois sections, xl (112) pour le badge en grand, sm (36) sur le pavé du bloc Salut.",
+   "origine": "Réfutation retenue, inventaire complété. md (56, la valeur par défaut) est employé par shareTemplates.tsx:492 (maquette « Ma collection de badges ») et xl par shareTemplates.tsx:446, UnlockedBadgeBlock.tsx:131, FelicitationsPage.tsx:61 et 71 ; xs (28) n'est employé nulle part dans le dépôt."
+  },
+  {
+   "categorie": "hors code",
+   "fonctionnalite": "Tailles des dessins de badge",
+   "texte": "Deux surcharges par sizePxOverride : 52 px pour un badge seul sur la home standard et 36 px à partir de deux, 460 px pour la carte de partage.",
+   "origine": "Réfutation retenue, phrase corrigée. Il y a trois sites d'appel : SalutBlock.tsx:728 (52 si un badge débloqué, 36 à partir de deux), SalutBlock.tsx:783 (52 pour le faux badge « ? », branche atteinte quand unlockedList.length === 0) et badgeCardImage.ts:115 (460)."
   }
  ],
  "glossaire": [
   {
    "terme": "Palier (BadgeTier)",
-   "definition": "Une des cinq valeurs de BADGE_TIERS_ASC : aucun, eveil, bronze, argent, or. Le type dérive de la liste ; le rang d'un palier est son index (0 à 4)."
+   "definition": "Une des cinq valeurs de BADGE_TIERS_ASC — aucun, eveil, bronze, argent, or — comparées par leur index dans cette liste (badgeTierRank)."
   },
   {
    "terme": "Éveil",
-   "definition": "Le palier le plus bas au-dessus de aucun : le critère du badge rempli sur une seule journée, aujourd'hui ou hier. Pour le Kangourou Musclé, la seule existence d'une séance."
+   "definition": "Palier de rang 1, obtenu quand le critère du badge est rempli sur une seule journée, aujourd'hui ou hier (eveilDates)."
   },
   {
-   "terme": "Fenêtre de N jours",
-   "definition": "getPastDates(N) : la liste des N dates locales YYYY-MM-DD allant d'aujourd'hui à aujourd'hui − (N−1), aujourd'hui en tête. Largeurs employées : 2, 7, 10."
+   "terme": "Fenêtre",
+   "definition": "Liste de N chaînes YYYY-MM-DD produite par getPastDates(N) à partir de l'instant courant en heure locale, aujourd'hui en tête. Largeurs employées : 7, 10, 2."
   },
   {
-   "terme": "Entrée survenue",
-   "definition": "hasOccurred(date, time?) : une entrée d'un jour passé, ou du jour courant à une heure déjà atteinte, ou sans heure et datée d'aujourd'hui ou avant. Seules ces entrées sont comptées."
+   "terme": "hasOccurred",
+   "definition": "Prédicat d'antériorité : vrai si la date est passée, faux si elle est future, et pour aujourd'hui vrai si l'heure HH:MM est atteinte ou si l'entrée n'a pas d'heure."
+  },
+  {
+   "terme": "Équivalent intensif / équivalent modéré",
+   "definition": "Minutes d'une séance multipliées par un coefficient d'intensité — intensif 1,0 / 0,67 / 0,33 et modéré 1,5 / 1,0 / 0,5 pour intensive, moderee et la branche par défaut."
   },
   {
    "terme": "Journée réussie",
-   "definition": "Pour les trois badges à comptage, une date de la fenêtre de 7 jours dont la somme des entrées survenues atteint le seuil : 25 g de fibres, l'objectif de protéines, ou 8 000 pas."
+   "definition": "Date de la fenêtre dont la somme des valeurs des entrées déjà survenues atteint le seuil du badge : 25 g de fibres, l'objectif de protéines, ou 8 000 pas."
   },
   {
-   "terme": "Équivalent intensif",
-   "definition": "Minutes d'une séance multipliées par 1 (intensive), 0,67 (moderee) ou 0,33 (toute autre valeur). Sert aux paliers or et argent du Kangourou Musclé."
+   "terme": "proteinDailyTarget",
+   "definition": "Math.round(poids × 1,5) en grammes, le poids étant celui de la dernière ligne du tableau weightHistory, sinon le poids de départ, sinon 70 kg."
   },
   {
-   "terme": "Équivalent modéré",
-   "definition": "Minutes d'une séance multipliées par 1,5 (intensive), 1 (moderee) ou 0,5 (toute autre valeur). Sert au palier bronze du Kangourou Musclé et à sa progression."
+   "terme": "categoryEnabled",
+   "definition": "Prédicat d'activité du module porté par chaque définition : sportTrackingEnabled !== false, foodTrackingEnabled === true, stepsTrackingEnabled !== false."
   },
   {
-   "terme": "Objectif quotidien de protéines",
-   "definition": "proteinDailyTarget : Math.round(poids actuel × 1,5), en grammes, le poids actuel étant la dernière ligne de weightHistory, 70 kg sur un historique vide."
-  },
-  {
-   "terme": "Module actif",
-   "definition": "categoryEnabled(profile) : sportTrackingEnabled !== false, stepsTrackingEnabled !== false, foodTrackingEnabled === true. Un badge de module inactif n'est pas évalué."
-  },
-  {
-   "terme": "Module masqué",
-   "definition": "isModuleHidden(profile, onglet) : module éteint ET drapeau *ModuleHidden vrai. Un module masqué retire son badge de la section « à activer »."
+   "terme": "isModuleHidden",
+   "definition": "Module éteint et drapeau de masquage vrai — stepsModuleHidden, sportModuleHidden ou foodModuleHidden ; le badge sort alors des trois sections."
   },
   {
    "terme": "Paliers connus",
-   "definition": "L'objet { identifiant de badge : palier } persisté sous glp1_badge_tiers_connus, dernier palier observé de chaque badge, hors de la sauvegarde des données."
+   "definition": "Objet { identifiant : palier } persisté sous la clé glp1_badge_tiers_connus du stockage local, distinct de la sauvegarde des données, qui sert de référence à la célébration."
   },
   {
-   "terme": "Découverte",
-   "definition": "Un badge dont le palier n'a jamais été observé (entrée undefined dans les paliers connus). Il est retenu sans célébration."
-  },
-  {
-   "terme": "Passe de célébration",
-   "definition": "evaluerCelebrations : fonction pure qui rend l'état à retenir et la liste des montées à fêter, à partir de l'état connu et des données courantes."
+   "terme": "evaluerCelebrations",
+   "definition": "Passe pure : part des paliers connus, saute les définitions dont le module est éteint, rend les paliers à retenir et la liste des montées à fêter."
   },
   {
    "terme": "Badge mystère",
-   "definition": "Le dessin id « placeholder » au palier argent, posé dans le bloc Salut quand aucun badge n'est débloqué et que profile.mysteryBadgeHidden est faux ou absent."
+   "definition": "Faux badge « ? » (id placeholder, palier argent) affiché dans le bloc Salut quand aucun badge n'est débloqué, masquable par le champ facultatif mysteryBadgeHidden."
+  },
+  {
+   "terme": "sizePxOverride",
+   "definition": "Taille en pixels imposée à BadgeIcon, prioritaire sur la table pixelSizes par un ||, donc ignorée quand elle vaut 0."
   },
   {
    "terme": "Carte de partage",
-   "definition": "renderBadgeCardFile : canvas 600 × 600 tracé à l'échelle 2, exporté en JPEG qualité 0,95 sous le nom badge-{id}-{palier}.jpg, ou null en cas d'échec."
+   "definition": "Canvas 600 × 600 points tracé à l'échelle 2, exporté en JPEG 0,95 sous le nom badge-{id}-{palier}.jpg, joint au partage si navigator.canShare l'accepte."
   }
  ],
  "index": [
+  {
+   "terme": "ALL_BADGE_DEFINITIONS",
+   "ancre": "badges-entites"
+  },
+  {
+   "terme": "BadgeDefinition",
+   "ancre": "badges-entites"
+  },
+  {
+   "terme": "criteria",
+   "ancre": "badges-entites"
+  },
+  {
+   "terme": "glp1_badge_tiers_connus",
+   "ancre": "badges-entites"
+  },
   {
    "terme": "BADGE_TIERS_ASC",
    "ancre": "badges-ordre-des-paliers-de-badge"
@@ -103,20 +145,16 @@
    "ancre": "badges-ordre-des-paliers-de-badge"
   },
   {
-   "terme": "BADGE_TIER_LABELS",
-   "ancre": "badges-ordre-des-paliers-de-badge"
-  },
-  {
    "terme": "isBadgeTier",
    "ancre": "badges-ordre-des-paliers-de-badge"
   },
   {
-   "terme": "Palier (BadgeTier)",
+   "terme": "BADGE_TIER_LABELS",
    "ancre": "badges-ordre-des-paliers-de-badge"
   },
   {
-   "terme": "Éveil (palier)",
-   "ancre": "badges-fenetres-et-donnees-comptees-par-les-badges"
+   "terme": "tierToVal (tables locales des thèmes)",
+   "ancre": "badges-ordre-des-paliers-de-badge"
   },
   {
    "terme": "getPastDates",
@@ -139,28 +177,28 @@
    "ancre": "badges-fenetres-et-donnees-comptees-par-les-badges"
   },
   {
-   "terme": "Équivalent intensif",
+   "terme": "Kangourou Musclé (athlete)",
    "ancre": "badges-badge-kangourou-muscle-activite-physique"
   },
   {
-   "terme": "Équivalent modéré",
+   "terme": "Coefficients d'intensité",
    "ancre": "badges-badge-kangourou-muscle-activite-physique"
   },
   {
-   "terme": "SportLog",
+   "terme": "Fenêtre de 10 jours",
    "ancre": "badges-badge-kangourou-muscle-activite-physique"
   },
   {
-   "terme": "intensity",
-   "ancre": "badges-badge-kangourou-muscle-activite-physique"
-  },
-  {
-   "terme": "Journée réussie",
+   "terme": "Lapin des Fibres (lapin)",
    "ancre": "badges-badge-lapin-des-fibres"
   },
   {
-   "terme": "fiber",
+   "terme": "Seuil de 25 g de fibres",
    "ancre": "badges-badge-lapin-des-fibres"
+  },
+  {
+   "terme": "Requin protéiné (kangourou)",
+   "ancre": "badges-badge-requin-proteine"
   },
   {
    "terme": "proteinDailyTarget",
@@ -171,28 +209,16 @@
    "ancre": "badges-badge-requin-proteine"
   },
   {
-   "terme": "weightHistory",
+   "terme": "updateWeighIn",
    "ancre": "badges-badge-requin-proteine"
   },
   {
-   "terme": "formatNumber",
-   "ancre": "badges-badge-requin-proteine"
-  },
-  {
-   "terme": "StepLog",
+   "terme": "Hérisson Marcheur (herisson)",
    "ancre": "badges-badge-herisson-marcheur"
   },
   {
-   "terme": "ALL_BADGE_DEFINITIONS",
-   "ancre": "badges-entites"
-  },
-  {
-   "terme": "BadgeDefinition",
-   "ancre": "badges-entites"
-  },
-  {
-   "terme": "SavedMealLog",
-   "ancre": "badges-entites"
+   "terme": "Seuil de 8 000 pas",
+   "ancre": "badges-badge-herisson-marcheur"
   },
   {
    "terme": "categoryEnabled",
@@ -215,8 +241,12 @@
    "ancre": "badges-badge-mystere"
   },
   {
-   "terme": "placeholder (badge « ? »)",
+   "terme": "placeholder (faux badge)",
    "ancre": "badges-badge-mystere"
+  },
+  {
+   "terme": "BadgeIcon",
+   "ancre": "badges-tailles-des-dessins-de-badge"
   },
   {
    "terme": "pixelSizes",
@@ -227,19 +257,11 @@
    "ancre": "badges-tailles-des-dessins-de-badge"
   },
   {
-   "terme": "BadgeFrame",
-   "ancre": "badges-tailles-des-dessins-de-badge"
-  },
-  {
-   "terme": "saturate-[.65]",
+   "terme": "viewBox 0 0 120 120",
    "ancre": "badges-tailles-des-dessins-de-badge"
   },
   {
    "terme": "evaluerCelebrations",
-   "ancre": "badges-celebration-d-un-badge"
-  },
-  {
-   "terme": "glp1_badge_tiers_connus",
    "ancre": "badges-celebration-d-un-badge"
   },
   {
@@ -251,23 +273,19 @@
    "ancre": "badges-celebration-d-un-badge"
   },
   {
-   "terme": "Découverte (badge jamais observé)",
+   "terme": "File de célébration",
    "ancre": "badges-celebration-d-un-badge"
-  },
-  {
-   "terme": "shareBadgeItem",
-   "ancre": "badges-partage-d-un-badge"
   },
   {
    "terme": "renderBadgeCardFile",
    "ancre": "badges-partage-d-un-badge"
   },
   {
-   "terme": "navigator.canShare",
+   "terme": "navigator.share / canShare",
    "ancre": "badges-partage-d-un-badge"
   },
   {
-   "terme": "Carte de partage",
+   "terme": "toBlob image/jpeg 0.95",
    "ancre": "badges-partage-d-un-badge"
   }
  ],

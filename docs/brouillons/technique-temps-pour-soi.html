@@ -12,7 +12,7 @@
       <tr><td><code>time</code></td><td>string</td><td><code>HH:MM</code>, minute ronde</td><td>obligatoire ; lu <code>'12:00'</code> s'il manque</td></tr>
       <tr><td><code>activity</code></td><td>string</td><td>= <code>MeTimePreset.value</code>, ex. « Spa »</td><td>obligatoire</td></tr>
       <tr><td><code>duration</code></td><td>number</td><td>minutes entières</td><td>obligatoire</td></tr>
-      <tr><td><code>notes</code></td><td>string</td><td>texte libre</td><td>facultatif ; <code>undefined</code> si vide après <code>trim()</code></td></tr>
+      <tr><td><code>notes</code></td><td>string</td><td>texte libre</td><td>facultatif ; la clé est toujours écrite, <code>undefined</code> si vide après <code>trim()</code></td></tr>
     </tbody>
   </table>
   <p><code>MeTimePreset</code> : <code>{ value, label }</code>, sans valeur MET — aucune calorie ne se calcule sur ces moments. Champs du profil qui commandent le domaine : <code>meTimeTrackingEnabled?: boolean</code> (absent = éteint), <code>meTimeModuleHidden?: boolean</code>, <code>deleteAllButtonsEnabled?: boolean</code>.</p>
@@ -69,14 +69,14 @@ setActiveTab(tab)</code></pre>
      index = dernier indice de logs dont date === log.date
      logs[index] = snapLogTime({ ...logs[index], ...log })
      -&gt; logs</code></pre>
-  <p>« La dernière du jour » est la dernière dans l'<strong>ordre du tableau</strong>, c'est-à-dire la dernière saisie, pas la plus tardive dans la journée. L'écrasement fusionne : la ligne garde son <code>id</code>, et un champ absent de la nouvelle saisie serait conservé.</p>
-  <p class="ancre">src/shared/model/logbook.ts · src/app/useAppData.ts</p>
+  <p>« La dernière du jour » est la dernière dans l'<strong>ordre du tableau</strong>, c'est-à-dire la dernière saisie, pas la plus tardive dans la journée. L'écrasement fusionne : la ligne garde son <code>id</code>, et un champ absent de la charge serait conservé. Le formulaire n'omet jamais un champ : <code>{ date, time, activity, duration, notes: notes.trim() ? notes : undefined }</code> porte toujours les cinq clés, si bien que la ligne écrasée prend en entier la nouvelle saisie, <code>notes: undefined</code> compris.</p>
+  <p class="ancre">src/shared/model/logbook.ts · src/app/useAppData.ts · src/features/me-time/useMeTimeForm.ts</p>
   <details><summary>Cas limites</summary>
     <p>Le plafond est par <strong>date de la saisie</strong>, pas par jour courant : 15 moments datés du 09/09 bloquent le 09/09, même saisis le 12/09.</p>
-    <p>La ligne écrasée garde ses <code>notes</code> si la nouvelle saisie n'en porte pas — <code>notes: undefined</code> n'est pas transmis quand le champ est vide.</p>
+    <p>La ligne écrasée <strong>perd</strong> ses notes quand le champ de la nouvelle saisie est vide : la clé <code>notes</code> est présente avec la valeur <code>undefined</code>, et le spread copie les clés propres, valeur <code>undefined</code> comprise.</p>
     <p>Journal absent (<code>meTimeLogs</code> non défini) : le défaut <code>logs = []</code> s'applique, l'ajout réussit.</p>
   </details>
-  <div class="exemple"><p>Camille a déjà 15 moments datés du 12/09. Le seizième affiche l'avis et remplace la ligne la plus récemment saisie de ce jour ; le journal compte toujours 15 lignes au 12/09.</p></div>
+  <div class="exemple"><p>Camille a déjà 15 moments datés du 12/09. Le seizième affiche l'avis et remplace la ligne la plus récemment saisie de ce jour ; le journal compte toujours 15 lignes au 12/09, et la note de la ligne écrasée disparaît si le nouveau formulaire n'en portait pas.</p></div>
 
   <h3 id="temps-pour-soi-curseur-calendrier-journal">Curseur Calendrier / Journal</h3>
   <p><code>useHistoryView(clé)</code> tient l'état de la vue et le persiste. Le calendrier est le défaut, et il l'est par exclusion : seule la chaîne <code>'journal'</code> donne la vue journal.</p>
@@ -151,7 +151,7 @@ sinon durationRefusal = '' ; form.handleSubmit(e)
 // 2. useMeTimeForm.handleSubmit, garde silencieuse
 parsedDuration = parseInt(showCustomDuration ? customDuration : duration, 10)
 si isNaN(parsedDuration) ou parsedDuration &lt;= 0 -&gt; return   // rien n'est écrit, aucun message</code></pre>
-  <p>Le refus n'est jugé que si « Autre » est ouvert : les préréglages 15, 30, 45 et 60 ne peuvent pas le déclencher. Il s'efface à quatre gestes : retoucher la durée personnalisée, choisir une autre durée, ouvrir le formulaire, le fermer, et au démarrage d'une modification. <a href="spec-fonctionnelle.html#temps-pour-soi-formulaire-nouveau-moment-pour-soi-modifier-le-moment-pour-s">→ fonctionnelle</a></p>
+  <p>Le refus n'est jugé que si « Autre » est ouvert : les préréglages 15, 30, 45 et 60 ne peuvent pas le déclencher. Six chemins appellent <code>setDurationRefusal('')</code> et l'effacent donc : retoucher la durée personnalisée (<code>changeCustomDuration</code>), choisir une autre durée (<code>selectDuration</code>), ouvrir le formulaire (<code>openAddForm</code>), l'ouvrir sur un jour cliqué du calendrier (<code>openAddFormAt</code>), le fermer (<code>resetForm</code>), démarrer une modification (<code>startEdit</code>). <a href="spec-fonctionnelle.html#temps-pour-soi-formulaire-nouveau-moment-pour-soi-modifier-le-moment-pour-s">→ fonctionnelle</a></p>
   <p class="ancre">src/versions/mixte/features/me-time/MeTimeTracker.tsx · src/features/me-time/useMeTimeForm.ts</p>
   <details><summary>Cas limites</summary>
     <p>« 500 » : refus affiché, champ conservé à 500, formulaire ouvert.</p>
@@ -226,7 +226,7 @@ handleClearMeTimeHistory() -&gt; { ...appData, meTimeLogs: [] }</code></pre>
   <details><summary>Cas limites</summary>
     <p>Identifiant inconnu : <code>applyLogUpdate</code> et <code>removeLogById</code> rendent la liste inchangée.</p>
     <p>Journal absent : le défaut <code>logs = []</code> évite l'erreur.</p>
-    <p>Notes vidées : <code>notes: undefined</code> est transmis explicitement par la ligne du journal, la note disparaît. Une charge qui ne porterait pas le champ le conserverait.</p>
+    <p>Notes vidées : <code>notes: undefined</code> est transmis explicitement, par la ligne du journal comme par le formulaire, et la note disparaît. Une charge qui ne porterait pas le champ le conserverait — aucune saisie du domaine ne produit ce cas.</p>
     <p>Ligne sans <code>time</code> : l'édition en place travaille sur <code>'12:00'</code> et écrit cette valeur.</p>
     <p>« Tout supprimer » vide le tableau, pas les préférences : fenêtres, vue et activités actives restent.</p>
   </details>
@@ -305,7 +305,7 @@ pour t = startMs ; t ≤ endMs ; t += 86 400 000 × step :
     <p>Le score est calculé sur <strong>tout</strong> le journal filtré par la date du point, jamais sur <code>filteredLogs</code> : le graphe et le total ne partagent pas leur source.</p>
     <p>Mode Choisir sans date de début : le graphe part d'aujourd'hui − 6 jours alors que le total, lui, ne filtre rien — les deux chiffres peuvent couvrir des périodes différentes. <span class="marque">arbitrage non validé</span></p>
     <p>90 jours : <code>diffDays = 90</code>, <code>maxPoints = 60</code>, <code>step = 1</code> — aucun jour n'est sauté malgré le plafond de 60 points.</p>
-    <p>Moment daté du futur : jamais tracé, <code>endMs</code> s'arrêtant à la fin d'aujourd'hui.</p>
+    <p>Moment daté du futur : jamais tracé sous les quatre fenêtres fixes ni sous « Depuis le début », <code>endMs</code> valant <code>dayEndMs</code>. En mode Choisir avec une borne de fin future, <code>endMs</code> vaut cette date à 23:59:59 : la boucle dépasse aujourd'hui et le point est tracé.</p>
   </details>
   <div class="exemple"><p>Le 12/09, Camille cumule 30 + 45 = 75 min : <code>min(75/60 × 10, 10) = 10</code>. Le 06/09, 45 min donnent 7,5. Le 09/09, 120 min donnent 10.</p></div>
 
@@ -366,10 +366,14 @@ meTimeWeeklyAverage(logs, now) = entriesWeeklyAverageSinceFirst(logs, now) :
   si jours &lt; 7                                 -&gt; null
   -&gt; logs.length / (jours / 7)
 
-affichage : format1Dec(valeur) + pluriel(valeur, 'moment')       // 's' dès que valeur ≥ 2
+affichage — deux portes de formatage :
+  tuile de gauche : format1Dec(moyenne) + pluriel(moyenne, 'moment')
+  tuile de droite : String(compte)      + pluriel(compte,  'moment')
+  pluriel(n, mot) = n &gt;= 2 ? mot + 's' : mot
+
 garde de la rangée : meTimeTrackingEnabled &amp;&amp; (moyenne !== null || compte &gt; 0)</code></pre>
-  <p><code>format1Dec</code> arrondit à une décimale au plus et laisse tomber les zéros de queue : 2,04 s'écrit « 2 », 2,33 s'écrit « 2.3 ». La tuile de gauche est absente tant que la moyenne vaut <code>null</code> ; celle de droite est toujours rendue quand la rangée l'est. <code>meTimeMinutesLast7Days</code> existe encore dans le domaine mais n'a plus d'appelant. <span class="marque non">non implémenté</span> <a href="spec-fonctionnelle.html#temps-pour-soi-tuiles-home-du-domaine-temps-pour-soi">→ fonctionnelle</a></p>
-  <p class="ancre">src/features/home/homeOverview.ts · src/versions/mixte/homes/sections/MaisonSections.tsx</p>
+  <p><code>format1Dec</code> (soit <code>formatNumber(valeur, 1)</code>) arrondit à une décimale au plus, laisse tomber les zéros de queue et sépare les milliers par une espace insécable : 2,04 s'écrit « 2 », 2,33 s'écrit « 2.3 », 1234,5 s'écrit « 1 234.5 ». <code>String</code> ne fait rien de tout cela — sans conséquence visible, le compte étant un entier. La tuile de gauche est absente tant que la moyenne vaut <code>null</code> ; celle de droite est toujours rendue quand la rangée l'est. <code>meTimeMinutesLast7Days</code> existe encore dans le domaine mais n'a plus d'appelant. <span class="marque non">non implémenté</span> <a href="spec-fonctionnelle.html#temps-pour-soi-tuiles-home-du-domaine-temps-pour-soi">→ fonctionnelle</a></p>
+  <p class="ancre">src/features/home/homeOverview.ts · src/shared/number/number.format.ts · src/versions/mixte/homes/sections/MaisonSections.tsx</p>
   <details><summary>Cas limites</summary>
     <p>Première entrée il y a moins de sept jours (bornes comprises) : moyenne <code>null</code>, seule la tuile des 7 jours paraît.</p>
     <p>Le diviseur est le temps écoulé depuis la première entrée, pas le nombre de journées renseignées : une semaine sans moment tire la moyenne vers le bas.</p>
@@ -379,7 +383,7 @@ garde de la rangée : meTimeTrackingEnabled &amp;&amp; (moyenne !== null || comp
   <div class="exemple"><p>Première entrée le 20/08, sept moments au 12/09 : <code>daysBetween = 23</code>, <code>jours = 24</code>, <code>7 / (24/7) = 2,0416…</code> → « 2 moments ». Quatre entrées du 06 au 12/09 → « 4 moments ».</p></div>
 
   <h3 id="temps-pour-soi-tendance-du-temps-pour-soi-tiroir">Tendance du temps pour soi (tiroir)</h3>
-  <p>Une valeur par jour sur quatorze jours, sans échelle ni date : la carte ne montre qu'une silhouette et un total.</p>
+  <p>Une valeur par jour sur quatorze jours, sans échelle ni date. La carte porte une silhouette quand la série a du relief, et un total.</p>
   <pre><code>TREND_DAYS = 14
 trendDates(days, today) = [ getLocalDateStr(today − i × 86 400 000) pour i = days−1 … 0 ]
 
@@ -389,13 +393,30 @@ meTimeTrend(meTimeLogs, days = 14, today = new Date()) :
         Σ duration des logs dont log.date === date )     // 0 les jours sans moment
 
 trendTotal(series) : series.length === 0 ? null : Σ (v ?? 0)
-libellé de la carte : « total : » + formatCalendarDuration(trendTotal(series))</code></pre>
-  <p>Le zéro est un arbitrage du domaine : un moment se note quand il a lieu, ne rien trouver c'est ne s'être rien accordé — à la différence des calories, du sommeil et des pas, qui posent <code>null</code>. La carte n'est montée que si <code>meTimeTrackingEnabled</code> ; le format est celui des tuiles de calendrier, donc « 5h00 » et « 45min ». <a href="spec-fonctionnelle.html#temps-pour-soi-tiroirs-journal-et-tendances">→ fonctionnelle</a></p>
+hasShape(series)   : connues = series sans les null ;
+                     connues.length &gt;= 2 &amp;&amp; min(connues) !== max(connues)
+
+rangée du tiroir :
+  row = { key:'metime', tab:'metime', label:'Temps pour soi',
+          series: meTimeTrend(appData.meTimeLogs),
+          enabled: Boolean(profile.meTimeTrackingEnabled) }
+
+rendu de la grille :
+  [...rows allumées, ...rows éteintes].filter(row =&gt; !isModuleHidden(profile, row.tab))
+  dessin  = hasShape(row.series) ? Sparkline(row.series)
+                                 : row.enabled ? inviteSaisie(row) : null
+  valeurs = row.enabled ? 'total : ' + formatCalendarDuration(trendTotal(row.series)) : null
+  moduleEteint = !row.enabled &amp;&amp; row.key ∈ MODULES_TENDANCE
+  bouton disabled = !row.enabled &amp;&amp; !moduleEteint</code></pre>
+  <p>Le zéro d'un jour sans moment est la règle commune des séries de tendance depuis le 2026-08-29 (« graphs tendance : valeurs manquantes : mets à zero ») : <code>caloriesTrend</code>, <code>stepsTrend</code> et <code>sleepTrend</code> posent zéro comme <code>sportTrend</code> et <code>meTimeTrend</code>. Le seul <code>null</code> qui subsiste est celui de <code>trendTotal</code> sur une série vide.</p>
+  <p>La carte est <strong>toujours rendue</strong>, module éteint compris. Éteinte, elle est reléguée après les cartes allumées par le tri en deux groupes, privée de sa zone de courbe et de ses valeurs, et son clic écrit le message d'activation qui mène à <code>module-metime-tracking</code> de la page Modules. Elle ne disparaît que si le module est <strong>masqué</strong> : <code>isModuleHidden(profile, 'metime')</code>, donc éteint <em>et</em> <code>meTimeModuleHidden</code>. Le format du total est celui des tuiles de calendrier, donc « 5h00 » et « 45min ». <a href="spec-fonctionnelle.html#temps-pour-soi-tiroirs-journal-et-tendances">→ fonctionnelle</a></p>
   <p class="ancre">src/features/trends/trends.ts · src/versions/mixte/components/TrendDrawer.tsx</p>
   <details><summary>Cas limites</summary>
-    <p>Journal vide : série <code>[]</code>, <code>trendTotal</code> rend <code>null</code>, la carte n'affiche pas de total.</p>
-    <p>Série entière à zéro : total 0 → « total : 0min ».</p>
-    <p>La fenêtre est fixe : les moments plus anciens que quatorze jours et ceux datés du futur n'entrent pas dans la série ni dans le total.</p>
+    <p>Journal vide : série <code>[]</code>, <code>hasShape</code> faux et <code>trendTotal</code> <code>null</code> — module allumé, la carte montre l'invite de saisie et aucun total.</p>
+    <p>Série entière à zéro, ou deux valeurs identiques : <code>hasShape</code> faux, aucune silhouette — l'invite de saisie prend sa place, et la ligne de valeurs reste (« total : 0min » pour une série toute à zéro).</p>
+    <p>Module éteint avec un journal plein : la série est calculée, mais ni dessin ni total ne sont rendus ; le bouton reste cliquable pour porter le message.</p>
+    <p>Module masqué : la rangée est retirée de la grille avant le rendu.</p>
+    <p>La fenêtre est fixe : les moments plus anciens que quatorze jours et ceux datés du futur n'entrent ni dans la série ni dans le total.</p>
   </details>
-  <div class="exemple"><p>Au 12/09, Camille a 300 minutes sur les quatorze derniers jours : la carte porte « total : 5h00 ».</p></div>
+  <div class="exemple"><p>Au 12/09, Camille a 300 minutes sur les quatorze derniers jours, réparties sur plusieurs journées : la silhouette est tracée et la carte porte « total : 5h00 ».</p></div>
 </section>
