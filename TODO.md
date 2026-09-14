@@ -18,3 +18,8 @@ Règles de tenue (voir GUIDELINES.md, « Manière de travailler ») :
 ---
 
 - [ ] finir équivalence poid/portion et inclure somehow aux formulaires
+
+- [ ] validation repas (ou construction) : un lapin qui dit si repas bon en
+      fibre, un requin qui dit si bon en prot.
+- [ ] idem : un kangourou qui félicite avec un pouce en l'air à la validation
+      d'une activité physique.
