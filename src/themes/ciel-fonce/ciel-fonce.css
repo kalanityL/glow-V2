@@ -126,8 +126,9 @@
   --panneau-filet: rgba(255, 255, 255, 0.16);
   --panneau-ombre: 0 18px 40px -18px rgba(0, 0, 0, 0.8);
 
-  /* La bille éteinte du décompte. L'allumée prend l'accent, commun aux deux
-     thèmes ; l'éteinte est un blanc voilé, plus discret sur un fond de nuit. */
+  /* Les billes du décompte. L'allumée prend l'accent ; l'éteinte est un
+     blanc voilé, plus discret sur un fond de nuit. */
+  --bille-allumee: var(--accent);
   --bille-eteinte: rgba(255, 255, 255, 0.22);
 
   --carte-filet: rgba(255, 255, 255, 0.18);

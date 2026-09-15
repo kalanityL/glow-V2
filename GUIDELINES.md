@@ -225,8 +225,10 @@ thèmes ne repeignent pas, et qui ne sont pas dans les templates non plus.
   texte sans emploi.** Ce qui est retiré est retiré **entièrement** : le
   fichier, le type, les textes dans chaque langue. Rien ne sèche dans le dépôt.
 - **Un thème ne pose que ses jetons.** Thèmes : `ciel` (jour),
-  `ciel-fonce` (nuit) et `blanc` (fond blanc, 2026-09-16). En ajouter un =
-  quatre gestes, écrits dans
+  `ciel-fonce` (nuit) et `blanc` (fond blanc, 2026-09-16). **Les couleurs et
+  la police de `blanc` sont dictées par `docs/pour-claude/colorboard.png`**
+  (« exactement conforme », 2026-09-16) : on n'y change rien à l'œil, on
+  relit le board. En ajouter un = quatre gestes, écrits dans
   `src/themes/themes.ts`. Le thème est choisi à l'écran ; il n'y a pas de
   page de choix de thème ailleurs. Le contour du téléphone et sa barre du bas
   (`src/index.css`) figurent l'appareil, pas l'application : ils ne suivent

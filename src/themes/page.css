@@ -95,8 +95,11 @@
   background: var(--bille-eteinte);
 }
 
+/* LA BILLE ALLUMÉE A SON PROPRE JETON (2026-09-16) : les deux ciels lui
+   donnent l'accent, Blanc le vert menthe que son colorboard réserve à la
+   progression. */
 .bille--allumee {
-  background: var(--accent);
+  background: var(--bille-allumee);
 }
 
 .logomark {
