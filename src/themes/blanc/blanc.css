@@ -14,11 +14,9 @@
    l'œil : ce qui n'est pas sur le board reste comme dans Ciel. */
 
 .theme-blanc {
-  /* « Gris 50 — Arrière-plan principal ». LES SURFACES AUSSI (2026-09-16,
-     « remplace le balnc par la couleur d'arriere plan principale ») : les
-     réponses, le champ et le panneau ne sont plus en « Blanc — Cartes », ils
-     sont de la couleur de la page, et c'est leur filet Gris 300 qui les
-     dessine. */
+  /* « Gris 50 — Arrière-plan principal ». Les surfaces (réponses, champs,
+     panneau) sont en « Blanc — Cartes, Surfaces » : le fond de page est un
+     rien plus gris qu'elles, et c'est ce qui les fait tenir dessus. */
   --fond: #f8fafc;
 
   /* « Bleu principal — Actions principales, Éléments interactifs, Liens ». */
@@ -37,16 +35,16 @@
   --encre: #0f172a;
   --encre-chapeau: #64748b;
 
-  /* Les réponses d'une question : la couleur de la page, cernée de « Gris
-     300 — Bordures », et celle qui est retenue en « Bleu clair — États
+  /* Les réponses d'une question : une surface blanche cernée de « Gris 300 —
+     Bordures », et celle qui est retenue en « Bleu clair — États
      sélectionnés ». Son liseré est l'accent. */
-  --option-fond: var(--fond);
+  --option-fond: #ffffff;
   --option-filet: #cbd5e1;
   --option-choisi-fond: #dbeafe;
 
-  /* LE PANNEAU FLOTTANT des roues du sélecteur : la couleur de la page,
-     opaque, cerné de Gris 300, décollé par une ombre d'ardoise. */
-  --panneau-fond: var(--fond);
+  /* LE PANNEAU FLOTTANT des roues du sélecteur : une carte blanche, opaque,
+     cernée de Gris 300, décollée par une ombre d'ardoise. */
+  --panneau-fond: #ffffff;
   --panneau-filet: #cbd5e1;
   --panneau-ombre: 0 18px 40px -18px rgba(15, 23, 42, 0.35);
 
