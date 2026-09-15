@@ -224,8 +224,9 @@ thèmes ne repeignent pas, et qui ne sont pas dans les templates non plus.
 - **Pas de jeton sans règle qui l'emploie ; pas de règle sans écran ; pas de
   texte sans emploi.** Ce qui est retiré est retiré **entièrement** : le
   fichier, le type, les textes dans chaque langue. Rien ne sèche dans le dépôt.
-- **Un thème ne pose que ses jetons.** Thèmes : `ciel` (jour) et
-  `ciel-fonce` (nuit). En ajouter un = quatre gestes, écrits dans
+- **Un thème ne pose que ses jetons.** Thèmes : `ciel` (jour),
+  `ciel-fonce` (nuit) et `blanc` (fond blanc, 2026-09-16). En ajouter un =
+  quatre gestes, écrits dans
   `src/themes/themes.ts`. Le thème est choisi à l'écran ; il n'y a pas de
   page de choix de thème ailleurs. Le contour du téléphone et sa barre du bas
   (`src/index.css`) figurent l'appareil, pas l'application : ils ne suivent
@@ -347,8 +348,8 @@ thèmes ne repeignent pas, et qui ne sont pas dans les templates non plus.
 ## 4. Décisions produit consignées
 
 L'onboarding, dans l'ordre (état au 2026-09-09) :
-1. **Thème** — deux cadres nus, le premier retenu, clic = toute la page
-   change. Titre « Choisissez ».
+1. **Thème** — trois cadres nus (Ciel, Ciel foncé, Blanc), le premier
+   retenu, clic = toute la page change. Titre « Choisissez ».
 2. **Langue et unités** — sur une ligne chacun. Français et cm · kg par
    défaut ; « English » bascule sur inch · pound. La langue est une
    **maquette** : recueillie, pas branchée (l'application parle la langue

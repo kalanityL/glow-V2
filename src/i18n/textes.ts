@@ -183,6 +183,7 @@ export const TEXTES: Record<Langue, Textes> = {
     themes: {
       ciel: 'Ciel',
       'ciel-fonce': 'Ciel foncé',
+      blanc: 'Blanc',
     },
     objectifs: {
       perdre: 'Perdre du poids',
@@ -315,6 +316,7 @@ export const TEXTES: Record<Langue, Textes> = {
     themes: {
       ciel: 'Sky',
       'ciel-fonce': 'Dark sky',
+      blanc: 'White',
     },
     objectifs: {
       perdre: 'Lose weight',

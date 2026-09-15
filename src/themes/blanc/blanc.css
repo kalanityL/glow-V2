@@ -1,0 +1,74 @@
+/* LE THÈME BLANC — le troisième thème, un fond blanc (2026-09-16, « ajouter
+   un choix fond blanc à l'onboarding »).
+
+   Des JETONS, et rien d'autre : la mise en page est dans `themes/page.css` et
+   ne bouge pas d'un thème à l'autre.
+
+   Il est le NÉGATIF de Ciel : même marque, mêmes rapports entre le titre et
+   le chapeau, même forme de bouton (arrondi de 14 px) — seule la lumière
+   s'inverse. Le fond est un blanc plein, pas un dégradé : c'est ce qui a été
+   demandé, un fond blanc. */
+
+.theme-blanc {
+  --fond: #ffffff;
+
+  /* L'ACCENT N'EST PAS CELUI DE CIEL. Le bleu clair des deux ciels (#5fc0ff)
+     est fait pour se poser sur du sombre : sur du blanc il ne tiendrait pas
+     le contraste — liseré du choix, bille allumée, colonne L/P/1 du
+     mot-symbole seraient délavés. C'est le bleu du coin clair de Ciel
+     (#2e7fbe), assez profond pour le blanc, et de la même famille : on
+     reconnaît le même accent d'un thème à l'autre. */
+  --accent: #2e7fbe;
+
+  /* La pastille de la marque — ses trois teintes et son halo, les mêmes que
+     Ciel : c'est le logo, pas une couleur d'ambiance. */
+  --logo-from: oklch(74.6% 0.16 232.661);
+  --logo-via: #0284c7;
+  --logo-to: oklch(76.5% 0.177 163.223);
+  --logo-ombre: 0 6px 18px -6px rgba(14, 165, 233, 0.8);
+
+  /* LES ENCRES. Le noir du thème est le noir bleuté que Ciel donne à l'encre
+     de son bouton (#0b1a2b) : la même encre, retournée sur le fond. Le
+     chapeau garde une nuance sous le titre, comme partout. */
+  --encre: #0b1a2b;
+  --encre-chapeau: rgba(11, 26, 43, 0.72);
+
+  /* Les réponses d'une question : un voile d'encre très léger sur le blanc,
+     son filet, et le fond de celle qui est retenue — un voile de l'accent.
+     Son liseré, lui, est l'accent. */
+  --option-fond: rgba(11, 26, 43, 0.04);
+  --option-filet: rgba(11, 26, 43, 0.16);
+  --option-choisi-fond: rgba(46, 127, 190, 0.10);
+
+  /* LE PANNEAU FLOTTANT des roues du sélecteur. Son fond est OPAQUE, blanc
+     comme la page, et c'est son filet et son ombre qui le décollent d'elle. */
+  --panneau-fond: #ffffff;
+  --panneau-filet: rgba(11, 26, 43, 0.16);
+  --panneau-ombre: 0 18px 40px -18px rgba(11, 26, 43, 0.35);
+
+  /* La bille éteinte du décompte : un voile d'encre, comme les autres thèmes
+     ont un voile de blanc. L'allumée prend l'accent. */
+  --bille-eteinte: rgba(11, 26, 43, 0.18);
+
+  /* Le filet du cadre : sur une page blanche, un cadre blanc ne se verrait
+     que par lui — il est donc un peu plus marqué que celui des ciels. */
+  --carte-filet: rgba(11, 26, 43, 0.16);
+
+  /* LE BOUTON DE BLANC : le même aplat plein que Ciel, l'accent en fond, mais
+     une encre blanche — sur ce bleu-là, c'est le blanc qui tient le contraste,
+     là où le bleu clair de Ciel demandait du noir. Même arrondi que Ciel. */
+  --bouton-fond: var(--accent);
+  --bouton-encre: #ffffff;
+  --bouton-filet: transparent;
+  /* Le second bouton, celui qui recule : pas de matière, un simple filet et
+     l'encre de la page. Il garde l'arrondi du premier — c'est la même rangée. */
+  --bouton2-fond: transparent;
+  --bouton2-encre: var(--encre);
+  --bouton2-filet: rgba(11, 26, 43, 0.25);
+
+  --bouton-rayon: 14px;
+  --bouton-ombre: none;
+
+  --font-display: 'Outfit', system-ui, sans-serif;
+  --font-body: 'Plus Jakarta Sans', system-ui, sans-serif;
+}
