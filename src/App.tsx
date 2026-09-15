@@ -8,6 +8,7 @@ import './themes/dessins.css';
 import './themes/ciel/ciel.css';
 import './themes/ciel-fonce/ciel-fonce.css';
 import './themes/blanc/blanc.css';
+import './themes/degrade-doux/degrade-doux.css';
 
 /**
  * V2 — repartie de zéro.

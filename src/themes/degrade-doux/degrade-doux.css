@@ -1,0 +1,77 @@
+/* LE THÈME DÉGRADÉ DOUX — le quatrième thème (2026-09-16, « tu peux mettre
+   le degradé que tu proposais en 4eme choix »).
+
+   Des JETONS, et rien d'autre : la mise en page est dans `themes/page.css` et
+   ne bouge pas d'un thème à l'autre.
+
+   C'EST BLANC, AVEC UN AUTRE FOND : tout est repris de `blanc/blanc.css`, donc
+   du colorboard `docs/pour-claude/colorboard.png`, et seul le fond de page
+   change — le « Dégradé doux » que le board réserve aux arrière-plans
+   décoratifs, à la place du Gris 50. Un jeton qui change dans Blanc doit
+   changer ici aussi ; les deux feuilles se lisent côte à côte. */
+
+.theme-degrade-doux {
+  /* « Dégradé doux — Arrière-plans décoratifs », #EFF6FF → #E0F2FE. Même
+     géométrie que Ciel : le second bout vise le coin en haut à droite. Les
+     surfaces restent en « Blanc — Cartes, Surfaces » et se détachent dessus. */
+  --fond: linear-gradient(to top right, #eff6ff 0%, #e0f2fe 100%);
+
+  /* « Bleu principal — Actions principales, Éléments interactifs, Liens ». */
+  --accent: #2563eb;
+
+  /* La pastille de la marque — ses trois teintes et son halo, les mêmes que
+     Ciel : c'est le logo, pas une couleur d'ambiance. Le board ne la
+     redessine pas. */
+  --logo-from: oklch(74.6% 0.16 232.661);
+  --logo-via: #0284c7;
+  --logo-to: oklch(76.5% 0.177 163.223);
+  --logo-ombre: 0 6px 18px -6px rgba(14, 165, 233, 0.8);
+
+  /* « Bleu profond — Textes principaux » et « Gris 500 — Textes
+     secondaires ». */
+  --encre: #0f172a;
+  --encre-chapeau: #64748b;
+
+  /* Les réponses d'une question : une surface blanche cernée de « Gris 300 —
+     Bordures », et celle qui est retenue en « Bleu clair — États
+     sélectionnés ». Son liseré est l'accent. */
+  --option-fond: #ffffff;
+  --option-filet: #cbd5e1;
+  --option-choisi-fond: #dbeafe;
+
+  /* LE PANNEAU FLOTTANT des roues du sélecteur : une carte blanche, opaque,
+     cernée de Gris 300, décollée par une ombre d'ardoise. */
+  --panneau-fond: #ffffff;
+  --panneau-filet: #cbd5e1;
+  --panneau-ombre: 0 18px 40px -18px rgba(15, 23, 42, 0.35);
+
+  /* Les billes du décompte : l'éteinte en Gris 300, l'allumée en « Vert
+     menthe — Succès, Confirmations, Progression » — c'est le seul thème où
+     la bille ne prend pas l'accent, parce que le board le dit. */
+  --bille-eteinte: #cbd5e1;
+  --bille-allumee: #10b981;
+
+  /* Le filet du cadre : Gris 300, comme toute bordure du board. Sur la page
+     Blanc, c'est lui seul qui dessine le cadre blanc. */
+  --carte-filet: #cbd5e1;
+
+  /* « Bouton principal » : un aplat de Bleu principal, encre blanche, pas de
+     filet, pas d'ombre — le board le montre plat. L'arrondi est celui de ses
+     composants, plus serré que Ciel : 10 px. */
+  --bouton-fond: var(--accent);
+  --bouton-encre: #ffffff;
+  --bouton-filet: transparent;
+  /* « Bouton secondaire » : une surface de bleu 50, cernée de bleu 200, et
+     l'accent en encre — tel que le board le montre. */
+  --bouton2-fond: #eff6ff;
+  --bouton2-encre: var(--accent);
+  --bouton2-filet: #bfdbfe;
+
+  --bouton-rayon: 10px;
+  --bouton-ombre: none;
+
+  /* « Typographie : Inter », pour les titres comme pour le texte courant.
+     Embarquée, voir `src/fonts.css`. */
+  --font-display: 'Inter', system-ui, sans-serif;
+  --font-body: 'Inter', system-ui, sans-serif;
+}

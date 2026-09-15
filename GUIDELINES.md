@@ -225,10 +225,12 @@ thèmes ne repeignent pas, et qui ne sont pas dans les templates non plus.
   texte sans emploi.** Ce qui est retiré est retiré **entièrement** : le
   fichier, le type, les textes dans chaque langue. Rien ne sèche dans le dépôt.
 - **Un thème ne pose que ses jetons.** Thèmes : `ciel` (jour),
-  `ciel-fonce` (nuit) et `blanc` (fond blanc, 2026-09-16). **Les couleurs et
-  la police de `blanc` sont dictées par `docs/pour-claude/colorboard.png`**
-  (« exactement conforme », 2026-09-16) : on n'y change rien à l'œil, on
-  relit le board. En ajouter un = quatre gestes, écrits dans
+  `ciel-fonce` (nuit), `blanc` (fond blanc, 2026-09-16) et `degrade-doux`
+  (Blanc avec le « Dégradé doux » du board en fond, 2026-09-16). **Les
+  couleurs et la police de `blanc` et de `degrade-doux` sont dictées par
+  `docs/pour-claude/colorboard.png`** (« exactement conforme », 2026-09-16) :
+  on n'y change rien à l'œil, on relit le board ; un jeton qui change dans
+  l'un change dans l'autre. En ajouter un = quatre gestes, écrits dans
   `src/themes/themes.ts`. Le thème est choisi à l'écran ; il n'y a pas de
   page de choix de thème ailleurs. Le contour du téléphone et sa barre du bas
   (`src/index.css`) figurent l'appareil, pas l'application : ils ne suivent
@@ -350,8 +352,8 @@ thèmes ne repeignent pas, et qui ne sont pas dans les templates non plus.
 ## 4. Décisions produit consignées
 
 L'onboarding, dans l'ordre (état au 2026-09-09) :
-1. **Thème** — trois cadres nus (Ciel, Ciel foncé, Blanc), le premier
-   retenu, clic = toute la page change. Titre « Choisissez ».
+1. **Thème** — quatre cadres nus (Ciel, Ciel foncé, Blanc, Dégradé doux),
+   le premier retenu, clic = toute la page change. Titre « Choisissez ».
 2. **Langue et unités** — sur une ligne chacun. Français et cm · kg par
    défaut ; « English » bascule sur inch · pound. La langue est une
    **maquette** : recueillie, pas branchée (l'application parle la langue

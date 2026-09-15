@@ -17,7 +17,7 @@
  */
 
 /** Les thèmes existants, dans l'ordre où ils s'affichent. */
-export const THEMES = ['ciel', 'ciel-fonce', 'blanc'] as const;
+export const THEMES = ['ciel', 'ciel-fonce', 'blanc', 'degrade-doux'] as const;
 
 export type ThemeId = (typeof THEMES)[number];
 

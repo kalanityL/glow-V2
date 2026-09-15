@@ -232,13 +232,13 @@
 
 /* ── LE CHOIX DU THÈME ──────────────────────────────────────────────────── */
 
-/* Un cadre par thème, côte à côte, en colonnes égales. Le plancher de 80 px
-   fait tenir TROIS cadres sur une ligne jusqu'à 320 px de large (le troisième
-   thème est arrivé le 2026-09-16) : un cadre passé seul à la ligne se lirait
-   comme le choix à part. */
+/* Un cadre par thème, côte à côte, en colonnes égales. Le plancher de 60 px
+   fait tenir QUATRE cadres sur une ligne jusqu'à 320 px de large (le
+   troisième et le quatrième thème sont arrivés le 2026-09-16) : un cadre
+   passé seul à la ligne se lirait comme le choix à part. */
 .choix-themes {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(80px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(60px, 1fr));
   gap: 12px;
   margin: 20px 0 24px;
 }

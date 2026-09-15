@@ -184,6 +184,7 @@ export const TEXTES: Record<Langue, Textes> = {
       ciel: 'Ciel',
       'ciel-fonce': 'Ciel foncé',
       blanc: 'Blanc',
+      'degrade-doux': 'Dégradé doux',
     },
     objectifs: {
       perdre: 'Perdre du poids',
@@ -317,6 +318,7 @@ export const TEXTES: Record<Langue, Textes> = {
       ciel: 'Sky',
       'ciel-fonce': 'Dark sky',
       blanc: 'White',
+      'degrade-doux': 'Soft gradient',
     },
     objectifs: {
       perdre: 'Lose weight',
