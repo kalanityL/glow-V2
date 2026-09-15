@@ -177,6 +177,23 @@ Elles décident de la FORME du code, pas seulement de son contenu.
 - Ce qui n'a pas pu être vu (un clic, une fermeture) se dit comme tel : « je
   n'ai pas pu le voir, c'est toi qui le confirmeras ».
 
+### Le contrôle des guidelines, à la fin de chaque modification (2026-09-15)
+- **À la fin de chaque modification, avant de rendre la réponse, un passage
+  de contrôle relit ce qui a été modifié** (le diff, pas la mémoire qu'on en
+  a) **et vérifie que rien n'y contrevient à ce fichier** : rien de style en
+  dur dans un template, aucun texte hors du dictionnaire, aucune API du
+  navigateur hors de `navigateur.ts`, aucun `:hover`, aucun popup, rien qui
+  déborde, aucune couleur dans `page.css`, rien de la V1 au-delà du
+  strictement demandé, le vocabulaire de `VOCABULAIRE.md`, les commentaires
+  en français qui disent le pourquoi…
+- **Si tout est respecté, la réponse dit seulement : « Guidelines
+  respectées ».**
+- **Sinon, on CORRIGE, puis la réponse dit : « Guidelines non respectées »**,
+  suivi d'UNE ligne disant ce qui contrevenait, et si c'est corrigé ou non.
+- **Par défaut, tout ce qui contrevient se corrige**, sans demander. Seule
+  une mention explicite d'elle (« laisse comme ça ») dispense de corriger ;
+  la ligne dit alors que ce n'est pas corrigé, et pourquoi.
+
 ### Serveur de développement
 - `npm run dev -- --port 3002 --strictPort`, en arrière-plan. **Le relancer en
   début de session** et chaque fois qu'il tombe — quand la page est blanche
