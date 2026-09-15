@@ -53,6 +53,17 @@
   flex: 1;
   min-height: 0;
   overflow-y: auto;
+  /* LA ZONE NE ROGNE PLUS LES LISERÉS (2026-09-15, « il y a un truc qui coupe
+     les cotés ») : `overflow-y: auto` rogne aussi ce qui dépasse à gauche et
+     à droite, et les liserés du choix sont des `box-shadow` posées HORS de
+     leur élément — 2 px pour une réponse ou un cadre de thème, 4 px pour une
+     pastille. Une réponse pleine largeur les voyait donc coupés sur les deux
+     côtés, et en bas quand elle était la dernière. La zone se donne 4 px de
+     rembourrage tout autour, où le liseré a la place de se peindre, et
+     rattrape ces 4 px sur les côtés par une marge négative pour que rien ne
+     bouge d'un pixel : le contenu garde exactement sa largeur et sa place. */
+  padding: 4px;
+  margin: 0 -4px;
 }
 
 /* ── L'ENTÊTE ───────────────────────────────────────────────────────────── */
