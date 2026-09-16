@@ -60,7 +60,7 @@ export function Accueil({ reponses }: { reponses: Reponses }) {
   const textes = useTextes();
 
   return (
-    <div className={`page ${classeDuTheme('blanc')}`}>
+    <div className={`page page--accueil ${classeDuTheme('blanc')}`}>
       <div className="page__colonne">
         {/* UNE SEULE LIGNE (2026-09-16, « header : logo / glow / recherche/
             parametre tous sur la meme ligne / logo et titre meme hauteur,

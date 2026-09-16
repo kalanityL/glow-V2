@@ -657,6 +657,42 @@
 
 /* ── L'ACCUEIL (2026-09-16) ─────────────────────────────────────────────── */
 
+/* L'IMAGE DERRIÈRE L'ENTÊTE ET LE SALUT (2026-09-16, « met cette image en
+   fond de header comme sur la 2eme image, avec le bas de l'image qui se
+   melange avec le fond de page ») : une bande en haut de la page, sous le
+   contenu, qui porte l'image du thème (`--accueil-entete-image`, `none` sur
+   les ciels) cadrée sur son bord droit — c'est là qu'est la plante — et
+   FONDUE VERS LE BAS par un masque : opaque sur ses deux premiers cinquièmes,
+   puis effacée jusqu'à son pied, où le fond de page — uni ou dégradé, peu
+   importe — passe au travers. Un masque et non un voile de la couleur du
+   fond : un voile devrait connaître le fond, et Dégradé doux n'en a pas
+   qu'une. Le noir et le transparent du masque ne sont pas des couleurs :
+   ce sont ses deux valeurs, opaque et percé.
+   La bande est posée sur la page et non sur la colonne (bornée à 380 px) :
+   elle va d'un bord à l'autre. Sa hauteur couvre l'entête, la devise et le
+   salut, avec le fondu qui s'achève juste sous le portrait. */
+.page--accueil {
+  position: relative;
+}
+
+.page--accueil::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 250px;
+  background: var(--accueil-entete-image) top right / cover no-repeat;
+  -webkit-mask-image: linear-gradient(to bottom, #000 40%, transparent 100%);
+  mask-image: linear-gradient(to bottom, #000 40%, transparent 100%);
+  pointer-events: none;
+}
+
+/* Le contenu passe devant la bande. */
+.page--accueil > * {
+  position: relative;
+}
+
 /* LES ICÔNES : un trait de l'encre courante, comme Lucide les dessine — la
    graisse et les bouts ronds sont ici et non dans le template. La taille est
    celle de l'endroit. */

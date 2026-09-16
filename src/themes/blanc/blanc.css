@@ -73,6 +73,13 @@
   --bouton-rayon: 10px;
   --bouton-ombre: none;
 
+  /* LE FOND DE L'ENTÊTE DE L'ACCUEIL (2026-09-16, « met cette image en fond
+     de header comme sur la 2eme image ») : sa photo — un mur blanc, une
+     plante à droite —, embarquée dans `src/assets/images/` comme les polices
+     (aucune ressource distante). La mise en page la fond dans le fond de
+     page ; ici, seulement l'image. */
+  --accueil-entete-image: url(../../assets/images/fond-entete-accueil.jpg);
+
   /* « Typographie : Inter », pour les titres comme pour le texte courant.
      Embarquée, voir `src/fonts.css`. */
   --font-display: 'Inter', system-ui, sans-serif;
