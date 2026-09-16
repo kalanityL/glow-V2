@@ -725,14 +725,11 @@
   fill-opacity: 0.15;
 }
 
-/* LES SEPT MODULES, au-dessus du menu, EN QUINCONCE (2026-09-16) : deux
-   rangs, trois cercles puis quatre. Les cercles du rang de quatre se
-   répartissent sur toute la largeur ; ceux du rang de trois sont resserrés
-   d'une demi-part de chaque côté, si bien que chacun tombe entre deux du
-   rang du dessous — c'est le quinconce, sans grille ni mesure en dur : une
-   part est un quart de la largeur, le retrait un huitième. Pas de fond
-   derrière la rangée (« ne rajoute pas de fond »), seulement le cercle de
-   chaque icône. */
+/* LES HUIT MODULES, au-dessus du menu, EN DEUX RANGS ALIGNÉS DE QUATRE
+   (2026-09-16, « dusposition 4 et 4 alignés » — le quinconce de trois puis
+   quatre n'a vécu qu'un après-midi). Les cercles se répartissent à parts
+   égales sur la largeur ; pas de fond derrière les rangs (« ne rajoute pas
+   de fond »), seulement le cercle de chaque icône. */
 .modules {
   display: flex;
   flex-direction: column;
@@ -748,13 +745,6 @@
   justify-content: space-around;
 }
 
-/* Le rang de trois est en retrait d'un huitième de la largeur de chaque
-   côté : ses trois centres tombent aux quarts impairs, entre les centres du
-   rang de quatre, qui tombent aux huitièmes impairs. */
-.modules__rang:first-child {
-  margin: 0 12.5%;
-}
-
 /* Chaque module dans son cercle : une surface cernée du filet, l'icône au
    trait FIN — plus fin que le menu (« trait plus fin ») — et, dessous, son
    nom sur une ou deux lignes. Le cercle a grandi de 48 à 78 px pour les
@@ -765,8 +755,10 @@
   align-items: center;
   justify-content: center;
   gap: 3px;
-  width: 78px;
-  height: 78px;
+  /* 78 px au plus ; sous 360 px de large, le cercle rétrécit pour que quatre
+     tiennent sur la ligne sans déborder — rien ne déborde jamais. */
+  width: min(78px, 21%);
+  aspect-ratio: 1;
   padding: 0 6px;
   border-radius: 50%;
   border: 1px solid var(--option-filet);

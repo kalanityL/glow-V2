@@ -274,6 +274,7 @@ const FR: Textes = {
       balance: 'Balance',
       'effets-secondaires': 'Effets secondaires',
       menus: 'Menus',
+      marche: 'Marche',
       'activite-physique': 'Activité physique',
       sommeil: 'Sommeil',
       'temps-pour-soi': 'Un temps pour soi',

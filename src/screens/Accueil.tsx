@@ -8,6 +8,7 @@ import {
   IconeEffetsSecondaires,
   IconeJournal,
   IconeMaison,
+  IconeMarche,
   IconePlus,
   IconeProfil,
   IconeRecherche,
@@ -41,11 +42,11 @@ import type { Reponses } from './onboarding/reponses';
  * LES SEPT MODULES, AU-DESSUS DU MENU (2026-09-16, « en bas de page au dessus
  * de notre menu, les 7 icones […] ne rajoute pas de fond / les icones doivent
  * etre celles de la v1 / l'ordre est : traitement poids effets secondaire
- * menu activité sommeil temps pour soi ») : des icônes sans mot, chacune
- * dans un cercle, sur DEUX RANGS EN QUINCONCE — trois en haut, quatre en
- * dessous (2026-09-16, « trait plus fin, chaque icone entourée d'un cercle,
- * 3 icones sur une ligne 4 icones sur la ligne du dessous, disposées en
- * quinconces »). L'ordre se lit rang par rang. Le traitement montre la
+ * menu activité sommeil temps pour soi », puis « ajouter marche entre menus
+ * et activité physique dusposition 4 et 4 alignés ») : huit cercles sur DEUX
+ * RANGS ALIGNÉS de quatre — le quinconce de trois puis quatre a vécu de
+ * l'après-midi au soir du 2026-09-16. L'ordre se lit rang par rang. Le
+ * traitement montre la
  * seringue ou le comprimé selon la forme répondue — la seringue quand rien
  * n'est répondu, comme la V1.
  *
@@ -154,6 +155,7 @@ const ICONES_MODULES: Record<Exclude<ModuleId, 'traitement'>, React.ReactNode> =
   balance: <IconeBalance />,
   'effets-secondaires': <IconeEffetsSecondaires />,
   menus: <IconeRepas />,
+  marche: <IconeMarche />,
   'activite-physique': <IconeActivite />,
   sommeil: <IconeSommeil />,
   'temps-pour-soi': <IconeTempsPourSoi />,
