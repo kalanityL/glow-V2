@@ -10,6 +10,7 @@ import type { Langue } from './langues';
 import type { Objectif } from '../screens/onboarding/reponses';
 import type { ThemeId } from '../themes/themes';
 import type { EntreeMenu } from '../app/menu';
+import type { ModuleId } from '../app/modules';
 
 /**
  * TOUS LES MOTS DE L'APPLICATION, ET RIEN D'AUTRE.
@@ -146,6 +147,16 @@ export interface Textes {
     bonjour: (prenom: string) => string;
     /** Les entrées du menu du bas, sous le même contrat que les thèmes. */
     menu: Record<EntreeMenu, string>;
+    /**
+     * LES SEPT MODULES, écrits dans leur cercle (2026-09-16, « dans les
+     * cercle sous les icones le nom ds catégories »). Le nom du traitement
+     * est celui de `traitement`, selon la forme : celui-ci est le nom
+     * quand rien n'est répondu.
+     */
+    modules: Record<ModuleId, string>;
+    /** Le nom du module du traitement selon sa forme (VOCABULAIRE : « Injections »
+     *  au pluriel pour la rubrique, « Comprimé » sous forme orale). */
+    traitement: Record<Forme, string>;
   };
   /** Le bouton « retour » de la barre du bas : lu par les lecteurs d'écran. */
   retour: string;
@@ -258,6 +269,19 @@ export const TEXTES: Record<Langue, Textes> = {
         ajouter: 'Ajouter',
         analyse: 'Analyse',
         profil: 'Profil',
+      },
+      modules: {
+        traitement: 'Traitement',
+        balance: 'Balance',
+        'effets-secondaires': 'Effets secondaires',
+        menus: 'Menus',
+        'activite-physique': 'Activité physique',
+        sommeil: 'Sommeil',
+        'temps-pour-soi': 'Un temps pour soi',
+      },
+      traitement: {
+        injection: 'Injections',
+        comprime: 'Comprimé',
       },
     },
     retour: 'Retour',
@@ -402,6 +426,19 @@ export const TEXTES: Record<Langue, Textes> = {
         ajouter: 'Add',
         analyse: 'Insights',
         profil: 'Profile',
+      },
+      modules: {
+        traitement: 'Treatment',
+        balance: 'Scale',
+        'effets-secondaires': 'Side effects',
+        menus: 'Menus',
+        'activite-physique': 'Physical activity',
+        sommeil: 'Sleep',
+        'temps-pour-soi': 'Me time',
+      },
+      traitement: {
+        injection: 'Injections',
+        comprime: 'Tablet',
       },
     },
     retour: 'Back',

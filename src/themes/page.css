@@ -755,22 +755,42 @@
   margin: 0 12.5%;
 }
 
-/* Chaque icône dans son cercle : une surface cernée du filet, l'icône au
-   trait FIN — plus fin que le menu (« trait plus fin »). */
+/* Chaque module dans son cercle : une surface cernée du filet, l'icône au
+   trait FIN — plus fin que le menu (« trait plus fin ») — et, dessous, son
+   nom sur une ou deux lignes. Le cercle a grandi de 48 à 78 px pour les
+   loger (2026-09-16, « cercle plus grand »). */
 .module {
-  display: grid;
-  place-items: center;
-  width: 48px;
-  height: 48px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 3px;
+  width: 78px;
+  height: 78px;
+  padding: 0 6px;
   border-radius: 50%;
   border: 1px solid var(--option-filet);
   background: var(--option-fond);
+  color: var(--encre);
+}
+
+.module__icone {
+  display: block;
+  width: 24px;
+  height: 24px;
 }
 
 .module .icone {
-  width: 24px;
-  height: 24px;
   stroke-width: 1.5;
+}
+
+.module__nom {
+  font-size: 10px;
+  font-weight: 500;
+  line-height: 1.1;
+  text-align: center;
+  text-wrap: balance;
+  color: var(--encre-chapeau);
 }
 
 .module .icone--resserree {

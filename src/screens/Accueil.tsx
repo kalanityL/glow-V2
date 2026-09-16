@@ -21,6 +21,7 @@ import { Etoiles, Logomark } from '../components/Logomark';
 import { Wordmark } from '../components/Wordmark';
 import { useTextes } from '../i18n/useTextes';
 import { ENTREES_MENU, type EntreeMenu } from '../app/menu';
+import { RANGS_MODULES, type ModuleId } from '../app/modules';
 import { classeDuTheme } from '../themes/themes';
 import type { Reponses } from './onboarding/reponses';
 
@@ -104,32 +105,31 @@ export function Accueil({ reponses }: { reponses: Reponses }) {
         <div className="page__defilant" />
       </div>
 
+      {/* Chaque cercle porte son icône et, dessous, son nom (2026-09-16,
+          « cercle plus grand dans les cercle sous les icones le nom ds
+          catégories »). Le traitement suit la forme répondue : dessin et
+          nom. */}
       <div className="modules">
-        <div className="modules__rang">
-          <span className="module">
-            {reponses.formeTraitement === 'comprime' ? <IconeComprime /> : <IconeSeringue />}
-          </span>
-          <span className="module">
-            <IconeBalance />
-          </span>
-          <span className="module">
-            <IconeEffetsSecondaires />
-          </span>
-        </div>
-        <div className="modules__rang">
-          <span className="module">
-            <IconeRepas />
-          </span>
-          <span className="module">
-            <IconeActivite />
-          </span>
-          <span className="module">
-            <IconeSommeil />
-          </span>
-          <span className="module">
-            <IconeTempsPourSoi />
-          </span>
-        </div>
+        {RANGS_MODULES.map((rang) => (
+          <div key={rang[0]} className="modules__rang">
+            {rang.map((module) => (
+              <span key={module} className="module">
+                <span className="module__icone">
+                  {module === 'traitement'
+                    ? reponses.formeTraitement === 'comprime'
+                      ? <IconeComprime />
+                      : <IconeSeringue />
+                    : ICONES_MODULES[module]}
+                </span>
+                <span className="module__nom">
+                  {module === 'traitement' && reponses.formeTraitement
+                    ? textes.accueil.traitement[reponses.formeTraitement]
+                    : textes.accueil.modules[module]}
+                </span>
+              </span>
+            ))}
+          </div>
+        ))}
       </div>
 
       {/* LE MENU EST HORS DE LA COLONNE DE LECTURE : la colonne est bornée à
@@ -148,6 +148,16 @@ export function Accueil({ reponses }: { reponses: Reponses }) {
     </div>
   );
 }
+
+/** L'icône de chaque module — sauf le traitement, qui suit la forme répondue. */
+const ICONES_MODULES: Record<Exclude<ModuleId, 'traitement'>, React.ReactNode> = {
+  balance: <IconeBalance />,
+  'effets-secondaires': <IconeEffetsSecondaires />,
+  menus: <IconeRepas />,
+  'activite-physique': <IconeActivite />,
+  sommeil: <IconeSommeil />,
+  'temps-pour-soi': <IconeTempsPourSoi />,
+};
 
 /** L'icône de chaque entrée : une par entrée, le type l'exige. */
 const ICONES_MENU: Record<EntreeMenu, React.ReactNode> = {
