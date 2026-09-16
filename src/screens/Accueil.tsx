@@ -58,12 +58,14 @@ export function Accueil({ reponses }: { reponses: Reponses }) {
   return (
     <div className={`page ${classeDuTheme('blanc')}`}>
       <div className="page__colonne">
+        {/* UNE SEULE LIGNE (2026-09-16, « header : logo / glow / recherche/
+            parametre tous sur la meme ligne / logo et titre meme hauteur,
+            recherche et parametre valigne middle ») : la pastille, le
+            mot-symbole à la hauteur de la pastille, les deux outils centrés
+            sur la ligne. La devise passe sous la ligne. */}
         <div className="entete entete--accueil">
           <Logomark />
-          <div className="entete__marque">
-            <Wordmark />
-            <p className="entete__devise">{textes.accueil.devise}</p>
-          </div>
+          <Wordmark />
           <div className="entete__outils">
             <span className="rond">
               <IconeRecherche />
@@ -73,6 +75,7 @@ export function Accueil({ reponses }: { reponses: Reponses }) {
             </span>
           </div>
         </div>
+        <p className="entete__devise">{textes.accueil.devise}</p>
 
         <div className="salut">
           <div className="salut__portrait">

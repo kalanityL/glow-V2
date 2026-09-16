@@ -707,20 +707,25 @@
   height: 26px;
 }
 
-/* L'ENTÊTE DE L'ACCUEIL : la marque et sa devise l'une sous l'autre, les deux
-   pastilles rondes poussées à droite. */
+/* L'ENTÊTE DE L'ACCUEIL, SUR UNE LIGNE (2026-09-16) : la pastille, le
+   mot-symbole, et les deux pastilles rondes poussées à droite, tous centrés
+   sur la ligne (`align-items: center` de `.entete`). */
 .entete--accueil {
-  margin-bottom: 18px;
+  margin-bottom: 4px;
 }
 
-.entete__marque {
-  display: flex;
-  flex-direction: column;
-  gap: 3px;
+/* LE MOT-SYMBOLE À LA HAUTEUR DE LA PASTILLE (« logo et titre meme hauteur »).
+   Le dessin est en em : sa hauteur d'encre est celle de la colonne L/P/1,
+   la plus haute de ses parties — trois rangs de 5,3 et deux airs de 1 sur
+   une base de 19, soit 0,94 em. La taille se déduit donc de `--logo-size`,
+   et suit la pastille si elle change. */
+.entete--accueil .wordmark {
+  font-size: calc(var(--logo-size) / 0.94);
 }
 
+/* La devise, sous la ligne. */
 .entete__devise {
-  margin: 0;
+  margin: 0 0 18px;
   font-size: 13px;
   line-height: 1.2;
   color: var(--encre-chapeau);
