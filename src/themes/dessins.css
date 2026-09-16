@@ -38,14 +38,17 @@
 /* UNE COULEUR PAR MODULE (2026-09-16, « pastilles colorees en guise de
    cercles ») : des repères de lecture, comme les couleurs des
    macronutriments — fixes d'un thème à l'autre. Trois viennent du colorboard
-   (« Bleu clair », « Vert très clair », « Pêche »), les cinq autres sont les
-   teintes pâles de la même palette (cyan, ambre, violet, indigo, rose 100),
-   pour que les huit se distinguent d'un coup d'œil sans qu'aucune ne crie. */
+   (« Bleu clair », « Vert très clair », « Gris 100 »), les cinq autres sont
+   les teintes pâles de la même palette (ciel, teal, violet, indigo, rose
+   100), pour que les huit se distinguent d'un coup d'œil sans qu'aucune ne
+   crie. PAS DE JAUNE NI D'ORANGE (2026-09-16) : la pêche et l'ambre du
+   premier jet sont partis, les effets secondaires sont en gris, les menus
+   en teal, la marche en ciel. */
 .module--traitement { background: #dbeafe; }
 .module--balance { background: #d1fae5; }
-.module--effets-secondaires { background: #ffe0c2; }
-.module--menus { background: #fef3c7; }
-.module--marche { background: #cffafe; }
+.module--effets-secondaires { background: #e2e8f0; }
+.module--menus { background: #ccfbf1; }
+.module--marche { background: #e0f2fe; }
 .module--activite-physique { background: #ede9fe; }
 .module--sommeil { background: #e0e7ff; }
 .module--temps-pour-soi { background: #fce7f3; }
