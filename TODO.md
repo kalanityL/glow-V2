@@ -28,3 +28,13 @@ Règles de tenue (voir GUIDELINES.md, « Manière de travailler ») :
       persos des badges
 - [ ] animation audio bravo / clic clic pesee
 - [ ] selection poids avec clic clic sur regle mesure
+
+- [ ] Option de restauration des donnees depuis le cloud : a l install si le
+      compte existe deja; et ailleurs dans les parametres
+- [ ] Widget avec pas,suivi prot et fibre, ajout food, sport, relax
+- [ ] CGU a l 'installation : suivi medical, ordonnance, kcal mg etc... sont
+      approximations
+- [ ] vérification 1 fois par mois de la connexion internet pour les comptes
+      payant pour vérifier que compte a jour dans les paiements. Autorisation
+      de debordement de 2 mois sans possibilité de verification puis on coupe
+      le service.
