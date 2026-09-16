@@ -671,6 +671,42 @@
   stroke-linejoin: round;
 }
 
+/* LA FENÊTRE RESSERRÉE des dessins maison de la V1 (`1.2 1.2 21.6 21.6`)
+   grossit aussi le trait, de 20/18 : il est divisé d'autant pour rester celui
+   des icônes voisines — la compensation de la V1, en feuille. */
+.icone--resserree {
+  stroke-width: 1.8;
+}
+
+/* Le cœur « me » déborde de sa fenêtre : le mot est plus large que le cœur. */
+.icone--deborde {
+  overflow: visible;
+}
+
+/* Les deux plaques de la balance : un voile de l'encre courante. */
+.icone__voile {
+  fill: currentColor;
+  fill-opacity: 0.15;
+}
+
+/* LES SEPT MODULES, en rangée au-dessus du menu : des icônes nues, sans fond
+   (« ne rajoute pas de fond »), à parts égales sur la largeur de la page. */
+.modules {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  /* En bas, la place du disque « Ajouter », qui monte de 30 px au-dessus de
+     la barre : sans elle, il chevauchait la rangée (vu à la capture). */
+  margin: 0 4px 24px;
+  color: var(--encre);
+}
+
+.module {
+  display: block;
+  width: 26px;
+  height: 26px;
+}
+
 /* L'ENTÊTE DE L'ACCUEIL : la marque et sa devise l'une sous l'autre, les deux
    pastilles rondes poussées à droite. */
 .entete--accueil {

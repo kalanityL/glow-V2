@@ -33,6 +33,23 @@
   stroke-width: 0.5;
 }
 
+/* ── Le cœur « me » : la cursive du mot ─────────────────────────────────── */
+
+/* Une police DE DESSIN, pas de thème : le mot est un trait du pictogramme,
+   comme la géométrie du mot-symbole, et ne suit pas la police du texte.
+   Celle de la V1, à l'identique. */
+.icone__mot {
+  font-family: 'Snell Roundhand', 'Segoe Script', 'Brush Script MT', cursive;
+  font-style: italic;
+  font-weight: 600;
+  font-size: 18px;
+}
+
+.icone__mot--encre {
+  fill: currentColor;
+  stroke: none;
+}
+
 /* ── L'avatar : ce que la personne ne choisit pas ───────────────────────── */
 
 .avatar__blanc { fill: #ffffff; }

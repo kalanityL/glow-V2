@@ -1,13 +1,21 @@
 import { Avatar } from '../components/Avatar';
 import {
+  IconeActivite,
   IconeAnalyse,
+  IconeBalance,
+  IconeComprime,
   IconeCrayon,
+  IconeEffetsSecondaires,
   IconeJournal,
   IconeMaison,
   IconePlus,
   IconeProfil,
   IconeRecherche,
   IconeReglages,
+  IconeRepas,
+  IconeSeringue,
+  IconeSommeil,
+  IconeTempsPourSoi,
 } from '../components/Icones';
 import { Etoiles, Logomark } from '../components/Logomark';
 import { Wordmark } from '../components/Wordmark';
@@ -28,6 +36,13 @@ import type { Reponses } from './onboarding/reponses';
  * « le logo est celui qui existe deja / les icones sont celles qui existent
  * deja » : la marque est celle de l'entête de l'onboarding, les icônes sont
  * les tracés de la V1 (`components/Icones.tsx`).
+ *
+ * LES SEPT MODULES, AU-DESSUS DU MENU (2026-09-16, « en bas de page au dessus
+ * de notre menu, les 7 icones […] ne rajoute pas de fond / les icones doivent
+ * etre celles de la v1 / l'ordre est : traitement poids effets secondaire
+ * menu activité sommeil temps pour soi ») : une rangée d'icônes nues, sans
+ * fond ni mot. Le traitement montre la seringue ou le comprimé selon la forme
+ * répondue — la seringue quand rien n'est répondu, comme la V1.
  *
  * RIEN N'EST CLIQUABLE (« les liens ne menent pour l'instant nulle part […]
  * rien de clicable ») : pas un bouton, pas un lien — des blocs, en attendant
@@ -78,6 +93,30 @@ export function Accueil({ reponses }: { reponses: Reponses }) {
 
         {/* La page, vide pour l'instant : c'est la zone qui défilera. */}
         <div className="page__defilant" />
+      </div>
+
+      <div className="modules">
+        <span className="module">
+          {reponses.formeTraitement === 'comprime' ? <IconeComprime /> : <IconeSeringue />}
+        </span>
+        <span className="module">
+          <IconeBalance />
+        </span>
+        <span className="module">
+          <IconeEffetsSecondaires />
+        </span>
+        <span className="module">
+          <IconeRepas />
+        </span>
+        <span className="module">
+          <IconeActivite />
+        </span>
+        <span className="module">
+          <IconeSommeil />
+        </span>
+        <span className="module">
+          <IconeTempsPourSoi />
+        </span>
       </div>
 
       {/* LE MENU EST HORS DE LA COLONNE DE LECTURE : la colonne est bornée à
