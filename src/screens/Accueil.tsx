@@ -46,6 +46,8 @@ import type { Reponses } from './onboarding/reponses';
  * et activité physique dusposition 4 et 4 alignés ») : huit cercles sur DEUX
  * RANGS ALIGNÉS de quatre — le quinconce de trois puis quatre a vécu de
  * l'après-midi au soir du 2026-09-16. L'ordre se lit rang par rang. Le
+ * cercles sont des PASTILLES COLORÉES (2026-09-16, « pastilles colorees en
+ * guise de cercles »), une couleur par module, posée dans `dessins.css`. Le
  * traitement montre la
  * seringue ou le comprimé selon la forme répondue — la seringue quand rien
  * n'est répondu, comme la V1.
@@ -114,7 +116,7 @@ export function Accueil({ reponses }: { reponses: Reponses }) {
         {RANGS_MODULES.map((rang) => (
           <div key={rang[0]} className="modules__rang">
             {rang.map((module) => (
-              <span key={module} className="module">
+              <span key={module} className={`module module--${module}`}>
                 <span className="module__icone">
                   {module === 'traitement'
                     ? reponses.formeTraitement === 'comprime'

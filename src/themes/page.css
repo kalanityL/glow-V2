@@ -778,8 +778,10 @@
      pour un mot de 52 px au plus (« Secondaires »). */
   padding: 0 8px;
   border-radius: 50%;
-  border: 1px solid var(--option-filet);
-  background: var(--option-fond);
+  /* UNE PASTILLE COLORÉE, PLUS UN CERCLE CERNÉ (2026-09-16, « pastilles
+     colorees en guise de cercles ») : ni filet ni surface ici — la couleur
+     de chaque module est un repère de lecture stable, posée dans
+     `dessins.css` (`.module--<id>`), que les thèmes ne repeignent pas. */
   color: var(--encre);
 }
 

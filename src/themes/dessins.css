@@ -33,6 +33,23 @@
   stroke-width: 0.5;
 }
 
+/* ── Les pastilles des modules de l'accueil ─────────────────────────────── */
+
+/* UNE COULEUR PAR MODULE (2026-09-16, « pastilles colorees en guise de
+   cercles ») : des repères de lecture, comme les couleurs des
+   macronutriments — fixes d'un thème à l'autre. Trois viennent du colorboard
+   (« Bleu clair », « Vert très clair », « Pêche »), les cinq autres sont les
+   teintes pâles de la même palette (cyan, ambre, violet, indigo, rose 100),
+   pour que les huit se distinguent d'un coup d'œil sans qu'aucune ne crie. */
+.module--traitement { background: #dbeafe; }
+.module--balance { background: #d1fae5; }
+.module--effets-secondaires { background: #ffe0c2; }
+.module--menus { background: #fef3c7; }
+.module--marche { background: #cffafe; }
+.module--activite-physique { background: #ede9fe; }
+.module--sommeil { background: #e0e7ff; }
+.module--temps-pour-soi { background: #fce7f3; }
+
 /* ── Le cœur « me » : la cursive du mot ─────────────────────────────────── */
 
 /* Une police DE DESSIN, pas de thème : le mot est un trait du pictogramme,
