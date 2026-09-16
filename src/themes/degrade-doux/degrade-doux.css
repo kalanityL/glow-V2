@@ -92,12 +92,13 @@
   --menu-ajouter-encre: #ffffff;
   --menu-ajouter-ombre: 0 8px 18px -6px rgba(47, 108, 245, 0.55);
 
-  /* LE FOND DE L'ENTÊTE DE L'ACCUEIL (2026-09-16, « met cette image en fond
-     de header comme sur la 2eme image ») : sa photo — un mur blanc, une
-     plante à droite —, embarquée dans `src/assets/images/` comme les polices
-     (aucune ressource distante). La mise en page la fond dans le fond de
-     page ; ici, seulement l'image. */
-  --accueil-entete-image: url(../../assets/images/fond-entete-accueil.jpg);
+  /* LE FOND DE L'ACCUEIL (2026-09-16, « essaie l'image fond haut sur toute
+     la jauteur de l'ecran en fond », « non zoomée », « fond-haut.png ») : sa
+     photo en portrait — un mur blanc, une plante à droite, le sol en bas —,
+     embarquée dans `src/assets/images/` comme les polices (aucune ressource
+     distante). Elle a remplacé la photo horizontale du haut de page, qui ne
+     couvrait qu'un tiers de la hauteur sans zoom. */
+  --accueil-fond-image: url(../../assets/images/fond-accueil.jpg);
 
   /* « Typographie : Inter », pour les titres comme pour le texte courant.
      Embarquée, voir `src/fonts.css`. */

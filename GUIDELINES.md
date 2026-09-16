@@ -408,11 +408,13 @@ du 2026-09-16**, avec le logo et les icônes qui existaient déjà (les tracés
 Lucide de la V1, recopiés sans la bibliothèque dans `components/Icones.tsx`),
 sans point d'exclamation, et les trois étoiles du logo en doré à la place du
 soleil. **Rien n'y est cliquable** tant que les pages n'existent pas : des
-blocs, pas des boutons. **Sa photo (mur blanc, plante) est le fond de
-l'entête et du salut**, fondue vers le bas dans le fond de page par un masque ;
-elle est un jeton des thèmes clairs (`--accueil-entete-image`, `none` sur
-les ciels) et un FICHIER embarqué dans `src/assets/images/`, comme les
-polices — jamais une ressource distante.
+blocs, pas des boutons. **Sa photo en portrait (mur blanc, plante,
+sol) est le fond de toute la page**, à la largeur de l'écran, sans zoom ni
+fondu (« essaie l'image fond haut sur toute la jauteur de l'ecran en fond »,
+« non zoomée », 2026-09-16 au soir — la photo horizontale du haut de page et
+son fondu ont vécu un après-midi) ; elle est un jeton des thèmes clairs
+(`--accueil-fond-image`, `none` sur les ciels) et un FICHIER embarqué dans
+`src/assets/images/`, comme les polices — jamais une ressource distante.
 
 ## 5. Non traité, au 2026-09-16
 - Aucune réponse n'est enregistrée : un rechargement perd tout — et

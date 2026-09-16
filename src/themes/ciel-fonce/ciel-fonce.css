@@ -171,10 +171,10 @@
   --menu-ajouter-encre: var(--bouton-encre);
   --menu-ajouter-ombre: var(--panneau-ombre);
 
-  /* Pas d'image derrière l'entête de l'accueil : elle appartient aux thèmes
-     clairs. Le jeton est déclaré, à `none`, pour que la règle qui le lit
-     trouve toujours une valeur. */
-  --accueil-entete-image: none;
+  /* Pas de photo derrière l'accueil : elle appartient aux thèmes clairs. Le
+     jeton est déclaré, à `none`, pour que la règle qui le lit trouve
+     toujours une valeur. */
+  --accueil-fond-image: none;
 
   --font-display: 'Outfit', system-ui, sans-serif;
   --font-body: 'Plus Jakarta Sans', system-ui, sans-serif;
