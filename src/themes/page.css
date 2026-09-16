@@ -670,23 +670,36 @@
   position: relative;
 }
 
-/* FLOUE, RIEN N'Y EST NET, MAIS « PAS TROP » (2026-09-16, « ajoute effet flou
-   rien e doit etre net dans le fond », puis « pas trop ») : un flou de 4 px
-   sur la photo — 8 la noyait. Le flou vide les bords de l'élément sur sa
-   propre largeur — d'où la photo débordée de 16 px de chaque côté, sous la
-   page qui rogne : aucun liseré clair au bord. */
 .page--accueil::before {
   content: '';
   position: absolute;
-  inset: -16px;
+  inset: 0;
   background: var(--accueil-fond-image) top / cover no-repeat;
-  filter: blur(4px);
   pointer-events: none;
 }
 
-/* Le contenu passe devant la photo. */
+/* FLOUE, RIEN N'Y EST NET, MAIS « PAS TROP », ET SANS ZOOM (2026-09-16,
+   « ajoute effet flou rien e doit etre net dans le fond », « pas trop »,
+   « pas de zoom ») : le flou n'est pas sur la photo mais sur un VOILE posé
+   dessus, qui floute ce qu'il a derrière lui (`backdrop-filter`, 4 px — 8
+   la noyait). Un `filter: blur` sur la photo elle-même vidait ses bords, et
+   la déborder pour le cacher l'agrandissait de 7 % : c'est le zoom qu'elle a
+   vu. Le voile, lui, s'arrête au bord de la page sans rien vider ni
+   agrandir. En natif, c'est une vue de flou par-dessus l'image. */
+.page--accueil::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  -webkit-backdrop-filter: blur(4px);
+  backdrop-filter: blur(4px);
+  pointer-events: none;
+}
+
+/* Le contenu passe devant la photo et son voile. */
 .page--accueil > * {
   position: relative;
+  z-index: 1;
 }
 
 /* LES ICÔNES : un trait de l'encre courante, comme Lucide les dessine — la
