@@ -69,7 +69,13 @@ Elles décident de la FORME du code, pas seulement de son contenu.
    sont des `Record<Id, string>` : ajouter une entrée sans la nommer dans
    chaque langue ne compile pas. Les noms de marques (traitements) et les
    codes couleur ne se traduisent pas et vivent dans `src/domaine/`. Les
-   noms de langues s'écrivent dans leur propre langue. **Le genre est une
+   noms de langues s'écrivent dans leur propre langue. **Pour l'instant, on
+   n'écrit que le français** (2026-09-16, « ne t'occupe pas du bilingue on ne
+   fait que le francais ») : l'entrée `en` de `TEXTES` lit le dictionnaire
+   français, et un lecteur anglophone — ou qui choisit « English » — tombe
+   sur le français (« si anglai choisi pour l'instant on tombe aussi sur le
+   francais »). Le squelette reste : le type exige toujours chaque langue ;
+   écrire l'anglais, c'est poser un second dictionnaire. **Le genre est une
    dimension des textes** (V1) : la structure du dictionnaire doit pouvoir
    porter des variantes accordées ou des tournures neutres — à prévoir dès
    qu'une phrase s'accorde. **Une durée écrite est une TOURNURE, pas un

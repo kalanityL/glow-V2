@@ -22,12 +22,11 @@ import type { ModuleId } from '../app/modules';
  * Deux contraintes permanentes qui expliquent la forme de ce fichier :
  *   - MULTILINGUE : une entrée par langue, toutes bâties sur le même type, si
  *     bien qu'un texte oublié dans une traduction est une erreur de
- *     compilation et non un trou découvert à l'écran ;
+ *     compilation et non un trou découvert à l'écran — pour l'instant, seul
+ *     le français est écrit, et l'anglais le lit (voir `TEXTES`) ;
  *   - REACT NATIVE : ce fichier est du TypeScript pur, sans rien du navigateur.
  *     Il partira tel quel dans le paquet natif.
  *
- * Les textes sont pour l'instant des « hello world » : le thème s'installe
- * avant les mots.
  */
 
 /** Le contrat : chaque langue doit porter exactement ces clés. */
@@ -179,319 +178,176 @@ export interface Textes {
   formes: Record<Forme, string>;
 }
 
-export const TEXTES: Record<Langue, Textes> = {
-  fr: {
-    langues: {
-      fr: 'Français',
-      en: 'English',
+/** LE DICTIONNAIRE FRANÇAIS — le seul écrit. */
+const FR: Textes = {
+  langues: {
+    fr: 'Français',
+    en: 'English',
+  },
+  groupes: {
+    langue: 'Langue',
+    unites: 'Unités',
+    forme: 'Forme',
+    traitement: 'Traitement',
+    anneeNaissance: 'Année de naissance',
+    taille: 'Taille',
+    prenom: 'Prénom',
+    email: 'Adresse e-mail',
+    motDePasse: 'Mot de passe',
+    genre: 'Genre',
+    peau: 'Peau',
+    cheveux: 'Cheveux',
+    yeux: 'Yeux',
+    coiffure: 'Coiffure',
+    visage: 'Visage',
+    expression: 'Expression',
+    lunettes: 'Lunettes',
+  },
+  themes: {
+    ciel: 'Ciel',
+    'ciel-fonce': 'Ciel foncé',
+    blanc: 'Blanc',
+    'degrade-doux': 'Dégradé doux',
+  },
+  objectifs: {
+    perdre: 'Perdre du poids',
+    stabiliser: 'Stabiliser mon poids',
+  },
+  unites: {
+    kg: 'kg',
+    lb: 'lb',
+    cm: 'cm',
+    in: 'in',
+  },
+  systemes: {
+    metrique: 'cm · kg',
+    imperial: 'inch · pound',
+  },
+  separateurDecimal: ',',
+  fractions: {
+    kg: 'Centaines de grammes',
+    lb: 'Dixièmes de livre',
+    cm: 'Millimètres',
+    in: 'Dixièmes de pouce',
+  },
+  onboarding: {
+    langueUnites: {
+      question: 'Langue et unités',
     },
-    groupes: {
-      langue: 'Langue',
-      unites: 'Unités',
-      forme: 'Forme',
+    theme: {
+      question: 'Choisissez',
+    },
+    objectif: {
+      question: 'Vous souhaitez…',
+    },
+    poids: {
+      question: 'Quel est votre poids actuel ?',
+    },
+    poidsCible: {
+      question: 'Quel poids visez-vous ?',
+    },
+    traitement: {
+      question: 'Avez-vous commencé votre traitement GLP-1 ?',
+    },
+    avatar: {
+      question: 'Composez votre avatar',
+    },
+    profil: {
+      question: 'Dernière étape',
+      regleMotDePasse: 'Huit caractères au moins.',
+    },
+    precedent: 'Précédent',
+    suivant: 'Suivant',
+    entrer: 'Entre dans la galaxie GLP1LOW',
+  },
+  accueil: {
+    bonjour: (prenom) => (prenom.trim() ? `Bonjour ${prenom.trim()}` : 'Bonjour'),
+    menu: {
+      accueil: 'Accueil',
+      journal: 'Journal',
+      ajouter: 'Ajouter',
+      analyse: 'Analyse',
+      profil: 'Profil',
+    },
+    modules: {
       traitement: 'Traitement',
-      anneeNaissance: 'Année de naissance',
-      taille: 'Taille',
-      prenom: 'Prénom',
-      email: 'Adresse e-mail',
-      motDePasse: 'Mot de passe',
-      genre: 'Genre',
-      peau: 'Peau',
-      cheveux: 'Cheveux',
-      yeux: 'Yeux',
-      coiffure: 'Coiffure',
-      visage: 'Visage',
-      expression: 'Expression',
-      lunettes: 'Lunettes',
+      balance: 'Balance',
+      'effets-secondaires': 'Effets secondaires',
+      menus: 'Menus',
+      'activite-physique': 'Activité physique',
+      sommeil: 'Sommeil',
+      'temps-pour-soi': 'Un temps pour soi',
     },
-    themes: {
-      ciel: 'Ciel',
-      'ciel-fonce': 'Ciel foncé',
-      blanc: 'Blanc',
-      'degrade-doux': 'Dégradé doux',
-    },
-    objectifs: {
-      perdre: 'Perdre du poids',
-      stabiliser: 'Stabiliser mon poids',
-    },
-    unites: {
-      kg: 'kg',
-      lb: 'lb',
-      cm: 'cm',
-      in: 'in',
-    },
-    systemes: {
-      metrique: 'cm · kg',
-      imperial: 'inch · pound',
-    },
-    separateurDecimal: ',',
-    fractions: {
-      kg: 'Centaines de grammes',
-      lb: 'Dixièmes de livre',
-      cm: 'Millimètres',
-      in: 'Dixièmes de pouce',
-    },
-    onboarding: {
-      langueUnites: {
-        question: 'Langue et unités',
-      },
-      theme: {
-        question: 'Choisissez',
-      },
-      objectif: {
-        question: 'Vous souhaitez…',
-      },
-      poids: {
-        question: 'Quel est votre poids actuel ?',
-      },
-      poidsCible: {
-        question: 'Quel poids visez-vous ?',
-      },
-      traitement: {
-        question: 'Avez-vous commencé votre traitement GLP-1 ?',
-      },
-      avatar: {
-        question: 'Composez votre avatar',
-      },
-      profil: {
-        question: 'Dernière étape',
-        regleMotDePasse: 'Huit caractères au moins.',
-      },
-      precedent: 'Précédent',
-      suivant: 'Suivant',
-      entrer: 'Entre dans la galaxie GLP1LOW',
-    },
-    accueil: {
-      bonjour: (prenom) => (prenom.trim() ? `Bonjour ${prenom.trim()}` : 'Bonjour'),
-      menu: {
-        accueil: 'Accueil',
-        journal: 'Journal',
-        ajouter: 'Ajouter',
-        analyse: 'Analyse',
-        profil: 'Profil',
-      },
-      modules: {
-        traitement: 'Traitement',
-        balance: 'Balance',
-        'effets-secondaires': 'Effets secondaires',
-        menus: 'Menus',
-        'activite-physique': 'Activité physique',
-        sommeil: 'Sommeil',
-        'temps-pour-soi': 'Un temps pour soi',
-      },
-      traitement: {
-        injection: 'Injections',
-        comprime: 'Comprimé',
-      },
-    },
-    retour: 'Retour',
-    oui: 'Oui',
-    non: 'Non',
-    progression: 'Avancement du questionnaire',
-    genres: {
-      femme: 'Femme',
-      homme: 'Homme',
-      neutre: 'Neutre',
-    },
-    coiffures: {
-      court: 'Courts',
-      long: 'Longs',
-      boucle: 'Bouclés',
-      frange: 'Frange',
-      brosse: 'En brosse',
-      chauve: 'Sans cheveux',
-    },
-    formesVisage: {
-      ovale: 'Ovale',
-      rond: 'Rond',
-      carre: 'Carré',
-      coeur: 'Cœur',
-    },
-    expressions: {
-      joyeuse: 'Joyeuse',
-      determinee: 'Déterminée',
-      fiere: 'Fière',
-      calme: 'Calme',
-    },
-    couleurs: {
-      '#FFE5D9': 'Clair',
-      '#F7D1BA': 'Beige',
-      '#E8AC80': 'Doré',
-      '#B57E58': 'Café',
-      '#724A30': 'Chocolat',
-      '#43291F': 'Ébène',
-      '#4682B4': 'Bleu',
-      '#2E8B57': 'Vert d’eau',
-      '#CD853F': 'Noisette',
-      '#5C3A21': 'Brun intense',
-      '#708090': 'Gris azur',
-      '#E9C46A': 'Blond',
-      '#4E3629': 'Brun',
-      '#8D5B4C': 'Châtain',
-      '#1A1A1A': 'Noir',
-      '#E76F51': 'Roux',
-      '#DFE2E6': 'Gris polaire',
-    },
-    formes: {
-      injection: 'Injection',
+    traitement: {
+      injection: 'Injections',
       comprime: 'Comprimé',
     },
   },
-  en: {
-    langues: {
-      fr: 'Français',
-      en: 'English',
-    },
-    groupes: {
-      langue: 'Language',
-      unites: 'Units',
-      forme: 'Form',
-      traitement: 'Treatment',
-      anneeNaissance: 'Year of birth',
-      taille: 'Height',
-      prenom: 'First name',
-      email: 'Email address',
-      motDePasse: 'Password',
-      genre: 'Gender',
-      peau: 'Skin',
-      cheveux: 'Hair',
-      yeux: 'Eyes',
-      coiffure: 'Hairstyle',
-      visage: 'Face',
-      expression: 'Expression',
-      lunettes: 'Glasses',
-    },
-    themes: {
-      ciel: 'Sky',
-      'ciel-fonce': 'Dark sky',
-      blanc: 'White',
-      'degrade-doux': 'Soft gradient',
-    },
-    objectifs: {
-      perdre: 'Lose weight',
-      stabiliser: 'Keep my weight steady',
-    },
-    unites: {
-      kg: 'kg',
-      lb: 'lb',
-      cm: 'cm',
-      in: 'in',
-    },
-    systemes: {
-      metrique: 'cm · kg',
-      imperial: 'inch · pound',
-    },
-    separateurDecimal: '.',
-    fractions: {
-      kg: 'Hundreds of grams',
-      lb: 'Tenths of a pound',
-      cm: 'Millimetres',
-      in: 'Tenths of an inch',
-    },
-    onboarding: {
-      langueUnites: {
-        question: 'Language and units',
-      },
-      theme: {
-        question: 'Choose',
-      },
-      objectif: {
-        question: 'You would like to…',
-      },
-      poids: {
-        question: 'What is your current weight?',
-      },
-      poidsCible: {
-        question: 'What weight are you aiming for?',
-      },
-      traitement: {
-        question: 'Have you started your GLP-1 treatment?',
-      },
-      avatar: {
-        question: 'Build your avatar',
-      },
-      profil: {
-        question: 'Last step',
-        regleMotDePasse: 'At least eight characters.',
-      },
-      precedent: 'Previous',
-      suivant: 'Next',
-      entrer: 'Enter the GLP1LOW galaxy',
-    },
-    accueil: {
-      bonjour: (prenom) => (prenom.trim() ? `Hello ${prenom.trim()}` : 'Hello'),
-      menu: {
-        accueil: 'Home',
-        journal: 'Journal',
-        ajouter: 'Add',
-        analyse: 'Insights',
-        profil: 'Profile',
-      },
-      modules: {
-        traitement: 'Treatment',
-        balance: 'Scale',
-        'effets-secondaires': 'Side effects',
-        menus: 'Menus',
-        'activite-physique': 'Physical activity',
-        sommeil: 'Sleep',
-        'temps-pour-soi': 'Me time',
-      },
-      traitement: {
-        injection: 'Injections',
-        comprime: 'Tablet',
-      },
-    },
-    retour: 'Back',
-    oui: 'Yes',
-    non: 'No',
-    progression: 'Questionnaire progress',
-    genres: {
-      femme: 'Woman',
-      homme: 'Man',
-      neutre: 'Neutral',
-    },
-    coiffures: {
-      court: 'Short',
-      long: 'Long',
-      boucle: 'Curly',
-      frange: 'Fringe',
-      brosse: 'Buzz cut',
-      chauve: 'No hair',
-    },
-    formesVisage: {
-      ovale: 'Oval',
-      rond: 'Round',
-      carre: 'Square',
-      coeur: 'Heart',
-    },
-    expressions: {
-      joyeuse: 'Joyful',
-      determinee: 'Determined',
-      fiere: 'Proud',
-      calme: 'Calm',
-    },
-    couleurs: {
-      '#FFE5D9': 'Fair',
-      '#F7D1BA': 'Beige',
-      '#E8AC80': 'Golden',
-      '#B57E58': 'Coffee',
-      '#724A30': 'Chocolate',
-      '#43291F': 'Ebony',
-      '#4682B4': 'Blue',
-      '#2E8B57': 'Sea green',
-      '#CD853F': 'Hazel',
-      '#5C3A21': 'Deep brown',
-      '#708090': 'Slate grey',
-      '#E9C46A': 'Blond',
-      '#4E3629': 'Brown',
-      '#8D5B4C': 'Chestnut',
-      '#1A1A1A': 'Black',
-      '#E76F51': 'Red',
-      '#DFE2E6': 'Polar grey',
-    },
-    formes: {
-      injection: 'Injection',
-      comprime: 'Tablet',
-    },
+  retour: 'Retour',
+  oui: 'Oui',
+  non: 'Non',
+  progression: 'Avancement du questionnaire',
+  genres: {
+    femme: 'Femme',
+    homme: 'Homme',
+    neutre: 'Neutre',
   },
+  coiffures: {
+    court: 'Courts',
+    long: 'Longs',
+    boucle: 'Bouclés',
+    frange: 'Frange',
+    brosse: 'En brosse',
+    chauve: 'Sans cheveux',
+  },
+  formesVisage: {
+    ovale: 'Ovale',
+    rond: 'Rond',
+    carre: 'Carré',
+    coeur: 'Cœur',
+  },
+  expressions: {
+    joyeuse: 'Joyeuse',
+    determinee: 'Déterminée',
+    fiere: 'Fière',
+    calme: 'Calme',
+  },
+  couleurs: {
+    '#FFE5D9': 'Clair',
+    '#F7D1BA': 'Beige',
+    '#E8AC80': 'Doré',
+    '#B57E58': 'Café',
+    '#724A30': 'Chocolat',
+    '#43291F': 'Ébène',
+    '#4682B4': 'Bleu',
+    '#2E8B57': 'Vert d’eau',
+    '#CD853F': 'Noisette',
+    '#5C3A21': 'Brun intense',
+    '#708090': 'Gris azur',
+    '#E9C46A': 'Blond',
+    '#4E3629': 'Brun',
+    '#8D5B4C': 'Châtain',
+    '#1A1A1A': 'Noir',
+    '#E76F51': 'Roux',
+    '#DFE2E6': 'Gris polaire',
+  },
+  formes: {
+    injection: 'Injection',
+    comprime: 'Comprimé',
+  },
+};
+
+/**
+ * ON NE FAIT QUE LE FRANÇAIS POUR L'INSTANT (2026-09-16, « ne t'occupe pas du
+ * bilingue on ne fait que le francais » ; « si anglai choisi pour l'instant on
+ * tombe aussi sur le francais ») : l'entrée anglaise LIT le dictionnaire
+ * français. Le squelette multilingue reste entier — le type exige toujours
+ * chaque langue, `detecterLangue` sert toujours l'anglais d'un lecteur
+ * anglophone —, mais il reçoit les mots français. Le jour où l'anglais
+ * s'écrira, c'est un second dictionnaire à poser ici, et rien d'autre. Les
+ * jalons anglais écrits jusqu'à ce jour sont dans l'historique (`349ea8e`).
+ */
+export const TEXTES: Record<Langue, Textes> = {
+  fr: FR,
+  en: FR,
 };
