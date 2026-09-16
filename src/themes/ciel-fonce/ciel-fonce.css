@@ -155,6 +155,17 @@
   --bouton-rayon: 999px;
   --bouton-ombre: none;
 
+  /* Le menu du bas : pas de couleurs propres ici, il prend celles du thème —
+     la surface des réponses, son filet, l'encre du chapeau, l'accent, le
+     bouton. Les jetons sont déclarés pour que la règle trouve une valeur. */
+  --menu-fond: var(--option-fond);
+  --menu-filet: var(--option-filet);
+  --menu-encre: var(--encre-chapeau);
+  --menu-actif: var(--accent);
+  --menu-ajouter-fond: var(--bouton-fond);
+  --menu-ajouter-encre: var(--bouton-encre);
+  --menu-ajouter-ombre: var(--panneau-ombre);
+
   /* Pas d'image derrière l'entête de l'accueil : elle appartient aux thèmes
      clairs. Le jeton est déclaré, à `none`, pour que la règle qui le lit
      trouve toujours une valeur. */

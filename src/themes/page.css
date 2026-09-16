@@ -923,13 +923,17 @@
    `.page` et non dans `.page__colonne`, bornée à 380 px : une barre de menu
    qui s'arrêterait avant le bord se lirait comme une erreur. Cinq entrées
    égales. */
+/* SES COULEURS SONT SIX JETONS À LUI (2026-09-16, « dans ../image claude/menu
+   tu as les couleurs exactes pour le menu du bas ») : les thèmes clairs les
+   posent aux valeurs relevées sur son image, les ciels les prennent dans
+   leurs jetons existants. */
 .menu {
   display: flex;
   align-items: flex-end;
   margin: 12px -16px -16px;
   padding: 8px 6px 10px;
-  border-top: 1px solid var(--option-filet);
-  background: var(--option-fond);
+  border-top: 1px solid var(--menu-filet);
+  background: var(--menu-fond);
 }
 
 .menu__entree {
@@ -942,11 +946,11 @@
   font-size: 12px;
   font-weight: 500;
   line-height: 1.2;
-  color: var(--encre-chapeau);
+  color: var(--menu-encre);
 }
 
 .menu__entree--active {
-  color: var(--accent);
+  color: var(--menu-actif);
 }
 
 .menu__icone {
@@ -967,11 +971,11 @@
   height: 54px;
   margin-top: -30px;
   border-radius: 50%;
-  background: var(--bouton-fond);
-  color: var(--bouton-encre);
+  background: var(--menu-ajouter-fond);
+  color: var(--menu-ajouter-encre);
   display: grid;
   place-items: center;
-  box-shadow: var(--panneau-ombre);
+  box-shadow: var(--menu-ajouter-ombre);
 }
 
 .menu__entree--ajouter .icone {

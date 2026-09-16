@@ -73,6 +73,20 @@
   --bouton-rayon: 10px;
   --bouton-ombre: none;
 
+  /* LE MENU DU BAS, AUX COULEURS DE SON IMAGE (2026-09-16,
+     `~/Desktop/GLOW/Images-pour-claude/couleur-menu.png`, relevées au
+     pixel) : barre blanche à filet à peine visible, entrée active en bleu
+     vif, entrées éteintes en gris bleuté, disque « Ajouter » en dégradé
+     vertical du bleu clair au bleu franc, croix blanche, halo bleu pâle
+     sous le disque. */
+  --menu-fond: #ffffff;
+  --menu-filet: #f5f7f9;
+  --menu-encre: #6c7793;
+  --menu-actif: #2f6cf5;
+  --menu-ajouter-fond: linear-gradient(to bottom, #4ba2f5 0%, #2b65f5 100%);
+  --menu-ajouter-encre: #ffffff;
+  --menu-ajouter-ombre: 0 8px 18px -6px rgba(47, 108, 245, 0.55);
+
   /* LE FOND DE L'ENTÊTE DE L'ACCUEIL (2026-09-16, « met cette image en fond
      de header comme sur la 2eme image ») : sa photo — un mur blanc, une
      plante à droite —, embarquée dans `src/assets/images/` comme les polices
