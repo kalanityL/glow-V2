@@ -670,11 +670,17 @@
   position: relative;
 }
 
+/* FLOUE, RIEN N'Y EST NET, MAIS « PAS TROP » (2026-09-16, « ajoute effet flou
+   rien e doit etre net dans le fond », puis « pas trop ») : un flou de 4 px
+   sur la photo — 8 la noyait. Le flou vide les bords de l'élément sur sa
+   propre largeur — d'où la photo débordée de 16 px de chaque côté, sous la
+   page qui rogne : aucun liseré clair au bord. */
 .page--accueil::before {
   content: '';
   position: absolute;
-  inset: 0;
+  inset: -16px;
   background: var(--accueil-fond-image) top / cover no-repeat;
+  filter: blur(4px);
   pointer-events: none;
 }
 
