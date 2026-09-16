@@ -822,22 +822,28 @@
    sur la ligne (`align-items: center` de `.entete`). DEUX FOIS PLUS PETIT
    que l'entête de l'onboarding (2026-09-16, « tous les éléments du header
    2x plus petits ») : la pastille passe de 46 à 23 px, le mot-symbole suit
-   (il se déduit de `--logo-size`), les outils de 40 à 20 px. */
+   (il se déduit de `--logo-size`), les outils de 40 à 20 px.
+   PUIS LES DEUX SE SÉPARENT (2026-09-17, « réduit de 15% la hauteur de
+   glp1low et augmenter de 20ù la hauteur du logo ») : la pastille monte à
+   27,6 px (23 × 1,2), le mot-symbole descend à 19,55 px d'encre
+   (23 × 0,85) — il n'est plus à raz de la pastille, il a sa propre hauteur,
+   `--marque-hauteur`. Les deux restent centrés sur la ligne. */
 .entete--accueil {
-  --logo-size: 23px;
+  --logo-size: 27.6px;
+  --marque-hauteur: 19.55px;
   gap: 6px;
   margin-bottom: 18px;
 }
 
-/* LE MOT-SYMBOLE EXACTEMENT À LA HAUTEUR DE LA PASTILLE, À RAZ (« logo et
-   titre meme hauteur », puis « glp1low doit faire exactement la hauteur du
-   logo à raz », 2026-09-16). Le dessin est en em : sa hauteur d'encre
-   MESURÉE au rendu est 0,92 em (la colonne L/P/1 et les capitales étirées
-   arrivent à la même hauteur). La taille se déduit donc de `--logo-size`,
-   et suit la pastille si elle change. Le demi-pixel de décalage vers le
-   haut, mesuré lui aussi, est rattrapé par le `padding-top`. */
+/* LA HAUTEUR D'ENCRE DU MOT-SYMBOLE est `--marque-hauteur` (le 2026-09-16 il
+   était à raz de la pastille, « glp1low doit faire exactement la hauteur du
+   logo à raz » ; le 2026-09-17 il en est séparé, voir `.entete--accueil`).
+   Le dessin est en em : sa hauteur d'encre MESURÉE au rendu est 0,92 em (la
+   colonne L/P/1 et les capitales étirées arrivent à la même hauteur), d'où
+   la taille. Le demi-pixel de décalage vers le haut, mesuré lui aussi, est
+   rattrapé par le `padding-top`. */
 .entete--accueil .wordmark {
-  font-size: calc(var(--logo-size) / 0.92);
+  font-size: calc(var(--marque-hauteur) / 0.92);
   padding-top: 1px;
 }
 
