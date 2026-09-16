@@ -801,17 +801,21 @@
   padding-top: 1px;
 }
 
-/* G ET LOW DANS LE BLEU DU LOGO, L/P/1 DANS SON VERT (2026-09-16, « g et low
-   le bleu du logo et lp1 le vert du logo ») : les jetons de la pastille,
-   qui ne changent pas d'un thème à l'autre. Sur l'accueil seulement :
-   l'entête de l'onboarding garde son encre et son accent. */
+/* LES DEUX COULEURS DU MOT-SYMBOLE SUR L'ACCUEIL : deux jetons de marque
+   posés par chaque thème — G et LOW en `--marque-encre`, L/P/1 en
+   `--marque-accent`. Le 2026-09-16 ils ont été le bleu et le vert de la
+   pastille (« g et low le bleu du logo et lp1 le vert du logo »), puis le
+   même jour un bleu marine et un vert assorti (« g et low en bleu marine,
+   lp1 en vert assorti harmonieusement au logo et au bleu marine »). Sur
+   l'accueil seulement : l'entête de l'onboarding garde son encre et son
+   accent. */
 .entete--accueil .wordmark__g,
 .entete--accueil .wordmark__low {
-  color: var(--logo-via);
+  color: var(--marque-encre);
 }
 
 .entete--accueil .wordmark__lp1 {
-  color: var(--logo-to);
+  color: var(--marque-accent);
 }
 
 .entete__outils {

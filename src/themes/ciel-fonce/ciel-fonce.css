@@ -155,6 +155,11 @@
   --bouton-rayon: 999px;
   --bouton-ombre: none;
 
+  /* Le mot-symbole de l'accueil : l'encre et l'accent du thème, comme dans
+     l'entête de l'onboarding. Déclarés pour que la règle trouve une valeur. */
+  --marque-encre: var(--encre);
+  --marque-accent: var(--accent);
+
   /* Le menu du bas : pas de couleurs propres ici, il prend celles du thème —
      la surface des réponses, son filet, l'encre du chapeau, l'accent, le
      bouton. Les jetons sont déclarés pour que la règle trouve une valeur. */

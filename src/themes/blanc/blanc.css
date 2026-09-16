@@ -73,6 +73,14 @@
   --bouton-rayon: 10px;
   --bouton-ombre: none;
 
+  /* LE MOT-SYMBOLE DE L'ACCUEIL (2026-09-16, « g et low en bleu marine, lp1
+     en vert assorti harmonieusement au logo et au bleu marine ») : un bleu
+     marine (le bleu 900 de la palette du board), et le vert de la pastille
+     — même teinte, OKLCH 163 — descendu à la clarté du marine pour peser
+     autant que lui sur le blanc (l'émeraude 600 de la même palette). */
+  --marque-encre: #1e3a8a;
+  --marque-accent: #059669;
+
   /* LE MENU DU BAS, AUX COULEURS DE SON IMAGE (2026-09-16,
      `~/Desktop/GLOW/Images-pour-claude/couleur-menu.png`, relevées au
      pixel) : barre blanche à filet à peine visible, entrée active en bleu
