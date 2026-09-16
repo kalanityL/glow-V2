@@ -675,16 +675,16 @@
   position: relative;
 }
 
+/* ESSAI DU 2026-09-16 (« essaie l'image fond haut sur toute la jauteur de
+   l'ecran en fond ») : la photo couvre TOUTE la page, sans fondu — la bande
+   de 250 px et son masque (`#000 40% → transparent`) sont mis de côté, à
+   rétablir d'un mot si l'essai ne plaît pas. Cadrée sur son bord droit, la
+   plante reste à droite ; `cover` la recadre en hauteur. */
 .page--accueil::before {
   content: '';
   position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 250px;
+  inset: 0;
   background: var(--accueil-entete-image) top right / cover no-repeat;
-  -webkit-mask-image: linear-gradient(to bottom, #000 40%, transparent 100%);
-  mask-image: linear-gradient(to bottom, #000 40%, transparent 100%);
   pointer-events: none;
 }
 
