@@ -924,14 +924,17 @@
   height: 15px;
 }
 
+/* Le mot est plus petit et les étoiles le suivent de près (2026-09-16,
+   « rétrécit texte bonjour marie cecile, l'étoile et juste apres le
+   prenom ») : 22 → 17 px, l'air 8 → 4 px, les étoiles à la taille du mot. */
 .salut__titre {
   margin: 12px 0 0;
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 4px;
   font-family: var(--font-display);
   font-weight: 700;
-  font-size: 22px;
+  font-size: 17px;
   line-height: 1.2;
   letter-spacing: -0.01em;
   color: var(--encre);
@@ -940,8 +943,8 @@
 /* Les trois étoiles dorées, à la taille du mot. */
 .salut__etoiles {
   display: block;
-  width: 26px;
-  height: 26px;
+  width: 20px;
+  height: 20px;
 }
 
 .etoiles {
