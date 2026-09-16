@@ -23,3 +23,8 @@ Règles de tenue (voir GUIDELINES.md, « Manière de travailler ») :
       fibre, un requin qui dit si bon en prot.
 - [ ] idem : un kangourou qui félicite avec un pouce en l'air à la validation
       d'une activité physique.
+
+- [ ] ecran apres paiement : presentation et/iu animation felicitations 4
+      persos des badges
+- [ ] animation audio bravo / clic clic pesee
+- [ ] selection poids avec clic clic sur regle mesure
