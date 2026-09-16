@@ -272,12 +272,15 @@ const FR: Textes = {
     modules: {
       traitement: 'Traitement',
       balance: 'Balance',
-      'effets-secondaires': 'Effets secondaires',
+      /* Majuscules aux seconds mots (2026-09-16, « majuscule à secondaire
+         physique temps et soit ») — la graphie des catégories de badges de
+         la V1 (« Activité Physique », « Un Temps pour Soi »). */
+      'effets-secondaires': 'Effets Secondaires',
       menus: 'Menus',
       marche: 'Marche',
-      'activite-physique': 'Activité physique',
+      'activite-physique': 'Activité Physique',
       sommeil: 'Sommeil',
-      'temps-pour-soi': 'Un temps pour soi',
+      'temps-pour-soi': 'Un Temps pour Soi',
     },
     traitement: {
       injection: 'Injections',

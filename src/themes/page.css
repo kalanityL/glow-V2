@@ -754,12 +754,18 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 3px;
+  gap: 2px;
   /* 78 px au plus ; sous 360 px de large, le cercle rétrécit pour que quatre
      tiennent sur la ligne sans déborder — rien ne déborde jamais. */
   width: min(78px, 21%);
   aspect-ratio: 1;
-  padding: 0 6px;
+  /* LE NOM NE SORT PAS DU CERCLE (2026-09-16, « les titres de categorie ne
+     doivent pas depasser des cercles ») : un cercle est plus étroit en bas
+     qu'au milieu, et une seconde ligne de nom y touchait le bord. L'icône
+     est un peu plus petite, le nom aussi, et le bloc remonte : la dernière
+     ligne s'arrête à 22 px sous le centre, où la corde fait encore 64 px,
+     pour un mot de 52 px au plus (« Secondaires »). */
+  padding: 0 8px;
   border-radius: 50%;
   border: 1px solid var(--option-filet);
   background: var(--option-fond);
@@ -768,8 +774,8 @@
 
 .module__icone {
   display: block;
-  width: 24px;
-  height: 24px;
+  width: 22px;
+  height: 22px;
 }
 
 .module .icone {
@@ -777,7 +783,7 @@
 }
 
 .module__nom {
-  font-size: 10px;
+  font-size: 9px;
   font-weight: 500;
   line-height: 1.1;
   text-align: center;
