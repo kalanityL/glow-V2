@@ -733,7 +733,10 @@
 .modules {
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  /* LES CERCLES NE SE TOUCHENT JAMAIS (2026-09-16) : 14 px d'air entre les
+     deux rangs, et sur chaque rang un air de 14 px garanti entre voisins —
+     la largeur du cercle se calcule à partir de cet air, jamais l'inverse. */
+  gap: 14px;
   /* En bas, la place du disque « Ajouter », qui monte de 30 px au-dessus de
      la barre : sans elle, il chevauchait la rangée (vu à la capture). */
   margin: 0 0 24px;
@@ -742,7 +745,8 @@
 
 .modules__rang {
   display: flex;
-  justify-content: space-around;
+  justify-content: space-evenly;
+  gap: 14px;
 }
 
 /* Chaque module dans son cercle : une surface cernée du filet, l'icône au
@@ -755,9 +759,10 @@
   align-items: center;
   justify-content: center;
   gap: 2px;
-  /* 78 px au plus ; sous 360 px de large, le cercle rétrécit pour que quatre
-     tiennent sur la ligne sans déborder — rien ne déborde jamais. */
-  width: min(78px, 21%);
+  /* 78 px au plus ; sur un écran étroit, le cercle rétrécit pour que quatre
+     tiennent sur la ligne AVEC leurs trois airs de 14 px — rien ne déborde
+     jamais, et rien ne se touche. */
+  width: min(78px, calc((100% - 3 * 14px) / 4));
   aspect-ratio: 1;
   /* LE NOM NE SORT PAS DU CERCLE (2026-09-16, « les titres de categorie ne
      doivent pas depasser des cercles ») : un cercle est plus étroit en bas
