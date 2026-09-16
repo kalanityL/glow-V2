@@ -34,8 +34,13 @@ export function useParcours() {
      la home ») : vrai une fois le dernier écran validé. Le parcours reste en
      mémoire — les réponses ne sont pas enregistrées, voir GUIDELINES § 5 —
      mais l'onboarding ne se remontre plus : le bouton « retour » de la barre
-     n'y ramène pas, comme un bouton natif ne rouvre pas un formulaire fini. */
-  const [entre, setEntre] = useState(false);
+     n'y ramène pas, comme un bouton natif ne rouvre pas un formulaire fini.
+
+     VRAI DÈS LE CHARGEMENT, POUR L'INSTANT (2026-09-16, « pour l'instant met
+     l'onboarding de coté et la home directement qd on charge la page ») :
+     l'accueil s'ouvre directement, avec les réponses de départ (pas de
+     prénom, l'avatar par défaut). Remettre `false` rend l'onboarding. */
+  const [entre, setEntre] = useState(true);
 
   const visibles = etapesVisibles(reponses);
   const rangBorne = Math.min(rang, visibles.length - 1);

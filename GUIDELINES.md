@@ -389,7 +389,11 @@ pas dans le design ; finir l'onboarding par un premier enregistrement (une
 injection, un comprimé, un repas, une séance) et le féliciter.
 
 **L'accueil** (2026-09-16, « a la fin du formulaire on arrive à la home ») :
-le bouton du dernier écran y mène. **Pour l'instant, l'accueil est en thème
+le bouton du dernier écran y mène. **Pour l'instant, la page s'ouvre
+DIRECTEMENT sur l'accueil, l'onboarding est mis de côté** (2026-09-16, « pour
+l'instant met l'onboarding de coté et la home directement qd on charge la
+page ») : `entre` part à `true` dans `useParcours` ; le remettre à `false`
+rend l'onboarding, rien d'autre n'a bougé. **Pour l'instant, l'accueil est en thème
 Blanc quel que soit le thème choisi dans l'onboarding** (« peu importe la
 couleur choisie dans l'onboarding, pour l'instant on arrive sur le theme fond
 gris blanc ») — provisoire, de son mot. Le bouton « retour » de la barre n'y
