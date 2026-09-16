@@ -40,9 +40,13 @@ import type { Reponses } from './onboarding/reponses';
  * LES SEPT MODULES, AU-DESSUS DU MENU (2026-09-16, « en bas de page au dessus
  * de notre menu, les 7 icones […] ne rajoute pas de fond / les icones doivent
  * etre celles de la v1 / l'ordre est : traitement poids effets secondaire
- * menu activité sommeil temps pour soi ») : une rangée d'icônes nues, sans
- * fond ni mot. Le traitement montre la seringue ou le comprimé selon la forme
- * répondue — la seringue quand rien n'est répondu, comme la V1.
+ * menu activité sommeil temps pour soi ») : des icônes sans mot, chacune
+ * dans un cercle, sur DEUX RANGS EN QUINCONCE — trois en haut, quatre en
+ * dessous (2026-09-16, « trait plus fin, chaque icone entourée d'un cercle,
+ * 3 icones sur une ligne 4 icones sur la ligne du dessous, disposées en
+ * quinconces »). L'ordre se lit rang par rang. Le traitement montre la
+ * seringue ou le comprimé selon la forme répondue — la seringue quand rien
+ * n'est répondu, comme la V1.
  *
  * RIEN N'EST CLIQUABLE (« les liens ne menent pour l'instant nulle part […]
  * rien de clicable ») : pas un bouton, pas un lien — des blocs, en attendant
@@ -99,27 +103,31 @@ export function Accueil({ reponses }: { reponses: Reponses }) {
       </div>
 
       <div className="modules">
-        <span className="module">
-          {reponses.formeTraitement === 'comprime' ? <IconeComprime /> : <IconeSeringue />}
-        </span>
-        <span className="module">
-          <IconeBalance />
-        </span>
-        <span className="module">
-          <IconeEffetsSecondaires />
-        </span>
-        <span className="module">
-          <IconeRepas />
-        </span>
-        <span className="module">
-          <IconeActivite />
-        </span>
-        <span className="module">
-          <IconeSommeil />
-        </span>
-        <span className="module">
-          <IconeTempsPourSoi />
-        </span>
+        <div className="modules__rang">
+          <span className="module">
+            {reponses.formeTraitement === 'comprime' ? <IconeComprime /> : <IconeSeringue />}
+          </span>
+          <span className="module">
+            <IconeBalance />
+          </span>
+          <span className="module">
+            <IconeEffetsSecondaires />
+          </span>
+        </div>
+        <div className="modules__rang">
+          <span className="module">
+            <IconeRepas />
+          </span>
+          <span className="module">
+            <IconeActivite />
+          </span>
+          <span className="module">
+            <IconeSommeil />
+          </span>
+          <span className="module">
+            <IconeTempsPourSoi />
+          </span>
+        </div>
       </div>
 
       {/* LE MENU EST HORS DE LA COLONNE DE LECTURE : la colonne est bornée à

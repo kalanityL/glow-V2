@@ -689,22 +689,56 @@
   fill-opacity: 0.15;
 }
 
-/* LES SEPT MODULES, en rangée au-dessus du menu : des icônes nues, sans fond
-   (« ne rajoute pas de fond »), à parts égales sur la largeur de la page. */
+/* LES SEPT MODULES, au-dessus du menu, EN QUINCONCE (2026-09-16) : deux
+   rangs, trois cercles puis quatre. Les cercles du rang de quatre se
+   répartissent sur toute la largeur ; ceux du rang de trois sont resserrés
+   d'une demi-part de chaque côté, si bien que chacun tombe entre deux du
+   rang du dessous — c'est le quinconce, sans grille ni mesure en dur : une
+   part est un quart de la largeur, le retrait un huitième. Pas de fond
+   derrière la rangée (« ne rajoute pas de fond »), seulement le cercle de
+   chaque icône. */
 .modules {
   display: flex;
-  justify-content: space-between;
-  align-items: center;
+  flex-direction: column;
+  gap: 10px;
   /* En bas, la place du disque « Ajouter », qui monte de 30 px au-dessus de
      la barre : sans elle, il chevauchait la rangée (vu à la capture). */
-  margin: 0 4px 24px;
+  margin: 0 0 24px;
   color: var(--encre);
 }
 
+.modules__rang {
+  display: flex;
+  justify-content: space-around;
+}
+
+/* Le rang de trois est en retrait d'un huitième de la largeur de chaque
+   côté : ses trois centres tombent aux quarts impairs, entre les centres du
+   rang de quatre, qui tombent aux huitièmes impairs. */
+.modules__rang:first-child {
+  margin: 0 12.5%;
+}
+
+/* Chaque icône dans son cercle : une surface cernée du filet, l'icône au
+   trait FIN — plus fin que le menu (« trait plus fin »). */
 .module {
-  display: block;
-  width: 26px;
-  height: 26px;
+  display: grid;
+  place-items: center;
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  border: 1px solid var(--option-filet);
+  background: var(--option-fond);
+}
+
+.module .icone {
+  width: 24px;
+  height: 24px;
+  stroke-width: 1.5;
+}
+
+.module .icone--resserree {
+  stroke-width: 1.35;
 }
 
 /* L'ENTÊTE DE L'ACCUEIL, SUR UNE LIGNE (2026-09-16) : la pastille, le
