@@ -7,7 +7,7 @@ import {
   IconeCrayon,
   IconeEffetsSecondaires,
   IconeJournal,
-  IconeMaison,
+  IconeEtoiles,
   IconeMarche,
   IconePlus,
   IconeProfil,
@@ -163,7 +163,7 @@ const ICONES_MODULES: Record<Exclude<ModuleId, 'traitement'>, React.ReactNode> =
 
 /** L'icône de chaque entrée : une par entrée, le type l'exige. */
 const ICONES_MENU: Record<EntreeMenu, React.ReactNode> = {
-  accueil: <IconeMaison />,
+  accueil: <IconeEtoiles />,
   journal: <IconeJournal />,
   ajouter: <IconePlus />,
   analyse: <IconeAnalyse />,

@@ -20,15 +20,17 @@ import { useId } from 'react';
  * `--logo-size`, posée par la feuille de l'endroit où le logo se trouve.
  */
 
-/** Les trois tracés : la grande étoile à quatre branches et ses deux satellites. */
-const STAR_PATHS = [
+/** Les trois tracés : la grande étoile à quatre branches et ses deux satellites.
+    Exportés : `Etoiles` (le salut, en or) et `IconeEtoiles` (le menu, en trait)
+    reprennent le même motif — une retouche vaut pour tous. */
+export const STAR_PATHS = [
   'm12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275Z',
   'm5 1.5 1 2.5L8.5 4.5 6 5.5 5 8 4 5.5 1.5 4.5 4 4Z',
   'm19 17 1 2.5 2.5.5-2.5 1-1 2.5-1-2.5-2.5-1 2.5-1Z',
 ] as const;
 
 /** La fenêtre qui recadre le motif sur sa bande commune. */
-const STAR_VIEWBOX = '-1.2 -0.7 26.4 26.4';
+export const STAR_VIEWBOX = '-1.2 -0.7 26.4 26.4';
 
 /**
  * LES TROIS ÉTOILES SEULES, SANS LA PASTILLE — en doré (2026-09-16, « remplace

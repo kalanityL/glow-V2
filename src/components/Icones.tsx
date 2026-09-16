@@ -12,6 +12,7 @@
  */
 
 import { useId } from 'react';
+import { STAR_PATHS, STAR_VIEWBOX } from './Logomark';
 
 /** Le cadre commun : la fenêtre de Lucide, et la classe qui peint le trait. */
 function Icone({ children }: { children: React.ReactNode }) {
@@ -22,13 +23,25 @@ function Icone({ children }: { children: React.ReactNode }) {
   );
 }
 
-/** Lucide `house` — l'accueil. */
-export function IconeMaison() {
+/**
+ * LES TROIS ÉTOILES DU LOGO, EN TRAIT — l'accueil (2026-09-16, « icone
+ * d'accueil remplace la maison par les étoiles comme pour la v1 ») : la V1
+ * mettait ce motif (`MonCielIcon`) sur l'onglet de la Maison. Les tracés et
+ * la fenêtre sont ceux du logo, et la fenêtre de 26,4 amincit le trait :
+ * `icone--etoiles` le compense dans `page.css`, comme la V1 le faisait.
+ */
+export function IconeEtoiles() {
   return (
-    <Icone>
-      <path d="M15 21v-8a1 1 0 0 0-1-1h-4a1 1 0 0 0-1 1v8" />
-      <path d="M3 10a2 2 0 0 1 .709-1.528l7-6a2 2 0 0 1 2.582 0l7 6A2 2 0 0 1 21 10v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
-    </Icone>
+    <svg
+      className="icone icone--etoiles"
+      viewBox={STAR_VIEWBOX}
+      aria-hidden="true"
+      focusable="false"
+    >
+      {STAR_PATHS.map((d) => (
+        <path key={d} d={d} />
+      ))}
+    </svg>
   );
 }
 

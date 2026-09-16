@@ -714,6 +714,12 @@
   stroke-width: 1.8;
 }
 
+/* La fenêtre des étoiles (26,4 pour 24) amincit le trait d'un dixième : il
+   est épaissi d'autant — la compensation de la V1, en feuille. */
+.icone--etoiles {
+  stroke-width: 2.2;
+}
+
 /* Le cœur « me » déborde de sa fenêtre : le mot est plus large que le cœur. */
 .icone--deborde {
   overflow: visible;
