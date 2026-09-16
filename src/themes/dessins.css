@@ -35,23 +35,22 @@
 
 /* ── Les pastilles des modules de l'accueil ─────────────────────────────── */
 
-/* UNE COULEUR PAR MODULE (2026-09-16, « pastilles colorees en guise de
-   cercles ») : des repères de lecture, comme les couleurs des
-   macronutriments — fixes d'un thème à l'autre. Trois viennent du colorboard
-   (« Bleu clair », « Vert très clair », « Gris 100 »), les cinq autres sont
-   les teintes pâles de la même palette (ciel, teal, violet, indigo, rose
-   100), pour que les huit se distinguent d'un coup d'œil sans qu'aucune ne
-   crie. PAS DE JAUNE NI D'ORANGE (2026-09-16) : la pêche et l'ambre du
-   premier jet sont partis, les effets secondaires sont en gris, les menus
-   en teal, la marche en ciel. */
-.module--traitement { background: #dbeafe; }
-.module--balance { background: #d1fae5; }
-.module--effets-secondaires { background: #e2e8f0; }
-.module--menus { background: #ccfbf1; }
-.module--marche { background: #e0f2fe; }
-.module--activite-physique { background: #ede9fe; }
-.module--sommeil { background: #e0e7ff; }
-.module--temps-pour-soi { background: #fce7f3; }
+/* UNE SEULE COULEUR POUR LES HUIT, CALCULÉE DEPUIS LA PHOTO À L'EXÉCUTION
+   (2026-09-16, « pastilles toutes de la meme couleur, couleur calculée à
+   partir du fond d'écran pour etre le plus joli possible », puis « pareil
+   que ce que fait youtube pour la couleur du cadre qui change en fonction
+   de l'image de la video ») : l'accueil pose `--module-fond` sur la page —
+   la teinte vive dominante de la photo hors jaune et orange, moyennée avec
+   le bleu du menu (« prend aussi en compte le bleu du menu dans ton
+   calcul »), éclaircie et un peu saturée, voir `domaine/couleurs.ts` (la teinte MOYENNE, essayée
+   d'abord, donnait une sauge olive : « c tres moche »). Le REPLI, tant que
+   la couleur n'est pas lue ou si elle ne peut pas l'être, est la valeur
+   calculée à la main sur la photo du 2026-09-16 : le bleu du fauteuil et du
+   ciel (215°) moyenné avec le bleu du menu (222°), HSL(218°, 45 %, 91 %) →
+   #DEE7F2. Les huit
+   couleurs distinctes du premier jet (une par module, palette du board)
+   sont dans l'historique (`b338fd9`). */
+.module { background: var(--module-fond, #dee7f2); }
 
 /* ── Le cœur « me » : la cursive du mot ─────────────────────────────────── */
 

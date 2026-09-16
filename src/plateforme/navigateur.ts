@@ -45,3 +45,50 @@ export function centrerDansSaListe(element: Element | null): void {
 export function remonterEnHaut(element: Element | null): void {
   if (element) element.scrollTop = 0;
 }
+
+/** La valeur calculée d'une propriété CSS de l'élément — un jeton du thème,
+    par exemple —, ou une chaîne vide. */
+export function proprieteCalculee(element: Element | null, nom: string): string {
+  return element ? getComputedStyle(element).getPropertyValue(nom).trim() : '';
+}
+
+/** L'adresse de l'image que porte une valeur CSS `url(…)`, ou `null`. */
+export function adresseDeLImage(valeurCss: string): string | null {
+  return /url\(["']?([^"')]+)["']?\)/.exec(valeurCss)?.[1] ?? null;
+}
+
+/**
+ * LES PIXELS D'UNE IMAGE, réduite à un carré de 32 (2026-09-16, la teinte
+ * des pastilles « comme YouTube », calculée depuis la photo de fond) : charge
+ * l'image et rend ses 1 024 pixels en rouge, vert, bleu. Renvoie `null` si
+ * elle ne se lit pas ; ce qu'on fait des pixels est décidé ailleurs
+ * (`domaine/couleurs.ts`) — ce fichier ne porte que des verbes. En React
+ * Native, c'est une bibliothèque de palette d'image qui tiendra ce rôle,
+ * derrière la même signature.
+ */
+export async function pixelsDeLImage(
+  url: string,
+): Promise<readonly (readonly [number, number, number])[] | null> {
+  const image = new Image();
+  image.src = url;
+  try {
+    await image.decode();
+  } catch {
+    return null;
+  }
+
+  const cote = 32;
+  const toile = document.createElement('canvas');
+  toile.width = cote;
+  toile.height = cote;
+  const contexte = toile.getContext('2d');
+  if (!contexte) return null;
+  contexte.drawImage(image, 0, 0, cote, cote);
+  const donnees = contexte.getImageData(0, 0, cote, cote).data;
+
+  const pixels: (readonly [number, number, number])[] = [];
+  for (let i = 0; i < donnees.length; i += 4) {
+    pixels.push([donnees[i], donnees[i + 1], donnees[i + 2]]);
+  }
+  return pixels;
+}
