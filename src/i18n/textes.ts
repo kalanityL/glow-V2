@@ -137,8 +137,6 @@ export interface Textes {
   };
   /** L'ACCUEIL (2026-09-16) : l'entête, le salut, le menu du bas. */
   accueil: {
-    /** La devise sous la marque : « Mon suivi. Mon équilibre. » */
-    devise: string;
     /**
      * LE SALUT, avec le prénom quand il y en a un : « Bonjour Lisa ». Sans
      * point d'exclamation (2026-09-16, « supprime le point d'exclamation »).
@@ -253,7 +251,6 @@ export const TEXTES: Record<Langue, Textes> = {
       entrer: 'Entre dans la galaxie GLP1LOW',
     },
     accueil: {
-      devise: 'Mon suivi. Mon équilibre.',
       bonjour: (prenom) => (prenom.trim() ? `Bonjour ${prenom.trim()}` : 'Bonjour'),
       menu: {
         accueil: 'Accueil',
@@ -398,7 +395,6 @@ export const TEXTES: Record<Langue, Textes> = {
       entrer: 'Enter the GLP1LOW galaxy',
     },
     accueil: {
-      devise: 'My tracking. My balance.',
       bonjour: (prenom) => (prenom.trim() ? `Hello ${prenom.trim()}` : 'Hello'),
       menu: {
         accueil: 'Home',

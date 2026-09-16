@@ -28,8 +28,8 @@ import type { Reponses } from './onboarding/reponses';
  * L'ACCUEIL — la page où mène le dernier écran de l'onboarding (2026-09-16,
  * « a la fin du formulaire on arrive à la home »).
  *
- * D'APRÈS SES DEUX IMAGES, et rien de plus : l'entête (la marque et sa devise,
- * la recherche et les préférences en pastilles rondes), le salut (le portrait
+ * D'APRÈS SES DEUX IMAGES, et rien de plus : l'entête (la marque, la
+ * recherche et les préférences en pastilles rondes), le salut (le portrait
  * de l'avatar avec son crayon, « Bonjour » et le prénom, les trois étoiles du
  * logo en doré à la place du soleil), une page vide entre les deux, et le
  * menu du bas (Accueil, Journal, Ajouter en relief, Analyse, Profil).
@@ -66,7 +66,10 @@ export function Accueil({ reponses }: { reponses: Reponses }) {
             parametre tous sur la meme ligne / logo et titre meme hauteur,
             recherche et parametre valigne middle ») : la pastille, le
             mot-symbole à la hauteur de la pastille, les deux outils centrés
-            sur la ligne. La devise passe sous la ligne. */}
+            sur la ligne — le tout DEUX FOIS PLUS PETIT que l'entête de
+            l'onboarding (2026-09-16, « tous les éléments du header 2x plus
+            petits »). La devise « Mon suivi. Mon équilibre. » a été
+            retirée le même jour. */}
         <div className="entete entete--accueil">
           <Logomark />
           <Wordmark />
@@ -79,7 +82,6 @@ export function Accueil({ reponses }: { reponses: Reponses }) {
             </span>
           </div>
         </div>
-        <p className="entete__devise">{textes.accueil.devise}</p>
 
         <div className="salut">
           <div className="salut__portrait">

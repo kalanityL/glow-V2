@@ -669,8 +669,8 @@
    qu'une. Le noir et le transparent du masque ne sont pas des couleurs :
    ce sont ses deux valeurs, opaque et percé.
    La bande est posée sur la page et non sur la colonne (bornée à 380 px) :
-   elle va d'un bord à l'autre. Sa hauteur couvre l'entête, la devise et le
-   salut, avec le fondu qui s'achève juste sous le portrait. */
+   elle va d'un bord à l'autre. Sa hauteur couvre l'entête et le salut,
+   avec le fondu qui s'achève juste sous le portrait. */
 .page--accueil {
   position: relative;
 }
@@ -779,9 +779,14 @@
 
 /* L'ENTÊTE DE L'ACCUEIL, SUR UNE LIGNE (2026-09-16) : la pastille, le
    mot-symbole, et les deux pastilles rondes poussées à droite, tous centrés
-   sur la ligne (`align-items: center` de `.entete`). */
+   sur la ligne (`align-items: center` de `.entete`). DEUX FOIS PLUS PETIT
+   que l'entête de l'onboarding (2026-09-16, « tous les éléments du header
+   2x plus petits ») : la pastille passe de 46 à 23 px, le mot-symbole suit
+   (il se déduit de `--logo-size`), les outils de 40 à 20 px. */
 .entete--accueil {
-  margin-bottom: 4px;
+  --logo-size: 23px;
+  gap: 6px;
+  margin-bottom: 18px;
 }
 
 /* LE MOT-SYMBOLE À LA HAUTEUR DE LA PASTILLE (« logo et titre meme hauteur »).
@@ -793,24 +798,16 @@
   font-size: calc(var(--logo-size) / 0.94);
 }
 
-/* La devise, sous la ligne. */
-.entete__devise {
-  margin: 0 0 18px;
-  font-size: 13px;
-  line-height: 1.2;
-  color: var(--encre-chapeau);
-}
-
 .entete__outils {
   margin-left: auto;
   display: flex;
-  gap: 10px;
+  gap: 5px;
 }
 
 /* La pastille ronde d'un outil : une surface cernée, l'icône dedans. */
 .rond {
-  width: 40px;
-  height: 40px;
+  width: 20px;
+  height: 20px;
   border-radius: 50%;
   border: 1px solid var(--option-filet);
   background: var(--option-fond);
@@ -820,8 +817,8 @@
 }
 
 .rond .icone {
-  width: 20px;
-  height: 20px;
+  width: 10px;
+  height: 10px;
 }
 
 /* LE SALUT : le portrait à gauche, le mot à droite. */
