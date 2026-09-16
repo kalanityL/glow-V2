@@ -654,3 +654,199 @@
   line-height: 1.6;
   color: var(--encre-chapeau);
 }
+
+/* ── L'ACCUEIL (2026-09-16) ─────────────────────────────────────────────── */
+
+/* LES ICÔNES : un trait de l'encre courante, comme Lucide les dessine — la
+   graisse et les bouts ronds sont ici et non dans le template. La taille est
+   celle de l'endroit. */
+.icone {
+  display: block;
+  width: 100%;
+  height: 100%;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+/* L'ENTÊTE DE L'ACCUEIL : la marque et sa devise l'une sous l'autre, les deux
+   pastilles rondes poussées à droite. */
+.entete--accueil {
+  margin-bottom: 18px;
+}
+
+.entete__marque {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.entete__devise {
+  margin: 0;
+  font-size: 13px;
+  line-height: 1.2;
+  color: var(--encre-chapeau);
+}
+
+.entete__outils {
+  margin-left: auto;
+  display: flex;
+  gap: 10px;
+}
+
+/* La pastille ronde d'un outil : une surface cernée, l'icône dedans. */
+.rond {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  border: 1px solid var(--option-filet);
+  background: var(--option-fond);
+  color: var(--encre);
+  display: grid;
+  place-items: center;
+}
+
+.rond .icone {
+  width: 20px;
+  height: 20px;
+}
+
+/* LE SALUT : le portrait à gauche, le mot à droite. */
+.salut {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 16px;
+}
+
+.salut__portrait {
+  position: relative;
+  flex: none;
+}
+
+/* Le portrait est rond : le dessin de l'avatar est recadré par le cercle, sur
+   un fond de surface retenue pour qu'il se détache du fond de page. */
+.salut__cercle {
+  width: 88px;
+  height: 88px;
+  border-radius: 50%;
+  overflow: hidden;
+  border: 1px solid var(--option-filet);
+  background: var(--option-choisi-fond);
+}
+
+.salut__cercle .avatar {
+  width: 100%;
+  height: 100%;
+}
+
+/* Le crayon, en badge sur le bas droit du portrait : la surface retenue et
+   l'accent, cerné du fond de page pour se détacher du cercle. */
+.salut__badge {
+  position: absolute;
+  right: -2px;
+  bottom: -2px;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  border: 2px solid var(--fond);
+  background: var(--option-choisi-fond);
+  color: var(--accent);
+  display: grid;
+  place-items: center;
+}
+
+.salut__badge .icone {
+  width: 15px;
+  height: 15px;
+}
+
+.salut__titre {
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 22px;
+  line-height: 1.2;
+  letter-spacing: -0.01em;
+  color: var(--encre);
+}
+
+/* Les trois étoiles dorées, à la taille du mot. */
+.salut__etoiles {
+  display: block;
+  width: 26px;
+  height: 26px;
+}
+
+.etoiles {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+/* LE MENU DU BAS : une barre de surface, cernée en haut, qui s'étend d'un bord
+   à l'autre de l'écran sous les marges de la page — d'où les marges
+   négatives, qui rattrapent le rembourrage de `.page`. Il est posé dans
+   `.page` et non dans `.page__colonne`, bornée à 380 px : une barre de menu
+   qui s'arrêterait avant le bord se lirait comme une erreur. Cinq entrées
+   égales. */
+.menu {
+  display: flex;
+  align-items: flex-end;
+  margin: 12px -16px -16px;
+  padding: 8px 6px 10px;
+  border-top: 1px solid var(--option-filet);
+  background: var(--option-fond);
+}
+
+.menu__entree {
+  flex: 1 1 0;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  font-size: 12px;
+  font-weight: 500;
+  line-height: 1.2;
+  color: var(--encre-chapeau);
+}
+
+.menu__entree--active {
+  color: var(--accent);
+}
+
+.menu__icone {
+  display: block;
+  width: 24px;
+  height: 24px;
+}
+
+.menu__nom {
+  white-space: nowrap;
+}
+
+/* « AJOUTER », EN RELIEF : un disque d'accent qui monte au-dessus de la barre,
+   le plus en encre de bouton. Le disque déborde vers le haut — dans la page,
+   jamais hors de l'écran. */
+.menu__entree--ajouter .menu__icone {
+  width: 54px;
+  height: 54px;
+  margin-top: -30px;
+  border-radius: 50%;
+  background: var(--bouton-fond);
+  color: var(--bouton-encre);
+  display: grid;
+  place-items: center;
+  box-shadow: var(--panneau-ombre);
+}
+
+.menu__entree--ajouter .icone {
+  width: 26px;
+  height: 26px;
+}

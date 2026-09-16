@@ -30,6 +30,12 @@ import { REPONSES_INITIALES, type Reponses } from '../screens/onboarding/reponse
 export function useParcours() {
   const [reponses, setReponses] = useState<Reponses>(REPONSES_INITIALES);
   const [rang, setRang] = useState(0);
+  /* ENTRÉ DANS L'APPLICATION (2026-09-16, « a la fin du formulaire on arrive à
+     la home ») : vrai une fois le dernier écran validé. Le parcours reste en
+     mémoire — les réponses ne sont pas enregistrées, voir GUIDELINES § 5 —
+     mais l'onboarding ne se remontre plus : le bouton « retour » de la barre
+     n'y ramène pas, comme un bouton natif ne rouvre pas un formulaire fini. */
+  const [entre, setEntre] = useState(false);
 
   const visibles = etapesVisibles(reponses);
   const rangBorne = Math.min(rang, visibles.length - 1);
@@ -102,10 +108,15 @@ export function useParcours() {
     /* Vrai quand l'étape courante laisse passer : le bouton « Suivant » s'y
        éteint quand elle ne le laisse pas. */
     peutValider: peutValider(etape, reponses),
-    peutRevenir: rangBorne > 0,
+    peutRevenir: !entre && rangBorne > 0,
     /* Vrai sur le dernier écran : son bouton porte alors un autre mot. */
     estDerniere: rangBorne === visibles.length - 1,
-    avancer: () => setRang(Math.min(rangBorne + 1, visibles.length - 1)),
-    reculer: () => setRang(Math.max(rangBorne - 1, 0)),
+    entre,
+    /* Sur le dernier écran, avancer n'est plus changer d'étape : c'est entrer. */
+    avancer: () =>
+      rangBorne === visibles.length - 1 ? setEntre(true) : setRang(rangBorne + 1),
+    reculer: () => {
+      if (!entre) setRang(Math.max(rangBorne - 1, 0));
+    },
   };
 }

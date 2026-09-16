@@ -388,9 +388,23 @@ complétée débloque une capacité ; la simplicité est dans la prédictibilit�
 pas dans le design ; finir l'onboarding par un premier enregistrement (une
 injection, un comprimé, un repas, une séance) et le féliciter.
 
-## 5. Non traité, au 2026-09-09
-- Aucune réponse n'est enregistrée : un rechargement perd tout.
-- Pas de page d'accueil : le bouton du dernier écran ne mène nulle part.
+**L'accueil** (2026-09-16, « a la fin du formulaire on arrive à la home ») :
+le bouton du dernier écran y mène. **Pour l'instant, l'accueil est en thème
+Blanc quel que soit le thème choisi dans l'onboarding** (« peu importe la
+couleur choisie dans l'onboarding, pour l'instant on arrive sur le theme fond
+gris blanc ») — provisoire, de son mot. Le bouton « retour » de la barre n'y
+ramène pas à l'onboarding. **Son entête et son menu suivent ses deux images
+du 2026-09-16**, avec le logo et les icônes qui existaient déjà (les tracés
+Lucide de la V1, recopiés sans la bibliothèque dans `components/Icones.tsx`),
+sans point d'exclamation, et les trois étoiles du logo en doré à la place du
+soleil. **Rien n'y est cliquable** tant que les pages n'existent pas : des
+blocs, pas des boutons.
+
+## 5. Non traité, au 2026-09-16
+- Aucune réponse n'est enregistrée : un rechargement perd tout — et
+  ramène à l'onboarding.
+- L'accueil n'a que son entête, son salut et son menu ; rien n'y est
+  cliquable, la zone du milieu est vide.
 - Pas de déploiement configuré.
 - Les roues ne se parcourent pas aux flèches du clavier.
 - L'écran de l'avatar défile (sept réglages) — le portrait et les boutons

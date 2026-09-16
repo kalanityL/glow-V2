@@ -9,6 +9,7 @@ import type { Systeme, Unite } from '../domaine/unites';
 import type { Langue } from './langues';
 import type { Objectif } from '../screens/onboarding/reponses';
 import type { ThemeId } from '../themes/themes';
+import type { EntreeMenu } from '../app/menu';
 
 /**
  * TOUS LES MOTS DE L'APPLICATION, ET RIEN D'AUTRE.
@@ -134,6 +135,20 @@ export interface Textes {
      */
     entrer: string;
   };
+  /** L'ACCUEIL (2026-09-16) : l'entête, le salut, le menu du bas. */
+  accueil: {
+    /** La devise sous la marque : « Mon suivi. Mon équilibre. » */
+    devise: string;
+    /**
+     * LE SALUT, avec le prénom quand il y en a un : « Bonjour Lisa ». Sans
+     * point d'exclamation (2026-09-16, « supprime le point d'exclamation »).
+     * Une fonction et non une chaîne à assembler dans l'écran : l'ordre du
+     * prénom et du mot dépend de la langue. Un prénom vide se tait : « Bonjour ».
+     */
+    bonjour: (prenom: string) => string;
+    /** Les entrées du menu du bas, sous le même contrat que les thèmes. */
+    menu: Record<EntreeMenu, string>;
+  };
   /** Le bouton « retour » de la barre du bas : lu par les lecteurs d'écran. */
   retour: string;
   oui: string;
@@ -236,6 +251,17 @@ export const TEXTES: Record<Langue, Textes> = {
       precedent: 'Précédent',
       suivant: 'Suivant',
       entrer: 'Entre dans la galaxie GLP1LOW',
+    },
+    accueil: {
+      devise: 'Mon suivi. Mon équilibre.',
+      bonjour: (prenom) => (prenom.trim() ? `Bonjour ${prenom.trim()}` : 'Bonjour'),
+      menu: {
+        accueil: 'Accueil',
+        journal: 'Journal',
+        ajouter: 'Ajouter',
+        analyse: 'Analyse',
+        profil: 'Profil',
+      },
     },
     retour: 'Retour',
     oui: 'Oui',
@@ -370,6 +396,17 @@ export const TEXTES: Record<Langue, Textes> = {
       precedent: 'Previous',
       suivant: 'Next',
       entrer: 'Enter the GLP1LOW galaxy',
+    },
+    accueil: {
+      devise: 'My tracking. My balance.',
+      bonjour: (prenom) => (prenom.trim() ? `Hello ${prenom.trim()}` : 'Hello'),
+      menu: {
+        accueil: 'Home',
+        journal: 'Journal',
+        ajouter: 'Add',
+        analyse: 'Insights',
+        profil: 'Profile',
+      },
     },
     retour: 'Back',
     oui: 'Yes',

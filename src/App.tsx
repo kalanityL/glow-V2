@@ -1,6 +1,7 @@
 import { useParcours } from './app/useParcours';
 import { useTextes } from './i18n/useTextes';
 import { Onboarding } from './screens/Onboarding';
+import { Accueil } from './screens/Accueil';
 /* La mise en page d'abord, les jetons des thèmes ensuite : les feuilles de
    thème doivent pouvoir battre la structure, jamais l'inverse. */
 import './themes/page.css';
@@ -13,9 +14,9 @@ import './themes/degrade-doux/degrade-doux.css';
 /**
  * V2 — repartie de zéro.
  *
- * Pour l'instant : le cadre du téléphone, sa barre du bas avec le bouton
- * « retour », et entre les deux l'unique page, habillée par le thème actif
- * (voir `themes/themes.ts` : c'est là, et là seulement, qu'on en change).
+ * Le cadre du téléphone, sa barre du bas avec le bouton « retour », et entre
+ * les deux une page : l'onboarding, puis, une fois son dernier écran validé,
+ * l'accueil (2026-09-16).
  *
  * Le cadre et le bouton sont repris de la version Mixte, réécrits en CSS
  * ordinaire — ce dépôt n'a ni Tailwind ni bibliothèque d'icônes.
@@ -42,7 +43,11 @@ export default function App() {
             éléments `position: fixed` qu'il abritera : les popups s'y
             centreront, plutôt que dans la fenêtre du navigateur. */}
         <div className="phone-screen" id="phone-screen">
-          <Onboarding parcours={parcours} />
+          {parcours.entre ? (
+            <Accueil reponses={parcours.reponses} />
+          ) : (
+            <Onboarding parcours={parcours} />
+          )}
         </div>
 
         {/* La barre du bas, hors écran : elle figure le menu natif du

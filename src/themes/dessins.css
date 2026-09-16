@@ -20,6 +20,19 @@
   stroke-width: 0.5;
 }
 
+/* L'OR DES ÉTOILES DU SALUT (2026-09-16, « en dorée comme le soleil ») : les
+   quatre teintes d'un soleil d'émoji, du blanc chaud à l'ambre, sur la même
+   rampe que l'argent. Une couleur de dessin, pas de thème. */
+.etoiles__or-1 { stop-color: #fff6cc; }
+.etoiles__or-2 { stop-color: #ffd93d; }
+.etoiles__or-3 { stop-color: #f5b301; }
+.etoiles__or-4 { stop-color: #c47a00; }
+
+.etoiles__etoile {
+  stroke: #f5b301;
+  stroke-width: 0.5;
+}
+
 /* ── L'avatar : ce que la personne ne choisit pas ───────────────────────── */
 
 .avatar__blanc { fill: #ffffff; }

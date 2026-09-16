@@ -30,6 +30,33 @@ const STAR_PATHS = [
 /** La fenêtre qui recadre le motif sur sa bande commune. */
 const STAR_VIEWBOX = '-1.2 -0.7 26.4 26.4';
 
+/**
+ * LES TROIS ÉTOILES SEULES, SANS LA PASTILLE — en doré (2026-09-16, « remplace
+ * le soleil pa les 3 étoiles du logo en dorée comme le soleil ») : le même
+ * motif, la même fenêtre, un autre métal. L'or est peint par les classes
+ * `etoiles__or-*` dans `themes/dessins.css` ; la taille est celle de
+ * l'endroit qui les abrite (`.salut__etoiles`).
+ */
+export function Etoiles() {
+  const gradientId = `glow-or-${useId().replace(/[^a-zA-Z0-9]/g, '')}`;
+
+  return (
+    <svg className="etoiles" viewBox={STAR_VIEWBOX} fill="none" aria-hidden="true">
+      <defs>
+        <linearGradient id={gradientId} x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" className="etoiles__or-1" />
+          <stop offset="35%" className="etoiles__or-2" />
+          <stop offset="65%" className="etoiles__or-3" />
+          <stop offset="100%" className="etoiles__or-4" />
+        </linearGradient>
+      </defs>
+      {STAR_PATHS.map((d) => (
+        <path key={d} d={d} className="etoiles__etoile" fill={`url(#${gradientId})`} />
+      ))}
+    </svg>
+  );
+}
+
 export function Logomark() {
   const gradientId = `glow-silver-${useId().replace(/[^a-zA-Z0-9]/g, '')}`;
 
