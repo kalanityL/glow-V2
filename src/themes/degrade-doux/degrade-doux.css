@@ -93,10 +93,10 @@
   --menu-ajouter-ombre: 0 8px 18px -6px rgba(47, 108, 245, 0.55);
 
   /* LE FOND DE L'ACCUEIL (2026-09-16, « essaie l'image fond haut sur toute
-     la jauteur de l'ecran en fond », « non zoomée », « fond-haut.png ») : sa
-     photo en portrait — un mur blanc, une plante à droite, le sol en bas —,
-     embarquée dans `src/assets/images/` comme les polices (aucune ressource
-     distante). Elle a remplacé la photo horizontale du haut de page, qui ne
+     la jauteur de l'ecran en fond », « non zoomée », « fond-haut.png », puis
+     « fond-haut2.png » le même soir) : sa photo en portrait — un mur clair,
+     une fenêtre fleurie à droite, un fauteuil bleu en bas —, embarquée dans
+     `src/assets/images/` comme les polices (aucune ressource distante). Elle a remplacé la photo horizontale du haut de page, qui ne
      couvrait qu'un tiers de la hauteur sans zoom. */
   --accueil-fond-image: url(../../assets/images/fond-accueil.jpg);
 
