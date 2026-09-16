@@ -47,9 +47,10 @@ body {
   display: flex;
   flex-direction: column;
   width: 100%;
-  /* 80 % de la fenêtre : le téléphone a été raccourci d'un cinquième le
-     2026-09-06. Il reste centré, l'air se répartit en haut et en bas. */
-  height: 80%;
+  /* 96 % de la fenêtre : raccourci d'un cinquième le 2026-09-06 (80 %),
+     puis rehaussé de 20 % le 2026-09-16 (« augmente de 20% la hauteur du
+     telephone »). Il reste centré, l'air se répartit en haut et en bas. */
+  height: 96%;
   min-width: 300px;
   max-width: 480px;
   overflow: hidden;

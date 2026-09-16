@@ -89,7 +89,11 @@ export const REPONSES_INITIALES: Reponses = {
   avatar: AVATAR_INITIAL,
   anneeNaissance: ANNEE_NAISSANCE_PAR_DEFAUT,
   tailleCm: TAILLE_PAR_DEFAUT_CM,
-  prenom: '',
+  /* « Marie Cécile » POUR L'INSTANT (2026-09-16, « mets bonjour marie
+     cecile ») : l'onboarding est mis de côté et l'accueil s'ouvre sans
+     réponse ; le salut a besoin d'un prénom. À remettre à vide quand
+     l'onboarding reprendra la main. */
+  prenom: 'Marie Cécile',
   email: '',
   motDePasse: '',
 };

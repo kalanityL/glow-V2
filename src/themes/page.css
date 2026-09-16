@@ -789,13 +789,29 @@
   margin-bottom: 18px;
 }
 
-/* LE MOT-SYMBOLE À LA HAUTEUR DE LA PASTILLE (« logo et titre meme hauteur »).
-   Le dessin est en em : sa hauteur d'encre est celle de la colonne L/P/1,
-   la plus haute de ses parties — trois rangs de 5,3 et deux airs de 1 sur
-   une base de 19, soit 0,94 em. La taille se déduit donc de `--logo-size`,
-   et suit la pastille si elle change. */
+/* LE MOT-SYMBOLE EXACTEMENT À LA HAUTEUR DE LA PASTILLE, À RAZ (« logo et
+   titre meme hauteur », puis « glp1low doit faire exactement la hauteur du
+   logo à raz », 2026-09-16). Le dessin est en em : sa hauteur d'encre
+   MESURÉE au rendu est 0,92 em (la colonne L/P/1 et les capitales étirées
+   arrivent à la même hauteur). La taille se déduit donc de `--logo-size`,
+   et suit la pastille si elle change. Le demi-pixel de décalage vers le
+   haut, mesuré lui aussi, est rattrapé par le `padding-top`. */
 .entete--accueil .wordmark {
-  font-size: calc(var(--logo-size) / 0.94);
+  font-size: calc(var(--logo-size) / 0.92);
+  padding-top: 1px;
+}
+
+/* G ET LOW DANS LE BLEU DU LOGO, L/P/1 DANS SON VERT (2026-09-16, « g et low
+   le bleu du logo et lp1 le vert du logo ») : les jetons de la pastille,
+   qui ne changent pas d'un thème à l'autre. Sur l'accueil seulement :
+   l'entête de l'onboarding garde son encre et son accent. */
+.entete--accueil .wordmark__g,
+.entete--accueil .wordmark__low {
+  color: var(--logo-via);
+}
+
+.entete--accueil .wordmark__lp1 {
+  color: var(--logo-to);
 }
 
 .entete__outils {
@@ -822,9 +838,11 @@
 }
 
 /* LE SALUT : le portrait à gauche, le mot à droite. */
+/* Le mot est REMONTÉ (2026-09-16, « remonte le bonjour ») : calé sur le
+   haut du portrait, un peu sous son sommet, plutôt que centré sur lui. */
 .salut {
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   gap: 16px;
   margin-bottom: 16px;
 }
@@ -836,9 +854,11 @@
 
 /* Le portrait est rond : le dessin de l'avatar est recadré par le cercle, sur
    un fond de surface retenue pour qu'il se détache du fond de page. */
+/* 75 px : 88 réduits de 15 % (2026-09-16, « réduit de 15% la taille de
+   l'avatar »). */
 .salut__cercle {
-  width: 88px;
-  height: 88px;
+  width: 75px;
+  height: 75px;
   border-radius: 50%;
   overflow: hidden;
   border: 1px solid var(--option-filet);
@@ -872,7 +892,7 @@
 }
 
 .salut__titre {
-  margin: 0;
+  margin: 12px 0 0;
   display: flex;
   align-items: center;
   gap: 8px;
