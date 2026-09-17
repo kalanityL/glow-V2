@@ -83,31 +83,31 @@ describe('apparier', () => {
     { date: '2026-03-02', dureeMin: 500 },
   ];
 
-  it('associe la journée à la nuit qui la suit, ou à celle qui la précède', () => {
-    expect(apparier(apports, nuits, 'journee-vers-nuit')[0].nuit.dureeMin).toBe(500);
-    expect(apparier(apports, nuits, 'nuit-vers-journee')[0].nuit.dureeMin).toBe(400);
+  it('associe la journée à la nuit qui la précède, jamais à celle qui la suit', () => {
+    expect(apparier(apports, nuits)[0].nuit.dureeMin).toBe(400);
+    expect(apparier(apports, nuits)).toHaveLength(1);
   });
 
   it('laisse de côté une journée sans sa nuit', () => {
-    expect(apparier([journee('2026-03-10', 1800)], nuits, 'journee-vers-nuit')).toHaveLength(0);
+    expect(apparier([journee('2026-03-10', 1800)], nuits)).toHaveLength(0);
   });
 });
 
 describe('correlationsNuitApports', () => {
   it('ne rend rien sous le plancher de jours', () => {
-    const jours = dates(JOURS_MINIMUM - 1);
-    const apports = jours.map((d, i) => journee(d, 1500 + i * 50));
+    const jours = dates(JOURS_MINIMUM);
+    const apports = jours.slice(1).map((d, i) => journee(d, 1500 + i * 50));
     const nuits = jours.map((d, i) => ({ date: d, dureeMin: 400 + i * 5 }));
     expect(correlationsNuitApports(apports, nuits)).toHaveLength(0);
   });
 
-  it('trouve un lien net entre les calories du jour et la durée de la nuit qui suit', () => {
-    const jours = dates(20);
-    const apports = jours.map((d, i) => journee(d, 1500 + i * 50));
-    /* Plus la journée est riche, plus la nuit qui SUIT est courte. */
+  it('trouve un lien net entre la durée de la nuit et les calories du lendemain', () => {
+    const jours = dates(21);
+    /* Plus la nuit est courte, plus la journée qui SUIT est riche. */
     const nuits = jours.map((d, i) => ({ date: d, dureeMin: 520 - i * 6 }));
+    const apports = jours.slice(1).map((d, i) => journee(d, 1500 + i * 50));
     const resultats = correlationsNuitApports(apports, nuits);
-    const kcal = resultats.find((r) => r.sens === 'journee-vers-nuit' && r.apports === 'kcal' && r.nuit === 'duree');
+    const kcal = resultats.find((r) => r.apports === 'kcal' && r.nuit === 'duree');
     expect(kcal).toBeDefined();
     expect(kcal!.n).toBe(20);
     expect(kcal!.rho).toBe(-1);
@@ -119,12 +119,12 @@ describe('correlationsNuitApports', () => {
   });
 
   it('ne conclut à rien quand les séries n’ont pas de rapport', () => {
-    const jours = dates(20);
+    const jours = dates(21);
     const bruit = [3, 9, 1, 7, 5, 8, 2, 6, 4, 10, 13, 11, 19, 15, 17, 12, 18, 14, 20, 16];
-    const apports = jours.map((d, i) => journee(d, 1500 + bruit[i] * 30));
+    const apports = jours.slice(1).map((d, i) => journee(d, 1500 + bruit[i] * 30));
     const nuits = jours.map((d, i) => ({ date: d, dureeMin: 400 + ((i * 7) % 11) * 10, qualite: 1 + (i % 5) }));
     const kcal = correlationsNuitApports(apports, nuits).find(
-      (r) => r.sens === 'journee-vers-nuit' && r.apports === 'kcal' && r.nuit === 'duree',
+      (r) => r.apports === 'kcal' && r.nuit === 'duree',
     );
     expect(kcal).toBeDefined();
     expect(kcal!.lien).toBe(false);

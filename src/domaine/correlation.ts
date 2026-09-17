@@ -11,12 +11,12 @@
  * comme une recommandation). Ce fichier ne connaît ni écran ni navigateur :
  * il partira tel quel dans le paquet natif.
  *
- * ── Les deux sens ──────────────────────────────────────────────────────────
- * Une journée D précède une nuit (celle qui commence le soir de D) et suit une
- * nuit (celle qui a commencé le soir de D-1). On calcule donc DEUX familles :
- *   - « journée → nuit » : les apports de D contre la nuit qui suit D ;
- *   - « nuit → journée » : la nuit qui précède D contre les apports de D.
- * Une nuit est datée du SOIR où elle commence.
+ * ── Le sens ────────────────────────────────────────────────────────────────
+ * UN SEUL : la nuit qui PRÉCÈDE la journée D — celle qui a commencé le soir de
+ * D-1 — contre les apports de D. La question est « la nuit que j'ai passée
+ * change-t-elle ce que je mange ? », pas l'inverse (2026-09-17 : « la 2eme on
+ * s'en fout, on veut juste savoir si la nuit qu'on a pasé influence comment
+ * on mangera »). Une nuit est datée du SOIR où elle commence.
  *
  * ── Les grandeurs ──────────────────────────────────────────────────────────
  * Côté nuit : la durée (minutes) et, quand elle est notée, la qualité.
@@ -41,9 +41,9 @@
  * paires, on ne calcule pas. Au-dessus, la « p-valeur » approche la chance
  * d'observer un tel coefficient s'il n'y avait aucun lien (transformation de
  * Fisher, correction de Spearman, loi normale). On ne conclut à un lien que
- * sous `SEUIL_P`. Avec dix grandeurs croisées, une paire sur vingt sortira
- * « liée » par hasard : la restitution devra le dire, ou ne montrer que les
- * liens les plus nets.
+ * sous `SEUIL_P`. Avec seize croisements, un sur vingt sortira « lié » par
+ * hasard : la restitution devra le dire, ou ne montrer que les liens les
+ * plus nets.
  */
 
 /** Une nuit, datée du soir où elle commence (AAAA-MM-JJ). */
@@ -82,9 +82,6 @@ export const MESURES_APPORTS = [
 ] as const;
 export type MesureApports = (typeof MESURES_APPORTS)[number];
 
-/** Les deux sens du croisement. */
-export type Sens = 'journee-vers-nuit' | 'nuit-vers-journee';
-
 /** En dessous, on ne calcule pas : une corrélation sur peu de jours ment. */
 export const JOURS_MINIMUM = 10;
 
@@ -94,9 +91,8 @@ export const SEUIL_P = 0.05;
 /** Les calories par gramme, pour les parts. */
 const KCAL_PAR_G = { lipides: 9, glucides: 4, proteines: 4 } as const;
 
-/** Un résultat pour une paire de grandeurs dans un sens. */
+/** Un résultat pour une paire de grandeurs. */
 export interface Correlation {
-  sens: Sens;
   nuit: MesureNuit;
   apports: MesureApports;
   /** Le nombre de paires (jour, nuit) réellement croisées. */
@@ -144,29 +140,25 @@ export function valeurNuit(nuit: Nuit, mesure: MesureNuit): number | null {
 }
 
 /**
- * LES PAIRES (journée, nuit) dans un sens : chaque journée est appariée à la
- * nuit qui la suit (journée → nuit) ou à celle qui la précède (nuit →
- * journée). Une journée sans sa nuit, ou une nuit sans sa journée, est
+ * LES PAIRES (nuit, journée) : chaque journée D est appariée à la nuit qui la
+ * précède, celle qui a commencé le soir de D-1. Une journée sans sa nuit est
  * laissée de côté — une valeur absente se tait, elle ne vaut pas zéro.
  */
 export function apparier(
   apports: readonly Apports[],
   nuits: readonly Nuit[],
-  sens: Sens,
 ): readonly { apports: Apports; nuit: Nuit }[] {
   const nuitParSoir = new Map(nuits.map((nuit) => [nuit.date, nuit]));
   const paires: { apports: Apports; nuit: Nuit }[] = [];
   for (const journee of apports) {
-    /* La nuit qui suit la journée D commence le soir de D ; celle qui la
-       précède a commencé le soir de la veille. */
-    const soir = sens === 'journee-vers-nuit' ? journee.date : veille(journee.date);
-    const nuit = nuitParSoir.get(soir);
+    const nuit = nuitParSoir.get(veille(journee.date));
     if (nuit) paires.push({ apports: journee, nuit });
   }
   return paires;
 }
 
-function veille(date: string): string {
+/** Retire un jour à une date AAAA-MM-JJ, sans passer par le fuseau. */
+export function veille(date: string): string {
   const [a, m, j] = date.split('-').map(Number);
   return new Date(Date.UTC(a, m - 1, j - 1)).toISOString().slice(0, 10);
 }
@@ -234,8 +226,8 @@ export function pValeur(rho: number, n: number): number {
 }
 
 /**
- * LE CROISEMENT COMPLET : chaque mesure de la nuit contre chaque mesure des
- * apports, dans les deux sens. Une paire de grandeurs qui n'a pas
+ * LE CROISEMENT COMPLET : chaque mesure de la nuit précédente contre chaque
+ * mesure des apports du jour. Une paire de grandeurs qui n'a pas
  * `JOURS_MINIMUM` jours croisés n'est pas rendue — plutôt rien qu'un chiffre
  * qui ment. Le résultat est trié du lien le plus net au moins net.
  */
@@ -244,32 +236,29 @@ export function correlationsNuitApports(
   nuits: readonly Nuit[],
 ): Correlation[] {
   const resultats: Correlation[] = [];
-  for (const sens of ['journee-vers-nuit', 'nuit-vers-journee'] as const) {
-    const paires = apparier(apports, nuits, sens);
-    for (const mesureNuit of MESURES_NUIT) {
-      for (const mesureApports of MESURES_APPORTS) {
-        const x: number[] = [];
-        const y: number[] = [];
-        for (const paire of paires) {
-          const vn = valeurNuit(paire.nuit, mesureNuit);
-          const va = valeurApports(paire.apports, mesureApports);
-          if (vn === null || va === null) continue;
-          x.push(va);
-          y.push(vn);
-        }
-        if (x.length < JOURS_MINIMUM) continue;
-        const rho = spearman(x, y);
-        const p = pValeur(rho, x.length);
-        resultats.push({
-          sens,
-          nuit: mesureNuit,
-          apports: mesureApports,
-          n: x.length,
-          rho,
-          p,
-          lien: p < SEUIL_P,
-        });
+  const paires = apparier(apports, nuits);
+  for (const mesureNuit of MESURES_NUIT) {
+    for (const mesureApports of MESURES_APPORTS) {
+      const x: number[] = [];
+      const y: number[] = [];
+      for (const paire of paires) {
+        const vn = valeurNuit(paire.nuit, mesureNuit);
+        const va = valeurApports(paire.apports, mesureApports);
+        if (vn === null || va === null) continue;
+        x.push(vn);
+        y.push(va);
       }
+      if (x.length < JOURS_MINIMUM) continue;
+      const rho = spearman(x, y);
+      const p = pValeur(rho, x.length);
+      resultats.push({
+        nuit: mesureNuit,
+        apports: mesureApports,
+        n: x.length,
+        rho,
+        p,
+        lien: p < SEUIL_P,
+      });
     }
   }
   return resultats.sort((a, b) => a.p - b.p || Math.abs(b.rho) - Math.abs(a.rho));

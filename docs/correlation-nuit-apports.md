@@ -12,39 +12,38 @@ des repas (« garde cet algo pret qq part », 2026-09-17).
   fibres en grammes ; et la **part** de chaque macronutriment dans les
   calories (lipides × 9, glucides × 4, protéines × 4, divisés par les kcal).
   Les grammes suivent la quantité, la part dit la composition.
-- **Dans les deux sens** : la journée D contre la nuit qui **suit** (celle
-  qui commence le soir de D), et la nuit qui **précède** D (celle du soir de
-  D-1) contre la journée D.
+- **Un seul sens** : la nuit qui **précède** la journée D (celle qui a
+  commencé le soir de D-1) contre les apports de D. La question est « la nuit
+  que j'ai passée change-t-elle ce que je mange ? » — pas l'inverse
+  (2026-09-17).
 
 ## L'algorithme
 
 ```
-POUR chaque sens dans [journée → nuit, nuit → journée] :
-    paires ← []
-    POUR chaque journée D ayant des apports :
-        soir ← (sens = journée → nuit) ? D : veille(D)
-        SI une nuit commence le soir `soir` :
-            paires ← paires + (apports de D, cette nuit)
-        SINON : on laisse la journée de côté (une valeur absente se tait)
+paires ← []
+POUR chaque journée D ayant des apports :
+    SI une nuit a commencé le soir de la veille de D :
+        paires ← paires + (cette nuit, apports de D)
+    SINON : on laisse la journée de côté (une valeur absente se tait)
 
-    POUR chaque mesure_nuit dans [durée, qualité] :
-        POUR chaque mesure_apports dans [kcal, lipides, glucides, protéines,
-                                          fibres, part lipides, part glucides,
-                                          part protéines] :
-            x ← [], y ← []
-            POUR chaque (apports, nuit) dans paires :
-                a ← valeur(apports, mesure_apports)   -- null si kcal = 0 pour une part
-                n ← valeur(nuit, mesure_nuit)         -- null si la qualité n'est pas notée
-                SI a et n existent : x ← x + a ; y ← y + n
+POUR chaque mesure_nuit dans [durée, qualité] :
+    POUR chaque mesure_apports dans [kcal, lipides, glucides, protéines,
+                                      fibres, part lipides, part glucides,
+                                      part protéines] :
+        x ← [], y ← []
+        POUR chaque (nuit, apports) dans paires :
+            n ← valeur(nuit, mesure_nuit)         -- null si la qualité n'est pas notée
+            a ← valeur(apports, mesure_apports)   -- null si kcal = 0 pour une part
+            SI n et a existent : x ← x + n ; y ← y + a
 
-            SI taille(x) < JOURS_MINIMUM : passer     -- pas de résultat, plutôt que
-                                                       -- un chiffre qui ment
-            rho ← Spearman(x, y)                       -- Pearson sur les RANGS,
-                                                       -- ex æquo au rang moyen
-            p   ← p-valeur(rho, taille(x))             -- voir ci-dessous
-            lien ← (p < SEUIL_P)
-            résultats ← résultats + {sens, mesure_nuit, mesure_apports,
-                                     n = taille(x), rho, p, lien}
+        SI taille(x) < JOURS_MINIMUM : passer     -- pas de résultat, plutôt que
+                                                   -- un chiffre qui ment
+        rho ← Spearman(x, y)                       -- Pearson sur les RANGS,
+                                                   -- ex æquo au rang moyen
+        p   ← p-valeur(rho, taille(x))             -- voir ci-dessous
+        lien ← (p < SEUIL_P)
+        résultats ← résultats + {mesure_nuit, mesure_apports,
+                                 n = taille(x), rho, p, lien}
 
 TRIER résultats par p croissante, puis |rho| décroissante
 ```
@@ -76,8 +75,8 @@ Lecture de la force de `rho`, en valeur absolue, pour la restitution :
 
 Deux garde-fous pour la restitution, quand elle existera :
 
-- **Seize croisements par sens** (2 mesures de nuit × 8 d'apports) : au seuil
+- **Seize croisements** (2 mesures de nuit × 8 d'apports) : au seuil
   de 5 %, un croisement sur vingt sortira « lié » par hasard. Ne montrer que
   les liens les plus nets, ou le dire.
-- **Un lien n'est pas une cause** : la restitution décrit (« vos nuits les plus
-  courtes suivent vos journées les plus riches »), elle ne conseille jamais.
+- **Un lien n'est pas une cause** : la restitution décrit (« vos journées les
+  plus riches suivent vos nuits les plus courtes »), elle ne conseille jamais.
