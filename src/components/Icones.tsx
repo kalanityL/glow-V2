@@ -2,7 +2,7 @@
  * LES ICÔNES DE L'APPLICATION — « les icones sont celles qui existent deja »
  * (2026-09-16) : les tracés de Lucide que la V1 employait, repris tracé par
  * tracé et SANS la bibliothèque — la V2 n'a pas de bibliothèque d'icônes, et
- * huit dessins ne justifient pas une dépendance. Lucide est sous licence ISC :
+ * une poignée de dessins ne justifie pas une dépendance. Lucide est sous licence ISC :
  * les tracés se recopient.
  *
  * AUCUNE COULEUR NI AUCUNE TAILLE ICI : le trait, sa graisse, ses bouts ronds
@@ -116,16 +116,6 @@ export function IconeCadenas() {
     <Icone>
       <rect width="18" height="11" x="3" y="11" rx="2" ry="2" />
       <path d="M7 11V7a5 5 0 0 1 10 0v4" />
-    </Icone>
-  );
-}
-
-/** Lucide `pencil` — modifier, sur le portrait. */
-export function IconeCrayon() {
-  return (
-    <Icone>
-      <path d="M21.174 6.812a1 1 0 0 0-3.986-3.987L3.842 16.174a2 2 0 0 0-.5.83l-1.321 4.352a.5.5 0 0 0 .623.622l4.353-1.32a2 2 0 0 0 .83-.497z" />
-      <path d="m15 5 4 4" />
     </Icone>
   );
 }

@@ -7,7 +7,6 @@ import {
   IconeBalance,
   IconeCadenas,
   IconeComprime,
-  IconeCrayon,
   IconeEffetsSecondaires,
   IconeJournal,
   IconeEtoiles,
@@ -37,7 +36,7 @@ import type { Reponses } from './onboarding/reponses';
  *
  * D'APRÈS SES DEUX IMAGES, et rien de plus : l'entête (la marque, la
  * recherche et les préférences en pastilles rondes), le salut (le portrait
- * de l'avatar avec son crayon, « Bonjour » et le prénom, les trois étoiles du
+ * de l'avatar — son crayon d'édition retiré le 2026-09-17 —, « Bonjour » et le prénom, les trois étoiles du
  * logo en doré à la place du soleil), une page vide entre les deux, et le
  * menu du bas (Accueil, Journal, Ajouter en relief, Analyse, Profil).
  * « le logo est celui qui existe deja / les icones sont celles qui existent
@@ -137,9 +136,6 @@ export function Accueil({ reponses }: { reponses: Reponses }) {
             <div className="salut__cercle">
               <Avatar avatar={reponses.avatar} />
             </div>
-            <span className="salut__badge">
-              <IconeCrayon />
-            </span>
           </div>
           <div className="salut__texte">
             <h1 className="salut__titre">
