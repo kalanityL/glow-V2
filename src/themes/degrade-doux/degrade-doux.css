@@ -92,10 +92,10 @@
   --menu-ajouter-encre: #ffffff;
   --menu-ajouter-ombre: 0 8px 18px -6px rgba(47, 108, 245, 0.55);
 
-  /* LES PASTILLES DES MODULES DE L'ACCUEIL : « Gris 50 — Arrière-plan
-     principal » du board (2026-09-17, « couleur des pastilles : le gris
-     blanc de la palquette »). */
-  --module-fond: #f8fafc;
+  /* LES PASTILLES DES MODULES DE L'ACCUEIL : blanc pur (2026-09-17,
+     « pastilles blanche vrai blanc » — le Gris 50 du board, demandé le
+     même jour, tirait sur le gris sur la photo). */
+  --module-fond: #ffffff;
 
   /* LES PASTILLES DE LA RECHERCHE ET DES PRÉFÉRENCES, aux couleurs de son
      image (2026-09-17, `~/Desktop/GLOW/Images-pour-claude/

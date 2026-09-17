@@ -780,7 +780,8 @@
    14 px tiennent toujours, sur un écran étroit elles rétrécissent — rien
    ne déborde, rien ne se touche. Sa couleur est un jeton du thème,
    `--module-fond` (2026-09-17, « couleur des pastilles : le gris blanc de la
-   palquette » — le Gris 50 du board sur les thèmes clairs). */
+   palquette », puis « pastilles blanche vrai blanc » — blanc pur sur les
+   thèmes clairs). */
 .module {
   display: grid;
   place-items: center;
