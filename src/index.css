@@ -73,7 +73,51 @@ body {
   }
 }
 
-/* L'écran : tout l'espace laissé par la barre du bas. */
+/* LA BARRE D'ÉTAT, en haut, hors écran (2026-09-17) : la livrée sombre du
+   contour, comme la barre du bas — elle figure l'appareil. L'heure à gauche,
+   le réseau, le wifi et la batterie à droite, en clair. */
+.phone-status {
+  z-index: 30;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 1.75rem;
+  padding: 0 1.25rem 0 1.5rem;
+  background: #0f172a;
+  color: #e2e8f0;
+  font-family: system-ui, sans-serif;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+}
+
+.phone-status-icones {
+  display: flex;
+  align-items: center;
+  gap: 0.375rem;
+}
+
+.phone-status svg {
+  display: block;
+  height: 0.7rem;
+  width: auto;
+  fill: currentColor;
+  stroke: currentColor;
+  stroke-width: 1.4;
+  stroke-linecap: round;
+}
+
+.phone-status-icones svg:first-child {
+  stroke: none;
+}
+
+.phone-status-plein {
+  fill: currentColor;
+  stroke: none;
+}
+
+/* L'écran : tout l'espace laissé par les deux barres. */
 .phone-screen {
   position: relative;
   flex: 1;

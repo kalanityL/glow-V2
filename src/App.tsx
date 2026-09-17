@@ -35,6 +35,21 @@ export default function App() {
           coins arrondis à toutes les largeurs — pour qu'on distingue ce qui
           est l'écran de ce qui ne l'est pas. */}
       <div className="phone-frame">
+        {/* LA BARRE D'ÉTAT DU TÉLÉPHONE (2026-09-17, « fait apparaitre sur le
+            telephone la barre du haut du telephone (réseau, heure ..;) ») :
+            l'heure, le réseau, le wifi, la batterie — hors écran, comme la
+            barre du bas : elle figure l'appareil, pas l'application, et
+            c'est pourquoi son heure est figée à celle de toutes les
+            maquettes de téléphone et n'est pas un texte du dictionnaire. */}
+        <div className="phone-status" aria-hidden="true">
+          <span className="phone-status-heure">{HEURE_DE_MAQUETTE}</span>
+          <span className="phone-status-icones">
+            <Reseau />
+            <Wifi />
+            <Batterie />
+          </span>
+        </div>
+
         {/* L'écran : rien d'autre que le contenu. La barre du bas n'en fait
             pas partie, elle figure le menu natif du téléphone, donc le bas de
             l'écran est juste au-dessus d'elle.
@@ -69,6 +84,44 @@ export default function App() {
         </footer>
       </div>
     </div>
+  );
+}
+
+/** L'heure de toutes les maquettes de téléphone : elle ne tourne pas. */
+const HEURE_DE_MAQUETTE = '9:41';
+
+/** Les quatre barres du réseau. */
+function Reseau() {
+  return (
+    <svg viewBox="0 0 18 12" aria-hidden="true" focusable="false">
+      <rect x="0" y="8" width="3" height="4" rx="0.8" />
+      <rect x="5" y="5.5" width="3" height="6.5" rx="0.8" />
+      <rect x="10" y="3" width="3" height="9" rx="0.8" />
+      <rect x="15" y="0" width="3" height="12" rx="0.8" />
+    </svg>
+  );
+}
+
+/** Le wifi : trois arcs et un point. */
+function Wifi() {
+  return (
+    <svg viewBox="0 0 16 12" fill="none" aria-hidden="true" focusable="false">
+      <path d="M1 4.2a10 10 0 0 1 14 0" />
+      <path d="M3.6 6.9a6.3 6.3 0 0 1 8.8 0" />
+      <path d="M6.2 9.5a2.6 2.6 0 0 1 3.6 0" />
+      <circle cx="8" cy="11" r="0.9" className="phone-status-plein" />
+    </svg>
+  );
+}
+
+/** La batterie, pleine. */
+function Batterie() {
+  return (
+    <svg viewBox="0 0 26 12" fill="none" aria-hidden="true" focusable="false">
+      <rect x="0.5" y="0.5" width="22" height="11" rx="3" />
+      <rect x="2.5" y="2.5" width="18" height="7" rx="1.6" className="phone-status-plein" />
+      <path d="M24 4v4a2 2 0 0 0 0-4Z" className="phone-status-plein" />
+    </svg>
   );
 }
 
