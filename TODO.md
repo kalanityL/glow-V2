@@ -44,3 +44,5 @@ Règles de tenue (voir GUIDELINES.md, « Manière de travailler ») :
       les jours dela semaine ou je fais du sport je veux me peser à quelle
       frequence tous les jours 1 fois par semaine une fois par 15j une fois
       par mois seuelemnt qd je vais chez le medecin
+
+- [ ] intégrer recherche correlation
