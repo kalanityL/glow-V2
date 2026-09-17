@@ -774,7 +774,8 @@
    noms hors des cercles sous les cercles, augmente la taille des icone et
    des cercles », « moins augmenté la taille des icones », « traits des
    icones dans cercle plus fins », puis « ne pas mettre les noms sous les
-   cercles ») : un rond de 92 px au plus, l'icône de 24 px au trait 1,2,
+   cercles ») : un rond de 84 px au plus (92 jusqu'au 2026-09-17, « reduis
+   légerement la taille des pastilles »), l'icône de 24 px au trait 1,2,
    pas de nom visible — il est dit en `aria-label`. La pastille a la
    largeur de sa part de ligne : quatre pastilles et leurs trois airs de
    14 px tiennent toujours, sur un écran étroit elles rétrécissent — rien
@@ -785,7 +786,7 @@
 .module {
   display: grid;
   place-items: center;
-  width: min(92px, calc((100% - 3 * 14px) / 4));
+  width: min(84px, calc((100% - 3 * 14px) / 4));
   aspect-ratio: 1;
   border-radius: 50%;
   background: var(--module-fond);
