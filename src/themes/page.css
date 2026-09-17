@@ -774,7 +774,7 @@
    noms hors des cercles sous les cercles, augmente la taille des icone et
    des cercles », « moins augmenté la taille des icones », « traits des
    icones dans cercle plus fins », puis « ne pas mettre les noms sous les
-   cercles ») : un rond de 92 px au plus, l'icône de 30 px au trait 1,2,
+   cercles ») : un rond de 92 px au plus, l'icône de 24 px au trait 1,2,
    pas de nom visible — il est dit en `aria-label`. La pastille a la
    largeur de sa part de ligne : quatre pastilles et leurs trois airs de
    14 px tiennent toujours, sur un écran étroit elles rétrécissent — rien
@@ -792,9 +792,11 @@
   color: var(--encre);
 }
 
+/* L'icône à la taille de celles du menu, 24 px (2026-09-17, « icones dans
+   les pastilles meme taille que icone du menu » — 30 auparavant). */
 .module .icone {
-  width: 30px;
-  height: 30px;
+  width: 24px;
+  height: 24px;
   stroke-width: 1.2;
 }
 
