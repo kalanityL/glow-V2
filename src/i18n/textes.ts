@@ -138,6 +138,14 @@ export interface Textes {
   /** L'ACCUEIL (2026-09-16) : l'entête, le salut, le menu du bas. */
   accueil: {
     /**
+     * LA DEVISE SOUS LE MOT-SYMBOLE, celle de la V1, telle quelle (2026-09-17,
+     * « logo et glp1low comme sur v1 avec ready shine glow en dessous ») :
+     * « ready, shine, glow! ». Une devise de marque, en anglais et avec son
+     * point d'exclamation : elle ne se traduit pas et ne suit pas la règle
+     * des textes d'interface.
+     */
+    devise: string;
+    /**
      * LE SALUT, avec le prénom quand il y en a un : « Bonjour Lisa ». Sans
      * point d'exclamation (2026-09-16, « supprime le point d'exclamation »).
      * Une fonction et non une chaîne à assembler dans l'écran : l'ordre du
@@ -261,6 +269,7 @@ const FR: Textes = {
     entrer: 'Entre dans la galaxie GLP1LOW',
   },
   accueil: {
+    devise: 'ready, shine, glow!',
     bonjour: (prenom) => (prenom.trim() ? `Bonjour ${prenom.trim()}` : 'Bonjour'),
     menu: {
       accueil: 'Accueil',

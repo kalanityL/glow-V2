@@ -180,4 +180,6 @@
   --font-body: 'Plus Jakarta Sans', system-ui, sans-serif;
   /* Le salut de l'accueil, dans la police de corps — celle de la V1. */
   --font-salut: var(--font-body);
+  /* La marque de l'accueil, dans la police de titre — Outfit, celle de la V1. */
+  --font-marque: var(--font-display);
 }

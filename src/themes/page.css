@@ -805,27 +805,49 @@
    2x plus petits ») : la pastille passe de 46 à 23 px, le mot-symbole suit
    (il se déduit de `--logo-size`), les outils de 40 à 20 px.
    PUIS LES DEUX SE SÉPARENT (2026-09-17, « réduit de 15% la hauteur de
-   glp1low et augmenter de 20ù la hauteur du logo ») : la pastille monte à
-   27,6 px (23 × 1,2), le mot-symbole descend à 19,55 px d'encre
-   (23 × 0,85) — il n'est plus à raz de la pastille, il a sa propre hauteur,
-   `--marque-hauteur`. Les deux restent centrés sur la ligne. */
+   glp1low et augmenter de 20ù la hauteur du logo ») : 27,6 px et 19,55 px.
+   PUIS L'ENTÊTE DE LA HOME DE LA V1, TELLE QUELLE (2026-09-17, « logo et
+   glp1low comme sur v1 avec ready shine glow en dessous meme taille du logo
+   et meme hauteur glp1low et redeay shine glow que sur v1 ») : la pastille
+   à 38 px, le mot-symbole sur une BASE de 19 px (celle de son dessin : les
+   em du composant y retombent sur leurs valeurs d'origine, 6,5 / 5,3 / 1 /
+   0,5 px), la devise à 0,5 em de cette base dessous — italique, noire,
+   capitales, interlettrage large, 2 px sous le mot, jamais à la ligne.
+   Les deux colonnes restent centrées sur la ligne. */
 .entete--accueil {
-  --logo-size: 27.6px;
-  --marque-hauteur: 19.55px;
-  gap: 6px;
+  --logo-size: 38px;
+  --marque-base: 19px;
+  gap: 8px;
   margin-bottom: 18px;
 }
 
-/* LA HAUTEUR D'ENCRE DU MOT-SYMBOLE est `--marque-hauteur` (le 2026-09-16 il
-   était à raz de la pastille, « glp1low doit faire exactement la hauteur du
-   logo à raz » ; le 2026-09-17 il en est séparé, voir `.entete--accueil`).
-   Le dessin est en em : sa hauteur d'encre MESURÉE au rendu est 0,92 em (la
-   colonne L/P/1 et les capitales étirées arrivent à la même hauteur), d'où
-   la taille. Le demi-pixel de décalage vers le haut, mesuré lui aussi, est
-   rattrapé par le `padding-top`. */
+/* La colonne de la marque : le mot-symbole, la devise dessous. */
+.entete__marque {
+  display: flex;
+  flex-direction: column;
+}
+
+.entete__devise {
+  margin: 2px 0 0;
+  font-family: var(--font-marque);
+  font-size: calc(var(--marque-base) * 0.5);
+  font-style: italic;
+  font-weight: 900;
+  line-height: 1.2;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  white-space: nowrap;
+  color: var(--marque-encre);
+}
+
+/* LE MOT-SYMBOLE SUR SA BASE DE 19 PX, DANS LA POLICE DE LA V1 (2026-09-17,
+   voir `.entete--accueil` ; le 2026-09-16 il était à raz de la pastille, puis
+   à 19,55 px d'encre). La police est celle de la marque, `--font-marque`,
+   la même sur tous les thèmes : Outfit, comme dans la V1 — le corps du
+   thème Blanc est Inter, la marque ne le suit pas. */
 .entete--accueil .wordmark {
-  font-size: calc(var(--marque-hauteur) / 0.92);
-  padding-top: 1px;
+  font-family: var(--font-marque);
+  font-size: var(--marque-base);
 }
 
 /* LES DEUX COULEURS DU MOT-SYMBOLE SUR L'ACCUEIL : deux jetons de marque

@@ -106,14 +106,20 @@ export function Accueil({ reponses }: { reponses: Reponses }) {
         {/* UNE SEULE LIGNE (2026-09-16, « header : logo / glow / recherche/
             parametre tous sur la meme ligne / logo et titre meme hauteur,
             recherche et parametre valigne middle ») : la pastille, le
-            mot-symbole à la hauteur de la pastille, les deux outils centrés
-            sur la ligne — le tout DEUX FOIS PLUS PETIT que l'entête de
-            l'onboarding (2026-09-16, « tous les éléments du header 2x plus
-            petits »). La devise « Mon suivi. Mon équilibre. » a été
-            retirée le même jour. */}
+            mot-symbole, les deux outils centrés sur la ligne. La devise
+            « Mon suivi. Mon équilibre. » a été retirée le 2026-09-16 ; le
+            2026-09-17, la marque reprend l'entête de la V1 — logo,
+            mot-symbole et devise « ready, shine, glow! ». */}
         <div className="entete entete--accueil">
           <Logomark />
-          <Wordmark />
+          {/* COMME LA V1 (2026-09-17, « logo et glp1low comme sur v1 avec
+              ready shine glow en dessous ») : le mot-symbole et, dessous, la
+              devise. Les tailles sont celles de l'entête de la home de la
+              V1, dans `page.css`. */}
+          <div className="entete__marque">
+            <Wordmark />
+            <p className="entete__devise">{textes.accueil.devise}</p>
+          </div>
           <div className="entete__outils">
             <span className="rond">
               <IconeRecherche />

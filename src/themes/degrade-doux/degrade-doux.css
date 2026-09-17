@@ -107,4 +107,7 @@
   /* Le salut de l'accueil garde la police de la V1 (2026-09-17, « meme
      police que v1 »), même sur un thème dont le corps est Inter. */
   --font-salut: 'Plus Jakarta Sans', system-ui, sans-serif;
+  /* La marque de l'accueil (mot-symbole, devise) dans la police de la V1
+     (2026-09-17, « comme sur v1 ») : Outfit, même si le corps est Inter. */
+  --font-marque: 'Outfit', system-ui, sans-serif;
 }
