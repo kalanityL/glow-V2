@@ -954,6 +954,13 @@
    corps, Plus Jakarta Sans, en demi-gras (600). Le jeton `--font-salut` le
    dit thème par thème : les ciels y mettent leur police de corps, qui est
    celle-là ; les thèmes clairs, dont le corps est Inter, la nomment. */
+/* La colonne du texte : le salut, puis l'emplacement du badge. */
+.salut__texte {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
 .salut__titre {
   margin: 12px 0 0;
   display: flex;
@@ -978,6 +985,42 @@
   display: block;
   width: 100%;
   height: 100%;
+}
+
+/* L'EMPLACEMENT D'UN BADGE (2026-09-17) : la cocarde vide, à 64 px, peinte
+   aux neutres du thème — plaque en surface, plis, anneau et liseré au filet.
+   Ce n'est pas un badge, il ne porte aucun métal. */
+.salut__cocarde {
+  display: block;
+  width: 64px;
+  height: 64px;
+}
+
+.cocarde {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.cocarde__plis {
+  fill: var(--option-filet);
+}
+
+.cocarde__anneau {
+  fill: none;
+  stroke: var(--option-filet);
+  stroke-width: 3;
+}
+
+.cocarde__plaque {
+  fill: var(--option-fond);
+}
+
+.cocarde__lisere {
+  fill: none;
+  stroke: var(--option-filet);
+  stroke-width: 1.2;
+  stroke-dasharray: 3 2;
 }
 
 /* LE MENU DU BAS : une barre de surface, cernée en haut, qui s'étend d'un bord

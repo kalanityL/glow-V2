@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState, type CSSProperties } from 'react';
 import { Avatar } from '../components/Avatar';
+import { Cocarde } from '../components/Cocarde';
 import {
   IconeActivite,
   IconeAnalyse,
@@ -139,12 +140,21 @@ export function Accueil({ reponses }: { reponses: Reponses }) {
               <IconeCrayon />
             </span>
           </div>
-          <h1 className="salut__titre">
-            {textes.accueil.bonjour(reponses.prenom)}
-            <span className="salut__etoiles">
-              <Etoiles />
+          <div className="salut__texte">
+            <h1 className="salut__titre">
+              {textes.accueil.bonjour(reponses.prenom)}
+              <span className="salut__etoiles">
+                <Etoiles />
+              </span>
+            </h1>
+            {/* L'EMPLACEMENT D'UN BADGE, sous le salut (2026-09-17, « sous
+                bonjour mettre un placeholder de la meme forme qu'un badge
+                (rond avec collerette) ») : la cocarde vide, en attendant
+                les badges. */}
+            <span className="salut__cocarde">
+              <Cocarde />
             </span>
-          </h1>
+          </div>
         </div>
 
         {/* La page, vide pour l'instant : c'est la zone qui défilera. */}
