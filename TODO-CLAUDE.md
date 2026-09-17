@@ -132,9 +132,9 @@ la V2.
       « sport » dans leur nom propre.
 - [ ] **La table d'équivalence portion/poids** : les trois questions de la
       quantité par défaut et les trois chiffres, listés dans la note ci-dessus.
-- [ ] **Le déploiement de la V2** : nouveau projet Firebase, canal de
-      préversion sur `glow-private`, ou écrasement volontaire du site de la
-      V1 ? Proposé le 2026-09-08, non tranché. Rien ne se déploie avant.
+- [x] **Le déploiement de la V2** — tranché le 2026-09-17 : un second site
+      Hosting dans le projet de la V1, `glow-private-v2.web.app`. Déployé
+      le jour même (voir GUIDELINES § 2).
 - [ ] **Un mot de passe vide laisse entrer** (dernière étape). Choisi le
       2026-09-08 parce que rien n'était obligatoire jusque-là ; à renverser
       d'un mot si le compte doit être obligatoire.

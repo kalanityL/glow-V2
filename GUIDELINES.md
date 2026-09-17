@@ -111,13 +111,17 @@ Elles décident de la FORME du code, pas seulement de son contenu.
   lot s'écrit en haut de `SUIVI-PUSHS.md`** et part avec lui. Push et
   vérifications se font en commandes SÉPARÉES, jamais en une chaîne : un
   `tsc` rouge au milieu d'une chaîne n'arrête rien.
-- **Le déploiement n'a jamais lieu sans ordre explicite.** V2 n'a **aucune**
-  configuration de déploiement. Le seul projet Firebase de la machine,
-  `glow-private`, est celui de la V1 : y publier V2 écraserait son site.
-  Proposer un projet à part ou un canal de préversion ; ne jamais trancher
-  seul. Quand un déploiement existera : vérifier que le site sert le nouveau
-  build (l'empreinte du bundle change), pas se contenter de « Deploy
-  complete ».
+- **Le déploiement n'a jamais lieu sans ordre explicite.** **Depuis le
+  2026-09-17, la V2 a son propre site Hosting dans le projet Firebase de la
+  V1 : `glow-private-v2`, servi à `https://glow-private-v2.web.app`**
+  (« ok alors fais ca et domne moi l url »). `firebase.json` et
+  `.firebaserc` de ce dépôt visent ce site par la cible `v2` ; la commande
+  est `npm run build` puis `firebase deploy --only hosting:v2`. Le site de
+  la V1, `glow-private.web.app`, est un autre site du même projet : rien de
+  ce qui part d'ici ne le touche, et on le vérifie après chaque déploiement
+  (son empreinte de bundle ne doit pas changer). À chaque déploiement :
+  vérifier que le site sert le nouveau build (l'empreinte du bundle
+  change), pas se contenter de « Deploy complete ».
 - **« Préparer un clear »** = committer tout ce qui ne l'est pas, mettre à
   jour la note de reprise, dire ce qui reste non poussé.
 
@@ -424,7 +428,6 @@ son fondu ont vécu un après-midi) ; elle est un jeton des thèmes clairs
   ramène à l'onboarding.
 - L'accueil n'a que son entête, son salut et son menu ; rien n'y est
   cliquable, la zone du milieu est vide.
-- Pas de déploiement configuré.
 - Les roues ne se parcourent pas aux flèches du clavier.
 - L'écran de l'avatar défile (sept réglages) — le portrait et les boutons
   restent en place, seuls les réglages défilent.

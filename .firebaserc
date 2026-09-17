@@ -1,0 +1,12 @@
+{
+  "projects": {
+    "default": "glow-private"
+  },
+  "targets": {
+    "glow-private": {
+      "hosting": {
+        "v2": ["glow-private-v2"]
+      }
+    }
+  }
+}
