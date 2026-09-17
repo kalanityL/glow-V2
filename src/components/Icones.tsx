@@ -110,6 +110,16 @@ export function IconeReglages() {
   );
 }
 
+/** Lucide `lock` — le cadenas d'un badge pas encore gagné. */
+export function IconeCadenas() {
+  return (
+    <Icone>
+      <rect width="18" height="11" x="3" y="11" rx="2" ry="2" />
+      <path d="M7 11V7a5 5 0 0 1 10 0v4" />
+    </Icone>
+  );
+}
+
 /** Lucide `pencil` — modifier, sur le portrait. */
 export function IconeCrayon() {
   return (

@@ -19,8 +19,15 @@ const PLIS = Array.from({ length: 16 }, (_, i) => i * 22.5);
 
 const CENTRE_X = 60;
 const CENTRE_Y = 57;
-const RAYON_PLIS = 47;
-const RAYON_PLI = 6.5;
+/* LE ROND EST PLUS PETIT QUE DANS LA V1 (2026-09-17, « réduire la proportion
+   rond/ruban du badge ») : rosette à 40 au lieu de 47, plis de 5,5 au lieu
+   de 6,5, anneau, plaque et liseré resserrés d'autant — les rubans, eux,
+   gardent leurs tracés, et se voient donc davantage sous le rond. */
+const RAYON_PLIS = 40;
+const RAYON_PLI = 5.5;
+const RAYON_ANNEAU = 41;
+const RAYON_PLAQUE = 39.5;
+const RAYON_LISERE = 36.5;
 
 export function Cocarde() {
   return (
@@ -42,9 +49,9 @@ export function Cocarde() {
           );
         })}
       </g>
-      <circle cx={CENTRE_X} cy={CENTRE_Y} r="48" className="cocarde__anneau" />
-      <circle cx={CENTRE_X} cy={CENTRE_Y} r="46.5" className="cocarde__plaque" />
-      <circle cx={CENTRE_X} cy={CENTRE_Y} r="43.5" className="cocarde__lisere" />
+      <circle cx={CENTRE_X} cy={CENTRE_Y} r={RAYON_ANNEAU} className="cocarde__anneau" />
+      <circle cx={CENTRE_X} cy={CENTRE_Y} r={RAYON_PLAQUE} className="cocarde__plaque" />
+      <circle cx={CENTRE_X} cy={CENTRE_Y} r={RAYON_LISERE} className="cocarde__lisere" />
     </svg>
   );
 }
