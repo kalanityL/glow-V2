@@ -5,9 +5,11 @@
  * (`versions/cartes/components/badge/BadgeFrame.tsx`) : une rosette de
  * seize plis régulièrement répartis, un anneau, une plaque, un liseré
  * pointillé, et LES DEUX RUBANS PENDANTS (« il manque les deux rubans sur le
- * placeholder ») — sans la bannière du palier, et sans dessin. La géométrie
- * est celle de la V1 à l'unité près : la cocarde centrée à (60, 57), les
- * rubans qui descendent jusqu'à 129 — d'où une fenêtre de 120 sur 130.
+ * placeholder ») — sans la bannière du palier, et sans dessin. La cocarde
+ * est centrée à (60, 57) comme dans la V1 ; les rubans sont les tracés de
+ * la V1 RÉDUITS DE 25 % (« placeholder : ruban 25% plus court »), par une
+ * homothétie de 0,75 depuis leur point d'attache (60, 86) : ils descendent
+ * à 118 au lieu de 129, et la fenêtre redevient un carré de 120.
  *
  * AUCUNE COULEUR ICI : chaque pièce porte une classe, `page.css` la peint aux
  * jetons du thème — c'est un emplacement, pas un badge, il ne porte aucun
@@ -31,8 +33,8 @@ const RAYON_LISERE = 36.5;
 
 export function Cocarde() {
   return (
-    <svg className="cocarde" viewBox="0 0 120 130" aria-hidden="true" focusable="false">
-      <g className="cocarde__rubans">
+    <svg className="cocarde" viewBox="0 0 120 120" aria-hidden="true" focusable="false">
+      <g className="cocarde__rubans" transform="translate(60 86) scale(0.75) translate(-60 -86)">
         <path d="M 40 86 Q 30 104 16 128 L 28 120 L 38 129 Q 48 106 50 90 Z" />
         <path d="M 70 90 Q 72 106 82 129 L 92 120 L 104 128 Q 90 104 80 86 Z" />
       </g>

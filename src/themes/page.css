@@ -974,13 +974,13 @@
 .salut__cocarde {
   position: relative;
   display: block;
-  /* 44 px de large, 47,7 de haut (la fenêtre est de 120 sur 130, les rubans
-     pendent sous le rond) : avec le salut de 20 px et 6 px d'air, le pied
-     des rubans arrive au bas du portrait de 75 px, pas plus bas (2026-09-17,
+  /* 44 px, carrés (les rubans, raccourcis de 25 % le 2026-09-17, tiennent
+     dans la fenêtre de 120) : avec le salut de 20 px et 6 px d'air, le pied
+     des rubans reste au-dessus du bas du portrait de 75 px (2026-09-17,
      « réduire la taille du placeholder pour qu'il ne desdnde pas plus bas
      que le bas de l'avatar »). */
   width: 44px;
-  height: calc(44px * 130 / 120);
+  height: 44px;
 }
 
 /* LÉGÈREMENT FLOUE (2026-09-17, « flouter legerement le badge ») : un badge
@@ -995,11 +995,11 @@
 /* Le cadenas, en pastille AU CENTRE DU ROND de la cocarde (2026-09-17,
    « cadenas plus gros et centré sur le placeholder » — il était d'abord sur
    le bord haut droit) — net, lui : c'est lui qui dit que le badge est
-   fermé. Le rond est centré à (60, 57) dans la fenêtre de 120 sur 130 :
-   50 % de la largeur, 43,8 % de la hauteur. */
+   fermé. Le rond est centré à (60, 57) dans la fenêtre de 120 : 50 % de la
+   largeur, 47,5 % de la hauteur. */
 .salut__cadenas {
   position: absolute;
-  top: calc(43.8% - 12px);
+  top: calc(47.5% - 12px);
   left: calc(50% - 12px);
   width: 24px;
   height: 24px;
