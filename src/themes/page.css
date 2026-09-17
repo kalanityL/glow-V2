@@ -990,17 +990,17 @@
   filter: blur(0.7px);
 }
 
-/* Le cadenas, en pastille sur le coin haut droit de la cocarde — net, lui :
-   c'est lui qui dit que le badge est fermé. Il est centré sur le bord du
-   ROND, à 45° : le rond est centré à (60, 57) avec un anneau de 41 dans la
-   fenêtre de 120 sur 130, son point à 45° tombe donc à 74 % de la largeur
-   et 21,5 % de la hauteur. */
+/* Le cadenas, en pastille AU CENTRE DU ROND de la cocarde (2026-09-17,
+   « cadenas plus gros et centré sur le placeholder » — il était d'abord sur
+   le bord haut droit) — net, lui : c'est lui qui dit que le badge est
+   fermé. Le rond est centré à (60, 57) dans la fenêtre de 120 sur 130 :
+   50 % de la largeur, 43,8 % de la hauteur. */
 .salut__cadenas {
   position: absolute;
-  top: calc(21.5% - 8px);
-  left: calc(74% - 8px);
-  width: 16px;
-  height: 16px;
+  top: calc(43.8% - 12px);
+  left: calc(50% - 12px);
+  width: 24px;
+  height: 24px;
   border-radius: 50%;
   border: 1px solid var(--option-filet);
   background: var(--option-fond);
@@ -1010,8 +1010,8 @@
 }
 
 .salut__cadenas .icone {
-  width: 9px;
-  height: 9px;
+  width: 14px;
+  height: 14px;
 }
 
 .cocarde__rubans,
