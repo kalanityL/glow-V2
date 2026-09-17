@@ -50,7 +50,7 @@
    #DEE7F2. Les huit
    couleurs distinctes du premier jet (une par module, palette du board)
    sont dans l'historique (`b338fd9`). */
-.module { background: var(--module-fond, #dee7f2); }
+.module__pastille { background: var(--module-fond, #dee7f2); }
 
 /* ── Le cœur « me » : la cursive du mot ─────────────────────────────────── */
 

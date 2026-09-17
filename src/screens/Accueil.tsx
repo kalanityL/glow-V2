@@ -145,16 +145,16 @@ export function Accueil({ reponses }: { reponses: Reponses }) {
         <div className="page__defilant" />
       </div>
 
-      {/* Chaque cercle porte son icône et, dessous, son nom (2026-09-16,
-          « cercle plus grand dans les cercle sous les icones le nom ds
-          catégories »). Le traitement suit la forme répondue : dessin et
-          nom. */}
+      {/* Chaque module : sa pastille avec l'icône, et son nom SOUS la
+          pastille (2026-09-17, « mets les noms hors des cercles sous les
+          cercles » — le 2026-09-16 le nom était dans le cercle). Le
+          traitement suit la forme répondue : dessin et nom. */}
       <div className="modules">
         {RANGS_MODULES.map((rang) => (
           <div key={rang[0]} className="modules__rang">
             {rang.map((module) => (
-              <span key={module} className={`module module--${module}`}>
-                <span className="module__icone">
+              <span key={module} className="module">
+                <span className={`module__pastille module--${module}`}>
                   {module === 'traitement'
                     ? reponses.formeTraitement === 'comprime'
                       ? <IconeComprime />

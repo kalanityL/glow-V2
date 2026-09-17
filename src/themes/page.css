@@ -764,57 +764,52 @@
   gap: 14px;
 }
 
-/* Chaque module dans son cercle : une surface cernée du filet, l'icône au
-   trait FIN — plus fin que le menu (« trait plus fin ») — et, dessous, son
-   nom sur une ou deux lignes. Le cercle a grandi de 48 à 78 px pour les
-   loger (2026-09-16, « cercle plus grand »). */
+/* CHAQUE MODULE : SA PASTILLE, ET SON NOM DESSOUS (2026-09-17, « mets les
+   noms hors des cercles sous les cercles, augmente la taille des icone et
+   des cercles » — la veille, le nom était dans le cercle de 78 px, l'icône
+   à 22). La pastille monte à 92 px au plus, l'icône à 30 (36 d'abord,
+   « moins augmenté la taille des icones ») ; le nom, à 11 px sur une ou
+   deux lignes, se centre sous elle, EN ENCRE PLEINE ET DEMI-GRAS (« textes
+   sous cercles meilleur couleur pour visibilité ») : en gris du chapeau,
+   il se perdait sur les zones sombres de la photo, le fauteuil bleu. La colonne du module a la
+   largeur de la pastille : quatre colonnes et leurs trois airs de 14 px
+   tiennent toujours dans la ligne, sur un écran étroit la pastille
+   rétrécit — rien ne déborde, rien ne se touche. */
 .module {
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
-  gap: 2px;
-  /* 78 px au plus ; sur un écran étroit, le cercle rétrécit pour que quatre
-     tiennent sur la ligne AVEC leurs trois airs de 14 px — rien ne déborde
-     jamais, et rien ne se touche. */
-  width: min(78px, calc((100% - 3 * 14px) / 4));
-  aspect-ratio: 1;
-  /* LE NOM NE SORT PAS DU CERCLE (2026-09-16, « les titres de categorie ne
-     doivent pas depasser des cercles ») : un cercle est plus étroit en bas
-     qu'au milieu, et une seconde ligne de nom y touchait le bord. L'icône
-     est un peu plus petite, le nom aussi, et le bloc remonte : la dernière
-     ligne s'arrête à 22 px sous le centre, où la corde fait encore 64 px,
-     pour un mot de 52 px au plus (« Secondaires »). */
-  padding: 0 8px;
-  border-radius: 50%;
-  /* UNE PASTILLE COLORÉE, PLUS UN CERCLE CERNÉ (2026-09-16, « pastilles
-     colorees en guise de cercles ») : ni filet ni surface ici — la couleur
-     de chaque module est un repère de lecture stable, posée dans
-     `dessins.css` (`.module--<id>`), que les thèmes ne repeignent pas. */
+  gap: 6px;
+  width: min(92px, calc((100% - 3 * 14px) / 4));
   color: var(--encre);
 }
 
-.module__icone {
-  display: block;
-  width: 22px;
-  height: 22px;
+/* La pastille : un aplat rond, sans filet — sa couleur est calculée depuis la
+   photo (2026-09-16, « comme YouTube »), voir `dessins.css`. */
+.module__pastille {
+  display: grid;
+  place-items: center;
+  width: 100%;
+  aspect-ratio: 1;
+  border-radius: 50%;
 }
 
-.module .icone {
-  stroke-width: 1.5;
+/* Le trait des icônes dans la pastille : 1,2, plus fin que le menu (2 —
+   « trait plus fin » le 2026-09-16, « traits des icones dans cercle plus
+   fins » le 2026-09-17, de 1,5 à 1,2). */
+.module__pastille .icone {
+  width: 30px;
+  height: 30px;
+  stroke-width: 1.2;
 }
 
 .module__nom {
-  font-size: 9px;
-  font-weight: 500;
-  line-height: 1.1;
+  font-size: 11px;
+  font-weight: 600;
+  line-height: 1.15;
   text-align: center;
   text-wrap: balance;
-  color: var(--encre-chapeau);
-}
-
-.module .icone--resserree {
-  stroke-width: 1.35;
+  color: var(--encre);
 }
 
 /* L'ENTÊTE DE L'ACCUEIL, SUR UNE LIGNE (2026-09-16) : la pastille, le
