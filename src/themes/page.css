@@ -957,15 +957,17 @@
    corps, Plus Jakarta Sans, en demi-gras (600). Le jeton `--font-salut` le
    dit thème par thème : les ciels y mettent leur police de corps, qui est
    celle-là ; les thèmes clairs, dont le corps est Inter, la nomment. */
-/* La colonne du texte : le salut, puis l'emplacement du badge. */
+/* La colonne du texte : le salut, puis l'emplacement du badge. Le salut est
+   au sommet du portrait (2026-09-17, « remonter bonjour ») et la cocarde,
+   dessous, ne descend pas plus bas que le portrait. */
 .salut__texte {
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 6px;
 }
 
 .salut__titre {
-  margin: 12px 0 0;
+  margin: 0;
   display: flex;
   align-items: center;
   gap: 4px;
@@ -995,8 +997,13 @@
    Ce n'est pas un badge, il ne porte aucun métal. */
 .salut__cocarde {
   display: block;
-  width: 64px;
-  height: 64px;
+  /* 44 px de large, 47,7 de haut (la fenêtre est de 120 sur 130, les rubans
+     pendent sous le rond) : avec le salut de 20 px et 6 px d'air, le pied
+     des rubans arrive au bas du portrait de 75 px, pas plus bas (2026-09-17,
+     « réduire la taille du placeholder pour qu'il ne desdnde pas plus bas
+     que le bas de l'avatar »). */
+  width: 44px;
+  height: calc(44px * 130 / 120);
 }
 
 .cocarde {
@@ -1005,6 +1012,7 @@
   height: 100%;
 }
 
+.cocarde__rubans,
 .cocarde__plis {
   fill: var(--option-filet);
 }
