@@ -217,11 +217,10 @@ Elles décident de la FORME du code, pas seulement de son contenu.
    **Les seules exceptions, consignées** : les couleurs que la personne
    CHOISIT et qui seront enregistrées (le nuancier de l'avatar — peau, yeux,
    cheveux) ; la géométrie du mot-symbole (des em calculés depuis les
-   constantes du dessin, comme des coordonnées SVG) ; **une couleur CALCULÉE
-   À L'EXÉCUTION depuis une image** (2026-09-16, la teinte des pastilles de
-   l'accueil, lue dans la photo de fond « comme YouTube ») — posée en
-   propriété CSS sur la page, jamais en couleur directe, avec une valeur de
-   repli dans la feuille.
+   constantes du dessin, comme des coordonnées SVG). (Une troisième, la
+   couleur des pastilles calculée depuis la photo de fond « comme YouTube »,
+   a vécu du 16 au 17 septembre 2026 : retirée avec le calcul, `129a7c9`
+   dans l'historique.)
 2. **`src/themes/page.css`** dit la mise en page, les tailles et les
    rapports, et **ne nomme aucune couleur** : elle consomme des jetons.
 3. **`src/themes/<id>/<id>.css`** pose les **jetons**, et rien d'autre.

@@ -81,6 +81,9 @@
   --menu-ajouter-encre: var(--bouton-encre);
   --menu-ajouter-ombre: var(--panneau-ombre);
 
+  /* Les pastilles des modules de l'accueil : la surface des réponses. */
+  --module-fond: var(--option-fond);
+
   /* Pas de photo derrière l'accueil : elle appartient aux thèmes clairs. Le
      jeton est déclaré, à `none`, pour que la règle qui le lit trouve
      toujours une valeur. */

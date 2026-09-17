@@ -92,6 +92,11 @@
   --menu-ajouter-encre: #ffffff;
   --menu-ajouter-ombre: 0 8px 18px -6px rgba(47, 108, 245, 0.55);
 
+  /* LES PASTILLES DES MODULES DE L'ACCUEIL : « Gris 50 — Arrière-plan
+     principal » du board (2026-09-17, « couleur des pastilles : le gris
+     blanc de la palquette »). */
+  --module-fond: #f8fafc;
+
   /* LE FOND DE L'ACCUEIL (2026-09-16, « essaie l'image fond haut sur toute
      la jauteur de l'ecran en fond », « non zoomée », « fond-haut.png », puis
      « fond-haut2.png » le même soir) : sa photo en portrait — un mur clair,

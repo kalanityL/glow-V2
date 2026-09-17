@@ -1,4 +1,3 @@
-import { useEffect, useRef, useState, type CSSProperties } from 'react';
 import { Avatar } from '../components/Avatar';
 import { Cocarde } from '../components/Cocarde';
 import {
@@ -26,8 +25,6 @@ import { useTextes } from '../i18n/useTextes';
 import { ENTREES_MENU, type EntreeMenu } from '../app/menu';
 import { RANGS_MODULES, type ModuleId } from '../app/modules';
 import { classeDuTheme } from '../themes/themes';
-import { rgbDepuisHex, teinteDePastille } from '../domaine/couleurs';
-import { adresseDeLImage, pixelsDeLImage, proprieteCalculee } from '../plateforme/navigateur';
 import type { Reponses } from './onboarding/reponses';
 
 /**
@@ -50,17 +47,12 @@ import type { Reponses } from './onboarding/reponses';
  * et activité physique dusposition 4 et 4 alignés ») : huit cercles sur DEUX
  * RANGS ALIGNÉS de quatre — le quinconce de trois puis quatre a vécu de
  * l'après-midi au soir du 2026-09-16. L'ordre se lit rang par rang. Le
- * cercles sont des PASTILLES COLORÉES (2026-09-16, « pastilles colorees en
- * guise de cercles »), TOUTES DE LA MÊME COULEUR, CALCULÉE DEPUIS LA PHOTO DE
- * FOND À L'EXÉCUTION — « pareil que ce que fait youtube pour la couleur du
- * cadre qui change en fonction de l'image de la video » : la plateforme lit
- * les pixels de l'image que le thème donne à la page et le bleu du menu, le
- * domaine en tire la teinte de pastille (la teinte vive dominante de la
- * photo, hors jaune et orange, moyennée avec celle du menu), et elle est posée sur la page en propriété
- * `--module-fond`, que `dessins.css` consomme (avec une valeur de repli tant
- * qu'elle n'est pas lue). C'est la seule couleur en `style` de l'accueil,
- * et pour la même raison que le nuancier de l'avatar : elle n'existe qu'à
- * l'exécution. Le traitement montre la
+ * cercles sont des PASTILLES (2026-09-16, « pastilles colorees en guise de
+ * cercles ») toutes de la même couleur, le Gris 50 de la palette (2026-09-17,
+ * « couleur des pastilles : le gris blanc de la palquette ») — un jeton du
+ * thème, `--module-fond`. Le calcul « comme YouTube » depuis la photo de
+ * fond (2026-09-16) a vécu un jour ; il est dans l'historique (`129a7c9`).
+ * Le traitement montre la
  * seringue ou le comprimé selon la forme répondue — la seringue quand rien
  * n'est répondu, comme la V1.
  *
@@ -74,35 +66,9 @@ import type { Reponses } from './onboarding/reponses';
  */
 export function Accueil({ reponses }: { reponses: Reponses }) {
   const textes = useTextes();
-  const page = useRef<HTMLDivElement>(null);
-  const [teintePastille, setTeintePastille] = useState<string | null>(null);
-
-  /* La couleur se lit une fois la page montée — la photo et le bleu du menu
-     viennent du thème posé sur elle. Si la lecture échoue, la pastille
-     garde sa couleur de repli. */
-  useEffect(() => {
-    let vivant = true;
-    const url = adresseDeLImage(proprieteCalculee(page.current, '--accueil-fond-image'));
-    const accentMenu = rgbDepuisHex(proprieteCalculee(page.current, '--menu-actif'));
-    if (!url) return;
-    pixelsDeLImage(url).then((pixels) => {
-      if (vivant && pixels) setTeintePastille(teinteDePastille(pixels, accentMenu));
-    });
-    return () => {
-      vivant = false;
-    };
-  }, []);
-
-  const proprietes = (
-    teintePastille ? { '--module-fond': teintePastille } : {}
-  ) as CSSProperties;
 
   return (
-    <div
-      ref={page}
-      className={`page page--accueil ${classeDuTheme('blanc')}`}
-      style={proprietes}
-    >
+    <div className={`page page--accueil ${classeDuTheme('blanc')}`}>
       <div className="page__colonne">
         {/* UNE SEULE LIGNE (2026-09-16, « header : logo / glow / recherche/
             parametre tous sur la meme ligne / logo et titre meme hauteur,
