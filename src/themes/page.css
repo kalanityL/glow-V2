@@ -945,13 +945,18 @@
 /* Le mot est plus petit et les étoiles le suivent de près (2026-09-16,
    « rétrécit texte bonjour marie cecile, l'étoile et juste apres le
    prenom ») : 22 → 17 px, l'air 8 → 4 px, les étoiles à la taille du mot. */
+/* PAS EN GRAS, ET DANS LA POLICE DU SALUT DE LA V1 (2026-09-17, « bonjour :
+   pas en gras, meme police que v1 ») : la V1 l'écrivait dans sa police de
+   corps, Plus Jakarta Sans, en demi-gras (600). Le jeton `--font-salut` le
+   dit thème par thème : les ciels y mettent leur police de corps, qui est
+   celle-là ; les thèmes clairs, dont le corps est Inter, la nomment. */
 .salut__titre {
   margin: 12px 0 0;
   display: flex;
   align-items: center;
   gap: 4px;
-  font-family: var(--font-display);
-  font-weight: 700;
+  font-family: var(--font-salut);
+  font-weight: 600;
   font-size: 17px;
   line-height: 1.2;
   letter-spacing: -0.01em;
