@@ -24,8 +24,11 @@
      bord de l'écran, y compris à 320 px de large. En haut s'ajoute LA ZONE
      SÛRE de l'appareil (2026-09-17) : la barre d'état est par-dessus
      l'écran, transparente, et la page dessine dessous — son fond y passe,
-     son contenu non. `0px` quand l'appareil n'en publie pas. */
-  padding: calc(16px + var(--zone-sure-haut, 0px)) 16px 16px;
+     son contenu non. `0px` quand l'appareil n'en publie pas. L'air entre la
+     barre et l'entête est de 8 px, la moitié de la marge (2026-09-17,
+     « réduire espace entre ligne du haut du téléphone et header de
+     l'application de moitié »). */
+  padding: calc(8px + var(--zone-sure-haut, 0px)) 16px 16px;
   font-family: var(--font-body);
   color: var(--encre);
   background: var(--fond);
