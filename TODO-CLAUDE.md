@@ -126,6 +126,18 @@ la V2.
 
 ## À arbitrer (décisions à toi)
 
+- [ ] **Les analyses croisées à retenir** (2026-09-17, sa question :
+      « quelle/s autres/s correlations/analyses de données croisées te
+      paraissent pertinentes ? ») — proposées dans la réponse du jour, à
+      trancher avant d'en écrire une seule : effets secondaires × jour depuis
+      l'injection ; effets secondaires × dose ; poids × apports (semaine
+      glissante) ; poids × activité + pas ; nuit × activité (heure et
+      intensité) ; nuit × dernier repas (heure, quantité) ; effets
+      secondaires × repas (gras, quantité) ; pas × nuit précédente ; « un
+      temps pour soi » × nuit et × effets secondaires ; appétit (kcal) × jour
+      depuis l'injection. Même moteur que la nuit × apports
+      (`src/domaine/correlation.ts`) : Spearman, plancher de jours, p-valeur.
+
 - [ ] **Les 14 questions de vocabulaire sans réponse** de `VOCABULAIRE.md`
       § 4 — dont l'étiquette « Pesée » du défilé récent (la règle « Balance »
       a été tranchée le 01/09, celle-ci jamais), et les activités qui portent
