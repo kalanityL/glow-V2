@@ -73,19 +73,26 @@ body {
   }
 }
 
-/* LA BARRE D'ÉTAT, en haut, hors écran (2026-09-17) : la livrée sombre du
-   contour, comme la barre du bas — elle figure l'appareil. L'heure à gauche,
-   le réseau, le wifi et la batterie à droite, en clair. */
+/* LA BARRE D'ÉTAT, PAR-DESSUS LE HAUT DE L'ÉCRAN, TRANSPARENTE (2026-09-17,
+   « le fond de l'image doit aussi etre le fond de la bande du haut du
+   telephone ») : comme sur un vrai téléphone, l'application dessine sous
+   elle. L'heure à gauche, le réseau, le wifi et la batterie à droite, en
+   encre sombre. Sa hauteur est LA ZONE SÛRE du haut, que l'écran publie
+   (`--zone-sure-haut`) et dont la page se décale — l'équivalent de
+   `env(safe-area-inset-top)` d'un vrai appareil. */
 .phone-status {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
   z-index: 30;
-  flex-shrink: 0;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  height: 1.75rem;
+  height: var(--zone-sure-haut);
   padding: 0 1.25rem 0 1.5rem;
-  background: #0f172a;
-  color: #e2e8f0;
+  color: #0f172a;
+  pointer-events: none;
   font-family: system-ui, sans-serif;
   font-size: 0.8125rem;
   font-weight: 600;
@@ -117,8 +124,10 @@ body {
   stroke: none;
 }
 
-/* L'écran : tout l'espace laissé par les deux barres. */
+/* L'écran : tout l'espace laissé par la barre du bas. Il publie la hauteur
+   de la barre d'état qui le recouvre, pour que la page s'en décale. */
 .phone-screen {
+  --zone-sure-haut: 1.75rem;
   position: relative;
   flex: 1;
   min-height: 0;

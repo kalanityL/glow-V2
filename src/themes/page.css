@@ -21,8 +21,11 @@
      qui défile, entre l'entête et les boutons, qui restent en place. */
   overflow: hidden;
   /* Marges réduites, PAS supprimées — le contenu ne doit pas venir toucher le
-     bord de l'écran, y compris à 320 px de large. */
-  padding: 16px;
+     bord de l'écran, y compris à 320 px de large. En haut s'ajoute LA ZONE
+     SÛRE de l'appareil (2026-09-17) : la barre d'état est par-dessus
+     l'écran, transparente, et la page dessine dessous — son fond y passe,
+     son contenu non. `0px` quand l'appareil n'en publie pas. */
+  padding: calc(16px + var(--zone-sure-haut, 0px)) 16px 16px;
   font-family: var(--font-body);
   color: var(--encre);
   background: var(--fond);

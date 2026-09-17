@@ -35,21 +35,6 @@ export default function App() {
           coins arrondis à toutes les largeurs — pour qu'on distingue ce qui
           est l'écran de ce qui ne l'est pas. */}
       <div className="phone-frame">
-        {/* LA BARRE D'ÉTAT DU TÉLÉPHONE (2026-09-17, « fait apparaitre sur le
-            telephone la barre du haut du telephone (réseau, heure ..;) ») :
-            l'heure, le réseau, le wifi, la batterie — hors écran, comme la
-            barre du bas : elle figure l'appareil, pas l'application, et
-            c'est pourquoi son heure est figée à celle de toutes les
-            maquettes de téléphone et n'est pas un texte du dictionnaire. */}
-        <div className="phone-status" aria-hidden="true">
-          <span className="phone-status-heure">{HEURE_DE_MAQUETTE}</span>
-          <span className="phone-status-icones">
-            <Reseau />
-            <Wifi />
-            <Batterie />
-          </span>
-        </div>
-
         {/* L'écran : rien d'autre que le contenu. La barre du bas n'en fait
             pas partie, elle figure le menu natif du téléphone, donc le bas de
             l'écran est juste au-dessus d'elle.
@@ -58,6 +43,24 @@ export default function App() {
             éléments `position: fixed` qu'il abritera : les popups s'y
             centreront, plutôt que dans la fenêtre du navigateur. */}
         <div className="phone-screen" id="phone-screen">
+          {/* LA BARRE D'ÉTAT DU TÉLÉPHONE (2026-09-17, « fait apparaitre sur
+              le telephone la barre du haut du telephone (réseau, heure ..;) »)
+              : l'heure, le réseau, le wifi, la batterie. Elle figure
+              l'appareil, pas l'application — son heure est figée à celle de
+              toutes les maquettes de téléphone et n'est pas un texte du
+              dictionnaire. ELLE EST PAR-DESSUS L'ÉCRAN, TRANSPARENTE (« le
+              fond de l'image doit aussi etre le fond de la bande du haut du
+              telephone ») : comme sur un vrai téléphone, l'application
+              dessine dessous et se décale de la zone sûre (`--zone-sure-haut`,
+              posée par `index.css` sur l'écran). */}
+          <div className="phone-status" aria-hidden="true">
+            <span className="phone-status-heure">{HEURE_DE_MAQUETTE}</span>
+            <span className="phone-status-icones">
+              <Reseau />
+              <Wifi />
+              <Batterie />
+            </span>
+          </div>
           {parcours.entre ? (
             <Accueil reponses={parcours.reponses} />
           ) : (
