@@ -878,16 +878,17 @@
   gap: 5px;
 }
 
-/* La pastille ronde d'un outil : une surface cernée, l'icône dedans. */
+/* La pastille ronde d'un outil : un aplat, l'icône dedans — ses deux
+   couleurs sont des jetons du thème, `--rond-fond` et `--rond-encre`
+   (2026-09-17, « recherche-parametre.png : mets ces couleurs là »). */
 /* 25 px : 20 augmentés de 25 % (2026-09-17, « parametre et recherche :
    augmenter taille de 25% »). */
 .rond {
   width: 25px;
   height: 25px;
   border-radius: 50%;
-  border: 1px solid var(--option-filet);
-  background: var(--option-fond);
-  color: var(--encre);
+  background: var(--rond-fond);
+  color: var(--rond-encre);
   display: grid;
   place-items: center;
 }

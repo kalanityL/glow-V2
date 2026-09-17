@@ -97,6 +97,13 @@
      blanc de la palquette »). */
   --module-fond: #f8fafc;
 
+  /* LES PASTILLES DE LA RECHERCHE ET DES PRÉFÉRENCES, aux couleurs de son
+     image (2026-09-17, `~/Desktop/GLOW/Images-pour-claude/
+     recherche-parametre.png`, relevées au pixel) : un gris très clair, sans
+     filet, et l'icône en noir. */
+  --rond-fond: #ecebed;
+  --rond-encre: #000000;
+
   /* LE FOND DE L'ACCUEIL (2026-09-16, « essaie l'image fond haut sur toute
      la jauteur de l'ecran en fond », « non zoomée », « fond-haut.png », puis
      « fond-haut2.png » le même soir) : sa photo en portrait — un mur clair,
