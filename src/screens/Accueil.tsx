@@ -145,27 +145,30 @@ export function Accueil({ reponses }: { reponses: Reponses }) {
         <div className="page__defilant" />
       </div>
 
-      {/* Chaque module : sa pastille avec l'icône, et son nom SOUS la
-          pastille (2026-09-17, « mets les noms hors des cercles sous les
-          cercles » — le 2026-09-16 le nom était dans le cercle). Le
+      {/* Chaque module : sa pastille avec l'icône, SANS NOM VISIBLE
+          (2026-09-17, « ne pas mettre les noms sous les cercles » — le
+          2026-09-16 le nom était dans le cercle, le matin du 17 sous lui).
+          Le nom reste dit à qui écoute la page, en `aria-label`. Le
           traitement suit la forme répondue : dessin et nom. */}
       <div className="modules">
         {RANGS_MODULES.map((rang) => (
           <div key={rang[0]} className="modules__rang">
             {rang.map((module) => (
-              <span key={module} className="module">
-                <span className={`module__pastille module--${module}`}>
-                  {module === 'traitement'
-                    ? reponses.formeTraitement === 'comprime'
-                      ? <IconeComprime />
-                      : <IconeSeringue />
-                    : ICONES_MODULES[module]}
-                </span>
-                <span className="module__nom">
-                  {module === 'traitement' && reponses.formeTraitement
+              <span
+                key={module}
+                className={`module module--${module}`}
+                role="img"
+                aria-label={
+                  module === 'traitement' && reponses.formeTraitement
                     ? textes.accueil.traitement[reponses.formeTraitement]
-                    : textes.accueil.modules[module]}
-                </span>
+                    : textes.accueil.modules[module]
+                }
+              >
+                {module === 'traitement'
+                  ? reponses.formeTraitement === 'comprime'
+                    ? <IconeComprime />
+                    : <IconeSeringue />
+                  : ICONES_MODULES[module]}
               </span>
             ))}
           </div>

@@ -764,40 +764,26 @@
   gap: 14px;
 }
 
-/* CHAQUE MODULE : SA PASTILLE, ET SON NOM DESSOUS (2026-09-17, « mets les
+/* CHAQUE MODULE EST UNE PASTILLE, ET RIEN D'AUTRE (2026-09-17 : « mets les
    noms hors des cercles sous les cercles, augmente la taille des icone et
-   des cercles » — la veille, le nom était dans le cercle de 78 px, l'icône
-   à 22). La pastille monte à 92 px au plus, l'icône à 30 (36 d'abord,
-   « moins augmenté la taille des icones ») ; le nom, à 11 px sur une ou
-   deux lignes, se centre sous elle, EN ENCRE PLEINE ET DEMI-GRAS (« textes
-   sous cercles meilleur couleur pour visibilité ») : en gris du chapeau,
-   il se perdait sur les zones sombres de la photo, le fauteuil bleu. La colonne du module a la
-   largeur de la pastille : quatre colonnes et leurs trois airs de 14 px
-   tiennent toujours dans la ligne, sur un écran étroit la pastille
-   rétrécit — rien ne déborde, rien ne se touche. */
+   des cercles », « moins augmenté la taille des icones », « traits des
+   icones dans cercle plus fins », puis « ne pas mettre les noms sous les
+   cercles ») : un rond de 92 px au plus, l'icône de 30 px au trait 1,2,
+   pas de nom visible — il est dit en `aria-label`. La pastille a la
+   largeur de sa part de ligne : quatre pastilles et leurs trois airs de
+   14 px tiennent toujours, sur un écran étroit elles rétrécissent — rien
+   ne déborde, rien ne se touche. Sa couleur est calculée depuis la photo
+   (2026-09-16, « comme YouTube »), voir `dessins.css`. */
 .module {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 6px;
+  display: grid;
+  place-items: center;
   width: min(92px, calc((100% - 3 * 14px) / 4));
+  aspect-ratio: 1;
+  border-radius: 50%;
   color: var(--encre);
 }
 
-/* La pastille : un aplat rond, sans filet — sa couleur est calculée depuis la
-   photo (2026-09-16, « comme YouTube »), voir `dessins.css`. */
-.module__pastille {
-  display: grid;
-  place-items: center;
-  width: 100%;
-  aspect-ratio: 1;
-  border-radius: 50%;
-}
-
-/* Le trait des icônes dans la pastille : 1,2, plus fin que le menu (2 —
-   « trait plus fin » le 2026-09-16, « traits des icones dans cercle plus
-   fins » le 2026-09-17, de 1,5 à 1,2). */
-.module__pastille .icone {
+.module .icone {
   width: 30px;
   height: 30px;
   stroke-width: 1.2;
@@ -805,17 +791,8 @@
 
 /* La fenêtre resserrée des dessins maison grossit le trait de 20/18 : 1,2
    devient 1,08 pour rester celui des voisins. */
-.module__pastille .icone--resserree {
+.module .icone--resserree {
   stroke-width: 1.08;
-}
-
-.module__nom {
-  font-size: 11px;
-  font-weight: 600;
-  line-height: 1.15;
-  text-align: center;
-  text-wrap: balance;
-  color: var(--encre);
 }
 
 /* L'ENTÊTE DE L'ACCUEIL, SUR UNE LIGNE (2026-09-16) : la pastille, le
@@ -872,9 +849,11 @@
 }
 
 /* La pastille ronde d'un outil : une surface cernée, l'icône dedans. */
+/* 25 px : 20 augmentés de 25 % (2026-09-17, « parametre et recherche :
+   augmenter taille de 25% »). */
 .rond {
-  width: 20px;
-  height: 20px;
+  width: 25px;
+  height: 25px;
   border-radius: 50%;
   border: 1px solid var(--option-filet);
   background: var(--option-fond);
@@ -884,8 +863,8 @@
 }
 
 .rond .icone {
-  width: 10px;
-  height: 10px;
+  width: 12.5px;
+  height: 12.5px;
 }
 
 /* LE SALUT : le portrait à gauche, le mot à droite. */
