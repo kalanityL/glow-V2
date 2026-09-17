@@ -38,3 +38,9 @@ Règles de tenue (voir GUIDELINES.md, « Manière de travailler ») :
       payant pour vérifier que compte a jour dans les paiements. Autorisation
       de debordement de 2 mois sans possibilité de verification puis on coupe
       le service.
+
+- [ ] questions de l'onboarding : je fais du sport avant ptit dej dans la
+      matinée apres dej avant diner apres diner plusieurs choix possibles,
+      les jours dela semaine ou je fais du sport je veux me peser à quelle
+      frequence tous les jours 1 fois par semaine une fois par 15j une fois
+      par mois seuelemnt qd je vais chez le medecin
