@@ -803,6 +803,12 @@
   stroke-width: 1.2;
 }
 
+/* La fenêtre resserrée des dessins maison grossit le trait de 20/18 : 1,2
+   devient 1,08 pour rester celui des voisins. */
+.module__pastille .icone--resserree {
+  stroke-width: 1.08;
+}
+
 .module__nom {
   font-size: 11px;
   font-weight: 600;
