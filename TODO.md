@@ -47,4 +47,4 @@ Règles de tenue (voir GUIDELINES.md, « Manière de travailler ») :
 
 - [ ] intégrer recherche correlation
 
-- [ ] tous les lundi
+- [ ] tous les lundi "votre rapport hebdomadaire est dispobible"
