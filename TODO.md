@@ -48,3 +48,6 @@ Règles de tenue (voir GUIDELINES.md, « Manière de travailler ») :
 - [ ] intégrer recherche correlation
 
 - [ ] tous les lundi "votre rapport hebdomadaire est dispobible"
+
+- [ ] sur la page export, l'historique des rapport hebdomadaire, la
+      possibilité de generer un rapport pour une periode 7j 30j ou libre
