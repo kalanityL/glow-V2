@@ -46,3 +46,5 @@ Règles de tenue (voir GUIDELINES.md, « Manière de travailler ») :
       par mois seuelemnt qd je vais chez le medecin
 
 - [ ] intégrer recherche correlation
+
+- [ ] tous les lundi
