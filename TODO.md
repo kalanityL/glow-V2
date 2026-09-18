@@ -51,3 +51,5 @@ Règles de tenue (voir GUIDELINES.md, « Manière de travailler ») :
 
 - [ ] sur la page export, l'historique des rapport hebdomadaire, la
       possibilité de generer un rapport pour une periode 7j 30j ou libre
+      Note : les rapports ne sont pas réellement stockés, ils sont générés à
+      la demande
