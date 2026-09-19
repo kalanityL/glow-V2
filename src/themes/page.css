@@ -759,8 +759,11 @@
      la largeur du cercle se calcule à partir de cet air, jamais l'inverse. */
   gap: 14px;
   /* En bas, la place du disque « Ajouter », qui monte de 30 px au-dessus de
-     la barre : sans elle, il chevauchait la rangée (vu à la capture). */
-  margin: 0 0 24px;
+     la barre : sans elle, il chevauchait la rangée (vu à la capture). Réduite
+     à 12 px le 2026-09-19 (« pastilles plus petites et plus basses ») : les
+     pastilles, plus petites, laissent au disque la place de se glisser entre
+     les deux du milieu sans les toucher. */
+  margin: 0 0 12px;
   color: var(--encre);
 }
 
@@ -774,8 +777,9 @@
    noms hors des cercles sous les cercles, augmente la taille des icone et
    des cercles », « moins augmenté la taille des icones », « traits des
    icones dans cercle plus fins », puis « ne pas mettre les noms sous les
-   cercles ») : un rond de 84 px au plus (92 jusqu'au 2026-09-17, « reduis
-   légerement la taille des pastilles »), l'icône de 24 px au trait 1,2,
+   cercles ») : un rond de 72 px au plus (92, puis 84 le 2026-09-17, puis 72
+   le 2026-09-19, « pastilles plus petites et plus basses »), l'icône de
+   24 px au trait 1,2,
    pas de nom visible — il est dit en `aria-label`. La pastille a la
    largeur de sa part de ligne : quatre pastilles et leurs trois airs de
    14 px tiennent toujours, sur un écran étroit elles rétrécissent — rien
@@ -786,7 +790,7 @@
 .module {
   display: grid;
   place-items: center;
-  width: min(84px, calc((100% - 3 * 14px) / 4));
+  width: min(72px, calc((100% - 3 * 14px) / 4));
   aspect-ratio: 1;
   border-radius: 50%;
   background: var(--module-fond);
