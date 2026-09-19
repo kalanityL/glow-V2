@@ -53,3 +53,7 @@ Règles de tenue (voir GUIDELINES.md, « Manière de travailler ») :
       possibilité de generer un rapport pour une periode 7j 30j ou libre
       Note : les rapports ne sont pas réellement stockés, ils sont générés à
       la demande
+
+- [ ] tous les 1ers du mois, une offre : new month new life : 1er mois à
+      -50% ; bandeau  d'annonce bas vitré foncé comme sur shipt cf mobbin -
+      se retrouve aussi sur la partie mes abos de mon compte.
