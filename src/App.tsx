@@ -3,7 +3,7 @@ import { useParcours } from './app/useParcours';
 import { useTextes } from './i18n/useTextes';
 import { Onboarding } from './screens/Onboarding';
 import { Accueil } from './screens/Accueil';
-import { Profil } from './screens/Profil';
+import { Compte } from './screens/Compte';
 /* La mise en page d'abord, les jetons des thèmes ensuite : les feuilles de
    thème doivent pouvoir battre la structure, jamais l'inverse. */
 import './themes/page.css';
@@ -31,11 +31,11 @@ export default function App() {
      doit pouvoir y reculer. */
   const parcours = useParcours();
 
-  /* LA PAGE OUVERTE PAR-DESSUS L'ACCUEIL (2026-09-19) : le profil, ouvert par
-     le portrait. Le bouton « retour » de la barre y ramène à l'accueil —
+  /* LA PAGE OUVERTE PAR-DESSUS L'ACCUEIL (2026-09-19) : « Mon compte »,
+     ouverte par le portrait ou par le tiroir du menu. Le bouton « retour » de la barre y ramène à l'accueil —
      c'est pour cela que la page vit ici, à côté du parcours, et non dans
      l'accueil. (Le menu principal, lui, est un tiroir de l'accueil.) */
-  const [page, setPage] = useState<'accueil' | 'profil'>('accueil');
+  const [page, setPage] = useState<'accueil' | 'compte'>('accueil');
   const peutRevenir = page !== 'accueil' || parcours.peutRevenir;
   const revenir = () => {
     if (page !== 'accueil') setPage('accueil');
@@ -76,10 +76,10 @@ export default function App() {
           </div>
           {!parcours.entre ? (
             <Onboarding parcours={parcours} />
-          ) : page === 'profil' ? (
-            <Profil parcours={parcours} onRevenir={() => setPage('accueil')} />
+          ) : page === 'compte' ? (
+            <Compte parcours={parcours} onRevenir={() => setPage('accueil')} />
           ) : (
-            <Accueil reponses={parcours.reponses} onOuvrirProfil={() => setPage('profil')} />
+            <Accueil reponses={parcours.reponses} onOuvrirCompte={() => setPage('compte')} />
           )}
         </div>
 

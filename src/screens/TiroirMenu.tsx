@@ -41,9 +41,17 @@ import {
  * flou ») : une vitre sans teinte, qui floute ce qu'elle couvre, et sur
  * laquelle un clic ferme le tiroir.
  *
- * AUCUNE ENTRÉE NE MÈNE ENCORE NULLE PART : des lignes, pas des boutons.
+ * AUCUNE ENTRÉE NE MÈNE ENCORE NULLE PART, sauf « Mon compte », dont la page
+ * existe : des lignes, pas des boutons.
  */
-export function TiroirMenu({ onFermer }: { onFermer: () => void }) {
+export function TiroirMenu({
+  onFermer,
+  onOuvrirCompte,
+}: {
+  onFermer: () => void;
+  /** « Mon compte » ouvre la page du compte (2026-09-19). */
+  onOuvrirCompte: () => void;
+}) {
   const textes = useTextes();
   const tiroir = useRef<HTMLDivElement>(null);
 
@@ -74,12 +82,26 @@ export function TiroirMenu({ onFermer }: { onFermer: () => void }) {
               )}
             </h2>
             <div className="tiroir__grille">
-              {ENTREES_PAR_SECTION[section].map((entree) => (
-                <div key={entree} className="tiroir__entree">
-                  <span className="tiroir__icone">{ICONES_ENTREES[entree]}</span>
-                  <span className="tiroir__nom">{textes.menuPrincipal.entrees[entree]}</span>
-                </div>
-              ))}
+              {ENTREES_PAR_SECTION[section].map((entree) =>
+                entree === 'compte' ? (
+                  /* LA SEULE ENTRÉE QUI MÈNE QUELQUE PART : « Mon compte », la
+                     page existe (2026-09-19). Les autres attendent la leur. */
+                  <button
+                    key={entree}
+                    type="button"
+                    className="tiroir__entree tiroir__entree--bouton"
+                    onClick={onOuvrirCompte}
+                  >
+                    <span className="tiroir__icone">{ICONES_ENTREES[entree]}</span>
+                    <span className="tiroir__nom">{textes.menuPrincipal.entrees[entree]}</span>
+                  </button>
+                ) : (
+                  <div key={entree} className="tiroir__entree">
+                    <span className="tiroir__icone">{ICONES_ENTREES[entree]}</span>
+                    <span className="tiroir__nom">{textes.menuPrincipal.entrees[entree]}</span>
+                  </div>
+                ),
+              )}
             </div>
           </section>
         ))}

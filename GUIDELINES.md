@@ -438,7 +438,14 @@ mot-symbole dessiné, puis « et vous » — (Mon compte, Avis et Feedback,
 Sondage, FAQ, Ciel). « Admin » attend qu'il existe un compte. Aucune entrée
 ne mène encore nulle part. La liste vit dans `src/app/menuPrincipal.ts`.
 
-**La page « Mon profil »** (2026-09-19, « clic sur avatar ouvre une page
+**La page « Mon compte »** — « Mon profil » jusqu'au soir du 2026-09-19
+(« page mon profil devient mon compte. Onglet information/avatar/mon
+compte ») : trois volets, Informations / Avatar / Mon compte (l'adresse et
+le mot de passe, éditables sur place, le mot de passe en points avec sa
+règle de huit signes), et des ONGLETS nommés figés en bas à la place des
+points. Le portrait de l'accueil et l'entrée « Mon compte » du tiroir
+l'ouvrent. Ce qui suit décrit la page telle qu'elle est née le matin
+(2026-09-19, « clic sur avatar ouvre une page
 profil avec les infos persos modifiables et la config de l'avatar […] garde
 les consignes : pas de label et info editable en inline sans icone de
 modification comme sur la V1 ; meme module de modification d'avatar que la

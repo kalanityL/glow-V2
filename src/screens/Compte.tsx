@@ -3,8 +3,10 @@ import { Avatar } from '../components/Avatar';
 import { ChampEnLigne } from '../components/ChampEnLigne';
 import {
   IconeBalance,
+  IconeCadenas,
   IconeCalendrier,
   IconeCible,
+  IconeCourriel,
   IconePalette,
   IconeProfil,
   IconeRegle,
@@ -17,17 +19,28 @@ import { classeDuTheme } from '../themes/themes';
 import { UNITES_DU_SYSTEME, tailleAffichee, tailleEnCm } from '../domaine/unites';
 import { POIDS_MAX, POIDS_MIN, TAILLE_BORNES, poidsDepuisSaisie } from '../domaine/mesures';
 import { formaterDateCourte, lireDateCourte } from '../domaine/dates';
+import { motDePasseValide } from '../domaine/compte';
 import { detecterLangue } from '../i18n/useTextes';
 import { montrerVolet, voletVisible } from '../plateforme/navigateur';
 import type { useParcours } from '../app/useParcours';
 import { EtapeAvatar } from './onboarding/EtapeAvatar';
 
-/** Les deux volets du carrousel, dans l'ordre. */
-const VOLETS = ['informations', 'avatar'] as const;
-type Volet = (typeof VOLETS)[number];
+/** Les trois volets du carrousel, dans l'ordre (2026-09-19, « Onglet
+    information/avatar/mon compte »). */
+export const VOLETS_COMPTE = ['informations', 'avatar', 'compte'] as const;
+export type VoletCompte = (typeof VOLETS_COMPTE)[number];
+const VOLETS = VOLETS_COMPTE;
+type Volet = VoletCompte;
 
 /**
- * LA PAGE PROFIL (2026-09-19, « clic sur avatar ouvre une page profil avec les
+ * LA PAGE « MON COMPTE » — « Mon profil » jusqu'au soir du 2026-09-19 (« page
+ * mon profil devient mon compte. Onglet information/avatar/mon compte ») :
+ * trois volets, Informations, Avatar, Mon compte, et des ONGLETS nommés figés
+ * en bas à la place des points. Le troisième volet porte l'adresse et le mot
+ * de passe, éditables sur place comme le reste ; le mot de passe se montre en
+ * points et garde sa seule règle, huit signes.
+ *
+ * L'HISTOIRE DE LA PAGE (2026-09-19, « clic sur avatar ouvre une page profil avec les
  * infos persos modifiables et la config de l'avatar […] garde les consignes :
  * pas de label et info editable en inline sans icone de modification comme
  * sur la V1 ; meme module de modification d'avatar que la v1, NE CHANGE PAS
@@ -63,7 +76,7 @@ type Volet = (typeof VOLETS)[number];
  * l'identique, dans le second volet. Pas de bouton « Enregistrer » : chaque
  * valeur s'enregistre quand on la quitte. En thème Blanc, comme l'accueil.
  */
-export function Profil({
+export function Compte({
   parcours,
   onRevenir,
 }: {
@@ -91,15 +104,15 @@ export function Profil({
   return (
     <div className={`page page--photo ${classeDuTheme('blanc')}`}>
       <div className="page__colonne">
-        <div className="profil__entete">
-          <div className="profil__marque">
+        <div className="compte__entete">
+          <div className="compte__marque">
             <Logomark />
             <Wordmark />
           </div>
-          <h1 className="profil__titre">{textes.profil.titre}</h1>
+          <h1 className="compte__titre">{textes.compte.titre}</h1>
           <button
             type="button"
-            className="rond rond--bouton profil__retour"
+            className="rond rond--bouton compte__retour"
             aria-label={textes.retour}
             onClick={onRevenir}
           >
@@ -107,14 +120,14 @@ export function Profil({
           </button>
         </div>
 
-        <div className="profil__identite">
+        <div className="compte__identite">
           <button
             type="button"
-            className="profil__portrait-bouton"
-            aria-label={textes.profil.avatar}
+            className="compte__portrait-bouton"
+            aria-label={textes.compte.avatar}
             onClick={() => aller('avatar')}
           >
-            <div className="profil__cercle">
+            <div className="compte__cercle">
               <Avatar avatar={reponses.avatar} />
             </div>
           </button>
@@ -132,15 +145,15 @@ export function Profil({
           ref={carrousel}
           onScroll={() => setVolet(VOLETS[voletVisible(carrousel.current)] ?? 'informations')}
         >
-          <section className="carrousel__volet" aria-label={textes.profil.informations}>
+          <section className="carrousel__volet" aria-label={textes.compte.onglets.informations}>
             <div className="carte">
               <h2 className="carte__titre">
                 <span className="carte__icone">
                   <IconeProfil />
                 </span>
-                {textes.profil.informations}
+                {textes.compte.informations}
               </h2>
-              <p className="carte__sous-titre">{textes.profil.informationsSousTitre}</p>
+              <p className="carte__sous-titre">{textes.compte.informationsSousTitre}</p>
 
               <div className="ligne">
                 <span className="ligne__icone">
@@ -156,7 +169,7 @@ export function Profil({
                     const lue = lireDateCourte(saisie, langue);
                     return lue ? formaterDateCourte(lue, langue) : null;
                   }}
-                  regle={textes.profil.regleDate}
+                  regle={textes.compte.regleDate}
                   nom={textes.groupes.dateNaissance}
                   inputMode="numeric"
                 />
@@ -175,7 +188,7 @@ export function Profil({
                       ? String(n)
                       : null;
                   }}
-                  regle={textes.profil.regleTaille(bornesTaille.min, bornesTaille.max, textes.unites[unites.taille])}
+                  regle={textes.compte.regleTaille(bornesTaille.min, bornesTaille.max, textes.unites[unites.taille])}
                   unite={textes.unites[unites.taille]}
                   nom={textes.groupes.taille}
                   inputMode="numeric"
@@ -196,7 +209,7 @@ export function Profil({
                     const stocke = poidsDepuisSaisie(saisie, unites.poids);
                     return stocke ? poidsEcrit(stocke) : null;
                   }}
-                  regle={textes.profil.reglePoids(POIDS_MIN, POIDS_MAX[unites.poids], textes.unites[unites.poids])}
+                  regle={textes.compte.reglePoids(POIDS_MIN, POIDS_MAX[unites.poids], textes.unites[unites.poids])}
                   unite={textes.unites[unites.poids]}
                   nom={textes.groupes.poids}
                   inputMode="decimal"
@@ -217,7 +230,7 @@ export function Profil({
                     const stocke = poidsDepuisSaisie(saisie, unites.poids);
                     return stocke ? poidsEcrit(stocke) : null;
                   }}
-                  regle={textes.profil.reglePoids(POIDS_MIN, POIDS_MAX[unites.poids], textes.unites[unites.poids])}
+                  regle={textes.compte.reglePoids(POIDS_MIN, POIDS_MAX[unites.poids], textes.unites[unites.poids])}
                   unite={textes.unites[unites.poids]}
                   nom={textes.groupes.poidsCible}
                   inputMode="decimal"
@@ -226,16 +239,16 @@ export function Profil({
             </div>
           </section>
 
-          <section className="carrousel__volet" aria-label={textes.profil.avatar}>
+          <section className="carrousel__volet" aria-label={textes.compte.onglets.avatar}>
             <div className="carte">
               <h2 className="carte__titre">
                 <span className="carte__icone">
                   <IconePalette />
                 </span>
-                {textes.profil.avatar}
+                {textes.compte.avatar}
               </h2>
-              <p className="carte__sous-titre">{textes.profil.avatarSousTitre}</p>
-              <div className="profil__portrait">
+              <p className="carte__sous-titre">{textes.compte.avatarSousTitre}</p>
+              <div className="compte__portrait">
                 <Avatar avatar={reponses.avatar} />
               </div>
               <EtapeAvatar
@@ -245,21 +258,65 @@ export function Profil({
               />
             </div>
           </section>
+
+          <section className="carrousel__volet" aria-label={textes.compte.onglets.compte}>
+            <div className="carte">
+              <h2 className="carte__titre">
+                <span className="carte__icone">
+                  <IconeProfil />
+                </span>
+                {textes.compte.titre}
+              </h2>
+              <p className="carte__sous-titre">{textes.compte.compteSousTitre}</p>
+
+              <div className="ligne">
+                <span className="ligne__icone">
+                  <IconeCourriel />
+                </span>
+                <ChampEnLigne
+                  valeur={reponses.email}
+                  onValeur={(email) => repondre('email', email)}
+                  nom={textes.groupes.email}
+                  type="email"
+                  autoComplete="email"
+                />
+              </div>
+
+              <div className="ligne">
+                <span className="ligne__icone">
+                  <IconeCadenas />
+                </span>
+                {/* La seule règle du mot de passe, huit signes (2026-09-08),
+                    jugée au moment où on quitte le champ, comme les autres. */}
+                <ChampEnLigne
+                  valeur={reponses.motDePasse}
+                  onValeur={(motDePasse) => repondre('motDePasse', motDePasse)}
+                  normaliser={(saisie) => (motDePasseValide(saisie) ? saisie : null)}
+                  regle={textes.onboarding.profil.regleMotDePasse}
+                  nom={textes.groupes.motDePasse}
+                  type="password"
+                  autoComplete="new-password"
+                  masque
+                />
+              </div>
+            </div>
+          </section>
         </div>
 
-        {/* LES POINTS DU CARROUSEL, FIGÉS SOUS LES VOLETS : ils restent en
-            place quoi qu'on fasse défiler, et mènent à l'un ou l'autre. */}
-        <div className="carrousel__points" role="tablist">
+        {/* LES ONGLETS DU CARROUSEL, FIGÉS SOUS LES VOLETS : ils restent en
+            place quoi qu'on fasse défiler, et mènent à chaque volet. */}
+        <div className="carrousel__onglets" role="tablist">
           {VOLETS.map((id) => (
             <button
               key={id}
               type="button"
               role="tab"
-              className={`carrousel__point${volet === id ? ' carrousel__point--actif' : ''}`}
+              className={`carrousel__onglet${volet === id ? ' carrousel__onglet--actif' : ''}`}
               aria-selected={volet === id}
-              aria-label={id === 'informations' ? textes.profil.informations : textes.profil.avatar}
               onClick={() => aller(id)}
-            />
+            >
+              {textes.compte.onglets[id]}
+            </button>
           ))}
         </div>
       </div>

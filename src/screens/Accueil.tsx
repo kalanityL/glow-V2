@@ -70,11 +70,12 @@ import type { Reponses } from './onboarding/reponses';
  */
 export function Accueil({
   reponses,
-  onOuvrirProfil,
+  onOuvrirCompte,
 }: {
   reponses: Reponses;
-  /** Le portrait ouvre la page Profil (2026-09-19). */
-  onOuvrirProfil: () => void;
+  /** Le portrait ouvre la page « Mon compte » (2026-09-19), et l'entrée
+      « Mon compte » du tiroir aussi. */
+  onOuvrirCompte: () => void;
 }) {
   const textes = useTextes();
   /* LE MENU PRINCIPAL EN TIROIR (2026-09-19) : ouvert par l'entrée « Menu »
@@ -123,8 +124,8 @@ export function Accueil({
           <button
             type="button"
             className="salut__portrait"
-            aria-label={textes.profil.titre}
-            onClick={onOuvrirProfil}
+            aria-label={textes.compte.titre}
+            onClick={onOuvrirCompte}
           >
             <div className="salut__cercle">
               <Avatar avatar={reponses.avatar} />
@@ -188,7 +189,7 @@ export function Accueil({
         ))}
       </div>
 
-      {menuOuvert ? <TiroirMenu onFermer={fermerMenu} /> : null}
+      {menuOuvert ? <TiroirMenu onFermer={fermerMenu} onOuvrirCompte={onOuvrirCompte} /> : null}
 
       {/* LE MENU EST HORS DE LA COLONNE DE LECTURE : la colonne est bornée à
           380 px, la barre doit aller d'un bord à l'autre de l'écran. */}

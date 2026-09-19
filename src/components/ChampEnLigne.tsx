@@ -17,7 +17,9 @@ interface ChampEnLigneProps {
   regle?: string;
   /** L'unité, écrite après la valeur — jamais dans le champ. */
   unite?: string;
-  type?: 'text' | 'email';
+  type?: 'text' | 'email' | 'password';
+  /** Une valeur qui ne se montre pas — le mot de passe : des points en vue. */
+  masque?: boolean;
   inputMode?: 'text' | 'decimal' | 'numeric';
   autoComplete?: string;
   /** Une valeur qui se lit comme un titre — le prénom à côté du portrait. */
@@ -48,6 +50,7 @@ export function ChampEnLigne({
   inputMode,
   autoComplete,
   grand = false,
+  masque = false,
 }: ChampEnLigneProps) {
   const [enEdition, setEnEdition] = useState(false);
   const [brouillon, setBrouillon] = useState(valeur);
@@ -111,7 +114,7 @@ export function ChampEnLigne({
           aria-label={nom}
           onClick={ouvrir}
         >
-          {valeur || nom}
+          {valeur ? (masque ? '••••••••' : valeur) : nom}
         </button>
       )}
       {unite ? <span className="enligne__unite">{unite}</span> : null}

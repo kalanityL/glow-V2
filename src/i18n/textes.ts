@@ -12,6 +12,7 @@ import type { ThemeId } from '../themes/themes';
 import type { EntreeMenu } from '../app/menu';
 import type { ModuleId } from '../app/modules';
 import type { EntreeMenuPrincipal, SectionMenu } from '../app/menuPrincipal';
+import type { VoletCompte } from '../screens/Compte';
 
 /**
  * TOUS LES MOTS DE L'APPLICATION, ET RIEN D'AUTRE.
@@ -181,14 +182,19 @@ export interface Textes {
     sections: Record<SectionMenu, string>;
     entrees: Record<EntreeMenuPrincipal, string>;
   };
-  /** LA PAGE PROFIL (2026-09-19) : son titre, ses deux volets, et ce que
-   *  chaque valeur attend quand une saisie est refusée. */
-  profil: {
+  /** LA PAGE « MON COMPTE » (2026-09-19, « Mon profil » jusqu'au soir) : son
+   *  titre, ses trois volets et leurs onglets, et ce que chaque valeur attend
+   *  quand une saisie est refusée. */
+  compte: {
     titre: string;
+    /** Les onglets du carrousel, figés en bas — des mots courts. */
+    onglets: Record<VoletCompte, string>;
     informations: string;
     informationsSousTitre: string;
     avatar: string;
     avatarSousTitre: string;
+    /** Le volet du compte : l'adresse et le mot de passe. */
+    compteSousTitre: string;
     /** La règle d'une date : dite au refus, dans l'écriture de la langue. */
     regleDate: string;
     /** La règle d'un poids, avec ses bornes et son unité. */
@@ -353,13 +359,19 @@ const FR: Textes = {
       ciel: 'Ciel',
     },
   },
-  profil: {
-    titre: 'Mon profil',
+  compte: {
+    titre: 'Mon compte',
+    onglets: {
+      informations: 'Informations',
+      avatar: 'Avatar',
+      compte: 'Mon compte',
+    },
     informations: 'Mes informations',
     informationsSousTitre:
       'Ces informations sont privées et peuvent être modifiées à tout moment.',
     avatar: 'Mon avatar',
     avatarSousTitre: 'Personnalisez votre avatar.',
+    compteSousTitre: 'Votre adresse et votre mot de passe.',
     regleDate: 'Une date, en JJ/MM/AAAA',
     reglePoids: (min, max, unite) => `Un poids entre ${min} et ${max} ${unite}`,
     regleTaille: (min, max, unite) => `Une taille entre ${min} et ${max} ${unite}`,

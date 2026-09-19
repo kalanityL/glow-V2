@@ -1115,7 +1115,7 @@
 
 /* L'ENTÊTE : la marque à gauche et le bouton retour DESSOUS (« logo à gauche,
    fleche retour en dessous »), le titre à droite, sur la ligne de la marque. */
-.profil__entete {
+.compte__entete {
   display: grid;
   grid-template-columns: auto 1fr;
   grid-template-areas:
@@ -1128,19 +1128,19 @@
   --logo-size: 27px;
 }
 
-.profil__marque {
+.compte__marque {
   grid-area: marque;
   display: flex;
   align-items: center;
   gap: 4px;
 }
 
-.profil__marque .wordmark {
+.compte__marque .wordmark {
   font-family: var(--font-marque);
   font-size: 14px;
 }
 
-.profil__titre {
+.compte__titre {
   grid-area: titre;
   justify-self: end;
   margin: 0;
@@ -1150,7 +1150,7 @@
   color: var(--encre);
 }
 
-.profil__retour {
+.compte__retour {
   grid-area: retour;
 }
 
@@ -1177,14 +1177,14 @@
 
 /* L'IDENTITÉ : le portrait — un bouton qui mène au volet de l'avatar — et le
    prénom, qui s'édite sur place, là et nulle part ailleurs. */
-.profil__identite {
+.compte__identite {
   display: flex;
   align-items: center;
   gap: 16px;
   margin: 2px 0 14px;
 }
 
-.profil__portrait-bouton {
+.compte__portrait-bouton {
   flex: none;
   padding: 0;
   border: 0;
@@ -1192,7 +1192,7 @@
   cursor: pointer;
 }
 
-.profil__cercle {
+.compte__cercle {
   width: 88px;
   height: 88px;
   border-radius: 50%;
@@ -1201,7 +1201,7 @@
   background: var(--option-choisi-fond);
 }
 
-.profil__cercle .avatar {
+.compte__cercle .avatar {
   width: 100%;
   height: 100%;
 }
@@ -1238,32 +1238,36 @@
   padding: 4px 16px;
 }
 
-/* LES POINTS, FIGÉS SOUS LES VOLETS (« boutons du bas du carroussel figé en
-   bas d'écran, scroller laisse toujours visble le slider ») : deux pastilles,
-   celle du volet montré à l'accent. Ce sont des boutons, sans autre matière
-   que le point. */
-.carrousel__points {
+/* LES ONGLETS, FIGÉS SOUS LES VOLETS (« boutons du bas du carroussel figé en
+   bas d'écran, scroller laisse toujours visble le slider » ; nommés le
+   2026-09-19, « Onglet information/avatar/mon compte ») : trois mots à parts
+   égales, celui du volet montré à l'accent et souligné. Des boutons sans
+   autre matière que le mot. */
+.carrousel__onglets {
   flex: none;
   display: flex;
-  justify-content: center;
-  gap: 10px;
-  padding: 12px 0 2px;
+  padding: 10px 0 0;
+  border-top: 1px solid var(--option-filet);
 }
 
-.carrousel__point {
-  width: 10px;
-  height: 10px;
-  padding: 0;
+.carrousel__onglet {
+  flex: 1 1 0;
+  min-width: 0;
+  padding: 6px 4px 8px;
   border: 0;
-  border-radius: 50%;
-  background: var(--bille-eteinte);
+  border-bottom: 2px solid transparent;
+  background: none;
+  font-family: var(--font-body);
+  font-weight: 600;
+  font-size: 13px;
+  color: var(--encre-chapeau);
   cursor: pointer;
-  transition: background 150ms, transform 150ms;
+  transition: color 150ms, border-color 150ms;
 }
 
-.carrousel__point--actif {
-  background: var(--accent);
-  transform: scale(1.2);
+.carrousel__onglet--actif {
+  color: var(--accent);
+  border-bottom-color: var(--accent);
 }
 
 /* UNE CARTE : une surface arrondie sur la photo, qui porte un titre iconé, un
@@ -1409,13 +1413,13 @@
 
 /* Le portrait de la carte de l'avatar : au milieu, comme à l'onboarding, et
    il change à chaque touche. */
-.profil__portrait {
+.compte__portrait {
   display: flex;
   justify-content: center;
   margin: 4px 0 8px;
 }
 
-.profil__portrait .avatar {
+.compte__portrait .avatar {
   width: 120px;
   height: 120px;
 }
@@ -1541,7 +1545,15 @@
 }
 
 /* Une entrée : l'icône nue, à l'encre, et le nom — rien d'autre, aucune
-   ligne entre deux entrées (2026-09-19). */
+   ligne entre deux entrées (2026-09-19). Celle qui est un bouton n'a pas
+   d'autre matière que les autres. */
+.tiroir__entree--bouton {
+  border: 0;
+  background: none;
+  text-align: left;
+  cursor: pointer;
+}
+
 .tiroir__entree {
   display: flex;
   align-items: center;
