@@ -1473,7 +1473,8 @@
   background: var(--option-filet);
 }
 
-/* La croix qui ferme, dans le coin haut droit. */
+/* La croix qui ferme, dans le coin haut droit, sur une pastille gris presque
+   blanc (2026-09-19) — celle des outils de l'entête. */
 .tiroir__fermer {
   position: absolute;
   top: 12px;
@@ -1485,7 +1486,7 @@
   padding: 0;
   border: 0;
   border-radius: 50%;
-  background: var(--option-choisi-fond);
+  background: var(--rond-fond);
   color: var(--encre);
   cursor: pointer;
 }
