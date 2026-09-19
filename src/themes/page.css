@@ -1434,9 +1434,21 @@
   cursor: pointer;
 }
 
+/* LA VITRE (2026-09-19, « reste de la page vitré flou ») : sous le tiroir,
+   tout le reste de la page passe derrière une vitre sans teinte qui le
+   floute — pas un voile sombre. Un clic dessus est un clic à côté du tiroir :
+   il le ferme. */
+.tiroir__vitre {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  -webkit-backdrop-filter: blur(6px);
+  backdrop-filter: blur(6px);
+}
+
 /* LE TIROIR : un panneau qui monte depuis la barre du bas, par-dessus le bas
-   de la page — pas de voile, pas de fenêtre. Il est posé sur la page, sous
-   la barre (qui garde le dessus et le cache sur sa hauteur, d'où le
+   de la page — pas de voile sombre, pas de fenêtre. Il est posé sur la page,
+   sous la barre (qui garde le dessus et le cache sur sa hauteur, d'où le
    rembourrage du bas), coins du haut arrondis, et il défile pour lui-même
    quand il est plus haut que la place. */
 .tiroir {
@@ -1494,21 +1506,31 @@
   margin: 0 0 10px;
 }
 
+/* Le titre d'un groupe, et UNE LONGUE LIGNE dessous, d'un bord à l'autre du
+   tiroir (2026-09-19) : c'est elle qui sépare, pas les entrées. */
 .tiroir__titre {
   display: flex;
   align-items: center;
   gap: 6px;
-  margin: 8px 0 6px;
+  margin: 8px 0 4px;
+  padding-bottom: 6px;
+  border-bottom: 1px solid var(--option-filet);
   font-family: var(--font-display);
   font-weight: 600;
   font-size: 15px;
   color: var(--encre-chapeau);
 }
 
-.tiroir__titre .wordmark--enligne {
-  font-family: var(--font-marque);
-  font-size: 18px;
-  color: var(--marque-encre);
+/* Le mot-symbole dans « GLP1LOW et vous » : la police, la couleur et la
+   graisse du reste de la ligne (2026-09-19) — seul son dessin reste. */
+.tiroir__titre .wordmark--enligne,
+.tiroir__titre .wordmark__g,
+.tiroir__titre .wordmark__lp1,
+.tiroir__titre .wordmark__low {
+  font-family: inherit;
+  font-size: inherit;
+  font-weight: inherit;
+  color: inherit;
 }
 
 /* Les entrées sur DEUX COLONNES, comme sur son image. */
@@ -1518,29 +1540,22 @@
   column-gap: 12px;
 }
 
+/* Une entrée : l'icône nue, à l'encre, et le nom — rien d'autre, aucune
+   ligne entre deux entrées (2026-09-19). */
 .tiroir__entree {
   display: flex;
   align-items: center;
-  gap: 8px;
-  min-height: 46px;
+  gap: 10px;
+  min-height: 42px;
   padding: 2px 0;
-  border-top: 1px solid var(--option-filet);
 }
 
 .tiroir__icone {
   flex: none;
-  display: grid;
-  place-items: center;
-  width: 34px;
-  height: 34px;
-  border-radius: 50%;
-  background: var(--option-choisi-fond);
-  color: var(--accent);
-}
-
-.tiroir__icone .icone {
-  width: 17px;
-  height: 17px;
+  display: block;
+  width: 20px;
+  height: 20px;
+  color: var(--encre);
 }
 
 .tiroir__nom {
@@ -1551,13 +1566,6 @@
   font-size: 13px;
   line-height: 1.2;
   color: var(--encre);
-}
-
-.tiroir__chevron {
-  flex: none;
-  width: 14px;
-  height: 14px;
-  color: var(--encre-chapeau);
 }
 
 /* La constellation : un tracé pointillé, doublé d'un trait estompé. */

@@ -2,7 +2,6 @@ import { useEffect, useRef } from 'react';
 import {
   IconeAvis,
   IconeBadges,
-  IconeChevron,
   IconeCompte,
   IconeConstellation,
   IconeCroix,
@@ -33,9 +32,14 @@ import {
  * geste. Il a remplacé la page « Menu » du matin.
  *
  * SES SECTIONS SONT CELLES DE `menuPrincipal.ts`, en DEUX COLONNES comme sur
- * son image ; chaque entrée porte l'icône de la V1 dans une pastille, son nom
- * et un chevron. La troisième section titre par le mot-symbole dessiné puis
- * « et vous ».
+ * son image ; chaque entrée porte l'icône de la V1, nue et à l'encre, et son
+ * nom — ni pastille, ni couleur, ni chevron, ni ligne entre les entrées d'un
+ * groupe ; une longue ligne sous chaque titre de groupe (2026-09-19). La
+ * troisième section titre par le mot-symbole dessiné, dans la police, la
+ * couleur et la graisse du reste de la ligne, puis « et vous ». Derrière le
+ * tiroir, LE RESTE DE LA PAGE EST VITRÉ, FLOU (« reste de la page vitré
+ * flou ») : une vitre sans teinte, qui floute ce qu'elle couvre, et sur
+ * laquelle un clic ferme le tiroir.
  *
  * AUCUNE ENTRÉE NE MÈNE ENCORE NULLE PART : des lignes, pas des boutons.
  */
@@ -48,7 +52,9 @@ export function TiroirMenu({ onFermer }: { onFermer: () => void }) {
   useEffect(() => surClicDehors(() => tiroir.current, onFermer), [onFermer]);
 
   return (
-    <div className="tiroir" ref={tiroir} role="dialog" aria-label={textes.menuPrincipal.titre}>
+    <>
+      <div className="tiroir__vitre" aria-hidden="true" />
+      <div className="tiroir" ref={tiroir} role="dialog" aria-label={textes.menuPrincipal.titre}>
       <div className="tiroir__poignee" aria-hidden="true" />
       <button type="button" className="tiroir__fermer" aria-label={textes.fermer} onClick={onFermer}>
         <IconeCroix />
@@ -72,16 +78,14 @@ export function TiroirMenu({ onFermer }: { onFermer: () => void }) {
                 <div key={entree} className="tiroir__entree">
                   <span className="tiroir__icone">{ICONES_ENTREES[entree]}</span>
                   <span className="tiroir__nom">{textes.menuPrincipal.entrees[entree]}</span>
-                  <span className="tiroir__chevron">
-                    <IconeChevron />
-                  </span>
                 </div>
               ))}
             </div>
           </section>
         ))}
       </div>
-    </div>
+      </div>
+    </>
   );
 }
 

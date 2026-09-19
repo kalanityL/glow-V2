@@ -423,10 +423,15 @@ blocs, pas des boutons — **sauf le portrait, qui ouvre la page Profil**
 icone menu qui ouvre un menu […] garder le design actuel », puis « ouvre le
 menu en tiroir comme ça avec une croix pour fermer ») : l'entrée « Menu » de
 la barre du bas (à la place de « Profil ») ouvre UN TIROIR qui monte depuis
-la barre par-dessus le bas de l'accueil — sans voile, fermé par sa croix,
-par un clic à côté ou par Échap, le mécanisme du panneau des roues, donc pas
-un popup — avec les entrées sur deux colonnes, l'icône de la V1 en pastille,
-le nom, un chevron. Ses trois sections, dans son ordre :
+la barre par-dessus le bas de l'accueil — sans voile sombre, fermé par sa
+croix, par un clic à côté ou par Échap, le mécanisme du panneau des roues,
+donc pas un popup — avec les entrées sur deux colonnes, l'icône de la V1 nue
+à l'encre et le nom, sans pastille ni chevron ni ligne entre les entrées ;
+une longue ligne sous chaque titre de groupe ; le mot-symbole de « GLP1LOW
+et vous » dans la police, la couleur et la graisse de la ligne. **Derrière
+le tiroir, le reste de la page est une vitre floue, sans teinte** (« reste
+de la page vitré flou », 2026-09-19) — c'est la seule chose qui couvre une
+page, et elle ne l'assombrit pas. Ses trois sections, dans son ordre :
 Préférences (Activation Modules, Notifications, Thème et couleurs, Badges),
 Export (Nouveau rapport médical, Rapports disponibles), GLP1LOW et vous — le
 mot-symbole dessiné, puis « et vous » — (Mon compte, Avis et Feedback,
