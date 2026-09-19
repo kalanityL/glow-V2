@@ -36,7 +36,7 @@ type Volet = VoletCompte;
  * LA PAGE « MON COMPTE » — « Mon profil » jusqu'au soir du 2026-09-19 (« page
  * mon profil devient mon compte. Onglet information/avatar/mon compte ») :
  * trois volets, Informations, Avatar, Mon compte, et des ONGLETS nommés figés
- * en bas à la place des points. Le troisième volet porte l'adresse et le mot
+ * EN HAUT des volets (en bas jusqu'au soir, à la place des points). Le troisième volet porte l'adresse et le mot
  * de passe, éditables sur place comme le reste ; le mot de passe se montre en
  * points et garde sa seule règle, huit signes.
  *
@@ -140,6 +140,23 @@ export function Compte({
           />
         </div>
 
+        {/* LES ONGLETS DU CARROUSEL, FIGÉS AU-DESSUS DES VOLETS (2026-09-19,
+            « les onglets sont en haut » — ils étaient en bas) : ils restent
+            en place quoi qu'on fasse défiler, et mènent à chaque volet. */}
+        <div className="carrousel__onglets" role="tablist">
+          {VOLETS.map((id) => (
+            <button
+              key={id}
+              type="button"
+              role="tab"
+              className={`carrousel__onglet${volet === id ? ' carrousel__onglet--actif' : ''}`}
+              aria-selected={volet === id}
+              onClick={() => aller(id)}
+            >
+              {textes.compte.onglets[id]}
+            </button>
+          ))}
+        </div>
         <div
           className="carrousel"
           ref={carrousel}
@@ -303,22 +320,6 @@ export function Compte({
           </section>
         </div>
 
-        {/* LES ONGLETS DU CARROUSEL, FIGÉS SOUS LES VOLETS : ils restent en
-            place quoi qu'on fasse défiler, et mènent à chaque volet. */}
-        <div className="carrousel__onglets" role="tablist">
-          {VOLETS.map((id) => (
-            <button
-              key={id}
-              type="button"
-              role="tab"
-              className={`carrousel__onglet${volet === id ? ' carrousel__onglet--actif' : ''}`}
-              aria-selected={volet === id}
-              onClick={() => aller(id)}
-            >
-              {textes.compte.onglets[id]}
-            </button>
-          ))}
-        </div>
       </div>
     </div>
   );

@@ -442,8 +442,8 @@ ne mène encore nulle part. La liste vit dans `src/app/menuPrincipal.ts`.
 (« page mon profil devient mon compte. Onglet information/avatar/mon
 compte ») : trois volets, Informations / Avatar / Mon compte (l'adresse et
 le mot de passe, éditables sur place, le mot de passe en points avec sa
-règle de huit signes), et des ONGLETS nommés figés en bas à la place des
-points. Le portrait de l'accueil et l'entrée « Mon compte » du tiroir
+règle de huit signes), et des ONGLETS nommés figés EN HAUT des volets (« les
+onglets sont en haut »), à la place des points du bas. Le portrait de l'accueil et l'entrée « Mon compte » du tiroir
 l'ouvrent. Ce qui suit décrit la page telle qu'elle est née le matin
 (2026-09-19, « clic sur avatar ouvre une page
 profil avec les infos persos modifiables et la config de l'avatar […] garde

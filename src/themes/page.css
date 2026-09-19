@@ -1227,16 +1227,16 @@
   padding: 4px 16px;
 }
 
-/* LES ONGLETS, FIGÉS SOUS LES VOLETS (« boutons du bas du carroussel figé en
-   bas d'écran, scroller laisse toujours visble le slider » ; nommés le
-   2026-09-19, « Onglet information/avatar/mon compte ») : trois mots à parts
-   égales, celui du volet montré à l'accent et souligné. Des boutons sans
-   autre matière que le mot. */
+/* LES ONGLETS, FIGÉS AU-DESSUS DES VOLETS (« scroller laisse toujours visble
+   le slider » ; nommés le 2026-09-19, « Onglet information/avatar/mon
+   compte » ; passés en haut le même soir, « les onglets sont en haut ») :
+   trois mots à parts égales, celui du volet montré à l'accent et souligné.
+   Des boutons sans autre matière que le mot. */
 .carrousel__onglets {
   flex: none;
   display: flex;
-  padding: 10px 0 0;
-  border-top: 1px solid var(--option-filet);
+  margin-bottom: 4px;
+  border-bottom: 1px solid var(--option-filet);
 }
 
 .carrousel__onglet {
