@@ -6,7 +6,6 @@ import {
   IconeActivite,
   IconeAnalyse,
   IconeBalance,
-  IconeCadenas,
   IconeComprime,
   IconeEffetsSecondaires,
   IconeJournal,
@@ -144,13 +143,6 @@ export function Accueil({
                 les badges. */}
             <span className="salut__cocarde">
               <Cocarde />
-              {/* Le cadenas, au centre du rond : le badge n'est pas encore
-                  gagné (2026-09-17, « mettre un cadenas sur le coin haut
-                  droit du badge », puis « cadenas plus gros et centré sur le
-                  placeholder »). */}
-              <span className="salut__cadenas">
-                <IconeCadenas />
-              </span>
             </span>
           </div>
         </div>

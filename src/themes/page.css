@@ -1006,43 +1006,32 @@
   height: 44px;
 }
 
-/* LÉGÈREMENT FLOUE (2026-09-17, « flouter legerement le badge ») : un badge
-   pas encore gagné se devine plus qu'il ne se voit. */
+/* Nette (le flou léger du 2026-09-17 est parti avec le cadenas le
+   2026-09-19 : « pour qu'il soit plus visible »). Elle déborde de sa boîte
+   de la largeur du contour. */
 .cocarde {
   display: block;
   width: 100%;
   height: 100%;
-  filter: blur(0.7px);
-}
-
-/* Le cadenas, en pastille AU CENTRE DU ROND de la cocarde (2026-09-17,
-   « cadenas plus gros et centré sur le placeholder » — il était d'abord sur
-   le bord haut droit) — net, lui : c'est lui qui dit que le badge est
-   fermé. Le rond est centré à (60, 57) dans la fenêtre de 120 : 50 % de la
-   largeur, 47,5 % de la hauteur. */
-.salut__cadenas {
-  position: absolute;
-  top: calc(47.5% - 12px);
-  left: calc(50% - 12px);
-  width: 24px;
-  height: 24px;
-  border-radius: 50%;
-  border: 1px solid var(--option-filet);
-  background: var(--option-fond);
-  color: var(--encre-chapeau);
-  display: grid;
-  place-items: center;
-}
-
-.salut__cadenas .icone {
-  width: 14px;
-  height: 14px;
+  overflow: visible;
 }
 
 /* UN MASQUE BLANC (2026-09-19) : toute la silhouette d'un seul aplat, la
-   surface du thème — rien de dessiné dedans. */
+   surface du thème — rien de dessiné dedans —, CERNÉE DE BLANC PUIS DE GRIS :
+   dessous, la même silhouette au trait gris large ; dessus, le masque blanc
+   au trait blanc plus fin. Ce qui dépasse du gris fait le contour visible. */
+.cocarde__contour {
+  fill: var(--option-filet);
+  stroke: var(--option-filet);
+  stroke-width: 6;
+  stroke-linejoin: round;
+}
+
 .cocarde__masque {
   fill: var(--option-fond);
+  stroke: var(--option-fond);
+  stroke-width: 3;
+  stroke-linejoin: round;
 }
 
 /* LE MENU DU BAS : une barre de surface, cernée en haut, qui s'étend d'un bord
