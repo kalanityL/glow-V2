@@ -240,16 +240,6 @@ export function IconeRapports() {
   );
 }
 
-/** Lucide `credit-card` — le compte (abonnement, paiement, comme la V1). */
-export function IconeCompte() {
-  return (
-    <Icone>
-      <rect width="20" height="14" x="2" y="5" rx="2" />
-      <line x1="2" x2="22" y1="10" y2="10" />
-    </Icone>
-  );
-}
-
 /** Lucide `message-square-plus` — les avis. */
 export function IconeAvis() {
   return (
