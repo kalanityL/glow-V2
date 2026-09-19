@@ -383,7 +383,8 @@ L'onboarding, dans l'ordre (état au 2026-09-09) :
 8. **Avatar** — le créateur de la V1 (genre inclus, il se voit sur le vêtement
    et la coiffure). Pas de photo, pas de tirage au hasard.
 9. **Dernière étape** — année de naissance (défaut 1980, remplace l'âge) et
-   taille (défaut 165 cm) côte à côte, prénom, e-mail, mot de passe (huit
+   taille (défaut 165 cm) côte à côte — l'année seule, stockée comme date
+   de naissance au 1er janvier (2026-09-19) —, prénom, e-mail, mot de passe (huit
    signes au moins, **seule** contrainte ; vide ne bloque pas). Bouton = le
    mot-symbole.
 
@@ -418,19 +419,26 @@ soleil. **Rien n'y est cliquable** tant que les pages n'existent pas : des
 blocs, pas des boutons — **sauf le portrait, qui ouvre la page Profil**
 (2026-09-19).
 
-**La page Profil** (2026-09-19, « clic sur avatar ouvre une page profil avec
-les infos persos modifiables et la config de l'avatar […] garde les
-consignes : pas de label et info editable en inline sans icone de
+**La page « Mon profil »** (2026-09-19, « clic sur avatar ouvre une page
+profil avec les infos persos modifiables et la config de l'avatar […] garde
+les consignes : pas de label et info editable en inline sans icone de
 modification comme sur la V1 ; meme module de modification d'avatar que la
-v1, NE CHANGE PAS LA FONCTIONNALITE UNIQUEMENT LE DESIGN ») : son design
-vient de son écran (entête retour / titre / marque, identité, deux cartes),
-ses règles de la V1 — **aucun intitulé devant une information, aucun
-crayon : la valeur s'édite sur place** (`ChampEnLigne` : on la touche, elle
+v1, NE CHANGE PAS LA FONCTIONNALITE UNIQUEMENT LE DESIGN », puis ses
+consignes du soir) : la marque à gauche et le bouton retour dessous, le
+titre à droite ; le portrait, qui mène au volet de l'avatar, et **le prénom
+qui s'édite sur place à côté du portrait, et nulle part ailleurs** ; puis
+**un carrousel à deux volets** — « Mes informations » (date de naissance,
+taille, poids actuel, poids cible ; ni prénom ni adresse) et « Mon avatar »
+(`EtapeAvatar`, celui de l'onboarding, à l'identique) — dont **les deux
+points sont figés sous les volets**, toujours visibles quoi qu'on fasse
+défiler. **Aucun intitulé devant une information, aucun crayon, aucun
+champ : la valeur s'édite sur place** (`ChampEnLigne` : on la touche, elle
 devient un champ, elle s'enregistre quand on la quitte ou sur Entrée, Échap
-la rend) ; les nombres passent par la roue de l'application ; **le module
-de l'avatar est `EtapeAvatar`, celui de l'onboarding, à l'identique**, posé
-dans une carte. Pas de bouton « Enregistrer » : chaque valeur s'enregistre
-quand on la quitte. Le bouton « retour » de la barre ramène à l'accueil. **Sa photo en portrait (mur blanc, plante,
+la rend ; une saisie refusée revient à la valeur enregistrée et LA RÈGLE SE
+DIT dessous). **La date de naissance remplace l'année** dans les réponses
+(`dateNaissance`, `AAAA-MM-JJ`) : l'onboarding ne demande que l'année et
+pose son 1er janvier. Pas de bouton « Enregistrer ». Le bouton « retour »
+de la barre ramène à l'accueil. **Sa photo en portrait (mur blanc, plante,
 sol) est le fond de toute la page**, à la largeur de l'écran, sans zoom ni
 fondu (« essaie l'image fond haut sur toute la jauteur de l'ecran en fond »,
 « non zoomée », 2026-09-16 au soir — la photo horizontale du haut de page et

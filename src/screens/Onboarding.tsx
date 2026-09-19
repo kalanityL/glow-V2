@@ -15,6 +15,7 @@ import { Avatar } from '../components/Avatar';
 import { EtapeAvatar } from './onboarding/EtapeAvatar';
 import { EtapeProfil } from './onboarding/EtapeProfil';
 import { Progression } from './onboarding/Progression';
+import { anneeDe, dateDepuisAnnee } from '../domaine/dates';
 
 /**
  * L'ONBOARDING — l'entête, l'étape courante, la rangée des boutons.
@@ -142,8 +143,9 @@ export function Onboarding({ parcours }: { parcours: ReturnType<typeof useParcou
 
         {etape === 'profil' ? (
           <EtapeProfil
-            anneeNaissance={reponses.anneeNaissance}
-            onAnneeNaissance={(annee) => repondre('anneeNaissance', annee)}
+            anneeNaissance={anneeDe(reponses.dateNaissance)}
+            /* L'onboarding ne demande que l'année : la date est son 1er janvier. */
+            onAnneeNaissance={(annee) => repondre('dateNaissance', dateDepuisAnnee(annee))}
             tailleCm={reponses.tailleCm}
             onTailleCm={(cm) => repondre('tailleCm', cm)}
             anneeCourante={new Date().getFullYear()}

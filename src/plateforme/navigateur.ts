@@ -45,3 +45,14 @@ export function centrerDansSaListe(element: Element | null): void {
 export function remonterEnHaut(element: Element | null): void {
   if (element) element.scrollTop = 0;
 }
+
+/** Fait glisser un carrousel horizontal jusqu'à son volet `index`. */
+export function montrerVolet(carrousel: Element | null, index: number): void {
+  carrousel?.scrollTo({ left: carrousel.clientWidth * index, behavior: 'smooth' });
+}
+
+/** Le volet d'un carrousel horizontal qui occupe l'écran. */
+export function voletVisible(carrousel: Element | null): number {
+  if (!carrousel || carrousel.clientWidth === 0) return 0;
+  return Math.round(carrousel.scrollLeft / carrousel.clientWidth);
+}

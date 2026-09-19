@@ -85,7 +85,12 @@ export interface Textes {
     forme: string;
     traitement: string;
     anneeNaissance: string;
+    /** La date entière, sur le profil ; l'onboarding ne demande que l'année. */
+    dateNaissance: string;
     taille: string;
+    /** Le poids actuel et le poids cible, sur le profil. */
+    poids: string;
+    poidsCible: string;
     prenom: string;
     email: string;
     motDePasse: string;
@@ -165,13 +170,20 @@ export interface Textes {
      *  au pluriel pour la rubrique, « Comprimé » sous forme orale). */
     traitement: Record<Forme, string>;
   };
-  /** LA PAGE PROFIL (2026-09-19) : son titre, ses deux cartes. */
+  /** LA PAGE PROFIL (2026-09-19) : son titre, ses deux volets, et ce que
+   *  chaque valeur attend quand une saisie est refusée. */
   profil: {
     titre: string;
     informations: string;
     informationsSousTitre: string;
     avatar: string;
     avatarSousTitre: string;
+    /** La règle d'une date : dite au refus, dans l'écriture de la langue. */
+    regleDate: string;
+    /** La règle d'un poids, avec ses bornes et son unité. */
+    reglePoids: (min: number, max: number, unite: string) => string;
+    /** La règle d'une taille, avec ses bornes et son unité. */
+    regleTaille: (min: number, max: number, unite: string) => string;
   };
   /** Le bouton « retour » de la barre du bas : lu par les lecteurs d'écran. */
   retour: string;
@@ -206,7 +218,10 @@ const FR: Textes = {
     forme: 'Forme',
     traitement: 'Traitement',
     anneeNaissance: 'Année de naissance',
+    dateNaissance: 'Date de naissance',
     taille: 'Taille',
+    poids: 'Poids actuel',
+    poidsCible: 'Poids cible',
     prenom: 'Prénom',
     email: 'Adresse e-mail',
     motDePasse: 'Mot de passe',
@@ -305,12 +320,15 @@ const FR: Textes = {
     },
   },
   profil: {
-    titre: 'Profil',
+    titre: 'Mon profil',
     informations: 'Mes informations',
     informationsSousTitre:
       'Ces informations sont privées et peuvent être modifiées à tout moment.',
     avatar: 'Mon avatar',
     avatarSousTitre: 'Personnalisez votre avatar.',
+    regleDate: 'Une date, en JJ/MM/AAAA',
+    reglePoids: (min, max, unite) => `Un poids entre ${min} et ${max} ${unite}`,
+    regleTaille: (min, max, unite) => `Une taille entre ${min} et ${max} ${unite}`,
   },
   retour: 'Retour',
   oui: 'Oui',

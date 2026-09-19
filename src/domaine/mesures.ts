@@ -55,3 +55,22 @@ export const TAILLE_BORNES: Record<UniteTaille, { min: number; max: number }> = 
   cm: { min: 50, max: 300 },
   in: { min: 20, max: 118 },
 };
+
+/** Le plus léger qu'on puisse choisir : un kilo, une livre — en dessous, c'est
+    l'absurde, et rien d'autre (GUIDELINES : les bornes n'écartent que
+    l'absurde). */
+export const POIDS_MIN = 1;
+
+/**
+ * UN POIDS TAPÉ À LA MAIN (2026-09-19, le profil édite ses valeurs sur
+ * place) : virgule ou point acceptés, une décimale au plus, dans les bornes
+ * de l'unité. Rendu sous la forme stockée — un point, une décimale, « 95.0 » —,
+ * ou `null` si la saisie ne vaut pas un poids.
+ */
+export function poidsDepuisSaisie(texte: string, unite: UnitePoids): string | null {
+  const propre = texte.trim().replace(',', '.');
+  if (!/^\d{1,4}(\.\d)?$/.test(propre)) return null;
+  const valeur = Number(propre);
+  if (valeur < POIDS_MIN || valeur > POIDS_MAX[unite]) return null;
+  return valeur.toFixed(1);
+}

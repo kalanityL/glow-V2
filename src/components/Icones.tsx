@@ -169,6 +169,17 @@ export function IconePalette() {
   );
 }
 
+/** Lucide `target` — le poids cible. */
+export function IconeCible() {
+  return (
+    <Icone>
+      <circle cx="12" cy="12" r="10" />
+      <circle cx="12" cy="12" r="6" />
+      <circle cx="12" cy="12" r="2" />
+    </Icone>
+  );
+}
+
 /** Lucide `lock` — le cadenas d'un badge pas encore gagné. */
 export function IconeCadenas() {
   return (

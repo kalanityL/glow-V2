@@ -1127,16 +1127,36 @@
 
 /* ── LA PAGE PROFIL (2026-09-19) ────────────────────────────────────────── */
 
-/* L'entête : le retour à gauche, le titre au milieu, la marque à droite. */
+/* L'ENTÊTE : la marque à gauche et le bouton retour DESSOUS (« logo à gauche,
+   fleche retour en dessous »), le titre à droite, sur la ligne de la marque. */
 .profil__entete {
   display: grid;
-  grid-template-columns: 1fr auto 1fr;
+  grid-template-columns: auto 1fr;
+  grid-template-areas:
+    'marque titre'
+    'retour titre';
+  column-gap: 12px;
+  row-gap: 8px;
   align-items: center;
-  margin-bottom: 14px;
+  margin-bottom: 12px;
   --logo-size: 27px;
 }
 
+.profil__marque {
+  grid-area: marque;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.profil__marque .wordmark {
+  font-family: var(--font-marque);
+  font-size: 14px;
+}
+
 .profil__titre {
+  grid-area: titre;
+  justify-self: end;
   margin: 0;
   font-family: var(--font-display);
   font-weight: 700;
@@ -1144,16 +1164,8 @@
   color: var(--encre);
 }
 
-.profil__marque {
-  display: flex;
-  align-items: center;
-  justify-content: flex-end;
-  gap: 4px;
-}
-
-.profil__marque .wordmark {
-  font-family: var(--font-marque);
-  font-size: 14px;
+.profil__retour {
+  grid-area: retour;
 }
 
 /* La pastille ronde qui est un BOUTON (le retour) : la même pastille que les
@@ -1177,18 +1189,26 @@
   transform: scale(0.95);
 }
 
-/* L'identité : le portrait, plus grand que sur l'accueil, et le prénom. */
+/* L'IDENTITÉ : le portrait — un bouton qui mène au volet de l'avatar — et le
+   prénom, qui s'édite sur place, là et nulle part ailleurs. */
 .profil__identite {
   display: flex;
   align-items: center;
-  gap: 18px;
-  margin: 4px 0 18px;
+  gap: 16px;
+  margin: 2px 0 14px;
+}
+
+.profil__portrait-bouton {
+  flex: none;
+  padding: 0;
+  border: 0;
+  background: none;
+  cursor: pointer;
 }
 
 .profil__cercle {
-  flex: none;
-  width: 96px;
-  height: 96px;
+  width: 88px;
+  height: 88px;
   border-radius: 50%;
   overflow: hidden;
   border: 2px solid var(--option-fond);
@@ -1200,12 +1220,64 @@
   height: 100%;
 }
 
-.profil__nom {
-  margin: 0;
-  font-family: var(--font-salut);
-  font-weight: 600;
-  font-size: 20px;
-  color: var(--encre);
+/* LE CARROUSEL : deux volets côte à côte, qui glissent d'un cran ; chacun
+   défile pour lui-même. Il prend toute la hauteur laissée par l'entête,
+   l'identité et les points. La barre de défilement horizontale ne se montre
+   pas : les points la remplacent. */
+.carrousel {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  overflow-x: auto;
+  overflow-y: hidden;
+  scroll-snap-type: x mandatory;
+  scrollbar-width: none;
+  /* Les volets ont la largeur de la page, marges comprises : le carrousel
+     s'étend sous les marges pour qu'un volet glisse hors de l'écran sans
+     qu'on le voie s'arrêter à la marge. */
+  margin: 0 -16px;
+}
+
+.carrousel::-webkit-scrollbar {
+  display: none;
+}
+
+.carrousel__volet {
+  flex: 0 0 100%;
+  min-width: 0;
+  overflow-y: auto;
+  scroll-snap-align: start;
+  /* Le rembourrage que le carrousel a pris à la page, et la place des
+     liserés. */
+  padding: 4px 16px;
+}
+
+/* LES POINTS, FIGÉS SOUS LES VOLETS (« boutons du bas du carroussel figé en
+   bas d'écran, scroller laisse toujours visble le slider ») : deux pastilles,
+   celle du volet montré à l'accent. Ce sont des boutons, sans autre matière
+   que le point. */
+.carrousel__points {
+  flex: none;
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  padding: 12px 0 2px;
+}
+
+.carrousel__point {
+  width: 10px;
+  height: 10px;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: var(--bille-eteinte);
+  cursor: pointer;
+  transition: background 150ms, transform 150ms;
+}
+
+.carrousel__point--actif {
+  background: var(--accent);
+  transform: scale(1.2);
 }
 
 /* UNE CARTE : une surface arrondie sur la photo, qui porte un titre iconé, un
@@ -1270,16 +1342,21 @@
   height: 18px;
 }
 
-/* Dans une ligne, la roue se serre : plus de marge, la ligne rythme. */
-.ligne .selecteur {
-  margin: 0;
+/* LA VALEUR ÉDITABLE SUR PLACE : la valeur, son unité à côté, et la règle en
+   dessous quand une saisie est refusée. */
+.enligne {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  column-gap: 6px;
 }
 
-/* LA VALEUR ÉDITABLE SUR PLACE : un bouton qui a l'air d'un texte — c'est en
-   la touchant qu'on découvre qu'elle s'édite, comme dans la V1. Vide, elle
-   montre le nom de la donnée en filigrane. */
+/* Un bouton qui a l'air d'un texte — c'est en le touchant qu'on découvre
+   qu'il s'édite, comme dans la V1. Vide, il montre le nom de la donnée en
+   filigrane. */
 .enligne__valeur {
-  flex: 1;
   min-width: 0;
   padding: 8px 0;
   border: 0;
@@ -1300,11 +1377,18 @@
   color: var(--encre-chapeau);
 }
 
+.enligne__unite {
+  font-family: var(--font-body);
+  font-size: 15px;
+  color: var(--encre-chapeau);
+}
+
 /* Le champ qui remplace la valeur : la matière du champ de texte, en plus
    serré, pour tenir dans la ligne. */
 .enligne__champ {
   flex: 1;
   min-width: 0;
+  width: 100%;
   margin: 0;
   padding: 8px 12px;
   border: 1px solid var(--option-filet);
@@ -1319,6 +1403,22 @@
 .enligne__champ:focus {
   outline: none;
   box-shadow: 0 0 0 2px var(--accent);
+}
+
+/* La règle, sur sa propre ligne sous la valeur. */
+.enligne__regle {
+  flex-basis: 100%;
+  margin: 0 0 4px;
+  font-size: 12px;
+}
+
+/* LE PRÉNOM, à côté du portrait : la même valeur éditable, en grand, dans la
+   police du salut. */
+.enligne--grand .enligne__valeur,
+.enligne--grand .enligne__champ {
+  font-family: var(--font-salut);
+  font-weight: 600;
+  font-size: 20px;
 }
 
 /* Le portrait de la carte de l'avatar : au milieu, comme à l'onboarding, et

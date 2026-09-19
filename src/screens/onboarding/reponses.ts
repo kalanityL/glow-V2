@@ -4,6 +4,7 @@ import { ANNEE_NAISSANCE_PAR_DEFAUT, TAILLE_PAR_DEFAUT_CM } from '../../domaine/
 import { SYSTEME_PAR_DEFAUT, type Systeme } from '../../domaine/unites';
 import { LANGUE_PAR_DEFAUT, type Langue } from '../../i18n/langues';
 import { THEME_PAR_DEFAUT, type ThemeId } from '../../themes/themes';
+import { dateDepuisAnnee } from '../../domaine/dates';
 
 /** Les objectifs proposés, dans l'ordre d'affichage. Le premier est retenu d'avance. */
 export const OBJECTIFS = ['perdre', 'stabiliser'] as const;
@@ -57,7 +58,11 @@ export interface Reponses {
   /* Qui l'on est. L'année de naissance et la taille ont un défaut (1980,
      165 cm — demande du 2026-09-09) ; le prénom part vide. LA TAILLE EST
      TOUJOURS EN CENTIMÈTRES ici, quelle que soit l'unité de saisie. */
-  anneeNaissance: number;
+  /** LA DATE DE NAISSANCE, `AAAA-MM-JJ` (2026-09-19, « rmeplacer année de
+     naissance par une date par defaut 01/01 année de naissance ») :
+     l'onboarding ne demande que l'année et pose le 1er janvier ; le profil
+     édite la date entière. */
+  dateNaissance: string;
   tailleCm: number;
   prenom: string;
   /* Le compte. Le mot de passe fait huit signes au moins, et c'est la seule
@@ -87,7 +92,7 @@ export const REPONSES_INITIALES: Reponses = {
   formeTraitement: null,
   traitement: null,
   avatar: AVATAR_INITIAL,
-  anneeNaissance: ANNEE_NAISSANCE_PAR_DEFAUT,
+  dateNaissance: dateDepuisAnnee(ANNEE_NAISSANCE_PAR_DEFAUT),
   tailleCm: TAILLE_PAR_DEFAUT_CM,
   /* « Marie Cécile » POUR L'INSTANT (2026-09-16, « mets bonjour marie
      cecile ») : l'onboarding est mis de côté et l'accueil s'ouvre sans
