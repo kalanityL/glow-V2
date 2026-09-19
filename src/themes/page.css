@@ -783,8 +783,8 @@
    noms hors des cercles sous les cercles, augmente la taille des icone et
    des cercles », « moins augmenté la taille des icones », « traits des
    icones dans cercle plus fins », puis « ne pas mettre les noms sous les
-   cercles ») : un rond de 64 px au plus (92, puis 84 le 2026-09-17, 72 puis
-   64 le 2026-09-19, « reduire taille des pastilles »), l'icône de
+   cercles ») : un rond de 56 px au plus (92, puis 84 le 2026-09-17, 72, 64
+   puis 56 le 2026-09-19, « pastilles home + petites »), l'icône de
    24 px au trait 1,2,
    pas de nom visible — il est dit en `aria-label`. La pastille a la
    largeur de sa part de ligne : quatre pastilles et leurs trois airs de
@@ -796,7 +796,7 @@
 .module {
   display: grid;
   place-items: center;
-  width: min(64px, calc((100% - 3 * 14px) / 4));
+  width: min(56px, calc((100% - 3 * 14px) / 4));
   aspect-ratio: 1;
   border-radius: 50%;
   background: var(--module-fond);
@@ -965,13 +965,15 @@
   gap: 6px;
 }
 
+/* En graisse normale (2026-09-19, « bonjour prenom->pas en gras » — le
+   demi-gras de la V1 y était encore). */
 .salut__titre {
   margin: 0;
   display: flex;
   align-items: center;
   gap: 4px;
   font-family: var(--font-salut);
-  font-weight: 600;
+  font-weight: 400;
   font-size: 17px;
   line-height: 1.2;
   letter-spacing: -0.01em;
