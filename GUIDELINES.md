@@ -420,10 +420,13 @@ blocs, pas des boutons — **sauf le portrait, qui ouvre la page Profil**
 (2026-09-19).
 
 **Le menu principal** (2026-09-19, « remplace le lien profil du menu par une
-icone menu qui ouvre un menu […] garder le design actuel ») : l'entrée
-« Menu » de la barre du bas (à la place de « Profil ») ouvre une page au
-design de « Mon profil » — une carte par section, une ligne iconée par
-entrée, les icônes de la V1. Ses trois sections, dans son ordre :
+icone menu qui ouvre un menu […] garder le design actuel », puis « ouvre le
+menu en tiroir comme ça avec une croix pour fermer ») : l'entrée « Menu » de
+la barre du bas (à la place de « Profil ») ouvre UN TIROIR qui monte depuis
+la barre par-dessus le bas de l'accueil — sans voile, fermé par sa croix,
+par un clic à côté ou par Échap, le mécanisme du panneau des roues, donc pas
+un popup — avec les entrées sur deux colonnes, l'icône de la V1 en pastille,
+le nom, un chevron. Ses trois sections, dans son ordre :
 Préférences (Activation Modules, Notifications, Thème et couleurs, Badges),
 Export (Nouveau rapport médical, Rapports disponibles), GLP1LOW et vous — le
 mot-symbole dessiné, puis « et vous » — (Mon compte, Avis et Feedback,

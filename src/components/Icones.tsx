@@ -301,6 +301,25 @@ export function IconeConstellation() {
   );
 }
 
+/** Lucide `x` — fermer. */
+export function IconeCroix() {
+  return (
+    <Icone>
+      <path d="M18 6 6 18" />
+      <path d="m6 6 12 12" />
+    </Icone>
+  );
+}
+
+/** Lucide `chevron-right` — une entrée qui mène plus loin. */
+export function IconeChevron() {
+  return (
+    <Icone>
+      <path d="m9 18 6-6-6-6" />
+    </Icone>
+  );
+}
+
 /** Lucide `lock` — le cadenas d'un badge pas encore gagné. */
 export function IconeCadenas() {
   return (

@@ -198,6 +198,8 @@ export interface Textes {
   };
   /** Le bouton « retour » de la barre du bas : lu par les lecteurs d'écran. */
   retour: string;
+  /** La croix qui ferme un tiroir : lue par les lecteurs d'écran. */
+  fermer: string;
   oui: string;
   non: string;
   /**
@@ -363,6 +365,7 @@ const FR: Textes = {
     regleTaille: (min, max, unite) => `Une taille entre ${min} et ${max} ${unite}`,
   },
   retour: 'Retour',
+  fermer: 'Fermer',
   oui: 'Oui',
   non: 'Non',
   progression: 'Avancement du questionnaire',

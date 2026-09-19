@@ -1420,7 +1420,7 @@
   height: 120px;
 }
 
-/* ── LE MENU PRINCIPAL (2026-09-19) ─────────────────────────────────────── */
+/* ── LE MENU PRINCIPAL, EN TIROIR (2026-09-19) ─────────────────────────── */
 
 /* L'entrée « Menu » de la barre est un bouton : rien de la matière d'un
    bouton, la même colonne icône + nom que ses voisines. */
@@ -1434,27 +1434,130 @@
   cursor: pointer;
 }
 
-/* Le texte d'une ligne du menu principal. */
-.ligne__texte {
+/* LE TIROIR : un panneau qui monte depuis la barre du bas, par-dessus le bas
+   de la page — pas de voile, pas de fenêtre. Il est posé sur la page, sous
+   la barre (qui garde le dessus et le cache sur sa hauteur, d'où le
+   rembourrage du bas), coins du haut arrondis, et il défile pour lui-même
+   quand il est plus haut que la place. */
+.tiroir {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 2;
+  max-height: calc(100% - 48px);
+  overflow-y: auto;
+  padding: 10px 16px 84px;
+  border-radius: 22px 22px 0 0;
+  background: var(--module-fond);
+  box-shadow: var(--panneau-ombre);
+}
+
+/* La barre du bas garde le dessus du tiroir. */
+.menu {
+  position: relative;
+  z-index: 3;
+}
+
+/* La poignée, au sommet : une languette qui dit « ça se tire ». */
+.tiroir__poignee {
+  width: 40px;
+  height: 4px;
+  margin: 0 auto 8px;
+  border-radius: 2px;
+  background: var(--option-filet);
+}
+
+/* La croix qui ferme, dans le coin haut droit. */
+.tiroir__fermer {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  display: grid;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: var(--option-choisi-fond);
+  color: var(--encre);
+  cursor: pointer;
+}
+
+.tiroir__fermer .icone {
+  width: 14px;
+  height: 14px;
+}
+
+.tiroir__section {
+  margin: 0 0 10px;
+}
+
+.tiroir__titre {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin: 8px 0 6px;
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 15px;
+  color: var(--encre-chapeau);
+}
+
+.tiroir__titre .wordmark--enligne {
+  font-family: var(--font-marque);
+  font-size: 18px;
+  color: var(--marque-encre);
+}
+
+/* Les entrées sur DEUX COLONNES, comme sur son image. */
+.tiroir__grille {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  column-gap: 12px;
+}
+
+.tiroir__entree {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 46px;
+  padding: 2px 0;
+  border-top: 1px solid var(--option-filet);
+}
+
+.tiroir__icone {
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  background: var(--option-choisi-fond);
+  color: var(--accent);
+}
+
+.tiroir__icone .icone {
+  width: 17px;
+  height: 17px;
+}
+
+.tiroir__nom {
   flex: 1;
   min-width: 0;
   font-family: var(--font-body);
   font-weight: 500;
-  font-size: 15px;
+  font-size: 13px;
+  line-height: 1.2;
   color: var(--encre);
 }
 
-/* La première ligne d'une carte sans sous-titre s'écarte un peu du titre. */
-.carte__titre + .ligne {
-  margin-top: 10px;
-}
-
-/* Le mot-symbole dans le titre de la section « GLP1LOW et vous » : à la
-   taille du titre, dans la police de la marque. */
-.carte__titre .wordmark--enligne {
-  font-family: var(--font-marque);
-  font-size: 15px;
-  margin-right: -4px;
+.tiroir__chevron {
+  flex: none;
+  width: 14px;
+  height: 14px;
+  color: var(--encre-chapeau);
 }
 
 /* La constellation : un tracé pointillé, doublé d'un trait estompé. */

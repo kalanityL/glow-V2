@@ -1,4 +1,6 @@
+import { useCallback, useState } from 'react';
 import { Avatar } from '../components/Avatar';
+import { TiroirMenu } from './TiroirMenu';
 import { Cocarde } from '../components/Cocarde';
 import {
   IconeActivite,
@@ -59,7 +61,8 @@ import type { Reponses } from './onboarding/reponses';
  * RIEN N'EST CLIQUABLE (« les liens ne menent pour l'instant nulle part […]
  * rien de clicable ») : pas un bouton, pas un lien — des blocs, en attendant
  * les pages. Le jour où elles existeront, chaque bloc devient un bouton.
- * PREMIÈRE EXCEPTION (2026-09-19) : le portrait, qui ouvre la page Profil.
+ * PREMIÈRE EXCEPTION (2026-09-19) : le portrait, qui ouvre la page Profil ;
+ * et « Menu » dans la barre, qui ouvre le tiroir du menu principal.
  *
  * POUR L'INSTANT EN THÈME BLANC, QUEL QUE SOIT LE THÈME CHOISI (« peu importe
  * la couleur choisie dans l'onboarding, pour l'instant on arrive sur le theme
@@ -68,15 +71,17 @@ import type { Reponses } from './onboarding/reponses';
 export function Accueil({
   reponses,
   onOuvrirProfil,
-  onOuvrirMenu,
 }: {
   reponses: Reponses;
   /** Le portrait ouvre la page Profil (2026-09-19). */
   onOuvrirProfil: () => void;
-  /** L'entrée « Menu » de la barre ouvre le menu principal (2026-09-19). */
-  onOuvrirMenu: () => void;
 }) {
   const textes = useTextes();
+  /* LE MENU PRINCIPAL EN TIROIR (2026-09-19) : ouvert par l'entrée « Menu »
+     de la barre, fermé par sa croix, par un clic à côté ou par « Menu » de
+     nouveau. */
+  const [menuOuvert, setMenuOuvert] = useState(false);
+  const fermerMenu = useCallback(() => setMenuOuvert(false), []);
 
   return (
     <div className={`page page--photo ${classeDuTheme('blanc')}`}>
@@ -183,6 +188,8 @@ export function Accueil({
         ))}
       </div>
 
+      {menuOuvert ? <TiroirMenu onFermer={fermerMenu} /> : null}
+
       {/* LE MENU EST HORS DE LA COLONNE DE LECTURE : la colonne est bornée à
           380 px, la barre doit aller d'un bord à l'autre de l'écran. */}
       <div className="menu">
@@ -193,8 +200,9 @@ export function Accueil({
               <button
                 key={entree}
                 type="button"
-                className="menu__entree menu__entree--menu menu__entree--bouton"
-                onClick={onOuvrirMenu}
+                className={`menu__entree menu__entree--menu menu__entree--bouton${menuOuvert ? ' menu__entree--active' : ''}`}
+                aria-expanded={menuOuvert}
+                onClick={() => setMenuOuvert((ouvert) => !ouvert)}
               >
                 <span className="menu__icone">{ICONES_MENU[entree]}</span>
                 <span className="menu__nom">{textes.accueil.menu[entree]}</span>
