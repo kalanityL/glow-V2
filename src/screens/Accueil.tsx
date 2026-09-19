@@ -13,7 +13,7 @@ import {
   IconeMenu,
   IconePlus,
   IconeRecherche,
-  IconeReglages,
+  IconeNotifications,
   IconeRepas,
   IconeSeringue,
   IconeSommeil,
@@ -103,7 +103,10 @@ export function Accueil({
               <IconeRecherche />
             </span>
             <span className="rond">
-              <IconeReglages />
+              {/* La cloche des notifications, à la place de la roue des
+                  préférences (2026-09-19) : les préférences sont dans le
+                  menu principal. */}
+              <IconeNotifications />
             </span>
           </div>
         </div>

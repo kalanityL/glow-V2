@@ -783,8 +783,8 @@
    noms hors des cercles sous les cercles, augmente la taille des icone et
    des cercles », « moins augmenté la taille des icones », « traits des
    icones dans cercle plus fins », puis « ne pas mettre les noms sous les
-   cercles ») : un rond de 72 px au plus (92, puis 84 le 2026-09-17, puis 72
-   le 2026-09-19, « pastilles plus petites et plus basses »), l'icône de
+   cercles ») : un rond de 64 px au plus (92, puis 84 le 2026-09-17, 72 puis
+   64 le 2026-09-19, « reduire taille des pastilles »), l'icône de
    24 px au trait 1,2,
    pas de nom visible — il est dit en `aria-label`. La pastille a la
    largeur de sa part de ligne : quatre pastilles et leurs trois airs de
@@ -796,7 +796,7 @@
 .module {
   display: grid;
   place-items: center;
-  width: min(72px, calc((100% - 3 * 14px) / 4));
+  width: min(64px, calc((100% - 3 * 14px) / 4));
   aspect-ratio: 1;
   border-radius: 50%;
   background: var(--module-fond);
@@ -940,9 +940,11 @@
    parti le même jour). */
 /* 75 px : 88 réduits de 15 % (2026-09-16, « réduit de 15% la taille de
    l'avatar »). */
+/* 64 px (2026-09-19, « reduire taille de l'avatar de la home » — 75 la
+   veille, 88 avant). */
 .salut__cercle {
-  width: 75px;
-  height: 75px;
+  width: 64px;
+  height: 64px;
   border-radius: 50%;
   overflow: hidden;
   border: 2px solid var(--option-fond);
