@@ -991,9 +991,9 @@
   height: 100%;
 }
 
-/* L'EMPLACEMENT D'UN BADGE (2026-09-17) : la cocarde vide, à 64 px, peinte
-   aux neutres du thème — plaque en surface, plis, anneau et liseré au filet.
-   Ce n'est pas un badge, il ne porte aucun métal. */
+/* L'EMPLACEMENT D'UN BADGE (2026-09-17) : la cocarde vide, un masque blanc
+   de sa silhouette (2026-09-19). Ce n'est pas un badge, il ne porte aucun
+   métal. */
 .salut__cocarde {
   position: relative;
   display: block;
@@ -1039,26 +1039,10 @@
   height: 14px;
 }
 
-.cocarde__rubans,
-.cocarde__plis {
-  fill: var(--option-filet);
-}
-
-.cocarde__anneau {
-  fill: none;
-  stroke: var(--option-filet);
-  stroke-width: 3;
-}
-
-.cocarde__plaque {
+/* UN MASQUE BLANC (2026-09-19) : toute la silhouette d'un seul aplat, la
+   surface du thème — rien de dessiné dedans. */
+.cocarde__masque {
   fill: var(--option-fond);
-}
-
-.cocarde__lisere {
-  fill: none;
-  stroke: var(--option-filet);
-  stroke-width: 1.2;
-  stroke-dasharray: 3 2;
 }
 
 /* LE MENU DU BAS : une barre de surface, cernée en haut, qui s'étend d'un bord
