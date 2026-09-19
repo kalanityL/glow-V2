@@ -180,6 +180,137 @@ export function IconeCible() {
   );
 }
 
+/* ── LE MENU PRINCIPAL (2026-09-19) : les icônes que la V1 donnait à ces
+   entrées (`quickMenuSections`), Lucide sauf la constellation, dessin
+   maison de la V1. ──────────────────────────────────────────────────────── */
+
+/** Lucide `menu` — l'entrée « Menu » de la barre du bas. */
+export function IconeMenu() {
+  return (
+    <Icone>
+      <path d="M4 5h16" />
+      <path d="M4 12h16" />
+      <path d="M4 19h16" />
+    </Icone>
+  );
+}
+
+/** Lucide `layout-grid` — l'activation des modules. */
+export function IconeModules() {
+  return (
+    <Icone>
+      <rect width="7" height="7" x="3" y="3" rx="1" />
+      <rect width="7" height="7" x="14" y="3" rx="1" />
+      <rect width="7" height="7" x="14" y="14" rx="1" />
+      <rect width="7" height="7" x="3" y="14" rx="1" />
+    </Icone>
+  );
+}
+
+/** Lucide `bell` — les notifications. */
+export function IconeNotifications() {
+  return (
+    <Icone>
+      <path d="M10.268 21a2 2 0 0 0 3.464 0" />
+      <path d="M3.262 15.326A1 1 0 0 0 4 17h16a1 1 0 0 0 .74-1.673C19.41 13.956 18 12.499 18 8A6 6 0 0 0 6 8c0 4.499-1.411 5.956-2.738 7.326" />
+    </Icone>
+  );
+}
+
+/** Lucide `award` — les badges. */
+export function IconeBadges() {
+  return (
+    <Icone>
+      <path d="m15.477 12.89 1.515 8.526a.5.5 0 0 1-.81.47l-3.58-2.687a1 1 0 0 0-1.197 0l-3.586 2.686a.5.5 0 0 1-.81-.469l1.514-8.526" />
+      <circle cx="12" cy="8" r="6" />
+    </Icone>
+  );
+}
+
+/** Lucide `file-up` — un nouveau rapport médical. */
+export function IconeRapport() {
+  return (
+    <Icone>
+      <path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z" />
+      <path d="M14 2v4a2 2 0 0 0 2 2h4" />
+      <path d="M12 12v6" />
+      <path d="m15 15-3-3-3 3" />
+    </Icone>
+  );
+}
+
+/** Lucide `files` — les rapports disponibles. */
+export function IconeRapports() {
+  return (
+    <Icone>
+      <path d="M15 2a2 2 0 0 1 1.414.586l4 4A2 2 0 0 1 21 8v7a2 2 0 0 1-2 2h-8a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2z" />
+      <path d="M15 2v4a2 2 0 0 0 2 2h4" />
+      <path d="M5 7a2 2 0 0 0-2 2v11a2 2 0 0 0 2 2h8a2 2 0 0 0 1.732-1" />
+    </Icone>
+  );
+}
+
+/** Lucide `credit-card` — le compte (abonnement, paiement, comme la V1). */
+export function IconeCompte() {
+  return (
+    <Icone>
+      <rect width="20" height="14" x="2" y="5" rx="2" />
+      <line x1="2" x2="22" y1="10" y2="10" />
+    </Icone>
+  );
+}
+
+/** Lucide `message-square-plus` — les avis. */
+export function IconeAvis() {
+  return (
+    <Icone>
+      <path d="M22 17a2 2 0 0 1-2 2H6.828a2 2 0 0 0-1.414.586l-2.202 2.202A.71.71 0 0 1 2 21.286V5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2z" />
+      <path d="M12 8v6" />
+      <path d="M9 11h6" />
+    </Icone>
+  );
+}
+
+/** Lucide `clipboard-list` — le sondage. */
+export function IconeSondage() {
+  return (
+    <Icone>
+      <rect width="8" height="4" x="8" y="2" rx="1" ry="1" />
+      <path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2" />
+      <path d="M12 11h4" />
+      <path d="M12 16h4" />
+      <path d="M8 11h.01" />
+      <path d="M8 16h.01" />
+    </Icone>
+  );
+}
+
+/** Lucide `circle-help` — la FAQ. */
+export function IconeFaq() {
+  return (
+    <Icone>
+      <circle cx="12" cy="12" r="10" />
+      <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3" />
+      <path d="M12 17h.01" />
+    </Icone>
+  );
+}
+
+/** La constellation de la V1 (`ConstellationIcon`) — la page Ciel : quatre
+    étoiles pleines reliées par un tracé pointillé, doublé d'un trait estompé. */
+export function IconeConstellation() {
+  return (
+    <Icone>
+      <path d="M5 18 10 12.5 15.5 15 20 6" className="icone__pointille" />
+      <path d="M5 18 10 12.5 15.5 15 20 6" className="icone__estompe" />
+      <circle cx="5" cy="18" r="1.4" className="icone__plein" />
+      <circle cx="10" cy="12.5" r="1.4" className="icone__plein" />
+      <circle cx="15.5" cy="15" r="1.4" className="icone__plein" />
+      <circle cx="20" cy="6" r="1.4" className="icone__plein" />
+    </Icone>
+  );
+}
+
 /** Lucide `lock` — le cadenas d'un badge pas encore gagné. */
 export function IconeCadenas() {
   return (

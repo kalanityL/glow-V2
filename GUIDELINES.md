@@ -419,6 +419,17 @@ soleil. **Rien n'y est cliquable** tant que les pages n'existent pas : des
 blocs, pas des boutons — **sauf le portrait, qui ouvre la page Profil**
 (2026-09-19).
 
+**Le menu principal** (2026-09-19, « remplace le lien profil du menu par une
+icone menu qui ouvre un menu […] garder le design actuel ») : l'entrée
+« Menu » de la barre du bas (à la place de « Profil ») ouvre une page au
+design de « Mon profil » — une carte par section, une ligne iconée par
+entrée, les icônes de la V1. Ses trois sections, dans son ordre :
+Préférences (Activation Modules, Notifications, Thème et couleurs, Badges),
+Export (Nouveau rapport médical, Rapports disponibles), GLP1LOW et vous — le
+mot-symbole dessiné, puis « et vous » — (Mon compte, Avis et Feedback,
+Sondage, FAQ, Ciel). « Admin » attend qu'il existe un compte. Aucune entrée
+ne mène encore nulle part. La liste vit dans `src/app/menuPrincipal.ts`.
+
 **La page « Mon profil »** (2026-09-19, « clic sur avatar ouvre une page
 profil avec les infos persos modifiables et la config de l'avatar […] garde
 les consignes : pas de label et info editable en inline sans icone de

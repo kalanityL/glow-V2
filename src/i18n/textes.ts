@@ -11,6 +11,7 @@ import type { Objectif } from '../screens/onboarding/reponses';
 import type { ThemeId } from '../themes/themes';
 import type { EntreeMenu } from '../app/menu';
 import type { ModuleId } from '../app/modules';
+import type { EntreeMenuPrincipal, SectionMenu } from '../app/menuPrincipal';
 
 /**
  * TOUS LES MOTS DE L'APPLICATION, ET RIEN D'AUTRE.
@@ -170,6 +171,16 @@ export interface Textes {
      *  au pluriel pour la rubrique, « Comprimé » sous forme orale). */
     traitement: Record<Forme, string>;
   };
+  /**
+   * LE MENU PRINCIPAL (2026-09-19) : son titre, ses sections et ses entrées.
+   * La section « GLP1LOW et vous » porte le mot-symbole dessiné : son texte
+   * n'est que la suite, « et vous ».
+   */
+  menuPrincipal: {
+    titre: string;
+    sections: Record<SectionMenu, string>;
+    entrees: Record<EntreeMenuPrincipal, string>;
+  };
   /** LA PAGE PROFIL (2026-09-19) : son titre, ses deux volets, et ce que
    *  chaque valeur attend quand une saisie est refusée. */
   profil: {
@@ -299,7 +310,7 @@ const FR: Textes = {
       journal: 'Journal',
       ajouter: 'Ajouter',
       analyse: 'Analyse',
-      profil: 'Profil',
+      menu: 'Menu',
     },
     modules: {
       traitement: 'Traitement',
@@ -317,6 +328,27 @@ const FR: Textes = {
     traitement: {
       injection: 'Injections',
       comprime: 'Comprimé',
+    },
+  },
+  menuPrincipal: {
+    titre: 'Menu',
+    sections: {
+      preferences: 'Préférences',
+      export: 'Export',
+      glowEtVous: 'et vous',
+    },
+    entrees: {
+      modules: 'Activation Modules',
+      notifications: 'Notifications',
+      theme: 'Thème et couleurs',
+      badges: 'Badges',
+      nouveauRapport: 'Nouveau rapport médical',
+      rapports: 'Rapports disponibles',
+      compte: 'Mon compte',
+      avis: 'Avis et Feedback',
+      sondage: 'Sondage',
+      faq: 'FAQ',
+      ciel: 'Ciel',
     },
   },
   profil: {

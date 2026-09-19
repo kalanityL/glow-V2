@@ -1433,3 +1433,50 @@
   width: 120px;
   height: 120px;
 }
+
+/* ── LE MENU PRINCIPAL (2026-09-19) ─────────────────────────────────────── */
+
+/* L'entrée « Menu » de la barre est un bouton : rien de la matière d'un
+   bouton, la même colonne icône + nom que ses voisines. */
+.menu__entree--bouton {
+  padding: 0;
+  border: 0;
+  background: none;
+  /* Pas de `font: inherit` : le raccourci écraserait la taille et la graisse
+     que `.menu__entree` pose ; la famille suffit. */
+  font-family: inherit;
+  cursor: pointer;
+}
+
+/* Le texte d'une ligne du menu principal. */
+.ligne__texte {
+  flex: 1;
+  min-width: 0;
+  font-family: var(--font-body);
+  font-weight: 500;
+  font-size: 15px;
+  color: var(--encre);
+}
+
+/* La première ligne d'une carte sans sous-titre s'écarte un peu du titre. */
+.carte__titre + .ligne {
+  margin-top: 10px;
+}
+
+/* Le mot-symbole dans le titre de la section « GLP1LOW et vous » : à la
+   taille du titre, dans la police de la marque. */
+.carte__titre .wordmark--enligne {
+  font-family: var(--font-marque);
+  font-size: 15px;
+  margin-right: -4px;
+}
+
+/* La constellation : un tracé pointillé, doublé d'un trait estompé. */
+.icone__pointille {
+  stroke-dasharray: 0.1 3;
+  stroke-width: 2.2;
+}
+
+.icone__estompe {
+  opacity: 0.45;
+}

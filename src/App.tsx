@@ -4,6 +4,7 @@ import { useTextes } from './i18n/useTextes';
 import { Onboarding } from './screens/Onboarding';
 import { Accueil } from './screens/Accueil';
 import { Profil } from './screens/Profil';
+import { Menu } from './screens/Menu';
 /* La mise en page d'abord, les jetons des thèmes ensuite : les feuilles de
    thème doivent pouvoir battre la structure, jamais l'inverse. */
 import './themes/page.css';
@@ -32,12 +33,13 @@ export default function App() {
   const parcours = useParcours();
 
   /* LA PAGE OUVERTE PAR-DESSUS L'ACCUEIL (2026-09-19) : le profil, ouvert par
-     le portrait. Le bouton « retour » de la barre y ramène à l'accueil — c'est
-     pour cela que la page vit ici, à côté du parcours, et non dans l'accueil. */
-  const [page, setPage] = useState<'accueil' | 'profil'>('accueil');
-  const peutRevenir = page === 'profil' || parcours.peutRevenir;
+     le portrait, ou le menu principal, ouvert par la barre. Le bouton
+     « retour » de la barre y ramène à l'accueil — c'est pour cela que la page
+     vit ici, à côté du parcours, et non dans l'accueil. */
+  const [page, setPage] = useState<'accueil' | 'profil' | 'menu'>('accueil');
+  const peutRevenir = page !== 'accueil' || parcours.peutRevenir;
   const revenir = () => {
-    if (page === 'profil') setPage('accueil');
+    if (page !== 'accueil') setPage('accueil');
     else parcours.reculer();
   };
 
@@ -77,8 +79,14 @@ export default function App() {
             <Onboarding parcours={parcours} />
           ) : page === 'profil' ? (
             <Profil parcours={parcours} onRevenir={() => setPage('accueil')} />
+          ) : page === 'menu' ? (
+            <Menu onRevenir={() => setPage('accueil')} />
           ) : (
-            <Accueil reponses={parcours.reponses} onOuvrirProfil={() => setPage('profil')} />
+            <Accueil
+              reponses={parcours.reponses}
+              onOuvrirProfil={() => setPage('profil')}
+              onOuvrirMenu={() => setPage('menu')}
+            />
           )}
         </div>
 

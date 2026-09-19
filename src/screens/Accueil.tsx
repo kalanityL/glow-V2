@@ -10,8 +10,8 @@ import {
   IconeJournal,
   IconeEtoiles,
   IconeMarche,
+  IconeMenu,
   IconePlus,
-  IconeProfil,
   IconeRecherche,
   IconeReglages,
   IconeRepas,
@@ -68,10 +68,13 @@ import type { Reponses } from './onboarding/reponses';
 export function Accueil({
   reponses,
   onOuvrirProfil,
+  onOuvrirMenu,
 }: {
   reponses: Reponses;
   /** Le portrait ouvre la page Profil (2026-09-19). */
   onOuvrirProfil: () => void;
+  /** L'entrée « Menu » de la barre ouvre le menu principal (2026-09-19). */
+  onOuvrirMenu: () => void;
 }) {
   const textes = useTextes();
 
@@ -180,15 +183,29 @@ export function Accueil({
       {/* LE MENU EST HORS DE LA COLONNE DE LECTURE : la colonne est bornée à
           380 px, la barre doit aller d'un bord à l'autre de l'écran. */}
       <div className="menu">
-          {ENTREES_MENU.map((entree) => (
-          <div
-            key={entree}
-            className={`menu__entree menu__entree--${entree}${entree === 'accueil' ? ' menu__entree--active' : ''}`}
-          >
-            <span className="menu__icone">{ICONES_MENU[entree]}</span>
-            <span className="menu__nom">{textes.accueil.menu[entree]}</span>
-          </div>
-          ))}
+          {ENTREES_MENU.map((entree) =>
+            entree === 'menu' ? (
+              /* LA SEULE ENTRÉE QUI MÈNE QUELQUE PART (2026-09-19) : « Menu »
+                 ouvre le menu principal. Les autres attendent leurs pages. */
+              <button
+                key={entree}
+                type="button"
+                className="menu__entree menu__entree--menu menu__entree--bouton"
+                onClick={onOuvrirMenu}
+              >
+                <span className="menu__icone">{ICONES_MENU[entree]}</span>
+                <span className="menu__nom">{textes.accueil.menu[entree]}</span>
+              </button>
+            ) : (
+              <div
+                key={entree}
+                className={`menu__entree menu__entree--${entree}${entree === 'accueil' ? ' menu__entree--active' : ''}`}
+              >
+                <span className="menu__icone">{ICONES_MENU[entree]}</span>
+                <span className="menu__nom">{textes.accueil.menu[entree]}</span>
+              </div>
+            ),
+          )}
       </div>
     </div>
   );
@@ -211,5 +228,5 @@ const ICONES_MENU: Record<EntreeMenu, React.ReactNode> = {
   journal: <IconeJournal />,
   ajouter: <IconePlus />,
   analyse: <IconeAnalyse />,
-  profil: <IconeProfil />,
+  menu: <IconeMenu />,
 };
