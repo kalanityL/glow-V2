@@ -415,7 +415,22 @@ du 2026-09-16**, avec le logo et les icônes qui existaient déjà (les tracés
 Lucide de la V1, recopiés sans la bibliothèque dans `components/Icones.tsx`),
 sans point d'exclamation, et les trois étoiles du logo en doré à la place du
 soleil. **Rien n'y est cliquable** tant que les pages n'existent pas : des
-blocs, pas des boutons. **Sa photo en portrait (mur blanc, plante,
+blocs, pas des boutons — **sauf le portrait, qui ouvre la page Profil**
+(2026-09-19).
+
+**La page Profil** (2026-09-19, « clic sur avatar ouvre une page profil avec
+les infos persos modifiables et la config de l'avatar […] garde les
+consignes : pas de label et info editable en inline sans icone de
+modification comme sur la V1 ; meme module de modification d'avatar que la
+v1, NE CHANGE PAS LA FONCTIONNALITE UNIQUEMENT LE DESIGN ») : son design
+vient de son écran (entête retour / titre / marque, identité, deux cartes),
+ses règles de la V1 — **aucun intitulé devant une information, aucun
+crayon : la valeur s'édite sur place** (`ChampEnLigne` : on la touche, elle
+devient un champ, elle s'enregistre quand on la quitte ou sur Entrée, Échap
+la rend) ; les nombres passent par la roue de l'application ; **le module
+de l'avatar est `EtapeAvatar`, celui de l'onboarding, à l'identique**, posé
+dans une carte. Pas de bouton « Enregistrer » : chaque valeur s'enregistre
+quand on la quitte. Le bouton « retour » de la barre ramène à l'accueil. **Sa photo en portrait (mur blanc, plante,
 sol) est le fond de toute la page**, à la largeur de l'écran, sans zoom ni
 fondu (« essaie l'image fond haut sur toute la jauteur de l'ecran en fond »,
 « non zoomée », 2026-09-16 au soir — la photo horizontale du haut de page et

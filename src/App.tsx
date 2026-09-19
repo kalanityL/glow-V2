@@ -1,7 +1,9 @@
+import { useState } from 'react';
 import { useParcours } from './app/useParcours';
 import { useTextes } from './i18n/useTextes';
 import { Onboarding } from './screens/Onboarding';
 import { Accueil } from './screens/Accueil';
+import { Profil } from './screens/Profil';
 /* La mise en page d'abord, les jetons des thèmes ensuite : les feuilles de
    thème doivent pouvoir battre la structure, jamais l'inverse. */
 import './themes/page.css';
@@ -28,6 +30,16 @@ export default function App() {
      barre est hors de l'écran du téléphone — il figure le bouton natif — et
      doit pouvoir y reculer. */
   const parcours = useParcours();
+
+  /* LA PAGE OUVERTE PAR-DESSUS L'ACCUEIL (2026-09-19) : le profil, ouvert par
+     le portrait. Le bouton « retour » de la barre y ramène à l'accueil — c'est
+     pour cela que la page vit ici, à côté du parcours, et non dans l'accueil. */
+  const [page, setPage] = useState<'accueil' | 'profil'>('accueil');
+  const peutRevenir = page === 'profil' || parcours.peutRevenir;
+  const revenir = () => {
+    if (page === 'profil') setPage('accueil');
+    else parcours.reculer();
+  };
 
   return (
     <div className="app-root">
@@ -61,10 +73,12 @@ export default function App() {
               <Batterie />
             </span>
           </div>
-          {parcours.entre ? (
-            <Accueil reponses={parcours.reponses} />
-          ) : (
+          {!parcours.entre ? (
             <Onboarding parcours={parcours} />
+          ) : page === 'profil' ? (
+            <Profil parcours={parcours} onRevenir={() => setPage('accueil')} />
+          ) : (
+            <Accueil reponses={parcours.reponses} onOuvrirProfil={() => setPage('profil')} />
           )}
         </div>
 
@@ -78,9 +92,9 @@ export default function App() {
             className="phone-bar-back"
             title={textes.retour}
             aria-label={textes.retour}
-            aria-disabled={!parcours.peutRevenir}
-            disabled={!parcours.peutRevenir}
-            onClick={parcours.reculer}
+            aria-disabled={!peutRevenir}
+            disabled={!peutRevenir}
+            onClick={revenir}
           >
             <ArrowLeft />
           </button>

@@ -59,16 +59,24 @@ import type { Reponses } from './onboarding/reponses';
  * RIEN N'EST CLIQUABLE (« les liens ne menent pour l'instant nulle part […]
  * rien de clicable ») : pas un bouton, pas un lien — des blocs, en attendant
  * les pages. Le jour où elles existeront, chaque bloc devient un bouton.
+ * PREMIÈRE EXCEPTION (2026-09-19) : le portrait, qui ouvre la page Profil.
  *
  * POUR L'INSTANT EN THÈME BLANC, QUEL QUE SOIT LE THÈME CHOISI (« peu importe
  * la couleur choisie dans l'onboarding, pour l'instant on arrive sur le theme
  * fond gris blanc ») : provisoire, de son mot.
  */
-export function Accueil({ reponses }: { reponses: Reponses }) {
+export function Accueil({
+  reponses,
+  onOuvrirProfil,
+}: {
+  reponses: Reponses;
+  /** Le portrait ouvre la page Profil (2026-09-19). */
+  onOuvrirProfil: () => void;
+}) {
   const textes = useTextes();
 
   return (
-    <div className={`page page--accueil ${classeDuTheme('blanc')}`}>
+    <div className={`page page--photo ${classeDuTheme('blanc')}`}>
       <div className="page__colonne">
         {/* UNE SEULE LIGNE (2026-09-16, « header : logo / glow / recherche/
             parametre tous sur la meme ligne / logo et titre meme hauteur,
@@ -98,11 +106,19 @@ export function Accueil({ reponses }: { reponses: Reponses }) {
         </div>
 
         <div className="salut">
-          <div className="salut__portrait">
+          {/* LE PORTRAIT OUVRE LE PROFIL (2026-09-19, « clic sur avatar ouvre
+              une page profil ») : le seul geste de l'accueil qui mène quelque
+              part, pour l'instant. */}
+          <button
+            type="button"
+            className="salut__portrait"
+            aria-label={textes.profil.titre}
+            onClick={onOuvrirProfil}
+          >
             <div className="salut__cercle">
               <Avatar avatar={reponses.avatar} />
             </div>
-          </div>
+          </button>
           <div className="salut__texte">
             <h1 className="salut__titre">
               {textes.accueil.bonjour(reponses.prenom)}

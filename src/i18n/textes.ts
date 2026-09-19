@@ -165,6 +165,14 @@ export interface Textes {
      *  au pluriel pour la rubrique, « Comprimé » sous forme orale). */
     traitement: Record<Forme, string>;
   };
+  /** LA PAGE PROFIL (2026-09-19) : son titre, ses deux cartes. */
+  profil: {
+    titre: string;
+    informations: string;
+    informationsSousTitre: string;
+    avatar: string;
+    avatarSousTitre: string;
+  };
   /** Le bouton « retour » de la barre du bas : lu par les lecteurs d'écran. */
   retour: string;
   oui: string;
@@ -295,6 +303,14 @@ const FR: Textes = {
       injection: 'Injections',
       comprime: 'Comprimé',
     },
+  },
+  profil: {
+    titre: 'Profil',
+    informations: 'Mes informations',
+    informationsSousTitre:
+      'Ces informations sont privées et peuvent être modifiées à tout moment.',
+    avatar: 'Mon avatar',
+    avatarSousTitre: 'Personnalisez votre avatar.',
   },
   retour: 'Retour',
   oui: 'Oui',

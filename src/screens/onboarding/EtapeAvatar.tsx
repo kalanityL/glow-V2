@@ -15,6 +15,11 @@ import { ChoixUnique } from './ChoixUnique';
 interface EtapeAvatarProps {
   avatar: AvatarModele;
   onAvatar: (avatar: AvatarModele) => void;
+  /**
+   * Sans le titre de l'étape : sur la page Profil (2026-09-19), c'est la
+   * carte « Mon avatar » qui titre — les réglages, eux, sont LES MÊMES.
+   */
+  sansTitre?: boolean;
 }
 
 /**
@@ -36,16 +41,18 @@ interface EtapeAvatarProps {
  * bouclé. C'est un point de départ, pas une règle — la coiffure se rechoisit
  * juste en dessous.
  */
-export function EtapeAvatar({ avatar, onAvatar }: EtapeAvatarProps) {
+export function EtapeAvatar({ avatar, onAvatar, sansTitre = false }: EtapeAvatarProps) {
   const textes = useTextes();
   const modifier = <C extends keyof AvatarModele>(champ: C, valeur: AvatarModele[C]) =>
     onAvatar({ ...avatar, [champ]: valeur });
 
   return (
     <>
-      <h1 className="titre">{textes.onboarding.avatar.question}</h1>
+      {sansTitre ? null : <h1 className="titre">{textes.onboarding.avatar.question}</h1>}
 
-      <p className="libelle-groupe">{textes.groupes.genre}</p>
+      <p className={`libelle-groupe${sansTitre ? ' libelle-groupe--premier' : ''}`}>
+        {textes.groupes.genre}
+      </p>
       <ChoixUnique
         options={GENRES}
         libelle={(id) => textes.genres[id]}
