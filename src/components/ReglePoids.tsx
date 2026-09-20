@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef } from 'react';
+import { useCallback, useEffect, useMemo, useRef } from 'react';
 import { ChampEnLigne } from './ChampEnLigne';
 import { useTextes } from '../i18n/useTextes';
 import { POIDS_MAX, POIDS_MIN, poidsDepuisRapport, poidsDepuisSaisie, rapportDuPoids } from '../domaine/mesures';
@@ -23,6 +23,15 @@ import { defilementHorizontal, defilerHorizontalA, surFinDeDefilement } from '..
  *
  * Le composant ne garde rien : le poids est à l'appelant (`valeur`,
  * `onValeur`), sous sa forme stockée.
+ *
+ * UNE SEULE SOURCE À LA FOIS (2026-09-21, son enregistrement : le chiffre
+ * et la graduation se contredisaient — 91,5 sous 116,5 — et s'échangeaient
+ * à chaque rendu). Le composant ne ramène JAMAIS la graduation sur un poids
+ * qu'elle vient elle-même de lui donner : `derniereLue` garde le dernier
+ * poids lu sur la graduation, et l'effet qui place la graduation ne joue
+ * que pour un poids venu d'ailleurs — l'ouverture, une frappe, un autre
+ * traitement. Sinon chaque lecture provoquait un placement, chaque
+ * placement une lecture, et deux positions se renvoyaient la balle.
  */
 export function ReglePoids({
   valeur,
@@ -43,6 +52,9 @@ export function ReglePoids({
   const textes = useTextes();
   const graduation = useRef<HTMLDivElement>(null);
   const enEdition = useRef(false);
+  /* Le dernier poids LU sur la graduation : un poids égal à lui n'a pas à y
+     être ramené, il en vient. */
+  const derniereLue = useRef<string | null>(null);
   const separateur = textes.separateurDecimal;
   const ecrit = (stocke: string) => stocke.replace('.', separateur);
 
@@ -74,18 +86,24 @@ export function ReglePoids({
     [unite],
   );
 
-  /* À l'ouverture — et quand la valeur change d'ailleurs —, la graduation
-     se place sous le poids, d'un coup. */
+  /* À l'ouverture — et quand le poids change D'AILLEURS que de la
+     graduation —, elle se place dessous, d'un coup. */
   useEffect(() => {
+    if (valeur === derniereLue.current) return;
+    derniereLue.current = valeur;
     amenerLaRegle(valeur, false);
   }, [valeur, amenerLaRegle]);
 
+  /* L'aimant immédiat : le geste fini, la graduation est amenée d'un coup
+     sur le cran du poids lu, et ce poids est le sien. */
   useEffect(
     () =>
       surFinDeDefilement(graduation.current, () => {
         const { position, course } = defilementHorizontal(graduation.current);
         if (course <= 0) return;
-        amenerLaRegle(poidsDepuisRapport(position / course, unite), false);
+        const lu = poidsDepuisRapport(position / course, unite);
+        derniereLue.current = lu;
+        amenerLaRegle(lu, false);
       }),
     [unite, amenerLaRegle],
   );
@@ -95,11 +113,33 @@ export function ReglePoids({
     const { position, course } = defilementHorizontal(graduation.current);
     if (course <= 0) return;
     const lu = poidsDepuisRapport(position / course, unite);
-    if (lu !== valeur) onValeur(lu);
+    if (lu === derniereLue.current) return;
+    derniereLue.current = lu;
+    onValeur(lu);
   };
 
-  const crans: number[] = [];
-  for (let d = POIDS_MIN * 10; d <= POIDS_MAX[unite] * 10; d += 1) crans.push(d);
+  /* LA PISTE NE SE REDESSINE PAS À CHAQUE POIDS : dix mille crans, rendus
+     une fois par unité — pas à chaque cran franchi. */
+  const piste = useMemo(() => {
+    const crans: number[] = [];
+    for (let d = POIDS_MIN * 10; d <= POIDS_MAX[unite] * 10; d += 1) crans.push(d);
+    return (
+      <div className="graduation__piste">
+        {crans.map((d) => (
+          <span
+            key={d}
+            className={`graduation__cran${
+              d % 10 === 0 ? ' graduation__cran--kilo' : d % 5 === 0 ? ' graduation__cran--demi' : ''
+            }`}
+          >
+            {d % 5 === 0 ? (
+              <span className="graduation__nombre">{d % 10 === 0 ? d / 10 : (d / 10).toFixed(1).replace('.', separateur)}</span>
+            ) : null}
+          </span>
+        ))}
+      </div>
+    );
+  }, [unite, separateur]);
 
   return (
     <div className="poids">
@@ -132,20 +172,7 @@ export function ReglePoids({
 
       <div className="graduation">
         <div className="graduation__defilement" ref={graduation} onScroll={surDefilement}>
-          <div className="graduation__piste">
-            {crans.map((d) => (
-              <span
-                key={d}
-                className={`graduation__cran${
-                  d % 10 === 0 ? ' graduation__cran--kilo' : d % 5 === 0 ? ' graduation__cran--demi' : ''
-                }`}
-              >
-                {d % 5 === 0 ? (
-                  <span className="graduation__nombre">{d % 10 === 0 ? d / 10 : ecrit((d / 10).toFixed(1))}</span>
-                ) : null}
-              </span>
-            ))}
-          </div>
+          {piste}
         </div>
         <span className="graduation__repere" aria-hidden="true" />
       </div>

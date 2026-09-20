@@ -287,6 +287,13 @@ thèmes ne repeignent pas, et qui ne sont pas dans les templates non plus.
   ouvert, une minute referme), `ChoixDate` (le calendrier : le mois entre
   deux flèches, lundi en premier, six semaines, aujourd'hui cerné, le jour
   choisi plein). Même règle pour le sélecteur de date natif.
+- **LES GESTES SE VÉRIFIENT EN PILOTANT CHROME** (2026-09-21) : l'extension
+  Chrome n'est pas connectée, mais `scripts/piloter-chrome.mjs` ouvre le
+  Chrome de la machine sans fenêtre par le protocole DevTools — molette,
+  lancers, clics — et lit la page ; `scripts/verifier-regle-poids.mjs` est
+  le scénario de la règle crantée (le chiffre contre le cran sous la tige).
+  L'état se force et se restaure par `sed` sur les `useState`, jamais par
+  `git checkout`.
 - **RIEN NE DÉBORDE JAMAIS, NULLE PART** (V1, sine qua non). Aucun élément ne
   dépasse l'écran du téléphone ni son conteneur. Quand un écran est plus haut
   que le téléphone : d'abord mettre côte à côte, resserrer, ou séparer en deux
@@ -606,7 +613,12 @@ défilement ; le geste fini, la graduation est amenée d'un coup sur le
 cran du poids lu, sans glissement d'approche
 (`plateforme/navigateur.ts`, `surFinDeDefilement`). **Le chiffre a une
 hauteur figée** et sa case vide porte un zéro invisible, pas une espace :
-rien ne bouge en passant les cent. La géométrie de la graduation (le pas
+rien ne bouge en passant les cent. **Une seule source à la fois**
+(2026-09-21, son enregistrement : 91,5 sous 116,5, et l'échange à chaque
+rendu) : la règle (`components/ReglePoids.tsx`) ne ramène jamais la
+graduation sur un poids qu'elle vient de lire — l'effet qui la place ne
+joue que pour un poids venu d'ailleurs (ouverture, frappe, autre
+traitement) ; sa piste de dix mille crans se rend une fois par unité. La géométrie de la graduation (le pas
 d'un cran, les hauteurs) est dans `page.css` ; le code n'en lit qu'un
 rapport (`domaine/mesures.ts`).
 « OK » au pied, éteint sans changement ; fermer sans valider propose
