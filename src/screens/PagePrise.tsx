@@ -1,14 +1,17 @@
-import { useState, type FormEvent } from 'react';
+import { useEffect, useState, type FormEvent } from 'react';
 import { BarreDuBas } from './BarreDuBas';
 import { EntetePage } from './EntetePage';
 import { surLeFond, type FondProps } from './Accueil';
+import { BlocTraitement } from './BlocTraitement';
+import { Choix } from '../components/Choix';
+import { ChoixDate } from '../components/ChoixDate';
+import { ChoixHeure } from '../components/ChoixHeure';
 import { IconeCalendrier, IconeCoche, IconeComprime, IconeCroix, IconeHorloge, IconePlus, IconeSeringue } from '../components/Icones';
 import { detecterLangue, useTextes } from '../i18n/useTextes';
 import { classeDuTheme } from '../themes/themes';
 import { dateLocale, formaterDateCourte } from '../domaine/dates';
 import { TRAITEMENTS, type Forme } from '../domaine/traitements';
 import {
-  MINUTES_RONDES,
   NOTE_MAX,
   ZONES_INJECTION,
   ZONE_PAR_DEFAUT,
@@ -19,6 +22,8 @@ import {
   type Zone,
 } from '../domaine/prises';
 import type { ModuleId } from '../app/modules';
+import type { useParcours } from '../app/useParcours';
+import { appliquerChoixTraitement, choixTraitementDe } from '../app/choixTraitement';
 
 /**
  * LA PAGE D'UNE PRISE (2026-09-20, « ajouter->injection : envoie vers une
@@ -27,22 +32,27 @@ import type { ModuleId } from '../app/modules';
  * page simple ») : une page ordinaire — l'entête des pages, la barre du
  * bas — dont le contenu n'est qu'une carte, LE FORMULAIRE DE LA V1
  * (`InjectionForm.tsx`, `useInjectionForm.ts`), mise en page comprise :
- * l'entête avec l'icône de la forme, le titre en capitales, la marque et la
- * croix ; la date et l'heure côte à côte, éditées en place ; la zone (pas
- * sous forme orale) ; la dose parmi les paliers de la spécialité, ou une
- * autre tapée ; « + Notes » ; « Valider ».
+ * l'entête avec l'icône de la forme, le titre en capitales et la croix ; LE
+ * NOM DU TRAITEMENT sur sa ligne, entier, jamais coupé — touché, il
+ * PROPOSE de mettre à jour le traitement, et « Oui » ouvre le bloc « Mon
+ * traitement » ; fermé, on est de retour sur le formulaire, au traitement
+ * mis à jour (2026-09-20) ; la date et l'heure côte à côte, éditées en
+ * place, l'icône à gauche ; la zone (pas sous forme orale) ; la dose parmi
+ * les paliers de la spécialité, ou une autre tapée ; « + Notes » ;
+ * « Valider ». RIEN EN GRAS. AUCUN `select` NATIF : chaque choix déroule un
+ * panneau dessiné, dans l'écran, au thème (`Choix`, `ChoixDate`,
+ * `ChoixHeure`).
  *
  * Ce qu'il fait : ce que la SPEC dit d'une prise. La date d'aujourd'hui et
  * l'heure de maintenant ramenée à la minute ronde inférieure sont
  * proposées ; le premier palier aussi ; la zone d'avance. Une dose absente,
  * illisible ou nulle est REFUSÉE et la règle se dit sous le champ. Les
  * notes vides sont absentes. L'identifiant du traitement est écrit depuis
- * le profil.
- *
- * L'écran qui suit la validation n'existe pas encore (« je te donnerai
- * l'écran de validation ensuite ») : validée, la prise remonte à `App`.
+ * le profil. Sans plus de traitement à la sortie du bloc, la page n'a plus
+ * lieu d'être : retour à l'accueil.
  */
 export function PagePrise({
+  parcours,
   forme,
   traitement,
   onAccueil,
@@ -51,6 +61,7 @@ export function PagePrise({
   onAjouter,
   fond,
 }: {
+  parcours: ReturnType<typeof useParcours>;
   forme: Forme;
   /** L'identifiant du traitement répondu. */
   traitement: string;
@@ -80,8 +91,17 @@ export function PagePrise({
   const [refuse, setRefuse] = useState(false);
   const [notesOuvertes, setNotesOuvertes] = useState(false);
   const [notes, setNotes] = useState('');
+  /* La proposition sous le nom du traitement, puis le bloc lui-même. */
+  const [proposition, setProposition] = useState(false);
+  const [blocTraitement, setBlocTraitement] = useState(false);
 
-  const [heureH, heureM] = heure.split(':');
+  /* Le traitement mis à jour : le premier palier de la nouvelle spécialité,
+     et la zone qui va avec la forme. */
+  useEffect(() => {
+    setPalier(paliers[0] ?? 0);
+    setZone((avant) => (orale ? 'voie-orale' : avant === 'voie-orale' ? ZONE_PAR_DEFAUT : avant));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [traitement, forme]);
 
   const valider = (evenement: FormEvent) => {
     evenement.preventDefault();
@@ -113,32 +133,50 @@ export function PagePrise({
           <div className="prise__entete">
             {orale ? <IconeComprime /> : <IconeSeringue />}
             <h2 className="prise__titre">{textes.prise.titre[forme]}</h2>
-            <span className="prise__marque">{specialite?.nom}</span>
             <button type="button" className="tiroir__fermer prise__fermer" aria-label={textes.fermer} onClick={onAccueil}>
               <IconeCroix />
             </button>
           </div>
 
+          {/* LE NOM DU TRAITEMENT, sur sa ligne, entier (2026-09-20, « il ne
+              doit pas etre coupé ») ; touché, il propose la mise à jour. */}
+          <button type="button" className="prise__marque" onClick={() => setProposition(!proposition)}>
+            {specialite?.nom}
+          </button>
+          {proposition ? (
+            <div className="prise__proposition">
+              <p className="regle regle--manquee prise__question">{textes.prise.mettreAJour}</p>
+              <div className="boutons">
+                <button type="button" className="bouton bouton--second" onClick={() => setProposition(false)}>
+                  {textes.non}
+                </button>
+                <button
+                  type="button"
+                  className="bouton"
+                  onClick={() => {
+                    setProposition(false);
+                    setBlocTraitement(true);
+                  }}
+                >
+                  {textes.oui}
+                </button>
+              </div>
+            </div>
+          ) : null}
+
           {/* LA DATE ET L'HEURE, éditées en place comme dans la V1 : la
-              valeur est un bouton, elle devient un champ, elle se referme en
-              la quittant ou sur Entrée et Échap. */}
+              valeur est un bouton ; touchée, elle devient une boîte, l'icône
+              à gauche (2026-09-20), et déroule son panneau. */}
           <div className="prise__moment">
             {editeDate ? (
-              <span className="prise__edition">
-                <input
-                  type="date"
-                  value={date}
-                  autoFocus
-                  aria-label={textes.groupes.age}
-                  onChange={(e) => {
-                    if (e.target.value) setDate(e.target.value);
-                  }}
-                  onBlur={() => setEditeDate(false)}
-                  onKeyDown={(e) => {
-                    if (e.key === 'Enter' || e.key === 'Escape') setEditeDate(false);
-                  }}
-                />
-              </span>
+              <ChoixDate
+                valeur={date}
+                onChoix={setDate}
+                nom={textes.groupes.age}
+                icone={<IconeCalendrier />}
+                ouvertDAbord
+                onFerme={() => setEditeDate(false)}
+              />
             ) : (
               <button type="button" className="prise__quand" onClick={() => setEditeDate(true)}>
                 <IconeCalendrier />
@@ -146,34 +184,14 @@ export function PagePrise({
               </button>
             )}
             {editeHeure ? (
-              <span
-                className="prise__edition"
-                onBlur={(e) => {
-                  if (!e.currentTarget.contains(e.relatedTarget as Node | null)) setEditeHeure(false);
-                }}
-              >
-                <select value={heureH} autoFocus onChange={(e) => setHeure(`${e.target.value}:${heureM}`)}>
-                  {Array.from({ length: 24 }, (_, h) => String(h).padStart(2, '0')).map((h) => (
-                    <option key={h} value={h}>
-                      {h}
-                    </option>
-                  ))}
-                </select>
-                <span>:</span>
-                <select
-                  value={heureM}
-                  onChange={(e) => {
-                    setHeure(`${heureH}:${e.target.value}`);
-                    setEditeHeure(false);
-                  }}
-                >
-                  {MINUTES_RONDES.map((m) => String(m).padStart(2, '0')).map((m) => (
-                    <option key={m} value={m}>
-                      {m}
-                    </option>
-                  ))}
-                </select>
-              </span>
+              <ChoixHeure
+                valeur={heure}
+                onChoix={setHeure}
+                nom={textes.prise.titre[forme]}
+                icone={<IconeHorloge />}
+                ouvertDAbord
+                onFerme={() => setEditeHeure(false)}
+              />
             ) : (
               <button type="button" className="prise__quand" onClick={() => setEditeHeure(true)}>
                 <IconeHorloge />
@@ -184,15 +202,12 @@ export function PagePrise({
 
           {/* LA ZONE — pas sous forme orale, où elle vaut « voie orale ». */}
           {!orale ? (
-            <span className="prise__boite">
-              <select className="prise__select" value={zone} onChange={(e) => setZone(e.target.value as Zone)}>
-                {ZONES_INJECTION.map((z) => (
-                  <option key={z} value={z}>
-                    {textes.prise.zones[z]}
-                  </option>
-                ))}
-              </select>
-            </span>
+            <Choix
+              valeur={zone}
+              options={ZONES_INJECTION.map((z) => ({ valeur: z, nom: textes.prise.zones[z] }))}
+              onChoix={(z) => setZone(z as Zone)}
+              nom={textes.prise.zones[zone]}
+            />
           ) : null}
 
           {/* LA DOSE : les paliers de la spécialité, ou une autre tapée. */}
@@ -211,22 +226,18 @@ export function PagePrise({
               }}
             />
           ) : (
-            <span className="prise__boite">
-              <select
-                className="prise__select"
-                value={palier}
-                onChange={(e) => {
-                  setPalier(Number(e.target.value));
-                  setRefuse(false);
-                }}
-              >
-                {paliers.map((mg, i) => (
-                  <option key={mg} value={mg}>
-                    {textes.prise.palier(mgEcrit(mg), i === 0 ? 'initiation' : i === paliers.length - 1 ? 'max' : null)}
-                  </option>
-                ))}
-              </select>
-            </span>
+            <Choix
+              valeur={String(palier)}
+              options={paliers.map((mg, i) => ({
+                valeur: String(mg),
+                nom: textes.prise.palier(mgEcrit(mg), i === 0 ? 'initiation' : i === paliers.length - 1 ? 'max' : null),
+              }))}
+              onChoix={(mg) => {
+                setPalier(Number(mg));
+                setRefuse(false);
+              }}
+              nom={textes.prise.autreDoseVide}
+            />
           )}
           <button
             type="button"
@@ -272,6 +283,14 @@ export function PagePrise({
           </div>
         </form>
       </div>
+
+      {blocTraitement ? (
+        <BlocTraitement
+          courant={choixTraitementDe(parcours.reponses)}
+          onEnregistrer={(choix) => appliquerChoixTraitement(parcours, choix)}
+          onFermer={() => setBlocTraitement(false)}
+        />
+      ) : null}
 
       <BarreDuBas
         active={null}

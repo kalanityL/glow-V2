@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { ageA, anneeDe, dateDepuisAnnee, dateLocale, formaterDateCourte, lireDateCourte } from './dates';
+import { ageA, anneeDe, anneeMoisDe, dateDepuisAnnee, dateLocale, formaterDateCourte, grilleDuMois, lireDateCourte, moisDecale } from './dates';
 
 describe('dateDepuisAnnee / anneeDe', () => {
   it('fait un 1er janvier, et retrouve l’année', () => {
@@ -42,5 +42,25 @@ describe('ageA', () => {
     expect(ageA('1980-01-01', '2026-09-20')).toBe(46);
     expect(ageA('1980-09-20', '2026-09-20')).toBe(46);
     expect(ageA('1980-09-21', '2026-09-20')).toBe(45);
+  });
+});
+
+describe('grilleDuMois', () => {
+  it('fait six semaines, lundi en premier, les voisins marqués', () => {
+    const grille = grilleDuMois(2026, 9);
+    expect(grille).toHaveLength(42);
+    /* Le 1er septembre 2026 est un mardi : la grille ouvre sur le lundi 31 août. */
+    expect(grille[0]).toEqual({ date: '2026-08-31', jour: 31, dansLeMois: false });
+    expect(grille[1]).toEqual({ date: '2026-09-01', jour: 1, dansLeMois: true });
+    expect(grille[30]).toEqual({ date: '2026-09-30', jour: 30, dansLeMois: true });
+    expect(grille[31].dansLeMois).toBe(false);
+  });
+});
+
+describe('moisDecale / anneeMoisDe', () => {
+  it('passe l’année en décalant', () => {
+    expect(moisDecale(2026, 12, 1)).toEqual({ annee: 2027, mois: 1 });
+    expect(moisDecale(2026, 1, -1)).toEqual({ annee: 2025, mois: 12 });
+    expect(anneeMoisDe('2026-09-20')).toEqual({ annee: 2026, mois: 9 });
   });
 });

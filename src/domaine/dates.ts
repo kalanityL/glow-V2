@@ -67,3 +67,35 @@ export function ageA(dateNaissance: string, aujourdhui: string): number {
   const anniversairePasse = ma > mn || (ma === mn && ja >= jn);
   return aa - an - (anniversairePasse ? 0 : 1);
 }
+
+/** L'année et le mois (1 à 12) d'une date `AAAA-MM-JJ`. */
+export function anneeMoisDe(date: string): { annee: number; mois: number } {
+  const [annee, mois] = date.split('-').map(Number);
+  return { annee, mois };
+}
+
+/** Le mois décalé de `delta` mois, l'année suivant. */
+export function moisDecale(annee: number, mois: number, delta: number): { annee: number; mois: number } {
+  const d = new Date(annee, mois - 1 + delta, 1);
+  return { annee: d.getFullYear(), mois: d.getMonth() + 1 };
+}
+
+export interface CaseDuMois {
+  date: string;
+  jour: number;
+  dansLeMois: boolean;
+}
+
+/**
+ * LA GRILLE D'UN MOIS, pour un calendrier : six semaines de sept jours,
+ * LUNDI EN PREMIER, les jours des mois voisins compris et marqués — la
+ * grille garde toujours la même hauteur d'un mois à l'autre.
+ */
+export function grilleDuMois(annee: number, mois: number): CaseDuMois[] {
+  const premier = new Date(annee, mois - 1, 1);
+  const decalage = (premier.getDay() + 6) % 7;
+  return Array.from({ length: 42 }, (_, i) => {
+    const d = new Date(annee, mois - 1, 1 - decalage + i);
+    return { date: dateLocale(d), jour: d.getDate(), dansLeMois: d.getMonth() === mois - 1 };
+  });
+}

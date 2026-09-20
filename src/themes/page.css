@@ -2160,24 +2160,41 @@
 
 /* Le titre en capitales espacées, dans le bleu de la marque, comme la V1. */
 .prise__titre {
+  flex: 1;
+  min-width: 0;
   margin: 0;
   font-family: var(--font-display);
-  font-weight: 600;
+  /* RIEN EN GRAS SUR LE FORMULAIRE (2026-09-20). */
+  font-weight: 500;
   font-size: 13px;
   letter-spacing: 0.06em;
   text-transform: uppercase;
   color: var(--marque-degrade-debut);
 }
 
+/* LE NOM DU TRAITEMENT, sur sa ligne, entier (2026-09-20, « deplacer le
+   nom du médicament (il ne doit pas etre coupé) ») ; c'est un bouton sans
+   matière : touché, il propose la mise à jour du traitement. */
 .prise__marque {
-  flex: 1;
-  min-width: 0;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+  align-self: flex-start;
+  margin: -6px 0 -4px;
+  padding: 0;
+  border: 0;
+  background: none;
+  text-align: left;
   font-family: var(--font-body);
-  font-size: 13px;
+  font-weight: 500;
+  font-size: 15px;
   color: var(--encre-chapeau);
+  cursor: pointer;
+}
+
+.prise__proposition {
+  margin-top: -4px;
+}
+
+.prise__question {
+  margin: 0;
 }
 
 /* La croix : celle des tiroirs, mais dans le flux de l'entête. */
@@ -2206,7 +2223,7 @@
   background: none;
   color: var(--encre);
   font-family: var(--font-body);
-  font-weight: 700;
+  font-weight: 500;
   font-size: 15px;
   cursor: pointer;
 }
@@ -2217,53 +2234,28 @@
   color: var(--accent);
 }
 
-/* La date et l'heure en édition : un champ de date natif, et deux roues
-   d'heure — l'heure et la minute ronde — dans une même boîte. */
-.prise__edition {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 4px;
+/* La date et l'heure en édition : la boîte de choix, plus basse que celles
+   du formulaire, l'icône à gauche (2026-09-20, « En mode edition, les
+   icones calendriers et horloge -> passe les à gauche »). */
+.prise__moment .choix {
+  padding: 8px 32px 8px 12px;
+  font-size: 15px;
 }
 
-.prise__edition input,
-.prise__edition select {
-  padding: 6px 8px;
-  border: 1px solid var(--option-filet);
-  border-radius: 10px;
-  background: var(--option-fond);
-  color: var(--encre);
-  font-family: var(--font-body);
-  font-weight: 700;
-  font-size: 14px;
+.prise__moment .choix .icone {
+  width: 16px;
+  height: 16px;
+  color: var(--accent);
 }
 
-/* Une boîte à choix : le `select` natif, sans son habit, et un chevron
-   dessiné à droite — la matière des champs de l'onboarding. */
-.prise__boite {
-  position: relative;
-  display: block;
+.prise__moment .choix__chevron {
+  right: 12px;
 }
 
-.prise__boite::after {
-  content: '';
-  position: absolute;
-  right: 18px;
-  top: 50%;
-  width: 8px;
-  height: 8px;
-  margin-top: -6px;
-  border-right: 2px solid var(--encre);
-  border-bottom: 2px solid var(--encre);
-  transform: rotate(45deg);
-  pointer-events: none;
-}
-
-.prise__select,
 .prise__dose {
   width: 100%;
   margin: 0;
-  padding: 15px 44px 15px 16px;
+  padding: 15px 16px;
   border: 1px solid var(--option-filet);
   border-radius: 14px;
   background: var(--option-fond);
@@ -2271,11 +2263,8 @@
   font-family: var(--font-body);
   font-weight: 500;
   font-size: 17px;
-  appearance: none;
-  -webkit-appearance: none;
 }
 
-.prise__select:focus,
 .prise__dose:focus,
 .prise__notes:focus {
   outline: none;
@@ -2295,7 +2284,7 @@
   background: none;
   color: var(--accent);
   font-family: var(--font-body);
-  font-weight: 600;
+  font-weight: 500;
   font-size: 15px;
   cursor: pointer;
 }
@@ -2335,6 +2324,8 @@
   gap: 8px;
   width: auto;
   padding: 12px 28px;
+  /* Rien en gras, le bouton compris (2026-09-20). */
+  font-weight: 500;
   text-transform: uppercase;
   letter-spacing: 0.04em;
 }
@@ -2343,4 +2334,222 @@
   width: 16px;
   height: 16px;
   stroke-width: 3;
+}
+
+/* ── LES CHOIX ET LEURS PANNEAUX (2026-09-20, « Regle ABSOLUE : AUCUN
+   SELECT NE DOIT JAMAIS DEPASSER DE L'ECRAN. Style des selects heure et
+   calendrier et TOUS les selects, toujours : tout est stylé, accordé au
+   theme, comme sur la v1 ») : la boîte d'un choix, et le panneau qu'elle
+   déroule — dessinés ici, aux jetons du thème, jamais par le système. ── */
+
+/* La boîte : la matière des champs de l'onboarding, la valeur à gauche, un
+   chevron à droite. */
+.choix {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  margin: 0;
+  padding: 15px 44px 15px 16px;
+  border: 1px solid var(--option-filet);
+  border-radius: 14px;
+  background: var(--option-fond);
+  color: var(--encre);
+  text-align: left;
+  font-family: var(--font-body);
+  font-weight: 500;
+  font-size: 17px;
+  cursor: pointer;
+}
+
+.choix--ouvert,
+.choix:focus-visible {
+  outline: none;
+  background: var(--option-choisi-fond);
+  box-shadow: 0 0 0 2px var(--accent);
+}
+
+.choix__valeur {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.choix__chevron {
+  position: absolute;
+  right: 18px;
+  top: 50%;
+  width: 8px;
+  height: 8px;
+  margin-top: -6px;
+  border-right: 2px solid var(--encre);
+  border-bottom: 2px solid var(--encre);
+  transform: rotate(45deg);
+  pointer-events: none;
+}
+
+/* LE PANNEAU : porté sur l'écran du téléphone, placé par `placerPanneau`
+   — en pixels de l'écran, jamais dehors. Au-dessus de tout ce que l'écran
+   montre (les blocs, les tiroirs, la barre). */
+.panneau {
+  position: fixed;
+  z-index: 10;
+  display: flex;
+  overflow: hidden;
+  border: 1px solid var(--option-filet);
+  border-radius: 14px;
+  background: var(--module-fond);
+  box-shadow: 0 12px 32px -12px rgb(15 23 42 / 0.25);
+}
+
+.panneau__liste {
+  flex: 1;
+  min-width: 0;
+  margin: 0;
+  padding: 6px;
+  list-style: none;
+  overflow-y: auto;
+}
+
+.panneau__option {
+  display: block;
+  width: 100%;
+  padding: 12px 12px;
+  border: 0;
+  border-radius: 10px;
+  background: none;
+  color: var(--encre);
+  text-align: left;
+  font-family: var(--font-body);
+  font-weight: 500;
+  font-size: 16px;
+  cursor: pointer;
+}
+
+/* La valeur choisie : le fond des réponses choisies, l'accent. */
+.panneau__option--choisie {
+  background: var(--option-choisi-fond);
+  color: var(--accent);
+}
+
+.panneau__option:disabled {
+  opacity: 0.4;
+  cursor: default;
+}
+
+/* LES HEURES : deux colonnes égales, les heures et les minutes rondes,
+   chacune défilant en elle-même ; les valeurs centrées, en chiffres
+   tabulaires. */
+.panneau--heures {
+  padding: 6px;
+  gap: 6px;
+}
+
+.heures__colonne {
+  flex: 1;
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  overflow-y: auto;
+  scrollbar-width: none;
+}
+
+.heures__colonne::-webkit-scrollbar {
+  display: none;
+}
+
+.heures__valeur {
+  height: 36px;
+  padding: 0;
+  text-align: center;
+  font-variant-numeric: tabular-nums;
+}
+
+/* LE CALENDRIER : le mois entre deux flèches, sept colonnes, six semaines. */
+.calendrier {
+  flex: 1;
+  min-width: 0;
+  padding: 10px;
+  overflow-y: auto;
+}
+
+.calendrier__entete {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 6px;
+}
+
+.calendrier__mois {
+  font-family: var(--font-body);
+  font-weight: 500;
+  font-size: 15px;
+  color: var(--encre);
+  text-transform: capitalize;
+}
+
+.calendrier__fleche {
+  display: grid;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: none;
+  color: var(--accent);
+  cursor: pointer;
+}
+
+.calendrier__fleche .icone {
+  width: 18px;
+  height: 18px;
+}
+
+.calendrier__grille {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 2px;
+}
+
+.calendrier__nomJour {
+  padding: 4px 0;
+  text-align: center;
+  font-family: var(--font-body);
+  font-size: 12px;
+  color: var(--encre-chapeau);
+}
+
+.calendrier__jour {
+  aspect-ratio: 1;
+  min-width: 0;
+  padding: 0;
+  border: 1px solid transparent;
+  border-radius: 50%;
+  background: none;
+  color: var(--encre);
+  font-family: var(--font-body);
+  font-weight: 500;
+  font-size: 14px;
+  font-variant-numeric: tabular-nums;
+  cursor: pointer;
+}
+
+.calendrier__jour--voisin {
+  color: var(--encre-chapeau);
+  opacity: 0.6;
+}
+
+.calendrier__jour--aujourdhui {
+  border-color: var(--accent);
+}
+
+.calendrier__jour--choisi {
+  background: var(--accent);
+  color: var(--bouton-encre);
+  opacity: 1;
 }

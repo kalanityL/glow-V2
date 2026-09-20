@@ -13,6 +13,7 @@ import {
 } from '../components/Icones';
 import { BarreDuBas } from './BarreDuBas';
 import type { ModuleId } from '../app/modules';
+import { appliquerChoixTraitement, choixTraitementDe } from '../app/choixTraitement';
 import { EntetePage } from './EntetePage';
 import { useTextes } from '../i18n/useTextes';
 import { classeDuTheme } from '../themes/themes';
@@ -121,19 +122,10 @@ export function Compte({
   /* LE BLOC DU POIDS (2026-09-20) : ouvert par la valeur — ou l'icône — du
      poids de départ ou de l'objectif final. */
   const [blocPoids, setBlocPoids] = useState<'poids' | 'poidsCible' | null>(null);
-  const traitementCourant: ChoixTraitement = reponses.traitement
-    ? { forme: reponses.formeTraitement, traitement: reponses.traitement }
-    : { forme: 'aucun', traitement: null };
+  /* Lu et écrit par les deux aides partagées avec la page d'une prise. */
+  const traitementCourant = choixTraitementDe(reponses);
   const nomTraitement = TRAITEMENTS.find((t) => t.id === reponses.traitement)?.nom;
-  const enregistrerTraitement = (choix: ChoixTraitement) => {
-    if (choix.forme === 'aucun' || choix.forme === null) {
-      parcours.repondreTraitementCommence(false);
-      return;
-    }
-    parcours.repondreTraitementCommence(true);
-    parcours.repondreForme(choix.forme);
-    if (choix.traitement) repondre('traitement', choix.traitement);
-  };
+  const enregistrerTraitement = (choix: ChoixTraitement) => appliquerChoixTraitement(parcours, choix);
   const aujourdhui = dateLocale(new Date());
 
   const unites = UNITES_DU_SYSTEME[reponses.systeme];

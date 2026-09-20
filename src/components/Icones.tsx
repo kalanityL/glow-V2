@@ -333,6 +333,24 @@ export function IconeCoche() {
   );
 }
 
+/** Lucide `chevron-left` — le mois d'avant. */
+export function IconeChevronGauche() {
+  return (
+    <Icone>
+      <path d="m15 18-6-6 6-6" />
+    </Icone>
+  );
+}
+
+/** Lucide `chevron-right` — le mois d'après. */
+export function IconeChevronDroit() {
+  return (
+    <Icone>
+      <path d="m9 18 6-6-6-6" />
+    </Icone>
+  );
+}
+
 /** Lucide `lock` — le cadenas d'un badge pas encore gagné. */
 export function IconeCadenas() {
   return (

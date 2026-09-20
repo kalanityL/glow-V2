@@ -268,6 +268,16 @@ export interface Textes {
     valider: string;
     /** La règle de la dose, dite au refus. */
     regleDose: string;
+    /** La proposition, quand on touche le nom du traitement (2026-09-20). */
+    mettreAJour: string;
+  };
+  /** LE CALENDRIER d'un choix de date (2026-09-20) : les mois, les jours en
+   *  court, lundi en premier, et les deux flèches dites à qui écoute. */
+  calendrier: {
+    mois: readonly string[];
+    jours: readonly string[];
+    moisPrecedent: string;
+    moisSuivant: string;
   };
   /** Le bouton « retour » de la barre du bas : lu par les lecteurs d'écran. */
   retour: string;
@@ -495,6 +505,13 @@ const FR: Textes = {
     notesVide: 'Notes / Observations (facultatif)',
     valider: 'Valider',
     regleDose: 'Une dose en mg, supérieure à zéro',
+    mettreAJour: 'Mettre à jour le traitement ?',
+  },
+  calendrier: {
+    mois: ['janvier', 'février', 'mars', 'avril', 'mai', 'juin', 'juillet', 'août', 'septembre', 'octobre', 'novembre', 'décembre'],
+    jours: ['L', 'M', 'M', 'J', 'V', 'S', 'D'],
+    moisPrecedent: 'Mois précédent',
+    moisSuivant: 'Mois suivant',
   },
   retour: 'Retour',
   fermer: 'Fermer',

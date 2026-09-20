@@ -47,6 +47,68 @@ export function surClicDehors(
   };
 }
 
+/** L'écran du téléphone — le bloc conteneur des éléments fixes (`App`). */
+export function ecranDuTelephone(): HTMLElement | null {
+  return document.getElementById('phone-screen');
+}
+
+/** Où un panneau se pose, en pixels DEPUIS L'ÉCRAN DU TÉLÉPHONE. */
+export interface PlacePanneau {
+  left: number;
+  width: number;
+  maxHeight: number;
+  /** Posé sous l'ancre (`top`) ou, faute de place, au-dessus (`bottom`). */
+  top?: number;
+  bottom?: number;
+}
+
+/**
+ * PLACE UN PANNEAU SOUS SON ANCRE, DANS L'ÉCRAN — JAMAIS DEHORS (2026-09-20,
+ * « Regle ABSOLUE : AUCUN SELECT NE DOIT JAMAIS DEPASSER DE L'ECRAN ») : de
+ * la largeur de l'ancre, ramené dans les bords ; sous l'ancre, ou au-dessus
+ * quand la place manque dessous et qu'il y en a plus dessus ; jamais plus
+ * haut que la place qui reste. Les coordonnées sont celles de l'écran, qui
+ * porte les éléments fixes.
+ */
+export function placerPanneau(ancre: Element | null, hauteurVoulue: number, largeurMin = 0): PlacePanneau | null {
+  const ecran = ecranDuTelephone();
+  if (!ancre || !ecran) return null;
+  const e = ecran.getBoundingClientRect();
+  const a = ancre.getBoundingClientRect();
+  const marge = 8;
+  const ecart = 4;
+  const placeDessous = e.bottom - a.bottom - marge - ecart;
+  const placeDessus = a.top - e.top - marge - ecart;
+  const dessus = placeDessous < Math.min(hauteurVoulue, 180) && placeDessus > placeDessous;
+  const maxHeight = Math.max(96, Math.min(hauteurVoulue, dessus ? placeDessus : placeDessous));
+  const width = Math.min(Math.max(a.width, largeurMin), e.width - 2 * marge);
+  const left = Math.min(Math.max(a.left - e.left, marge), e.width - marge - width);
+  return dessus
+    ? { left, width, maxHeight, bottom: e.bottom - a.top + ecart }
+    : { left, width, maxHeight, top: a.bottom - e.top + ecart };
+}
+
+/** LA PAGE qui abrite un élément — là où un panneau se porte, pour hériter
+    des jetons du thème posés sur elle ; l'écran, à défaut. */
+export function pageDe(element: Element | null): HTMLElement | null {
+  return (element?.closest('.page') as HTMLElement | null) ?? ecranDuTelephone();
+}
+
+/** Appelle `quand` à tout défilement HORS des éléments `dedans` — un
+    panneau resté ouvert se décrocherait de son ancre. */
+export function surDefilementHors(
+  dedans: () => readonly (Element | null)[],
+  quand: () => void,
+): () => void {
+  const auDefilement = (evenement: Event) => {
+    const cible = evenement.target;
+    if (cible instanceof Node && dedans().some((element) => element?.contains(cible))) return;
+    quand();
+  };
+  window.addEventListener('scroll', auDefilement, { capture: true, passive: true });
+  return () => window.removeEventListener('scroll', auDefilement, { capture: true });
+}
+
 /** Amène l'élément au milieu de sa zone de défilement. */
 export function centrerDansSaListe(element: Element | null): void {
   element?.scrollIntoView({ block: 'center' });

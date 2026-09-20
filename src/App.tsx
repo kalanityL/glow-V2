@@ -122,6 +122,7 @@ export default function App() {
             <Compte parcours={parcours} onAccueil={() => setPage('accueil')} fond={fond} onAjouter={ajouter} />
           ) : page === 'prise' && parcours.reponses.formeTraitement && parcours.reponses.traitement ? (
             <PagePrise
+              parcours={parcours}
               forme={parcours.reponses.formeTraitement}
               traitement={parcours.reponses.traitement}
               onAccueil={() => setPage('accueil')}

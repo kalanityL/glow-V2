@@ -258,6 +258,21 @@ thèmes ne repeignent pas, et qui ne sont pas dans les templates non plus.
   thème. Ce qui n'est pas un popup : un panneau déroulant qui se ferme au
   clic à côté (les roues des sélecteurs). Sur une sortie : **un bouton,
   jamais une redirection minutée**.
+- **AUCUN `select` NATIF, JAMAIS ; AUCUN CHOIX NE SORT DE L'ÉCRAN** (2026-09-20,
+  règle absolue : « AUCUN SELECT NE DOIT JAMAIS DEPASSER DE L'ECRAN. Style
+  des selects heure et calendrier et TOUS les selects, toujours : tout est
+  stylé, accordé au theme, comme sur la v1 »). Le menu d'un `<select>` est
+  celui du système, gris, hors de l'écran du téléphone. Tout choix déroule
+  un PANNEAU DESSINÉ par l'application (`components/Panneau.tsx`) — porté
+  dans la page, aux jetons du thème, placé sous son ancre ou au-dessus
+  quand la place manque, jamais plus haut que la place qui reste, jamais
+  hors des bords (`plateforme/navigateur.ts`, `placerPanneau`) ; il se
+  ferme au clic à côté, à Échap, au défilement. Trois formes :
+  `Choix` (une liste, la valeur choisie marquée et amenée sous les yeux),
+  `ChoixHeure` (heures et minutes rondes, deux colonnes — une heure laisse
+  ouvert, une minute referme), `ChoixDate` (le calendrier : le mois entre
+  deux flèches, lundi en premier, six semaines, aujourd'hui cerné, le jour
+  choisi plein). Même règle pour le sélecteur de date natif.
 - **RIEN NE DÉBORDE JAMAIS, NULLE PART** (V1, sine qua non). Aucun élément ne
   dépasse l'écran du téléphone ni son conteneur. Quand un écran est plus haut
   que le téléphone : d'abord mettre côte à côte, resserrer, ou séparer en deux
@@ -469,9 +484,16 @@ simple ») : la case « Traitement » du tiroir du « + » y mène, quand un
 traitement est répondu (sinon la case ne fait rien encore). Une page
 ordinaire — l'entête des pages, la barre du bas — dont le contenu n'est
 qu'une carte : le formulaire de la V1 (`InjectionForm.tsx`), mise en page
-comprise — l'icône de la forme, le titre en capitales, la marque, la croix
-qui ramène à l'accueil ; la date et l'heure côte à côte, éditées en place
-(l'heure sur les minutes rondes de la V1) ; la zone (pas sous forme orale) ;
+comprise — l'icône de la forme, le titre en capitales, la croix qui ramène
+à l'accueil ; **le nom du traitement sur sa ligne, entier, jamais coupé**
+(« il ne doit pas etre coupé »), et **touché, il propose « Mettre à jour
+le traitement ? » Non / Oui — Oui ouvre le bloc « Mon traitement », et
+fermé, on est de retour sur le formulaire au traitement mis à jour** (le
+premier palier de la nouvelle spécialité, la zone selon la forme) ; la
+date et l'heure côte à côte, éditées en place — en édition, la boîte porte
+son icône à gauche et déroule son panneau (l'heure sur les minutes rondes
+de la V1) ; **rien en gras sur le formulaire**, le bouton compris ; la zone
+(pas sous forme orale) ;
 la dose parmi les paliers de la spécialité — désormais dans
 `domaine/traitements.ts`, des faits de boîte, pas un conseil — ou « Autre
 dose » tapée ; « + Notes » ; « Valider » au milieu. Une dose absente ou
