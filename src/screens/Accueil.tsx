@@ -1,4 +1,4 @@
-import { useCallback, useState } from 'react';
+import { useCallback, useRef, useState } from 'react';
 import { Avatar } from '../components/Avatar';
 import { TiroirMenu } from './TiroirMenu';
 import { Cocarde } from '../components/Cocarde';
@@ -82,6 +82,8 @@ export function Accueil({
      nouveau. */
   const [menuOuvert, setMenuOuvert] = useState(false);
   const fermerMenu = useCallback(() => setMenuOuvert(false), []);
+  const boutonMenu = useRef<HTMLButtonElement>(null);
+  const leBoutonMenu = useCallback(() => boutonMenu.current, []);
 
   return (
     <div className={`page page--photo ${classeDuTheme('blanc')}`}>
@@ -181,7 +183,9 @@ export function Accueil({
         ))}
       </div>
 
-      {menuOuvert ? <TiroirMenu onFermer={fermerMenu} onOuvrirCompte={onOuvrirCompte} /> : null}
+      {menuOuvert ? (
+        <TiroirMenu onFermer={fermerMenu} onOuvrirCompte={onOuvrirCompte} bouton={leBoutonMenu} />
+      ) : null}
 
       {/* LE MENU EST HORS DE LA COLONNE DE LECTURE : la colonne est bornée à
           380 px, la barre doit aller d'un bord à l'autre de l'écran. */}
@@ -192,6 +196,7 @@ export function Accueil({
                  ouvre le menu principal. Les autres attendent leurs pages. */
               <button
                 key={entree}
+                ref={boutonMenu}
                 type="button"
                 className={`menu__entree menu__entree--menu menu__entree--bouton${menuOuvert ? ' menu__entree--active' : ''}`}
                 aria-expanded={menuOuvert}

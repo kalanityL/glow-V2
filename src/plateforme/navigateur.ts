@@ -20,10 +20,21 @@ export function languesDuLecteur(): readonly string[] {
 /**
  * Appelle `quand` à chaque clic HORS de `dedans`, et à la touche Échap.
  * Renvoie ce qui arrête l'écoute. C'est la fermeture ordinaire d'un panneau.
+ *
+ * `dedans` peut rendre PLUSIEURS éléments (2026-09-20) : le panneau, et le
+ * bouton qui l'ouvre — un clic sur ce bouton n'est pas un clic « à côté »,
+ * sinon il fermerait le panneau juste avant de le rouvrir, et « reclic
+ * ferme » ne marcherait jamais.
  */
-export function surClicDehors(dedans: () => Element | null, quand: () => void): () => void {
+export function surClicDehors(
+  dedans: () => Element | null | readonly (Element | null)[],
+  quand: () => void,
+): () => void {
   const auClic = (evenement: MouseEvent) => {
-    if (!dedans()?.contains(evenement.target as Node)) quand();
+    const cible = evenement.target as Node;
+    const elements = dedans();
+    const liste = Array.isArray(elements) ? elements : [elements];
+    if (!liste.some((element) => element?.contains(cible))) quand();
   };
   const auClavier = (evenement: KeyboardEvent) => {
     if (evenement.key === 'Escape') quand();

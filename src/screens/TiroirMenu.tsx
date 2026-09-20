@@ -47,17 +47,25 @@ import {
 export function TiroirMenu({
   onFermer,
   onOuvrirCompte,
+  bouton,
 }: {
   onFermer: () => void;
   /** « Mon compte » ouvre la page du compte (2026-09-19). */
   onOuvrirCompte: () => void;
+  /** Le bouton « Menu » de la barre : un clic dessus n'est pas « à côté ». */
+  bouton: () => Element | null;
 }) {
   const textes = useTextes();
   const tiroir = useRef<HTMLDivElement>(null);
 
   /* Le clic à côté et Échap ferment — comme les roues. Le bouton « Menu » de
-     la barre est hors du tiroir : son clic ferme aussi, par ce chemin. */
-  useEffect(() => surClicDehors(() => tiroir.current, onFermer), [onFermer]);
+     la barre n'est PAS « à côté » (2026-09-20, « clic menu ouvre menu ;
+     reclic menu ferme menu ») : c'est lui qui bascule, et le clic à côté
+     fermait juste avant qu'il ne rouvre. */
+  useEffect(
+    () => surClicDehors(() => [tiroir.current, bouton()], onFermer),
+    [onFermer, bouton],
+  );
 
   return (
     <>
