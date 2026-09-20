@@ -504,10 +504,12 @@ qu'en mémoire, dans `App`** : ni journal, ni enregistrement sur l'appareil.
 « ecran de confirmation : que souhaitez vous -> vous pouvez maintenant :
 nouvelle element : en 1er ; ouvre la meme chose que bouton plus. Rien en
 gras sur cette page. ») : validée, la prise y mène (`PageConfirmation`).
-**La coche de son image, redessinée en plus petit** (« meme image que
-jointe, en plus petit ») : le disque menthe dans son halo, la coche verte,
-six éclats bleus et verts — **ses couleurs sont celles de l'image, pas du
-thème : exception consignée** —, décollée du titre de page ; « Injection
+**La coche est son image, le fichier même** (« meme image que jointe, en
+plus petit », puis « image de validation :
+glp1low_validation_injection.svg ») : `assets/images/validation-prise.svg`,
+embarqué comme les polices et la photo, montré en plus petit — **ses
+couleurs sont celles de l'image, pas du thème : exception consignée** —,
+décollé du titre de page ; « Injection
 enregistrée ! » (« Prise enregistrée ! » sous forme orale), « Votre suivi
 est à jour. » ; la carte de la prise en TROIS LIGNES DE MÊME STYLE — la
 spécialité et sa dose, la date en toutes lettres et l'heure, la zone

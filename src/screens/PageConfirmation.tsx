@@ -20,6 +20,10 @@ import { formaterDateLongue } from '../domaine/dates';
 import { TRAITEMENTS, type Forme } from '../domaine/traitements';
 import type { Prise } from '../domaine/prises';
 import type { ModuleId } from '../app/modules';
+/* SON IMAGE DE VALIDATION (2026-09-20, « image de validation :
+   glp1low_validation_injection.svg ») : un fichier embarqué, comme les
+   polices et la photo — jamais une ressource distante. */
+import imageValidation from '../assets/images/validation-prise.svg';
 
 /** Les cinq entrées de l'écran, DANS SON ORDRE (2026-09-20, « nouvelle
     element : en 1er ») : ajouter d'abord, l'accueil en dernier. */
@@ -53,10 +57,11 @@ const ICONES: Record<EntreeConfirmation, () => ReactElement> = {
  * le formulaire en modification ; revenue d'une mise à jour, la page titre
  * « Injection mise à jour ! ».
  *
- * LA COCHE EST SON IMAGE, redessinée en plus petit (« meme image que
- * jointe, en plus petit ») : le disque menthe dans son halo, la coche
- * verte, et six éclats autour, bleus et verts. Ses couleurs sont celles de
- * l'image, pas du thème — l'exception est consignée dans GUIDELINES.
+ * LA COCHE EST SON IMAGE, LE FICHIER MÊME (2026-09-20, « image de
+ * validation : ../image pour claude/glp1low_validation_injection.svg ») :
+ * `assets/images/validation-prise.svg`, montré en plus petit. Ses couleurs
+ * sont celles de l'image, pas du thème — l'exception est consignée dans
+ * GUIDELINES.
  */
 export function PageConfirmation({
   prise,
@@ -107,7 +112,7 @@ export function PageConfirmation({
         <EntetePage titre={textes.accueil.traitement[forme]} onAccueil={onAccueil} />
 
         <div className="confirmation">
-          <Coche />
+          <img className="confirmation__coche" src={imageValidation} alt="" />
           <h2 className="confirmation__titre">
             {miseAJour ? textes.confirmation.titreMiseAJour[forme] : textes.confirmation.titre[forme]}
           </h2>
@@ -169,29 +174,5 @@ export function PageConfirmation({
         demandeAjout={demandeAjout}
       />
     </div>
-  );
-}
-
-/**
- * LA COCHE DE SON IMAGE : le disque menthe (#c6efe2) dans un halo plus pâle,
- * la coche verte (#4fb597), et six éclats — deux bleus, deux verts, deux
- * menthe — jetés autour comme sur l'image. Ces couleurs sont celles de
- * l'image jointe, et d'elle seule.
- */
-function Coche() {
-  return (
-    <svg className="confirmation__coche" viewBox="0 0 160 100" aria-hidden="true" focusable="false">
-      <circle cx="80" cy="50" r="40" fill="#c6efe2" opacity="0.5" />
-      <circle cx="80" cy="50" r="30" fill="#b3e9d7" />
-      <path d="M66 51l9 9 19-19" fill="none" stroke="#4fb597" strokeWidth="5" strokeLinecap="round" strokeLinejoin="round" />
-      <g fill="none" strokeWidth="3" strokeLinecap="round">
-        <path d="M35 40l9 -4" stroke="#7ec6f5" />
-        <path d="M30 62l9 3" stroke="#a6e6c8" />
-        <path d="M44 22l6 5" stroke="#6fd3a8" />
-        <path d="M125 40l-9 -4" stroke="#7ec6f5" />
-        <path d="M130 62l-9 3" stroke="#a6e6c8" />
-        <path d="M116 22l-6 5" stroke="#7ec6f5" />
-      </g>
-    </svg>
   );
 }

@@ -1,0 +1,86 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="390" height="260" viewBox="0 0 390 260" fill="none">
+  <defs>
+    <radialGradient id="outerGlow" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse"
+      gradientTransform="translate(218 120) rotate(90) scale(105)">
+      <stop offset="0" stop-color="#B8F2DF" stop-opacity="0.72"/>
+      <stop offset="0.68" stop-color="#D8F7F2" stop-opacity="0.52"/>
+      <stop offset="1" stop-color="#DFF9F8" stop-opacity="0"/>
+    </radialGradient>
+
+    <radialGradient id="ring" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse"
+      gradientTransform="translate(218 120) rotate(90) scale(101)">
+      <stop offset="0" stop-color="#C5F3E3" stop-opacity="0.95"/>
+      <stop offset="0.72" stop-color="#D2F5F0" stop-opacity="0.78"/>
+      <stop offset="1" stop-color="#C7EEF0" stop-opacity="0.5"/>
+    </radialGradient>
+
+    <radialGradient id="core" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse"
+      gradientTransform="translate(205 103) rotate(45) scale(100 94)">
+      <stop offset="0" stop-color="#A9F0D0"/>
+      <stop offset="0.55" stop-color="#9DE8D2"/>
+      <stop offset="1" stop-color="#A6E9DF"/>
+    </radialGradient>
+
+    <linearGradient id="check" x1="183" y1="110" x2="254" y2="84" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#14BFA2"/>
+      <stop offset="1" stop-color="#0AAE96"/>
+    </linearGradient>
+
+    <linearGradient id="sparkBlue" x1="0" y1="0" x2="1" y2="1">
+      <stop stop-color="#1699EE"/>
+      <stop offset="1" stop-color="#5EC6F4"/>
+    </linearGradient>
+
+    <linearGradient id="sparkMint" x1="0" y1="0" x2="1" y2="1">
+      <stop stop-color="#16C6A2"/>
+      <stop offset="1" stop-color="#8BE9C5"/>
+    </linearGradient>
+
+    <filter id="blurGlow" x="-80%" y="-80%" width="260%" height="260%">
+      <feGaussianBlur stdDeviation="12"/>
+    </filter>
+
+    <filter id="soft" x="-80%" y="-80%" width="260%" height="260%">
+      <feGaussianBlur stdDeviation="2.5"/>
+    </filter>
+  </defs>
+
+  <!-- soft ambient glow -->
+  <circle cx="218" cy="120" r="105" fill="url(#outerGlow)" filter="url(#blurGlow)"/>
+
+  <!-- outer translucent badge -->
+  <circle cx="218" cy="120" r="101" fill="url(#ring)"/>
+
+  <!-- inner badge -->
+  <circle cx="218" cy="120" r="76" fill="url(#core)"/>
+
+  <!-- subtle inner highlight -->
+  <circle cx="205" cy="103" r="54" fill="#E6FFF6" opacity="0.13"/>
+
+  <!-- confirmation check -->
+  <path d="M184 119.5 L204.5 139 L250 91"
+        stroke="url(#check)"
+        stroke-width="10"
+        stroke-linecap="round"
+        stroke-linejoin="round"/>
+
+  <!-- surrounding spark glow -->
+  <g opacity="0.28" filter="url(#soft)">
+    <rect x="95" y="36" width="6" height="20" rx="3" transform="rotate(-38 95 36)" fill="#1BC7A5"/>
+    <rect x="57" y="82" width="27" height="7" rx="3.5" transform="rotate(15 57 82)" fill="#1699EE"/>
+    <rect x="66" y="153" width="23" height="6" rx="3" transform="rotate(-29 66 153)" fill="#1BC7A5"/>
+    <rect x="351" y="63" width="26" height="7" rx="3.5" transform="rotate(-45 351 63)" fill="#1699EE"/>
+    <rect x="355" y="142" width="25" height="7" rx="3.5" transform="rotate(15 355 142)" fill="#1BC7A5"/>
+    <rect x="331" y="188" width="21" height="6" rx="3" transform="rotate(48 331 188)" fill="#1699EE"/>
+  </g>
+
+  <!-- crisp sparks -->
+  <g stroke-linecap="round">
+    <path d="M98 38 L105 48" stroke="url(#sparkMint)" stroke-width="5"/>
+    <path d="M59 83 L81 89" stroke="url(#sparkBlue)" stroke-width="6"/>
+    <path d="M68 158 L82 151" stroke="url(#sparkMint)" stroke-width="5"/>
+    <path d="M365 65 L351 79" stroke="url(#sparkBlue)" stroke-width="6"/>
+    <path d="M374 149 L356 144" stroke="url(#sparkMint)" stroke-width="5"/>
+    <path d="M339 202 L328 187" stroke="url(#sparkBlue)" stroke-width="5"/>
+  </g>
+</svg>
