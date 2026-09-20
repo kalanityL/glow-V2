@@ -10,6 +10,53 @@ du push seul, jusqu'au jour où un déploiement existera.
 
 ---
 
+## 2026-09-20 — troisième push · 49 commits (`183a88d..deb6fad`) · déployé
+
+**Poussé et déployé sur sa demande** (« push deploy »), troisième
+déploiement sur `https://glow-private-v2.web.app` ; celui de la V1 n'est
+pas touché. **L'entrée ci-dessous a été écrite APRÈS le push, pas avant**,
+contrairement à la règle en tête de ce fichier : elle part dans un push de
+suite, seule.
+
+**Vérifié avant envoi :** `tsc` silencieux, `npm test` 44/44,
+`npm run build` vert ; après envoi, le site en ligne sert le même paquet
+que la construction locale (`index-CoPqKw5G.js`).
+
+**Ce que le lot contient** — du 19 septembre au soir au 20 :
+- les tiroirs : « Menu » ouvre et referme, le tiroir glisse depuis le bas à
+  la vitesse de la V1, voile transparent sur la photo ; le tiroir du « + »
+  de la V1 au style de la V2 (« Exporter un bilan », deux cases par
+  rangée, icônes plus grandes au trait inchangé) ; un tiroir en ferme un
+  autre ; les couleurs de son image (bleu vers marine, devise d'une
+  couleur, pastilles presque blanches) ;
+- les réponses enregistrées sur l'appareil ; l'avatar par défaut, une femme
+  aux cheveux longs ;
+- « Mon compte », page à part entière : entête des pages (la marque ramène
+  à l'accueil), barre du bas, trois onglets en haut ; les informations de
+  la V1 (prénom, âge édité en date, taille avec sa toise, poids de départ,
+  objectif, médicament) sans titre ni crayon ; l'avatar figé avec
+  « Valider » à côté, qui ramène aux informations ; toute la ligne d'une
+  information lance l'édition ;
+- le bloc « Mon traitement » (« Aucun » seul, hauteur pleine, boutons
+  ancrés, sortie confirmée) ; le bloc « Thème » (photo ou ciel de la V1,
+  aperçu sous les yeux, un clic sur le fond de page l'ouvre, sortie
+  confirmée ; sous le ciel, le logo et l'entête aux couleurs de la V1) ;
+- le bloc du poids : le chiffre en grand dans des cases fixes, une
+  graduation qui glisse — au dixième, nombres au-dessus tous les demis,
+  trois hauteurs de crans, la tige bleue de deux pixels par-dessus le cran
+  désigné, aimantée et immédiate ; un seul son pour tous les clics, en
+  rythme quand on glisse vite ; la hauteur du bloc qui ne bouge plus en
+  passant les cent ;
+- dans tous les blocs, la confirmation affichée, la croix ferme sans
+  enregistrer ;
+- la marge des côtés suit la largeur de l'écran, la colonne est centrée
+  sur un écran large.
+
+**Défauts corrigés en route :** le fond choisi ne mettait pas à jour le
+fond de page (cascade des thèmes) ; le repère foncé de la graduation était
+emporté hors de vue par le défilement — la marque foncée qu'on voyait
+était le cran des 100 ; le cran gris passait devant la tige.
+
 ## 2026-09-19 — second push · 108 commits (`b69715d..6b365ab`) · déployé
 
 **Poussé et déployé sur sa demande** (« ppush et deploy »). Le déploiement
