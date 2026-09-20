@@ -1972,7 +1972,11 @@
   --graduation-cran: 14px;
   --graduation-nombres: 18px;
   --graduation-tige: calc(var(--graduation-cran) * 4);
-  position: relative;
+  /* UNE GRILLE D'UNE SEULE CASE (2026-09-20, « je ne vois pas la tige
+     d'indication ») : le défilement et la tige occupent la même case, l'un
+     sous l'autre, sans rien d'absolu — la tige est un élément du flux,
+     centrée et calée en bas de la case, quel que soit le navigateur. */
+  display: grid;
   width: 100%;
 }
 
@@ -1980,6 +1984,8 @@
    (2026-09-20) — dans le défilement, un élément absolu part avec le
    contenu et Chrome l'emportait hors de vue. */
 .graduation__defilement {
+  grid-area: 1 / 1;
+  min-width: 0;
   width: 100%;
   overflow-x: auto;
   overflow-y: hidden;
@@ -2051,12 +2057,11 @@
    sur la ligne de base des crans, elle pend dessous. Ce n'est pas un cran
    de la graduation, elle dit où l'on en est sur elle. */
 .graduation__repere {
-  position: absolute;
-  left: 50%;
-  top: calc(var(--graduation-nombres) + var(--graduation-cran) * 2);
+  grid-area: 1 / 1;
+  justify-self: center;
+  align-self: end;
   width: 2px;
   height: var(--graduation-tige);
-  margin-left: -1px;
   background: var(--graduation-repere);
   pointer-events: none;
 }
