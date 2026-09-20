@@ -90,9 +90,15 @@ export interface Textes {
     /** La date entière, sur le profil ; l'onboarding ne demande que l'année. */
     dateNaissance: string;
     taille: string;
-    /** Le poids actuel et le poids cible, sur le profil. */
+    /** Le poids de départ et l'objectif final, sur « Mon compte » — les
+     *  mots de la V1 (2026-09-20, « information mon compte : celles de la
+     *  v1 »). */
     poids: string;
     poidsCible: string;
+    /** L'âge, lu ; c'est la date de naissance qui s'édite. */
+    age: string;
+    /** Le médicament prescrit — le traitement, sur « Mon compte ». */
+    medicament: string;
     prenom: string;
     email: string;
     motDePasse: string;
@@ -198,6 +204,23 @@ export interface Textes {
     avatarSousTitre: string;
     /** Le volet du compte : l'adresse et le mot de passe. */
     compteSousTitre: string;
+    /** L'âge écrit, « 46 ans » : une tournure, par langue. */
+    ageEcrit: (ans: number) => string;
+    /**
+     * LE BLOC « MON TRAITEMENT » (2026-09-20) : son titre, le choix
+     * « Aucun » à côté des deux formes, la valeur lue quand il n'y a pas de
+     * traitement, et ses boutons — enregistrer (pas de traitement avant),
+     * mettre à jour (il y en avait un), et les deux sorties quand on ferme
+     * sans avoir enregistré.
+     */
+    traitement: {
+      titre: string;
+      aucun: string;
+      enregistrer: string;
+      mettreAJour: string;
+      terminer: string;
+      confirmer: string;
+    };
     /** La règle d'une date : dite au refus, dans l'écriture de la langue. */
     regleDate: string;
     /** La règle d'un poids, avec ses bornes et son unité. */
@@ -242,8 +265,10 @@ const FR: Textes = {
     anneeNaissance: 'Année de naissance',
     dateNaissance: 'Date de naissance',
     taille: 'Taille',
-    poids: 'Poids actuel',
-    poidsCible: 'Poids cible',
+    poids: 'Poids de départ',
+    poidsCible: 'Objectif final',
+    age: 'Âge',
+    medicament: 'Médicament prescrit',
     prenom: 'Prénom',
     email: 'Adresse e-mail',
     motDePasse: 'Mot de passe',
@@ -381,6 +406,15 @@ const FR: Textes = {
     avatar: 'Mon avatar',
     avatarSousTitre: 'Personnalisez votre avatar.',
     compteSousTitre: 'Votre adresse et votre mot de passe.',
+    ageEcrit: (ans) => `${ans} ans`,
+    traitement: {
+      titre: 'Mon traitement',
+      aucun: 'Aucun',
+      enregistrer: 'Enregistrer',
+      mettreAJour: 'Mettre à jour',
+      terminer: 'Terminer la mise à jour',
+      confirmer: 'Confirmer la mise à jour',
+    },
     regleDate: 'Une date, en JJ/MM/AAAA',
     reglePoids: (min, max, unite) => `Un poids entre ${min} et ${max} ${unite}`,
     regleTaille: (min, max, unite) => `Une taille entre ${min} et ${max} ${unite}`,

@@ -461,6 +461,17 @@ titre centré et non gras dessous, pas de flèche de retour — « Accueil » de
 barre et le bouton du téléphone ramènent ; 2026-09-20, « mon compte est une
 page à part entiere »).
 
+**Les informations de « Mon compte » sont celles de la V1** (2026-09-20) :
+l'âge (lu en années, édité en date de naissance), la taille, le poids de
+départ, l'objectif final, le médicament prescrit. **Le médicament s'édite dans
+le bloc « Mon traitement »** (`BlocTraitement`, sur la page vitrée comme un
+tiroir — pas un popup : la vitre des tiroirs, à l'endroit du geste) :
+Comprimé / Injection / Aucun, puis les spécialités de la forme ; le bouton dit
+« Enregistrer » s'il n'y avait pas de traitement, « Mettre à jour » sinon.
+Fermer sans avoir enregistré, avec un changement en cours, propose deux
+sorties : « Terminer la mise à jour » / « Fermer » si seule la forme est
+choisie, « Confirmer la mise à jour » / « Fermer » si le choix est complet.
+
 **La page « Mon compte »** — « Mon profil » jusqu'au soir du 2026-09-19
 (« page mon profil devient mon compte. Onglet information/avatar/mon
 compte ») : trois volets, Informations / Avatar / Mon compte (l'adresse et

@@ -52,3 +52,18 @@ export function lireDateCourte(texte: string, langue: Langue): string | null {
   if (d.getUTCMonth() !== mois - 1 || d.getUTCDate() !== jour) return null;
   return `${String(annee).padStart(4, '0')}-${String(mois).padStart(2, '0')}-${String(jour).padStart(2, '0')}`;
 }
+
+/** Une `Date` écrite `AAAA-MM-JJ` EN LOCAL — jamais `toISOString`, qui
+    recule d'un jour en soirée (GUIDELINES). */
+export function dateLocale(d: Date): string {
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+}
+
+/** L'âge en années révolues à la date `aujourdhui`, l'une et l'autre en
+    `AAAA-MM-JJ` : l'anniversaire compte le jour même. */
+export function ageA(dateNaissance: string, aujourdhui: string): number {
+  const [an, mn, jn] = dateNaissance.split('-').map(Number);
+  const [aa, ma, ja] = aujourdhui.split('-').map(Number);
+  const anniversairePasse = ma > mn || (ma === mn && ja >= jn);
+  return aa - an - (anniversairePasse ? 0 : 1);
+}

@@ -5,6 +5,7 @@ import {
   IconeBalance,
   IconeCadenas,
   IconeCalendrier,
+  IconeSeringue,
   IconeCible,
   IconeCourriel,
   IconePalette,
@@ -17,7 +18,9 @@ import { useTextes } from '../i18n/useTextes';
 import { classeDuTheme } from '../themes/themes';
 import { UNITES_DU_SYSTEME, tailleAffichee, tailleEnCm } from '../domaine/unites';
 import { POIDS_MAX, POIDS_MIN, TAILLE_BORNES, poidsDepuisSaisie } from '../domaine/mesures';
-import { formaterDateCourte, lireDateCourte } from '../domaine/dates';
+import { ageA, dateLocale, formaterDateCourte, lireDateCourte } from '../domaine/dates';
+import { TRAITEMENTS } from '../domaine/traitements';
+import { BlocTraitement, type ChoixTraitement } from './BlocTraitement';
 import { motDePasseValide } from '../domaine/compte';
 import { detecterLangue } from '../i18n/useTextes';
 import { montrerVolet, voletVisible } from '../plateforme/navigateur';
@@ -66,10 +69,13 @@ type Volet = VoletCompte;
  * avatar » ; chacun défile pour lui-même ; les deux points du bas sont FIGÉS
  * sous les volets, toujours visibles, et mènent à l'un ou l'autre.
  *
- * LES INFORMATIONS, toutes éditables sur place (`ChampEnLigne`), sans
- * intitulé ni crayon : la date de naissance (le 1er janvier de l'année de
- * l'onboarding, tant qu'elle n'a pas été précisée), la taille, le poids
- * actuel, le poids cible. Chaque saisie est jugée par le domaine — une date
+ * LES INFORMATIONS SONT CELLES DE LA V1 (2026-09-20, « information mon
+ * compte : celles de la v1 ») : l'âge — lu en années, ÉDITÉ EN DATE DE
+ * NAISSANCE (le 1er janvier de l'année de l'onboarding, tant qu'elle n'a pas
+ * été précisée) —, la taille, le poids de départ, l'objectif final, et le
+ * médicament prescrit, qui ouvre le bloc « Mon traitement »
+ * (`BlocTraitement`). Toutes éditables sur place (`ChampEnLigne`), sans
+ * intitulé ni crayon. Chaque saisie est jugée par le domaine — une date
  * qui existe, un poids ou une taille dans ses bornes — et le refus se dit
  * sous la valeur. Le poids et la taille sont stockés dans leur unité ou en
  * centimètres, comme l'onboarding les stocke : ce que l'écran montre est
@@ -92,6 +98,24 @@ export function Compte({
   const { reponses, repondre } = parcours;
   const carrousel = useRef<HTMLDivElement>(null);
   const [volet, setVolet] = useState<Volet>('informations');
+  /* LE BLOC « MON TRAITEMENT » (2026-09-20) : ouvert par la valeur du
+     médicament. Ce qu'il édite part de ce qui est enregistré ; « aucun »
+     quand il n'y a pas de traitement. */
+  const [blocTraitement, setBlocTraitement] = useState(false);
+  const traitementCourant: ChoixTraitement = reponses.traitement
+    ? { forme: reponses.formeTraitement, traitement: reponses.traitement }
+    : { forme: 'aucun', traitement: null };
+  const nomTraitement = TRAITEMENTS.find((t) => t.id === reponses.traitement)?.nom;
+  const enregistrerTraitement = (choix: ChoixTraitement) => {
+    if (choix.forme === 'aucun' || choix.forme === null) {
+      parcours.repondreTraitementCommence(false);
+      return;
+    }
+    parcours.repondreTraitementCommence(true);
+    parcours.repondreForme(choix.forme);
+    if (choix.traitement) repondre('traitement', choix.traitement);
+  };
+  const aujourdhui = dateLocale(new Date());
 
   const unites = UNITES_DU_SYSTEME[reponses.systeme];
   const bornesTaille = TAILLE_BORNES[unites.taille];
@@ -166,8 +190,11 @@ export function Compte({
                 <span className="ligne__icone">
                   <IconeCalendrier />
                 </span>
+                {/* L'ÂGE SE LIT, LA DATE DE NAISSANCE S'ÉDITE (2026-09-20,
+                    « qd on édite l'age, on remplit la date de naissance »). */}
                 <ChampEnLigne
                   valeur={formaterDateCourte(reponses.dateNaissance, langue)}
+                  valeurAffichee={textes.compte.ageEcrit(ageA(reponses.dateNaissance, aujourdhui))}
                   onValeur={(ecrite) => {
                     const lue = lireDateCourte(ecrite, langue);
                     if (lue) repondre('dateNaissance', lue);
@@ -177,7 +204,7 @@ export function Compte({
                     return lue ? formaterDateCourte(lue, langue) : null;
                   }}
                   regle={textes.compte.regleDate}
-                  nom={textes.groupes.dateNaissance}
+                  nom={textes.groupes.age}
                   inputMode="numeric"
                 />
               </div>
@@ -242,6 +269,22 @@ export function Compte({
                   nom={textes.groupes.poidsCible}
                   inputMode="decimal"
                 />
+              </div>
+
+              <div className="ligne">
+                <span className="ligne__icone">
+                  <IconeSeringue />
+                </span>
+                {/* LE MÉDICAMENT PRESCRIT ne s'édite pas sur place : sa valeur
+                    ouvre le bloc « Mon traitement » (2026-09-20). */}
+                <button
+                  type="button"
+                  className="enligne__valeur"
+                  aria-label={textes.groupes.medicament}
+                  onClick={() => setBlocTraitement(true)}
+                >
+                  {nomTraitement ?? textes.compte.traitement.aucun}
+                </button>
               </div>
             </div>
           </section>
@@ -311,6 +354,14 @@ export function Compte({
         </div>
 
       </div>
+
+      {blocTraitement ? (
+        <BlocTraitement
+          courant={traitementCourant}
+          onEnregistrer={enregistrerTraitement}
+          onFermer={() => setBlocTraitement(false)}
+        />
+      ) : null}
 
       <BarreDuBas
         active={null}

@@ -3,6 +3,12 @@ import { useEffect, useState } from 'react';
 interface ChampEnLigneProps {
   /** La valeur enregistrée, sous la forme où elle s'écrit à l'écran. */
   valeur: string;
+  /**
+   * Ce qu'on LIT quand on n'édite pas, si ce n'est pas la valeur elle-même :
+   * l'âge se lit (« 46 ans »), la date de naissance s'édite (2026-09-20,
+   * « qd on édite l'age, on remplit la date de naissance »).
+   */
+  valeurAffichee?: string;
   /** Enregistre la valeur retenue ; appelée seulement si elle a changé. */
   onValeur: (valeur: string) => void;
   /** Le nom de la donnée, dit à qui écoute la page et en filigrane du champ vide. */
@@ -41,6 +47,7 @@ interface ChampEnLigneProps {
  */
 export function ChampEnLigne({
   valeur,
+  valeurAffichee,
   onValeur,
   nom,
   normaliser = (saisie) => saisie.trim(),
@@ -114,7 +121,7 @@ export function ChampEnLigne({
           aria-label={nom}
           onClick={ouvrir}
         >
-          {valeur ? (masque ? '••••••••' : valeur) : nom}
+          {valeur ? (masque ? '••••••••' : (valeurAffichee ?? valeur)) : nom}
         </button>
       )}
       {unite ? <span className="enligne__unite">{unite}</span> : null}

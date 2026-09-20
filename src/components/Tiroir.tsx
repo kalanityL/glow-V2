@@ -47,7 +47,7 @@ export function Tiroir({
 
   return (
     <>
-      <div className={`tiroir__vitre${enFermeture ? ' tiroir__vitre--fermeture' : ''}`} aria-hidden="true" />
+      <div className={`vitre${enFermeture ? ' vitre--fermeture' : ''}`} aria-hidden="true" />
       <div
         className={`tiroir${enFermeture ? ' tiroir--fermeture' : ''}`}
         ref={tiroir}

@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { anneeDe, dateDepuisAnnee, formaterDateCourte, lireDateCourte } from './dates';
+import { ageA, anneeDe, dateDepuisAnnee, dateLocale, formaterDateCourte, lireDateCourte } from './dates';
 
 describe('dateDepuisAnnee / anneeDe', () => {
   it('fait un 1er janvier, et retrouve l’année', () => {
@@ -28,5 +28,19 @@ describe('lireDateCourte', () => {
     expect(lireDateCourte('19/09/26', 'fr')).toBeNull();
     expect(lireDateCourte('demain', 'fr')).toBeNull();
     expect(lireDateCourte('', 'fr')).toBeNull();
+  });
+});
+
+describe('dateLocale', () => {
+  it('écrit la date locale, sans passer par le fuseau', () => {
+    expect(dateLocale(new Date(2026, 8, 20, 23, 30))).toBe('2026-09-20');
+  });
+});
+
+describe('ageA', () => {
+  it('compte les années révolues, l’anniversaire le jour même', () => {
+    expect(ageA('1980-01-01', '2026-09-20')).toBe(46);
+    expect(ageA('1980-09-20', '2026-09-20')).toBe(46);
+    expect(ageA('1980-09-21', '2026-09-20')).toBe(45);
   });
 });
