@@ -1652,8 +1652,10 @@
 .tiroir__cases {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
-  gap: 14px 8px;
-  margin-top: 6px;
+  /* 24 px entre les rangées (14 auparavant ; 2026-09-20, « plus de vspace
+     entre les icones menu bouton + »). */
+  gap: 24px 8px;
+  margin-top: 10px;
 }
 
 .tiroir__case {
