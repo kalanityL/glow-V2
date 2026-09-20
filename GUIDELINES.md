@@ -479,7 +479,9 @@ ensoleillé » de la V1 —, et « Choisir ». Toucher un cadre change le fond d
 page SOUS LES YEUX sans l'enregistrer ; « Choisir » l'enregistre (réponse
 `fond`, sur l'appareil) ; fermer sans choisir rend le fond enregistré. Le fond
 choisi vaut pour toute page, les tiroirs et les blocs (`.page--fond-<id>`
-rebranche le jeton `--accueil-fond-image`). **Un bloc prend toute la hauteur
+rebranche le jeton `--accueil-fond-image`). **Sous le ciel, le logo et
+l'entête prennent les couleurs du thème « Bleu ensoleillé » de la V1**
+(2026-09-20) : jetons rebranchés dans la même règle. **Un bloc prend toute la hauteur
 entre la zone sûre et la barre du bas, son contenu défile, son pied est
 ancré** (2026-09-20).
 

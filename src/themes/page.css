@@ -706,6 +706,23 @@
 
 .page.page--fond-ciel {
   --accueil-fond-image: var(--fond-ciel);
+  /* SOUS LE CIEL, LE LOGO ET L'ENTÊTE PRENNENT LES COULEURS DU THÈME « BLEU
+     ENSOLEILLÉ » DE LA V1 (2026-09-20, « changement de fond mets à jour logo
+     et header aux couleurs de la v1 correspondante pour journée
+     ensoleillée ») — relevées dans sa feuille : la pastille en bleus du
+     plein jour (le ciel #2e8fd2 en bas à gauche, le bleu profond #0a4363
+     sur la diagonale, le ciel clair #b7e0ff en haut à droite) ; G et LOW en
+     encre principale #082137 (uni : les deux bouts du dégradé) ; L/P/1 et
+     la devise en bleu profond #0a4363. Ce sont des jetons rebranchés ici,
+     pas des couleurs dans un template ; à deux classes, pour battre la
+     feuille du thème comme le fond lui-même. */
+  --logo-from: #2e8fd2;
+  --logo-via: #0a4363;
+  --logo-to: #b7e0ff;
+  --marque-degrade-debut: #082137;
+  --marque-degrade-fin: #082137;
+  --marque-accent: #0a4363;
+  --devise-encre: #0a4363;
 }
 
 /* FLOUE, RIEN N'Y EST NET, MAIS « PAS TROP », ET SANS ZOOM (2026-09-16,
