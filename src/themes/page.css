@@ -847,8 +847,7 @@
 }
 
 /* La devise : bleu moyen, graisse MOYENNE (2026-09-20, « meme graisse que
-   sur l'image » — 900 auparavant), et sa fin « glow! » en gras et plus
-   clair. */
+   sur l'image » — 900 auparavant), et sa fin « glow! » en gras. */
 .entete__devise {
   margin: 2px 0 0;
   font-family: var(--font-marque);
@@ -862,9 +861,11 @@
   color: var(--devise-encre);
 }
 
+/* « glow! » : en gras, mais de la même couleur que le reste de la ligne
+   (2026-09-20, « toute la ligne de la meme couleur que ready » — plus
+   clair pendant une heure). */
 .entete__devise-fin {
   font-weight: 800;
-  color: var(--devise-accent);
 }
 
 /* LE MOT-SYMBOLE SUR SA BASE DE 19 PX, DANS LA POLICE DE LA V1 (2026-09-17,
@@ -1731,7 +1732,9 @@
   width: 34px;
   height: 34px;
   border-radius: 50%;
-  background: var(--option-choisi-fond);
+  /* Bleu très clair, presque blanc (2026-09-20, « pastille d'icone menu :
+     bleu plus clair presque blanc ») : le jeton `--pastille-fond` du thème. */
+  background: var(--pastille-fond);
   color: var(--encre);
 }
 

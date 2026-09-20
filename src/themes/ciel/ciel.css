@@ -73,7 +73,7 @@
   --marque-degrade-debut: var(--encre);
   --marque-degrade-fin: var(--encre);
   --devise-encre: var(--encre);
-  --devise-accent: var(--accent);
+  --pastille-fond: var(--option-fond);
 
   /* Le menu du bas : pas de couleurs propres ici, il prend celles du thème —
      la surface des réponses, son filet, l'encre du chapeau, l'accent, le

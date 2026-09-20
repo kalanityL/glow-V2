@@ -93,7 +93,10 @@
   --marque-degrade-fin: #46a6f2;
   --marque-accent: #29b6cf;
   --devise-encre: #2a5fd6;
-  --devise-accent: #3d8ff2;
+
+  /* Les pastilles des icônes des tiroirs : le bleu 50 du board, presque
+     blanc (2026-09-20). */
+  --pastille-fond: #eff6ff;
 
   /* LE MENU DU BAS, AUX COULEURS DE SON IMAGE (2026-09-16,
      `~/Desktop/GLOW/Images-pour-claude/couleur-menu.png`, relevées au
