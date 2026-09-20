@@ -77,7 +77,8 @@
   /* La graduation du poids : sur les neutres du thème. */
   --graduation-unite: var(--option-filet);
   --graduation-dizaine: var(--bille-eteinte);
-  --graduation-repere: var(--encre);
+  /* La tige, dans le bleu du thème (2026-09-20, « tige bleue »). */
+  --graduation-repere: var(--accent);
 
   /* Le menu du bas : pas de couleurs propres ici, il prend celles du thème —
      la surface des réponses, son filet, l'encre du chapeau, l'accent, le

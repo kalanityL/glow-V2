@@ -1959,8 +1959,10 @@
    plus grands que cran actuels ; crans de 5 kg : hauteur actuelle ; autres
    crans : 3/4 »), de haut en bas : les nombres ; les crans, posés sur une
    même ligne de base et montant plus ou moins haut — l'unité
-   `--graduation-cran` est la hauteur du cran moyen ; puis, sous cette
-   ligne, la place de LA TIGE.
+   `--graduation-cran` est la hauteur du cran moyen. LA TIGE SE SUPERPOSE
+   AUX CRANS (2026-09-20, « tige de la taille d'un cran de kilo, ne pas la
+   positionner sous la regle graduée mais en superposition ») : de la
+   hauteur du cran de kilo, le pied sur la même ligne de base.
 
    SON ÉCHELLE, DIX FOIS PLUS FINE le même jour (« ce qui represente
    actuellement 10kg change pour representer à la place 1 kilo. faire
@@ -1971,7 +1973,7 @@
   --graduation-pas: 20px;
   --graduation-cran: 14px;
   --graduation-nombres: 18px;
-  --graduation-tige: calc(var(--graduation-cran) * 4);
+  --graduation-tige: calc(var(--graduation-cran) * 2);
   /* UNE GRILLE D'UNE SEULE CASE (2026-09-20, « je ne vois pas la tige
      d'indication ») : le défilement et la tige occupent la même case, l'un
      sous l'autre, sans rien d'absolu — la tige est un élément du flux,
@@ -1990,6 +1992,10 @@
   overflow-x: auto;
   overflow-y: hidden;
   scrollbar-width: none;
+  /* AIMANTÉE (2026-09-20, « tige "aimantée" sur les crans ») : le
+     défilement s'arrête toujours un cran au centre, jamais entre deux — le
+     poids lu est un dixième juste. */
+  scroll-snap-type: x mandatory;
 }
 
 .graduation__defilement::-webkit-scrollbar {
@@ -1998,7 +2004,7 @@
 
 .graduation__piste {
   display: flex;
-  height: calc(var(--graduation-nombres) + var(--graduation-cran) * 2 + var(--graduation-tige));
+  height: calc(var(--graduation-nombres) + var(--graduation-cran) * 2);
   padding-inline: calc(50% - var(--graduation-pas) / 2);
   width: max-content;
 }
@@ -2015,13 +2021,14 @@
   flex: none;
   width: var(--graduation-pas);
   height: 100%;
+  scroll-snap-align: center;
 }
 
 .graduation__cran::before {
   content: '';
   position: absolute;
   left: 50%;
-  bottom: var(--graduation-tige);
+  bottom: 0;
   width: 1px;
   height: calc(var(--graduation-cran) * 3 / 4);
   background: var(--graduation-unite);
@@ -2050,12 +2057,13 @@
   color: var(--encre-chapeau);
 }
 
-/* LA TIGE (2026-09-20, « positionne une tige verticale noire, 4 fois plus
-   grande qu'un cran, au milieu de l'écran, dont le bout supérieur se place
-   sur la regle graduée. la tige indique en permanence le poids affiché en
-   chiffre ») : LE SEUL ENDROIT FONCÉ, fixe, au milieu — son bout supérieur
-   sur la ligne de base des crans, elle pend dessous. Ce n'est pas un cran
-   de la graduation, elle dit où l'on en est sur elle. */
+/* LA TIGE (2026-09-20, « positionne une tige verticale […] au milieu de
+   l'écran […] la tige indique en permanence le poids affiché en chiffre »,
+   puis « tige bleue ; tige de la taille d'un cran de kilo, ne pas la
+   positionner sous la regle graduée mais en superposition ») : fixe, au
+   milieu, de la hauteur du cran de kilo, le pied sur la ligne de base —
+   par-dessus les crans, dans le bleu du thème (`--graduation-repere`). Ce
+   n'est pas un cran de la graduation, elle dit où l'on en est sur elle. */
 .graduation__repere {
   grid-area: 1 / 1;
   justify-self: center;

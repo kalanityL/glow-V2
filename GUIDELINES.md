@@ -475,11 +475,16 @@ au dixième** (2026-09-20, « échelle de la regle : 10x plus précise : ce qui
 represente actuellement 10kg change pour representer à la place 1 kilo.
 faire figurer aussi les graduations des centiemes ») : un cran par dixième
 de kilo — le kilo a le grand cran, le demi-kilo le moyen, le dixième le
-petit, le nombre tous les demis (« 97 », « 97,5 ») ; et LA TIGE, seule chose foncée, fixe au milieu, quatre crans
-de haut, le bout supérieur sur la ligne de base — elle pend sous la règle
-et dit en permanence le poids que le chiffre affiche. Elle est posée sur
-le cadre, HORS du défilement : dedans, un élément absolu part avec la piste
-qui glisse et Chrome l'emportait hors de vue. **Le chiffre a une
+petit, le nombre tous les demis (« 97 », « 97,5 ») ; et LA TIGE, fixe au
+milieu, dans le bleu du thème, de la hauteur du cran de kilo, PAR-DESSUS
+les crans, le pied sur leur ligne de base (2026-09-20, « tige bleue ; tige
+de la taille d'un cran de kilo, ne pas la positionner sous la regle
+graduée mais en superposition ») — elle dit en permanence le poids que le
+chiffre affiche. Elle est posée sur le cadre, HORS du défilement, dans une
+grille d'une case avec lui : dedans, un élément absolu part avec la piste
+qui glisse et Chrome l'emportait hors de vue. **La graduation est
+aimantée** (« tige "aimantée" sur les crans ») : le défilement s'arrête
+toujours un cran au centre, jamais entre deux. **Le chiffre a une
 hauteur figée** et sa case vide porte un zéro invisible, pas une espace :
 rien ne bouge en passant les cent. La géométrie de la graduation (le pas
 d'un cran, les hauteurs) est dans `page.css` ; le code n'en lit qu'un

@@ -101,7 +101,8 @@
      foncé ») ; le repère du milieu, seul foncé, à l'encre. Relevés à l'œil. */
   --graduation-unite: #c6cdd8;
   --graduation-dizaine: #9aa3b3;
-  --graduation-repere: #1e2a44;
+  /* La tige, dans le bleu du thème (2026-09-20, « tige bleue »). */
+  --graduation-repere: var(--accent);
 
   /* LE MENU DU BAS, AUX COULEURS DE SON IMAGE (2026-09-16,
      `~/Desktop/GLOW/Images-pour-claude/couleur-menu.png`, relevées au
