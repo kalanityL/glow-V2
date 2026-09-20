@@ -2,7 +2,7 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import { Bloc } from '../components/Bloc';
 import { ChampEnLigne } from '../components/ChampEnLigne';
 import { useTextes } from '../i18n/useTextes';
-import { POIDS_MAX, POIDS_MIN, cransFranchis, poidsDepuisRapport, poidsDepuisSaisie, rapportDuPoids } from '../domaine/mesures';
+import { POIDS_MAX, POIDS_MIN, cransFranchis, dixiemesFranchis, poidsDepuisRapport, poidsDepuisSaisie, rapportDuPoids } from '../domaine/mesures';
 import type { UnitePoids } from '../domaine/unites';
 import { defilementHorizontal, defilerHorizontalA, jouerSon } from '../plateforme/navigateur';
 /* SES DEUX SONS (2026-09-20, « utilise les sons dans ../son pour claude ») :
@@ -23,9 +23,9 @@ import sonCentieme from '../assets/sons/03_metallic_air_centieme.wav';
  * deux se suivent : glisser la règle change le chiffre, taper le chiffre
  * amène la règle, à chaque frappe.
  *
- * LES CLICS (2026-09-20) : le son « kilo » à chaque cran franchi en
- * glissant, le son « centième » à chaque chiffre changé en tapant — ses deux
- * sons, embarqués.
+ * LES CLICS (2026-09-20) : en glissant, le son « kilo » à chaque cran entier
+ * franchi et le son « centième » à chaque dixième entre deux ; en tapant, le
+ * son « centième » à chaque chiffre changé — ses deux sons, embarqués.
  *
  * LA GRADUATION EST DU DÉFILEMENT NATIF (le doigt, la molette) : sa position se lit
  * en RAPPORT du chemin total — la géométrie (le pas d'un cran) est dans la
@@ -110,8 +110,13 @@ export function BlocPoids({
     const nouveau = poidsDepuisRapport(position / course, unite);
     setBrouillon((precedent) => {
       if (!placement.current) {
+        /* Les crans entiers cliquent « kilo », les dixièmes entre eux
+           cliquent « centième » (2026-09-20, « les centièmes de kilos font
+           clic clic aussi »). */
         const crans = cransFranchis(precedent, nouveau);
+        const dixiemes = dixiemesFranchis(precedent, nouveau);
         if (crans > 0) jouerSon(sonKilo, crans);
+        if (dixiemes > 0) jouerSon(sonCentieme, dixiemes);
       }
       return nouveau;
     });

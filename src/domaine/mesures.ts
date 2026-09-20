@@ -104,3 +104,14 @@ export function rapportDuPoids(stocke: string, unite: UnitePoids): number {
 export function cransFranchis(avant: string, apres: string): number {
   return Math.abs(Math.floor(Number(apres)) - Math.floor(Number(avant)));
 }
+
+/** LES DIXIÈMES FRANCHIS entre deux poids stockés (2026-09-20, « les
+    centièmes de kilos font clic clic aussi ») : un par dixième passé, hors
+    ceux qui tombent sur une unité entière — ceux-là sont des crans, et
+    cliquent autrement. De 95,0 à 95,3 : trois ; de 94,8 à 95,2 : trois (le
+    95,0 est un cran). */
+export function dixiemesFranchis(avant: string, apres: string): number {
+  const a = Math.round(Number(avant) * 10);
+  const b = Math.round(Number(apres) * 10);
+  return Math.abs(b - a) - cransFranchis(avant, apres);
+}
