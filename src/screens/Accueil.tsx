@@ -14,12 +14,30 @@ import { classeDuTheme } from '../themes/themes';
 import type { Reponses } from './onboarding/reponses';
 import type { FondId } from '../app/fonds';
 
-/** Le fond de page tel que `App` le tient : l'enregistré, l'aperçu, les gestes. */
+/** Le fond de page tel que `App` le tient : l'enregistré, l'aperçu, les
+    gestes — et le bloc « Thème », ouvert ou non, qu'on ouvre depuis le
+    tiroir ou d'UN CLIC SUR LE FOND de n'importe quelle page (2026-09-20). */
 export interface FondProps {
   courant: FondId;
   apercu: FondId | null;
   onApercu: (fond: FondId | null) => void;
   onChoisir: (fond: FondId) => void;
+  blocOuvert: boolean;
+  onOuvrirBloc: () => void;
+  onFermerBloc: () => void;
+}
+
+/**
+ * UN CLIC SUR LE FOND (2026-09-20, « clique sur fond d'écran depuis n'importe
+ * quelle page : ouvre comme si on avait cliqué sur menu couleur ») : le clic
+ * qui tombe sur l'élément lui-même, et non sur un de ses enfants — une carte,
+ * une pastille, un bouton, une vitre —, ouvre le bloc « Thème ». Posé sur
+ * chaque zone de page où le fond se voit.
+ */
+export function surLeFond(onOuvrir: () => void) {
+  return (evenement: React.MouseEvent) => {
+    if (evenement.target === evenement.currentTarget) onOuvrir();
+  };
 }
 
 /**
@@ -79,8 +97,11 @@ export function Accueil({
      de la barre, fermé par sa croix, par un clic à côté ou par « Menu » de
      nouveau. */
   return (
-    <div className={`page page--photo page--fond-${fond.apercu ?? fond.courant} ${classeDuTheme('blanc')}`}>
-      <div className="page__colonne">
+    <div
+      className={`page page--photo page--fond-${fond.apercu ?? fond.courant} ${classeDuTheme('blanc')}`}
+      onClick={surLeFond(fond.onOuvrirBloc)}
+    >
+      <div className="page__colonne" onClick={surLeFond(fond.onOuvrirBloc)}>
         {/* UNE SEULE LIGNE (2026-09-16, « header : logo / glow / recherche/
             parametre tous sur la meme ligne / logo et titre meme hauteur,
             recherche et parametre valigne middle ») : la pastille, le
@@ -146,7 +167,7 @@ export function Accueil({
         </div>
 
         {/* La page, vide pour l'instant : c'est la zone qui défilera. */}
-        <div className="page__defilant" />
+        <div className="page__defilant" onClick={surLeFond(fond.onOuvrirBloc)} />
       </div>
 
       {/* Chaque module : sa pastille avec l'icône, SANS NOM VISIBLE
@@ -154,9 +175,9 @@ export function Accueil({
           2026-09-16 le nom était dans le cercle, le matin du 17 sous lui).
           Le nom reste dit à qui écoute la page, en `aria-label`. Le
           traitement suit la forme répondue : dessin et nom. */}
-      <div className="modules">
+      <div className="modules" onClick={surLeFond(fond.onOuvrirBloc)}>
         {RANGS_MODULES.map((rang) => (
-          <div key={rang[0]} className="modules__rang">
+          <div key={rang[0]} className="modules__rang" onClick={surLeFond(fond.onOuvrirBloc)}>
             {rang.map((module) => (
               <span
                 key={module}

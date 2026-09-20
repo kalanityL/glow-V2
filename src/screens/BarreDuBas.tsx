@@ -50,11 +50,6 @@ export function BarreDuBas({
   fond: FondProps;
 }) {
   const textes = useTextes();
-  const [blocTheme, setBlocTheme] = useState(false);
-  const fermerTheme = useCallback(() => {
-    setBlocTheme(false);
-    fond.onApercu(null);
-  }, [fond]);
 
   type EtatTiroir = 'ferme' | 'ouvert' | 'fermeture';
   const [tiroirs, setTiroirs] = useState<Record<'menu' | 'ajout', EtatTiroir>>({
@@ -83,20 +78,20 @@ export function BarreDuBas({
           onFermee={menuFerme}
           enFermeture={tiroirs.menu === 'fermeture'}
           onOuvrirCompte={onOuvrirCompte}
-          onOuvrirCouleurs={() => setBlocTheme(true)}
+          onOuvrirCouleurs={fond.onOuvrirBloc}
           bouton={leBoutonMenu}
         />
       ) : null}
-      {blocTheme ? (
+      {fond.blocOuvert ? (
         <BlocTheme
           courant={fond.courant}
           apercu={fond.apercu}
           onApercu={fond.onApercu}
           onChoisir={(choix) => {
             fond.onChoisir(choix);
-            fermerTheme();
+            fond.onFermerBloc();
           }}
-          onFermer={fermerTheme}
+          onFermer={fond.onFermerBloc}
         />
       ) : null}
       {tiroirs.ajout !== 'ferme' ? (

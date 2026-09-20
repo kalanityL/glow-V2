@@ -24,7 +24,7 @@ import { motDePasseValide } from '../domaine/compte';
 import { detecterLangue } from '../i18n/useTextes';
 import { montrerVolet, voletVisible } from '../plateforme/navigateur';
 import type { useParcours } from '../app/useParcours';
-import type { FondProps } from './Accueil';
+import { surLeFond, type FondProps } from './Accueil';
 import { EtapeAvatar } from './onboarding/EtapeAvatar';
 
 /** Les trois volets du carrousel, dans l'ordre (2026-09-19, « Onglet
@@ -141,8 +141,11 @@ export function Compte({
   };
 
   return (
-    <div className={`page page--photo page--fond-${fond.apercu ?? fond.courant} ${classeDuTheme('blanc')}`}>
-      <div className="page__colonne">
+    <div
+      className={`page page--photo page--fond-${fond.apercu ?? fond.courant} ${classeDuTheme('blanc')}`}
+      onClick={surLeFond(fond.onOuvrirBloc)}
+    >
+      <div className="page__colonne" onClick={surLeFond(fond.onOuvrirBloc)}>
         <EntetePage titre={textes.compte.titre} onAccueil={onAccueil} />
 
         {/* LES ONGLETS DU CARROUSEL, FIGÉS AU-DESSUS DES VOLETS (2026-09-19,
@@ -164,10 +167,15 @@ export function Compte({
         </div>
         <div
           className="carrousel"
+          onClick={surLeFond(fond.onOuvrirBloc)}
           ref={carrousel}
           onScroll={() => setVolet(VOLETS[voletVisible(carrousel.current)] ?? 'informations')}
         >
-          <section className="carrousel__volet" aria-label={textes.compte.onglets.informations}>
+          <section
+            className="carrousel__volet"
+            aria-label={textes.compte.onglets.informations}
+            onClick={surLeFond(fond.onOuvrirBloc)}
+          >
             <div className="carte">
               <div className="ligne">
                 <ChampEnLigne
@@ -289,6 +297,7 @@ export function Compte({
           <section
             className="carrousel__volet carrousel__volet--fixe"
             aria-label={textes.compte.onglets.avatar}
+            onClick={surLeFond(fond.onOuvrirBloc)}
           >
             <div className="carte carte--colonne">
               <div className="compte__portrait">
@@ -314,7 +323,11 @@ export function Compte({
             </div>
           </section>
 
-          <section className="carrousel__volet" aria-label={textes.compte.onglets.compte}>
+          <section
+            className="carrousel__volet"
+            aria-label={textes.compte.onglets.compte}
+            onClick={surLeFond(fond.onOuvrirBloc)}
+          >
             <div className="carte">
               <div className="ligne">
                 <ChampEnLigne

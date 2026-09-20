@@ -483,7 +483,11 @@ rebranche le jeton `--accueil-fond-image`). **Sous le ciel, le logo et
 l'entête prennent les couleurs du thème « Bleu ensoleillé » de la V1**
 (2026-09-20) : jetons rebranchés dans la même règle. **Un bloc prend toute la hauteur
 entre la zone sûre et la barre du bas, son contenu défile, son pied est
-ancré** (2026-09-20).
+ancré** (2026-09-20). **Un clic sur le fond de n'importe quelle page ouvre
+le bloc « Thème »** (« clique sur fond d'écran depuis n'importe quelle
+page : ouvre comme si on avait cliqué sur menu couleur ») : le clic qui
+tombe sur une zone de page elle-même, pas sur une carte, une pastille, un
+bouton ou une vitre.
 
 **La page « Mon compte »** — « Mon profil » jusqu'au soir du 2026-09-19
 (« page mon profil devient mon compte. Onglet information/avatar/mon

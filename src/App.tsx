@@ -42,11 +42,19 @@ export default function App() {
      provisoire, vit ici — le bloc « Thème » le pose sous les yeux, « Choisir »
      l'enregistre, fermer l'efface. Toute page le reçoit. */
   const [apercuFond, setApercuFond] = useState<FondId | null>(null);
+  const [blocTheme, setBlocTheme] = useState(false);
   const fond = {
     courant: parcours.reponses.fond,
     apercu: apercuFond,
     onApercu: setApercuFond,
     onChoisir: (choix: FondId) => parcours.repondre('fond', choix),
+    blocOuvert: blocTheme,
+    onOuvrirBloc: () => setBlocTheme(true),
+    /* Fermer efface l'aperçu : le fond enregistré revient. */
+    onFermerBloc: () => {
+      setBlocTheme(false);
+      setApercuFond(null);
+    },
   };
   const peutRevenir = page !== 'accueil' || parcours.peutRevenir;
   const revenir = () => {
