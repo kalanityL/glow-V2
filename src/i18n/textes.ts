@@ -476,9 +476,11 @@ const FR: Textes = {
   },
   blocTheme: {
     titre: 'Thème',
+    /* Ses deux photos (2026-09-20 au soir) : les identifiants sont restés
+       — `fond` est une réponse enregistrée —, les noms suivent les images. */
     fonds: {
-      photo: 'Photo',
-      ciel: 'Ciel ensoleillé',
+      photo: 'Fleurs',
+      ciel: 'Brasserie',
     },
     choisir: 'Choisir',
     confirmer: 'Confirmer le nouveau fond',

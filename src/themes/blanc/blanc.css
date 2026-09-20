@@ -133,23 +133,15 @@
   --rond-fond: #ecebed;
   --rond-encre: #000000;
 
-  /* LE FOND DE L'ACCUEIL (2026-09-16, « essaie l'image fond haut sur toute
-     la jauteur de l'ecran en fond », « non zoomée », « fond-haut.png », puis
-     « fond-haut2.png » le même soir) : sa photo en portrait — un mur clair,
-     une fenêtre fleurie à droite, un fauteuil bleu en bas —, embarquée dans
-     `src/assets/images/` comme les polices (aucune ressource distante). Elle a remplacé la photo horizontale du haut de page, qui ne
-     couvrait qu'un tiers de la hauteur sans zoom. */
-  --fond-photo: url(../../assets/images/fond-accueil.jpg);
-  /* LE CIEL DE MIDI DE LA V1 (2026-09-20, « l'image de fond de ciel journée
-     ensoleillé de la v1 ») : le fond du thème « Bleu ensoleillé »
-     (`versions/mixte/themes/bleu-ensoleille`), repris à l'identique moins son
-     grain (une couche à taille propre, que le raccourci `cover` ne sait pas
-     porter) — le halo du soleil hors du coin haut droit, la brume qui monte
-     du bas, le dégradé #2e8fd2 → #a6dcf7. */
-  --fond-ciel:
-    radial-gradient(120% 78% at 84% -8%, rgb(255 249 226 / 0.9) 0%, rgb(255 244 205 / 0.4) 26%, rgb(255 240 190 / 0) 58%),
-    linear-gradient(to top, rgb(255 255 255 / 0.28) 0%, rgb(255 255 255 / 0) 44%),
-    linear-gradient(168deg, #2e8fd2 0%, #a6dcf7 100%);
+  /* LES DEUX FONDS DE PAGE, SES DEUX PHOTOS (2026-09-20, « theme : remplacer
+     le fond fleur existant par fond-fleur.png ; remplacer le fond bleu par
+     fond-brasserie.png ») : un mur clair sous des fleurs de jasmin, et la
+     terrasse d'un café — « Café Bonheur, ici on prend soin de soi ». Elles
+     ont remplacé la photo du 16 septembre (fond-haut2) et le ciel de midi
+     de la V1. Embarquées dans `src/assets/images/` comme les polices, en
+     JPEG (les PNG de 1,4 et 1,7 Mo pesaient six fois plus). */
+  --fond-photo: url(../../assets/images/fond-fleur.jpg);
+  --fond-ciel: url(../../assets/images/fond-brasserie.jpg);
   /* Le fond de page courant : la photo par défaut ; `.page--fond-<id>` le
      rebranche sur le fond choisi. */
   --accueil-fond-image: var(--fond-photo);

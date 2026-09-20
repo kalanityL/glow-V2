@@ -594,15 +594,20 @@ choisie, « Confirmer la mise à jour » / « Fermer » si le choix est complet.
 **Le bloc « Thème »** (2026-09-20, « menu parametre couleur ») : l'entrée
 « Couleurs » du tiroir l'ouvre, sur toute page. Deux cadres, ceux du choix du
 thème de l'onboarding — la photo, et le ciel de midi du thème « Bleu
-ensoleillé » de la V1 —, et « Choisir ». Toucher un cadre change le fond de la
+ensoleillé » de la V1 — **devenus ses deux photos le 2026-09-20 au soir**
+(« theme : remplacer le fond fleur existant par fond-fleur.png ; remplacer
+le fond bleu par fond-brasserie.png ») : « Fleurs », un mur clair sous du
+jasmin, et « Brasserie », la terrasse d'un café ; les identifiants `photo`
+et `ciel` sont restés, `fond` étant une réponse enregistrée ; les images
+sont embarquées en JPEG dans `src/assets/images/` —, et « Choisir ». Toucher un cadre change le fond de la
 page SOUS LES YEUX sans l'enregistrer ; « Choisir » l'enregistre (réponse
 `fond`, sur l'appareil) ; fermer sans choisir, avec un autre fond sous les
 yeux, propose « Confirmer le nouveau fond » / « Fermer » (comme le bloc du
 traitement) ; « Fermer » rend le fond enregistré. Le fond
 choisi vaut pour toute page, les tiroirs et les blocs (`.page--fond-<id>`
-rebranche le jeton `--accueil-fond-image`). **Sous le ciel, le logo et
-l'entête prennent les couleurs du thème « Bleu ensoleillé » de la V1**
-(2026-09-20) : jetons rebranchés dans la même règle. **Un bloc prend toute la hauteur
+rebranche le jeton `--accueil-fond-image`). Sous le ciel de la V1, le logo
+et l'entête prenaient ses couleurs « Bleu ensoleillé » ; le ciel parti,
+ces couleurs aussi — sur une photo claire, les couleurs ordinaires. **Un bloc prend toute la hauteur
 entre la zone sûre et la barre du bas, son contenu défile, son pied est
 ancré** (2026-09-20). **Un clic sur le fond de n'importe quelle page ouvre
 le bloc « Thème »** (« clique sur fond d'écran depuis n'importe quelle
