@@ -472,9 +472,13 @@ son fondu ont vécu un après-midi) ; elle est un jeton des thèmes clairs
 (`--accueil-fond-image`, `none` sur les ciels) et un FICHIER embarqué dans
 `src/assets/images/`, comme les polices — jamais une ressource distante.
 
-## 5. Non traité, au 2026-09-16
-- Aucune réponse n'est enregistrée : un rechargement perd tout — et
-  ramène à l'onboarding.
+## 5. Non traité, au 2026-09-20
+- Les réponses sont enregistrées SUR L'APPAREIL depuis le 2026-09-20
+  (« changement d'information dans "mon compte" persistent au reload ») :
+  `app/enregistrement.ts` (la forme, versionnée — changer la forme, c'est
+  monter la version et migrer) et deux verbes de la plateforme (le stockage
+  local). Rien ne quitte l'appareil. Mais rien d'autre n'est enregistré : ni
+  journal, ni mesures.
 - L'accueil n'a que son entête, son salut et son menu ; rien n'y est
   cliquable, la zone du milieu est vide.
 - Les roues ne se parcourent pas aux flèches du clavier.

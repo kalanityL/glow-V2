@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { SYSTEME_PAR_LANGUE } from '../domaine/unites';
 import type { Langue } from '../i18n/langues';
 import type { Forme } from '../domaine/traitements';
@@ -9,6 +9,8 @@ import {
   type EtapeId,
 } from '../screens/onboarding/parcours';
 import { REPONSES_INITIALES, type Reponses } from '../screens/onboarding/reponses';
+import { CLE_REPONSES, deserialiser, serialiser } from './enregistrement';
+import { enregistrer, lireEnregistre } from '../plateforme/navigateur';
 
 /**
  * LE PARCOURS : les réponses ET le rang de l'étape, ensemble.
@@ -28,12 +30,21 @@ import { REPONSES_INITIALES, type Reponses } from '../screens/onboarding/reponse
  * la dernière étape que sur rien.
  */
 export function useParcours() {
-  const [reponses, setReponses] = useState<Reponses>(REPONSES_INITIALES);
+  /* LES RÉPONSES SONT ENREGISTRÉES SUR L'APPAREIL (2026-09-20, « changement
+     d'information dans "mon compte" persistent au reload ») : relues au
+     montage, écrites à chaque changement. Ce qui est enregistré et comment
+     on le relit est dans `app/enregistrement.ts` ; le stockage lui-même est
+     un verbe de la plateforme. */
+  const [reponses, setReponses] = useState<Reponses>(
+    () => deserialiser(lireEnregistre(CLE_REPONSES)) ?? REPONSES_INITIALES,
+  );
+  useEffect(() => {
+    enregistrer(CLE_REPONSES, serialiser(reponses));
+  }, [reponses]);
   const [rang, setRang] = useState(0);
   /* ENTRÉ DANS L'APPLICATION (2026-09-16, « a la fin du formulaire on arrive à
-     la home ») : vrai une fois le dernier écran validé. Le parcours reste en
-     mémoire — les réponses ne sont pas enregistrées, voir GUIDELINES § 5 —
-     mais l'onboarding ne se remontre plus : le bouton « retour » de la barre
+     la home ») : vrai une fois le dernier écran validé. L'onboarding ne se
+     remontre plus : le bouton « retour » de la barre
      n'y ramène pas, comme un bouton natif ne rouvre pas un formulaire fini.
 
      VRAI DÈS LE CHARGEMENT, POUR L'INSTANT (2026-09-16, « pour l'instant met

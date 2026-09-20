@@ -56,3 +56,27 @@ export function voletVisible(carrousel: Element | null): number {
   if (!carrousel || carrousel.clientWidth === 0) return 0;
   return Math.round(carrousel.scrollLeft / carrousel.clientWidth);
 }
+
+/**
+ * LE STOCKAGE LOCAL DE L'APPAREIL (2026-09-20) : lire et écrire un texte sous
+ * une clé, sur l'appareil et nulle part ailleurs. `null` quand il n'y a rien
+ * ou que le stockage est indisponible (navigation privée, quota) ; une
+ * écriture qui échoue se tait — la forme de ce qu'on écrit est décidée
+ * ailleurs (`app/enregistrement.ts`). En natif, c'est le stockage sécurisé
+ * du téléphone derrière les mêmes deux verbes.
+ */
+export function lireEnregistre(cle: string): string | null {
+  try {
+    return localStorage.getItem(cle);
+  } catch {
+    return null;
+  }
+}
+
+export function enregistrer(cle: string, texte: string): void {
+  try {
+    localStorage.setItem(cle, texte);
+  } catch {
+    /* Stockage indisponible : l'application continue sans enregistrer. */
+  }
+}
