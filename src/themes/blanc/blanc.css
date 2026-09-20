@@ -78,11 +78,12 @@
      marine (le bleu 900 de la palette du board), et le vert de la pastille
      — même teinte, OKLCH 163 — descendu à la clarté du marine pour peser
      autant que lui sur le blanc (l'émeraude 600 de la même palette). */
-  /* G et LOW dans le sky-600 de la V1 (2026-09-20, « utilise ce meme bleu
-     sky600 pour G et low de Glp1low du header partout où il apparait en
-     header ») — le bleu du milieu de la pastille ; le marine #1e3a8a a vécu
-     du 16 au 20. Les titres de section du tiroir prennent le même jeton. */
-  --marque-encre: #0284c7;
+  /* G et LOW, et les titres de section du tiroir : un bleu QUI TIRE VERS LE
+     MARINE SANS L'ÊTRE (2026-09-20, « bleu sky600-> passer à un bleu qui
+     tire un peu vers le bleu marine sans etre bleu marine ») — le bleu 700
+     de la palette du board, #1d4ed8, entre le sky-600 de la V1 (#0284c7,
+     essayé le même jour) et le marine du 16 (#1e3a8a). */
+  --marque-encre: #1d4ed8;
   --marque-accent: #059669;
 
   /* LE MENU DU BAS, AUX COULEURS DE SON IMAGE (2026-09-16,
