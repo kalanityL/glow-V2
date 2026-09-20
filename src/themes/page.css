@@ -1319,6 +1319,12 @@
   height: 18px;
 }
 
+/* Toute la ligne est le geste (2026-09-20, « clic n'importe où sur la ligne
+   bloc de l'info lance l'édit ») : la main sur la ligne entière. */
+.ligne--geste {
+  cursor: pointer;
+}
+
 /* L'icône est un bouton qui ouvre l'édition (2026-09-20) : rien de la
    matière d'un bouton, la pastille seule. */
 .ligne__icone--bouton {

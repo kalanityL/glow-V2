@@ -34,9 +34,11 @@ interface ChampEnLigneProps {
   inputMode?: 'text' | 'decimal' | 'numeric';
   autoComplete?: string;
   /**
-   * L'icône de la donnée, dans sa pastille — UN BOUTON QUI OUVRE L'ÉDITION,
-   * comme la valeur (2026-09-20, « clique sur icone ouvre la modification du
-   * champ comme si on avait cliqué sur l'inline »).
+   * L'icône de la donnée, dans sa pastille. Avec elle, le champ rend TOUTE
+   * SA LIGNE, et la ligne entière ouvre l'édition — l'icône, la valeur, le
+   * vide entre les deux (2026-09-20, « clique sur icone ouvre la modification
+   * du champ comme si on avait cliqué sur l'inline », puis « clic n'importe
+   * où sur la ligne bloc de l'info lance l'édit »).
    */
   icone?: ReactNode;
 }
@@ -79,6 +81,7 @@ export function ChampEnLigne({
   }, [valeur]);
 
   const ouvrir = () => {
+    if (enEdition) return;
     setRefuse(false);
     setEnEdition(true);
     onEdition?.(true);
@@ -104,13 +107,7 @@ export function ChampEnLigne({
     onEdition?.(false);
   };
 
-  return (
-    <>
-      {icone ? (
-        <button type="button" className="ligne__icone ligne__icone--bouton" aria-label={nom} onClick={ouvrir}>
-          {icone}
-        </button>
-      ) : null}
+  const champ = (
     <span className="enligne">
       {enEdition ? (
         <input
@@ -138,7 +135,9 @@ export function ChampEnLigne({
           type="button"
           className={`enligne__valeur${valeur ? '' : ' enligne__valeur--vide'}`}
           aria-label={nom}
-          onClick={ouvrir}
+          /* Avec une icône, c'est la ligne entière qui ouvre : le clic monte
+             jusqu'à elle. Sans, la valeur ouvre elle-même. */
+          onClick={icone ? undefined : ouvrir}
         >
           {valeur ? (masque ? '••••••••' : (valeurAffichee ?? valeur)) : nom}
         </button>
@@ -146,6 +145,15 @@ export function ChampEnLigne({
       {unite ? <span className="enligne__unite">{unite}</span> : null}
       {refuse && regle ? <span className="regle regle--manquee enligne__regle">{regle}</span> : null}
     </span>
-    </>
+  );
+
+  if (!icone) return champ;
+  return (
+    <div className="ligne ligne--geste" onClick={ouvrir}>
+      <button type="button" className="ligne__icone ligne__icone--bouton" aria-label={nom}>
+        {icone}
+      </button>
+      {champ}
+    </div>
   );
 }

@@ -181,63 +181,56 @@ export function Compte({
             onClick={surLeFond(fond.onOuvrirBloc)}
           >
             <div className="carte">
-              <div className="ligne">
-                <ChampEnLigne
-                  icone={<IconeProfil />}
-                  valeur={reponses.prenom}
-                  onValeur={(prenom) => repondre('prenom', prenom)}
-                  nom={textes.groupes.prenom}
-                  autoComplete="given-name"
-                />
-              </div>
+              <ChampEnLigne
+                icone={<IconeProfil />}
+                valeur={reponses.prenom}
+                onValeur={(prenom) => repondre('prenom', prenom)}
+                nom={textes.groupes.prenom}
+                autoComplete="given-name"
+              />
 
-              <div className="ligne">
-                {/* L'ÂGE SE LIT, LA DATE DE NAISSANCE S'ÉDITE (2026-09-20,
-                    « qd on édite l'age, on remplit la date de naissance »). */}
-                <ChampEnLigne
-                  icone={<IconeCalendrier />}
-                  valeur={formaterDateCourte(reponses.dateNaissance, langue)}
-                  valeurAffichee={textes.compte.ageEcrit(ageA(reponses.dateNaissance, aujourdhui))}
-                  onValeur={(ecrite) => {
-                    const lue = lireDateCourte(ecrite, langue);
-                    if (lue) repondre('dateNaissance', lue);
-                  }}
-                  normaliser={(saisie) => {
-                    const lue = lireDateCourte(saisie, langue);
-                    return lue ? formaterDateCourte(lue, langue) : null;
-                  }}
-                  regle={textes.compte.regleDate}
-                  nom={textes.groupes.age}
-                  inputMode="numeric"
-                />
-              </div>
+              {/* L'ÂGE SE LIT, LA DATE DE NAISSANCE S'ÉDITE (2026-09-20,
+                  « qd on édite l'age, on remplit la date de naissance »). */}
+              <ChampEnLigne
+                icone={<IconeCalendrier />}
+                valeur={formaterDateCourte(reponses.dateNaissance, langue)}
+                valeurAffichee={textes.compte.ageEcrit(ageA(reponses.dateNaissance, aujourdhui))}
+                onValeur={(ecrite) => {
+                  const lue = lireDateCourte(ecrite, langue);
+                  if (lue) repondre('dateNaissance', lue);
+                }}
+                normaliser={(saisie) => {
+                  const lue = lireDateCourte(saisie, langue);
+                  return lue ? formaterDateCourte(lue, langue) : null;
+                }}
+                regle={textes.compte.regleDate}
+                nom={textes.groupes.age}
+                inputMode="numeric"
+              />
 
-              <div className="ligne">
-                <ChampEnLigne
-                  icone={<IconeToise />}
-                  valeur={String(tailleAffichee(reponses.tailleCm, unites.taille))}
-                  onValeur={(ecrite) => repondre('tailleCm', tailleEnCm(Number(ecrite), unites.taille))}
-                  normaliser={(saisie) => {
-                    const n = Number(saisie.trim());
-                    return Number.isInteger(n) && n >= bornesTaille.min && n <= bornesTaille.max
-                      ? String(n)
-                      : null;
-                  }}
-                  regle={textes.compte.regleTaille(bornesTaille.min, bornesTaille.max, textes.unites[unites.taille])}
-                  unite={textes.unites[unites.taille]}
-                  nom={textes.groupes.taille}
-                  inputMode="numeric"
-                />
-              </div>
+              <ChampEnLigne
+                icone={<IconeToise />}
+                valeur={String(tailleAffichee(reponses.tailleCm, unites.taille))}
+                onValeur={(ecrite) => repondre('tailleCm', tailleEnCm(Number(ecrite), unites.taille))}
+                normaliser={(saisie) => {
+                  const n = Number(saisie.trim());
+                  return Number.isInteger(n) && n >= bornesTaille.min && n <= bornesTaille.max
+                    ? String(n)
+                    : null;
+                }}
+                regle={textes.compte.regleTaille(bornesTaille.min, bornesTaille.max, textes.unites[unites.taille])}
+                unite={textes.unites[unites.taille]}
+                nom={textes.groupes.taille}
+                inputMode="numeric"
+              />
 
-              <div className="ligne">
-                {/* Le poids s'édite dans son bloc, règle et chiffre (2026-09-20) :
-                    l'icône et la valeur l'ouvrent. */}
+              {/* Le poids s'édite dans son bloc, graduation et chiffre
+                  (2026-09-20) : toute la ligne l'ouvre. */}
+              <div className="ligne ligne--geste" onClick={() => setBlocPoids('poids')}>
                 <button
                   type="button"
                   className="ligne__icone ligne__icone--bouton"
                   aria-label={textes.groupes.poids}
-                  onClick={() => setBlocPoids('poids')}
                 >
                   <IconeBalance />
                 </button>
@@ -246,7 +239,6 @@ export function Compte({
                     type="button"
                     className="enligne__valeur"
                     aria-label={textes.groupes.poids}
-                    onClick={() => setBlocPoids('poids')}
                   >
                     {poidsEcrit(reponses.poids)}
                   </button>
@@ -254,14 +246,13 @@ export function Compte({
                 </span>
               </div>
 
-              <div className="ligne">
+              <div className="ligne ligne--geste" onClick={() => setBlocPoids('poidsCible')}>
                 {/* Le poids s'édite dans son bloc, règle et chiffre (2026-09-20) :
                     l'icône et la valeur l'ouvrent. */}
                 <button
                   type="button"
                   className="ligne__icone ligne__icone--bouton"
                   aria-label={textes.groupes.poidsCible}
-                  onClick={() => setBlocPoids('poidsCible')}
                 >
                   <IconeCible />
                 </button>
@@ -270,7 +261,6 @@ export function Compte({
                     type="button"
                     className="enligne__valeur"
                     aria-label={textes.groupes.poidsCible}
-                    onClick={() => setBlocPoids('poidsCible')}
                   >
                     {poidsEcrit(reponses.poidsCible)}
                   </button>
@@ -278,15 +268,13 @@ export function Compte({
                 </span>
               </div>
 
-              <div className="ligne">
-                {/* LE MÉDICAMENT PRESCRIT ne s'édite pas sur place : sa valeur
-                    — et son icône — ouvrent le bloc « Mon traitement »
-                    (2026-09-20). */}
+              {/* LE MÉDICAMENT PRESCRIT ne s'édite pas sur place : toute sa
+                  ligne ouvre le bloc « Mon traitement » (2026-09-20). */}
+              <div className="ligne ligne--geste" onClick={() => setBlocTraitement(true)}>
                 <button
                   type="button"
                   className="ligne__icone ligne__icone--bouton"
                   aria-label={textes.groupes.medicament}
-                  onClick={() => setBlocTraitement(true)}
                 >
                   <IconeSeringue />
                 </button>
@@ -294,7 +282,6 @@ export function Compte({
                   type="button"
                   className="enligne__valeur"
                   aria-label={textes.groupes.medicament}
-                  onClick={() => setBlocTraitement(true)}
                 >
                   {nomTraitement ?? textes.compte.traitement.aucun}
                 </button>
@@ -343,32 +330,28 @@ export function Compte({
             onClick={surLeFond(fond.onOuvrirBloc)}
           >
             <div className="carte">
-              <div className="ligne">
-                <ChampEnLigne
-                  icone={<IconeCourriel />}
-                  valeur={reponses.email}
-                  onValeur={(email) => repondre('email', email)}
-                  nom={textes.groupes.email}
-                  type="email"
-                  autoComplete="email"
-                />
-              </div>
+              <ChampEnLigne
+                icone={<IconeCourriel />}
+                valeur={reponses.email}
+                onValeur={(email) => repondre('email', email)}
+                nom={textes.groupes.email}
+                type="email"
+                autoComplete="email"
+              />
 
-              <div className="ligne">
-                {/* La seule règle du mot de passe, huit signes (2026-09-08),
-                    jugée au moment où on quitte le champ, comme les autres. */}
-                <ChampEnLigne
-                  icone={<IconeCadenas />}
-                  valeur={reponses.motDePasse}
-                  onValeur={(motDePasse) => repondre('motDePasse', motDePasse)}
-                  normaliser={(saisie) => (motDePasseValide(saisie) ? saisie : null)}
-                  regle={textes.onboarding.profil.regleMotDePasse}
-                  nom={textes.groupes.motDePasse}
-                  type="password"
-                  autoComplete="new-password"
-                  masque
-                />
-              </div>
+              {/* La seule règle du mot de passe, huit signes (2026-09-08),
+                  jugée au moment où on quitte le champ, comme les autres. */}
+              <ChampEnLigne
+                icone={<IconeCadenas />}
+                valeur={reponses.motDePasse}
+                onValeur={(motDePasse) => repondre('motDePasse', motDePasse)}
+                normaliser={(saisie) => (motDePasseValide(saisie) ? saisie : null)}
+                regle={textes.onboarding.profil.regleMotDePasse}
+                nom={textes.groupes.motDePasse}
+                type="password"
+                autoComplete="new-password"
+                masque
+              />
             </div>
           </section>
         </div>

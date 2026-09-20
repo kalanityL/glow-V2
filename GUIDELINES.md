@@ -523,7 +523,13 @@ défiler. **Aucun intitulé devant une information, aucun crayon, aucun
 champ : la valeur s'édite sur place** (`ChampEnLigne` : on la touche, elle
 devient un champ, elle s'enregistre quand on la quitte ou sur Entrée, Échap
 la rend ; une saisie refusée revient à la valeur enregistrée et LA RÈGLE SE
-DIT dessous). **La date de naissance remplace l'année** dans les réponses
+DIT dessous). **Toute la ligne d'une information est le geste** (2026-09-20,
+« clic n'importe où sur la ligne bloc de l'info lance l'édit ») : l'icône,
+la valeur, le vide entre les deux et jusqu'au bord — un clic n'importe où
+sur la ligne lance l'édition sur place, ou ouvre le bloc du poids, de
+l'objectif, du traitement. La ligne porte la main (`ligne--geste`) ; les
+boutons qu'elle contient n'ont plus de geste propre, le clic monte jusqu'à
+elle. **La date de naissance remplace l'année** dans les réponses
 (`dateNaissance`, `AAAA-MM-JJ`) : l'onboarding ne demande que l'année et
 pose son 1er janvier. Pas de bouton « Enregistrer ». Le bouton « retour »
 de la barre ramène à l'accueil. **Sa photo en portrait (mur blanc, plante,
