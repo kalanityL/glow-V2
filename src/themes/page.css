@@ -1151,9 +1151,14 @@
   gap: 4px;
 }
 
+/* Le mot-symbole du petit entête, PRESQUE AUSSI HAUT QUE LA PASTILLE
+   (2026-09-20, « agrandis la hauteur de glp1 low pour etre presque aussi
+   haut que le logo du mini header » — 14 px de corps auparavant) : 90 % de
+   la pastille en hauteur d'encre, laquelle vaut 0,92 em du corps (mesuré le
+   16). */
 .compte__marque .wordmark {
   font-family: var(--font-marque);
-  font-size: 14px;
+  font-size: calc(var(--logo-size) * 0.9 / 0.92);
 }
 
 .compte__titre {
