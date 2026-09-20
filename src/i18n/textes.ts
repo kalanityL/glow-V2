@@ -198,12 +198,9 @@ export interface Textes {
     titre: string;
     /** Les onglets du carrousel, figés en bas — des mots courts. */
     onglets: Record<VoletCompte, string>;
-    informations: string;
-    informationsSousTitre: string;
+    /** Le nom du volet de l'avatar, dit à qui écoute la page (le portrait y
+     *  mène) ; les cartes n'ont plus de titre (2026-09-20). */
     avatar: string;
-    avatarSousTitre: string;
-    /** Le volet du compte : l'adresse et le mot de passe. */
-    compteSousTitre: string;
     /** L'âge écrit, « 46 ans » : une tournure, par langue. */
     ageEcrit: (ans: number) => string;
     /**
@@ -400,12 +397,7 @@ const FR: Textes = {
       avatar: 'Avatar',
       compte: 'Mon compte',
     },
-    informations: 'Mes informations',
-    informationsSousTitre:
-      'Ces informations sont privées et peuvent être modifiées à tout moment.',
     avatar: 'Mon avatar',
-    avatarSousTitre: 'Personnalisez votre avatar.',
-    compteSousTitre: 'Votre adresse et votre mot de passe.',
     ageEcrit: (ans) => `${ans} ans`,
     traitement: {
       titre: 'Mon traitement',

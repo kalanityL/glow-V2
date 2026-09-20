@@ -8,8 +8,6 @@ import {
   IconeSeringue,
   IconeCible,
   IconeCourriel,
-  IconePalette,
-  IconeProfil,
   IconeRegle,
 } from '../components/Icones';
 import { BarreDuBas } from './BarreDuBas';
@@ -178,14 +176,6 @@ export function Compte({
         >
           <section className="carrousel__volet" aria-label={textes.compte.onglets.informations}>
             <div className="carte">
-              <h2 className="carte__titre">
-                <span className="carte__icone">
-                  <IconeProfil />
-                </span>
-                {textes.compte.informations}
-              </h2>
-              <p className="carte__sous-titre">{textes.compte.informationsSousTitre}</p>
-
               <div className="ligne">
                 <span className="ligne__icone">
                   <IconeCalendrier />
@@ -291,13 +281,6 @@ export function Compte({
 
           <section className="carrousel__volet" aria-label={textes.compte.onglets.avatar}>
             <div className="carte">
-              <h2 className="carte__titre">
-                <span className="carte__icone">
-                  <IconePalette />
-                </span>
-                {textes.compte.avatar}
-              </h2>
-              <p className="carte__sous-titre">{textes.compte.avatarSousTitre}</p>
               <div className="compte__portrait">
                 <Avatar avatar={reponses.avatar} />
               </div>
@@ -311,14 +294,6 @@ export function Compte({
 
           <section className="carrousel__volet" aria-label={textes.compte.onglets.compte}>
             <div className="carte">
-              <h2 className="carte__titre">
-                <span className="carte__icone">
-                  <IconeProfil />
-                </span>
-                {textes.compte.titre}
-              </h2>
-              <p className="carte__sous-titre">{textes.compte.compteSousTitre}</p>
-
               <div className="ligne">
                 <span className="ligne__icone">
                   <IconeCourriel />
