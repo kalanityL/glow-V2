@@ -6,7 +6,11 @@ import { surClicDehors } from '../plateforme/navigateur';
 /**
  * UN BLOC SUR LA PAGE VITRÉE (2026-09-20, « un bloc en reste page vitré ») :
  * le reste de la page passe derrière la vitre floue — la même que sous les
- * tiroirs —, et le bloc se pose au milieu, avec son titre et sa croix. Il se
+ * tiroirs —, et le bloc se pose entre l'entête et la barre du bas, avec son
+ * titre et sa croix. IL A TOUJOURS SA HAUTEUR MAXIMALE, quel que soit son
+ * contenu (« hauteur maximal du bloc peu importe le choix ») : son contenu
+ * défile, son pied ne bouge pas. Son fond est celui de la page, sous le même
+ * voile que les tiroirs. Il se
  * ferme à la croix, au clic à côté ou à Échap ; mais c'est l'appelant qui
  * décide de ce que « fermer » veut dire (il peut d'abord demander de
  * confirmer). Pas de voile sombre, pas de fenêtre : la vitre des tiroirs, à
@@ -15,11 +19,15 @@ import { surClicDehors } from '../plateforme/navigateur';
 export function Bloc({
   titre,
   onFermer,
+  pied,
   children,
 }: {
   titre: string;
   /** Demandé par la croix, le clic à côté ou Échap. */
   onFermer: () => void;
+  /** Les boutons, ANCRÉS AU BAS DU BLOC (2026-09-20, « bouton du bloc encrés
+      en bas de bloc, ne change pas de place c'est le reste qui scrolle »). */
+  pied?: ReactNode;
   children: ReactNode;
 }) {
   const textes = useTextes();
@@ -36,7 +44,8 @@ export function Bloc({
             <IconeCroix />
           </button>
         </div>
-        {children}
+        <div className="bloc__contenu">{children}</div>
+        {pied ? <div className="bloc__pied">{pied}</div> : null}
       </div>
     </>
   );

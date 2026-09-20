@@ -10,9 +10,11 @@ export interface ChoixTraitement {
   traitement: string | null;
 }
 
-/** Les trois choix de la première ligne, dans SON ordre : « comprimé /
-    injection /aucun ». */
-const CHOIX = ['comprime', 'injection', 'aucun'] as const;
+/** « Aucun » seul sur sa ligne, pleine largeur ; comprimé et injection
+    dessous, côte à côte (2026-09-20, « aucun : sur une ligne toute la largeur
+    de ligne, comprimé/injection en dessous »). */
+const AUCUN = ['aucun'] as const;
+const FORMES_CHOIX = ['comprime', 'injection'] as const;
 
 /**
  * LE BLOC « MON TRAITEMENT » (2026-09-20) : « qd on édite le traitement, un
@@ -63,18 +65,56 @@ export function BlocTraitement({
   }, [differe, complet, onFermer]);
 
   const disponibles = choix.forme && choix.forme !== 'aucun' ? traitementsDeLaForme(choix.forme) : [];
+  /* Changer de forme efface la spécialité, comme dans le parcours. */
+  const choisirForme = (forme: Forme | 'aucun') => {
+    setSortie(null);
+    setChoix((avant) => ({ forme, traitement: forme === avant.forme ? avant.traitement : null }));
+  };
+
+  const pied =
+    sortie === null ? (
+      <div className="boutons">
+        <button
+          type="button"
+          className="bouton"
+          disabled={!complet || !differe}
+          aria-disabled={!complet || !differe}
+          onClick={enregistrer}
+        >
+          {courant.traitement ? textes.compte.traitement.mettreAJour : textes.compte.traitement.enregistrer}
+        </button>
+      </div>
+    ) : (
+      <div className="boutons">
+        <button type="button" className="bouton bouton--second" onClick={onFermer}>
+          {textes.fermer}
+        </button>
+        {sortie === 'terminer' ? (
+          <button type="button" className="bouton" onClick={() => setSortie(null)}>
+            {textes.compte.traitement.terminer}
+          </button>
+        ) : (
+          <button type="button" className="bouton" onClick={enregistrer}>
+            {textes.compte.traitement.confirmer}
+          </button>
+        )}
+      </div>
+    );
 
   return (
-    <Bloc titre={textes.compte.traitement.titre} onFermer={demanderFermeture}>
+    <Bloc titre={textes.compte.traitement.titre} onFermer={demanderFermeture} pied={pied}>
       <ChoixUnique
-        options={CHOIX}
-        libelle={(id) => (id === 'aucun' ? textes.compte.traitement.aucun : textes.formes[id])}
-        valeur={choix.forme}
-        /* Changer de forme efface la spécialité, comme dans le parcours. */
-        onChoix={(forme) => {
-          setSortie(null);
-          setChoix((avant) => ({ forme, traitement: forme === avant.forme ? avant.traitement : null }));
-        }}
+        options={AUCUN}
+        libelle={() => textes.compte.traitement.aucun}
+        valeur={choix.forme === 'aucun' ? 'aucun' : null}
+        onChoix={choisirForme}
+        question={textes.groupes.forme}
+      />
+      <ChoixUnique
+        options={FORMES_CHOIX}
+        libelle={(id) => textes.formes[id]}
+        valeur={choix.forme === 'aucun' ? null : choix.forme}
+        onChoix={choisirForme}
         question={textes.groupes.forme}
         enLigne
       />
@@ -92,34 +132,6 @@ export function BlocTraitement({
         />
       ) : null}
 
-      {sortie === null ? (
-        <div className="boutons">
-          <button
-            type="button"
-            className="bouton"
-            disabled={!complet || !differe}
-            aria-disabled={!complet || !differe}
-            onClick={enregistrer}
-          >
-            {courant.traitement ? textes.compte.traitement.mettreAJour : textes.compte.traitement.enregistrer}
-          </button>
-        </div>
-      ) : (
-        <div className="boutons">
-          <button type="button" className="bouton bouton--second" onClick={onFermer}>
-            {textes.fermer}
-          </button>
-          {sortie === 'terminer' ? (
-            <button type="button" className="bouton" onClick={() => setSortie(null)}>
-              {textes.compte.traitement.terminer}
-            </button>
-          ) : (
-            <button type="button" className="bouton" onClick={enregistrer}>
-              {textes.compte.traitement.confirmer}
-            </button>
-          )}
-        </div>
-      )}
     </Bloc>
   );
 }

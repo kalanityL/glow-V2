@@ -685,6 +685,17 @@
   pointer-events: none;
 }
 
+/* LE FOND CHOISI (2026-09-20, le bloc « Thème ») : la page rebranche le jeton
+   du fond sur la photo ou sur le ciel de midi de la V1 ; tout ce qui lit
+   `--accueil-fond-image` — la page, les tiroirs, les blocs — suit. */
+.page--fond-photo {
+  --accueil-fond-image: var(--fond-photo);
+}
+
+.page--fond-ciel {
+  --accueil-fond-image: var(--fond-ciel);
+}
+
 /* FLOUE, RIEN N'Y EST NET, MAIS « PAS TROP », ET SANS ZOOM (2026-09-16,
    « ajoute effet flou rien e doit etre net dans le fond », « pas trop »,
    « pas de zoom ») : le flou n'est pas sur la photo mais sur un VOILE posé
@@ -1717,22 +1728,73 @@
 /* Le bloc : une carte au milieu de la page, par-dessus la vitre — la même
    vitre que sous les tiroirs. Il défile pour lui-même s'il est plus haut
    que la place. */
+/* IL PREND TOUTE LA HAUTEUR entre la zone sûre et la barre du bas, quel que
+   soit son contenu (2026-09-20, « hauteur maximal du bloc peu importe le
+   choix […] Le bloc ne deborde pas sur le menu du bas ») : une colonne dont
+   le contenu défile et dont le pied ne bouge pas. Son fond est la photo de
+   la page sous le voile des tiroirs (« fond du bloc : fond courant, meme
+   transparence que sur la home ») : même mécanique que `.tiroir` — un
+   `::before` fixé sur l'écran, rogné par le `clip-path`. */
 .bloc {
   position: absolute;
   left: 16px;
   right: 16px;
-  top: 50%;
+  top: calc(var(--zone-sure-haut, 0px) + 16px);
+  bottom: 88px;
   z-index: 2;
-  max-height: calc(100% - 96px);
-  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
   padding: 16px;
-  border-radius: 18px;
-  background: var(--module-fond);
-  box-shadow: var(--panneau-ombre);
-  transform: translateY(-50%);
+  clip-path: inset(0 round 18px);
+}
+
+.bloc::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  background:
+    linear-gradient(rgba(255, 255, 255, 0.78), rgba(255, 255, 255, 0.78)),
+    var(--accueil-fond-image) top / cover no-repeat;
+  filter: blur(4px);
+  pointer-events: none;
+}
+
+/* Le contenu défile — et, comme la zone de l'onboarding, il rognerait les
+   liserés du choix (des `box-shadow` posées hors des réponses) : 4 px de
+   rembourrage où le liseré a la place de se peindre, rattrapés sur les côtés
+   par une marge négative (2026-09-20, « attention au bug qui rogne les bords
+   sur les côtés »). */
+.bloc__contenu {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  padding: 4px;
+  margin: 0 -4px;
+}
+
+.bloc__pied {
+  flex: none;
+  padding-top: 8px;
+}
+
+/* Les deux fonds au choix, dans les cadres du choix du thème de l'onboarding :
+   chacun peint de son fond. */
+.choix-themes--fonds {
+  grid-template-columns: repeat(2, 1fr);
+  margin: 12px 0 0;
+}
+
+.carte-fond--photo {
+  background: var(--fond-photo) center / cover no-repeat;
+}
+
+.carte-fond--ciel {
+  background: var(--fond-ciel);
 }
 
 .bloc__entete {
+  flex: none;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -1750,6 +1812,7 @@
 /* La croix du bloc est dans son entête, pas dans un coin absolu. */
 .bloc__fermer {
   position: static;
+  flex: none;
 }
 
 /* La rangée des réponses, sous le titre du bloc, garde son air. */
