@@ -425,9 +425,10 @@ menu en tiroir comme ça avec une croix pour fermer ») : l'entrée « Menu » d
 la barre du bas (à la place de « Profil ») ouvre UN TIROIR qui monte depuis
 la barre par-dessus le bas de l'accueil — sans voile sombre, fermé par sa
 croix, par un clic à côté ou par Échap, le mécanisme du panneau des roues,
-donc pas un popup — avec les entrées sur deux colonnes, l'icône de la V1 nue
-à l'encre et le nom, sans pastille ni chevron ni ligne entre les entrées ;
-une longue ligne sous chaque titre de groupe ; le mot-symbole de « GLP1LOW
+donc pas un popup — avec les entrées sur deux colonnes, l'icône de la V1 à
+l'encre sur une pastille bleu clair (2026-09-20) et le nom, sans chevron ni
+ligne entre les entrées ; une longue ligne sous chaque titre de groupe, le
+titre à l'accent (2026-09-20) ; le mot-symbole de « GLP1LOW
 et vous » dans la police, la couleur et la graisse de la ligne. **Derrière
 le tiroir, le reste de la page est une vitre floue, sans teinte** (« reste
 de la page vitré flou », 2026-09-19) — c'est la seule chose qui couvre une

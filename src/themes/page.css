@@ -1523,7 +1523,8 @@
   font-family: var(--font-display);
   font-weight: 600;
   font-size: 15px;
-  color: var(--encre-chapeau);
+  /* À l'accent (2026-09-20, « titre de section -> bleu »). */
+  color: var(--accent);
 }
 
 /* Le mot-symbole dans « GLP1LOW et vous » : la police, la couleur et la
@@ -1545,9 +1546,10 @@
   column-gap: 12px;
 }
 
-/* Une entrée : l'icône nue, à l'encre, et le nom — rien d'autre, aucune
-   ligne entre deux entrées (2026-09-19). Celle qui est un bouton n'a pas
-   d'autre matière que les autres. */
+/* Une entrée : l'icône à l'encre sur une pastille bleu clair (2026-09-20,
+   « pastille bleu clair, icone ne change pas de couleur » — nue la veille),
+   et le nom — rien d'autre, aucune ligne entre deux entrées. Celle qui est
+   un bouton n'a pas d'autre matière que les autres. */
 .tiroir__entree--bouton {
   border: 0;
   background: none;
@@ -1565,10 +1567,18 @@
 
 .tiroir__icone {
   flex: none;
-  display: block;
-  width: 20px;
-  height: 20px;
+  display: grid;
+  place-items: center;
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  background: var(--option-choisi-fond);
   color: var(--encre);
+}
+
+.tiroir__icone .icone {
+  width: 18px;
+  height: 18px;
 }
 
 .tiroir__nom {
