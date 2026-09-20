@@ -486,6 +486,10 @@ d'un cran, les hauteurs) est dans `page.css` ; le code n'en lit qu'un
 rapport (`domaine/mesures.ts`).
 « OK » au pied, éteint sans changement ; fermer sans valider propose
 « Confirmer la mise à jour » / « Fermer », comme les autres blocs.
+**Dans tous les blocs fermables, la confirmation affichée, un second clic
+sur la croix ferme sans enregistrer** (2026-09-20, « si on clic sur la
+croix qd le message de confirmation s'affiche, ca confirme la fermeture
+sans sauvegarde ») : la croix vaut alors « Fermer ».
 
 **Les informations de « Mon compte » sont celles de la V1** (2026-09-20) :
 l'âge (lu en années, édité en date de naissance), la taille, le poids de

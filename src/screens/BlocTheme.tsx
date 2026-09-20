@@ -40,13 +40,16 @@ export function BlocTheme({
   /* La sortie demandée avec un autre fond sous les yeux : à confirmer. */
   const [sortie, setSortie] = useState(false);
 
+  /* La confirmation affichée, un second clic sur la croix ferme sans
+     retenir le fond (2026-09-20, « si on clic sur la croix qd le message de
+     confirmation s'affiche, ca confirme la fermeture sans sauvegarde »). */
   const demanderFermeture = useCallback(() => {
-    if (!differe) {
+    if (!differe || sortie) {
       onFermer();
       return;
     }
     setSortie(true);
-  }, [differe, onFermer]);
+  }, [differe, sortie, onFermer]);
 
   const pied = sortie ? (
     <div className="boutons">

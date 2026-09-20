@@ -135,13 +135,17 @@ export function BlocPoids({
     onEnregistrer(brouillon);
     onFermer();
   };
+  /* La croix : sans changement, ferme ; avec, demande confirmation ; et LA
+     CONFIRMATION AFFICHÉE, UN SECOND CLIC FERME SANS ENREGISTRER (2026-09-20,
+     « si on clic sur la croix qd le message de confirmation s'affiche, ca
+     confirme la fermeture sans sauvegarde »). */
   const demanderFermeture = useCallback(() => {
-    if (brouillon === valeur) {
+    if (brouillon === valeur || sortie) {
       onFermer();
       return;
     }
     setSortie(true);
-  }, [brouillon, valeur, onFermer]);
+  }, [brouillon, valeur, sortie, onFermer]);
 
   /* LES CRANS SONT DES DIXIÈMES (2026-09-20, « échelle de la regle : 10x plus
      précise : ce qui represente actuellement 10kg change pour representer à

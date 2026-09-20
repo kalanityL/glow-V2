@@ -56,13 +56,16 @@ export function BlocTraitement({
     onFermer();
   };
 
+  /* La confirmation affichée, un second clic sur la croix ferme sans
+     enregistrer (2026-09-20, « si on clic sur la croix qd le message de
+     confirmation s'affiche, ca confirme la fermeture sans sauvegarde »). */
   const demanderFermeture = useCallback(() => {
-    if (!differe) {
+    if (!differe || sortie !== null) {
       onFermer();
       return;
     }
     setSortie(complet ? 'confirmer' : 'terminer');
-  }, [differe, complet, onFermer]);
+  }, [differe, complet, sortie, onFermer]);
 
   const disponibles = choix.forme && choix.forme !== 'aucun' ? traitementsDeLaForme(choix.forme) : [];
   /* Changer de forme efface la spécialité, comme dans le parcours. */
