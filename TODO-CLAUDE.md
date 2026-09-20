@@ -11,54 +11,58 @@ que de te faire lire le fichier. Le TODO de la V1 est importé tel quel dans
 
 ---
 
-## NOTE DE REPRISE — CLEAR DU 2026-09-15 (les quatre documents existent)
+## NOTE DE REPRISE — CLEAR DU 2026-09-21 (l'application prend forme)
 
 **Rien ne tourne, rien n'est à moitié fait.** Aucun workflow ni agent en
-cours. Tout est commité : V2 28 commits non poussés, V1 2 commits non poussés
-(`69b3ff7b`, `3fc02a3d`). Aucun push, aucun déploiement — elle ne l'a pas
-demandé.
+cours. Tout est commité : 13 commits non poussés depuis `c54f5af` (le
+troisième push et son entrée de suivi, le 20/09). Le site en ligne
+(`glow-private-v2.web.app`) est au troisième déploiement, du 20/09 au soir —
+il ne porte rien de ce qui suit. Pousser et déployer SEULEMENT sur son
+ordre, et ÉCRIRE L'ENTRÉE DE `SUIVI-PUSHS.md` AVANT le push (oublié le
+20/09, réparé dans un commit de suite).
 
-**Les serveurs** (à relancer s'ils sont tombés — la mémoire de la machine est
-presque à sec à cause de SON Chrome, cinquante processus ; le serveur de la V2
-a déjà été tué une fois le 14/09) :
-- 3002 : la V2, `npm run dev -- --port 3002 --strictPort` (règle de début de
-  session) ;
-- 3003 : les docs, `python3 scripts/servir-docs.py 3003` — PAS `http.server`,
-  qui n'annonce pas l'UTF-8 et fait lire « SpÃ©cification » dans les `.md` ;
-- 3000 : la V1 (`npm run dev` dans `~/Desktop/GLOW/REPO-GIT-LOCAL`), verrou
-  Firebase ARMÉ, elle se connecte avec son compte ;
-- 3011 : le banc de capture de la V1 (copie jetable, verrou désarmé, données
-  de Camille) — `sh <rig>/scripts/servir-dist.sh <rig>/dist 3011`, rig =
-  `/private/tmp/claude-501/-Users-beauty-Desktop-GLOW/4f237620-7356-4a0e-861c-339563e2ef7b/scratchpad/rig-v1`,
-  outil de capture à côté dans `outil-capture/` (lire `MODE-EMPLOI.md`).
+**Le serveur** : 3002, `npm run dev -- --port 3002 --strictPort` (règle de
+début de session). Les docs sur 3003 : `python3 scripts/servir-docs.py 3003`.
+L'extension Chrome n'est PAS connectée : les clics ne se vérifient pas ; les
+captures se font avec Chrome sans fenêtre, en forçant l'état par `sed` sur
+les `useState` — et en RESTAURANT PAR `sed` INVERSE, jamais par
+`git checkout` (un checkout a emporté du travail non commité le 20/09).
 
-**Ce qui est FAIT — les quatre documents, tous réfutés contre le code et
-corrigés :**
-- `docs/spec-fonctionnelle.html` (750 ko) : 21 chapitres, 300 sous-sections,
-  251 captures, ZÉRO figure absente, table des écrans, glossaire, index.
-- `docs/spec-technique.html` (1,42 Mo) : 21 chapitres, 689 sous-sections ;
-  honore les 667 ancres promises par la fonctionnelle, et ses 140 renvois
-  retour existent tous.
-- `docs/spec-abstraite.html` (545 ko) : 10 chapitres, 166 sous-sections, sans
-  un mot d'interface. Aussi en Markdown, `docs/spec-abstraite.md` (376 ko,
-  contrôlé : mêmes comptes de titres, 0 entité, 144 tableaux réguliers), et en
-  synthèse de trois pages, `docs/synthese-abstraite.{html,md}`.
-- `docs/inspirations.html` (200 ko) : 105 arbitrages non validés, 348
-  inventions.
-- Tout s'engendre : `node scripts/assembler-chapitres.mjs
-  spec|technique|abstraite|brouillons`, `node scripts/assembler-inspirations.mjs`,
-  `node scripts/page-autonome.mjs <page> <sortie>` (copie autonome, feuille
-  incrustée, refuse les pages à images sans `--avec-images`). Les fragments
-  sont dans `docs/brouillons/` (`chapitre-*`, `technique-*`, `abstraite-*`).
-- `VOCABULAIRE.md` à la racine : 74 directives tranchées, son vocabulaire à
-  elle, les règles d'écriture (vouvoiement au féminin…), 14 questions sans
-  réponse, 8 contradictions — 237 sources `fichier:ligne`, toutes résolues.
-  Nommé dans GUIDELINES § Écriture et dans CLAUDE.md.
-- Dans la V1 : la page d'admin « Animation perso des badges », EN PREMIER des
-  pages, avec le lien « Lancer l'animation Lapin des Fibres » qui fait danser
-  `LapinSeul` (le lapin sorti du badge en pièces partagées, sans cocarde ni
-  salade, oreilles animées) dans la page. Le badge est prouvé identique octet
-  pour octet.
+**Ce qui est FAIT depuis la note du 15/09 — tout dans GUIDELINES, section par
+section :**
+- l'accueil, les tiroirs (menu, « + »), « Mon compte » avec ses blocs
+  (traitement, poids, thème), les marges, la persistance sur l'appareil ;
+- le bloc du poids devenu LA RÈGLE CRANTÉE (`components/ReglePoids.tsx`) :
+  chiffre en cases fixes, graduation au dixième, tige bleue de 2 px sur son
+  cran, aimant immédiat, en silence ;
+- la page d'une PRISE (`PagePrise`) : le formulaire de la V1, le nom du
+  traitement qui propose sa mise à jour, rien en gras, TOUS LES CHOIX EN
+  PANNEAUX DESSINÉS DANS L'ÉCRAN (`Panneau`, `Choix`, `ChoixHeure`,
+  `ChoixDate` — règle absolue : aucun `select` natif) ;
+- la page d'une PESÉE (`PagePesee`) : idem, avec la règle ; poids proposé =
+  la pesée la plus récente non future (`domaine/pesees.ts`) ; une pesée par
+  jour, remplacement sur oui ;
+- L'ÉCRAN DE CONFIRMATION générique (`PageConfirmation`) : son image
+  (`validation-prise.svg`), la carte qui rouvre le formulaire en
+  modification, « Vous pouvez maintenant : », seul « Ajouter » agit ;
+- douze fonds de page (Fleurs, Brasserie, et les dix de sa planche),
+  l'image nette, et LA PALETTE PAR FOND — `scripts/palette-fonds.py` lit les
+  images et écrit `src/themes/fonds-palette.css` (logo, entête, `--fond-encre`) ;
+  à relancer à chaque fond ajouté.
+
+**Ce qui n'existe pas encore (et que les écrans annoncent, éteint) :** les
+pages Journal, Analyse, Concentration sanguine, Évolution du traitement /
+du poids ; les cases du « + » autres que Traitement et Balance ; les
+mensurations de la pesée ; l'enregistrement des prises et des pesées SUR
+L'APPAREIL (elles vivent en mémoire dans `App`, perdues au rechargement —
+`app/enregistrement.ts` est versionné, c'est là que ça ira).
+
+**À vérifier à l'écran, par elle :** les gestes (glisser la règle, les
+panneaux, le tiroir depuis l'écran de confirmation) ; la barre d'état du
+téléphone reste sombre sur un fond sombre ; les dix fonds de la planche
+sont petits (≈ 200 px de large) — lui demander les originaux.
+
+**Ce qui reste des documents (note du 15/09), toujours vrai :**
 
 **Ce qui reste, à dépiler (petit, refermable, un commit par point) :**
 - [ ] **Neuf contradictions internes dans l'abstraite**, relevées par l'agent
