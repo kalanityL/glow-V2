@@ -432,7 +432,10 @@ titre à l'accent (2026-09-20) ; le mot-symbole de « GLP1LOW
 et vous » dans la police, la couleur et la graisse de la ligne. **Derrière
 le tiroir, le reste de la page est une vitre floue, sans teinte** (« reste
 de la page vitré flou », 2026-09-19) — c'est la seule chose qui couvre une
-page, et elle ne l'assombrit pas. Ses trois sections, dans son ordre :
+page, et elle ne l'assombrit pas. **Le fond du tiroir est en très légère
+transparence sur la PHOTO de la page qui l'ouvre, jamais sur son contenu**
+(2026-09-20) : la photo est repeinte sous le tiroir, alignée sur celle de la
+page, sous un voile blanc à 86 %. Ses trois sections, dans son ordre :
 Préférences (Modules, Notifications, Couleurs, Badges), Exporter un rapport
 (Créer, Disponibles), GLP1LOW et vous — le mot-symbole dessiné, puis « et
 vous » — (Mon compte, Sondage, Avis et Feedback, FAQ, Ciel) ; mots courts et

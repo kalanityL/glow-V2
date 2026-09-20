@@ -1455,9 +1455,33 @@
   max-height: calc(100% - 48px);
   overflow-y: auto;
   padding: 10px 16px 84px;
-  border-radius: 22px 22px 0 0;
-  background: var(--module-fond);
-  box-shadow: var(--panneau-ombre);
+  /* Les coins sont découpés par `clip-path` et non par `border-radius` : c'est
+     lui qui rogne aussi la photo de fond posée dessous (voir `::before`). */
+  clip-path: inset(0 round 22px 22px 0 0);
+}
+
+/* LE FOND DU TIROIR EST EN TRÈS LÉGÈRE TRANSPARENCE SUR LA PHOTO DE LA PAGE
+   (2026-09-20, « ajoute le fond en tres legere transparence […] On ne doit
+   pas voir en transparence l'écran sous le menu, uniquement la partie du fond
+   de page qui est sous le menu » ; « le fond en transparence du menu doit
+   etre le fond de la page depuis laquelle le menu est ouvert ») : ce n'est
+   pas une transparence sur l'écran — on verrait les pastilles à travers —
+   mais la PHOTO DE LA PAGE, repeinte sous le tiroir, sous un voile blanc à
+   86 %. La photo est celle du jeton de la page (`--accueil-fond-image`) ; elle
+   est posée en `position: fixed` sur tout l'écran du téléphone (le bloc
+   conteneur des `fixed`, GUIDELINES) — donc EXACTEMENT alignée sur celle de
+   la page, même cadrage, même flou — et le `clip-path` du tiroir la rogne à
+   sa forme. Le voile blanc est le premier calque du même fond. */
+.tiroir::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  background:
+    linear-gradient(rgba(255, 255, 255, 0.86), rgba(255, 255, 255, 0.86)),
+    var(--accueil-fond-image) top / cover no-repeat;
+  filter: blur(4px);
+  pointer-events: none;
 }
 
 /* La barre du bas garde le dessus du tiroir. */
