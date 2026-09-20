@@ -77,7 +77,6 @@
   /* La graduation du poids : sur les neutres du thème. */
   --graduation-unite: var(--option-filet);
   --graduation-dizaine: var(--bille-eteinte);
-  --graduation-centaine: var(--encre-chapeau);
   --graduation-repere: var(--encre);
 
   /* Le menu du bas : pas de couleurs propres ici, il prend celles du thème —

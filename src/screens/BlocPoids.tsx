@@ -5,11 +5,10 @@ import { useTextes } from '../i18n/useTextes';
 import { POIDS_MAX, POIDS_MIN, cransFranchis, dixiemesFranchis, poidsDepuisRapport, poidsDepuisSaisie, rapportDuPoids } from '../domaine/mesures';
 import type { UnitePoids } from '../domaine/unites';
 import { defilementHorizontal, defilerHorizontalA, jouerSon } from '../plateforme/navigateur';
-/* SES DEUX SONS (2026-09-20, « utilise les sons dans ../son pour claude ») :
-   le « kilo » à chaque cran franchi en glissant, le « centième » à chaque
-   chiffre changé en tapant. Des fichiers embarqués, comme les polices. */
+/* SON SON (2026-09-20, « utilise les sons dans ../son pour claude », puis
+   « utilise le son kilo pour tous les clics ») : le « kilo », pour chaque
+   clic. Un fichier embarqué, comme les polices. */
 import sonKilo from '../assets/sons/03_metallic_air_kilo.wav';
-import sonCentieme from '../assets/sons/03_metallic_air_centieme.wav';
 
 /**
  * LE BLOC DU POIDS (2026-09-20, « mise à jour de poids : ouvre qqchose comme
@@ -23,9 +22,9 @@ import sonCentieme from '../assets/sons/03_metallic_air_centieme.wav';
  * deux se suivent : glisser la règle change le chiffre, taper le chiffre
  * amène la règle, à chaque frappe.
  *
- * LES CLICS (2026-09-20) : en glissant, le son « kilo » à chaque cran entier
- * franchi et le son « centième » à chaque dixième entre deux ; en tapant, le
- * son « centième » à chaque chiffre changé — ses deux sons, embarqués.
+ * LES CLICS (2026-09-20) : en glissant, un clic par cran entier franchi et un
+ * par dixième entre deux ; en tapant, un clic par chiffre changé — toujours
+ * le même son, le « kilo », embarqué.
  *
  * LA GRADUATION EST DU DÉFILEMENT NATIF (le doigt, la molette) : sa position se lit
  * en RAPPORT du chemin total — la géométrie (le pas d'un cran) est dans la
@@ -75,7 +74,11 @@ export function BlocPoids({
       <span className="poids__cases">
         {chiffres.map((chiffre, i) => (
           <span key={i} className="poids__case">
-            {chiffre.trim()}
+            {/* Une case vide porte une espace insécable : sans texte, elle n'a
+                pas de ligne de base, et le chiffre changeait de hauteur en
+                passant les cent (2026-09-20, « le bloc change de hauteur qd
+                on passe les cents kilos »). */}
+            {chiffre === ' ' ? '\u00A0' : chiffre}
           </span>
         ))}
         <span className="poids__separateur">{separateur}</span>
@@ -115,8 +118,8 @@ export function BlocPoids({
            clic clic aussi »). */
         const crans = cransFranchis(precedent, nouveau);
         const dixiemes = dixiemesFranchis(precedent, nouveau);
-        if (crans > 0) jouerSon(sonKilo, crans);
-        if (dixiemes > 0) jouerSon(sonCentieme, dixiemes);
+        /* Le même son pour tous (« utilise le son kilo pour tous les clics »). */
+        if (crans + dixiemes > 0) jouerSon(sonKilo, crans + dixiemes);
       }
       return nouveau;
     });
@@ -182,7 +185,7 @@ export function BlocPoids({
               /* Un clic à chaque chiffre changé (2026-09-20) : chaque frappe qui
                  change le texte. La graduation suit, en silence — elle est
                  amenée, elle ne passe pas de crans. */
-              jouerSon(sonCentieme);
+              jouerSon(sonKilo);
               const stocke = poidsDepuisSaisie(saisie, unite);
               if (stocke) {
                 placement.current = true;

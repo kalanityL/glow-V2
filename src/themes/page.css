@@ -1962,8 +1962,11 @@
    ligne graduée ne doit pas bouger verticalement qd on passe des dizaines ou
    des centaines » — les crans plus hauts faisaient onduler la ligne sous le
    repère) ; ils ne diffèrent que par la couleur, d'après son image : les
-   unités très claires, les dizaines un peu plus marquées, les centaines un
-   peu plus encore — trois jetons du thème. Le nombre dessous tous les dix. */
+   unités claires, les dizaines et les centaines un peu plus marquées — deux
+   jetons du thème. AUCUN CRAN N'EST FONCÉ (2026-09-20, « il n'y a qu'UN SEUL
+   endroit foncé, il est fixe, il correspond au centre de la règle, ça n'est
+   pas un cran ») : le seul élément foncé est le repère. Le nombre dessous
+   tous les dix. */
 .graduation__cran {
   position: relative;
   flex: none;
@@ -1981,12 +1984,9 @@
   background: var(--graduation-unite);
 }
 
-.graduation__cran--dix::before {
-  background: var(--graduation-dizaine);
-}
-
+.graduation__cran--dix::before,
 .graduation__cran--cent::before {
-  background: var(--graduation-centaine);
+  background: var(--graduation-dizaine);
 }
 
 .graduation__nombre {
@@ -1999,9 +1999,9 @@
   color: var(--encre-chapeau);
 }
 
-/* LE REPÈRE, au milieu : le seul cran foncé — « uniquement le cran du milieu
-   qui correspond à où on en est est foncé ». Sur la même ligne que les
-   crans, un peu plus long, à l'encre. */
+/* LE REPÈRE, au milieu : LE SEUL ENDROIT FONCÉ, fixe — ce n'est pas un cran
+   de la graduation, il dit où l'on en est sur elle. Sur la même ligne que
+   les crans, un peu plus long. */
 .graduation__repere {
   position: absolute;
   left: 50%;

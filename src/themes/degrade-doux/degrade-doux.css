@@ -96,11 +96,11 @@
   --pastille-fond: #eff6ff;
 
   /* LA GRADUATION DU POIDS, d'après son image (2026-09-20) : les crans des
-     unités très clairs, ceux des dizaines un peu plus marqués, les centaines
-     un peu plus encore ; le repère du milieu à l'encre. Relevés à l'œil. */
-  --graduation-unite: #dfe3ea;
-  --graduation-dizaine: #b6bdc9;
-  --graduation-centaine: #8d96a6;
+     unités clairs, ceux des dizaines un peu plus marqués — un cran plus
+     foncés qu'au premier jet (« les crans clairs deviennent un peu plus
+     foncé ») ; le repère du milieu, seul foncé, à l'encre. Relevés à l'œil. */
+  --graduation-unite: #c6cdd8;
+  --graduation-dizaine: #9aa3b3;
   --graduation-repere: #1e2a44;
 
   /* LE MENU DU BAS, AUX COULEURS DE SON IMAGE (2026-09-16,
