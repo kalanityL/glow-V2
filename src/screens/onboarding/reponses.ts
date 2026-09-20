@@ -5,6 +5,7 @@ import { SYSTEME_PAR_DEFAUT, type Systeme } from '../../domaine/unites';
 import { LANGUE_PAR_DEFAUT, type Langue } from '../../i18n/langues';
 import { THEME_PAR_DEFAUT, type ThemeId } from '../../themes/themes';
 import { dateDepuisAnnee } from '../../domaine/dates';
+import { FOND_PAR_DEFAUT, type FondId } from '../../app/fonds';
 
 /** Les objectifs proposés, dans l'ordre d'affichage. Le premier est retenu d'avance. */
 export const OBJECTIFS = ['perdre', 'stabiliser'] as const;
@@ -30,6 +31,9 @@ export interface Reponses {
    */
   langue: Langue;
   theme: ThemeId;
+  /** LE FOND DE PAGE choisi dans le bloc « Thème » (2026-09-20) : sa photo,
+     ou le ciel ensoleillé de la V1. */
+  fond: FondId;
   systeme: Systeme;
   objectif: Objectif;
   poids: string;
@@ -74,6 +78,7 @@ export interface Reponses {
 export const REPONSES_INITIALES: Reponses = {
   langue: LANGUE_PAR_DEFAUT,
   theme: THEME_PAR_DEFAUT,
+  fond: FOND_PAR_DEFAUT,
   systeme: SYSTEME_PAR_DEFAUT,
   objectif: OBJECTIFS[0],
   /* 95,0 par défaut (demande du 2026-09-07) : le sélecteur s'ouvre sur une

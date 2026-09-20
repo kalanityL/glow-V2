@@ -13,6 +13,7 @@ import type { EntreeMenu } from '../app/menu';
 import type { ModuleId } from '../app/modules';
 import type { EntreeMenuPrincipal, SectionMenu } from '../app/menuPrincipal';
 import type { VoletCompte } from '../screens/Compte';
+import type { FondId } from '../app/fonds';
 
 /**
  * TOUS LES MOTS DE L'APPLICATION, ET RIEN D'AUTRE.
@@ -190,6 +191,13 @@ export interface Textes {
     titre: string;
     sections: Record<SectionMenu, string>;
     entrees: Record<EntreeMenuPrincipal, string>;
+  };
+  /** LE BLOC « THÈME » (2026-09-20) : son titre, le nom de chaque fond (dit
+   *  à qui écoute la page : les cadres se voient), son bouton. */
+  blocTheme: {
+    titre: string;
+    fonds: Record<FondId, string>;
+    choisir: string;
   };
   /** LA PAGE « MON COMPTE » (2026-09-19, « Mon profil » jusqu'au soir) : son
    *  titre, ses trois volets et leurs onglets, et ce que chaque valeur attend
@@ -389,6 +397,14 @@ const FR: Textes = {
       faq: 'FAQ',
       ciel: 'Ciel',
     },
+  },
+  blocTheme: {
+    titre: 'Thème',
+    fonds: {
+      photo: 'Photo',
+      ciel: 'Ciel ensoleillé',
+    },
+    choisir: 'Choisir',
   },
   compte: {
     titre: 'Mon compte',

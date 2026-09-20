@@ -12,6 +12,15 @@ import { useTextes } from '../i18n/useTextes';
 import { RANGS_MODULES } from '../app/modules';
 import { classeDuTheme } from '../themes/themes';
 import type { Reponses } from './onboarding/reponses';
+import type { FondId } from '../app/fonds';
+
+/** Le fond de page tel que `App` le tient : l'enregistré, l'aperçu, les gestes. */
+export interface FondProps {
+  courant: FondId;
+  apercu: FondId | null;
+  onApercu: (fond: FondId | null) => void;
+  onChoisir: (fond: FondId) => void;
+}
 
 /**
  * L'ACCUEIL — la page où mène le dernier écran de l'onboarding (2026-09-16,
@@ -56,8 +65,11 @@ import type { Reponses } from './onboarding/reponses';
 export function Accueil({
   reponses,
   onOuvrirCompte,
+  fond,
 }: {
   reponses: Reponses;
+  /** Le fond de page et ses gestes, tenus par `App`. */
+  fond: FondProps;
   /** Le portrait ouvre la page « Mon compte » (2026-09-19), et l'entrée
       « Mon compte » du tiroir aussi. */
   onOuvrirCompte: () => void;
@@ -67,7 +79,7 @@ export function Accueil({
      de la barre, fermé par sa croix, par un clic à côté ou par « Menu » de
      nouveau. */
   return (
-    <div className={`page page--photo ${classeDuTheme('blanc')}`}>
+    <div className={`page page--photo page--fond-${fond.apercu ?? fond.courant} ${classeDuTheme('blanc')}`}>
       <div className="page__colonne">
         {/* UNE SEULE LIGNE (2026-09-16, « header : logo / glow / recherche/
             parametre tous sur la meme ligne / logo et titre meme hauteur,
@@ -168,6 +180,7 @@ export function Accueil({
         onAccueil={() => undefined}
         onOuvrirCompte={onOuvrirCompte}
         forme={reponses.formeTraitement}
+        fond={fond}
       />
     </div>
   );

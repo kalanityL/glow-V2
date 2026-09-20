@@ -11,6 +11,8 @@ import { ENTREES_MENU, type EntreeMenu } from '../app/menu';
 import type { Forme } from '../domaine/traitements';
 import { TiroirAjout } from './TiroirAjout';
 import { TiroirMenu } from './TiroirMenu';
+import { BlocTheme } from './BlocTheme';
+import type { FondProps } from './Accueil';
 
 /**
  * LA BARRE DU BAS ET SES DEUX TIROIRS — communs à toutes les pages de
@@ -35,6 +37,7 @@ export function BarreDuBas({
   onAccueil,
   onOuvrirCompte,
   forme,
+  fond,
 }: {
   /** L'entrée de la page courante, allumée. */
   active: EntreeMenu | null;
@@ -42,8 +45,16 @@ export function BarreDuBas({
   onOuvrirCompte: () => void;
   /** La forme du traitement répondue, pour la case du tiroir d'ajout. */
   forme: Forme | null;
+  /** LE FOND DE PAGE, pour le bloc « Thème » : l'enregistré, l'aperçu, et les
+      deux gestes — voir `App`, qui tient l'aperçu pour toute page. */
+  fond: FondProps;
 }) {
   const textes = useTextes();
+  const [blocTheme, setBlocTheme] = useState(false);
+  const fermerTheme = useCallback(() => {
+    setBlocTheme(false);
+    fond.onApercu(null);
+  }, [fond]);
 
   type EtatTiroir = 'ferme' | 'ouvert' | 'fermeture';
   const [tiroirs, setTiroirs] = useState<Record<'menu' | 'ajout', EtatTiroir>>({
@@ -72,7 +83,20 @@ export function BarreDuBas({
           onFermee={menuFerme}
           enFermeture={tiroirs.menu === 'fermeture'}
           onOuvrirCompte={onOuvrirCompte}
+          onOuvrirCouleurs={() => setBlocTheme(true)}
           bouton={leBoutonMenu}
+        />
+      ) : null}
+      {blocTheme ? (
+        <BlocTheme
+          courant={fond.courant}
+          apercu={fond.apercu}
+          onApercu={fond.onApercu}
+          onChoisir={(choix) => {
+            fond.onChoisir(choix);
+            fermerTheme();
+          }}
+          onFermer={fermerTheme}
         />
       ) : null}
       {tiroirs.ajout !== 'ferme' ? (

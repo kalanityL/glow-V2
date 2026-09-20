@@ -23,6 +23,7 @@ import { motDePasseValide } from '../domaine/compte';
 import { detecterLangue } from '../i18n/useTextes';
 import { montrerVolet, voletVisible } from '../plateforme/navigateur';
 import type { useParcours } from '../app/useParcours';
+import type { FondProps } from './Accueil';
 import { EtapeAvatar } from './onboarding/EtapeAvatar';
 
 /** Les trois volets du carrousel, dans l'ordre (2026-09-19, « Onglet
@@ -86,8 +87,11 @@ type Volet = VoletCompte;
 export function Compte({
   parcours,
   onAccueil,
+  fond,
 }: {
   parcours: ReturnType<typeof useParcours>;
+  /** Le fond de page et ses gestes, tenus par `App`. */
+  fond: FondProps;
   /** « Accueil » de la barre du bas ramène à l'accueil. */
   onAccueil: () => void;
 }) {
@@ -128,7 +132,7 @@ export function Compte({
   };
 
   return (
-    <div className={`page page--photo ${classeDuTheme('blanc')}`}>
+    <div className={`page page--photo page--fond-${fond.apercu ?? fond.courant} ${classeDuTheme('blanc')}`}>
       <div className="page__colonne">
         <EntetePage titre={textes.compte.titre} />
 
@@ -343,6 +347,7 @@ export function Compte({
         onAccueil={onAccueil}
         onOuvrirCompte={() => aller('compte')}
         forme={reponses.formeTraitement}
+        fond={fond}
       />
     </div>
   );

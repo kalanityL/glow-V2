@@ -4,6 +4,7 @@ import { useTextes } from './i18n/useTextes';
 import { Onboarding } from './screens/Onboarding';
 import { Accueil } from './screens/Accueil';
 import { Compte } from './screens/Compte';
+import type { FondId } from './app/fonds';
 /* La mise en page d'abord, les jetons des thèmes ensuite : les feuilles de
    thème doivent pouvoir battre la structure, jamais l'inverse. */
 import './themes/page.css';
@@ -36,6 +37,17 @@ export default function App() {
      c'est pour cela que la page vit ici, à côté du parcours, et non dans
      l'accueil. (Le menu principal, lui, est un tiroir de l'accueil.) */
   const [page, setPage] = useState<'accueil' | 'compte'>('accueil');
+
+  /* LE FOND DE PAGE (2026-09-20) : l'enregistré vient des réponses ; l'APERÇU,
+     provisoire, vit ici — le bloc « Thème » le pose sous les yeux, « Choisir »
+     l'enregistre, fermer l'efface. Toute page le reçoit. */
+  const [apercuFond, setApercuFond] = useState<FondId | null>(null);
+  const fond = {
+    courant: parcours.reponses.fond,
+    apercu: apercuFond,
+    onApercu: setApercuFond,
+    onChoisir: (choix: FondId) => parcours.repondre('fond', choix),
+  };
   const peutRevenir = page !== 'accueil' || parcours.peutRevenir;
   const revenir = () => {
     if (page !== 'accueil') setPage('accueil');
@@ -77,9 +89,9 @@ export default function App() {
           {!parcours.entre ? (
             <Onboarding parcours={parcours} />
           ) : page === 'compte' ? (
-            <Compte parcours={parcours} onAccueil={() => setPage('accueil')} />
+            <Compte parcours={parcours} onAccueil={() => setPage('accueil')} fond={fond} />
           ) : (
-            <Accueil reponses={parcours.reponses} onOuvrirCompte={() => setPage('compte')} />
+            <Accueil reponses={parcours.reponses} onOuvrirCompte={() => setPage('compte')} fond={fond} />
           )}
         </div>
 

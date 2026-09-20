@@ -187,6 +187,8 @@
   /* Pas de photo derrière l'accueil : elle appartient aux thèmes clairs. Le
      jeton est déclaré, à `none`, pour que la règle qui le lit trouve
      toujours une valeur. */
+  --fond-photo: none;
+  --fond-ciel: none;
   --accueil-fond-image: none;
 
   --font-display: 'Outfit', system-ui, sans-serif;

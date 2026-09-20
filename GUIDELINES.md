@@ -472,6 +472,17 @@ Fermer sans avoir enregistré, avec un changement en cours, propose deux
 sorties : « Terminer la mise à jour » / « Fermer » si seule la forme est
 choisie, « Confirmer la mise à jour » / « Fermer » si le choix est complet.
 
+**Le bloc « Thème »** (2026-09-20, « menu parametre couleur ») : l'entrée
+« Couleurs » du tiroir l'ouvre, sur toute page. Deux cadres, ceux du choix du
+thème de l'onboarding — la photo, et le ciel de midi du thème « Bleu
+ensoleillé » de la V1 —, et « Choisir ». Toucher un cadre change le fond de la
+page SOUS LES YEUX sans l'enregistrer ; « Choisir » l'enregistre (réponse
+`fond`, sur l'appareil) ; fermer sans choisir rend le fond enregistré. Le fond
+choisi vaut pour toute page, les tiroirs et les blocs (`.page--fond-<id>`
+rebranche le jeton `--accueil-fond-image`). **Un bloc prend toute la hauteur
+entre la zone sûre et la barre du bas, son contenu défile, son pied est
+ancré** (2026-09-20).
+
 **La page « Mon compte »** — « Mon profil » jusqu'au soir du 2026-09-19
 (« page mon profil devient mon compte. Onglet information/avatar/mon
 compte ») : trois volets, Informations / Avatar / Mon compte (l'adresse et

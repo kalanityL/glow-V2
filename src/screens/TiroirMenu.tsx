@@ -45,6 +45,7 @@ export function TiroirMenu({
   onFermee,
   enFermeture,
   onOuvrirCompte,
+  onOuvrirCouleurs,
   bouton,
 }: {
   onFermer: () => void;
@@ -52,6 +53,8 @@ export function TiroirMenu({
   enFermeture: boolean;
   /** « Mon compte » ouvre la page du compte (2026-09-19). */
   onOuvrirCompte: () => void;
+  /** « Couleurs » ouvre le bloc « Thème » (2026-09-20). */
+  onOuvrirCouleurs: () => void;
   bouton: () => Element | null;
 }) {
   const textes = useTextes();
@@ -78,14 +81,18 @@ export function TiroirMenu({
           </h2>
           <div className="tiroir__grille">
             {ENTREES_PAR_SECTION[section].map((entree) =>
-              entree === 'compte' ? (
-                /* LA SEULE ENTRÉE QUI MÈNE QUELQUE PART : « Mon compte », la
-                   page existe (2026-09-19). Les autres attendent la leur. */
+              entree === 'compte' || entree === 'theme' ? (
+                /* LES ENTRÉES QUI MÈNENT QUELQUE PART : « Mon compte », la page
+                   (2026-09-19) ; « Couleurs », le bloc « Thème » (2026-09-20).
+                   Les autres attendent la leur. */
                 <button
                   key={entree}
                   type="button"
                   className="tiroir__entree tiroir__entree--bouton"
-                  onClick={onOuvrirCompte}
+                  onClick={() => {
+                    onFermer();
+                    (entree === 'compte' ? onOuvrirCompte : onOuvrirCouleurs)();
+                  }}
                 >
                   <span className="tiroir__icone">{ICONES_ENTREES[entree]}</span>
                   <span className="tiroir__nom">{textes.menuPrincipal.entrees[entree]}</span>
