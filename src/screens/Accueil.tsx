@@ -80,8 +80,14 @@ export function Accueil({
   /* LE MENU PRINCIPAL EN TIROIR (2026-09-19) : ouvert par l'entrée « Menu »
      de la barre, fermé par sa croix, par un clic à côté ou par « Menu » de
      nouveau. */
-  const [menuOuvert, setMenuOuvert] = useState(false);
-  const fermerMenu = useCallback(() => setMenuOuvert(false), []);
+  /* Trois états (2026-09-20, « effet tiroir à l'ouverture et à la
+     fermeture ») : fermé, ouvert, et EN FERMETURE — le tiroir reste monté le
+     temps de redescendre, puis se démonte quand son mouvement finit. */
+  const [menu, setMenu] = useState<'ferme' | 'ouvert' | 'fermeture'>('ferme');
+  const menuOuvert = menu !== 'ferme';
+  const fermerMenu = useCallback(() => setMenu((etat) => (etat === 'ouvert' ? 'fermeture' : etat)), []);
+  const menuFerme = useCallback(() => setMenu('ferme'), []);
+  const basculerMenu = () => setMenu((etat) => (etat === 'ouvert' ? 'fermeture' : 'ouvert'));
   const boutonMenu = useRef<HTMLButtonElement>(null);
   const leBoutonMenu = useCallback(() => boutonMenu.current, []);
 
@@ -184,7 +190,13 @@ export function Accueil({
       </div>
 
       {menuOuvert ? (
-        <TiroirMenu onFermer={fermerMenu} onOuvrirCompte={onOuvrirCompte} bouton={leBoutonMenu} />
+        <TiroirMenu
+          onFermer={fermerMenu}
+          onFermee={menuFerme}
+          enFermeture={menu === 'fermeture'}
+          onOuvrirCompte={onOuvrirCompte}
+          bouton={leBoutonMenu}
+        />
       ) : null}
 
       {/* LE MENU EST HORS DE LA COLONNE DE LECTURE : la colonne est bornée à
@@ -199,8 +211,8 @@ export function Accueil({
                 ref={boutonMenu}
                 type="button"
                 className={`menu__entree menu__entree--menu menu__entree--bouton${menuOuvert ? ' menu__entree--active' : ''}`}
-                aria-expanded={menuOuvert}
-                onClick={() => setMenuOuvert((ouvert) => !ouvert)}
+                aria-expanded={menu === 'ouvert'}
+                onClick={basculerMenu}
               >
                 <span className="menu__icone">{ICONES_MENU[entree]}</span>
                 <span className="menu__nom">{textes.accueil.menu[entree]}</span>

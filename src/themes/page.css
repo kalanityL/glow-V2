@@ -1439,8 +1439,13 @@
   z-index: 1;
   -webkit-backdrop-filter: blur(6px);
   backdrop-filter: blur(6px);
-  /* La vitre apparaît en fondu, le temps que le tiroir monte. */
+  /* La vitre apparaît en fondu, le temps que le tiroir monte — et s'efface
+     de même le temps qu'il redescend. */
   animation: vitre-apparait 240ms ease-out;
+}
+
+.tiroir__vitre--fermeture {
+  animation: vitre-apparait 240ms ease-in reverse forwards;
 }
 
 @keyframes vitre-apparait {
@@ -1478,12 +1483,27 @@
   animation: tiroir-monte 240ms ease-out;
 }
 
+/* Et il redescend de même à la fermeture (2026-09-20), en restant en place le
+   temps du mouvement (`forwards`) : il se démonte quand l'animation finit. */
+.tiroir--fermeture {
+  animation: tiroir-descend 240ms ease-in forwards;
+}
+
 @keyframes tiroir-monte {
   from {
     bottom: -100%;
   }
   to {
     bottom: 0;
+  }
+}
+
+@keyframes tiroir-descend {
+  from {
+    bottom: 0;
+  }
+  to {
+    bottom: -100%;
   }
 }
 
@@ -1494,7 +1514,7 @@
    etre le fond de la page depuis laquelle le menu est ouvert ») : ce n'est
    pas une transparence sur l'écran — on verrait les pastilles à travers —
    mais la PHOTO DE LA PAGE, repeinte sous le tiroir, sous un voile blanc à
-   86 %. La photo est celle du jeton de la page (`--accueil-fond-image`) ; elle
+   78 % (86 d'abord, « un peu plus transparent » le même jour). La photo est celle du jeton de la page (`--accueil-fond-image`) ; elle
    est posée en `position: fixed` sur tout l'écran du téléphone (le bloc
    conteneur des `fixed`, GUIDELINES) — donc EXACTEMENT alignée sur celle de
    la page, même cadrage, même flou — et le `clip-path` du tiroir la rogne à
@@ -1505,7 +1525,7 @@
   inset: 0;
   z-index: -1;
   background:
-    linear-gradient(rgba(255, 255, 255, 0.86), rgba(255, 255, 255, 0.86)),
+    linear-gradient(rgba(255, 255, 255, 0.78), rgba(255, 255, 255, 0.78)),
     var(--accueil-fond-image) top / cover no-repeat;
   filter: blur(4px);
   pointer-events: none;

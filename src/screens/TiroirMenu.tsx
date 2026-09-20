@@ -26,8 +26,10 @@ import {
  * LE MENU PRINCIPAL EN TIROIR (2026-09-19, « ouvre le menu en tiroir comme ça
  * avec une croix pour fermer », d'après son image) : un panneau qui monte
  * depuis la barre du bas, par-dessus le bas de l'accueil, et qui se ferme à
- * la croix, au clic à côté ou à Échap — LE MÊME MÉCANISME QUE LE PANNEAU DES
- * ROUES (`surClicDehors`), qui n'est pas un popup au sens des guidelines :
+ * la croix, au clic à côté ou à Échap — en redescendant (2026-09-20, « effet
+ * tiroir à l'ouverture et à la fermeture ») — LE MÊME MÉCANISME QUE LE
+ * PANNEAU DES ROUES (`surClicDehors`), qui n'est pas un popup au sens des
+ * guidelines :
  * pas de voile sombre, pas de fenêtre, un panneau déroulant à l'endroit du
  * geste. Il a remplacé la page « Menu » du matin.
  *
@@ -46,10 +48,17 @@ import {
  */
 export function TiroirMenu({
   onFermer,
+  onFermee,
+  enFermeture,
   onOuvrirCompte,
   bouton,
 }: {
+  /** Demande la fermeture : le tiroir redescend. */
   onFermer: () => void;
+  /** Le tiroir a fini de redescendre : il peut se démonter. */
+  onFermee: () => void;
+  /** Vrai le temps de la descente. */
+  enFermeture: boolean;
   /** « Mon compte » ouvre la page du compte (2026-09-19). */
   onOuvrirCompte: () => void;
   /** Le bouton « Menu » de la barre : un clic dessus n'est pas « à côté ». */
@@ -69,8 +78,16 @@ export function TiroirMenu({
 
   return (
     <>
-      <div className="tiroir__vitre" aria-hidden="true" />
-      <div className="tiroir" ref={tiroir} role="dialog" aria-label={textes.menuPrincipal.titre}>
+      <div className={`tiroir__vitre${enFermeture ? ' tiroir__vitre--fermeture' : ''}`} aria-hidden="true" />
+      <div
+        className={`tiroir${enFermeture ? ' tiroir--fermeture' : ''}`}
+        ref={tiroir}
+        role="dialog"
+        aria-label={textes.menuPrincipal.titre}
+        /* La descente finie, le tiroir se démonte — c'est son mouvement qui
+           le dit, pas une minuterie à côté. */
+        onAnimationEnd={enFermeture ? onFermee : undefined}
+      >
       <div className="tiroir__poignee" aria-hidden="true" />
       <button type="button" className="tiroir__fermer" aria-label={textes.fermer} onClick={onFermer}>
         <IconeCroix />
