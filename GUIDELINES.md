@@ -440,7 +440,7 @@ page, et elle ne l'assombrit pas. **Le fond du tiroir est en très légère
 transparence sur la PHOTO de la page qui l'ouvre, jamais sur son contenu**
 (2026-09-20) : la photo est repeinte sous le tiroir, alignée sur celle de la
 page, sous un voile blanc à 78 %. Il glisse aussi à la fermeture. Ses trois sections, dans son ordre :
-Préférences (Modules, Notifications, Couleurs, Badges), Exporter un rapport
+Préférences (Modules, Notifications, Couleurs, Badges), Exporter un bilan
 (Créer, Disponibles), GLP1LOW et vous — le mot-symbole dessiné, puis « et
 vous » — (Mon compte, Sondage, Avis et Feedback, FAQ, Ciel) ; mots courts et
 ordre du 2026-09-20, la croix en contour, le premier titre sous sa ligne. « Admin » attend qu'il existe un compte. Aucune entrée

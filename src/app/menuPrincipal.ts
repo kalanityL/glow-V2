@@ -4,7 +4,7 @@
  * de la V1 (`versions/mixte/App.tsx`, `quickMenuSections`), qu'elle a redit
  * entrée par entrée :
  *   Préférences — Modules, Notifications, Couleurs, Badges ;
- *   Exporter un rapport — Créer, Disponibles ;
+ *   Exporter un bilan — Créer, Disponibles ;
  *   GLP1LOW et vous (le titre porte le mot-symbole dessiné, suivi de
  *                 « et vous ») — Mon compte, Sondage, Avis et Feedback, FAQ,
  *                 Ciel.

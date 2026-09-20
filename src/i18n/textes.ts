@@ -345,11 +345,12 @@ const FR: Textes = {
     titre: 'Menu',
     sections: {
       preferences: 'Préférences',
-      /* Renommages du 2026-09-20 : « Export » → « Exporter un rapport »,
+      /* Renommages du 2026-09-20 : « Export » → « Exporter un rapport » puis
+         « Exporter un bilan » le même jour,
          « Activation Modules » → « Modules », « Thème et couleurs » →
          « Couleurs », « Nouveau rapport médical » → « Créer », « Rapports
          disponibles » → « Disponibles ». */
-      export: 'Exporter un rapport',
+      export: 'Exporter un bilan',
       glowEtVous: 'et vous',
     },
     entrees: {

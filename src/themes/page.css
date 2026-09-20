@@ -1644,6 +1644,18 @@
   min-width: 0;
 }
 
+/* Les icônes du « + » sont plus grandes que celles du menu (2026-09-20,
+   « icones du menu ajouter : + grandes ») : pastille de 48 px, icône de 26. */
+.tiroir__case .tiroir__icone {
+  width: 48px;
+  height: 48px;
+}
+
+.tiroir__case .tiroir__icone .icone {
+  width: 26px;
+  height: 26px;
+}
+
 .tiroir__case-nom {
   max-width: 100%;
   font-family: var(--font-body);
