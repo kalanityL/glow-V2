@@ -47,7 +47,8 @@ export function TiroirAjout({
       enFermeture={enFermeture}
       bouton={bouton}
     >
-      <h2 className="tiroir__titre">{textes.accueil.questionAjout}</h2>
+      {/* Sur la ligne de la croix, sans ligne dessous, à l'encre (2026-09-20). */}
+      <h2 className="tiroir__titre tiroir__titre--entete">{textes.accueil.questionAjout}</h2>
       <div className="tiroir__cases">
         {MODULES_AJOUT.map((module) => (
           <div key={module} className="tiroir__case">

@@ -451,8 +451,12 @@ tiroir meme fonctionnalité que v1 avec le style actuel de v2 ») : la fonction
 du tiroir « ajout » de la V1 — les sept modules qui ont un formulaire d'ajout,
 trois par rangée, dans l'ordre de la V1, chaque case menant à la page du
 module avec son formulaire ouvert (les pages n'existent pas encore) — dans le
-cadre commun des tiroirs (`components/Tiroir.tsx`). **Ouvrir un tiroir ferme
-l'autre en même temps** : l'un descend pendant que l'autre monte.
+cadre commun des tiroirs (`components/Tiroir.tsx`). Son titre, « Que
+souhaitez-vous ajouter ? », est **sur la ligne de la croix, sans ligne
+dessous, à l'encre de la croix** (2026-09-20, « meme ligne que la croix de
+fermeture, pas de ligne horizontale dessous, meme couleur que la croix de
+fermeture ») — le menu principal, lui, garde son premier titre sous la
+croix. **Ouvrir un tiroir ferme l'autre en même temps** : l'un descend pendant que l'autre monte.
 
 **Toute page de l'application porte la barre du bas** (`BarreDuBas`, avec
 ses deux tiroirs) et, hors de l'accueil, **l'entête des pages**

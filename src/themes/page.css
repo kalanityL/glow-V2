@@ -1639,6 +1639,20 @@
   color: var(--marque-degrade-debut);
 }
 
+/* LE TITRE DU TIROIR DU « + », SUR LA LIGNE DE LA CROIX (2026-09-20, « que
+   souhaitez vous ajouter : meme ligne que la croix de fermeture, pas de
+   ligne horizontale dessous, meme couleur que la croix de fermeture ») : à
+   la hauteur de la croix (28 px à 12 px du haut — le contenu commence à
+   22 px, sous la poignée), sans la longue ligne, à l'encre. Le menu
+   principal, lui, garde son premier titre sous la croix. */
+.tiroir__contenu > .tiroir__titre--entete:first-child {
+  min-height: 28px;
+  margin: -10px 40px 10px 0;
+  padding-bottom: 0;
+  border-bottom: 0;
+  color: var(--encre);
+}
+
 /* Le mot-symbole dans « GLP1LOW et vous » : la police, la couleur et la
    graisse du reste de la ligne (2026-09-19) — seul son dessin reste. */
 .tiroir__titre .wordmark--enligne,
