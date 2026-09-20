@@ -885,7 +885,7 @@
    même jour un bleu marine et un vert assorti (« g et low en bleu marine,
    lp1 en vert assorti harmonieusement au logo et au bleu marine ») ; le
    2026-09-20 le sky-600 de la V1 pour G et LOW. Dans les entêtes de
-   l'accueil (en grand) et des pages (en petit, `.compte__marque`) : l'entête
+   l'accueil (en grand) et des pages (en petit, `.entete--page`) : l'entête
    de l'onboarding garde son encre et son accent. */
 /* G ET LOW EN DÉGRADÉ, du bleu profond au bleu azur de gauche à droite
    (2026-09-20, d'après son image) : le dégradé est posé sur le lockup entier
@@ -894,7 +894,7 @@
    fond est retiré et son encre remise. En natif, un masque de texte sur un
    dégradé. */
 .entete--accueil .wordmark__lockup,
-.compte__marque .wordmark__lockup {
+.entete--page .wordmark__lockup {
   background: linear-gradient(to right, var(--marque-degrade-debut), var(--marque-degrade-fin));
   -webkit-background-clip: text;
   background-clip: text;
@@ -902,12 +902,12 @@
 }
 
 .entete--accueil .wordmark__lp1,
-.compte__marque .wordmark__lp1 {
+.entete--page .wordmark__lp1 {
   background: none;
 }
 
 .entete--accueil .wordmark__lp1,
-.compte__marque .wordmark__lp1 {
+.entete--page .wordmark__lp1 {
   color: var(--marque-accent);
 }
 
@@ -1127,74 +1127,36 @@
   height: 26px;
 }
 
-/* ── LA PAGE PROFIL (2026-09-19) ────────────────────────────────────────── */
+/* ── L'ENTÊTE DES PAGES (2026-09-20) ────────────────────────────────────── */
 
-/* L'ENTÊTE : la marque à gauche et le bouton retour DESSOUS (« logo à gauche,
-   fleche retour en dessous »), le titre à droite, sur la ligne de la marque. */
-.compte__entete {
-  display: grid;
-  grid-template-columns: auto 1fr;
-  grid-template-areas:
-    'marque titre'
-    'retour titre';
-  column-gap: 12px;
-  row-gap: 8px;
-  align-items: center;
-  margin-bottom: 12px;
+/* La marque en petit à gauche, les deux outils à droite sur la même ligne
+   (« search et notif sur la meme ligne que logo »), sans flèche de retour ;
+   le titre de la page sur la ligne du dessous, centré, pas en gras. */
+.entete--page {
   --logo-size: 27px;
-}
-
-.compte__marque {
-  grid-area: marque;
-  display: flex;
-  align-items: center;
-  gap: 4px;
+  gap: 6px;
+  margin-bottom: 6px;
 }
 
 /* Le mot-symbole du petit entête, PRESQUE AUSSI HAUT QUE LA PASTILLE
    (2026-09-20, « agrandis la hauteur de glp1 low pour etre presque aussi
-   haut que le logo du mini header » — 14 px de corps auparavant) : 90 % de
-   la pastille en hauteur d'encre, laquelle vaut 0,92 em du corps (mesuré le
-   16). */
-.compte__marque .wordmark {
+   haut que le logo du mini header ») : 90 % de la pastille en hauteur
+   d'encre, laquelle vaut 0,92 em du corps (mesuré le 16). */
+.entete--page .wordmark {
   font-family: var(--font-marque);
   font-size: calc(var(--logo-size) * 0.9 / 0.92);
 }
 
-.compte__titre {
-  grid-area: titre;
-  justify-self: end;
-  margin: 0;
+.page__titre {
+  margin: 0 0 12px;
   font-family: var(--font-display);
-  font-weight: 700;
+  font-weight: 400;
   font-size: 20px;
+  text-align: center;
   color: var(--encre);
 }
 
-.compte__retour {
-  grid-area: retour;
-}
-
-/* La pastille ronde qui est un BOUTON (le retour) : la même pastille que les
-   outils de l'accueil, un peu plus grande, et un vrai bouton. */
-.rond--bouton {
-  width: 36px;
-  height: 36px;
-  padding: 0;
-  border: 0;
-  cursor: pointer;
-  justify-self: start;
-  transition: transform 150ms;
-}
-
-.rond--bouton .icone {
-  width: 18px;
-  height: 18px;
-}
-
-.rond--bouton:active {
-  transform: scale(0.95);
-}
+/* ── LA PAGE « MON COMPTE » ─────────────────────────────────────────────── */
 
 /* L'IDENTITÉ : le portrait — un bouton qui mène au volet de l'avatar — et le
    prénom, qui s'édite sur place, là et nulle part ailleurs. */

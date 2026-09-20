@@ -77,7 +77,7 @@ export default function App() {
           {!parcours.entre ? (
             <Onboarding parcours={parcours} />
           ) : page === 'compte' ? (
-            <Compte parcours={parcours} onRevenir={() => setPage('accueil')} />
+            <Compte parcours={parcours} onAccueil={() => setPage('accueil')} />
           ) : (
             <Accueil reponses={parcours.reponses} onOuvrirCompte={() => setPage('compte')} />
           )}

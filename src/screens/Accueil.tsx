@@ -1,22 +1,14 @@
-import { useCallback, useRef, useState } from 'react';
 import { Avatar } from '../components/Avatar';
-import { TiroirMenu } from './TiroirMenu';
-import { TiroirAjout } from './TiroirAjout';
+import { BarreDuBas } from './BarreDuBas';
 import { IconeDuModule } from './iconesModules';
 import { Cocarde } from '../components/Cocarde';
 import {
-  IconeAnalyse,
-  IconeJournal,
-  IconeEtoiles,
-  IconeMenu,
-  IconePlus,
   IconeRecherche,
   IconeNotifications,
 } from '../components/Icones';
 import { Etoiles, Logomark } from '../components/Logomark';
 import { Wordmark } from '../components/Wordmark';
 import { useTextes } from '../i18n/useTextes';
-import { ENTREES_MENU, type EntreeMenu } from '../app/menu';
 import { RANGS_MODULES } from '../app/modules';
 import { classeDuTheme } from '../themes/themes';
 import type { Reponses } from './onboarding/reponses';
@@ -74,36 +66,6 @@ export function Accueil({
   /* LE MENU PRINCIPAL EN TIROIR (2026-09-19) : ouvert par l'entrée « Menu »
      de la barre, fermé par sa croix, par un clic à côté ou par « Menu » de
      nouveau. */
-  /* DEUX TIROIRS, le menu et le « + », chacun en trois états (2026-09-20,
-     « effet tiroir à l'ouverture et à la fermeture ») : fermé, ouvert, et EN
-     FERMETURE — le tiroir reste monté le temps de redescendre, puis se
-     démonte quand son mouvement finit. OUVRIR L'UN FERME L'AUTRE EN MÊME
-     TEMPS (« si un autre tiroir est déjà ouvert, ferme le tiroir ouvert et
-     ouvre le tiroir + en meme temps et inversement ») : l'un descend pendant
-     que l'autre monte — c'est le clic « à côté » de l'ouvert qui le ferme,
-     et le bouton du nouveau qui l'ouvre, dans le même geste. */
-  type EtatTiroir = 'ferme' | 'ouvert' | 'fermeture';
-  const [tiroirs, setTiroirs] = useState<Record<'menu' | 'ajout', EtatTiroir>>({
-    menu: 'ferme',
-    ajout: 'ferme',
-  });
-  const fermer = (lequel: 'menu' | 'ajout') =>
-    setTiroirs((etats) => (etats[lequel] === 'ouvert' ? { ...etats, [lequel]: 'fermeture' } : etats));
-  const ferme = (lequel: 'menu' | 'ajout') => setTiroirs((etats) => ({ ...etats, [lequel]: 'ferme' }));
-  const basculer = (lequel: 'menu' | 'ajout') =>
-    setTiroirs((etats) => ({ ...etats, [lequel]: etats[lequel] === 'ouvert' ? 'fermeture' : 'ouvert' }));
-  const fermerMenu = useCallback(() => fermer('menu'), []);
-  const menuFerme = useCallback(() => ferme('menu'), []);
-  const fermerAjout = useCallback(() => fermer('ajout'), []);
-  const ajoutFerme = useCallback(() => ferme('ajout'), []);
-  const menu = tiroirs.menu;
-  const menuOuvert = menu !== 'ferme';
-  const ajoutOuvert = tiroirs.ajout !== 'ferme';
-  const boutonMenu = useRef<HTMLButtonElement>(null);
-  const leBoutonMenu = useCallback(() => boutonMenu.current, []);
-  const boutonAjout = useRef<HTMLButtonElement>(null);
-  const leBoutonAjout = useCallback(() => boutonAjout.current, []);
-
   return (
     <div className={`page page--photo ${classeDuTheme('blanc')}`}>
       <div className="page__colonne">
@@ -201,76 +163,12 @@ export function Accueil({
         ))}
       </div>
 
-      {menuOuvert ? (
-        <TiroirMenu
-          onFermer={fermerMenu}
-          onFermee={menuFerme}
-          enFermeture={menu === 'fermeture'}
-          onOuvrirCompte={onOuvrirCompte}
-          bouton={leBoutonMenu}
-        />
-      ) : null}
-      {ajoutOuvert ? (
-        <TiroirAjout
-          onFermer={fermerAjout}
-          onFermee={ajoutFerme}
-          enFermeture={tiroirs.ajout === 'fermeture'}
-          bouton={leBoutonAjout}
-          forme={reponses.formeTraitement}
-        />
-      ) : null}
-
-      {/* LE MENU EST HORS DE LA COLONNE DE LECTURE : la colonne est bornée à
-          380 px, la barre doit aller d'un bord à l'autre de l'écran. */}
-      <div className="menu">
-          {ENTREES_MENU.map((entree) =>
-            entree === 'menu' ? (
-              /* LA SEULE ENTRÉE QUI MÈNE QUELQUE PART (2026-09-19) : « Menu »
-                 ouvre le menu principal. Les autres attendent leurs pages. */
-              <button
-                key={entree}
-                ref={boutonMenu}
-                type="button"
-                className={`menu__entree menu__entree--menu menu__entree--bouton${menuOuvert ? ' menu__entree--active' : ''}`}
-                aria-expanded={menu === 'ouvert'}
-                onClick={() => basculer('menu')}
-              >
-                <span className="menu__icone">{ICONES_MENU[entree]}</span>
-                <span className="menu__nom">{textes.accueil.menu[entree]}</span>
-              </button>
-            ) : entree === 'ajouter' ? (
-              /* « + » ouvre le tiroir d'ajout (2026-09-20). */
-              <button
-                key={entree}
-                ref={boutonAjout}
-                type="button"
-                className="menu__entree menu__entree--ajouter menu__entree--bouton"
-                aria-expanded={tiroirs.ajout === 'ouvert'}
-                onClick={() => basculer('ajout')}
-              >
-                <span className="menu__icone">{ICONES_MENU[entree]}</span>
-                <span className="menu__nom">{textes.accueil.menu[entree]}</span>
-              </button>
-            ) : (
-              <div
-                key={entree}
-                className={`menu__entree menu__entree--${entree}${entree === 'accueil' ? ' menu__entree--active' : ''}`}
-              >
-                <span className="menu__icone">{ICONES_MENU[entree]}</span>
-                <span className="menu__nom">{textes.accueil.menu[entree]}</span>
-              </div>
-            ),
-          )}
-      </div>
+      <BarreDuBas
+        active="accueil"
+        onAccueil={() => undefined}
+        onOuvrirCompte={onOuvrirCompte}
+        forme={reponses.formeTraitement}
+      />
     </div>
   );
 }
-
-/** L'icône de chaque entrée : une par entrée, le type l'exige. */
-const ICONES_MENU: Record<EntreeMenu, React.ReactNode> = {
-  accueil: <IconeEtoiles />,
-  journal: <IconeJournal />,
-  ajouter: <IconePlus />,
-  analyse: <IconeAnalyse />,
-  menu: <IconeMenu />,
-};

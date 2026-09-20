@@ -454,6 +454,13 @@ module avec son formulaire ouvert (les pages n'existent pas encore) — dans le
 cadre commun des tiroirs (`components/Tiroir.tsx`). **Ouvrir un tiroir ferme
 l'autre en même temps** : l'un descend pendant que l'autre monte.
 
+**Toute page de l'application porte la barre du bas** (`BarreDuBas`, avec
+ses deux tiroirs) et, hors de l'accueil, **l'entête des pages**
+(`EntetePage` : la marque en petit et les deux outils sur une ligne, le
+titre centré et non gras dessous, pas de flèche de retour — « Accueil » de la
+barre et le bouton du téléphone ramènent ; 2026-09-20, « mon compte est une
+page à part entiere »).
+
 **La page « Mon compte »** — « Mon profil » jusqu'au soir du 2026-09-19
 (« page mon profil devient mon compte. Onglet information/avatar/mon
 compte ») : trois volets, Informations / Avatar / Mon compte (l'adresse et

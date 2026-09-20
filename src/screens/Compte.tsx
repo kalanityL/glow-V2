@@ -10,10 +10,9 @@ import {
   IconePalette,
   IconeProfil,
   IconeRegle,
-  IconeRetour,
 } from '../components/Icones';
-import { Logomark } from '../components/Logomark';
-import { Wordmark } from '../components/Wordmark';
+import { BarreDuBas } from './BarreDuBas';
+import { EntetePage } from './EntetePage';
 import { useTextes } from '../i18n/useTextes';
 import { classeDuTheme } from '../themes/themes';
 import { UNITES_DU_SYSTEME, tailleAffichee, tailleEnCm } from '../domaine/unites';
@@ -56,7 +55,11 @@ type Volet = VoletCompte;
  * carroussel figé en pas d'écran, scroller laisse toujours visble le
  * slider »).
  *
- * L'ENTÊTE : la marque à gauche, le bouton retour dessous, le titre à droite.
+ * UNE PAGE À PART ENTIÈRE (2026-09-20, « mon compte est une page à part
+ * entiere : le menu du bas apparait, pas de fleche de retour, search et notif
+ * sur la meme ligne que logo, titre de page ligne du dessous centré pas en
+ * gras ») : l'entête des pages (`EntetePage`), et la barre du bas
+ * (`BarreDuBas`) dont « Accueil » ramène à l'accueil — plus de flèche.
  * L'IDENTITÉ : le portrait — qui mène au volet de l'avatar — et le prénom,
  * qui s'édite sur place, là, et nulle part ailleurs.
  * LE CARROUSEL : deux volets qui glissent, « Mes informations » puis « Mon
@@ -78,10 +81,11 @@ type Volet = VoletCompte;
  */
 export function Compte({
   parcours,
-  onRevenir,
+  onAccueil,
 }: {
   parcours: ReturnType<typeof useParcours>;
-  onRevenir: () => void;
+  /** « Accueil » de la barre du bas ramène à l'accueil. */
+  onAccueil: () => void;
 }) {
   const textes = useTextes();
   const langue = detecterLangue();
@@ -104,21 +108,7 @@ export function Compte({
   return (
     <div className={`page page--photo ${classeDuTheme('blanc')}`}>
       <div className="page__colonne">
-        <div className="compte__entete">
-          <div className="compte__marque">
-            <Logomark />
-            <Wordmark />
-          </div>
-          <h1 className="compte__titre">{textes.compte.titre}</h1>
-          <button
-            type="button"
-            className="rond rond--bouton compte__retour"
-            aria-label={textes.retour}
-            onClick={onRevenir}
-          >
-            <IconeRetour />
-          </button>
-        </div>
+        <EntetePage titre={textes.compte.titre} />
 
         <div className="compte__identite">
           <button
@@ -321,6 +311,13 @@ export function Compte({
         </div>
 
       </div>
+
+      <BarreDuBas
+        active={null}
+        onAccueil={onAccueil}
+        onOuvrirCompte={() => aller('compte')}
+        forme={reponses.formeTraitement}
+      />
     </div>
   );
 }
