@@ -874,15 +874,19 @@
    `--marque-accent`. Le 2026-09-16 ils ont été le bleu et le vert de la
    pastille (« g et low le bleu du logo et lp1 le vert du logo »), puis le
    même jour un bleu marine et un vert assorti (« g et low en bleu marine,
-   lp1 en vert assorti harmonieusement au logo et au bleu marine »). Sur
-   l'accueil seulement : l'entête de l'onboarding garde son encre et son
-   accent. */
+   lp1 en vert assorti harmonieusement au logo et au bleu marine ») ; le
+   2026-09-20 le sky-600 de la V1 pour G et LOW. Dans les entêtes de
+   l'accueil (en grand) et des pages (en petit, `.compte__marque`) : l'entête
+   de l'onboarding garde son encre et son accent. */
 .entete--accueil .wordmark__g,
-.entete--accueil .wordmark__low {
+.entete--accueil .wordmark__low,
+.compte__marque .wordmark__g,
+.compte__marque .wordmark__low {
   color: var(--marque-encre);
 }
 
-.entete--accueil .wordmark__lp1 {
+.entete--accueil .wordmark__lp1,
+.compte__marque .wordmark__lp1 {
   color: var(--marque-accent);
 }
 
@@ -1594,8 +1598,9 @@
   font-family: var(--font-display);
   font-weight: 600;
   font-size: 15px;
-  /* À l'accent (2026-09-20, « titre de section -> bleu »). */
-  color: var(--accent);
+  /* Le bleu de G et LOW — le sky-600 de la V1 (2026-09-20, « titre de
+     section -> bleu », puis « utilise le bleu sky600 de la v1 »). */
+  color: var(--marque-encre);
 }
 
 /* Le mot-symbole dans « GLP1LOW et vous » : la police, la couleur et la
