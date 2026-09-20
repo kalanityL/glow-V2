@@ -91,3 +91,15 @@ export function enregistrer(cle: string, texte: string): void {
     /* Stockage indisponible : l'application continue sans enregistrer. */
   }
 }
+
+/** Où en est un défilement horizontal : sa position, et sa course totale
+    (2026-09-20, la règle des poids — le code n'en fait qu'un rapport). */
+export function defilementHorizontal(element: Element | null): { position: number; course: number } {
+  if (!element) return { position: 0, course: 0 };
+  return { position: element.scrollLeft, course: element.scrollWidth - element.clientWidth };
+}
+
+/** Amène un défilement horizontal à une position, en glissant ou d'un coup. */
+export function defilerHorizontalA(element: Element | null, position: number, doux: boolean): void {
+  element?.scrollTo({ left: position, behavior: doux ? 'smooth' : 'auto' });
+}

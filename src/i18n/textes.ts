@@ -192,6 +192,12 @@ export interface Textes {
     sections: Record<SectionMenu, string>;
     entrees: Record<EntreeMenuPrincipal, string>;
   };
+  /** LE BLOC DU POIDS (2026-09-20) : ses boutons — enregistrer, et la sortie
+   *  sans avoir enregistré. Son titre est le nom de la donnée. */
+  blocPoids: {
+    enregistrer: string;
+    confirmer: string;
+  };
   /** LE BLOC « THÈME » (2026-09-20) : son titre, le nom de chaque fond (dit
    *  à qui écoute la page : les cadres se voient), son bouton. */
   blocTheme: {
@@ -401,6 +407,11 @@ const FR: Textes = {
       faq: 'FAQ',
       ciel: 'Ciel',
     },
+  },
+  blocPoids: {
+    /* « OK » (2026-09-20, « bouton ok »). */
+    enregistrer: 'OK',
+    confirmer: 'Confirmer la mise à jour',
   },
   blocTheme: {
     titre: 'Thème',

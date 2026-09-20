@@ -16,10 +16,11 @@ import { EntetePage } from './EntetePage';
 import { useTextes } from '../i18n/useTextes';
 import { classeDuTheme } from '../themes/themes';
 import { UNITES_DU_SYSTEME, tailleAffichee, tailleEnCm } from '../domaine/unites';
-import { POIDS_MAX, POIDS_MIN, TAILLE_BORNES, poidsDepuisSaisie } from '../domaine/mesures';
+import { TAILLE_BORNES } from '../domaine/mesures';
 import { ageA, dateLocale, formaterDateCourte, lireDateCourte } from '../domaine/dates';
 import { TRAITEMENTS } from '../domaine/traitements';
 import { BlocTraitement, type ChoixTraitement } from './BlocTraitement';
+import { BlocPoids } from './BlocPoids';
 import { motDePasseValide } from '../domaine/compte';
 import { detecterLangue } from '../i18n/useTextes';
 import { montrerVolet, voletVisible } from '../plateforme/navigateur';
@@ -113,6 +114,9 @@ export function Compte({
      médicament. Ce qu'il édite part de ce qui est enregistré ; « aucun »
      quand il n'y a pas de traitement. */
   const [blocTraitement, setBlocTraitement] = useState(false);
+  /* LE BLOC DU POIDS (2026-09-20) : ouvert par la valeur — ou l'icône — du
+     poids de départ ou de l'objectif final. */
+  const [blocPoids, setBlocPoids] = useState<'poids' | 'poidsCible' | null>(null);
   const traitementCourant: ChoixTraitement = reponses.traitement
     ? { forme: reponses.formeTraitement, traitement: reponses.traitement }
     : { forme: 'aucun', traitement: null };
@@ -227,41 +231,51 @@ export function Compte({
               </div>
 
               <div className="ligne">
-                <ChampEnLigne
-                  icone={<IconeBalance />}
-                  valeur={poidsEcrit(reponses.poids)}
-                  onValeur={(ecrite) => {
-                    const stocke = poidsDepuisSaisie(ecrite, unites.poids);
-                    if (stocke) repondre('poids', stocke);
-                  }}
-                  normaliser={(saisie) => {
-                    const stocke = poidsDepuisSaisie(saisie, unites.poids);
-                    return stocke ? poidsEcrit(stocke) : null;
-                  }}
-                  regle={textes.compte.reglePoids(POIDS_MIN, POIDS_MAX[unites.poids], textes.unites[unites.poids])}
-                  unite={textes.unites[unites.poids]}
-                  nom={textes.groupes.poids}
-                  inputMode="decimal"
-                />
+                {/* Le poids s'édite dans son bloc, règle et chiffre (2026-09-20) :
+                    l'icône et la valeur l'ouvrent. */}
+                <button
+                  type="button"
+                  className="ligne__icone ligne__icone--bouton"
+                  aria-label={textes.groupes.poids}
+                  onClick={() => setBlocPoids('poids')}
+                >
+                  <IconeBalance />
+                </button>
+                <span className="enligne">
+                  <button
+                    type="button"
+                    className="enligne__valeur"
+                    aria-label={textes.groupes.poids}
+                    onClick={() => setBlocPoids('poids')}
+                  >
+                    {poidsEcrit(reponses.poids)}
+                  </button>
+                  <span className="enligne__unite">{textes.unites[unites.poids]}</span>
+                </span>
               </div>
 
               <div className="ligne">
-                <ChampEnLigne
-                  icone={<IconeCible />}
-                  valeur={poidsEcrit(reponses.poidsCible)}
-                  onValeur={(ecrite) => {
-                    const stocke = poidsDepuisSaisie(ecrite, unites.poids);
-                    if (stocke) repondre('poidsCible', stocke);
-                  }}
-                  normaliser={(saisie) => {
-                    const stocke = poidsDepuisSaisie(saisie, unites.poids);
-                    return stocke ? poidsEcrit(stocke) : null;
-                  }}
-                  regle={textes.compte.reglePoids(POIDS_MIN, POIDS_MAX[unites.poids], textes.unites[unites.poids])}
-                  unite={textes.unites[unites.poids]}
-                  nom={textes.groupes.poidsCible}
-                  inputMode="decimal"
-                />
+                {/* Le poids s'édite dans son bloc, règle et chiffre (2026-09-20) :
+                    l'icône et la valeur l'ouvrent. */}
+                <button
+                  type="button"
+                  className="ligne__icone ligne__icone--bouton"
+                  aria-label={textes.groupes.poidsCible}
+                  onClick={() => setBlocPoids('poidsCible')}
+                >
+                  <IconeCible />
+                </button>
+                <span className="enligne">
+                  <button
+                    type="button"
+                    className="enligne__valeur"
+                    aria-label={textes.groupes.poidsCible}
+                    onClick={() => setBlocPoids('poidsCible')}
+                  >
+                    {poidsEcrit(reponses.poidsCible)}
+                  </button>
+                  <span className="enligne__unite">{textes.unites[unites.poids]}</span>
+                </span>
               </div>
 
               <div className="ligne">
@@ -361,6 +375,15 @@ export function Compte({
 
       </div>
 
+      {blocPoids ? (
+        <BlocPoids
+          titre={textes.groupes[blocPoids]}
+          valeur={reponses[blocPoids]}
+          unite={unites.poids}
+          onEnregistrer={(stocke) => repondre(blocPoids, stocke)}
+          onFermer={() => setBlocPoids(null)}
+        />
+      ) : null}
       {blocTraitement ? (
         <BlocTraitement
           courant={traitementCourant}

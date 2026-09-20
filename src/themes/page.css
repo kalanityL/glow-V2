@@ -1866,3 +1866,117 @@
 .bloc .options {
   margin: 10px 0 0;
 }
+
+/* ── LE BLOC DU POIDS : le chiffre en grand, la règle qui glisse ─────────── */
+
+.poids {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 18px;
+  padding-top: 18px;
+}
+
+/* Le chiffre, en grand, dans la police de titre ; son unité petite à côté. */
+.poids__valeur .enligne {
+  justify-content: center;
+  align-items: baseline;
+}
+
+.poids__valeur .enligne__valeur,
+.poids__valeur .enligne__champ {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 56px;
+  line-height: 1;
+  text-align: center;
+  padding: 0;
+}
+
+.poids__valeur .enligne__champ {
+  width: 5ch;
+  flex: none;
+  background: none;
+  border: 0;
+  border-radius: 0;
+}
+
+.poids__valeur .enligne__unite {
+  font-size: 18px;
+}
+
+/* LA GRADUATION (« la barre du bas ») : un défilement horizontal dont la barre ne se montre pas ; la
+   géométrie est ICI — le pas d'un cran, `--graduation-pas` — et le code n'en lit
+   qu'un rapport. La piste est rembourrée d'une demi-largeur moins un
+   demi-cran de chaque côté : le premier cran comme le dernier viennent se
+   centrer sous le repère, et la course du défilement vaut exactement
+   (max − min) crans. */
+.graduation {
+  --graduation-pas: 20px;
+  position: relative;
+  width: 100%;
+  overflow-x: auto;
+  overflow-y: hidden;
+  scrollbar-width: none;
+}
+
+.graduation::-webkit-scrollbar {
+  display: none;
+}
+
+.graduation__piste {
+  display: flex;
+  height: 52px;
+  padding-inline: calc(50% - var(--graduation-pas) / 2);
+  width: max-content;
+}
+
+/* Un cran : sa marque au milieu, courte ; plus haute tous les cinq, et tous
+   les dix avec son nombre dessous. */
+.graduation__cran {
+  position: relative;
+  flex: none;
+  width: var(--graduation-pas);
+  height: 100%;
+}
+
+.graduation__cran::before {
+  content: '';
+  position: absolute;
+  left: 50%;
+  top: 8px;
+  width: 1px;
+  height: 8px;
+  background: var(--option-filet);
+}
+
+.graduation__cran--cinq::before {
+  height: 12px;
+}
+
+.graduation__cran--dix::before {
+  height: 16px;
+  background: var(--encre-chapeau);
+}
+
+.graduation__nombre {
+  position: absolute;
+  left: 50%;
+  top: 30px;
+  transform: translateX(-50%);
+  font-family: var(--font-body);
+  font-size: 12px;
+  color: var(--encre-chapeau);
+}
+
+/* Le repère fixe, au milieu de la règle, à l'encre. */
+.graduation__repere {
+  position: absolute;
+  left: 50%;
+  top: 2px;
+  width: 2px;
+  height: 26px;
+  margin-left: -1px;
+  background: var(--encre);
+  pointer-events: none;
+}

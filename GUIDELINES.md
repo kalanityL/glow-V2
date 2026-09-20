@@ -461,6 +461,15 @@ titre centré et non gras dessous, pas de flèche de retour — « Accueil » de
 barre et le bouton du téléphone ramènent ; 2026-09-20, « mon compte est une
 page à part entiere »).
 
+**Le poids s'édite dans son bloc** (2026-09-20, « mise à jour de poids :
+ouvre qqchose comme ça […] la barre du bas se met à jour au bon endroit en
+temps réel ») : le chiffre en grand, éditable sur place, et dessous une
+graduation qui glisse sous un repère fixe — les deux se suivent à chaque
+geste et à chaque frappe. La géométrie de la graduation (le pas d'un cran)
+est dans `page.css` ; le code n'en lit qu'un rapport (`domaine/mesures.ts`).
+« OK » au pied, éteint sans changement ; fermer sans valider propose
+« Confirmer la mise à jour » / « Fermer », comme les autres blocs.
+
 **Les informations de « Mon compte » sont celles de la V1** (2026-09-20) :
 l'âge (lu en années, édité en date de naissance), la taille, le poids de
 départ, l'objectif final, le médicament prescrit. **Le médicament s'édite dans

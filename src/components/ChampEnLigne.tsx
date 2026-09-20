@@ -21,6 +21,11 @@ interface ChampEnLigneProps {
   normaliser?: (saisie: string) => string | null;
   /** Ce que la donnée attend, dit quand la saisie est refusée. */
   regle?: string;
+  /** Chaque frappe, telle quelle — pour qui veut suivre la saisie en temps
+      réel (la règle des poids, 2026-09-20). */
+  onSaisie?: (saisie: string) => void;
+  /** L'ouverture et la fermeture de l'édition. */
+  onEdition?: (enEdition: boolean) => void;
   /** L'unité, écrite après la valeur — jamais dans le champ. */
   unite?: string;
   type?: 'text' | 'email' | 'password';
@@ -56,6 +61,8 @@ export function ChampEnLigne({
   nom,
   normaliser = (saisie) => saisie.trim(),
   regle,
+  onSaisie,
+  onEdition,
   unite,
   type = 'text',
   inputMode,
@@ -74,10 +81,12 @@ export function ChampEnLigne({
   const ouvrir = () => {
     setRefuse(false);
     setEnEdition(true);
+    onEdition?.(true);
   };
 
   const valider = () => {
     setEnEdition(false);
+    onEdition?.(false);
     const retenue = normaliser(brouillon);
     if (retenue === null) {
       setBrouillon(valeur);
@@ -92,6 +101,7 @@ export function ChampEnLigne({
   const abandonner = () => {
     setBrouillon(valeur);
     setEnEdition(false);
+    onEdition?.(false);
   };
 
   return (
@@ -115,6 +125,7 @@ export function ChampEnLigne({
           onChange={(evenement) => {
             setBrouillon(evenement.target.value);
             if (normaliser(evenement.target.value) !== null) setRefuse(false);
+            onSaisie?.(evenement.target.value);
           }}
           onBlur={valider}
           onKeyDown={(evenement) => {

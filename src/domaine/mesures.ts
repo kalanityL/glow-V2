@@ -74,3 +74,23 @@ export function poidsDepuisSaisie(texte: string, unite: UnitePoids): string | nu
   if (valeur < POIDS_MIN || valeur > POIDS_MAX[unite]) return null;
   return valeur.toFixed(1);
 }
+
+/**
+ * LA RÈGLE DES POIDS (2026-09-20, la mise à jour du poids « comme ça » : le
+ * chiffre en grand et une règle qui glisse dessous). Elle va de `POIDS_MIN` à
+ * `POIDS_MAX` de l'unité ; sa position est un RAPPORT de 0 à 1, jamais des
+ * pixels — la géométrie est dans la feuille, le code ne connaît que le
+ * rapport entre le chemin parcouru et le chemin total. Le poids lu est
+ * arrondi au dixième, la forme stockée.
+ */
+export function poidsDepuisRapport(rapport: number, unite: UnitePoids): string {
+  const borne = Math.min(1, Math.max(0, rapport));
+  const valeur = POIDS_MIN + borne * (POIDS_MAX[unite] - POIDS_MIN);
+  return (Math.round(valeur * 10) / 10).toFixed(1);
+}
+
+/** Le rapport (0 à 1) où se trouve un poids stocké sur la règle de l'unité. */
+export function rapportDuPoids(stocke: string, unite: UnitePoids): number {
+  const valeur = Number(stocke);
+  return (valeur - POIDS_MIN) / (POIDS_MAX[unite] - POIDS_MIN);
+}

@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { poidsDepuisSaisie } from './mesures';
+import { POIDS_MAX, POIDS_MIN, poidsDepuisRapport, poidsDepuisSaisie, rapportDuPoids } from './mesures';
 
 describe('poidsDepuisSaisie', () => {
   it('lit virgule ou point, et rend la forme stockée avec un point et une décimale', () => {
@@ -15,5 +15,19 @@ describe('poidsDepuisSaisie', () => {
     expect(poidsDepuisSaisie('95.55', 'kg')).toBeNull();
     expect(poidsDepuisSaisie('lourd', 'kg')).toBeNull();
     expect(poidsDepuisSaisie('', 'kg')).toBeNull();
+  });
+});
+
+describe('la règle des poids', () => {
+  it('va du plus léger au plus lourd, en rapport', () => {
+    expect(poidsDepuisRapport(0, 'kg')).toBe(`${POIDS_MIN}.0`);
+    expect(poidsDepuisRapport(1, 'kg')).toBe(`${POIDS_MAX.kg}.0`);
+    expect(poidsDepuisRapport(1.5, 'kg')).toBe(`${POIDS_MAX.kg}.0`);
+  });
+
+  it('retrouve le poids d’où l’on est parti, au dixième', () => {
+    expect(poidsDepuisRapport(rapportDuPoids('95.0', 'kg'), 'kg')).toBe('95.0');
+    expect(poidsDepuisRapport(rapportDuPoids('82.4', 'kg'), 'kg')).toBe('82.4');
+    expect(poidsDepuisRapport(rapportDuPoids('1500.0', 'lb'), 'lb')).toBe('1500.0');
   });
 });
