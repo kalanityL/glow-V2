@@ -481,9 +481,9 @@ les crans, le pied sur leur ligne de base (2026-09-20, « tige bleue ; tige
 de la taille d'un cran de kilo, ne pas la positionner sous la regle
 graduée mais en superposition ») — elle dit en permanence le poids que le
 chiffre affiche, et RECOUVRE le cran qu'elle désigne (« tige bleue par
-dessus et rend invisible tout autre tige sous elle »), de la même
-épaisseur que lui (« cran d'indication bleu : meme épaisseur que les
-autres crans »). Elle est posée sur le cadre, HORS du défilement,
+dessus et rend invisible tout autre tige sous elle »), épaisse de deux
+pixels (« épaisseur tige bleue : 2px », après un passage à l'épaisseur
+d'un cran). Elle est posée sur le cadre, HORS du défilement,
 dans une grille d'une case avec lui : dedans, un élément absolu part avec
 la piste qui glisse et Chrome l'emportait hors de vue. **La graduation est
 aimantée, et l'aimant est immédiat** (« tige "aimantée" sur les crans »,

@@ -2072,16 +2072,16 @@
   justify-self: start;
   margin-left: 50%;
   align-self: end;
-  /* DE L'ÉPAISSEUR D'UN CRAN (2026-09-20, « cran d'indication bleu : meme
-     épaisseur que les autres crans ») : un pixel, au même demi-pixel que
-     le cran qu'elle désigne, et elle le RECOUVRE (« tige bleue par dessus et rend
+  /* DEUX PIXELS (2026-09-20, « épaisseur tige bleue : 2px » — un pixel
+     comme les crans l'instant d'avant) : le bord gauche sur celui du cran
+     qu'elle désigne, elle le RECOUVRE (« tige bleue par dessus et rend
      invisible tout autre tige sous elle »). PAR-DESSUS pour de bon : les
      crans sont positionnés, ils passaient devant elle — le cran gris se
      voyait au travers ; elle est positionnée à son tour, un rang
      au-dessus. */
   position: relative;
   z-index: 1;
-  width: 1px;
+  width: 2px;
   height: var(--graduation-tige);
   background: var(--graduation-repere);
   pointer-events: none;
