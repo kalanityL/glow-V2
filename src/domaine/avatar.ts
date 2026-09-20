@@ -74,11 +74,13 @@ export interface Avatar {
 
 /** L'avatar de départ : celui qu'on voit avant d'avoir touché à quoi que ce soit. */
 export const AVATAR_INITIAL: Avatar = {
-  genre: 'neutre',
+  /* Femme aux cheveux longs par défaut (2026-09-20, « avatar par defaut :
+     cheveux long femme ») — neutre et bouclé jusque-là. */
+  genre: 'femme',
   formeVisage: 'ovale',
   couleurPeau: COULEURS_PEAU[1],
   couleurYeux: COULEURS_YEUX[0],
-  coiffure: COIFFURE_DU_GENRE.neutre,
+  coiffure: COIFFURE_DU_GENRE.femme,
   couleurCheveux: COULEURS_CHEVEUX[1],
   lunettes: false,
   expression: 'joyeuse',
