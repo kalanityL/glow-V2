@@ -20,6 +20,7 @@ export function Bloc({
   titre,
   onFermer,
   pied,
+  hauteur = 'pleine',
   children,
 }: {
   titre: string;
@@ -28,6 +29,10 @@ export function Bloc({
   /** Les boutons, ANCRÉS AU BAS DU BLOC (2026-09-20, « bouton du bloc encrés
       en bas de bloc, ne change pas de place c'est le reste qui scrolle »). */
   pied?: ReactNode;
+  /** `ajustee` : le bloc prend la hauteur de son contenu, et non toute la
+      hauteur (2026-09-20, le bloc du poids : « la hauteur du bloc doit etre
+      ajustée à la hauteur nécessaire »). */
+  hauteur?: 'pleine' | 'ajustee';
   children: ReactNode;
 }) {
   const textes = useTextes();
@@ -37,7 +42,12 @@ export function Bloc({
   return (
     <>
       <div className="vitre" aria-hidden="true" />
-      <div className="bloc" ref={bloc} role="dialog" aria-label={titre}>
+      <div
+        className={`bloc${hauteur === 'ajustee' ? ' bloc--ajuste' : ''}`}
+        ref={bloc}
+        role="dialog"
+        aria-label={titre}
+      >
         <div className="bloc__entete">
           <h2 className="bloc__titre">{titre}</h2>
           <button type="button" className="tiroir__fermer bloc__fermer" aria-label={textes.fermer} onClick={onFermer}>

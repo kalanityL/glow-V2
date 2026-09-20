@@ -1825,6 +1825,14 @@
   padding-top: 8px;
 }
 
+/* Le bloc ajusté à son contenu (2026-09-20) : il garde son haut et sa
+   largeur, mais ne descend qu'aussi bas que son contenu — sans jamais
+   passer sous la barre. */
+.bloc--ajuste {
+  bottom: auto;
+  max-height: calc(100% - var(--zone-sure-haut, 0px) - 16px - 88px);
+}
+
 /* Les deux fonds au choix, dans les cadres du choix du thème de l'onboarding :
    chacun peint de son fond. */
 .choix-themes--fonds {
@@ -1950,8 +1958,12 @@
   width: max-content;
 }
 
-/* Un cran : sa marque au milieu, courte ; plus haute tous les cinq, et tous
-   les dix avec son nombre dessous. */
+/* Un cran : sa marque au milieu, TOUS DE LA MÊME HAUTEUR (2026-09-20, « la
+   ligne graduée ne doit pas bouger verticalement qd on passe des dizaines ou
+   des centaines » — les crans plus hauts faisaient onduler la ligne sous le
+   repère) ; ils ne diffèrent que par la couleur, d'après son image : les
+   unités très claires, les dizaines un peu plus marquées, les centaines un
+   peu plus encore — trois jetons du thème. Le nombre dessous tous les dix. */
 .graduation__cran {
   position: relative;
   flex: none;
@@ -1965,24 +1977,16 @@
   left: 50%;
   top: 8px;
   width: 1px;
-  height: 8px;
-  background: var(--option-filet);
-}
-
-.graduation__cran--cinq::before {
-  height: 12px;
+  height: 14px;
+  background: var(--graduation-unite);
 }
 
 .graduation__cran--dix::before {
-  height: 16px;
-  background: var(--encre-chapeau);
+  background: var(--graduation-dizaine);
 }
 
-/* Le cran des centaines, très légèrement plus visible (2026-09-20) : un peu
-   plus haut, à l'encre. */
 .graduation__cran--cent::before {
-  height: 18px;
-  background: var(--encre);
+  background: var(--graduation-centaine);
 }
 
 .graduation__nombre {
@@ -1995,14 +1999,16 @@
   color: var(--encre-chapeau);
 }
 
-/* Le repère fixe, au milieu de la règle, à l'encre. */
+/* LE REPÈRE, au milieu : le seul cran foncé — « uniquement le cran du milieu
+   qui correspond à où on en est est foncé ». Sur la même ligne que les
+   crans, un peu plus long, à l'encre. */
 .graduation__repere {
   position: absolute;
   left: 50%;
-  top: 2px;
+  top: 6px;
   width: 2px;
-  height: 26px;
+  height: 18px;
   margin-left: -1px;
-  background: var(--encre);
+  background: var(--graduation-repere);
   pointer-events: none;
 }

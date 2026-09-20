@@ -281,7 +281,7 @@ const FR: Textes = {
     dateNaissance: 'Date de naissance',
     taille: 'Taille',
     poids: 'Poids de départ',
-    poidsCible: 'Objectif final',
+    poidsCible: 'Objectif',
     age: 'Âge',
     medicament: 'Médicament prescrit',
     prenom: 'Prénom',

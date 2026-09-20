@@ -17,8 +17,9 @@ import sonCentieme from '../assets/sons/03_metallic_air_centieme.wav';
  * jusqu'au poids choisi ou bien directement modifier les chiffres et la barre
  * du bas se met à jour au bon endroit en temps réel », d'après son image) :
  * le chiffre en grand, qui s'édite sur place, et dessous UNE RÈGLE qui glisse
- * — un cran par unité, un cran plus haut tous les cinq, le nombre écrit tous
- * les dix, du plus léger au plus lourd de l'unité — sous un repère fixe. Les
+ * — un cran par unité, tous de la même hauteur, plus marqué tous les dix et
+ * tous les cent, le nombre écrit tous les dix, du plus léger au plus lourd de
+ * l'unité — sous un repère fixe, le seul cran foncé. Les
  * deux se suivent : glisser la règle change le chiffre, taper le chiffre
  * amène la règle, à chaque frappe.
  *
@@ -157,7 +158,7 @@ export function BlocPoids({
   );
 
   return (
-    <Bloc titre={titre} onFermer={demanderFermeture} pied={pied}>
+    <Bloc titre={titre} onFermer={demanderFermeture} pied={pied} hauteur="ajustee">
       <div className="poids">
         <div className="poids__valeur">
           <ChampEnLigne
@@ -202,13 +203,7 @@ export function BlocPoids({
               <span
                 key={v}
                 className={`graduation__cran${
-                  v % 100 === 0
-                    ? ' graduation__cran--dix graduation__cran--cent'
-                    : v % 10 === 0
-                      ? ' graduation__cran--dix'
-                      : v % 5 === 0
-                        ? ' graduation__cran--cinq'
-                        : ''
+                  v % 100 === 0 ? ' graduation__cran--cent' : v % 10 === 0 ? ' graduation__cran--dix' : ''
                 }`}
               >
                 {v % 10 === 0 ? <span className="graduation__nombre">{v}</span> : null}

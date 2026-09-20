@@ -95,6 +95,14 @@
      blanc (2026-09-20). */
   --pastille-fond: #eff6ff;
 
+  /* LA GRADUATION DU POIDS, d'après son image (2026-09-20) : les crans des
+     unités très clairs, ceux des dizaines un peu plus marqués, les centaines
+     un peu plus encore ; le repère du milieu à l'encre. Relevés à l'œil. */
+  --graduation-unite: #dfe3ea;
+  --graduation-dizaine: #b6bdc9;
+  --graduation-centaine: #8d96a6;
+  --graduation-repere: #1e2a44;
+
   /* LE MENU DU BAS, AUX COULEURS DE SON IMAGE (2026-09-16,
      `~/Desktop/GLOW/Images-pour-claude/couleur-menu.png`, relevées au
      pixel) : barre blanche à filet à peine visible, entrée active en bleu
