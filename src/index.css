@@ -128,6 +128,9 @@ body {
    de la barre d'état qui le recouvre, pour que la page s'en décale. */
 .phone-screen {
   --zone-sure-haut: 1.75rem;
+  /* L'écran est un CONTENEUR (2026-09-20) : la page calcule sa marge sur la
+     largeur de l'écran du téléphone (`cqw`), pas sur celle de la fenêtre. */
+  container-type: inline-size;
   position: relative;
   flex: 1;
   min-height: 0;
