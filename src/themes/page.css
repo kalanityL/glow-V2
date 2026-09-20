@@ -695,12 +695,16 @@
 
 /* LE FOND CHOISI (2026-09-20, le bloc « Thème ») : la page rebranche le jeton
    du fond sur la photo ou sur le ciel de midi de la V1 ; tout ce qui lit
-   `--accueil-fond-image` — la page, les tiroirs, les blocs — suit. */
-.page--fond-photo {
+   `--accueil-fond-image` — la page, les tiroirs, les blocs — suit.
+   DEUX CLASSES, et non une : la feuille du thème, chargée APRÈS celle-ci,
+   pose le même jeton sur `.theme-<id>` avec une classe ; à spécificité
+   égale elle gagnait, et le choix ne prenait jamais (« le fond selectionné
+   doit mettre à jour le fond de page », 2026-09-20). */
+.page.page--fond-photo {
   --accueil-fond-image: var(--fond-photo);
 }
 
-.page--fond-ciel {
+.page.page--fond-ciel {
   --accueil-fond-image: var(--fond-ciel);
 }
 
