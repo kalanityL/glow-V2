@@ -2575,27 +2575,18 @@
   flex: none;
 }
 
-/* La coche : un disque à l'accent, dans un halo de la même couleur, pâle. */
+/* La coche de son image, en plus petit, DÉCOLLÉE DU TITRE DE PAGE
+   (2026-09-20, « attention à ce que le bandeau titre de page ne mange pas
+   sur l'icone »). */
 .confirmation__coche {
-  display: grid;
-  place-items: center;
-  width: 72px;
-  height: 72px;
-  margin: 4px auto 0;
-  border-radius: 50%;
-  background: var(--option-choisi-fond);
-  box-shadow: 0 0 0 10px color-mix(in srgb, var(--option-choisi-fond) 55%, transparent);
-  color: var(--accent);
-}
-
-.confirmation__coche .icone {
-  width: 34px;
-  height: 34px;
-  stroke-width: 2.5;
+  display: block;
+  width: 144px;
+  height: 90px;
+  margin: 14px auto 0;
 }
 
 .confirmation__titre {
-  margin: 12px 0 0;
+  margin: 4px 0 0;
   text-align: center;
   font-family: var(--font-display);
   font-weight: 500;
@@ -2616,45 +2607,7 @@
   padding: 12px 16px;
 }
 
-.confirmation__traitement {
-  display: flex;
-  align-items: center;
-  gap: 14px;
-  padding-bottom: 12px;
-  border-bottom: 1px solid var(--option-filet);
-}
-
-.confirmation__icone {
-  display: grid;
-  place-items: center;
-  width: 56px;
-  height: 56px;
-  border-radius: 14px;
-  background: var(--option-choisi-fond);
-  color: var(--accent);
-}
-
-.confirmation__icone .icone {
-  width: 28px;
-  height: 28px;
-}
-
-.confirmation__nom {
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-  font-family: var(--font-body);
-  font-weight: 500;
-  font-size: 17px;
-  color: var(--encre);
-}
-
-.confirmation__dose {
-  font-weight: 400;
-  font-size: 15px;
-  color: var(--encre-chapeau);
-}
-
+/* Trois lignes de même style : l'icône, le mot, la valeur à droite. */
 .confirmation__ligne {
   display: flex;
   align-items: center;
@@ -2712,38 +2665,28 @@
   cursor: default;
 }
 
+/* Les pastilles plus petites (2026-09-20, « icones + petites »). */
 .confirmation__pastille {
   flex: none;
   display: grid;
   place-items: center;
-  width: 44px;
-  height: 44px;
+  width: 34px;
+  height: 34px;
   border-radius: 50%;
   background: var(--option-choisi-fond);
   color: var(--accent);
 }
 
 .confirmation__pastille .icone {
-  width: 22px;
-  height: 22px;
-}
-
-.confirmation__texte {
-  flex: 1;
-  min-width: 0;
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
+  width: 17px;
+  height: 17px;
 }
 
 .confirmation__entreeNom {
+  flex: 1;
+  min-width: 0;
   font-weight: 500;
   font-size: 15px;
-}
-
-.confirmation__detail {
-  font-size: 13px;
-  color: var(--encre-chapeau);
 }
 
 .confirmation__entree > .icone {
@@ -2764,7 +2707,6 @@
   color: var(--bouton-encre);
 }
 
-.confirmation__entree--pleine .confirmation__detail,
 .confirmation__entree--pleine > .icone {
   color: var(--bouton-encre);
   opacity: 0.85;

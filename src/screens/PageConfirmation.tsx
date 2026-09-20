@@ -6,7 +6,6 @@ import {
   IconeAnalyse,
   IconeCalendrier,
   IconeChevronDroit,
-  IconeCoche,
   IconeComprime,
   IconeCourbe,
   IconeEtoiles,
@@ -41,11 +40,19 @@ const ICONES: Record<EntreeConfirmation, () => ReactElement> = {
  * element : en 1er ; ouvre la meme chose que bouton plus. Rien en gras sur
  * cette page. ») : la coche dans son halo, « Injection enregistrée ! »,
  * « Votre suivi est à jour. » ; la carte de la prise — l'icône de la forme,
- * la spécialité et la dose, la date et l'heure, la zone ; puis « Vous
- * pouvez maintenant : » et cinq entrées, la première pleine : AJOUTER UN
- * AUTRE ÉLÉMENT, qui ouvre le tiroir du « + » ; le journal, la
- * concentration et l'évolution, dont les pages n'existent pas encore —
- * éteintes ; le retour à l'accueil. RIEN EN GRAS.
+ * la spécialité et la dose, la date et l'heure, la zone — TROIS LIGNES DE
+ * MÊME STYLE (2026-09-20, « icone + wegovy meme style et taille que date
+ * et zone d'injection ; 0.25mg come 20:30 et cuisse droite ») ; puis « Vous
+ * pouvez maintenant : » et cinq entrées SANS SOUS-TITRE, la première
+ * pleine : AJOUTER UN AUTRE ÉLÉMENT, qui ouvre le tiroir du « + » ; les
+ * quatre autres éteintes — le journal, la concentration et l'évolution
+ * n'ont pas de page, et le retour à l'accueil l'est aussi, à sa demande
+ * (« retour à l'accueil comme les autres désactivés »). RIEN EN GRAS.
+ *
+ * LA COCHE EST SON IMAGE, redessinée en plus petit (« meme image que
+ * jointe, en plus petit ») : le disque menthe dans son halo, la coche
+ * verte, et six éclats autour, bleus et verts. Ses couleurs sont celles de
+ * l'image, pas du thème — l'exception est consignée dans GUIDELINES.
  */
 export function PageConfirmation({
   prise,
@@ -70,12 +77,15 @@ export function PageConfirmation({
   /* La demande d'ouvrir le tiroir du « + » : un compteur que la barre écoute. */
   const [demandeAjout, setDemandeAjout] = useState(0);
 
+  /* Seul « Ajouter » agit (2026-09-20, « retour à l'accueil comme les
+     autres désactivés ») ; la barre du bas et le bouton du téléphone
+     ramènent à l'accueil. */
   const agir: Record<EntreeConfirmation, (() => void) | null> = {
     ajouter: () => setDemandeAjout((n) => n + 1),
     journal: null,
     concentration: null,
     evolution: null,
-    accueil: onAccueil,
+    accueil: null,
   };
 
   return (
@@ -87,19 +97,15 @@ export function PageConfirmation({
         <EntetePage titre={textes.accueil.traitement[forme]} onAccueil={onAccueil} />
 
         <div className="confirmation">
-          <div className="confirmation__coche" aria-hidden="true">
-            <IconeCoche />
-          </div>
+          <Coche />
           <h2 className="confirmation__titre">{textes.confirmation.titre[forme]}</h2>
           <p className="confirmation__sousTitre">{textes.confirmation.sousTitre}</p>
 
           <div className="carte confirmation__prise">
-            <div className="confirmation__traitement">
-              <span className="confirmation__icone">{orale ? <IconeComprime /> : <IconeSeringue />}</span>
-              <span className="confirmation__nom">
-                <span>{specialite?.nom}</span>
-                <span className="confirmation__dose">{dose}</span>
-              </span>
+            <div className="confirmation__ligne">
+              {orale ? <IconeComprime /> : <IconeSeringue />}
+              <span>{specialite?.nom}</span>
+              <span className="confirmation__valeur">{dose}</span>
             </div>
             <div className="confirmation__ligne">
               <IconeCalendrier />
@@ -132,10 +138,7 @@ export function PageConfirmation({
                   <span className="confirmation__pastille">
                     <Icone />
                   </span>
-                  <span className="confirmation__texte">
-                    <span className="confirmation__entreeNom">{textes.confirmation.entrees[entree].nom}</span>
-                    <span className="confirmation__detail">{textes.confirmation.entrees[entree].detail}</span>
-                  </span>
+                  <span className="confirmation__entreeNom">{textes.confirmation.entrees[entree]}</span>
                   <IconeChevronDroit />
                 </button>
               );
@@ -154,5 +157,29 @@ export function PageConfirmation({
         demandeAjout={demandeAjout}
       />
     </div>
+  );
+}
+
+/**
+ * LA COCHE DE SON IMAGE : le disque menthe (#c6efe2) dans un halo plus pâle,
+ * la coche verte (#4fb597), et six éclats — deux bleus, deux verts, deux
+ * menthe — jetés autour comme sur l'image. Ces couleurs sont celles de
+ * l'image jointe, et d'elle seule.
+ */
+function Coche() {
+  return (
+    <svg className="confirmation__coche" viewBox="0 0 160 100" aria-hidden="true" focusable="false">
+      <circle cx="80" cy="50" r="40" fill="#c6efe2" opacity="0.5" />
+      <circle cx="80" cy="50" r="30" fill="#b3e9d7" />
+      <path d="M66 51l9 9 19-19" fill="none" stroke="#4fb597" strokeWidth="5" strokeLinecap="round" strokeLinejoin="round" />
+      <g fill="none" strokeWidth="3" strokeLinecap="round">
+        <path d="M35 40l9 -4" stroke="#7ec6f5" />
+        <path d="M30 62l9 3" stroke="#a6e6c8" />
+        <path d="M44 22l6 5" stroke="#6fd3a8" />
+        <path d="M125 40l-9 -4" stroke="#7ec6f5" />
+        <path d="M130 62l-9 3" stroke="#a6e6c8" />
+        <path d="M116 22l-6 5" stroke="#7ec6f5" />
+      </g>
+    </svg>
   );
 }

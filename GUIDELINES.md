@@ -504,15 +504,22 @@ qu'en mémoire, dans `App`** : ni journal, ni enregistrement sur l'appareil.
 « ecran de confirmation : que souhaitez vous -> vous pouvez maintenant :
 nouvelle element : en 1er ; ouvre la meme chose que bouton plus. Rien en
 gras sur cette page. ») : validée, la prise y mène (`PageConfirmation`).
-La coche dans son halo, « Injection enregistrée ! » (« Prise enregistrée ! »
-sous forme orale), « Votre suivi est à jour. » ; la carte de la prise — la
-spécialité et la dose, la date en toutes lettres et l'heure, la zone ;
-« Vous pouvez maintenant : » et cinq entrées, dans cet ordre : **Ajouter
-un autre élément, en premier et pleine, qui ouvre le tiroir du « + »**
-(la barre du bas l'ouvre sur demande, `demandeAjout`) ; Voir dans le
-journal, Voir la concentration sanguine, Voir l'évolution du traitement —
-éteintes tant que leurs pages n'existent pas ; Retour à l'accueil. Rien en
-gras. La colonne défile en elle-même sur un écran court.
+**La coche de son image, redessinée en plus petit** (« meme image que
+jointe, en plus petit ») : le disque menthe dans son halo, la coche verte,
+six éclats bleus et verts — **ses couleurs sont celles de l'image, pas du
+thème : exception consignée** —, décollée du titre de page ; « Injection
+enregistrée ! » (« Prise enregistrée ! » sous forme orale), « Votre suivi
+est à jour. » ; la carte de la prise en TROIS LIGNES DE MÊME STYLE — la
+spécialité et sa dose, la date en toutes lettres et l'heure, la zone
+(« icone + wegovy meme style et taille que date et zone d'injection ») ;
+« Vous pouvez maintenant : » et cinq entrées SANS SOUS-TITRE, petites
+pastilles, dans cet ordre : **Ajouter un autre élément, en premier et
+pleine, qui ouvre le tiroir du « + »** (la barre du bas l'ouvre sur
+demande, `demandeAjout`) ; Voir dans le journal, Concentration sanguine,
+Évolution du traitement, Retour à l'accueil — **les quatre éteintes**
+(« retour à l'accueil comme les autres désactivés » ; la barre et le
+bouton du téléphone ramènent). Rien en gras. La colonne défile en
+elle-même sur un écran court.
 
 **Toute page de l'application porte la barre du bas** (`BarreDuBas`, avec
 ses deux tiroirs) et, hors de l'accueil, **l'entête des pages**

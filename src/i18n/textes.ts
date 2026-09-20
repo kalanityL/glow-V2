@@ -283,7 +283,8 @@ export interface Textes {
     sousTitre: string;
     zone: string;
     maintenant: string;
-    entrees: Record<EntreeConfirmation, { nom: string; detail: string }>;
+    /** Les entrées, sans sous-titre (2026-09-20, « pas de sous titre »). */
+    entrees: Record<EntreeConfirmation, string>;
   };
   /** LE CALENDRIER d'un choix de date (2026-09-20) : les mois, les jours en
    *  court, lundi en premier, et les deux flèches dites à qui écoute. */
@@ -529,12 +530,14 @@ const FR: Textes = {
     sousTitre: 'Votre suivi est à jour.',
     zone: 'Zone d’injection',
     maintenant: 'Vous pouvez maintenant :',
+    /* Ses mots du 2026-09-20 : « voir la concentration -> concentration
+       sanguine ; voir l'évolution : Evolution du traitement ». */
     entrees: {
-      ajouter: { nom: 'Ajouter un autre élément', detail: 'Poids, repas, activité, symptômes…' },
-      journal: { nom: 'Voir dans le journal', detail: 'Consultez tous vos enregistrements' },
-      concentration: { nom: 'Voir la concentration sanguine', detail: 'Estimation de la molécule dans votre corps' },
-      evolution: { nom: 'Voir l’évolution du traitement', detail: 'Doses, efficacité, tendances' },
-      accueil: { nom: 'Retour à l’accueil', detail: 'Revenir à votre tableau de bord' },
+      ajouter: 'Ajouter un autre élément',
+      journal: 'Voir dans le journal',
+      concentration: 'Concentration sanguine',
+      evolution: 'Évolution du traitement',
+      accueil: 'Retour à l’accueil',
     },
   },
   calendrier: {
