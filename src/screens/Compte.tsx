@@ -143,7 +143,7 @@ export function Compte({
   return (
     <div className={`page page--photo page--fond-${fond.apercu ?? fond.courant} ${classeDuTheme('blanc')}`}>
       <div className="page__colonne">
-        <EntetePage titre={textes.compte.titre} />
+        <EntetePage titre={textes.compte.titre} onAccueil={onAccueil} />
 
         {/* LES ONGLETS DU CARROUSEL, FIGÉS AU-DESSUS DES VOLETS (2026-09-19,
             « les onglets sont en haut » — ils étaient en bas) : ils restent

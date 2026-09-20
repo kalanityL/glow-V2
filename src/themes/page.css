@@ -1149,6 +1149,19 @@
   margin-bottom: 6px;
 }
 
+/* La marque est un bouton qui ramène à l'accueil (2026-09-20) : rien de la
+   matière d'un bouton, la pastille et le mot-symbole tels quels, avec leur
+   air entre eux. */
+.entete__marque-bouton {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 0;
+  border: 0;
+  background: none;
+  cursor: pointer;
+}
+
 /* Le mot-symbole du petit entête, PRESQUE AUSSI HAUT QUE LA PASTILLE
    (2026-09-20, « agrandis la hauteur de glp1 low pour etre presque aussi
    haut que le logo du mini header ») : 90 % de la pastille en hauteur

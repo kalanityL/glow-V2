@@ -1,6 +1,7 @@
 import { IconeNotifications, IconeRecherche } from '../components/Icones';
 import { Logomark } from '../components/Logomark';
 import { Wordmark } from '../components/Wordmark';
+import { useTextes } from '../i18n/useTextes';
 
 /**
  * L'ENTÊTE D'UNE PAGE (2026-09-20, « search et notif sur la meme ligne que
@@ -8,14 +9,25 @@ import { Wordmark } from '../components/Wordmark';
  * petit à gauche, la recherche et la cloche à droite sur la même ligne — les
  * mêmes pastilles que l'accueil —, et le titre de la page centré sur la ligne
  * du dessous. Pas de flèche de retour : la barre du bas et le bouton du
- * téléphone ramènent.
+ * téléphone ramènent — ET LA MARQUE (2026-09-20, « clic sur logo ou glp1low
+ * n'importe où sur le header qui contient ces deux zones on revient à
+ * l'accueil ») : la pastille et le mot-symbole sont un seul bouton, qui
+ * ramène à l'accueil.
  */
-export function EntetePage({ titre }: { titre: string }) {
+export function EntetePage({ titre, onAccueil }: { titre: string; onAccueil: () => void }) {
+  const textes = useTextes();
   return (
     <>
       <div className="entete entete--page">
-        <Logomark />
-        <Wordmark />
+        <button
+          type="button"
+          className="entete__marque-bouton"
+          aria-label={textes.accueil.menu.accueil}
+          onClick={onAccueil}
+        >
+          <Logomark />
+          <Wordmark />
+        </button>
         <div className="entete__outils">
           <span className="rond">
             <IconeRecherche />
