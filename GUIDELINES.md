@@ -445,6 +445,14 @@ vous » — (Mon compte, Sondage, Avis et Feedback, FAQ, Ciel) ; mots courts et
 ordre du 2026-09-20, la croix en contour, le premier titre sous sa ligne. « Admin » attend qu'il existe un compte. Aucune entrée
 ne mène encore nulle part. La liste vit dans `src/app/menuPrincipal.ts`.
 
+**Le tiroir du « + »** (2026-09-20, « bouton + du menu du bas : ouvre un
+tiroir meme fonctionnalité que v1 avec le style actuel de v2 ») : la fonction
+du tiroir « ajout » de la V1 — les sept modules qui ont un formulaire d'ajout,
+trois par rangée, dans l'ordre de la V1, chaque case menant à la page du
+module avec son formulaire ouvert (les pages n'existent pas encore) — dans le
+cadre commun des tiroirs (`components/Tiroir.tsx`). **Ouvrir un tiroir ferme
+l'autre en même temps** : l'un descend pendant que l'autre monte.
+
 **La page « Mon compte »** — « Mon profil » jusqu'au soir du 2026-09-19
 (« page mon profil devient mon compte. Onglet information/avatar/mon
 compte ») : trois volets, Informations / Avatar / Mon compte (l'adresse et

@@ -32,3 +32,20 @@ export const RANGS_MODULES: readonly (readonly ModuleId[])[] = [
   MODULES.slice(0, 4),
   MODULES.slice(4),
 ];
+
+/**
+ * LES MODULES DU TIROIR « + » (2026-09-20) : ceux qui ont un formulaire
+ * d'ajout, dans l'ordre du tiroir « ajout » de la V1 (`ADD_DRAWER_ORDER` :
+ * injection, pesée, effets secondaires, activité physique, repas, sommeil,
+ * temps pour soi) — la marche n'y est pas, elle n'a pas de formulaire
+ * d'ajout dans la V1.
+ */
+export const MODULES_AJOUT: readonly ModuleId[] = [
+  'traitement',
+  'balance',
+  'effets-secondaires',
+  'activite-physique',
+  'menus',
+  'sommeil',
+  'temps-pour-soi',
+];

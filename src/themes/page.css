@@ -1617,6 +1617,33 @@
   column-gap: 12px;
 }
 
+/* LES CASES DU « + » (2026-09-20) : trois par rangée, comme dans la V1 —
+   l'icône sur sa pastille, le nom dessous, centrés. */
+.tiroir__cases {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 14px 8px;
+  margin-top: 34px;
+}
+
+.tiroir__case {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+}
+
+.tiroir__case-nom {
+  font-family: var(--font-body);
+  font-weight: 500;
+  font-size: 13px;
+  line-height: 1.2;
+  text-align: center;
+  text-wrap: balance;
+  color: var(--encre);
+}
+
 /* Une entrée : l'icône à l'encre sur une pastille bleu clair (2026-09-20,
    « pastille bleu clair, icone ne change pas de couleur » — nue la veille),
    et le nom — rien d'autre, aucune ligne entre deux entrées. Celle qui est

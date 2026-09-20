@@ -1,30 +1,23 @@
 import { useCallback, useRef, useState } from 'react';
 import { Avatar } from '../components/Avatar';
 import { TiroirMenu } from './TiroirMenu';
+import { TiroirAjout } from './TiroirAjout';
+import { IconeDuModule } from './iconesModules';
 import { Cocarde } from '../components/Cocarde';
 import {
-  IconeActivite,
   IconeAnalyse,
-  IconeBalance,
-  IconeComprime,
-  IconeEffetsSecondaires,
   IconeJournal,
   IconeEtoiles,
-  IconeMarche,
   IconeMenu,
   IconePlus,
   IconeRecherche,
   IconeNotifications,
-  IconeRepas,
-  IconeSeringue,
-  IconeSommeil,
-  IconeTempsPourSoi,
 } from '../components/Icones';
 import { Etoiles, Logomark } from '../components/Logomark';
 import { Wordmark } from '../components/Wordmark';
 import { useTextes } from '../i18n/useTextes';
 import { ENTREES_MENU, type EntreeMenu } from '../app/menu';
-import { RANGS_MODULES, type ModuleId } from '../app/modules';
+import { RANGS_MODULES } from '../app/modules';
 import { classeDuTheme } from '../themes/themes';
 import type { Reponses } from './onboarding/reponses';
 
@@ -61,7 +54,8 @@ import type { Reponses } from './onboarding/reponses';
  * rien de clicable ») : pas un bouton, pas un lien — des blocs, en attendant
  * les pages. Le jour où elles existeront, chaque bloc devient un bouton.
  * PREMIÈRE EXCEPTION (2026-09-19) : le portrait, qui ouvre la page Profil ;
- * et « Menu » dans la barre, qui ouvre le tiroir du menu principal.
+ * « Menu » dans la barre, qui ouvre le tiroir du menu principal ; et « + »
+ * (2026-09-20), qui ouvre le tiroir d'ajout.
  *
  * POUR L'INSTANT EN THÈME BLANC, QUEL QUE SOIT LE THÈME CHOISI (« peu importe
  * la couleur choisie dans l'onboarding, pour l'instant on arrive sur le theme
@@ -80,16 +74,35 @@ export function Accueil({
   /* LE MENU PRINCIPAL EN TIROIR (2026-09-19) : ouvert par l'entrée « Menu »
      de la barre, fermé par sa croix, par un clic à côté ou par « Menu » de
      nouveau. */
-  /* Trois états (2026-09-20, « effet tiroir à l'ouverture et à la
-     fermeture ») : fermé, ouvert, et EN FERMETURE — le tiroir reste monté le
-     temps de redescendre, puis se démonte quand son mouvement finit. */
-  const [menu, setMenu] = useState<'ferme' | 'ouvert' | 'fermeture'>('ferme');
+  /* DEUX TIROIRS, le menu et le « + », chacun en trois états (2026-09-20,
+     « effet tiroir à l'ouverture et à la fermeture ») : fermé, ouvert, et EN
+     FERMETURE — le tiroir reste monté le temps de redescendre, puis se
+     démonte quand son mouvement finit. OUVRIR L'UN FERME L'AUTRE EN MÊME
+     TEMPS (« si un autre tiroir est déjà ouvert, ferme le tiroir ouvert et
+     ouvre le tiroir + en meme temps et inversement ») : l'un descend pendant
+     que l'autre monte — c'est le clic « à côté » de l'ouvert qui le ferme,
+     et le bouton du nouveau qui l'ouvre, dans le même geste. */
+  type EtatTiroir = 'ferme' | 'ouvert' | 'fermeture';
+  const [tiroirs, setTiroirs] = useState<Record<'menu' | 'ajout', EtatTiroir>>({
+    menu: 'ferme',
+    ajout: 'ferme',
+  });
+  const fermer = (lequel: 'menu' | 'ajout') =>
+    setTiroirs((etats) => (etats[lequel] === 'ouvert' ? { ...etats, [lequel]: 'fermeture' } : etats));
+  const ferme = (lequel: 'menu' | 'ajout') => setTiroirs((etats) => ({ ...etats, [lequel]: 'ferme' }));
+  const basculer = (lequel: 'menu' | 'ajout') =>
+    setTiroirs((etats) => ({ ...etats, [lequel]: etats[lequel] === 'ouvert' ? 'fermeture' : 'ouvert' }));
+  const fermerMenu = useCallback(() => fermer('menu'), []);
+  const menuFerme = useCallback(() => ferme('menu'), []);
+  const fermerAjout = useCallback(() => fermer('ajout'), []);
+  const ajoutFerme = useCallback(() => ferme('ajout'), []);
+  const menu = tiroirs.menu;
   const menuOuvert = menu !== 'ferme';
-  const fermerMenu = useCallback(() => setMenu((etat) => (etat === 'ouvert' ? 'fermeture' : etat)), []);
-  const menuFerme = useCallback(() => setMenu('ferme'), []);
-  const basculerMenu = () => setMenu((etat) => (etat === 'ouvert' ? 'fermeture' : 'ouvert'));
+  const ajoutOuvert = tiroirs.ajout !== 'ferme';
   const boutonMenu = useRef<HTMLButtonElement>(null);
   const leBoutonMenu = useCallback(() => boutonMenu.current, []);
+  const boutonAjout = useRef<HTMLButtonElement>(null);
+  const leBoutonAjout = useCallback(() => boutonAjout.current, []);
 
   return (
     <div className={`page page--photo ${classeDuTheme('blanc')}`}>
@@ -178,11 +191,7 @@ export function Accueil({
                     : textes.accueil.modules[module]
                 }
               >
-                {module === 'traitement'
-                  ? reponses.formeTraitement === 'comprime'
-                    ? <IconeComprime />
-                    : <IconeSeringue />
-                  : ICONES_MODULES[module]}
+                <IconeDuModule module={module} forme={reponses.formeTraitement} />
               </span>
             ))}
           </div>
@@ -196,6 +205,15 @@ export function Accueil({
           enFermeture={menu === 'fermeture'}
           onOuvrirCompte={onOuvrirCompte}
           bouton={leBoutonMenu}
+        />
+      ) : null}
+      {ajoutOuvert ? (
+        <TiroirAjout
+          onFermer={fermerAjout}
+          onFermee={ajoutFerme}
+          enFermeture={tiroirs.ajout === 'fermeture'}
+          bouton={leBoutonAjout}
+          forme={reponses.formeTraitement}
         />
       ) : null}
 
@@ -212,7 +230,20 @@ export function Accueil({
                 type="button"
                 className={`menu__entree menu__entree--menu menu__entree--bouton${menuOuvert ? ' menu__entree--active' : ''}`}
                 aria-expanded={menu === 'ouvert'}
-                onClick={basculerMenu}
+                onClick={() => basculer('menu')}
+              >
+                <span className="menu__icone">{ICONES_MENU[entree]}</span>
+                <span className="menu__nom">{textes.accueil.menu[entree]}</span>
+              </button>
+            ) : entree === 'ajouter' ? (
+              /* « + » ouvre le tiroir d'ajout (2026-09-20). */
+              <button
+                key={entree}
+                ref={boutonAjout}
+                type="button"
+                className="menu__entree menu__entree--ajouter menu__entree--bouton"
+                aria-expanded={tiroirs.ajout === 'ouvert'}
+                onClick={() => basculer('ajout')}
               >
                 <span className="menu__icone">{ICONES_MENU[entree]}</span>
                 <span className="menu__nom">{textes.accueil.menu[entree]}</span>
@@ -231,17 +262,6 @@ export function Accueil({
     </div>
   );
 }
-
-/** L'icône de chaque module — sauf le traitement, qui suit la forme répondue. */
-const ICONES_MODULES: Record<Exclude<ModuleId, 'traitement'>, React.ReactNode> = {
-  balance: <IconeBalance />,
-  'effets-secondaires': <IconeEffetsSecondaires />,
-  menus: <IconeRepas />,
-  marche: <IconeMarche />,
-  'activite-physique': <IconeActivite />,
-  sommeil: <IconeSommeil />,
-  'temps-pour-soi': <IconeTempsPourSoi />,
-};
 
 /** L'icône de chaque entrée : une par entrée, le type l'exige. */
 const ICONES_MENU: Record<EntreeMenu, React.ReactNode> = {

@@ -1,9 +1,7 @@
-import { useEffect, useRef } from 'react';
 import {
   IconeAvis,
   IconeBadges,
   IconeConstellation,
-  IconeCroix,
   IconeFaq,
   IconeModules,
   IconeNotifications,
@@ -15,7 +13,7 @@ import {
 } from '../components/Icones';
 import { Wordmark } from '../components/Wordmark';
 import { useTextes } from '../i18n/useTextes';
-import { surClicDehors } from '../plateforme/navigateur';
+import { Tiroir } from '../components/Tiroir';
 import {
   ENTREES_PAR_SECTION,
   SECTIONS_MENU,
@@ -24,14 +22,10 @@ import {
 
 /**
  * LE MENU PRINCIPAL EN TIROIR (2026-09-19, « ouvre le menu en tiroir comme ça
- * avec une croix pour fermer », d'après son image) : un panneau qui monte
- * depuis la barre du bas, par-dessus le bas de l'accueil, et qui se ferme à
- * la croix, au clic à côté ou à Échap — en redescendant (2026-09-20, « effet
- * tiroir à l'ouverture et à la fermeture ») — LE MÊME MÉCANISME QUE LE
- * PANNEAU DES ROUES (`surClicDehors`), qui n'est pas un popup au sens des
- * guidelines :
- * pas de voile sombre, pas de fenêtre, un panneau déroulant à l'endroit du
- * geste. Il a remplacé la page « Menu » du matin.
+ * avec une croix pour fermer », d'après son image) : le cadre commun des
+ * tiroirs (`components/Tiroir.tsx` — la vitre, le panneau qui monte et
+ * redescend, la croix, la fermeture au clic à côté) et, dedans, les
+ * sections du menu. Il a remplacé la page « Menu » du matin.
  *
  * SES SECTIONS SONT CELLES DE `menuPrincipal.ts`, en DEUX COLONNES comme sur
  * son image ; chaque entrée porte l'icône de la V1, nue et à l'encre, et son
@@ -53,86 +47,60 @@ export function TiroirMenu({
   onOuvrirCompte,
   bouton,
 }: {
-  /** Demande la fermeture : le tiroir redescend. */
   onFermer: () => void;
-  /** Le tiroir a fini de redescendre : il peut se démonter. */
   onFermee: () => void;
-  /** Vrai le temps de la descente. */
   enFermeture: boolean;
   /** « Mon compte » ouvre la page du compte (2026-09-19). */
   onOuvrirCompte: () => void;
-  /** Le bouton « Menu » de la barre : un clic dessus n'est pas « à côté ». */
   bouton: () => Element | null;
 }) {
   const textes = useTextes();
-  const tiroir = useRef<HTMLDivElement>(null);
-
-  /* Le clic à côté et Échap ferment — comme les roues. Le bouton « Menu » de
-     la barre n'est PAS « à côté » (2026-09-20, « clic menu ouvre menu ;
-     reclic menu ferme menu ») : c'est lui qui bascule, et le clic à côté
-     fermait juste avant qu'il ne rouvre. */
-  useEffect(
-    () => surClicDehors(() => [tiroir.current, bouton()], onFermer),
-    [onFermer, bouton],
-  );
 
   return (
-    <>
-      <div className={`tiroir__vitre${enFermeture ? ' tiroir__vitre--fermeture' : ''}`} aria-hidden="true" />
-      <div
-        className={`tiroir${enFermeture ? ' tiroir--fermeture' : ''}`}
-        ref={tiroir}
-        role="dialog"
-        aria-label={textes.menuPrincipal.titre}
-        /* La descente finie, le tiroir se démonte — c'est son mouvement qui
-           le dit, pas une minuterie à côté. */
-        onAnimationEnd={enFermeture ? onFermee : undefined}
-      >
-      <div className="tiroir__poignee" aria-hidden="true" />
-      <button type="button" className="tiroir__fermer" aria-label={textes.fermer} onClick={onFermer}>
-        <IconeCroix />
-      </button>
-
-      <div className="tiroir__contenu">
-        {SECTIONS_MENU.map((section) => (
-          <section key={section} className="tiroir__section">
-            <h2 className="tiroir__titre">
-              {section === 'glowEtVous' ? (
-                <>
-                  <Wordmark enLigne />
-                  <span>{textes.menuPrincipal.sections[section]}</span>
-                </>
+    <Tiroir
+      nom={textes.menuPrincipal.titre}
+      onFermer={onFermer}
+      onFermee={onFermee}
+      enFermeture={enFermeture}
+      bouton={bouton}
+    >
+      {SECTIONS_MENU.map((section) => (
+        <section key={section} className="tiroir__section">
+          <h2 className="tiroir__titre">
+            {section === 'glowEtVous' ? (
+              <>
+                <Wordmark enLigne />
+                <span>{textes.menuPrincipal.sections[section]}</span>
+              </>
+            ) : (
+              textes.menuPrincipal.sections[section]
+            )}
+          </h2>
+          <div className="tiroir__grille">
+            {ENTREES_PAR_SECTION[section].map((entree) =>
+              entree === 'compte' ? (
+                /* LA SEULE ENTRÉE QUI MÈNE QUELQUE PART : « Mon compte », la
+                   page existe (2026-09-19). Les autres attendent la leur. */
+                <button
+                  key={entree}
+                  type="button"
+                  className="tiroir__entree tiroir__entree--bouton"
+                  onClick={onOuvrirCompte}
+                >
+                  <span className="tiroir__icone">{ICONES_ENTREES[entree]}</span>
+                  <span className="tiroir__nom">{textes.menuPrincipal.entrees[entree]}</span>
+                </button>
               ) : (
-                textes.menuPrincipal.sections[section]
-              )}
-            </h2>
-            <div className="tiroir__grille">
-              {ENTREES_PAR_SECTION[section].map((entree) =>
-                entree === 'compte' ? (
-                  /* LA SEULE ENTRÉE QUI MÈNE QUELQUE PART : « Mon compte », la
-                     page existe (2026-09-19). Les autres attendent la leur. */
-                  <button
-                    key={entree}
-                    type="button"
-                    className="tiroir__entree tiroir__entree--bouton"
-                    onClick={onOuvrirCompte}
-                  >
-                    <span className="tiroir__icone">{ICONES_ENTREES[entree]}</span>
-                    <span className="tiroir__nom">{textes.menuPrincipal.entrees[entree]}</span>
-                  </button>
-                ) : (
-                  <div key={entree} className="tiroir__entree">
-                    <span className="tiroir__icone">{ICONES_ENTREES[entree]}</span>
-                    <span className="tiroir__nom">{textes.menuPrincipal.entrees[entree]}</span>
-                  </div>
-                ),
-              )}
-            </div>
-          </section>
-        ))}
-      </div>
-      </div>
-    </>
+                <div key={entree} className="tiroir__entree">
+                  <span className="tiroir__icone">{ICONES_ENTREES[entree]}</span>
+                  <span className="tiroir__nom">{textes.menuPrincipal.entrees[entree]}</span>
+                </div>
+              ),
+            )}
+          </div>
+        </section>
+      ))}
+    </Tiroir>
   );
 }
 
@@ -144,8 +112,6 @@ const ICONES_ENTREES: Record<EntreeMenuPrincipal, React.ReactNode> = {
   badges: <IconeBadges />,
   nouveauRapport: <IconeRapport />,
   rapports: <IconeRapports />,
-  /* Le bonhomme du profil, et non la carte de paiement de la V1 (2026-09-19,
-     « icone mon compte : icone mon profil »). */
   compte: <IconeProfil />,
   avis: <IconeAvis />,
   sondage: <IconeSondage />,
