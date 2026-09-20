@@ -198,6 +198,9 @@ export interface Textes {
     titre: string;
     fonds: Record<FondId, string>;
     choisir: string;
+    /** La sortie sans avoir choisi, avec un autre fond sous les yeux
+     *  (2026-09-20) : confirmer le nouveau fond, ou fermer. */
+    confirmer: string;
   };
   /** LA PAGE « MON COMPTE » (2026-09-19, « Mon profil » jusqu'au soir) : son
    *  titre, ses trois volets et leurs onglets, et ce que chaque valeur attend
@@ -406,6 +409,7 @@ const FR: Textes = {
       ciel: 'Ciel ensoleillé',
     },
     choisir: 'Choisir',
+    confirmer: 'Confirmer le nouveau fond',
   },
   compte: {
     titre: 'Mon compte',

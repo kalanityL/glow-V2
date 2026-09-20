@@ -477,7 +477,9 @@ choisie, « Confirmer la mise à jour » / « Fermer » si le choix est complet.
 thème de l'onboarding — la photo, et le ciel de midi du thème « Bleu
 ensoleillé » de la V1 —, et « Choisir ». Toucher un cadre change le fond de la
 page SOUS LES YEUX sans l'enregistrer ; « Choisir » l'enregistre (réponse
-`fond`, sur l'appareil) ; fermer sans choisir rend le fond enregistré. Le fond
+`fond`, sur l'appareil) ; fermer sans choisir, avec un autre fond sous les
+yeux, propose « Confirmer le nouveau fond » / « Fermer » (comme le bloc du
+traitement) ; « Fermer » rend le fond enregistré. Le fond
 choisi vaut pour toute page, les tiroirs et les blocs (`.page--fond-<id>`
 rebranche le jeton `--accueil-fond-image`). **Sous le ciel, le logo et
 l'entête prennent les couleurs du thème « Bleu ensoleillé » de la V1**

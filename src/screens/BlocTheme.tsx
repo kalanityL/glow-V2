@@ -1,3 +1,4 @@
+import { useCallback, useState } from 'react';
 import { Bloc } from '../components/Bloc';
 import { useTextes } from '../i18n/useTextes';
 import { FONDS, type FondId } from '../app/fonds';
@@ -12,8 +13,11 @@ import { FONDS, type FondId } from '../app/fonds';
  * clique sur choisir, ça met à jour l'image de fond de page de façon
  * pérenne ») : deux cadres, comme ceux du choix du thème de l'onboarding,
  * chacun peint de son fond ; toucher un cadre change le fond de la page
- * SOUS LES YEUX, sans l'enregistrer ; « Choisir » l'enregistre. Fermer sans
- * choisir rend le fond enregistré.
+ * SOUS LES YEUX, sans l'enregistrer ; « Choisir » l'enregistre. FERMER SANS
+ * AVOIR CHOISI, avec un autre fond sous les yeux (2026-09-20, « si on sort du
+ * bloc theme sans valider, idem que pour mise à jour de traitement :
+ * confirmer le nouveau fond ou fermer ») : deux sorties, « Confirmer le
+ * nouveau fond » / « Fermer » ; fermer rend le fond enregistré.
  */
 export function BlocTheme({
   courant,
@@ -32,25 +36,43 @@ export function BlocTheme({
 }) {
   const textes = useTextes();
   const montre = apercu ?? courant;
+  const differe = montre !== courant;
+  /* La sortie demandée avec un autre fond sous les yeux : à confirmer. */
+  const [sortie, setSortie] = useState(false);
+
+  const demanderFermeture = useCallback(() => {
+    if (!differe) {
+      onFermer();
+      return;
+    }
+    setSortie(true);
+  }, [differe, onFermer]);
+
+  const pied = sortie ? (
+    <div className="boutons">
+      <button type="button" className="bouton bouton--second" onClick={onFermer}>
+        {textes.fermer}
+      </button>
+      <button type="button" className="bouton" onClick={() => onChoisir(montre)}>
+        {textes.blocTheme.confirmer}
+      </button>
+    </div>
+  ) : (
+    <div className="boutons">
+      <button
+        type="button"
+        className="bouton"
+        disabled={!differe}
+        aria-disabled={!differe}
+        onClick={() => onChoisir(montre)}
+      >
+        {textes.blocTheme.choisir}
+      </button>
+    </div>
+  );
 
   return (
-    <Bloc
-      titre={textes.blocTheme.titre}
-      onFermer={onFermer}
-      pied={
-        <div className="boutons">
-          <button
-            type="button"
-            className="bouton"
-            disabled={montre === courant}
-            aria-disabled={montre === courant}
-            onClick={() => onChoisir(montre)}
-          >
-            {textes.blocTheme.choisir}
-          </button>
-        </div>
-      }
-    >
+    <Bloc titre={textes.blocTheme.titre} onFermer={demanderFermeture} pied={pied}>
       <div className="choix-themes choix-themes--fonds" role="radiogroup" aria-label={textes.blocTheme.titre}>
         {FONDS.map((fond) => (
           <button
@@ -60,7 +82,10 @@ export function BlocTheme({
             className={`carte-theme carte-fond carte-fond--${fond}${montre === fond ? ' carte-theme--choisi' : ''}`}
             aria-label={textes.blocTheme.fonds[fond]}
             aria-checked={montre === fond}
-            onClick={() => onApercu(fond)}
+            onClick={() => {
+              setSortie(false);
+              onApercu(fond);
+            }}
           />
         ))}
       </div>
