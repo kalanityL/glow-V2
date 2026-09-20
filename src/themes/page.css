@@ -2311,10 +2311,12 @@
   margin: -8px 0 0;
 }
 
-/* « Valider » au milieu, à sa largeur, la coche devant — comme la V1. */
+/* « Valider » au milieu, à sa largeur, la coche devant — comme la V1 ; en
+   modification, « Annuler » à côté. */
 .prise__pied {
   display: flex;
   justify-content: center;
+  gap: 10px;
   padding-top: 4px;
 }
 
@@ -2602,9 +2604,16 @@
   color: var(--encre-chapeau);
 }
 
+/* La carte est un bouton (2026-09-20) : rien de la matière d'un bouton. */
 .confirmation__prise {
+  display: block;
+  width: 100%;
   margin: 0;
   padding: 12px 16px;
+  text-align: left;
+  color: inherit;
+  font: inherit;
+  cursor: pointer;
 }
 
 /* Trois lignes de même style : l'icône, le mot, la valeur à droite. */

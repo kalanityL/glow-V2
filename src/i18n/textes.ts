@@ -254,6 +254,8 @@ export interface Textes {
    */
   prise: {
     titre: Record<Forme, string>;
+    /** Le titre en modification — les mots de la V1 (`InjectionForm.tsx`). */
+    titreModification: Record<Forme, string>;
     zones: Record<Zone, string>;
     /** Un palier écrit : « 0,25 mg (Initiation) », « 2,4 mg (Dose max) »,
         « 1 mg » entre les deux. */
@@ -271,6 +273,11 @@ export interface Textes {
     regleDose: string;
     /** La proposition, quand on touche le nom du traitement (2026-09-20). */
     mettreAJour: string;
+    /** EN MODIFICATION (2026-09-20, « réouvre le formulaire avec les données
+        enregistrées par defaut, et bouton annuler et mettre à jour ») : ses
+        deux boutons. */
+    annuler: string;
+    mettreAJourPrise: string;
   };
   /**
    * L'ÉCRAN DE CONFIRMATION D'UNE PRISE (2026-09-20, son image) : le titre
@@ -280,6 +287,9 @@ export interface Textes {
    */
   confirmation: {
     titre: Record<Forme, string>;
+    /** Le titre après une modification (2026-09-20, « Message de validation
+        devient "Injection mise à jour" »). */
+    titreMiseAJour: Record<Forme, string>;
     sousTitre: string;
     zone: string;
     maintenant: string;
@@ -500,6 +510,10 @@ const FR: Textes = {
       injection: 'Nouvelle injection',
       comprime: 'Nouvelle prise de comprimé',
     },
+    titreModification: {
+      injection: 'Modifier l’injection',
+      comprime: 'Modifier la prise',
+    },
     /* Les zones de la V1, avec leurs majuscules. */
     zones: {
       'abdomen-gauche': 'Abdomen Gauche',
@@ -521,11 +535,17 @@ const FR: Textes = {
     valider: 'Valider',
     regleDose: 'Une dose en mg, supérieure à zéro',
     mettreAJour: 'Mettre à jour le traitement ?',
+    annuler: 'Annuler',
+    mettreAJourPrise: 'Mettre à jour',
   },
   confirmation: {
     titre: {
       injection: 'Injection enregistrée !',
       comprime: 'Prise enregistrée !',
+    },
+    titreMiseAJour: {
+      injection: 'Injection mise à jour !',
+      comprime: 'Prise mise à jour !',
     },
     sousTitre: 'Votre suivi est à jour.',
     zone: 'Zone d’injection',

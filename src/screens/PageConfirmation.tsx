@@ -47,7 +47,11 @@ const ICONES: Record<EntreeConfirmation, () => ReactElement> = {
  * pleine : AJOUTER UN AUTRE ÉLÉMENT, qui ouvre le tiroir du « + » ; les
  * quatre autres éteintes — le journal, la concentration et l'évolution
  * n'ont pas de page, et le retour à l'accueil l'est aussi, à sa demande
- * (« retour à l'accueil comme les autres désactivés »). RIEN EN GRAS.
+ * (« retour à l'accueil comme les autres désactivés »). RIEN EN GRAS. LA
+ * CARTE EST UN BOUTON (2026-09-20, « clic sur bloc récapitulatif : réouvre
+ * le formulaire avec les données enregistrées par defaut ») : elle rouvre
+ * le formulaire en modification ; revenue d'une mise à jour, la page titre
+ * « Injection mise à jour ! ».
  *
  * LA COCHE EST SON IMAGE, redessinée en plus petit (« meme image que
  * jointe, en plus petit ») : le disque menthe dans son halo, la coche
@@ -57,6 +61,8 @@ const ICONES: Record<EntreeConfirmation, () => ReactElement> = {
 export function PageConfirmation({
   prise,
   forme,
+  miseAJour,
+  onModifier,
   onAccueil,
   onOuvrirCompte,
   onAjouter,
@@ -64,6 +70,10 @@ export function PageConfirmation({
 }: {
   prise: Prise;
   forme: Forme;
+  /** La prise vient d'être mise à jour, pas enregistrée pour la première fois. */
+  miseAJour: boolean;
+  /** La carte touchée : rouvrir le formulaire sur cette prise. */
+  onModifier: () => void;
   onAccueil: () => void;
   onOuvrirCompte: () => void;
   onAjouter: (module: ModuleId) => void;
@@ -98,10 +108,12 @@ export function PageConfirmation({
 
         <div className="confirmation">
           <Coche />
-          <h2 className="confirmation__titre">{textes.confirmation.titre[forme]}</h2>
+          <h2 className="confirmation__titre">
+            {miseAJour ? textes.confirmation.titreMiseAJour[forme] : textes.confirmation.titre[forme]}
+          </h2>
           <p className="confirmation__sousTitre">{textes.confirmation.sousTitre}</p>
 
-          <div className="carte confirmation__prise">
+          <button type="button" className="carte confirmation__prise" onClick={onModifier}>
             <div className="confirmation__ligne">
               {orale ? <IconeComprime /> : <IconeSeringue />}
               <span>{specialite?.nom}</span>
@@ -119,7 +131,7 @@ export function PageConfirmation({
                 <span className="confirmation__valeur">{textes.prise.zones[prise.zone]}</span>
               </div>
             ) : null}
-          </div>
+          </button>
 
           <h3 className="confirmation__maintenant">{textes.confirmation.maintenant}</h3>
           <div className="confirmation__entrees">

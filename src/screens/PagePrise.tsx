@@ -50,6 +50,15 @@ import { appliquerChoixTraitement, choixTraitementDe } from '../app/choixTraitem
  * notes vides sont absentes. L'identifiant du traitement est écrit depuis
  * le profil. Sans plus de traitement à la sortie du bloc, la page n'a plus
  * lieu d'être : retour à l'accueil.
+ *
+ * EN MODIFICATION (2026-09-20, « clic sur bloc récapitulatif : réouvre le
+ * formulaire avec les données enregistrées par defaut, et bouton annuler et
+ * mettre à jour ») : la prise à modifier remplit le formulaire — sa date,
+ * son heure, sa zone, sa dose (un palier, ou « Autre dose » si elle n'en
+ * est pas un), ses notes dépliées si elle en a — et le pied porte
+ * « Annuler » et « Mettre à jour ». C'est le chemin du recueil complet de
+ * la SPEC : une dose finie strictement positive, rien d'autre, et le
+ * traitement réécrit depuis le profil.
  */
 export function PagePrise({
   parcours,
@@ -60,6 +69,8 @@ export function PagePrise({
   onValider,
   onAjouter,
   fond,
+  initiale,
+  onAnnuler,
 }: {
   parcours: ReturnType<typeof useParcours>;
   forme: Forme;
@@ -70,6 +81,11 @@ export function PagePrise({
   onValider: (prise: Prise) => void;
   onAjouter: (module: ModuleId) => void;
   fond: FondProps;
+  /** La prise à modifier : le formulaire part d'elle. Absente, c'est une
+      nouvelle prise. */
+  initiale?: Prise;
+  /** « Annuler », en modification : on repart sans rien écrire. */
+  onAnnuler?: () => void;
 }) {
   const textes = useTextes();
   const langue = detecterLangue();
@@ -78,19 +94,23 @@ export function PagePrise({
   const orale = forme === 'comprime';
   const separateur = textes.separateurDecimal;
   const mgEcrit = (mg: number) => String(mg).replace('.', separateur);
+  const modification = initiale !== undefined;
+  const doseInitialeEstUnPalier = initiale ? paliers.includes(initiale.doseMg) : true;
 
   const maintenant = new Date();
-  const [date, setDate] = useState(dateLocale(maintenant));
-  const [heure, setHeure] = useState(heureRonde(heureLocale(maintenant)));
+  const [date, setDate] = useState(initiale?.date ?? dateLocale(maintenant));
+  const [heure, setHeure] = useState(initiale?.heure ?? heureRonde(heureLocale(maintenant)));
   const [editeDate, setEditeDate] = useState(false);
   const [editeHeure, setEditeHeure] = useState(false);
-  const [zone, setZone] = useState<Zone>(orale ? 'voie-orale' : ZONE_PAR_DEFAUT);
-  const [palier, setPalier] = useState<number>(paliers[0] ?? 0);
-  const [autreDose, setAutreDose] = useState(false);
-  const [doseTapee, setDoseTapee] = useState('');
+  const [zone, setZone] = useState<Zone>(initiale?.zone ?? (orale ? 'voie-orale' : ZONE_PAR_DEFAUT));
+  const [palier, setPalier] = useState<number>(
+    initiale && doseInitialeEstUnPalier ? initiale.doseMg : (paliers[0] ?? 0),
+  );
+  const [autreDose, setAutreDose] = useState(!doseInitialeEstUnPalier);
+  const [doseTapee, setDoseTapee] = useState(initiale && !doseInitialeEstUnPalier ? mgEcrit(initiale.doseMg) : '');
   const [refuse, setRefuse] = useState(false);
-  const [notesOuvertes, setNotesOuvertes] = useState(false);
-  const [notes, setNotes] = useState('');
+  const [notesOuvertes, setNotesOuvertes] = useState(Boolean(initiale?.notes));
+  const [notes, setNotes] = useState(initiale?.notes ?? '');
   /* La proposition sous le nom du traitement, puis le bloc lui-même. */
   const [proposition, setProposition] = useState(false);
   const [blocTraitement, setBlocTraitement] = useState(false);
@@ -132,7 +152,9 @@ export function PagePrise({
         <form className="carte prise" onSubmit={valider} noValidate>
           <div className="prise__entete">
             {orale ? <IconeComprime /> : <IconeSeringue />}
-            <h2 className="prise__titre">{textes.prise.titre[forme]}</h2>
+            <h2 className="prise__titre">
+              {modification ? textes.prise.titreModification[forme] : textes.prise.titre[forme]}
+            </h2>
             <button type="button" className="tiroir__fermer prise__fermer" aria-label={textes.fermer} onClick={onAccueil}>
               <IconeCroix />
             </button>
@@ -276,9 +298,14 @@ export function PagePrise({
           )}
 
           <div className="prise__pied">
+            {modification ? (
+              <button type="button" className="bouton bouton--second prise__valider" onClick={onAnnuler}>
+                {textes.prise.annuler}
+              </button>
+            ) : null}
             <button type="submit" className="bouton prise__valider">
               <IconeCoche />
-              <span>{textes.prise.valider}</span>
+              <span>{modification ? textes.prise.mettreAJourPrise : textes.prise.valider}</span>
             </button>
           </div>
         </form>

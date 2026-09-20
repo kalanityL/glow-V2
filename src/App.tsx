@@ -50,15 +50,24 @@ export default function App() {
      et l'écran qui suit la validation attend le sien (« je te donnerai
      l'écran de validation ensuite ») : validée, la prise ramène à l'accueil. */
   const [prises, setPrises] = useState<Prise[]>([]);
+  /* LA MODIFICATION DE LA DERNIÈRE PRISE (2026-09-20, « clic sur bloc
+     récapitulatif : réouvre le formulaire avec les données enregistrées
+     par defaut ») : le formulaire part d'elle, « Mettre à jour » la
+     remplace, et la confirmation le dit. */
+  const [modification, setModification] = useState(false);
+  const [miseAJour, setMiseAJour] = useState(false);
   const ajouter = (module: ModuleId) => {
     if (module === 'traitement' && parcours.reponses.formeTraitement && parcours.reponses.traitement) {
+      setModification(false);
       setPage('prise');
     }
   };
   /* Validée, la prise mène à L'ÉCRAN DE CONFIRMATION (2026-09-20, son
      image) : la dernière prise, et ce qu'on peut faire maintenant. */
   const validerPrise = (prise: Prise) => {
-    setPrises((avant) => [...avant, prise]);
+    setPrises((avant) => (modification ? [...avant.slice(0, -1), prise] : [...avant, prise]));
+    setMiseAJour(modification);
+    setModification(false);
     setPage('confirmation');
   };
   const derniere = prises[prises.length - 1] ?? null;
@@ -127,6 +136,11 @@ export default function App() {
             <PageConfirmation
               prise={derniere}
               forme={parcours.reponses.formeTraitement}
+              miseAJour={miseAJour}
+              onModifier={() => {
+                setModification(true);
+                setPage('prise');
+              }}
               onAccueil={() => setPage('accueil')}
               onOuvrirCompte={() => setPage('compte')}
               onAjouter={ajouter}
@@ -142,6 +156,11 @@ export default function App() {
               onValider={validerPrise}
               onAjouter={ajouter}
               fond={fond}
+              initiale={modification && derniere ? derniere : undefined}
+              onAnnuler={() => {
+                setModification(false);
+                setPage('confirmation');
+              }}
             />
           ) : (
             <Accueil

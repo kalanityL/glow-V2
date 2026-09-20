@@ -519,7 +519,13 @@ demande, `demandeAjout`) ; Voir dans le journal, Concentration sanguine,
 Évolution du traitement, Retour à l'accueil — **les quatre éteintes**
 (« retour à l'accueil comme les autres désactivés » ; la barre et le
 bouton du téléphone ramènent). Rien en gras. La colonne défile en
-elle-même sur un écran court.
+elle-même sur un écran court. **La carte de la prise est un bouton**
+(2026-09-20, « clic sur bloc récapitulatif : réouvre le formulaire avec
+les données enregistrées par defaut, et bouton annuler et mettre à
+jour ») : elle rouvre le formulaire en modification — rempli de la prise,
+« Annuler » et « Mettre à jour » au pied — et la prise mise à jour
+remplace la dernière ; la confirmation titre alors « Injection mise à
+jour ! » (« Message de validation devient "Injection mise à jour" »).
 
 **Toute page de l'application porte la barre du bas** (`BarreDuBas`, avec
 ses deux tiroirs) et, hors de l'accueil, **l'entête des pages**
