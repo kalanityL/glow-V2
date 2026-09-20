@@ -47,7 +47,8 @@ export function Tiroir({
 
   return (
     <>
-      <div className={`vitre${enFermeture ? ' vitre--fermeture' : ''}`} aria-hidden="true" />
+      {/* La vitre d'un tiroir passe PAR-DESSUS un bloc resté ouvert (2026-09-20). */}
+      <div className={`vitre vitre--tiroir${enFermeture ? ' vitre--fermeture' : ''}`} aria-hidden="true" />
       <div
         className={`tiroir${enFermeture ? ' tiroir--fermeture' : ''}`}
         ref={tiroir}

@@ -94,24 +94,3 @@ export function rapportDuPoids(stocke: string, unite: UnitePoids): number {
   const valeur = Number(stocke);
   return (valeur - POIDS_MIN) / (POIDS_MAX[unite] - POIDS_MIN);
 }
-
-/**
- * LES CRANS FRANCHIS entre deux poids stockés (2026-09-20, « autant de clic
- * que de crans qui passent ») : un cran par unité entière — ceux que la
- * graduation dessine. De 94,9 à 95,1 on en franchit un ; de 95,0 à 95,9,
- * aucun ; de 90,0 à 95,0, cinq. Dans un sens comme dans l'autre.
- */
-export function cransFranchis(avant: string, apres: string): number {
-  return Math.abs(Math.floor(Number(apres)) - Math.floor(Number(avant)));
-}
-
-/** LES DIXIÈMES FRANCHIS entre deux poids stockés (2026-09-20, « les
-    centièmes de kilos font clic clic aussi ») : un par dixième passé, hors
-    ceux qui tombent sur une unité entière — ceux-là sont des crans, et
-    cliquent autrement. De 95,0 à 95,3 : trois ; de 94,8 à 95,2 : trois (le
-    95,0 est un cran). */
-export function dixiemesFranchis(avant: string, apres: string): number {
-  const a = Math.round(Number(avant) * 10);
-  const b = Math.round(Number(apres) * 10);
-  return Math.abs(b - a) - cransFranchis(avant, apres);
-}

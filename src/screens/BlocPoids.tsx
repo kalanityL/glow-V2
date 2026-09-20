@@ -2,13 +2,12 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import { Bloc } from '../components/Bloc';
 import { ChampEnLigne } from '../components/ChampEnLigne';
 import { useTextes } from '../i18n/useTextes';
-import { POIDS_MAX, POIDS_MIN, cransFranchis, dixiemesFranchis, poidsDepuisRapport, poidsDepuisSaisie, rapportDuPoids } from '../domaine/mesures';
+import { POIDS_MAX, POIDS_MIN, poidsDepuisRapport, poidsDepuisSaisie, rapportDuPoids } from '../domaine/mesures';
 import type { UnitePoids } from '../domaine/unites';
-import { defilementHorizontal, defilerHorizontalA, jouerSon, surFinDeDefilement } from '../plateforme/navigateur';
+import { defilementHorizontal, defilerHorizontalA, surFinDeDefilement } from '../plateforme/navigateur';
 /* SON SON (2026-09-20, « utilise les sons dans ../son pour claude », puis
    « utilise le son kilo pour tous les clics ») : le « kilo », pour chaque
    clic. Un fichier embarqué, comme les polices. */
-import sonKilo from '../assets/sons/03_metallic_air_kilo.wav';
 
 /**
  * LE BLOC DU POIDS (2026-09-20, « mise à jour de poids : ouvre qqchose comme
@@ -101,7 +100,6 @@ export function BlocPoids({
 
   /* À l'ouverture, la graduation se place sous le poids enregistré, d'un coup. */
   useEffect(() => {
-    placement.current = true;
     amenerLaRegle(valeur, false);
   }, [valeur, amenerLaRegle]);
 
@@ -120,29 +118,15 @@ export function BlocPoids({
     [unite, amenerLaRegle],
   );
 
-  /* Glisser la graduation écrit le chiffre — sauf pendant qu'on le tape — et
-     FAIT CLIQUER chaque cran qui passe (2026-09-20, « autant de clic que de
-     crans qui passent »). Le glissement d'ouverture, programmé, ne compte
-     pas : la graduation se place, elle ne passe pas de crans. */
-  const placement = useRef(true);
+  /* Glisser la graduation écrit le chiffre — sauf pendant qu'on le tape. EN
+     SILENCE (2026-09-20, « supprime completement l'effet bruit lors de la
+     modification d'un poids ») : les clics de cran, arrivés le matin même,
+     sont partis le soir. */
   const surDefilement = () => {
     if (enEdition) return;
     const { position, course } = defilementHorizontal(graduation.current);
     if (course <= 0) return;
-    const nouveau = poidsDepuisRapport(position / course, unite);
-    setBrouillon((precedent) => {
-      if (!placement.current) {
-        /* Les crans entiers cliquent « kilo », les dixièmes entre eux
-           cliquent « centième » (2026-09-20, « les centièmes de kilos font
-           clic clic aussi »). */
-        const crans = cransFranchis(precedent, nouveau);
-        const dixiemes = dixiemesFranchis(precedent, nouveau);
-        /* Le même son pour tous (« utilise le son kilo pour tous les clics »). */
-        if (crans + dixiemes > 0) jouerSon(sonKilo, crans + dixiemes);
-      }
-      return nouveau;
-    });
-    placement.current = false;
+    setBrouillon(poidsDepuisRapport(position / course, unite));
   };
 
   const differe = brouillon !== valeur;
@@ -210,22 +194,11 @@ export function BlocPoids({
             }}
             onSaisie={(saisie) => {
               setSortie(false);
-              /* Un clic à chaque chiffre changé (2026-09-20) : chaque frappe qui
-                 change le texte. La graduation suit, en silence — elle est
-                 amenée, elle ne passe pas de crans. */
-              jouerSon(sonKilo);
+              /* La graduation suit chaque frappe : elle est amenée d'un coup. */
               const stocke = poidsDepuisSaisie(saisie, unite);
-              if (stocke) {
-                placement.current = true;
-                amenerLaRegle(stocke, false);
-              }
+              if (stocke) amenerLaRegle(stocke, false);
             }}
-            onEdition={(edition) => {
-              setEnEdition(edition);
-              /* L'édition finie, la graduation est en place : le prochain
-                 glissement compte ses crans. */
-              if (!edition) placement.current = false;
-            }}
+            onEdition={setEnEdition}
             regle={textes.compte.reglePoids(POIDS_MIN, POIDS_MAX[unite], textes.unites[unite])}
             unite={textes.unites[unite]}
             nom={titre}

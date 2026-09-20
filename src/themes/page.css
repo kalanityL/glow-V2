@@ -1501,7 +1501,7 @@
   left: 0;
   right: 0;
   bottom: 0;
-  z-index: 2;
+  z-index: 4;
   max-height: calc(100% - 48px);
   overflow-y: auto;
   padding: 10px var(--marge-page) 84px;
@@ -1568,10 +1568,19 @@
   pointer-events: none;
 }
 
+/* LES RANGS (2026-09-20, « s'il y a un bloc reste de page vitré ouvert qd
+   on ouvre un tiroir ou un menu, ce bloc passe sous la vitre ») : la vitre
+   d'un bloc (1), le bloc (2), la vitre d'un tiroir (3), le tiroir (4), la
+   barre du bas (5) — un bloc resté ouvert passe sous la vitre du tiroir,
+   flouté avec le reste de la page. */
+.vitre--tiroir {
+  z-index: 3;
+}
+
 /* La barre du bas garde le dessus du tiroir. */
 .menu {
   position: relative;
-  z-index: 3;
+  z-index: 5;
 }
 
 /* La poignée, au sommet : une languette qui dit « ça se tire ». */

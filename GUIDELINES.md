@@ -456,7 +456,11 @@ souhaitez-vous ajouter ? », est **sur la ligne de la croix, sans ligne
 dessous, à l'encre de la croix** (2026-09-20, « meme ligne que la croix de
 fermeture, pas de ligne horizontale dessous, meme couleur que la croix de
 fermeture ») — le menu principal, lui, garde son premier titre sous la
-croix. **Ouvrir un tiroir ferme l'autre en même temps** : l'un descend pendant que l'autre monte.
+croix. **Un bloc resté ouvert passe sous la vitre d'un tiroir** (2026-09-20,
+« s'il y a un bloc reste de page vitré ouvert qd on ouvre un tiroir ou un
+menu, ce bloc passe sous la vitre ») : les rangs sont dans `page.css` —
+vitre du bloc, bloc, vitre du tiroir, tiroir, barre du bas. **Ouvrir un
+tiroir ferme l'autre en même temps** : l'un descend pendant que l'autre monte.
 
 **Toute page de l'application porte la barre du bas** (`BarreDuBas`, avec
 ses deux tiroirs) et, hors de l'accueil, **l'entête des pages**
@@ -469,7 +473,10 @@ page à part entiere »).
 ouvre qqchose comme ça […] la barre du bas se met à jour au bon endroit en
 temps réel ») : le chiffre en grand, éditable sur place, et dessous une
 graduation qui glisse sous une tige fixe — les deux se suivent à chaque
-geste et à chaque frappe. **La graduation** (2026-09-20, « met les chiffres
+geste et à chaque frappe, **sans aucun son** (2026-09-20 au soir,
+« supprime completement l'effet bruit lors de la modification d'un
+poids » — les clics de cran du matin sont partis, avec leur fichier et la
+file qui les jouait). **La graduation** (2026-09-20, « met les chiffres
 de la regle graduée au dessus des crans, tous les 5 kilos […] positionne
 une tige verticale noire, 4 fois plus grande qu'un cran, au milieu de
 l'écran, dont le bout supérieur se place sur la regle graduée ») : les
