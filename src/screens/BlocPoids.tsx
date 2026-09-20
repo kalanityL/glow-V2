@@ -50,6 +50,30 @@ export function BlocPoids({
   const separateur = textes.separateurDecimal;
   const ecrit = (stocke: string) => stocke.replace('.', separateur);
 
+  /* LE CHIFFRE EN CASES FIXES (2026-09-20, « fixer la place des centaines des
+     dizaines des unites et des diziemes pour ne pas que ça saute trop quand on
+     fait varier le poids ») : autant de cases entières que le plus lourd de
+     l'unité a de chiffres (trois en kilos, quatre en livres), puis le
+     séparateur et la case des dixièmes ; une case sans chiffre reste vide, à
+     sa place. Les chiffres sont tabulaires : chaque case a la largeur d'un
+     chiffre. */
+  const casesEntieres = String(POIDS_MAX[unite]).length;
+  const enCases = (stocke: string) => {
+    const [entier, dixieme] = stocke.split('.');
+    const chiffres = entier.padStart(casesEntieres, ' ').split('');
+    return (
+      <span className="poids__cases">
+        {chiffres.map((chiffre, i) => (
+          <span key={i} className="poids__case">
+            {chiffre.trim()}
+          </span>
+        ))}
+        <span className="poids__separateur">{separateur}</span>
+        <span className="poids__case">{dixieme}</span>
+      </span>
+    );
+  };
+
   const amenerLaRegle = useCallback(
     (stocke: string, doux: boolean) => {
       const { course } = defilementHorizontal(graduation.current);
@@ -115,6 +139,7 @@ export function BlocPoids({
         <div className="poids__valeur">
           <ChampEnLigne
             valeur={ecrit(brouillon)}
+            valeurAffichee={enCases(brouillon)}
             onValeur={(saisie) => {
               const stocke = poidsDepuisSaisie(saisie, unite);
               if (stocke) setBrouillon(stocke);
@@ -141,7 +166,15 @@ export function BlocPoids({
             {crans.map((v) => (
               <span
                 key={v}
-                className={`graduation__cran${v % 10 === 0 ? ' graduation__cran--dix' : v % 5 === 0 ? ' graduation__cran--cinq' : ''}`}
+                className={`graduation__cran${
+                  v % 100 === 0
+                    ? ' graduation__cran--dix graduation__cran--cent'
+                    : v % 10 === 0
+                      ? ' graduation__cran--dix'
+                      : v % 5 === 0
+                        ? ' graduation__cran--cinq'
+                        : ''
+                }`}
               >
                 {v % 10 === 0 ? <span className="graduation__nombre">{v}</span> : null}
               </span>

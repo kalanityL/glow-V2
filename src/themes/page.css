@@ -1891,6 +1891,25 @@
   line-height: 1;
   text-align: center;
   padding: 0;
+  /* Chiffres tabulaires : tous de la même largeur, pour que rien ne saute
+     quand le poids varie (2026-09-20). */
+  font-variant-numeric: tabular-nums;
+}
+
+/* Les cases du chiffre : une par rang, de la largeur d'un chiffre (`1ch`, en
+   tabulaire c'est la largeur de tous) ; le séparateur prend la sienne. */
+.poids__cases {
+  display: inline-flex;
+}
+
+.poids__case {
+  display: inline-block;
+  width: 1ch;
+  text-align: center;
+}
+
+.poids__separateur {
+  display: inline-block;
 }
 
 .poids__valeur .enligne__champ {
@@ -1957,6 +1976,13 @@
 .graduation__cran--dix::before {
   height: 16px;
   background: var(--encre-chapeau);
+}
+
+/* Le cran des centaines, très légèrement plus visible (2026-09-20) : un peu
+   plus haut, à l'encre. */
+.graduation__cran--cent::before {
+  height: 18px;
+  background: var(--encre);
 }
 
 .graduation__nombre {
