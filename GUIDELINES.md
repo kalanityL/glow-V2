@@ -480,11 +480,16 @@ milieu, dans le bleu du thème, de la hauteur du cran de kilo, PAR-DESSUS
 les crans, le pied sur leur ligne de base (2026-09-20, « tige bleue ; tige
 de la taille d'un cran de kilo, ne pas la positionner sous la regle
 graduée mais en superposition ») — elle dit en permanence le poids que le
-chiffre affiche. Elle est posée sur le cadre, HORS du défilement, dans une
-grille d'une case avec lui : dedans, un élément absolu part avec la piste
-qui glisse et Chrome l'emportait hors de vue. **La graduation est
-aimantée** (« tige "aimantée" sur les crans ») : le défilement s'arrête
-toujours un cran au centre, jamais entre deux. **Le chiffre a une
+chiffre affiche, et RECOUVRE le cran qu'elle désigne (« tige bleue par
+dessus et rend invisible tout autre tige sous elle » : trois pixels de
+large, le cran d'un). Elle est posée sur le cadre, HORS du défilement,
+dans une grille d'une case avec lui : dedans, un élément absolu part avec
+la piste qui glisse et Chrome l'emportait hors de vue. **La graduation est
+aimantée, et l'aimant est immédiat** (« tige "aimantée" sur les crans »,
+« aimant immédiat ») : pendant le geste, l'aimantation native du
+défilement ; le geste fini, la graduation est amenée d'un coup sur le
+cran du poids lu, sans glissement d'approche
+(`plateforme/navigateur.ts`, `surFinDeDefilement`). **Le chiffre a une
 hauteur figée** et sa case vide porte un zéro invisible, pas une espace :
 rien ne bouge en passant les cent. La géométrie de la graduation (le pas
 d'un cran, les hauteurs) est dans `page.css` ; le code n'en lit qu'un

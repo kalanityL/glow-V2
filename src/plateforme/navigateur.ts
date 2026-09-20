@@ -99,6 +99,29 @@ export function defilementHorizontal(element: Element | null): { position: numbe
   return { position: element.scrollLeft, course: element.scrollWidth - element.clientWidth };
 }
 
+/**
+ * APPELLE `action` QUAND UN DÉFILEMENT S'ARRÊTE (2026-09-20, « aimant
+ * immédiat ») : sur `scrollend` là où le navigateur le donne, sinon après
+ * un court silence des événements `scroll`. Rend de quoi se désabonner.
+ */
+export function surFinDeDefilement(element: Element | null, action: () => void): () => void {
+  if (!element) return () => {};
+  if ('onscrollend' in window) {
+    element.addEventListener('scrollend', action);
+    return () => element.removeEventListener('scrollend', action);
+  }
+  let minuteur: ReturnType<typeof setTimeout> | undefined;
+  const surScroll = () => {
+    clearTimeout(minuteur);
+    minuteur = setTimeout(action, 80);
+  };
+  element.addEventListener('scroll', surScroll);
+  return () => {
+    clearTimeout(minuteur);
+    element.removeEventListener('scroll', surScroll);
+  };
+}
+
 /** Amène un défilement horizontal à une position, en glissant ou d'un coup. */
 export function defilerHorizontalA(element: Element | null, position: number, doux: boolean): void {
   element?.scrollTo({ left: position, behavior: doux ? 'smooth' : 'auto' });

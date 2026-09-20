@@ -4,7 +4,7 @@ import { ChampEnLigne } from '../components/ChampEnLigne';
 import { useTextes } from '../i18n/useTextes';
 import { POIDS_MAX, POIDS_MIN, cransFranchis, dixiemesFranchis, poidsDepuisRapport, poidsDepuisSaisie, rapportDuPoids } from '../domaine/mesures';
 import type { UnitePoids } from '../domaine/unites';
-import { defilementHorizontal, defilerHorizontalA, jouerSon } from '../plateforme/navigateur';
+import { defilementHorizontal, defilerHorizontalA, jouerSon, surFinDeDefilement } from '../plateforme/navigateur';
 /* SON SON (2026-09-20, « utilise les sons dans ../son pour claude », puis
    « utilise le son kilo pour tous les clics ») : le « kilo », pour chaque
    clic. Un fichier embarqué, comme les polices. */
@@ -104,6 +104,21 @@ export function BlocPoids({
     placement.current = true;
     amenerLaRegle(valeur, false);
   }, [valeur, amenerLaRegle]);
+
+  /* L'AIMANT IMMÉDIAT (2026-09-20, « tige "aimantée" sur les crans »,
+     « aimant immédiat ») : le geste fini, la graduation est amenée D'UN
+     COUP sur le cran du poids lu — pas de glissement d'approche. Pendant le
+     geste, c'est l'aimantation native du défilement (`scroll-snap`) qui
+     joue. */
+  useEffect(
+    () =>
+      surFinDeDefilement(graduation.current, () => {
+        const { position, course } = defilementHorizontal(graduation.current);
+        if (course <= 0) return;
+        amenerLaRegle(poidsDepuisRapport(position / course, unite), false);
+      }),
+    [unite, amenerLaRegle],
+  );
 
   /* Glisser la graduation écrit le chiffre — sauf pendant qu'on le tape — et
      FAIT CLIQUER chaque cran qui passe (2026-09-20, « autant de clic que de
