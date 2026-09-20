@@ -159,6 +159,11 @@
      l'entête de l'onboarding. Déclarés pour que la règle trouve une valeur. */
   --marque-encre: var(--encre);
   --marque-accent: var(--accent);
+  /* Pas de dégradé de marque sur les ciels : les deux bouts sont l'encre. */
+  --marque-degrade-debut: var(--encre);
+  --marque-degrade-fin: var(--encre);
+  --devise-encre: var(--encre);
+  --devise-accent: var(--accent);
 
   /* Le menu du bas : pas de couleurs propres ici, il prend celles du thème —
      la surface des réponses, son filet, l'encre du chapeau, l'accent, le

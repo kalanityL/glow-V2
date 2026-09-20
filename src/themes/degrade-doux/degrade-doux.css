@@ -81,7 +81,16 @@
      de la palette du board, #1d4ed8, entre le sky-600 de la V1 (#0284c7,
      essayé le même jour) et le marine du 16 (#1e3a8a). */
   --marque-encre: #1d4ed8;
-  --marque-accent: #059669;
+  /* LES COULEURS DE SON IMAGE DU 2026-09-20 (« reprend ces couleurs pour
+     glp1glow et la phrase du dessous ») : G et LOW en dégradé du bleu
+     profond au bleu azur, de gauche à droite ; L/P/1 en turquoise ; la
+     devise en bleu moyen, sa fin « glow! » en bleu plus clair. Relevées à
+     l'œil — l'image n'est pas sur le disque. */
+  --marque-degrade-debut: #1e3fae;
+  --marque-degrade-fin: #46a6f2;
+  --marque-accent: #29b6cf;
+  --devise-encre: #2a5fd6;
+  --devise-accent: #3d8ff2;
 
   /* LE MENU DU BAS, AUX COULEURS DE SON IMAGE (2026-09-16,
      `~/Desktop/GLOW/Images-pour-claude/couleur-menu.png`, relevées au

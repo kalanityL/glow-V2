@@ -846,17 +846,25 @@
   flex-direction: column;
 }
 
+/* La devise : bleu moyen, graisse MOYENNE (2026-09-20, « meme graisse que
+   sur l'image » — 900 auparavant), et sa fin « glow! » en gras et plus
+   clair. */
 .entete__devise {
   margin: 2px 0 0;
   font-family: var(--font-marque);
   font-size: calc(var(--marque-base) * 0.5);
   font-style: italic;
-  font-weight: 900;
+  font-weight: 600;
   line-height: 1.2;
   text-transform: uppercase;
   letter-spacing: 0.1em;
   white-space: nowrap;
-  color: var(--marque-encre);
+  color: var(--devise-encre);
+}
+
+.entete__devise-fin {
+  font-weight: 800;
+  color: var(--devise-accent);
 }
 
 /* LE MOT-SYMBOLE SUR SA BASE DE 19 PX, DANS LA POLICE DE LA V1 (2026-09-17,
@@ -878,11 +886,23 @@
    2026-09-20 le sky-600 de la V1 pour G et LOW. Dans les entêtes de
    l'accueil (en grand) et des pages (en petit, `.compte__marque`) : l'entête
    de l'onboarding garde son encre et son accent. */
-.entete--accueil .wordmark__g,
-.entete--accueil .wordmark__low,
-.compte__marque .wordmark__g,
-.compte__marque .wordmark__low {
-  color: var(--marque-encre);
+/* G ET LOW EN DÉGRADÉ, du bleu profond au bleu azur de gauche à droite
+   (2026-09-20, d'après son image) : le dégradé est posé sur le lockup entier
+   et découpé par les lettres (`background-clip: text`) — G en prend le début,
+   LOW la fin, comme sur l'image. L/P/1, elle, garde sa propre couleur : son
+   fond est retiré et son encre remise. En natif, un masque de texte sur un
+   dégradé. */
+.entete--accueil .wordmark__lockup,
+.compte__marque .wordmark__lockup {
+  background: linear-gradient(to right, var(--marque-degrade-debut), var(--marque-degrade-fin));
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.entete--accueil .wordmark__lp1,
+.compte__marque .wordmark__lp1 {
+  background: none;
 }
 
 .entete--accueil .wordmark__lp1,

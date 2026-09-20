@@ -149,9 +149,10 @@ export interface Textes {
      * « logo et glp1low comme sur v1 avec ready shine glow en dessous ») :
      * « ready, shine, glow! ». Une devise de marque, en anglais et avec son
      * point d'exclamation : elle ne se traduit pas et ne suit pas la règle
-     * des textes d'interface.
+     * des textes d'interface. En DEUX PARTS depuis le 2026-09-20 : la fin,
+     * « glow! », se peint en gras et plus clair, comme sur son image.
      */
-    devise: string;
+    devise: { debut: string; fin: string };
     /**
      * LE SALUT, avec le prénom quand il y en a un : « Bonjour Lisa ». Sans
      * point d'exclamation (2026-09-16, « supprime le point d'exclamation »).
@@ -313,7 +314,7 @@ const FR: Textes = {
     entrer: 'Entre dans la galaxie GLP1LOW',
   },
   accueil: {
-    devise: 'ready, shine, glow!',
+    devise: { debut: 'ready, shine, ', fin: 'glow!' },
     bonjour: (prenom) => (prenom.trim() ? `Bonjour ${prenom.trim()}` : 'Bonjour'),
     menu: {
       accueil: 'Accueil',

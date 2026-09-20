@@ -122,7 +122,10 @@ export function Accueil({
               V1, dans `page.css`. */}
           <div className="entete__marque">
             <Wordmark />
-            <p className="entete__devise">{textes.accueil.devise}</p>
+            <p className="entete__devise">
+              {textes.accueil.devise.debut}
+              <span className="entete__devise-fin">{textes.accueil.devise.fin}</span>
+            </p>
           </div>
           <div className="entete__outils">
             <span className="rond">
