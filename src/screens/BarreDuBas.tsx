@@ -1,4 +1,4 @@
-import { useCallback, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import type { ModuleId } from '../app/modules';
 import {
   IconeAnalyse,
@@ -40,6 +40,7 @@ export function BarreDuBas({
   forme,
   fond,
   onAjouter,
+  demandeAjout,
 }: {
   /** L'entrée de la page courante, allumée. */
   active: EntreeMenu | null;
@@ -52,6 +53,10 @@ export function BarreDuBas({
   fond: FondProps;
   /** Une case du tiroir du « + » touchée : le tiroir se ferme, la page change. */
   onAjouter: (module: ModuleId) => void;
+  /** UNE DEMANDE D'OUVRIR LE TIROIR DU « + » venue de la page (2026-09-20,
+      l'écran de confirmation : « nouvel element : ouvre la meme chose que
+      bouton plus ») : un compteur, chaque incrément ouvre. */
+  demandeAjout?: number;
 }) {
   const textes = useTextes();
 
@@ -73,6 +78,9 @@ export function BarreDuBas({
   const leBoutonMenu = useCallback(() => boutonMenu.current, []);
   const boutonAjout = useRef<HTMLButtonElement>(null);
   const leBoutonAjout = useCallback(() => boutonAjout.current, []);
+  useEffect(() => {
+    if (demandeAjout) setTiroirs((etats) => ({ ...etats, menu: etats.menu === 'ouvert' ? 'fermeture' : etats.menu, ajout: 'ouvert' }));
+  }, [demandeAjout]);
 
   return (
     <>

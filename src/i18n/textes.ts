@@ -6,6 +6,7 @@ import type {
 } from '../domaine/avatar';
 import type { Forme } from '../domaine/traitements';
 import type { Zone } from '../domaine/prises';
+import type { EntreeConfirmation } from '../screens/PageConfirmation';
 import type { Systeme, Unite } from '../domaine/unites';
 import type { Langue } from './langues';
 import type { Objectif } from '../screens/onboarding/reponses';
@@ -271,6 +272,19 @@ export interface Textes {
     /** La proposition, quand on touche le nom du traitement (2026-09-20). */
     mettreAJour: string;
   };
+  /**
+   * L'ÉCRAN DE CONFIRMATION D'UNE PRISE (2026-09-20, son image) : le titre
+   * selon la forme, le sous-titre, la ligne de la zone, le titre de la liste
+   * (« que souhaitez vous -> vous pouvez maintenant : »), et les cinq
+   * entrées avec leur sous-titre.
+   */
+  confirmation: {
+    titre: Record<Forme, string>;
+    sousTitre: string;
+    zone: string;
+    maintenant: string;
+    entrees: Record<EntreeConfirmation, { nom: string; detail: string }>;
+  };
   /** LE CALENDRIER d'un choix de date (2026-09-20) : les mois, les jours en
    *  court, lundi en premier, et les deux flèches dites à qui écoute. */
   calendrier: {
@@ -506,6 +520,22 @@ const FR: Textes = {
     valider: 'Valider',
     regleDose: 'Une dose en mg, supérieure à zéro',
     mettreAJour: 'Mettre à jour le traitement ?',
+  },
+  confirmation: {
+    titre: {
+      injection: 'Injection enregistrée !',
+      comprime: 'Prise enregistrée !',
+    },
+    sousTitre: 'Votre suivi est à jour.',
+    zone: 'Zone d’injection',
+    maintenant: 'Vous pouvez maintenant :',
+    entrees: {
+      ajouter: { nom: 'Ajouter un autre élément', detail: 'Poids, repas, activité, symptômes…' },
+      journal: { nom: 'Voir dans le journal', detail: 'Consultez tous vos enregistrements' },
+      concentration: { nom: 'Voir la concentration sanguine', detail: 'Estimation de la molécule dans votre corps' },
+      evolution: { nom: 'Voir l’évolution du traitement', detail: 'Doses, efficacité, tendances' },
+      accueil: { nom: 'Retour à l’accueil', detail: 'Revenir à votre tableau de bord' },
+    },
   },
   calendrier: {
     mois: ['janvier', 'février', 'mars', 'avril', 'mai', 'juin', 'juillet', 'août', 'septembre', 'octobre', 'novembre', 'décembre'],

@@ -2553,3 +2553,219 @@
   color: var(--bouton-encre);
   opacity: 1;
 }
+
+/* ── L'ÉCRAN DE CONFIRMATION D'UNE PRISE (2026-09-20, son image) : la coche
+   dans son halo, le titre et le sous-titre, la carte de la prise, « Vous
+   pouvez maintenant : » et ses entrées — la première pleine, les autres sur
+   carte. RIEN EN GRAS (« Rien en gras sur cette page »). La colonne défile
+   en elle-même quand l'écran est plus court. ────────────────────────── */
+
+.confirmation {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 8px;
+  flex: 0 1 auto;
+  min-height: 0;
+  overflow-y: auto;
+  padding-bottom: 8px;
+}
+
+.confirmation > * {
+  flex: none;
+}
+
+/* La coche : un disque à l'accent, dans un halo de la même couleur, pâle. */
+.confirmation__coche {
+  display: grid;
+  place-items: center;
+  width: 72px;
+  height: 72px;
+  margin: 4px auto 0;
+  border-radius: 50%;
+  background: var(--option-choisi-fond);
+  box-shadow: 0 0 0 10px color-mix(in srgb, var(--option-choisi-fond) 55%, transparent);
+  color: var(--accent);
+}
+
+.confirmation__coche .icone {
+  width: 34px;
+  height: 34px;
+  stroke-width: 2.5;
+}
+
+.confirmation__titre {
+  margin: 12px 0 0;
+  text-align: center;
+  font-family: var(--font-display);
+  font-weight: 500;
+  font-size: 24px;
+  color: var(--encre);
+}
+
+.confirmation__sousTitre {
+  margin: 0 0 8px;
+  text-align: center;
+  font-family: var(--font-body);
+  font-size: 15px;
+  color: var(--encre-chapeau);
+}
+
+.confirmation__prise {
+  margin: 0;
+  padding: 12px 16px;
+}
+
+.confirmation__traitement {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--option-filet);
+}
+
+.confirmation__icone {
+  display: grid;
+  place-items: center;
+  width: 56px;
+  height: 56px;
+  border-radius: 14px;
+  background: var(--option-choisi-fond);
+  color: var(--accent);
+}
+
+.confirmation__icone .icone {
+  width: 28px;
+  height: 28px;
+}
+
+.confirmation__nom {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  font-family: var(--font-body);
+  font-weight: 500;
+  font-size: 17px;
+  color: var(--encre);
+}
+
+.confirmation__dose {
+  font-weight: 400;
+  font-size: 15px;
+  color: var(--encre-chapeau);
+}
+
+.confirmation__ligne {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 40px;
+  font-family: var(--font-body);
+  font-size: 15px;
+  color: var(--encre);
+}
+
+.confirmation__ligne .icone {
+  width: 18px;
+  height: 18px;
+  color: var(--encre-chapeau);
+}
+
+.confirmation__valeur {
+  margin-left: auto;
+  color: var(--encre-chapeau);
+}
+
+.confirmation__maintenant {
+  margin: 12px 0 2px;
+  font-family: var(--font-body);
+  font-weight: 500;
+  font-size: 16px;
+  color: var(--encre);
+}
+
+.confirmation__entrees {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+/* Une entrée : la pastille, le nom et son détail, le chevron ; sur carte,
+   ou pleine à l'accent pour la première. */
+.confirmation__entree {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid var(--option-filet);
+  border-radius: 18px;
+  background: var(--module-fond);
+  color: var(--encre);
+  text-align: left;
+  font-family: var(--font-body);
+  cursor: pointer;
+}
+
+.confirmation__entree:disabled {
+  opacity: 0.55;
+  cursor: default;
+}
+
+.confirmation__pastille {
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: var(--option-choisi-fond);
+  color: var(--accent);
+}
+
+.confirmation__pastille .icone {
+  width: 22px;
+  height: 22px;
+}
+
+.confirmation__texte {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.confirmation__entreeNom {
+  font-weight: 500;
+  font-size: 15px;
+}
+
+.confirmation__detail {
+  font-size: 13px;
+  color: var(--encre-chapeau);
+}
+
+.confirmation__entree > .icone {
+  flex: none;
+  width: 18px;
+  height: 18px;
+  color: var(--encre-chapeau);
+}
+
+.confirmation__entree--pleine {
+  border-color: var(--bouton-filet);
+  background: var(--bouton-fond);
+  color: var(--bouton-encre);
+}
+
+.confirmation__entree--pleine .confirmation__pastille {
+  background: rgb(255 255 255 / 0.18);
+  color: var(--bouton-encre);
+}
+
+.confirmation__entree--pleine .confirmation__detail,
+.confirmation__entree--pleine > .icone {
+  color: var(--bouton-encre);
+  opacity: 0.85;
+}

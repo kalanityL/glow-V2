@@ -99,3 +99,11 @@ export function grilleDuMois(annee: number, mois: number): CaseDuMois[] {
     return { date: dateLocale(d), jour: d.getDate(), dansLeMois: d.getMonth() === mois - 1 };
   });
 }
+
+/** Une date `AAAA-MM-JJ` écrite en toutes lettres avec les noms de mois
+    donnés : « 13 septembre 2026 » ; en anglais, « September 13, 2026 ». */
+export function formaterDateLongue(date: string, mois: readonly string[], langue: Langue): string {
+  const [annee, m, jour] = date.split('-').map(Number);
+  const nom = mois[m - 1] ?? '';
+  return langue === 'en' ? `${nom} ${jour}, ${annee}` : `${jour} ${nom} ${annee}`;
+}

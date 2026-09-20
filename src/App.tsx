@@ -5,6 +5,7 @@ import { Onboarding } from './screens/Onboarding';
 import { Accueil } from './screens/Accueil';
 import { Compte } from './screens/Compte';
 import { PagePrise } from './screens/PagePrise';
+import { PageConfirmation } from './screens/PageConfirmation';
 import type { ModuleId } from './app/modules';
 import type { Prise } from './domaine/prises';
 import type { FondId } from './app/fonds';
@@ -39,7 +40,7 @@ export default function App() {
      ouverte par le portrait ou par le tiroir du menu. Le bouton « retour » de la barre y ramène à l'accueil —
      c'est pour cela que la page vit ici, à côté du parcours, et non dans
      l'accueil. (Le menu principal, lui, est un tiroir de l'accueil.) */
-  const [page, setPage] = useState<'accueil' | 'compte' | 'prise'>('accueil');
+  const [page, setPage] = useState<'accueil' | 'compte' | 'prise' | 'confirmation'>('accueil');
 
   /* LA PAGE D'UNE PRISE (2026-09-20, « ajouter->injection : envoie vers une
      page ultra simple avec uniquement le formulaire d'ajout d'injection de
@@ -54,11 +55,13 @@ export default function App() {
       setPage('prise');
     }
   };
+  /* Validée, la prise mène à L'ÉCRAN DE CONFIRMATION (2026-09-20, son
+     image) : la dernière prise, et ce qu'on peut faire maintenant. */
   const validerPrise = (prise: Prise) => {
     setPrises((avant) => [...avant, prise]);
-    setPage('accueil');
+    setPage('confirmation');
   };
-  void prises;
+  const derniere = prises[prises.length - 1] ?? null;
 
   /* LE FOND DE PAGE (2026-09-20) : l'enregistré vient des réponses ; l'APERÇU,
      provisoire, vit ici — le bloc « Thème » le pose sous les yeux, « Choisir »
@@ -120,6 +123,15 @@ export default function App() {
             <Onboarding parcours={parcours} />
           ) : page === 'compte' ? (
             <Compte parcours={parcours} onAccueil={() => setPage('accueil')} fond={fond} onAjouter={ajouter} />
+          ) : page === 'confirmation' && derniere && parcours.reponses.formeTraitement ? (
+            <PageConfirmation
+              prise={derniere}
+              forme={parcours.reponses.formeTraitement}
+              onAccueil={() => setPage('accueil')}
+              onOuvrirCompte={() => setPage('compte')}
+              onAjouter={ajouter}
+              fond={fond}
+            />
           ) : page === 'prise' && parcours.reponses.formeTraitement && parcours.reponses.traitement ? (
             <PagePrise
               parcours={parcours}

@@ -498,9 +498,21 @@ la dose parmi les paliers de la spécialité — désormais dans
 `domaine/traitements.ts`, des faits de boîte, pas un conseil — ou « Autre
 dose » tapée ; « + Notes » ; « Valider » au milieu. Une dose absente ou
 nulle est refusée et la règle se dit. **Les prises validées ne sont gardées
-qu'en mémoire, dans `App`** : ni journal, ni enregistrement sur l'appareil,
-et l'écran qui suit la validation attend le sien (« je te donnerai l'écran
-de validation ensuite ») — validée, la prise ramène à l'accueil.
+qu'en mémoire, dans `App`** : ni journal, ni enregistrement sur l'appareil.
+
+**L'écran de confirmation d'une prise** (2026-09-20, son image, puis
+« ecran de confirmation : que souhaitez vous -> vous pouvez maintenant :
+nouvelle element : en 1er ; ouvre la meme chose que bouton plus. Rien en
+gras sur cette page. ») : validée, la prise y mène (`PageConfirmation`).
+La coche dans son halo, « Injection enregistrée ! » (« Prise enregistrée ! »
+sous forme orale), « Votre suivi est à jour. » ; la carte de la prise — la
+spécialité et la dose, la date en toutes lettres et l'heure, la zone ;
+« Vous pouvez maintenant : » et cinq entrées, dans cet ordre : **Ajouter
+un autre élément, en premier et pleine, qui ouvre le tiroir du « + »**
+(la barre du bas l'ouvre sur demande, `demandeAjout`) ; Voir dans le
+journal, Voir la concentration sanguine, Voir l'évolution du traitement —
+éteintes tant que leurs pages n'existent pas ; Retour à l'accueil. Rien en
+gras. La colonne défile en elle-même sur un écran court.
 
 **Toute page de l'application porte la barre du bas** (`BarreDuBas`, avec
 ses deux tiroirs) et, hors de l'accueil, **l'entête des pages**
