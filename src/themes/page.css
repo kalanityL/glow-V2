@@ -1699,6 +1699,14 @@
   align-items: center;
   gap: 6px;
   min-width: 0;
+  /* Une case est un bouton (2026-09-20, elle mène à sa page) : rien de la
+     matière d'un bouton. */
+  padding: 0;
+  border: 0;
+  background: none;
+  color: inherit;
+  font: inherit;
+  cursor: pointer;
 }
 
 /* Les icônes du « + » sont plus grandes que celles du menu (2026-09-20,
@@ -2108,4 +2116,231 @@
   height: var(--graduation-tige);
   background: var(--graduation-repere);
   pointer-events: none;
+}
+
+/* ── LA PAGE D'UNE PRISE (2026-09-20, « ajouter->injection : envoie vers une
+   page ultra simple avec uniquement le fomulaire d'ajout d'injection de la
+   v1 avec la meme mise en page, mais pas en bloc reste page vitré, en mode
+   page simple ») : une carte, la mise en page du formulaire de la V1
+   (`InjectionForm.tsx`) — l'entête avec l'icône, le titre en capitales, la
+   marque et la croix ; la date et l'heure côte à côte ; la zone ; la dose et
+   son lien ; les notes ; « Valider » au milieu. ──────────────────────── */
+
+.prise {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  /* Plus haute que l'écran — notes dépliées, règle dite —, la carte DÉFILE
+     EN ELLE-MÊME plutôt que d'être coupée (GUIDELINES : rien ne déborde,
+     jamais une coupe) : elle se laisse rétrécir par la colonne. */
+  flex: 0 1 auto;
+  min-height: 0;
+  overflow-y: auto;
+}
+
+/* Rien dans la carte ne se laisse écraser : c'est la carte qui défile, pas
+   le champ des notes qui s'aplatit. */
+.prise > * {
+  flex: none;
+}
+
+.prise__entete {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--option-filet);
+}
+
+.prise__entete .icone {
+  width: 20px;
+  height: 20px;
+  color: var(--accent);
+}
+
+/* Le titre en capitales espacées, dans le bleu de la marque, comme la V1. */
+.prise__titre {
+  margin: 0;
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 13px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--marque-degrade-debut);
+}
+
+.prise__marque {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-family: var(--font-body);
+  font-size: 13px;
+  color: var(--encre-chapeau);
+}
+
+/* La croix : celle des tiroirs, mais dans le flux de l'entête. */
+.prise__fermer {
+  position: static;
+  flex: none;
+}
+
+/* La date et l'heure, deux colonnes égales, chacune centrée. */
+.prise__moment {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--option-filet);
+}
+
+.prise__quand {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  min-height: 36px;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--encre);
+  font-family: var(--font-body);
+  font-weight: 700;
+  font-size: 15px;
+  cursor: pointer;
+}
+
+.prise__quand .icone {
+  width: 16px;
+  height: 16px;
+  color: var(--accent);
+}
+
+/* La date et l'heure en édition : un champ de date natif, et deux roues
+   d'heure — l'heure et la minute ronde — dans une même boîte. */
+.prise__edition {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+}
+
+.prise__edition input,
+.prise__edition select {
+  padding: 6px 8px;
+  border: 1px solid var(--option-filet);
+  border-radius: 10px;
+  background: var(--option-fond);
+  color: var(--encre);
+  font-family: var(--font-body);
+  font-weight: 700;
+  font-size: 14px;
+}
+
+/* Une boîte à choix : le `select` natif, sans son habit, et un chevron
+   dessiné à droite — la matière des champs de l'onboarding. */
+.prise__boite {
+  position: relative;
+  display: block;
+}
+
+.prise__boite::after {
+  content: '';
+  position: absolute;
+  right: 18px;
+  top: 50%;
+  width: 8px;
+  height: 8px;
+  margin-top: -6px;
+  border-right: 2px solid var(--encre);
+  border-bottom: 2px solid var(--encre);
+  transform: rotate(45deg);
+  pointer-events: none;
+}
+
+.prise__select,
+.prise__dose {
+  width: 100%;
+  margin: 0;
+  padding: 15px 44px 15px 16px;
+  border: 1px solid var(--option-filet);
+  border-radius: 14px;
+  background: var(--option-fond);
+  color: var(--encre);
+  font-family: var(--font-body);
+  font-weight: 500;
+  font-size: 17px;
+  appearance: none;
+  -webkit-appearance: none;
+}
+
+.prise__select:focus,
+.prise__dose:focus,
+.prise__notes:focus {
+  outline: none;
+  box-shadow: 0 0 0 2px var(--accent);
+}
+
+/* Les liens du formulaire — « Autre dose », « Préréglages », « + Notes » —
+   à l'accent, sans matière de bouton. */
+.prise__lien {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  align-self: flex-start;
+  margin-top: -8px;
+  padding: 4px 4px;
+  border: 0;
+  background: none;
+  color: var(--accent);
+  font-family: var(--font-body);
+  font-weight: 600;
+  font-size: 15px;
+  cursor: pointer;
+}
+
+.prise__lien .icone {
+  width: 14px;
+  height: 14px;
+}
+
+.prise__notes {
+  width: 100%;
+  margin: 0;
+  padding: 12px 16px;
+  border: 1px solid var(--option-filet);
+  border-radius: 14px;
+  background: var(--option-fond);
+  color: var(--encre);
+  font-family: var(--font-body);
+  font-size: 15px;
+  resize: none;
+}
+
+.prise__regle {
+  margin: -8px 0 0;
+}
+
+/* « Valider » au milieu, à sa largeur, la coche devant — comme la V1. */
+.prise__pied {
+  display: flex;
+  justify-content: center;
+  padding-top: 4px;
+}
+
+.prise__valider {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  width: auto;
+  padding: 12px 28px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.prise__valider .icone {
+  width: 16px;
+  height: 16px;
+  stroke-width: 3;
 }

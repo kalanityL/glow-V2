@@ -5,6 +5,7 @@ import type {
   Genre,
 } from '../domaine/avatar';
 import type { Forme } from '../domaine/traitements';
+import type { Zone } from '../domaine/prises';
 import type { Systeme, Unite } from '../domaine/unites';
 import type { Langue } from './langues';
 import type { Objectif } from '../screens/onboarding/reponses';
@@ -243,6 +244,31 @@ export interface Textes {
     /** La règle d'une taille, avec ses bornes et son unité. */
     regleTaille: (min: number, max: number, unite: string) => string;
   };
+  /**
+   * LA PAGE D'UNE PRISE (2026-09-20, « ajouter->injection : envoie vers une
+   * page ultra simple avec uniquement le formulaire d'ajout d'injection de
+   * la v1 avec la meme mise en page ») : le titre du formulaire selon la
+   * forme, les zones, les paliers écrits, les liens et le bouton — les mots
+   * de la V1.
+   */
+  prise: {
+    titre: Record<Forme, string>;
+    zones: Record<Zone, string>;
+    /** Un palier écrit : « 0,25 mg (Initiation) », « 2,4 mg (Dose max) »,
+        « 1 mg » entre les deux. */
+    palier: (mg: string, rang: 'initiation' | 'max' | null) => string;
+    autreDose: string;
+    prereglages: string;
+    /** Le champ de l'autre dose, vide. */
+    autreDoseVide: string;
+    notes: string;
+    masquerNotes: string;
+    /** Le champ des notes, vide. */
+    notesVide: string;
+    valider: string;
+    /** La règle de la dose, dite au refus. */
+    regleDose: string;
+  };
   /** Le bouton « retour » de la barre du bas : lu par les lecteurs d'écran. */
   retour: string;
   /** La croix qui ferme un tiroir : lue par les lecteurs d'écran. */
@@ -443,6 +469,32 @@ const FR: Textes = {
     regleDate: 'Une date, en JJ/MM/AAAA',
     reglePoids: (min, max, unite) => `Un poids entre ${min} et ${max} ${unite}`,
     regleTaille: (min, max, unite) => `Une taille entre ${min} et ${max} ${unite}`,
+  },
+  prise: {
+    titre: {
+      injection: 'Nouvelle injection',
+      comprime: 'Nouvelle prise de comprimé',
+    },
+    /* Les zones de la V1, avec leurs majuscules. */
+    zones: {
+      'abdomen-gauche': 'Abdomen Gauche',
+      'abdomen-droit': 'Abdomen Droit',
+      'cuisse-gauche': 'Cuisse Gauche',
+      'cuisse-droite': 'Cuisse Droite',
+      'bras-gauche': 'Bras Gauche',
+      'bras-droit': 'Bras Droit',
+      'voie-orale': 'Prise Orale',
+    },
+    palier: (mg, rang) =>
+      `${mg} mg${rang === 'initiation' ? ' (Initiation)' : rang === 'max' ? ' (Dose max)' : ''}`,
+    autreDose: 'Autre dose',
+    prereglages: 'Préréglages',
+    autreDoseVide: 'Autre dose de GLP-1 (mg)',
+    notes: 'Notes',
+    masquerNotes: 'Masquer les notes',
+    notesVide: 'Notes / Observations (facultatif)',
+    valider: 'Valider',
+    regleDose: 'Une dose en mg, supérieure à zéro',
   },
   retour: 'Retour',
   fermer: 'Fermer',

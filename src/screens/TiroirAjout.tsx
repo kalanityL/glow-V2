@@ -1,6 +1,6 @@
 import { Tiroir } from '../components/Tiroir';
 import { useTextes } from '../i18n/useTextes';
-import { MODULES_AJOUT } from '../app/modules';
+import { MODULES_AJOUT, type ModuleId } from '../app/modules';
 import type { Forme } from '../domaine/traitements';
 import { IconeDuModule } from './iconesModules';
 
@@ -21,7 +21,10 @@ import { IconeDuModule } from './iconesModules';
  * grisé et inerte (la V1, « oui en grisé ») le jour où les modules
  * s'éteindront.
  *
- * AUCUNE CASE NE MÈNE ENCORE NULLE PART : les pages n'existent pas.
+ * LA CASE DU TRAITEMENT MÈNE À LA PAGE D'UNE PRISE (2026-09-20,
+ * « ajouter->injection : envoie vers une page ultra simple avec uniquement
+ * le formulaire d'ajout d'injection de la v1 ») ; les autres n'ont pas
+ * encore de page.
  */
 export function TiroirAjout({
   onFermer,
@@ -29,6 +32,7 @@ export function TiroirAjout({
   enFermeture,
   bouton,
   forme,
+  onAjouter,
 }: {
   onFermer: () => void;
   onFermee: () => void;
@@ -36,6 +40,8 @@ export function TiroirAjout({
   bouton: () => Element | null;
   /** La forme du traitement répondue, pour l'icône et le nom de sa case. */
   forme: Forme | null;
+  /** Une case touchée : le module dont on veut ajouter quelque chose. */
+  onAjouter: (module: ModuleId) => void;
 }) {
   const textes = useTextes();
 
@@ -51,7 +57,7 @@ export function TiroirAjout({
       <h2 className="tiroir__titre tiroir__titre--entete">{textes.accueil.questionAjout}</h2>
       <div className="tiroir__cases">
         {MODULES_AJOUT.map((module) => (
-          <div key={module} className="tiroir__case">
+          <button key={module} type="button" className="tiroir__case" onClick={() => onAjouter(module)}>
             <span className="tiroir__icone">
               <IconeDuModule module={module} forme={forme} />
             </span>
@@ -60,7 +66,7 @@ export function TiroirAjout({
                 ? textes.accueil.traitement[forme]
                 : textes.accueil.modules[module]}
             </span>
-          </div>
+          </button>
         ))}
       </div>
     </Tiroir>

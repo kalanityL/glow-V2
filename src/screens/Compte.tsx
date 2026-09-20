@@ -12,6 +12,7 @@ import {
   IconeToise,
 } from '../components/Icones';
 import { BarreDuBas } from './BarreDuBas';
+import type { ModuleId } from '../app/modules';
 import { EntetePage } from './EntetePage';
 import { useTextes } from '../i18n/useTextes';
 import { classeDuTheme } from '../themes/themes';
@@ -91,12 +92,15 @@ export function Compte({
   parcours,
   onAccueil,
   fond,
+  onAjouter,
 }: {
   parcours: ReturnType<typeof useParcours>;
   /** Le fond de page et ses gestes, tenus par `App`. */
   fond: FondProps;
   /** « Accueil » de la barre du bas ramène à l'accueil. */
   onAccueil: () => void;
+  /** Une case du tiroir du « + » : voir `App`. */
+  onAjouter: (module: ModuleId) => void;
 }) {
   const textes = useTextes();
   const langue = detecterLangue();
@@ -381,6 +385,7 @@ export function Compte({
         onOuvrirCompte={() => aller('compte')}
         forme={reponses.formeTraitement}
         fond={fond}
+        onAjouter={onAjouter}
       />
     </div>
   );

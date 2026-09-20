@@ -4,6 +4,9 @@ import { useTextes } from './i18n/useTextes';
 import { Onboarding } from './screens/Onboarding';
 import { Accueil } from './screens/Accueil';
 import { Compte } from './screens/Compte';
+import { PagePrise } from './screens/PagePrise';
+import type { ModuleId } from './app/modules';
+import type { Prise } from './domaine/prises';
 import type { FondId } from './app/fonds';
 /* La mise en page d'abord, les jetons des thèmes ensuite : les feuilles de
    thème doivent pouvoir battre la structure, jamais l'inverse. */
@@ -36,7 +39,26 @@ export default function App() {
      ouverte par le portrait ou par le tiroir du menu. Le bouton « retour » de la barre y ramène à l'accueil —
      c'est pour cela que la page vit ici, à côté du parcours, et non dans
      l'accueil. (Le menu principal, lui, est un tiroir de l'accueil.) */
-  const [page, setPage] = useState<'accueil' | 'compte'>('accueil');
+  const [page, setPage] = useState<'accueil' | 'compte' | 'prise'>('accueil');
+
+  /* LA PAGE D'UNE PRISE (2026-09-20, « ajouter->injection : envoie vers une
+     page ultra simple avec uniquement le formulaire d'ajout d'injection de
+     la v1 ») : la case « Traitement » du tiroir du « + » y mène, quand un
+     traitement est répondu. LES PRISES VALIDÉES SONT GARDÉES ICI, EN
+     MÉMOIRE SEULEMENT — ni journal ni enregistrement sur l'appareil encore,
+     et l'écran qui suit la validation attend le sien (« je te donnerai
+     l'écran de validation ensuite ») : validée, la prise ramène à l'accueil. */
+  const [prises, setPrises] = useState<Prise[]>([]);
+  const ajouter = (module: ModuleId) => {
+    if (module === 'traitement' && parcours.reponses.formeTraitement && parcours.reponses.traitement) {
+      setPage('prise');
+    }
+  };
+  const validerPrise = (prise: Prise) => {
+    setPrises((avant) => [...avant, prise]);
+    setPage('accueil');
+  };
+  void prises;
 
   /* LE FOND DE PAGE (2026-09-20) : l'enregistré vient des réponses ; l'APERÇU,
      provisoire, vit ici — le bloc « Thème » le pose sous les yeux, « Choisir »
@@ -97,9 +119,24 @@ export default function App() {
           {!parcours.entre ? (
             <Onboarding parcours={parcours} />
           ) : page === 'compte' ? (
-            <Compte parcours={parcours} onAccueil={() => setPage('accueil')} fond={fond} />
+            <Compte parcours={parcours} onAccueil={() => setPage('accueil')} fond={fond} onAjouter={ajouter} />
+          ) : page === 'prise' && parcours.reponses.formeTraitement && parcours.reponses.traitement ? (
+            <PagePrise
+              forme={parcours.reponses.formeTraitement}
+              traitement={parcours.reponses.traitement}
+              onAccueil={() => setPage('accueil')}
+              onOuvrirCompte={() => setPage('compte')}
+              onValider={validerPrise}
+              onAjouter={ajouter}
+              fond={fond}
+            />
           ) : (
-            <Accueil reponses={parcours.reponses} onOuvrirCompte={() => setPage('compte')} fond={fond} />
+            <Accueil
+              reponses={parcours.reponses}
+              onOuvrirCompte={() => setPage('compte')}
+              fond={fond}
+              onAjouter={ajouter}
+            />
           )}
         </div>
 

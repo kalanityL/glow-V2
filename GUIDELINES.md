@@ -462,6 +462,24 @@ menu, ce bloc passe sous la vitre ») : les rangs sont dans `page.css` —
 vitre du bloc, bloc, vitre du tiroir, tiroir, barre du bas. **Ouvrir un
 tiroir ferme l'autre en même temps** : l'un descend pendant que l'autre monte.
 
+**La page d'une prise** (2026-09-20, « ajouter->injection : envoie vers une
+page ultra simple avec uniquement le fomulaire d'ajout d'injection de la v1
+avec la meme mise en page, mais pas en bloc reste page vitré, en mode page
+simple ») : la case « Traitement » du tiroir du « + » y mène, quand un
+traitement est répondu (sinon la case ne fait rien encore). Une page
+ordinaire — l'entête des pages, la barre du bas — dont le contenu n'est
+qu'une carte : le formulaire de la V1 (`InjectionForm.tsx`), mise en page
+comprise — l'icône de la forme, le titre en capitales, la marque, la croix
+qui ramène à l'accueil ; la date et l'heure côte à côte, éditées en place
+(l'heure sur les minutes rondes de la V1) ; la zone (pas sous forme orale) ;
+la dose parmi les paliers de la spécialité — désormais dans
+`domaine/traitements.ts`, des faits de boîte, pas un conseil — ou « Autre
+dose » tapée ; « + Notes » ; « Valider » au milieu. Une dose absente ou
+nulle est refusée et la règle se dit. **Les prises validées ne sont gardées
+qu'en mémoire, dans `App`** : ni journal, ni enregistrement sur l'appareil,
+et l'écran qui suit la validation attend le sien (« je te donnerai l'écran
+de validation ensuite ») — validée, la prise ramène à l'accueil.
+
 **Toute page de l'application porte la barre du bas** (`BarreDuBas`, avec
 ses deux tiroirs) et, hors de l'accueil, **l'entête des pages**
 (`EntetePage` : la marque en petit et les deux outils sur une ligne, le

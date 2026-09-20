@@ -314,6 +314,25 @@ export function IconeCroix() {
   );
 }
 
+/** Lucide `clock` — l'heure d'une prise. */
+export function IconeHorloge() {
+  return (
+    <Icone>
+      <circle cx="12" cy="12" r="10" />
+      <path d="M12 6v6l4 2" />
+    </Icone>
+  );
+}
+
+/** Lucide `check` — la coche du bouton « Valider ». */
+export function IconeCoche() {
+  return (
+    <Icone>
+      <path d="M20 6 9 17l-5-5" />
+    </Icone>
+  );
+}
+
 /** Lucide `lock` — le cadenas d'un badge pas encore gagné. */
 export function IconeCadenas() {
   return (

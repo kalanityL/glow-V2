@@ -1,5 +1,6 @@
 import { Avatar } from '../components/Avatar';
 import { BarreDuBas } from './BarreDuBas';
+import type { ModuleId } from '../app/modules';
 import { IconeDuModule } from './iconesModules';
 import { Cocarde } from '../components/Cocarde';
 import {
@@ -84,6 +85,7 @@ export function Accueil({
   reponses,
   onOuvrirCompte,
   fond,
+  onAjouter,
 }: {
   reponses: Reponses;
   /** Le fond de page et ses gestes, tenus par `App`. */
@@ -91,6 +93,8 @@ export function Accueil({
   /** Le portrait ouvre la page « Mon compte » (2026-09-19), et l'entrée
       « Mon compte » du tiroir aussi. */
   onOuvrirCompte: () => void;
+  /** Une case du tiroir du « + » : voir `App`. */
+  onAjouter: (module: ModuleId) => void;
 }) {
   const textes = useTextes();
   /* LE MENU PRINCIPAL EN TIROIR (2026-09-19) : ouvert par l'entrée « Menu »
@@ -202,6 +206,7 @@ export function Accueil({
         onOuvrirCompte={onOuvrirCompte}
         forme={reponses.formeTraitement}
         fond={fond}
+        onAjouter={onAjouter}
       />
     </div>
   );

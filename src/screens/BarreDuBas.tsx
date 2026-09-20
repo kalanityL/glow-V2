@@ -1,4 +1,5 @@
 import { useCallback, useRef, useState } from 'react';
+import type { ModuleId } from '../app/modules';
 import {
   IconeAnalyse,
   IconeEtoiles,
@@ -38,6 +39,7 @@ export function BarreDuBas({
   onOuvrirCompte,
   forme,
   fond,
+  onAjouter,
 }: {
   /** L'entrée de la page courante, allumée. */
   active: EntreeMenu | null;
@@ -48,6 +50,8 @@ export function BarreDuBas({
   /** LE FOND DE PAGE, pour le bloc « Thème » : l'enregistré, l'aperçu, et les
       deux gestes — voir `App`, qui tient l'aperçu pour toute page. */
   fond: FondProps;
+  /** Une case du tiroir du « + » touchée : le tiroir se ferme, la page change. */
+  onAjouter: (module: ModuleId) => void;
 }) {
   const textes = useTextes();
 
@@ -101,6 +105,10 @@ export function BarreDuBas({
           enFermeture={tiroirs.ajout === 'fermeture'}
           bouton={leBoutonAjout}
           forme={forme}
+          onAjouter={(module) => {
+            fermerAjout();
+            onAjouter(module);
+          }}
         />
       ) : null}
 
