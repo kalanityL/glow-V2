@@ -8,7 +8,9 @@ import { IconeDuModule } from './iconesModules';
  * LE TIROIR DU « + » (2026-09-20, « bouton + du menu du bas : ouvre un tiroir
  * meme fonctionnalité que v1 avec le style actuel de v2 ») : LA FONCTION DE
  * LA V1 (`addDrawerItems`, le tiroir « ajout ») — les sept modules qui ont un
- * formulaire d'ajout, trois par rangée, chacun par son icône et son nom, dans
+ * formulaire d'ajout, DEUX par rangée et le nom sur une seule ligne, sous le
+ * titre « Que souhaitez-vous ajouter ? » (2026-09-20), chacun par son icône
+ * et son nom, dans
  * l'ordre de la V1 ; toucher une case mène à la page du module avec son
  * formulaire d'ajout ouvert (« menu + : envoie sur les pages avec formulaire
  * d'ajout ouvert », 2026-08-25). LE STYLE DE LA V2 : le cadre commun des
@@ -45,6 +47,7 @@ export function TiroirAjout({
       enFermeture={enFermeture}
       bouton={bouton}
     >
+      <h2 className="tiroir__titre">{textes.accueil.questionAjout}</h2>
       <div className="tiroir__cases">
         {MODULES_AJOUT.map((module) => (
           <div key={module} className="tiroir__case">

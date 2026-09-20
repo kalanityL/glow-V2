@@ -274,7 +274,8 @@ thèmes ne repeignent pas, et qui ne sont pas dans les templates non plus.
   bougent sont nommées ; un fondu léger est le maximum, et il doit se
   transposer en natif. **Une exception, consignée** (2026-09-20, « le menu
   s'ouvre en tiroir depuis le bas de l'écran ») : le tiroir du menu GLISSE
-  depuis le bas, 240 ms, sur sa position (`bottom`, une propriété nommée) —
+  depuis le bas, 280 ms en `ease-out` — la vitesse du tiroir de la V1 —, sur
+  sa position (`bottom`, une propriété nommée) —
   en natif, une valeur animée sur la position.
 - **Mémoïsation** (V1, obligatoire le jour où une page a un formulaire et des
   sections lourdes) : la frappe ne re-rend que le formulaire — `React.memo`

@@ -1445,11 +1445,11 @@
   backdrop-filter: blur(6px);
   /* La vitre apparaît en fondu, le temps que le tiroir monte — et s'efface
      de même le temps qu'il redescend. */
-  animation: vitre-apparait 240ms ease-out;
+  animation: vitre-apparait 280ms ease-out;
 }
 
 .tiroir__vitre--fermeture {
-  animation: vitre-apparait 240ms ease-in reverse forwards;
+  animation: vitre-apparait 280ms ease-out reverse forwards;
 }
 
 @keyframes vitre-apparait {
@@ -1483,14 +1483,17 @@
      léger est le maximum ». C'est la POSITION qui est animée, pas une
      transformation : une transformation ferait du tiroir le bloc conteneur
      de la photo `fixed` posée dessous, qui se désalignerait le temps du
-     mouvement. 240 ms, une seule propriété nommée. */
-  animation: tiroir-monte 240ms ease-out;
+     mouvement. 280 ms en `ease-out` — LA VITESSE DU TIROIR DE LA V1
+     (2026-09-20, « tiroir meme vitesse que v1 » : `duration: 0.28, ease:
+     'easeOut'` dans `versions/mixte/App.tsx`) —, une seule propriété
+     nommée. */
+  animation: tiroir-monte 280ms ease-out;
 }
 
 /* Et il redescend de même à la fermeture (2026-09-20), en restant en place le
    temps du mouvement (`forwards`) : il se démonte quand l'animation finit. */
 .tiroir--fermeture {
-  animation: tiroir-descend 240ms ease-in forwards;
+  animation: tiroir-descend 280ms ease-out forwards;
 }
 
 @keyframes tiroir-monte {
@@ -1582,7 +1585,8 @@
    pas sur la meme ligne que la croix de fermeture, preference sur la ligne
    du dessous ») : la croix, à 12 px du haut, fait 28 px ; le titre commence
    après. */
-.tiroir__section:first-child .tiroir__titre {
+.tiroir__section:first-child .tiroir__titre,
+.tiroir__contenu > .tiroir__titre:first-child {
   margin-top: 34px;
 }
 
@@ -1622,13 +1626,14 @@
   column-gap: 12px;
 }
 
-/* LES CASES DU « + » (2026-09-20) : trois par rangée, comme dans la V1 —
-   l'icône sur sa pastille, le nom dessous, centrés. */
+/* LES CASES DU « + » (2026-09-20) : DEUX par rangée (trois d'abord, comme
+   la V1 ; « 2 icones par ligne » le même jour), sous le titre du tiroir —
+   l'icône sur sa pastille, le nom dessous, sur UNE SEULE LIGNE. */
 .tiroir__cases {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(2, 1fr);
   gap: 14px 8px;
-  margin-top: 34px;
+  margin-top: 6px;
 }
 
 .tiroir__case {
@@ -1640,12 +1645,15 @@
 }
 
 .tiroir__case-nom {
+  max-width: 100%;
   font-family: var(--font-body);
   font-weight: 500;
   font-size: 13px;
   line-height: 1.2;
   text-align: center;
-  text-wrap: balance;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
   color: var(--encre);
 }
 

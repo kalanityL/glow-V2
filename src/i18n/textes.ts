@@ -161,6 +161,8 @@ export interface Textes {
     bonjour: (prenom: string) => string;
     /** Les entrées du menu du bas, sous le même contrat que les thèmes. */
     menu: Record<EntreeMenu, string>;
+    /** Le titre du tiroir du « + » (2026-09-20). */
+    questionAjout: string;
     /**
      * LES SEPT MODULES, écrits dans leur cercle (2026-09-16, « dans les
      * cercle sous les icones le nom ds catégories »). Le nom du traitement
@@ -320,6 +322,7 @@ const FR: Textes = {
       analyse: 'Analyse',
       menu: 'Menu',
     },
+    questionAjout: 'Que souhaitez-vous ajouter ?',
     modules: {
       traitement: 'Traitement',
       balance: 'Balance',
