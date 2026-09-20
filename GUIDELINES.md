@@ -464,9 +464,22 @@ page à part entiere »).
 **Le poids s'édite dans son bloc** (2026-09-20, « mise à jour de poids :
 ouvre qqchose comme ça […] la barre du bas se met à jour au bon endroit en
 temps réel ») : le chiffre en grand, éditable sur place, et dessous une
-graduation qui glisse sous un repère fixe — les deux se suivent à chaque
-geste et à chaque frappe. La géométrie de la graduation (le pas d'un cran)
-est dans `page.css` ; le code n'en lit qu'un rapport (`domaine/mesures.ts`).
+graduation qui glisse sous une tige fixe — les deux se suivent à chaque
+geste et à chaque frappe. **La graduation** (2026-09-20, « met les chiffres
+de la regle graduée au dessus des crans, tous les 5 kilos […] positionne
+une tige verticale noire, 4 fois plus grande qu'un cran, au milieu de
+l'écran, dont le bout supérieur se place sur la regle graduée ») : les
+nombres AU-DESSUS des crans, tous les cinq ; les crans sur une même ligne
+de base, les dizaines deux fois plus hauts que les cinq, les unités aux
+trois quarts ; et LA TIGE, seule chose foncée, fixe au milieu, quatre crans
+de haut, le bout supérieur sur la ligne de base — elle pend sous la règle
+et dit en permanence le poids que le chiffre affiche. Elle est posée sur
+le cadre, HORS du défilement : dedans, un élément absolu part avec la piste
+qui glisse et Chrome l'emportait hors de vue. **Le chiffre a une
+hauteur figée** et sa case vide porte un zéro invisible, pas une espace :
+rien ne bouge en passant les cent. La géométrie de la graduation (le pas
+d'un cran, les hauteurs) est dans `page.css` ; le code n'en lit qu'un
+rapport (`domaine/mesures.ts`).
 « OK » au pied, éteint sans changement ; fermer sans valider propose
 « Confirmer la mise à jour » / « Fermer », comme les autres blocs.
 

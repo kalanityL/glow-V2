@@ -73,12 +73,16 @@ export function BlocPoids({
     return (
       <span className="poids__cases">
         {chiffres.map((chiffre, i) => (
-          <span key={i} className="poids__case">
-            {/* Une case vide porte une espace insécable : sans texte, elle n'a
-                pas de ligne de base, et le chiffre changeait de hauteur en
-                passant les cent (2026-09-20, « le bloc change de hauteur qd
-                on passe les cents kilos »). */}
-            {chiffre === ' ' ? '\u00A0' : chiffre}
+          <span key={i} className={`poids__case${chiffre === ' ' ? ' poids__case--vide' : ''}`}>
+            {/* Une case vide porte UN ZÉRO INVISIBLE : sans texte, elle n'a
+                pas de ligne de base ; avec une espace insécable, la police
+                d'affichage n'a pas ce glyphe et le navigateur en prend un
+                dans une autre, aux métriques différentes — dans les deux
+                cas le chiffre changeait de hauteur en passant les cent
+                (2026-09-20, « corrige le changement de hauteur qd on passe
+                la barre des 100 »). Un chiffre caché a exactement la
+                hauteur d'un chiffre. */}
+            {chiffre === ' ' ? '0' : chiffre}
           </span>
         ))}
         <span className="poids__separateur">{separateur}</span>
@@ -205,18 +209,30 @@ export function BlocPoids({
           />
         </div>
 
-        <div className="graduation" ref={graduation} onScroll={surDefilement}>
-          <div className="graduation__piste">
-            {crans.map((v) => (
-              <span
-                key={v}
-                className={`graduation__cran${
-                  v % 100 === 0 ? ' graduation__cran--cent' : v % 10 === 0 ? ' graduation__cran--dix' : ''
-                }`}
-              >
-                {v % 10 === 0 ? <span className="graduation__nombre">{v}</span> : null}
-              </span>
-            ))}
+        {/* La tige est HORS du défilement (2026-09-20) : dedans, un élément
+            absolu part avec le contenu qui glisse, et Chrome l'emportait hors
+            de vue — la tige tient dans le cadre, seule la piste glisse. */}
+        <div className="graduation">
+          <div className="graduation__defilement" ref={graduation} onScroll={surDefilement}>
+            <div className="graduation__piste">
+              {crans.map((v) => (
+                <span
+                  key={v}
+                  className={`graduation__cran${
+                    v % 100 === 0
+                      ? ' graduation__cran--cent'
+                      : v % 10 === 0
+                        ? ' graduation__cran--dix'
+                        : v % 5 === 0
+                          ? ' graduation__cran--cinq'
+                          : ''
+                  }`}
+                >
+                  {/* Le nombre au-dessus de son cran, tous les cinq (2026-09-20). */}
+                  {v % 5 === 0 ? <span className="graduation__nombre">{v}</span> : null}
+                </span>
+              ))}
+            </div>
           </div>
           <span className="graduation__repere" aria-hidden="true" />
         </div>

@@ -1903,6 +1903,10 @@
   font-weight: 700;
   font-size: 56px;
   line-height: 1;
+  /* Hauteur figée (2026-09-20, « corrige le changement de hauteur qd on
+     passe la barre des 100 ») : quoi que porte la ligne, le chiffre fait
+     une ligne de sa police, ni plus ni moins. */
+  height: 56px;
   text-align: center;
   padding: 0;
   /* Chiffres tabulaires : tous de la même largeur, pour que rien ne saute
@@ -1920,6 +1924,11 @@
   display: inline-block;
   width: 1ch;
   text-align: center;
+}
+
+/* La case vide : un chiffre qu'on ne voit pas, pour la ligne de base. */
+.poids__case--vide {
+  visibility: hidden;
 }
 
 .poids__separateur {
@@ -1942,37 +1951,53 @@
    géométrie est ICI — le pas d'un cran, `--graduation-pas` — et le code n'en lit
    qu'un rapport. La piste est rembourrée d'une demi-largeur moins un
    demi-cran de chaque côté : le premier cran comme le dernier viennent se
-   centrer sous le repère, et la course du défilement vaut exactement
-   (max − min) crans. */
+   centrer sous la tige, et la course du défilement vaut exactement
+   (max − min) crans.
+
+   SA GÉOMÉTRIE VERTICALE (2026-09-20, « met les chiffres de la regle graduée
+   au dessus des crans, tous les 5 kilos ; hauteur des crans de dizaines 2x
+   plus grands que cran actuels ; crans de 5 kg : hauteur actuelle ; autres
+   crans : 3/4 »), de haut en bas : les nombres, tous les cinq ; les crans,
+   posés sur une même ligne de base et montant plus ou moins haut — l'unité
+   `--graduation-cran` est la hauteur d'un cran de cinq ; puis, sous cette
+   ligne, la place de LA TIGE. */
 .graduation {
   --graduation-pas: 20px;
+  --graduation-cran: 14px;
+  --graduation-nombres: 18px;
+  --graduation-tige: calc(var(--graduation-cran) * 4);
   position: relative;
+  width: 100%;
+}
+
+/* Ce qui glisse : la piste seule. La tige, elle, est posée sur le cadre
+   (2026-09-20) — dans le défilement, un élément absolu part avec le
+   contenu et Chrome l'emportait hors de vue. */
+.graduation__defilement {
   width: 100%;
   overflow-x: auto;
   overflow-y: hidden;
   scrollbar-width: none;
 }
 
-.graduation::-webkit-scrollbar {
+.graduation__defilement::-webkit-scrollbar {
   display: none;
 }
 
 .graduation__piste {
   display: flex;
-  height: 52px;
+  height: calc(var(--graduation-nombres) + var(--graduation-cran) * 2 + var(--graduation-tige));
   padding-inline: calc(50% - var(--graduation-pas) / 2);
   width: max-content;
 }
 
-/* Un cran : sa marque au milieu, TOUS DE LA MÊME HAUTEUR (2026-09-20, « la
-   ligne graduée ne doit pas bouger verticalement qd on passe des dizaines ou
-   des centaines » — les crans plus hauts faisaient onduler la ligne sous le
-   repère) ; ils ne diffèrent que par la couleur, d'après son image : les
-   unités claires, les dizaines et les centaines un peu plus marquées — deux
-   jetons du thème. AUCUN CRAN N'EST FONCÉ (2026-09-20, « il n'y a qu'UN SEUL
+/* Un cran : sa marque au milieu, le pied sur la ligne de base commune (au
+   ras de la tige), la tête plus ou moins haute : l'unité aux trois quarts,
+   le cinq entier, la dizaine double. Les couleurs sont deux jetons du
+   thème : les unités claires, les cinq et les dizaines un peu plus
+   marqués. AUCUN CRAN N'EST FONCÉ (2026-09-20, « il n'y a qu'UN SEUL
    endroit foncé, il est fixe, il correspond au centre de la règle, ça n'est
-   pas un cran ») : le seul élément foncé est le repère. Le nombre dessous
-   tous les dix. */
+   pas un cran ») : le seul élément foncé est la tige. */
 .graduation__cran {
   position: relative;
   flex: none;
@@ -1984,36 +2009,47 @@
   content: '';
   position: absolute;
   left: 50%;
-  top: 8px;
+  bottom: var(--graduation-tige);
   width: 1px;
-  height: 14px;
+  height: calc(var(--graduation-cran) * 3 / 4);
   background: var(--graduation-unite);
+}
+
+.graduation__cran--cinq::before {
+  height: var(--graduation-cran);
+  background: var(--graduation-dizaine);
 }
 
 .graduation__cran--dix::before,
 .graduation__cran--cent::before {
+  height: calc(var(--graduation-cran) * 2);
   background: var(--graduation-dizaine);
 }
 
+/* Le nombre, au-dessus de son cran, tous les cinq. */
 .graduation__nombre {
   position: absolute;
   left: 50%;
-  top: 30px;
+  top: 0;
   transform: translateX(-50%);
   font-family: var(--font-body);
   font-size: 12px;
+  line-height: 1;
   color: var(--encre-chapeau);
 }
 
-/* LE REPÈRE, au milieu : LE SEUL ENDROIT FONCÉ, fixe — ce n'est pas un cran
-   de la graduation, il dit où l'on en est sur elle. Sur la même ligne que
-   les crans, un peu plus long. */
+/* LA TIGE (2026-09-20, « positionne une tige verticale noire, 4 fois plus
+   grande qu'un cran, au milieu de l'écran, dont le bout supérieur se place
+   sur la regle graduée. la tige indique en permanence le poids affiché en
+   chiffre ») : LE SEUL ENDROIT FONCÉ, fixe, au milieu — son bout supérieur
+   sur la ligne de base des crans, elle pend dessous. Ce n'est pas un cran
+   de la graduation, elle dit où l'on en est sur elle. */
 .graduation__repere {
   position: absolute;
   left: 50%;
-  top: 6px;
+  top: calc(var(--graduation-nombres) + var(--graduation-cran) * 2);
   width: 2px;
-  height: 18px;
+  height: var(--graduation-tige);
   margin-left: -1px;
   background: var(--graduation-repere);
   pointer-events: none;
