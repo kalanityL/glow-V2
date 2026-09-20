@@ -98,6 +98,10 @@
      réponses et l'encre du thème. */
   --rond-fond: var(--option-fond);
   --rond-encre: var(--encre);
+  /* L'encre des textes posés À MÊME LE FOND DE PAGE — le salut, le titre
+     de page — (2026-09-20 au soir) : celle du thème, sauf sur un fond
+     sombre, où la palette du fond la rend claire. */
+  --fond-encre: var(--encre);
 
   /* Pas de photo derrière l'accueil : elle appartient aux thèmes clairs. Le
      jeton est déclaré, à `none`, pour que la règle qui le lit trouve

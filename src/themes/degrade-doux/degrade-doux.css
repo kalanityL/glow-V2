@@ -129,6 +129,10 @@
      filet, et l'icône en noir. */
   --rond-fond: #ecebed;
   --rond-encre: #000000;
+  /* L'encre des textes posés À MÊME LE FOND DE PAGE — le salut, le titre
+     de page — (2026-09-20 au soir) : celle du thème, sauf sur un fond
+     sombre, où la palette du fond la rend claire. */
+  --fond-encre: var(--encre);
 
   /* LES DEUX FONDS DE PAGE, SES DEUX PHOTOS (2026-09-20, « theme : remplacer
      le fond fleur existant par fond-fleur.png ; remplacer le fond bleu par

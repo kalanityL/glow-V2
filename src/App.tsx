@@ -17,6 +17,9 @@ import './themes/ciel/ciel.css';
 import './themes/ciel-fonce/ciel-fonce.css';
 import './themes/blanc/blanc.css';
 import './themes/degrade-doux/degrade-doux.css';
+/* La palette de chaque fond — engendrée par `scripts/palette-fonds.py`
+   depuis les images —, après les thèmes : elle rebranche leurs jetons. */
+import './themes/fonds-palette.css';
 
 /**
  * V2 — repartie de zéro.

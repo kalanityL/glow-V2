@@ -606,8 +606,25 @@ Café parisien, Nuit étoilée, Minimaliste clair, Aquarelle, Montagnes,
 Abstrait glow — découpés de la planche (le haut de chaque case, au-dessus
 du téléphone dessiné, environ 200 × 300 px : ils s'agrandissent sous le
 voile flou), douze cadres sur trois colonnes, le bloc défile —, et
-« Choisir ». **Non traité :** l'encre reste sombre sur les fonds sombres
-(Nuit étoilée, Abstrait glow), où sa planche la montre blanche. Toucher un cadre change le fond de la
+« Choisir ». **Hors du fond par défaut, le logo et l'entête prennent les
+couleurs de l'image choisie** (2026-09-20 au soir, « a part le theme par
+defaut, calcule changement couleur logo et header selon image de fond
+choisie ») : `scripts/palette-fonds.py` lit chaque image, en tire la
+teinte dominante vive (moyenne vectorielle des pixels vifs, pondérée par
+la saturation, désaturée quand ils sont rares) et la clarté du haut de
+l'image, et ÉCRIT `src/themes/fonds-palette.css` — les jetons du logo
+(les trois couleurs de la pastille), de G et LOW, de L/P/1 et de la
+devise, de l'encre des pastilles de l'entête, et de l'encre des textes
+posés à même le fond (`--fond-encre`, nouveau jeton : le salut, le titre de
+page — celle du thème par défaut), pour `.page--fond-<id>` ; encres claires
+sur un haut sombre (Nuit étoilée), où les pastilles de l'entête restent
+blanches à encre sombre. **Non traité :** la barre d'état du téléphone
+reste sombre sur un fond sombre — elle figure l'appareil, hors de la page. Calculé une fois, hors
+du navigateur, relisible ; à relancer à chaque fond ajouté. « Fleurs », le
+fond par défaut, garde les couleurs du thème. **L'image de fond est
+nette** (le même soir, « supprimer flou de l'image de fond ») : le voile
+flou du 16 septembre est parti, la vitre des tiroirs et des blocs floute
+toujours ce qu'elle couvre. Toucher un cadre change le fond de la
 page SOUS LES YEUX sans l'enregistrer ; « Choisir » l'enregistre (réponse
 `fond`, sur l'appareil) ; fermer sans choisir, avec un autre fond sous les
 yeux, propose « Confirmer le nouveau fond » / « Fermer » (comme le bloc du

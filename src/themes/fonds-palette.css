@@ -1,0 +1,150 @@
+/* ENGENDRÉ PAR `scripts/palette-fonds.py` — ne pas éditer à la main, relancer
+   le script. LA PALETTE DE CHAQUE FOND (2026-09-20 au soir, « a part le
+   theme par defaut, calcule changement couleur logo et header selon image
+   de fond choisie ») : les jetons du logo et de l'entête, tirés de la
+   teinte dominante vive de l'image ; encres claires sur un haut d'image
+   sombre. Le fond par défaut, « Fleurs », garde les couleurs du thème.
+   Deux classes, comme `.page--fond-<id>` : pour battre la feuille du
+   thème. */
+
+/* fond-brasserie.jpg — teinte 49°, 36 % de pixels vifs, haut clair (0.69). */
+.page.page--fond-ciel {
+  --logo-from: hsl(49 68% 48%);
+  --logo-via: hsl(49 68% 28%);
+  --logo-to: hsl(49 54% 72%);
+  --marque-degrade-debut: hsl(49 54% 16%);
+  --marque-degrade-fin: hsl(49 54% 16%);
+  --marque-accent: hsl(49 68% 32%);
+  --devise-encre: hsl(49 68% 32%);
+  --rond-encre: hsl(49 54% 20%);
+  --fond-encre: hsl(49 54% 16%);
+}
+
+/* fond-nature-printaniere.jpg — teinte 65°, 35 % de pixels vifs, haut clair (0.81). */
+.page.page--fond-nature-printaniere {
+  --logo-from: hsl(65 67% 48%);
+  --logo-via: hsl(65 67% 28%);
+  --logo-to: hsl(65 53% 72%);
+  --marque-degrade-debut: hsl(65 53% 16%);
+  --marque-degrade-fin: hsl(65 53% 16%);
+  --marque-accent: hsl(65 67% 32%);
+  --devise-encre: hsl(65 67% 32%);
+  --rond-encre: hsl(65 53% 20%);
+  --fond-encre: hsl(65 53% 16%);
+}
+
+/* fond-coucher-de-soleil.jpg — teinte 356°, 99 % de pixels vifs, haut clair (0.60). */
+.page.page--fond-coucher-de-soleil {
+  --logo-from: hsl(356 80% 48%);
+  --logo-via: hsl(356 80% 28%);
+  --logo-to: hsl(356 64% 72%);
+  --marque-degrade-debut: hsl(356 64% 16%);
+  --marque-degrade-fin: hsl(356 64% 16%);
+  --marque-accent: hsl(356 80% 32%);
+  --devise-encre: hsl(356 80% 32%);
+  --rond-encre: hsl(356 64% 20%);
+  --fond-encre: hsl(356 64% 16%);
+}
+
+/* fond-bord-de-mer.jpg — teinte 194°, 69 % de pixels vifs, haut clair (0.64). */
+.page.page--fond-bord-de-mer {
+  --logo-from: hsl(194 80% 48%);
+  --logo-via: hsl(194 80% 28%);
+  --logo-to: hsl(194 64% 72%);
+  --marque-degrade-debut: hsl(194 64% 16%);
+  --marque-degrade-fin: hsl(194 64% 16%);
+  --marque-accent: hsl(194 80% 32%);
+  --devise-encre: hsl(194 80% 32%);
+  --rond-encre: hsl(194 64% 20%);
+  --fond-encre: hsl(194 64% 16%);
+}
+
+/* fond-foret.jpg — teinte 52°, 66 % de pixels vifs, haut clair (0.66). */
+.page.page--fond-foret {
+  --logo-from: hsl(52 80% 48%);
+  --logo-via: hsl(52 80% 28%);
+  --logo-to: hsl(52 64% 72%);
+  --marque-degrade-debut: hsl(52 64% 16%);
+  --marque-degrade-fin: hsl(52 64% 16%);
+  --marque-accent: hsl(52 80% 32%);
+  --devise-encre: hsl(52 80% 32%);
+  --rond-encre: hsl(52 64% 20%);
+  --fond-encre: hsl(52 64% 16%);
+}
+
+/* fond-cafe-parisien.jpg — teinte 31°, 49 % de pixels vifs, haut clair (0.68). */
+.page.page--fond-cafe-parisien {
+  --logo-from: hsl(31 79% 48%);
+  --logo-via: hsl(31 79% 28%);
+  --logo-to: hsl(31 63% 72%);
+  --marque-degrade-debut: hsl(31 63% 16%);
+  --marque-degrade-fin: hsl(31 63% 16%);
+  --marque-accent: hsl(31 79% 32%);
+  --devise-encre: hsl(31 79% 32%);
+  --rond-encre: hsl(31 63% 20%);
+  --fond-encre: hsl(31 63% 16%);
+}
+
+/* fond-nuit-etoilee.jpg — teinte 222°, 44 % de pixels vifs, haut sombre (0.08). */
+.page.page--fond-nuit-etoilee {
+  --logo-from: hsl(222 75% 55%);
+  --logo-via: hsl(222 75% 38%);
+  --logo-to: hsl(222 60% 82%);
+  --marque-degrade-debut: hsl(222 37% 96%);
+  --marque-degrade-fin: hsl(222 37% 96%);
+  --marque-accent: hsl(222 52% 82%);
+  --devise-encre: hsl(222 52% 82%);
+  --fond-encre: hsl(222 30% 97%);
+}
+
+/* fond-minimaliste-clair.jpg — teinte 44°, 9 % de pixels vifs, haut clair (0.83). */
+.page.page--fond-minimaliste-clair {
+  --logo-from: hsl(44 43% 48%);
+  --logo-via: hsl(44 43% 28%);
+  --logo-to: hsl(44 34% 72%);
+  --marque-degrade-debut: hsl(44 34% 16%);
+  --marque-degrade-fin: hsl(44 34% 16%);
+  --marque-accent: hsl(44 43% 32%);
+  --devise-encre: hsl(44 43% 32%);
+  --rond-encre: hsl(44 34% 20%);
+  --fond-encre: hsl(44 34% 16%);
+}
+
+/* fond-aquarelle.jpg — teinte 203°, 20 % de pixels vifs, haut clair (0.87). */
+.page.page--fond-aquarelle {
+  --logo-from: hsl(203 53% 48%);
+  --logo-via: hsl(203 53% 28%);
+  --logo-to: hsl(203 42% 72%);
+  --marque-degrade-debut: hsl(203 42% 16%);
+  --marque-degrade-fin: hsl(203 42% 16%);
+  --marque-accent: hsl(203 53% 32%);
+  --devise-encre: hsl(203 53% 32%);
+  --rond-encre: hsl(203 42% 20%);
+  --fond-encre: hsl(203 42% 16%);
+}
+
+/* fond-montagnes.jpg — teinte 25°, 31 % de pixels vifs, haut clair (0.76). */
+.page.page--fond-montagnes {
+  --logo-from: hsl(25 63% 48%);
+  --logo-via: hsl(25 63% 28%);
+  --logo-to: hsl(25 50% 72%);
+  --marque-degrade-debut: hsl(25 50% 16%);
+  --marque-degrade-fin: hsl(25 50% 16%);
+  --marque-accent: hsl(25 63% 32%);
+  --devise-encre: hsl(25 63% 32%);
+  --rond-encre: hsl(25 50% 20%);
+  --fond-encre: hsl(25 50% 16%);
+}
+
+/* fond-abstrait-glow.jpg — teinte 230°, 65 % de pixels vifs, haut clair (0.66). */
+.page.page--fond-abstrait-glow {
+  --logo-from: hsl(230 80% 48%);
+  --logo-via: hsl(230 80% 28%);
+  --logo-to: hsl(230 64% 72%);
+  --marque-degrade-debut: hsl(230 64% 16%);
+  --marque-degrade-fin: hsl(230 64% 16%);
+  --marque-accent: hsl(230 80% 32%);
+  --devise-encre: hsl(230 80% 32%);
+  --rond-encre: hsl(230 64% 20%);
+  --fond-encre: hsl(230 64% 16%);
+}

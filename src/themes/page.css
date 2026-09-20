@@ -746,23 +746,11 @@
   --accueil-fond-image: var(--fond-abstrait-glow);
 }
 
-/* FLOUE, RIEN N'Y EST NET, MAIS « PAS TROP », ET SANS ZOOM (2026-09-16,
-   « ajoute effet flou rien e doit etre net dans le fond », « pas trop »,
-   « pas de zoom ») : le flou n'est pas sur la photo mais sur un VOILE posé
-   dessus, qui floute ce qu'il a derrière lui (`backdrop-filter`, 4 px — 8
-   la noyait). Un `filter: blur` sur la photo elle-même vidait ses bords, et
-   la déborder pour le cacher l'agrandissait de 7 % : c'est le zoom qu'elle a
-   vu. Le voile, lui, s'arrête au bord de la page sans rien vider ni
-   agrandir. En natif, c'est une vue de flou par-dessus l'image. */
-.page--photo::after {
-  content: '';
-  position: absolute;
-  inset: 0;
-  z-index: 0;
-  -webkit-backdrop-filter: blur(4px);
-  backdrop-filter: blur(4px);
-  pointer-events: none;
-}
+/* NETTE (2026-09-20 au soir, « supprimer flou de l'image de fond ») : le
+   voile flou posé sur la photo le 16 septembre (« ajoute effet flou rien e
+   doit etre net dans le fond ») est parti — la photo se voit telle quelle,
+   sans zoom. La vitre des tiroirs et des blocs, elle, floute toujours ce
+   qu'elle couvre : c'est le « reste de page vitré », pas l'image de fond. */
 
 /* Le contenu passe devant la photo et son voile. */
 .page--photo > * {
@@ -1063,7 +1051,8 @@
   font-size: 17px;
   line-height: 1.2;
   letter-spacing: -0.01em;
-  color: var(--encre);
+  /* À même le fond de page : l'encre du fond (claire sur un fond sombre). */
+  color: var(--fond-encre);
 }
 
 /* Les trois étoiles dorées, à la taille du mot. */
@@ -1227,7 +1216,8 @@
   font-weight: 400;
   font-size: 20px;
   text-align: center;
-  color: var(--encre);
+  /* À même le fond de page : l'encre du fond (claire sur un fond sombre). */
+  color: var(--fond-encre);
 }
 
 /* ── LA PAGE « MON COMPTE » ─────────────────────────────────────────────── */
@@ -1575,8 +1565,9 @@
    78 % (86 d'abord, « un peu plus transparent » le même jour). La photo est celle du jeton de la page (`--accueil-fond-image`) ; elle
    est posée en `position: fixed` sur tout l'écran du téléphone (le bloc
    conteneur des `fixed`, GUIDELINES) — donc EXACTEMENT alignée sur celle de
-   la page, même cadrage, même flou — et le `clip-path` du tiroir la rogne à
-   sa forme. Le voile blanc est le premier calque du même fond. */
+   la page, même cadrage, nette comme elle depuis le 2026-09-20 au soir — et
+   le `clip-path` du tiroir la rogne à sa forme. Le voile blanc est le
+   premier calque du même fond. */
 .tiroir::before {
   content: '';
   position: fixed;
@@ -1585,7 +1576,6 @@
   background:
     linear-gradient(rgba(255, 255, 255, 0.78), rgba(255, 255, 255, 0.78)),
     var(--accueil-fond-image) top / cover no-repeat;
-  filter: blur(4px);
   pointer-events: none;
 }
 
@@ -1861,7 +1851,6 @@
   background:
     linear-gradient(rgba(255, 255, 255, 0.78), rgba(255, 255, 255, 0.78)),
     var(--accueil-fond-image) top / cover no-repeat;
-  filter: blur(4px);
   pointer-events: none;
 }
 
