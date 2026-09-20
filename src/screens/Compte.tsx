@@ -298,7 +298,12 @@ export function Compte({
                   className="bouton compte__valider"
                   disabled={!avatarModifie}
                   aria-disabled={!avatarModifie}
-                  onClick={() => repondre('avatar', brouillonAvatar)}
+                  /* Valider ramène au volet des informations (2026-09-20,
+                     « avatar validé : on revient à l'onglet information »). */
+                  onClick={() => {
+                    repondre('avatar', brouillonAvatar);
+                    aller('informations');
+                  }}
                 >
                   {textes.compte.valider}
                 </button>
