@@ -104,22 +104,41 @@ export function defilerHorizontalA(element: Element | null, position: number, do
   element?.scrollTo({ left: position, behavior: doux ? 'smooth' : 'auto' });
 }
 
+/* LES CLICS EN ATTENTE : une file, jouée un clic à la fois. */
+let clicsEnAttente = 0;
+let clicsEnCours = false;
+
+/** L'écart entre deux clics, et la file au plus long : ce qui garde les clics
+    HARMONIEUX quand on glisse vite (2026-09-20). */
+const ECART_CLICS_MS = 45;
+const FILE_CLICS_MAX = 6;
+
 /**
- * JOUE UN SON, `nombre` fois (2026-09-20, les clics de la graduation du poids) :
- * un clic par cran, espacés de quelques millisecondes pour qu'on les entende
- * un à un plutôt qu'en un seul bruit ; au-delà de vingt d'un coup — une
- * pichenette qui traverse la graduation —, on s'arrête à vingt. Le son est un
- * FICHIER embarqué (`src/assets/sons/`), jamais distant. Un navigateur qui
- * refuse le son (pas de geste préalable) se tait : rien ne se casse. En
- * natif, le lecteur audio du téléphone derrière le même verbe.
+ * FAIT CLIQUER, `nombre` fois (2026-09-20, les clics de la graduation du
+ * poids ; « si on slide tres vite : ne fait pas entendre tous les clics, il
+ * faut que ça reste harmonieux à l'oreille. Si on slide lentement, toute
+ * modification est un clic ») : chaque demande entre dans une file qui joue
+ * un clic toutes les 45 ms — lentement, chaque cran s'entend ; vite, la file
+ * ne garde que six clics d'avance et laisse tomber le reste, et l'oreille
+ * entend un roulement régulier plutôt qu'une rafale. Le son est un FICHIER
+ * embarqué (`src/assets/sons/`), jamais distant. Un navigateur qui refuse le
+ * son (pas de geste préalable) se tait : rien ne se casse. En natif, le
+ * lecteur audio du téléphone derrière le même verbe.
  */
 export function jouerSon(url: string, nombre = 1): void {
-  const fois = Math.min(nombre, 20);
-  for (let i = 0; i < fois; i += 1) {
-    setTimeout(() => {
-      new Audio(url).play().catch(() => {
-        /* Le son refusé se tait. */
-      });
-    }, i * 24);
-  }
+  clicsEnAttente = Math.min(clicsEnAttente + nombre, FILE_CLICS_MAX);
+  if (clicsEnCours) return;
+  clicsEnCours = true;
+  const suivant = () => {
+    if (clicsEnAttente <= 0) {
+      clicsEnCours = false;
+      return;
+    }
+    clicsEnAttente -= 1;
+    new Audio(url).play().catch(() => {
+      /* Le son refusé se tait. */
+    });
+    setTimeout(suivant, ECART_CLICS_MS);
+  };
+  suivant();
 }
