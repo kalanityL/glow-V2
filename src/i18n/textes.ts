@@ -279,6 +279,14 @@ export interface Textes {
     annuler: string;
     mettreAJourPrise: string;
   };
+  /** LA PAGE D'UNE PESÉE (2026-09-21, « ajouter balance : idem que ajouter
+   *  injection ») : ses titres — les mots de la V1 —, et la question quand
+   *  le jour est déjà pesé (SPEC : au plus une pesée par jour). */
+  pesee: {
+    titre: string;
+    titreModification: string;
+    remplacer: string;
+  };
   /**
    * L'ÉCRAN DE CONFIRMATION D'UNE PRISE (2026-09-20, son image) : le titre
    * selon la forme, le sous-titre, la ligne de la zone, le titre de la liste
@@ -290,6 +298,11 @@ export interface Textes {
     /** Le titre après une modification (2026-09-20, « Message de validation
         devient "Injection mise à jour" »). */
     titreMiseAJour: Record<Forme, string>;
+    /** Les titres de l'écran d'une pesée (2026-09-21). */
+    titrePesee: string;
+    titrePeseeMiseAJour: string;
+    /** La ligne du poids sur la carte d'une pesée. */
+    poids: string;
     sousTitre: string;
     zone: string;
     maintenant: string;
@@ -551,6 +564,11 @@ const FR: Textes = {
     annuler: 'Annuler',
     mettreAJourPrise: 'Mettre à jour',
   },
+  pesee: {
+    titre: 'Nouvelle pesée',
+    titreModification: 'Modifier la pesée',
+    remplacer: 'Une pesée existe déjà ce jour-là. La remplacer ?',
+  },
   confirmation: {
     titre: {
       injection: 'Injection enregistrée !',
@@ -560,6 +578,9 @@ const FR: Textes = {
       injection: 'Injection mise à jour !',
       comprime: 'Prise mise à jour !',
     },
+    titrePesee: 'Pesée enregistrée !',
+    titrePeseeMiseAJour: 'Pesée mise à jour !',
+    poids: 'Poids',
     sousTitre: 'Votre suivi est à jour.',
     zone: 'Zone d’injection',
     maintenant: 'Vous pouvez maintenant :',
@@ -570,6 +591,7 @@ const FR: Textes = {
       journal: 'Voir dans le journal',
       concentration: 'Concentration sanguine',
       evolution: 'Évolution du traitement',
+      evolutionPoids: 'Évolution du poids',
       accueil: 'Retour à l’accueil',
     },
   },

@@ -529,6 +529,28 @@ jour ») : elle rouvre le formulaire en modification — rempli de la prise,
 remplace la dernière ; la confirmation titre alors « Injection mise à
 jour ! » (« Message de validation devient "Injection mise à jour" »).
 
+**La page d'une pesée** (2026-09-21, « ajouter balance : idem que ajouter
+injection, utilise le system de regle crantée pour choisir le poids, poids
+par defaut à l'ouverture : poids dont la date est la plus proche de la date
+d'aujourd'hui et inferieure à la date d'aujourd'hui (attention : la date du
+formulaire de poids, pas la date de creation de l'entrée de la table) ; on
+ne regarde pas les dates futures ») : la case « Balance » du tiroir du « + »
+y mène. La page d'une prise, au poids : la carte « Nouvelle pesée » (les
+mots de la V1), la date et l'heure côte à côte, LA RÈGLE CRANTÉE du poids —
+`components/ReglePoids.tsx`, sortie du bloc du poids pour servir aux deux —,
+« Valider ». Le poids proposé d'avance (`domaine/pesees.ts`,
+`poidsLePlusRecent`, testé) : celui de la pesée dont la date — celle du
+formulaire — est la plus proche d'aujourd'hui sans être future, aujourd'hui
+compris ; sans pesée, le poids du profil. Une pesée par jour (SPEC) :
+valider sur un jour déjà pesé demande « La remplacer ? » Non / Oui, et
+rien ne s'écrit sans ce oui. Sa confirmation est LE MÊME ÉCRAN que celui
+de la prise (« exactement meme principe »), `PageConfirmation` devenu
+générique : « Pesée enregistrée ! » / « Pesée mise à jour ! », la carte
+(poids, date et heure) qui rouvre le formulaire en modification, puis
+Ajouter un autre élément, Voir dans le journal, Évolution du poids, Retour à
+l'accueil. Les pesées ne sont gardées qu'en mémoire, comme les prises. Pas
+encore : les mensurations de la V1.
+
 **Toute page de l'application porte la barre du bas** (`BarreDuBas`, avec
 ses deux tiroirs) et, hors de l'accueil, **l'entête des pages**
 (`EntetePage` : la marque en petit et les deux outils sur une ligne, le

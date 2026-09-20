@@ -5,7 +5,14 @@ import { Onboarding } from './screens/Onboarding';
 import { Accueil } from './screens/Accueil';
 import { Compte } from './screens/Compte';
 import { PagePrise } from './screens/PagePrise';
-import { PageConfirmation } from './screens/PageConfirmation';
+import { PageConfirmation, ENTREES_PESEE, ENTREES_PRISE } from './screens/PageConfirmation';
+import { PagePesee } from './screens/PagePesee';
+import { IconeBalance, IconeCalendrier, IconeComprime, IconeLieu, IconeSeringue } from './components/Icones';
+import { TRAITEMENTS } from './domaine/traitements';
+import { UNITES_DU_SYSTEME } from './domaine/unites';
+import { dateLocale, formaterDateLongue } from './domaine/dates';
+import { avecLaPesee, poidsLePlusRecent, type Pesee } from './domaine/pesees';
+import { detecterLangue } from './i18n/useTextes';
 import type { ModuleId } from './app/modules';
 import type { Prise } from './domaine/prises';
 import type { FondId } from './app/fonds';
@@ -43,7 +50,9 @@ export default function App() {
      ouverte par le portrait ou par le tiroir du menu. Le bouton « retour » de la barre y ramène à l'accueil —
      c'est pour cela que la page vit ici, à côté du parcours, et non dans
      l'accueil. (Le menu principal, lui, est un tiroir de l'accueil.) */
-  const [page, setPage] = useState<'accueil' | 'compte' | 'prise' | 'confirmation'>('accueil');
+  const [page, setPage] = useState<'accueil' | 'compte' | 'prise' | 'confirmation' | 'pesee' | 'confirmation-pesee'>(
+    'accueil',
+  );
 
   /* LA PAGE D'UNE PRISE (2026-09-20, « ajouter->injection : envoie vers une
      page ultra simple avec uniquement le formulaire d'ajout d'injection de
@@ -64,7 +73,31 @@ export default function App() {
       setModification(false);
       setPage('prise');
     }
+    if (module === 'balance') {
+      setModification(false);
+      setPage('pesee');
+    }
   };
+
+  /* LES PESÉES (2026-09-21, « ajouter balance : idem que ajouter
+     injection ») : en mémoire seulement, comme les prises. Le poids proposé
+     d'avance est celui de la pesée la plus proche d'aujourd'hui qui n'est
+     pas dans le futur, sinon le poids du profil. Une pesée par jour : la
+     nouvelle remplace celle du même jour. */
+  const [pesees, setPesees] = useState<Pesee[]>([]);
+  const [dernierePesee, setDernierePesee] = useState<Pesee | null>(null);
+  const aujourdhui = dateLocale(new Date());
+  const poidsPropose = poidsLePlusRecent(pesees, aujourdhui) ?? parcours.reponses.poids;
+  const validerPesee = (pesee: Pesee) => {
+    setPesees((avant) => avecLaPesee(modification && dernierePesee ? avant.filter((p) => p !== dernierePesee) : avant, pesee));
+    setDernierePesee(pesee);
+    setMiseAJour(modification);
+    setModification(false);
+    setPage('confirmation-pesee');
+  };
+  const langue = detecterLangue();
+  const unites = UNITES_DU_SYSTEME[parcours.reponses.systeme];
+  const poidsEcrit = (stocke: string) => `${stocke.replace('.', textes.separateurDecimal)} ${textes.unites[unites.poids]}`;
   /* Validée, la prise mène à L'ÉCRAN DE CONFIRMATION (2026-09-20, son
      image) : la dernière prise, et ce qu'on peut faire maintenant. */
   const validerPrise = (prise: Prise) => {
@@ -137,12 +170,72 @@ export default function App() {
             <Compte parcours={parcours} onAccueil={() => setPage('accueil')} fond={fond} onAjouter={ajouter} />
           ) : page === 'confirmation' && derniere && parcours.reponses.formeTraitement ? (
             <PageConfirmation
-              prise={derniere}
+              titrePage={textes.accueil.traitement[parcours.reponses.formeTraitement]}
+              titre={
+                miseAJour
+                  ? textes.confirmation.titreMiseAJour[parcours.reponses.formeTraitement]
+                  : textes.confirmation.titre[parcours.reponses.formeTraitement]
+              }
+              lignes={[
+                {
+                  icone: parcours.reponses.formeTraitement === 'comprime' ? <IconeComprime /> : <IconeSeringue />,
+                  nom: TRAITEMENTS.find((t) => t.id === derniere.traitement)?.nom ?? '',
+                  valeur: `${String(derniere.doseMg).replace('.', textes.separateurDecimal)} mg`,
+                },
+                {
+                  icone: <IconeCalendrier />,
+                  nom: formaterDateLongue(derniere.date, textes.calendrier.mois, langue),
+                  valeur: derniere.heure,
+                },
+                ...(parcours.reponses.formeTraitement === 'comprime'
+                  ? []
+                  : [{ icone: <IconeLieu />, nom: textes.confirmation.zone, valeur: textes.prise.zones[derniere.zone] }]),
+              ]}
+              entrees={ENTREES_PRISE}
               forme={parcours.reponses.formeTraitement}
-              miseAJour={miseAJour}
               onModifier={() => {
                 setModification(true);
                 setPage('prise');
+              }}
+              onAccueil={() => setPage('accueil')}
+              onOuvrirCompte={() => setPage('compte')}
+              onAjouter={ajouter}
+              fond={fond}
+            />
+          ) : page === 'pesee' ? (
+            <PagePesee
+              poidsPropose={poidsPropose}
+              unite={unites.poids}
+              pesees={pesees}
+              forme={parcours.reponses.formeTraitement}
+              initiale={modification && dernierePesee ? dernierePesee : undefined}
+              onValider={validerPesee}
+              onAnnuler={() => {
+                setModification(false);
+                setPage('confirmation-pesee');
+              }}
+              onAccueil={() => setPage('accueil')}
+              onOuvrirCompte={() => setPage('compte')}
+              onAjouter={ajouter}
+              fond={fond}
+            />
+          ) : page === 'confirmation-pesee' && dernierePesee ? (
+            <PageConfirmation
+              titrePage={textes.accueil.modules.balance}
+              titre={miseAJour ? textes.confirmation.titrePeseeMiseAJour : textes.confirmation.titrePesee}
+              lignes={[
+                { icone: <IconeBalance />, nom: textes.confirmation.poids, valeur: poidsEcrit(dernierePesee.poids) },
+                {
+                  icone: <IconeCalendrier />,
+                  nom: formaterDateLongue(dernierePesee.date, textes.calendrier.mois, langue),
+                  valeur: dernierePesee.heure,
+                },
+              ]}
+              entrees={ENTREES_PESEE}
+              forme={parcours.reponses.formeTraitement}
+              onModifier={() => {
+                setModification(true);
+                setPage('pesee');
               }}
               onAccueil={() => setPage('accueil')}
               onOuvrirCompte={() => setPage('compte')}
