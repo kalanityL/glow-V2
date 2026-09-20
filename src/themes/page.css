@@ -1622,9 +1622,11 @@
   font-family: var(--font-display);
   font-weight: 600;
   font-size: 15px;
-  /* Le bleu de G et LOW — le sky-600 de la V1 (2026-09-20, « titre de
-     section -> bleu », puis « utilise le bleu sky600 de la v1 »). */
-  color: var(--marque-encre);
+  /* Le bleu du G de GLP1LOW dans l'entête — le début de son dégradé
+     (2026-09-20, « bleu de titre de section de menu : meme que bleu du G de
+     glp1low du header » ; l'accent, puis le sky-600, puis le bleu 700 y
+     ont passé la journée). */
+  color: var(--marque-degrade-debut);
 }
 
 /* Le mot-symbole dans « GLP1LOW et vous » : la police, la couleur et la
