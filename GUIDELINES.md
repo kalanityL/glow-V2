@@ -432,10 +432,10 @@ et vous » dans la police, la couleur et la graisse de la ligne. **Derrière
 le tiroir, le reste de la page est une vitre floue, sans teinte** (« reste
 de la page vitré flou », 2026-09-19) — c'est la seule chose qui couvre une
 page, et elle ne l'assombrit pas. Ses trois sections, dans son ordre :
-Préférences (Activation Modules, Notifications, Thème et couleurs, Badges),
-Export (Nouveau rapport médical, Rapports disponibles), GLP1LOW et vous — le
-mot-symbole dessiné, puis « et vous » — (Mon compte, Avis et Feedback,
-Sondage, FAQ, Ciel). « Admin » attend qu'il existe un compte. Aucune entrée
+Préférences (Modules, Notifications, Couleurs, Badges), Exporter un rapport
+(Créer, Disponibles), GLP1LOW et vous — le mot-symbole dessiné, puis « et
+vous » — (Mon compte, Sondage, Avis et Feedback, FAQ, Ciel) ; mots courts et
+ordre du 2026-09-20, la croix en contour, le premier titre sous sa ligne. « Admin » attend qu'il existe un compte. Aucune entrée
 ne mène encore nulle part. La liste vit dans `src/app/menuPrincipal.ts`.
 
 **La page « Mon compte »** — « Mon profil » jusqu'au soir du 2026-09-19

@@ -1475,8 +1475,9 @@
   background: var(--option-filet);
 }
 
-/* La croix qui ferme, dans le coin haut droit, sur une pastille gris presque
-   blanc (2026-09-19) — celle des outils de l'entête. */
+/* La croix qui ferme, dans le coin haut droit : un rond cerné d'un filet,
+   sans fond (2026-09-20, « croix de fermeture contour au lieu de
+   pastille » — pastille grise la veille). */
 .tiroir__fermer {
   position: absolute;
   top: 12px;
@@ -1486,9 +1487,9 @@
   width: 28px;
   height: 28px;
   padding: 0;
-  border: 0;
+  border: 1px solid var(--option-filet);
   border-radius: 50%;
-  background: var(--rond-fond);
+  background: none;
   color: var(--encre);
   cursor: pointer;
 }
@@ -1500,6 +1501,14 @@
 
 .tiroir__section {
   margin: 0 0 10px;
+}
+
+/* Le premier titre passe SOUS la ligne de la croix (2026-09-20, « preference
+   pas sur la meme ligne que la croix de fermeture, preference sur la ligne
+   du dessous ») : la croix, à 12 px du haut, fait 28 px ; le titre commence
+   après. */
+.tiroir__section:first-child .tiroir__titre {
+  margin-top: 34px;
 }
 
 /* Le titre d'un groupe, et UNE LONGUE LIGNE dessous, d'un bord à l'autre du

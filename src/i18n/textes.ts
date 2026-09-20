@@ -342,16 +342,20 @@ const FR: Textes = {
     titre: 'Menu',
     sections: {
       preferences: 'Préférences',
-      export: 'Export',
+      /* Renommages du 2026-09-20 : « Export » → « Exporter un rapport »,
+         « Activation Modules » → « Modules », « Thème et couleurs » →
+         « Couleurs », « Nouveau rapport médical » → « Créer », « Rapports
+         disponibles » → « Disponibles ». */
+      export: 'Exporter un rapport',
       glowEtVous: 'et vous',
     },
     entrees: {
-      modules: 'Activation Modules',
+      modules: 'Modules',
       notifications: 'Notifications',
-      theme: 'Thème et couleurs',
+      theme: 'Couleurs',
       badges: 'Badges',
-      nouveauRapport: 'Nouveau rapport médical',
-      rapports: 'Rapports disponibles',
+      nouveauRapport: 'Créer',
+      rapports: 'Disponibles',
       compte: 'Mon compte',
       avis: 'Avis et Feedback',
       sondage: 'Sondage',

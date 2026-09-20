@@ -3,12 +3,12 @@
  * icone menu qui ouvre un menu »), en trois sections, dans son ordre — celui
  * de la V1 (`versions/mixte/App.tsx`, `quickMenuSections`), qu'elle a redit
  * entrée par entrée :
- *   Préférences — Activation Modules, Notifications, Thème et couleurs,
- *                 Badges ;
- *   Export      — Nouveau rapport médical, Rapports disponibles ;
+ *   Préférences — Modules, Notifications, Couleurs, Badges ;
+ *   Exporter un rapport — Créer, Disponibles ;
  *   GLP1LOW et vous (le titre porte le mot-symbole dessiné, suivi de
- *                 « et vous ») — Mon compte, Avis et Feedback, Sondage, FAQ,
+ *                 « et vous ») — Mon compte, Sondage, Avis et Feedback, FAQ,
  *                 Ciel.
+ * (Les mots courts et l'ordre Sondage / Avis sont du 2026-09-20.)
  * « Admin (seulement pour le compte administrateur) » n'est pas là : la V2
  * n'a pas de compte, donc pas d'administrateur ; l'entrée viendra avec lui.
  *
@@ -39,5 +39,5 @@ export type EntreeMenuPrincipal = (typeof ENTREES_MENU_PRINCIPAL)[number];
 export const ENTREES_PAR_SECTION: Record<SectionMenu, readonly EntreeMenuPrincipal[]> = {
   preferences: ['modules', 'notifications', 'theme', 'badges'],
   export: ['nouveauRapport', 'rapports'],
-  glowEtVous: ['compte', 'avis', 'sondage', 'faq', 'ciel'],
+  glowEtVous: ['compte', 'sondage', 'avis', 'faq', 'ciel'],
 };
