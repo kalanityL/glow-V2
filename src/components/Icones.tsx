@@ -132,15 +132,23 @@ export function IconeCourriel() {
   );
 }
 
-/** Lucide `ruler` — la taille. */
-export function IconeRegle() {
+/**
+ * UNE TOISE — la taille (2026-09-20, « icone hauteur dans information :
+ * inspire toi de cette image ») : le mât gradué sur un socle, et la tête
+ * coulissante en haut, d'après son image. Dessin maison, dans la bande
+ * commune de Lucide (2 → 22), au trait des voisines.
+ */
+export function IconeToise() {
   return (
     <Icone>
-      <path d="M21.3 15.3a2.4 2.4 0 0 1 0 3.4l-2.6 2.6a2.4 2.4 0 0 1-3.4 0L2.7 8.7a2.41 2.41 0 0 1 0-3.4l2.6-2.6a2.41 2.41 0 0 1 3.4 0Z" />
-      <path d="m14.5 12.5 2-2" />
-      <path d="m11.5 9.5 2-2" />
-      <path d="m8.5 6.5 2-2" />
-      <path d="m17.5 15.5 2-2" />
+      <path d="M7 2v20" />
+      <path d="M3 22h13" />
+      <path d="M7 6h12" />
+      <path d="M7 4h3" />
+      <path d="M7 10h3" />
+      <path d="M7 13h2" />
+      <path d="M7 16h3" />
+      <path d="M7 19h2" />
     </Icone>
   );
 }

@@ -9,7 +9,7 @@ import {
   IconeSeringue,
   IconeCible,
   IconeCourriel,
-  IconeRegle,
+  IconeToise,
 } from '../components/Icones';
 import { BarreDuBas } from './BarreDuBas';
 import { EntetePage } from './EntetePage';
@@ -210,7 +210,7 @@ export function Compte({
 
               <div className="ligne">
                 <ChampEnLigne
-                  icone={<IconeRegle />}
+                  icone={<IconeToise />}
                   valeur={String(tailleAffichee(reponses.tailleCm, unites.taille))}
                   onValeur={(ecrite) => repondre('tailleCm', tailleEnCm(Number(ecrite), unites.taille))}
                   normaliser={(saisie) => {
