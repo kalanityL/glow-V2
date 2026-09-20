@@ -599,7 +599,15 @@ ensoleillé » de la V1 — **devenus ses deux photos le 2026-09-20 au soir**
 le fond bleu par fond-brasserie.png ») : « Fleurs », un mur clair sous du
 jasmin, et « Brasserie », la terrasse d'un café ; les identifiants `photo`
 et `ciel` sont restés, `fond` étant une réponse enregistrée ; les images
-sont embarquées en JPEG dans `src/assets/images/` —, et « Choisir ». Toucher un cadre change le fond de la
+sont embarquées en JPEG dans `src/assets/images/` —, **puis les dix fonds
+de sa planche** (le même soir, « extrais les 10 fonds et ajoute les a la
+page theme ») : Nature printanière, Coucher de soleil, Bord de mer, Forêt,
+Café parisien, Nuit étoilée, Minimaliste clair, Aquarelle, Montagnes,
+Abstrait glow — découpés de la planche (le haut de chaque case, au-dessus
+du téléphone dessiné, environ 200 × 300 px : ils s'agrandissent sous le
+voile flou), douze cadres sur trois colonnes, le bloc défile —, et
+« Choisir ». **Non traité :** l'encre reste sombre sur les fonds sombres
+(Nuit étoilée, Abstrait glow), où sa planche la montre blanche. Toucher un cadre change le fond de la
 page SOUS LES YEUX sans l'enregistrer ; « Choisir » l'enregistre (réponse
 `fond`, sur l'appareil) ; fermer sans choisir, avec un autre fond sous les
 yeux, propose « Confirmer le nouveau fond » / « Fermer » (comme le bloc du

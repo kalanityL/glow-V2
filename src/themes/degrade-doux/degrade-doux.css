@@ -139,6 +139,19 @@
      JPEG (les PNG de 1,4 et 1,7 Mo pesaient six fois plus). */
   --fond-photo: url(../../assets/images/fond-fleur.jpg);
   --fond-ciel: url(../../assets/images/fond-brasserie.jpg);
+  /* Les dix fonds de sa planche (2026-09-20 au soir), découpés d'elle —
+     le haut de chaque case, au-dessus du téléphone dessiné — et embarqués
+     en JPEG. */
+  --fond-nature-printaniere: url(../../assets/images/fond-nature-printaniere.jpg);
+  --fond-coucher-de-soleil: url(../../assets/images/fond-coucher-de-soleil.jpg);
+  --fond-bord-de-mer: url(../../assets/images/fond-bord-de-mer.jpg);
+  --fond-foret: url(../../assets/images/fond-foret.jpg);
+  --fond-cafe-parisien: url(../../assets/images/fond-cafe-parisien.jpg);
+  --fond-nuit-etoilee: url(../../assets/images/fond-nuit-etoilee.jpg);
+  --fond-minimaliste-clair: url(../../assets/images/fond-minimaliste-clair.jpg);
+  --fond-aquarelle: url(../../assets/images/fond-aquarelle.jpg);
+  --fond-montagnes: url(../../assets/images/fond-montagnes.jpg);
+  --fond-abstrait-glow: url(../../assets/images/fond-abstrait-glow.jpg);
   /* Le fond de page courant : la photo par défaut ; `.page--fond-<id>` le
      rebranche sur le fond choisi. */
   --accueil-fond-image: var(--fond-photo);

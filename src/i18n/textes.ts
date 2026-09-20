@@ -481,6 +481,17 @@ const FR: Textes = {
     fonds: {
       photo: 'Fleurs',
       ciel: 'Brasserie',
+      /* Les noms de sa planche (2026-09-20 au soir). */
+      'nature-printaniere': 'Nature printanière',
+      'coucher-de-soleil': 'Coucher de soleil',
+      'bord-de-mer': 'Bord de mer',
+      foret: 'Forêt',
+      'cafe-parisien': 'Café parisien',
+      'nuit-etoilee': 'Nuit étoilée',
+      'minimaliste-clair': 'Minimaliste clair',
+      aquarelle: 'Aquarelle',
+      montagnes: 'Montagnes',
+      'abstrait-glow': 'Abstrait glow',
     },
     choisir: 'Choisir',
     confirmer: 'Confirmer le nouveau fond',

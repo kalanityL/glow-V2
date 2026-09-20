@@ -6,7 +6,15 @@
  * qu'il peint est dans les feuilles des thèmes (`--fond-photo`,
  * `--fond-ciel`), consommé par `.page--fond-<id>`.
  */
-export const FONDS = ['photo', 'ciel'] as const;
+export const FONDS = [
+  'photo',
+  'ciel',
+  /* LES DIX FONDS DE SA PLANCHE (2026-09-20 au soir, « extrais les 10 fonds
+     et ajoute les a la page theme ») : dans l'ordre de la planche, sous
+     leurs noms. Les deux premiers identifiants sont d'avant — `photo` est
+     « Fleurs », `ciel` est « Brasserie ». */
+  ...(['nature-printaniere', 'coucher-de-soleil', 'bord-de-mer', 'foret', 'cafe-parisien', 'nuit-etoilee', 'minimaliste-clair', 'aquarelle', 'montagnes', 'abstrait-glow'] as const),
+] as const;
 
 export type FondId = (typeof FONDS)[number];
 

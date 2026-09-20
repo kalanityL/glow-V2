@@ -714,6 +714,38 @@
   --accueil-fond-image: var(--fond-ciel);
 }
 
+/* Les dix fonds de sa planche (2026-09-20 au soir) : même mécanique. */
+.page.page--fond-nature-printaniere {
+  --accueil-fond-image: var(--fond-nature-printaniere);
+}
+.page.page--fond-coucher-de-soleil {
+  --accueil-fond-image: var(--fond-coucher-de-soleil);
+}
+.page.page--fond-bord-de-mer {
+  --accueil-fond-image: var(--fond-bord-de-mer);
+}
+.page.page--fond-foret {
+  --accueil-fond-image: var(--fond-foret);
+}
+.page.page--fond-cafe-parisien {
+  --accueil-fond-image: var(--fond-cafe-parisien);
+}
+.page.page--fond-nuit-etoilee {
+  --accueil-fond-image: var(--fond-nuit-etoilee);
+}
+.page.page--fond-minimaliste-clair {
+  --accueil-fond-image: var(--fond-minimaliste-clair);
+}
+.page.page--fond-aquarelle {
+  --accueil-fond-image: var(--fond-aquarelle);
+}
+.page.page--fond-montagnes {
+  --accueil-fond-image: var(--fond-montagnes);
+}
+.page.page--fond-abstrait-glow {
+  --accueil-fond-image: var(--fond-abstrait-glow);
+}
+
 /* FLOUE, RIEN N'Y EST NET, MAIS « PAS TROP », ET SANS ZOOM (2026-09-16,
    « ajoute effet flou rien e doit etre net dans le fond », « pas trop »,
    « pas de zoom ») : le flou n'est pas sur la photo mais sur un VOILE posé
@@ -1862,7 +1894,10 @@
 /* Les deux fonds au choix, dans les cadres du choix du thème de l'onboarding :
    chacun peint de son fond. */
 .choix-themes--fonds {
-  grid-template-columns: repeat(2, 1fr);
+  /* Douze fonds depuis le 2026-09-20 au soir : trois par rangée, le bloc
+     défile. */
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
   margin: 12px 0 0;
 }
 
@@ -1872,6 +1907,37 @@
 
 .carte-fond--ciel {
   background: var(--fond-ciel) center / cover no-repeat;
+}
+
+.carte-fond--nature-printaniere {
+  background: var(--fond-nature-printaniere) center / cover no-repeat;
+}
+.carte-fond--coucher-de-soleil {
+  background: var(--fond-coucher-de-soleil) center / cover no-repeat;
+}
+.carte-fond--bord-de-mer {
+  background: var(--fond-bord-de-mer) center / cover no-repeat;
+}
+.carte-fond--foret {
+  background: var(--fond-foret) center / cover no-repeat;
+}
+.carte-fond--cafe-parisien {
+  background: var(--fond-cafe-parisien) center / cover no-repeat;
+}
+.carte-fond--nuit-etoilee {
+  background: var(--fond-nuit-etoilee) center / cover no-repeat;
+}
+.carte-fond--minimaliste-clair {
+  background: var(--fond-minimaliste-clair) center / cover no-repeat;
+}
+.carte-fond--aquarelle {
+  background: var(--fond-aquarelle) center / cover no-repeat;
+}
+.carte-fond--montagnes {
+  background: var(--fond-montagnes) center / cover no-repeat;
+}
+.carte-fond--abstrait-glow {
+  background: var(--fond-abstrait-glow) center / cover no-repeat;
 }
 
 .bloc__entete {

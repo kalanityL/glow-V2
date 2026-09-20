@@ -194,6 +194,16 @@
      toujours une valeur. */
   --fond-photo: none;
   --fond-ciel: none;
+  --fond-nature-printaniere: none;
+  --fond-coucher-de-soleil: none;
+  --fond-bord-de-mer: none;
+  --fond-foret: none;
+  --fond-cafe-parisien: none;
+  --fond-nuit-etoilee: none;
+  --fond-minimaliste-clair: none;
+  --fond-aquarelle: none;
+  --fond-montagnes: none;
+  --fond-abstrait-glow: none;
   --accueil-fond-image: none;
 
   --font-display: 'Outfit', system-ui, sans-serif;
