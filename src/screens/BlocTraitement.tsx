@@ -109,6 +109,8 @@ export function BlocTraitement({
         valeur={choix.forme === 'aucun' ? 'aucun' : null}
         onChoix={choisirForme}
         question={textes.groupes.forme}
+        /* Seul sur sa ligne, `enLigne` le centre (« aucun : texte centré »). */
+        enLigne
       />
       <ChoixUnique
         options={FORMES_CHOIX}

@@ -1,10 +1,11 @@
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Avatar } from '../components/Avatar';
 import { ChampEnLigne } from '../components/ChampEnLigne';
 import {
   IconeBalance,
   IconeCadenas,
   IconeCalendrier,
+  IconeProfil,
   IconeSeringue,
   IconeCible,
   IconeCourriel,
@@ -62,8 +63,9 @@ type Volet = VoletCompte;
  * sur la meme ligne que logo, titre de page ligne du dessous centré pas en
  * gras ») : l'entête des pages (`EntetePage`), et la barre du bas
  * (`BarreDuBas`) dont « Accueil » ramène à l'accueil — plus de flèche.
- * L'IDENTITÉ : le portrait — qui mène au volet de l'avatar — et le prénom,
- * qui s'édite sur place, là, et nulle part ailleurs.
+ * PLUS D'IDENTITÉ EN TÊTE (2026-09-20, « supprimer avatar principal et
+ * prenom, prenom apparait à la place dans les infos ») : le prénom est la
+ * première ligne des informations, le portrait vit dans le volet de l'avatar.
  * LE CARROUSEL : deux volets qui glissent, « Mes informations » puis « Mon
  * avatar » ; chacun défile pour lui-même ; les deux points du bas sont FIGÉS
  * sous les volets, toujours visibles, et mènent à l'un ou l'autre.
@@ -100,6 +102,13 @@ export function Compte({
   const { reponses, repondre } = parcours;
   const carrousel = useRef<HTMLDivElement>(null);
   const [volet, setVolet] = useState<Volet>('informations');
+  /* Le brouillon de l'avatar : ce que les réglages touchent, jusqu'à
+     « Valider ». Il suit l'enregistré quand celui-ci change. */
+  const [brouillonAvatar, setBrouillonAvatar] = useState(reponses.avatar);
+  useEffect(() => {
+    setBrouillonAvatar(reponses.avatar);
+  }, [reponses.avatar]);
+  const avatarModifie = JSON.stringify(brouillonAvatar) !== JSON.stringify(reponses.avatar);
   /* LE BLOC « MON TRAITEMENT » (2026-09-20) : ouvert par la valeur du
      médicament. Ce qu'il édite part de ce qui est enregistré ; « aucun »
      quand il n'y a pas de traitement. */
@@ -136,26 +145,6 @@ export function Compte({
       <div className="page__colonne">
         <EntetePage titre={textes.compte.titre} />
 
-        <div className="compte__identite">
-          <button
-            type="button"
-            className="compte__portrait-bouton"
-            aria-label={textes.compte.avatar}
-            onClick={() => aller('avatar')}
-          >
-            <div className="compte__cercle">
-              <Avatar avatar={reponses.avatar} />
-            </div>
-          </button>
-          <ChampEnLigne
-            valeur={reponses.prenom}
-            onValeur={(prenom) => repondre('prenom', prenom)}
-            nom={textes.groupes.prenom}
-            autoComplete="given-name"
-            grand
-          />
-        </div>
-
         {/* LES ONGLETS DU CARROUSEL, FIGÉS AU-DESSUS DES VOLETS (2026-09-19,
             « les onglets sont en haut » — ils étaient en bas) : ils restent
             en place quoi qu'on fasse défiler, et mènent à chaque volet. */}
@@ -181,12 +170,20 @@ export function Compte({
           <section className="carrousel__volet" aria-label={textes.compte.onglets.informations}>
             <div className="carte">
               <div className="ligne">
-                <span className="ligne__icone">
-                  <IconeCalendrier />
-                </span>
+                <ChampEnLigne
+                  icone={<IconeProfil />}
+                  valeur={reponses.prenom}
+                  onValeur={(prenom) => repondre('prenom', prenom)}
+                  nom={textes.groupes.prenom}
+                  autoComplete="given-name"
+                />
+              </div>
+
+              <div className="ligne">
                 {/* L'ÂGE SE LIT, LA DATE DE NAISSANCE S'ÉDITE (2026-09-20,
                     « qd on édite l'age, on remplit la date de naissance »). */}
                 <ChampEnLigne
+                  icone={<IconeCalendrier />}
                   valeur={formaterDateCourte(reponses.dateNaissance, langue)}
                   valeurAffichee={textes.compte.ageEcrit(ageA(reponses.dateNaissance, aujourdhui))}
                   onValeur={(ecrite) => {
@@ -204,10 +201,8 @@ export function Compte({
               </div>
 
               <div className="ligne">
-                <span className="ligne__icone">
-                  <IconeRegle />
-                </span>
                 <ChampEnLigne
+                  icone={<IconeRegle />}
                   valeur={String(tailleAffichee(reponses.tailleCm, unites.taille))}
                   onValeur={(ecrite) => repondre('tailleCm', tailleEnCm(Number(ecrite), unites.taille))}
                   normaliser={(saisie) => {
@@ -224,10 +219,8 @@ export function Compte({
               </div>
 
               <div className="ligne">
-                <span className="ligne__icone">
-                  <IconeBalance />
-                </span>
                 <ChampEnLigne
+                  icone={<IconeBalance />}
                   valeur={poidsEcrit(reponses.poids)}
                   onValeur={(ecrite) => {
                     const stocke = poidsDepuisSaisie(ecrite, unites.poids);
@@ -245,10 +238,8 @@ export function Compte({
               </div>
 
               <div className="ligne">
-                <span className="ligne__icone">
-                  <IconeCible />
-                </span>
                 <ChampEnLigne
+                  icone={<IconeCible />}
                   valeur={poidsEcrit(reponses.poidsCible)}
                   onValeur={(ecrite) => {
                     const stocke = poidsDepuisSaisie(ecrite, unites.poids);
@@ -266,11 +257,17 @@ export function Compte({
               </div>
 
               <div className="ligne">
-                <span className="ligne__icone">
-                  <IconeSeringue />
-                </span>
                 {/* LE MÉDICAMENT PRESCRIT ne s'édite pas sur place : sa valeur
-                    ouvre le bloc « Mon traitement » (2026-09-20). */}
+                    — et son icône — ouvrent le bloc « Mon traitement »
+                    (2026-09-20). */}
+                <button
+                  type="button"
+                  className="ligne__icone ligne__icone--bouton"
+                  aria-label={textes.groupes.medicament}
+                  onClick={() => setBlocTraitement(true)}
+                >
+                  <IconeSeringue />
+                </button>
                 <button
                   type="button"
                   className="enligne__valeur"
@@ -283,26 +280,40 @@ export function Compte({
             </div>
           </section>
 
-          <section className="carrousel__volet" aria-label={textes.compte.onglets.avatar}>
-            <div className="carte">
+          {/* LE VOLET DE L'AVATAR (2026-09-20, « avatar : image de l'avatar
+              fixe et bouton valider fixe, on scrolle entre les deux », puis
+              « bouton valider à côté de l'avatar, pas en bas ») : le portrait
+              et « Valider », côte à côte en haut, ne bougent pas ; les
+              réglages défilent dessous. Les réglages touchent un BROUILLON,
+              que le portrait montre ; « Valider » l'enregistre. */}
+          <section
+            className="carrousel__volet carrousel__volet--fixe"
+            aria-label={textes.compte.onglets.avatar}
+          >
+            <div className="carte carte--colonne">
               <div className="compte__portrait">
-                <Avatar avatar={reponses.avatar} />
+                <Avatar avatar={brouillonAvatar} />
+                <button
+                  type="button"
+                  className="bouton compte__valider"
+                  disabled={!avatarModifie}
+                  aria-disabled={!avatarModifie}
+                  onClick={() => repondre('avatar', brouillonAvatar)}
+                >
+                  {textes.compte.valider}
+                </button>
               </div>
-              <EtapeAvatar
-                avatar={reponses.avatar}
-                onAvatar={(avatar) => repondre('avatar', avatar)}
-                sansTitre
-              />
+              <div className="carte__defilant">
+                <EtapeAvatar avatar={brouillonAvatar} onAvatar={setBrouillonAvatar} sansTitre />
+              </div>
             </div>
           </section>
 
           <section className="carrousel__volet" aria-label={textes.compte.onglets.compte}>
             <div className="carte">
               <div className="ligne">
-                <span className="ligne__icone">
-                  <IconeCourriel />
-                </span>
                 <ChampEnLigne
+                  icone={<IconeCourriel />}
                   valeur={reponses.email}
                   onValeur={(email) => repondre('email', email)}
                   nom={textes.groupes.email}
@@ -312,12 +323,10 @@ export function Compte({
               </div>
 
               <div className="ligne">
-                <span className="ligne__icone">
-                  <IconeCadenas />
-                </span>
                 {/* La seule règle du mot de passe, huit signes (2026-09-08),
                     jugée au moment où on quitte le champ, comme les autres. */}
                 <ChampEnLigne
+                  icone={<IconeCadenas />}
                   valeur={reponses.motDePasse}
                   onValeur={(motDePasse) => repondre('motDePasse', motDePasse)}
                   normaliser={(saisie) => (motDePasseValide(saisie) ? saisie : null)}

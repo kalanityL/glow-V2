@@ -1169,37 +1169,6 @@
 
 /* ── LA PAGE « MON COMPTE » ─────────────────────────────────────────────── */
 
-/* L'IDENTITÉ : le portrait — un bouton qui mène au volet de l'avatar — et le
-   prénom, qui s'édite sur place, là et nulle part ailleurs. */
-.compte__identite {
-  display: flex;
-  align-items: center;
-  gap: 16px;
-  margin: 2px 0 14px;
-}
-
-.compte__portrait-bouton {
-  flex: none;
-  padding: 0;
-  border: 0;
-  background: none;
-  cursor: pointer;
-}
-
-.compte__cercle {
-  width: 88px;
-  height: 88px;
-  border-radius: 50%;
-  overflow: hidden;
-  border: 2px solid var(--option-fond);
-  background: var(--option-choisi-fond);
-}
-
-.compte__cercle .avatar {
-  width: 100%;
-  height: 100%;
-}
-
 /* LE CARROUSEL : deux volets côte à côte, qui glissent d'un cran ; chacun
    défile pour lui-même. Il prend toute la hauteur laissée par l'entête,
    l'identité et les points. La barre de défilement horizontale ne se montre
@@ -1308,6 +1277,14 @@
   height: 18px;
 }
 
+/* L'icône est un bouton qui ouvre l'édition (2026-09-20) : rien de la
+   matière d'un bouton, la pastille seule. */
+.ligne__icone--bouton {
+  padding: 0;
+  border: 0;
+  cursor: pointer;
+}
+
 /* LA VALEUR ÉDITABLE SUR PLACE : la valeur, son unité à côté, et la règle en
    dessous quand une saisie est refusée. */
 .enligne {
@@ -1378,21 +1355,45 @@
   font-size: 12px;
 }
 
-/* LE PRÉNOM, à côté du portrait : la même valeur éditable, en grand, dans la
-   police du salut. */
-.enligne--grand .enligne__valeur,
-.enligne--grand .enligne__champ {
-  font-family: var(--font-salut);
-  font-weight: 600;
-  font-size: 20px;
+/* LE VOLET DE L'AVATAR : le portrait fixe en haut, « Valider » fixe en bas,
+   les réglages qui défilent entre les deux (2026-09-20). Le volet et sa
+   carte deviennent des colonnes ; la zone qui défile garde 4 px de
+   rembourrage rattrapés en marge, pour les liserés des réponses. */
+.carrousel__volet--fixe {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
 }
 
-/* Le portrait de la carte de l'avatar : au milieu, comme à l'onboarding, et
-   il change à chaque touche. */
-.compte__portrait {
+.carte--colonne {
+  flex: 1;
+  min-height: 0;
   display: flex;
-  justify-content: center;
+  flex-direction: column;
+}
+
+.carte__defilant {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  padding: 4px;
+  margin: 0 -4px;
+}
+
+/* Le portrait de la carte de l'avatar et, À CÔTÉ, « Valider » (2026-09-20,
+   « bouton valider à côté de l'avatar, pas en bas ») : figés en haut, les
+   réglages défilent dessous. Le portrait change à chaque touche. */
+.compte__portrait {
+  flex: none;
+  display: flex;
+  align-items: center;
+  gap: 16px;
   margin: 4px 0 8px;
+}
+
+.compte__valider {
+  flex: 1;
+  width: auto;
 }
 
 .compte__portrait .avatar {

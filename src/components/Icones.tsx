@@ -159,13 +159,18 @@ export function IconePalette() {
   );
 }
 
-/** Lucide `target` — le poids cible. */
+/** La cible à la flèche plantée de la V1 (`TargetArrowIcon`) — l'objectif
+    final (2026-09-20, « ajouter fleche plantée au centre de la cible »). Le
+    point du centre est plein. */
 export function IconeCible() {
   return (
     <Icone>
-      <circle cx="12" cy="12" r="10" />
-      <circle cx="12" cy="12" r="6" />
-      <circle cx="12" cy="12" r="2" />
+      <circle cx="10" cy="14" r="8" />
+      <circle cx="10" cy="14" r="4.5" />
+      <circle cx="10" cy="14" r="1.2" className="icone__plein" />
+      <path d="M10 14 L20.5 3.5" />
+      <path d="M16.2 5.2 L18.8 7.8" />
+      <path d="M18.2 3.2 L20.8 5.8" />
     </Icone>
   );
 }

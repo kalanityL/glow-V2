@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, type ReactNode } from 'react';
 
 interface ChampEnLigneProps {
   /** La valeur enregistrée, sous la forme où elle s'écrit à l'écran. */
@@ -28,8 +28,12 @@ interface ChampEnLigneProps {
   masque?: boolean;
   inputMode?: 'text' | 'decimal' | 'numeric';
   autoComplete?: string;
-  /** Une valeur qui se lit comme un titre — le prénom à côté du portrait. */
-  grand?: boolean;
+  /**
+   * L'icône de la donnée, dans sa pastille — UN BOUTON QUI OUVRE L'ÉDITION,
+   * comme la valeur (2026-09-20, « clique sur icone ouvre la modification du
+   * champ comme si on avait cliqué sur l'inline »).
+   */
+  icone?: ReactNode;
 }
 
 /**
@@ -56,8 +60,8 @@ export function ChampEnLigne({
   type = 'text',
   inputMode,
   autoComplete,
-  grand = false,
   masque = false,
+  icone,
 }: ChampEnLigneProps) {
   const [enEdition, setEnEdition] = useState(false);
   const [brouillon, setBrouillon] = useState(valeur);
@@ -90,10 +94,14 @@ export function ChampEnLigne({
     setEnEdition(false);
   };
 
-  const classe = grand ? 'enligne enligne--grand' : 'enligne';
-
   return (
-    <span className={classe}>
+    <>
+      {icone ? (
+        <button type="button" className="ligne__icone ligne__icone--bouton" aria-label={nom} onClick={ouvrir}>
+          {icone}
+        </button>
+      ) : null}
+    <span className="enligne">
       {enEdition ? (
         <input
           className="enligne__champ"
@@ -127,5 +135,6 @@ export function ChampEnLigne({
       {unite ? <span className="enligne__unite">{unite}</span> : null}
       {refuse && regle ? <span className="regle regle--manquee enligne__regle">{regle}</span> : null}
     </span>
+    </>
   );
 }

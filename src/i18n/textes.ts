@@ -206,9 +206,10 @@ export interface Textes {
     titre: string;
     /** Les onglets du carrousel, figés en bas — des mots courts. */
     onglets: Record<VoletCompte, string>;
-    /** Le nom du volet de l'avatar, dit à qui écoute la page (le portrait y
-     *  mène) ; les cartes n'ont plus de titre (2026-09-20). */
+    /** Le nom du volet de l'avatar, dit à qui écoute la page. */
     avatar: string;
+    /** Le bouton qui enregistre l'avatar composé (2026-09-20). */
+    valider: string;
     /** L'âge écrit, « 46 ans » : une tournure, par langue. */
     ageEcrit: (ans: number) => string;
     /**
@@ -414,6 +415,7 @@ const FR: Textes = {
       compte: 'Mon compte',
     },
     avatar: 'Mon avatar',
+    valider: 'Valider',
     ageEcrit: (ans) => `${ans} ans`,
     traitement: {
       titre: 'Mon traitement',
