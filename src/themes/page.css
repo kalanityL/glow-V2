@@ -321,11 +321,15 @@
   transition: box-shadow 150ms, background 150ms;
 }
 
+/* LE FOCUS EST UN TRÈS LÉGER CHANGEMENT (2026-09-21, sa charte des
+   formulaires : « pas de couleur criarde de focus souris : un tres leger
+   changement de couleur à la place ») : le fond et le filet s'assombrissent
+   d'un rien, plus d'anneau à l'accent — partout où l'on tape ou choisit. */
 .selecteur__boite--ouvert,
 .selecteur__boite:focus-visible {
   outline: none;
   background: var(--option-choisi-fond);
-  box-shadow: 0 0 0 2px var(--accent);
+  border-color: var(--bille-eteinte);
 }
 
 /* Le chevron, une seule fois pour le champ entier. */
@@ -496,7 +500,7 @@
 .champ-texte:focus {
   outline: none;
   background: var(--option-choisi-fond);
-  box-shadow: 0 0 0 2px var(--accent);
+  border-color: var(--bille-eteinte);
 }
 
 /* ── LES RÉPONSES D'UNE QUESTION ────────────────────────────────────────── */
@@ -1321,8 +1325,9 @@
   width: 36px;
   height: 36px;
   border-radius: 50%;
-  background: var(--option-choisi-fond);
-  color: var(--accent);
+  background: var(--option-fond);
+  /* Pas d'icône en couleur dans un formulaire (2026-09-21). */
+  color: var(--encre-chapeau);
 }
 
 .ligne__icone .icone {
@@ -1404,7 +1409,8 @@
 
 .enligne__champ:focus {
   outline: none;
-  box-shadow: 0 0 0 2px var(--accent);
+  background: var(--option-choisi-fond);
+  border-color: var(--bille-eteinte);
 }
 
 /* La règle, sur sa propre ligne sous la valeur. */
@@ -2188,18 +2194,23 @@
   flex: none;
 }
 
+/* SA CHARTE DES FORMULAIRES (2026-09-21, d'après son image « Ajouter un
+   poids » : « couleur sobre ; pas d'icone en couleur ; pas de ligne
+   separatrice ; pas de couleur criarde de focus souris ; pas de texte en
+   bleu ; utiliser meme police meme taille ; croix de fermeture et icone de
+   ligne titre pas en bleu ») : tout le formulaire est à l'encre et à ses
+   gris, dans la police et la taille du texte courant ; seul le bouton qui
+   valide est à l'accent. */
 .prise__entete {
   display: flex;
   align-items: center;
   gap: 10px;
-  padding-bottom: 12px;
-  border-bottom: 1px solid var(--option-filet);
 }
 
-.prise__entete .icone {
+.prise__entete > .icone {
   width: 20px;
   height: 20px;
-  color: var(--accent);
+  color: var(--encre-chapeau);
 }
 
 /* Le titre en capitales espacées, dans le bleu de la marque, comme la V1. */
@@ -2207,13 +2218,11 @@
   flex: 1;
   min-width: 0;
   margin: 0;
-  font-family: var(--font-display);
-  /* RIEN EN GRAS SUR LE FORMULAIRE (2026-09-20). */
+  /* Même police, même taille que le reste (2026-09-21) ; rien en gras. */
+  font-family: var(--font-body);
   font-weight: 500;
-  font-size: 13px;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-  color: var(--marque-degrade-debut);
+  font-size: 15px;
+  color: var(--encre);
 }
 
 /* LE NOM DU TRAITEMENT, sur sa ligne, entier (2026-09-20, « deplacer le
@@ -2252,8 +2261,6 @@
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 8px;
-  padding-bottom: 12px;
-  border-bottom: 1px solid var(--option-filet);
 }
 
 .prise__quand {
@@ -2275,7 +2282,7 @@
 .prise__quand .icone {
   width: 16px;
   height: 16px;
-  color: var(--accent);
+  color: var(--encre-chapeau);
 }
 
 /* La date et l'heure en édition : la boîte de choix, plus basse que celles
@@ -2289,7 +2296,7 @@
 .prise__moment .choix .icone {
   width: 16px;
   height: 16px;
-  color: var(--accent);
+  color: var(--encre-chapeau);
 }
 
 .prise__moment .choix__chevron {
@@ -2312,7 +2319,8 @@
 .prise__dose:focus,
 .prise__notes:focus {
   outline: none;
-  box-shadow: 0 0 0 2px var(--accent);
+  background: var(--option-choisi-fond);
+  border-color: var(--bille-eteinte);
 }
 
 /* Les liens du formulaire — « Autre dose », « Préréglages », « + Notes » —
@@ -2326,7 +2334,10 @@
   padding: 4px 4px;
   border: 0;
   background: none;
-  color: var(--accent);
+  /* Pas de texte en bleu (2026-09-21) : le lien est à l'encre, souligné. */
+  color: var(--encre);
+  text-decoration: underline;
+  text-underline-offset: 3px;
   font-family: var(--font-body);
   font-weight: 500;
   font-size: 15px;
@@ -2355,6 +2366,12 @@
   margin: -8px 0 0;
 }
 
+/* Dans un formulaire, ce qui se dit se dit en gris, jamais en bleu
+   (2026-09-21) — la question de la mise à jour, la règle refusée. */
+.prise .regle--manquee {
+  color: var(--encre-chapeau);
+}
+
 /* « Valider » au milieu, à sa largeur, la coche devant — comme la V1 ; en
    modification, « Annuler » à côté. */
 .prise__pied {
@@ -2370,10 +2387,10 @@
   gap: 8px;
   width: auto;
   padding: 12px 28px;
-  /* Rien en gras, le bouton compris (2026-09-20). */
+  /* Rien en gras, le bouton compris (2026-09-20) ; en bas de casse, dans la
+     taille du texte (2026-09-21). */
   font-weight: 500;
-  text-transform: uppercase;
-  letter-spacing: 0.04em;
+  font-size: 15px;
 }
 
 .prise__valider .icone {
@@ -2413,7 +2430,7 @@
 .choix:focus-visible {
   outline: none;
   background: var(--option-choisi-fond);
-  box-shadow: 0 0 0 2px var(--accent);
+  border-color: var(--bille-eteinte);
 }
 
 .choix__valeur {
@@ -2478,7 +2495,7 @@
 /* La valeur choisie : le fond des réponses choisies, l'accent. */
 .panneau__option--choisie {
   background: var(--option-choisi-fond);
-  color: var(--accent);
+  color: var(--encre);
 }
 
 .panneau__option:disabled {
@@ -2547,7 +2564,7 @@
   border: 0;
   border-radius: 50%;
   background: none;
-  color: var(--accent);
+  color: var(--encre);
   cursor: pointer;
 }
 
@@ -2591,12 +2608,12 @@
 }
 
 .calendrier__jour--aujourdhui {
-  border-color: var(--accent);
+  border-color: var(--bille-eteinte);
 }
 
 .calendrier__jour--choisi {
-  background: var(--accent);
-  color: var(--bouton-encre);
+  background: var(--encre);
+  color: var(--module-fond);
   opacity: 1;
 }
 

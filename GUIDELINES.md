@@ -258,6 +258,20 @@ thèmes ne repeignent pas, et qui ne sont pas dans les templates non plus.
   thème. Ce qui n'est pas un popup : un panneau déroulant qui se ferme au
   clic à côté (les roues des sélecteurs). Sur une sortie : **un bouton,
   jamais une redirection minutée**.
+- **LA CHARTE DES FORMULAIRES** (2026-09-21, d'après son image « Ajouter un
+  poids » : « utilise cette image comme guidlines de style pour TOUS les
+  formulaires de la v2 ») : **couleur sobre ; pas d'icône en couleur ; pas
+  de ligne séparatrice ; pas de couleur criarde de focus — un très léger
+  changement de couleur à la place ; pas de texte en bleu ; même police,
+  même taille partout ; la croix de fermeture et l'icône de la ligne de
+  titre pas en bleu.** Tout le formulaire est à l'encre et à ses gris, dans
+  la police et la taille du texte courant ; ce qui se dit (règle refusée,
+  question) se dit en gris ; les liens sont à l'encre, soulignés ; la valeur
+  choisie d'un panneau est à l'encre sur fond léger, le jour choisi du
+  calendrier plein à l'encre ; seul le bouton qui valide est à l'accent. Le
+  focus, partout où l'on tape ou choisit : le fond et le filet
+  s'assombrissent d'un rien, plus d'anneau. Vaut pour la page d'une prise,
+  d'une pesée, les lignes de « Mon compte », les champs de l'onboarding.
 - **AUCUN `select` NATIF, JAMAIS ; AUCUN CHOIX NE SORT DE L'ÉCRAN** (2026-09-20,
   règle absolue : « AUCUN SELECT NE DOIT JAMAIS DEPASSER DE L'ECRAN. Style
   des selects heure et calendrier et TOUS les selects, toujours : tout est
