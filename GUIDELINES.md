@@ -469,9 +469,13 @@ geste et à chaque frappe. **La graduation** (2026-09-20, « met les chiffres
 de la regle graduée au dessus des crans, tous les 5 kilos […] positionne
 une tige verticale noire, 4 fois plus grande qu'un cran, au milieu de
 l'écran, dont le bout supérieur se place sur la regle graduée ») : les
-nombres AU-DESSUS des crans, tous les cinq ; les crans sur une même ligne
-de base, les dizaines deux fois plus hauts que les cinq, les unités aux
-trois quarts ; et LA TIGE, seule chose foncée, fixe au milieu, quatre crans
+nombres AU-DESSUS des crans ; les crans sur une même ligne de base, en
+trois hauteurs (le double, l'entière, les trois quarts) ; **l'échelle est
+au dixième** (2026-09-20, « échelle de la regle : 10x plus précise : ce qui
+represente actuellement 10kg change pour representer à la place 1 kilo.
+faire figurer aussi les graduations des centiemes ») : un cran par dixième
+de kilo — le kilo a le grand cran, le demi-kilo le moyen, le dixième le
+petit, le nombre tous les demis (« 97 », « 97,5 ») ; et LA TIGE, seule chose foncée, fixe au milieu, quatre crans
 de haut, le bout supérieur sur la ligne de base — elle pend sous la règle
 et dit en permanence le poids que le chiffre affiche. Elle est posée sur
 le cadre, HORS du défilement : dedans, un élément absolu part avec la piste

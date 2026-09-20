@@ -143,8 +143,13 @@ export function BlocPoids({
     setSortie(true);
   }, [brouillon, valeur, onFermer]);
 
+  /* LES CRANS SONT DES DIXIÈMES (2026-09-20, « échelle de la regle : 10x plus
+     précise : ce qui represente actuellement 10kg change pour representer à
+     la place 1 kilo. faire figurer aussi les graduations des centiemes ») :
+     un cran par dixième d'unité, comptés en entiers de dixièmes pour ne pas
+     additionner des flottants. */
   const crans: number[] = [];
-  for (let v = POIDS_MIN; v <= POIDS_MAX[unite]; v += 1) crans.push(v);
+  for (let d = POIDS_MIN * 10; d <= POIDS_MAX[unite] * 10; d += 1) crans.push(d);
 
   const pied = sortie ? (
     <div className="boutons">
@@ -215,21 +220,18 @@ export function BlocPoids({
         <div className="graduation">
           <div className="graduation__defilement" ref={graduation} onScroll={surDefilement}>
             <div className="graduation__piste">
-              {crans.map((v) => (
+              {crans.map((d) => (
                 <span
-                  key={v}
+                  key={d}
                   className={`graduation__cran${
-                    v % 100 === 0
-                      ? ' graduation__cran--cent'
-                      : v % 10 === 0
-                        ? ' graduation__cran--dix'
-                        : v % 5 === 0
-                          ? ' graduation__cran--cinq'
-                          : ''
+                    d % 10 === 0 ? ' graduation__cran--kilo' : d % 5 === 0 ? ' graduation__cran--demi' : ''
                   }`}
                 >
-                  {/* Le nombre au-dessus de son cran, tous les cinq (2026-09-20). */}
-                  {v % 5 === 0 ? <span className="graduation__nombre">{v}</span> : null}
+                  {/* Le nombre au-dessus de son cran, tous les demis : l'entier
+                      seul sur le kilo, « 97,5 » sur le demi (2026-09-20). */}
+                  {d % 5 === 0 ? (
+                    <span className="graduation__nombre">{d % 10 === 0 ? d / 10 : ecrit((d / 10).toFixed(1))}</span>
+                  ) : null}
                 </span>
               ))}
             </div>

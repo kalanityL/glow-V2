@@ -1957,10 +1957,16 @@
    SA GÉOMÉTRIE VERTICALE (2026-09-20, « met les chiffres de la regle graduée
    au dessus des crans, tous les 5 kilos ; hauteur des crans de dizaines 2x
    plus grands que cran actuels ; crans de 5 kg : hauteur actuelle ; autres
-   crans : 3/4 »), de haut en bas : les nombres, tous les cinq ; les crans,
-   posés sur une même ligne de base et montant plus ou moins haut — l'unité
-   `--graduation-cran` est la hauteur d'un cran de cinq ; puis, sous cette
-   ligne, la place de LA TIGE. */
+   crans : 3/4 »), de haut en bas : les nombres ; les crans, posés sur une
+   même ligne de base et montant plus ou moins haut — l'unité
+   `--graduation-cran` est la hauteur du cran moyen ; puis, sous cette
+   ligne, la place de LA TIGE.
+
+   SON ÉCHELLE, DIX FOIS PLUS FINE le même jour (« ce qui represente
+   actuellement 10kg change pour representer à la place 1 kilo. faire
+   figurer aussi les graduations des centiemes ») : UN CRAN EST UN DIXIÈME
+   de kilo. Le kilo a le grand cran, le demi-kilo le moyen, le dixième le
+   petit ; le nombre tous les demis. */
 .graduation {
   --graduation-pas: 20px;
   --graduation-cran: 14px;
@@ -1992,10 +1998,10 @@
 }
 
 /* Un cran : sa marque au milieu, le pied sur la ligne de base commune (au
-   ras de la tige), la tête plus ou moins haute : l'unité aux trois quarts,
-   le cinq entier, la dizaine double. Les couleurs sont deux jetons du
-   thème : les unités claires, les cinq et les dizaines un peu plus
-   marqués. AUCUN CRAN N'EST FONCÉ (2026-09-20, « il n'y a qu'UN SEUL
+   ras de la tige), la tête plus ou moins haute : le dixième aux trois
+   quarts, le demi-kilo entier, le kilo double. Les couleurs sont deux
+   jetons du thème : les dixièmes clairs, les demis et les kilos un peu
+   plus marqués. AUCUN CRAN N'EST FONCÉ (2026-09-20, « il n'y a qu'UN SEUL
    endroit foncé, il est fixe, il correspond au centre de la règle, ça n'est
    pas un cran ») : le seul élément foncé est la tige. */
 .graduation__cran {
@@ -2015,18 +2021,17 @@
   background: var(--graduation-unite);
 }
 
-.graduation__cran--cinq::before {
+.graduation__cran--demi::before {
   height: var(--graduation-cran);
   background: var(--graduation-dizaine);
 }
 
-.graduation__cran--dix::before,
-.graduation__cran--cent::before {
+.graduation__cran--kilo::before {
   height: calc(var(--graduation-cran) * 2);
   background: var(--graduation-dizaine);
 }
 
-/* Le nombre, au-dessus de son cran, tous les cinq. */
+/* Le nombre, au-dessus de son cran, tous les demis. */
 .graduation__nombre {
   position: absolute;
   left: 50%;
@@ -2035,6 +2040,7 @@
   font-family: var(--font-body);
   font-size: 12px;
   line-height: 1;
+  white-space: nowrap;
   color: var(--encre-chapeau);
 }
 
