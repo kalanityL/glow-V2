@@ -1439,6 +1439,17 @@
   z-index: 1;
   -webkit-backdrop-filter: blur(6px);
   backdrop-filter: blur(6px);
+  /* La vitre apparaît en fondu, le temps que le tiroir monte. */
+  animation: vitre-apparait 240ms ease-out;
+}
+
+@keyframes vitre-apparait {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
 }
 
 /* LE TIROIR : un panneau qui monte depuis la barre du bas, par-dessus le bas
@@ -1458,6 +1469,22 @@
   /* Les coins sont découpés par `clip-path` et non par `border-radius` : c'est
      lui qui rogne aussi la photo de fond posée dessous (voir `::before`). */
   clip-path: inset(0 round 22px 22px 0 0);
+  /* IL GLISSE DEPUIS LE BAS DE L'ÉCRAN (2026-09-20, « le menu s'ouvre en
+     tiroir depuis le bas de l'écran ») — l'exception consignée à « un fondu
+     léger est le maximum ». C'est la POSITION qui est animée, pas une
+     transformation : une transformation ferait du tiroir le bloc conteneur
+     de la photo `fixed` posée dessous, qui se désalignerait le temps du
+     mouvement. 240 ms, une seule propriété nommée. */
+  animation: tiroir-monte 240ms ease-out;
+}
+
+@keyframes tiroir-monte {
+  from {
+    bottom: -100%;
+  }
+  to {
+    bottom: 0;
+  }
 }
 
 /* LE FOND DU TIROIR EST EN TRÈS LÉGÈRE TRANSPARENCE SUR LA PHOTO DE LA PAGE
