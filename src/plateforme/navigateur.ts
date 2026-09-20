@@ -103,3 +103,23 @@ export function defilementHorizontal(element: Element | null): { position: numbe
 export function defilerHorizontalA(element: Element | null, position: number, doux: boolean): void {
   element?.scrollTo({ left: position, behavior: doux ? 'smooth' : 'auto' });
 }
+
+/**
+ * JOUE UN SON, `nombre` fois (2026-09-20, les clics de la graduation du poids) :
+ * un clic par cran, espacés de quelques millisecondes pour qu'on les entende
+ * un à un plutôt qu'en un seul bruit ; au-delà de vingt d'un coup — une
+ * pichenette qui traverse la graduation —, on s'arrête à vingt. Le son est un
+ * FICHIER embarqué (`src/assets/sons/`), jamais distant. Un navigateur qui
+ * refuse le son (pas de geste préalable) se tait : rien ne se casse. En
+ * natif, le lecteur audio du téléphone derrière le même verbe.
+ */
+export function jouerSon(url: string, nombre = 1): void {
+  const fois = Math.min(nombre, 20);
+  for (let i = 0; i < fois; i += 1) {
+    setTimeout(() => {
+      new Audio(url).play().catch(() => {
+        /* Le son refusé se tait. */
+      });
+    }, i * 24);
+  }
+}

@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { POIDS_MAX, POIDS_MIN, poidsDepuisRapport, poidsDepuisSaisie, rapportDuPoids } from './mesures';
+import { POIDS_MAX, POIDS_MIN, cransFranchis, poidsDepuisRapport, poidsDepuisSaisie, rapportDuPoids } from './mesures';
 
 describe('poidsDepuisSaisie', () => {
   it('lit virgule ou point, et rend la forme stockée avec un point et une décimale', () => {
@@ -29,5 +29,15 @@ describe('la règle des poids', () => {
     expect(poidsDepuisRapport(rapportDuPoids('95.0', 'kg'), 'kg')).toBe('95.0');
     expect(poidsDepuisRapport(rapportDuPoids('82.4', 'kg'), 'kg')).toBe('82.4');
     expect(poidsDepuisRapport(rapportDuPoids('1500.0', 'lb'), 'lb')).toBe('1500.0');
+  });
+});
+
+describe('cransFranchis', () => {
+  it('compte les unités entières passées, dans les deux sens', () => {
+    expect(cransFranchis('94.9', '95.1')).toBe(1);
+    expect(cransFranchis('95.0', '95.9')).toBe(0);
+    expect(cransFranchis('90.0', '95.0')).toBe(5);
+    expect(cransFranchis('95.0', '90.0')).toBe(5);
+    expect(cransFranchis('95.0', '95.0')).toBe(0);
   });
 });

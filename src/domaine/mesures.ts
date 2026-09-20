@@ -94,3 +94,13 @@ export function rapportDuPoids(stocke: string, unite: UnitePoids): number {
   const valeur = Number(stocke);
   return (valeur - POIDS_MIN) / (POIDS_MAX[unite] - POIDS_MIN);
 }
+
+/**
+ * LES CRANS FRANCHIS entre deux poids stockés (2026-09-20, « autant de clic
+ * que de crans qui passent ») : un cran par unité entière — ceux que la
+ * graduation dessine. De 94,9 à 95,1 on en franchit un ; de 95,0 à 95,9,
+ * aucun ; de 90,0 à 95,0, cinq. Dans un sens comme dans l'autre.
+ */
+export function cransFranchis(avant: string, apres: string): number {
+  return Math.abs(Math.floor(Number(apres)) - Math.floor(Number(avant)));
+}
