@@ -2582,13 +2582,16 @@
    titre de page ne mange pas sur l'icone »). */
 .confirmation__coche {
   display: block;
-  width: 180px;
+  /* Moitié moins large qu'avant, et presque sans air au-dessus ni dessous
+     (2026-09-20, « diminuer sa taille par 2 ; réduire le vspace au dessus
+     et en dessous »). */
+  width: 90px;
   height: auto;
-  margin: 8px auto 0;
+  margin: 0 auto -8px;
 }
 
 .confirmation__titre {
-  margin: 4px 0 0;
+  margin: 0;
   text-align: center;
   font-family: var(--font-display);
   font-weight: 500;

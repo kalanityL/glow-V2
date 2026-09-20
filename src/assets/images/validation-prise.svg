@@ -1,4 +1,8 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="390" height="260" viewBox="0 0 390 260" fill="none">
+<svg xmlns="http://www.w3.org/2000/svg" width="324" height="210" viewBox="56 15 324 210" fill="none">
+  <!-- Fenêtre RECADRÉE sur le dessin (2026-09-20, « "trimmer" le svg pour
+       qu'elle soit parfaitement centrée ») : le disque est en (218, 120), les
+       éclats vont de x = 56 à 380 et de y = 15 à 225 — la fenêtre est
+       symétrique autour du disque, plus de vide à gauche. -->
   <defs>
     <radialGradient id="outerGlow" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse"
       gradientTransform="translate(218 120) rotate(90) scale(105)">
