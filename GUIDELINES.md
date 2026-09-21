@@ -747,15 +747,22 @@ mets pas les pictos endormissement / réveil ») : le nom, le jour en gris
 dessous (« Hier », « Aujourd'hui » ou la date, le calendrier au clic), le
 cadran avec l'arc du haut jusqu'à la boule (la boule seule, sans bout
 d'aiguille — « uniquement la boule, pas la petite barre intérieure ») — en
-dégradé LE LONG DE L'ARC, du gris du cercle à 0 jusqu'au bleu à la boule
-quel que soit l'angle (« il y manque un dégradé dans la coloration du
-cercle », « le dégradé doit partir de 0 et arriver jusqu'à la boule » —
-par segments de 4°, un dégradé linéaire ne suivant pas un cercle), relevé
-sur l'image —, l'heure en pastille avec son
-horloge — **aux couleurs de son image `horloge.png`, relevées au pixel et
-écrites telles quelles, pas en jetons du thème : exception consignée**
-(« on a dit que tu mets exactement les couleurs qd je te donne une
-capture ») — **« Hier » et « Aujourd'hui » valent pour les deux
+dégradé LE LONG DE L'ARC jusqu'à la boule quel que soit l'angle (« il y
+manque un dégradé dans la coloration du cercle », « le dégradé doit
+partir de 0 et arriver jusqu'à la boule » — par segments de 4°, un
+dégradé linéaire ne suivant pas un cercle), **l'arc et la boule dans les
+bleus des étoiles de la note depuis le soir du 2026-09-21** (« assorti le
+bleu degradé du cadran de montre et celui de la boule avec le bleu des
+étoiles de notation /5 » : du bleu clair au bleu foncé du « + »,
+`--menu-ajouter-debut` → `--menu-ajouter-fin`, chaque segment portant sa
+part du chemin en propriété personnalisée et la feuille la mêlant ; la
+boule au bleu foncé, cerclée du fond de la carte — le gris-vers-bleu et la
+boule bleu nuit relevés sur l'image ont vécu la journée) —, l'heure en
+pastille avec son horloge — **le reste du cadran (intérieur, cercle,
+repères, crans) et la pastille aux couleurs de son image `horloge.png`,
+relevées au pixel et écrites telles quelles, pas en jetons du thème :
+exception consignée** (« on a dit que tu mets exactement les couleurs qd
+je te donne une capture ») — **« Hier » et « Aujourd'hui » valent pour les deux
 bords, quelle que soit la date choisie** (« la règle pour aujourd'hui /
 hier reste : si date choisie est hier ou aujourd'hui, mettre hier ou
 aujourd'hui ») ; deux

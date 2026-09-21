@@ -3188,8 +3188,8 @@
 
 /* Son image, relevée au pixel : intérieur (250, 251, 253), cercle
    (220, 225, 235), repères (41, 59, 92), crans des minutes (196, 203, 219),
-   crans des heures (54, 72, 106), arc (146, 175, 241), boule (30, 45, 82)
-   cerclée de (250, 250, 250). */
+   crans des heures (54, 72, 106). L'arc et la boule, eux, suivent les
+   étoiles de la note depuis le soir du 2026-09-21 (voir plus bas). */
 .cadran__cercle {
   fill: #fafbfd;
   stroke: #dce1eb;
@@ -3204,19 +3204,26 @@
   pointer-events: none;
 }
 
-/* L'arc du haut à la boule, et la boule cerclée de blanc (son dessin). */
-/* L'arc, par segments qui portent chacun leur couleur (du gris du cercle
-   au bleu, le long de l'arc) ; les bouts droits, pour qu'ils se joignent. */
+/* L'ARC ET LA BOULE, ASSORTIS AUX ÉTOILES DE LA NOTE (2026-09-21 au soir,
+   « assorti le bleu degradé du cadran de montre et celui de la boule avec
+   le bleu des étoiles de notation /5 ») : le dégradé du « + », celui des
+   étoiles pleines — du bleu clair en haut du cadran au bleu foncé à la
+   boule, LE LONG DE L'ARC, par segments dont chacun porte sa part du
+   chemin (`--part`, 0 à 1, posée par le composant) ; la boule est le bleu
+   foncé, cerclée du fond de la carte. L'arc et la boule ne sont plus aux
+   couleurs de `horloge.png` ; le reste du cadran (intérieur, cercle,
+   repères, crans) y est toujours. Les bouts des segments sont droits pour
+   qu'ils se joignent. */
 .cadran__arc {
   fill: none;
+  stroke: color-mix(in srgb, var(--menu-ajouter-fin) calc(var(--part, 1) * 100%), var(--menu-ajouter-debut));
   stroke-width: 3;
   stroke-linecap: butt;
 }
 
-
 .cadran__boule {
-  fill: #1e2d52;
-  stroke: #fafafa;
+  fill: var(--menu-ajouter-fin);
+  stroke: var(--module-fond);
   stroke-width: 2;
 }
 
