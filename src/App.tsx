@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useParcours } from './app/useParcours';
+import { useJournaux } from './app/useJournaux';
 import { useTextes } from './i18n/useTextes';
 import { Onboarding } from './screens/Onboarding';
 import { Accueil } from './screens/Accueil';
@@ -57,11 +58,11 @@ export default function App() {
   /* LA PAGE D'UNE PRISE (2026-09-20, « ajouter->injection : envoie vers une
      page ultra simple avec uniquement le formulaire d'ajout d'injection de
      la v1 ») : la case « Traitement » du tiroir du « + » y mène, quand un
-     traitement est répondu. LES PRISES VALIDÉES SONT GARDÉES ICI, EN
-     MÉMOIRE SEULEMENT — ni journal ni enregistrement sur l'appareil encore,
-     et l'écran qui suit la validation attend le sien (« je te donnerai
-     l'écran de validation ensuite ») : validée, la prise ramène à l'accueil. */
-  const [prises, setPrises] = useState<Prise[]>([]);
+     traitement est répondu. */
+  /* LES JOURNAUX SUR L'APPAREIL (2026-09-21, « les poids et injections
+     saisies disparaissent ?? ») : relus au départ, écrits à chaque
+     changement (`useJournaux`) — ils ne vivent plus en mémoire seulement. */
+  const { prises, pesees, setPrises, setPesees } = useJournaux();
   /* LA MODIFICATION DE LA DERNIÈRE PRISE (2026-09-20, « clic sur bloc
      récapitulatif : réouvre le formulaire avec les données enregistrées
      par defaut ») : le formulaire part d'elle, « Mettre à jour » la
@@ -80,11 +81,9 @@ export default function App() {
   };
 
   /* LES PESÉES (2026-09-21, « ajouter balance : idem que ajouter
-     injection ») : en mémoire seulement, comme les prises. Le poids proposé
-     d'avance est celui de la pesée la plus proche d'aujourd'hui qui n'est
-     pas dans le futur, sinon le poids du profil. Une pesée par jour : la
-     nouvelle remplace celle du même jour. */
-  const [pesees, setPesees] = useState<Pesee[]>([]);
+     injection ») : le poids proposé d'avance est celui de la pesée la plus
+     proche d'aujourd'hui qui n'est pas dans le futur, sinon le poids du
+     profil. Une pesée par jour : la nouvelle remplace celle du même jour. */
   const [dernierePesee, setDernierePesee] = useState<Pesee | null>(null);
   const aujourdhui = dateLocale(new Date());
   const poidsPropose = poidsLePlusRecent(pesees, aujourdhui) ?? parcours.reponses.poids;

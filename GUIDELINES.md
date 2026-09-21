@@ -532,8 +532,12 @@ dose » tapée ; « + Notes » ; « Valider » au milieu. Une dose absente ou
 nulle est refusée et la règle se dit. **Deux prises par jour au plus**
 (SPEC, règle reprise avec le formulaire, 2026-09-21) : la troisième
 consignée sur une journée pleine remplace la dernière de cette journée
-(`domaine/prises.ts`, `avecLaPrise`). **Les prises validées ne sont gardées
-qu'en mémoire, dans `App`** : ni journal, ni enregistrement sur l'appareil.
+(`domaine/prises.ts`, `avecLaPrise`). **Les prises et les pesées sont
+enregistrées sur l'appareil** (2026-09-21, « tu effaces toutes les
+modifications qd je reload ? ») : `app/journaux.ts`, même forme que les
+réponses — une clé, une version, chaque ligne relue vérifiée et une ligne
+abîmée écartée sans perdre le journal —, relus au départ et écrits à chaque
+changement (`app/useJournaux.ts`).
 
 **L'écran de confirmation d'une prise** (2026-09-20, son image, puis
 « ecran de confirmation : que souhaitez vous -> vous pouvez maintenant :
@@ -585,8 +589,8 @@ de la prise (« exactement meme principe »), `PageConfirmation` devenu
 générique : « Pesée enregistrée ! » / « Pesée mise à jour ! », la carte
 (poids, date et heure) qui rouvre le formulaire en modification, puis
 Ajouter un autre élément, Voir dans le journal, Évolution du poids, Retour à
-l'accueil. Les pesées ne sont gardées qu'en mémoire, comme les prises. Pas
-encore : les mensurations de la V1.
+l'accueil. Les pesées sont enregistrées sur l'appareil avec les prises
+(`app/journaux.ts`). Pas encore : les mensurations de la V1.
 
 **Toute page de l'application porte la barre du bas** (`BarreDuBas`, avec
 ses deux tiroirs) et, hors de l'accueil, **l'entête des pages**
