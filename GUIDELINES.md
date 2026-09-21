@@ -1028,11 +1028,13 @@ second bouton avec le G de Google dessiné sur place (ses couleurs dans
 `dessins.css`), la note « Les comptes sont créés par l'administratrice —
 pas d'inscription libre. ». La fenêtre de Google (`signInWithPopup`, celle
 de la V1) n'est pas un popup de l'application : c'est la page de Google,
-hors de l'écran. Le domaine `glow-private-v2.web.app` est un site Hosting
-du projet : Firebase l'autorise de lui-même pour la connexion Google —
-sinon le refus « Ce domaine n'est pas autorisé dans la console Firebase »
-le dirait, et il faudrait l'ajouter dans Authentication → Settings →
-Authorized domains. Rien d'autre ne passe par Firebase : les données
+hors de l'écran. **Un site Hosting supplémentaire n'est PAS autorisé de lui-même
+pour la connexion Google** (constaté le 2026-09-21 au soir : la fenêtre
+Google se refermait aussitôt, le domaine manquait) : elle a ajouté
+`glow-private-v2.web.app` dans la console, Authentication → Settings →
+Authorized domains, et ça marche. Tout nouveau domaine s'ajoute là, à la
+main ; la liste se lit sans identifiants par le point public
+`getProjectConfig` de l'Identity Toolkit avec la clé d'API. Rien d'autre ne passe par Firebase : les données
 restent sur l'appareil.
 
 **L'avatar modulaire, essayé et retiré le 2026-09-21 au soir.** Un agent

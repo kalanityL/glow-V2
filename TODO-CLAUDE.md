@@ -58,11 +58,12 @@ tout dans GUIDELINES § 4, « Le verrou de connexion ». Armé en production
 seulement ; en local, `npm run build` puis `npx vite preview --port 4173`
 pour voir l'écran de connexion. Vérifié au rendu, et un faux mot de passe
 reçoit bien « E-mail ou mot de passe incorrect. » du vrai projet.
-- [ ] À vérifier par elle, en ligne : « Continuer avec Google » sur
-      `glow-private-v2.web.app` — si le refus « Ce domaine n'est pas
-      autorisé » apparaît, ajouter le domaine dans la console (Authentication
-      → Settings → Authorized domains). L'e-mail + mot de passe, lui, ne
-      dépend pas de cette liste.
+- [x] « Continuer avec Google » en ligne : la fenêtre Google se refermait
+      aussitôt — `glow-private-v2.web.app` n'était pas dans les domaines
+      autorisés du projet (lu par le point public `getProjectConfig` avec
+      la clé d'API). Elle l'a ajouté dans la console le 21/09 au soir :
+      « fait - ça marche ». Un site Hosting supplémentaire n'est PAS
+      autorisé de lui-même : tout nouveau domaine s'ajoute à la main.
 - L'HÉBERGEMENT : Firebase Hosting (Google), projet `glow-private`, site
   `glow-private-v2`, déployé depuis sa machine par `firebase deploy`.
 
