@@ -8,16 +8,18 @@ import { Onboarding } from './screens/Onboarding';
 import { Accueil } from './screens/Accueil';
 import { Compte } from './screens/Compte';
 import { PagePrise } from './screens/PagePrise';
-import { PageConfirmation, ENTREES_PESEE, ENTREES_PRISE } from './screens/PageConfirmation';
+import { PageConfirmation, ENTREES_PESEE, ENTREES_PRISE, ENTREES_SOMMEIL } from './screens/PageConfirmation';
 import { PagePesee } from './screens/PagePesee';
-import { IconeBalance, IconeCalendrier, IconeComprime, IconeHorloge, IconeLieu, IconeSeringue } from './components/Icones';
+import { PageSommeil } from './screens/PageSommeil';
+import { IconeBalance, IconeCalendrier, IconeCoche, IconeComprime, IconeHorloge, IconeLieu, IconeSeringue, IconeSommeil } from './components/Icones';
 import { TRAITEMENTS } from './domaine/traitements';
 import { UNITES_DU_SYSTEME, poidsDepuisKg } from './domaine/unites';
-import { dateLocale, formaterDateLongue } from './domaine/dates';
+import { dateLocale, formaterDateCourte, formaterDateLongue } from './domaine/dates';
 import { peseeDuJour, poidsLePlusRecent } from './domaine/pesees';
 import { detecterLangue } from './i18n/useTextes';
 import type { ModuleId } from './app/modules';
-import type { InjectionLog, WeightLog } from './donnees/v1';
+import type { InjectionLog, SleepLog, WeightLog } from './donnees/v1';
+import { dureeEcrite, dureeMinutes } from './domaine/sommeils';
 import { traitementDepuisBrand } from './donnees/conversions';
 import type { FondId } from './app/fonds';
 /* La mise en page d'abord, les jetons des thèmes ensuite : les feuilles de
@@ -54,7 +56,7 @@ export default function App() {
      ouverte par le portrait ou par le tiroir du menu. Le bouton « retour » de la barre y ramène à l'accueil —
      c'est pour cela que la page vit ici, à côté du parcours, et non dans
      l'accueil. (Le menu principal, lui, est un tiroir de l'accueil.) */
-  const [page, setPage] = useState<'accueil' | 'compte' | 'prise' | 'confirmation' | 'pesee' | 'confirmation-pesee'>(
+  const [page, setPage] = useState<'accueil' | 'compte' | 'prise' | 'confirmation' | 'pesee' | 'confirmation-pesee' | 'sommeil' | 'confirmation-sommeil'>(
     'accueil',
   );
 
@@ -113,6 +115,10 @@ export default function App() {
       setModification(false);
       setPage('pesee');
     }
+    if (module === 'sommeil') {
+      setModification(false);
+      setPage('sommeil');
+    }
   };
 
   /* LES PESÉES (2026-09-21, « ajouter balance : idem que ajouter
@@ -120,6 +126,16 @@ export default function App() {
      proche d'aujourd'hui qui n'est pas dans le futur, sinon le poids du
      profil. Une pesée par jour : la nouvelle remplace celle du même jour. */
   const [dernierePesee, setDernierePesee] = useState<WeightLog | null>(null);
+  /* LES SOMMEILS (2026-09-21, « fais moi l'écran nouveau sommeil et
+     confirmation ») : la table `sleepLogs` de la V1. */
+  const [dernierSommeil, setDernierSommeil] = useState<SleepLog | null>(null);
+  const validerSommeil = (sommeil: SleepLog) => {
+    journaux.consignerSommeil(sommeil);
+    setDernierSommeil(sommeil);
+    setMiseAJour(modification);
+    setModification(false);
+    setPage('confirmation-sommeil');
+  };
   const aujourdhui = dateLocale(new Date());
   const langue = detecterLangue();
   const unites = UNITES_DU_SYSTEME[parcours.reponses.systeme];
@@ -263,6 +279,58 @@ export default function App() {
               onAnnuler={() => {
                 setModification(false);
                 setPage('confirmation-pesee');
+              }}
+              onAccueil={() => setPage('accueil')}
+              onOuvrirCompte={() => setPage('compte')}
+              onAjouter={ajouter}
+              ajoutTraitement={ajoutTraitement}
+              fond={fond}
+            />
+          ) : page === 'sommeil' ? (
+            <PageSommeil
+              sommeils={journaux.sommeils}
+              forme={parcours.reponses.formeTraitement}
+              initiale={modification && dernierSommeil ? dernierSommeil : undefined}
+              onValider={validerSommeil}
+              onAnnuler={() => {
+                setModification(false);
+                setPage('confirmation-sommeil');
+              }}
+              onAccueil={() => setPage('accueil')}
+              onOuvrirCompte={() => setPage('compte')}
+              onAjouter={ajouter}
+              ajoutTraitement={ajoutTraitement}
+              fond={fond}
+            />
+          ) : page === 'confirmation-sommeil' && dernierSommeil ? (
+            <PageConfirmation
+              titrePage={textes.accueil.modules.sommeil}
+              titre={miseAJour ? textes.confirmation.titreSommeilMiseAJour : textes.confirmation.titreSommeil}
+              lignes={[
+                {
+                  icone: <IconeSommeil />,
+                  nom: textes.sommeil.natures[dernierSommeil.kind],
+                  valeur: dureeEcrite(dureeMinutes(dernierSommeil)),
+                },
+                {
+                  icone: <IconeCalendrier />,
+                  nom: `${textes.sommeil.endormissement} · ${formaterDateCourte(dernierSommeil.bedDate, langue)}`,
+                  valeur: dernierSommeil.bedTime,
+                  iconeValeur: <IconeHorloge />,
+                },
+                {
+                  icone: <IconeCalendrier />,
+                  nom: `${textes.sommeil.reveil} · ${formaterDateCourte(dernierSommeil.date, langue)}`,
+                  valeur: dernierSommeil.time,
+                  iconeValeur: <IconeHorloge />,
+                },
+                { icone: <IconeCoche />, nom: textes.sommeil.qualites[dernierSommeil.quality] ?? '', valeur: `${dernierSommeil.quality} / 5` },
+              ]}
+              entrees={ENTREES_SOMMEIL}
+              forme={parcours.reponses.formeTraitement}
+              onModifier={() => {
+                setModification(true);
+                setPage('sommeil');
               }}
               onAccueil={() => setPage('accueil')}
               onOuvrirCompte={() => setPage('compte')}

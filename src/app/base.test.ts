@@ -20,12 +20,17 @@ describe('lireBase', () => {
         { id: 'inj-1', date: '2026-09-20', time: '08:30', dose: 0.25, site: 'abdomen_gauche', brand: 'ozempic' },
         { id: 'inj-2', date: '2026-09-20', time: '08:30', dose: 'beaucoup', site: 'abdomen_gauche' },
       ],
-      sleepLogs: [{ id: 's-1', kind: 'nuit' }],
+      sleepLogs: [
+        { id: 's-1', kind: 'nuit' },
+        { id: 's-2', date: '2026-09-12', time: '07:00', bedDate: '2026-09-11', bedTime: '23:00', kind: 'nuit', quality: 3 },
+      ],
+      sportLogs: [{ id: 'sp-1', sport: 'Marche' }],
     });
     const base = lireBase(texte);
     expect(base.profile).toMatchObject({ name: 'Camille', glp1Brand: 'ozempic', age: 42 });
     expect(base.weightHistory.map((p) => p.id)).toEqual(['w-1']);
     expect(base.injectionHistory.map((p) => p.id)).toEqual(['inj-1']);
-    expect(base.sleepLogs).toEqual([{ id: 's-1', kind: 'nuit' }]);
+    expect(base.sleepLogs?.map((s) => s.id)).toEqual(['s-2']);
+    expect(base.sportLogs).toEqual([{ id: 'sp-1', sport: 'Marche' }]);
   });
 });

@@ -141,6 +141,25 @@ export interface InjectionLog {
   brand?: string;
 }
 
+/** Une nuit ou une sieste (`SleepLog`) : DEUX INSTANTS COMPLETS, jour et
+    heure de l'endormissement, jour et heure du réveil — la date de la ligne
+    est celle du réveil ; la durée n'est jamais stockée ; la qualité de 0 à
+    5, toujours écrite. */
+export type SleepKind = 'nuit' | 'sieste';
+
+export interface SleepLog {
+  id: string;
+  /** Le jour du réveil. */
+  date: string;
+  /** L'heure du réveil. */
+  time: string;
+  bedDate: string;
+  bedTime: string;
+  kind: SleepKind;
+  quality: number;
+  notes?: string;
+}
+
 /** Une journée marquée (`DailyLog`) : sa seule présence à une date. */
 export interface DailyLog {
   id: string;
@@ -159,7 +178,7 @@ export interface AppData {
   stepLogs?: unknown[];
   sportLogs?: unknown[];
   meTimeLogs?: unknown[];
-  sleepLogs?: unknown[];
+  sleepLogs?: SleepLog[];
   [autre: string]: unknown;
 }
 
@@ -169,6 +188,7 @@ export const STARTING_WEIGHT_LOG_ID = 'starting-weight-log';
 /** Les identifiants de la V1 : un préfixe et l'horloge (`V1/src/app/useAppData.ts`). */
 export const idPesee = (): string => `w-${Date.now()}`;
 export const idPrise = (): string => `inj-${Date.now()}`;
+export const idSommeil = (): string => `sleep-${Date.now()}`;
 
 /** Le profil d'usine de la V1 (SPEC § « Le profil », colonne « d'usine »). */
 export const PROFIL_USINE: UserProfile = {

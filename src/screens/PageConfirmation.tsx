@@ -23,13 +23,14 @@ import { IndiceDefilement } from '../components/IndiceDefilement';
 /** Les entrées possibles de l'écran ; chaque écran dit lesquelles, DANS
     SON ORDRE (2026-09-20, « nouvelle element : en 1er ») : ajouter
     d'abord, l'accueil en dernier. */
-export const ENTREES_CONFIRMATION = ['ajouter', 'journal', 'concentration', 'evolution', 'evolutionPoids', 'accueil'] as const;
+export const ENTREES_CONFIRMATION = ['ajouter', 'journal', 'concentration', 'evolution', 'evolutionPoids', 'evolutionSommeil', 'accueil'] as const;
 export type EntreeConfirmation = (typeof ENTREES_CONFIRMATION)[number];
 
 /** Les entrées de l'écran d'une prise, et celles d'une pesée (2026-09-21,
     « page de confirmation : exactement meme principe »). */
 export const ENTREES_PRISE: readonly EntreeConfirmation[] = ['ajouter', 'journal', 'concentration', 'evolution', 'accueil'];
 export const ENTREES_PESEE: readonly EntreeConfirmation[] = ['ajouter', 'journal', 'evolutionPoids', 'accueil'];
+export const ENTREES_SOMMEIL: readonly EntreeConfirmation[] = ['ajouter', 'journal', 'evolutionSommeil', 'accueil'];
 
 const ICONES: Record<EntreeConfirmation, () => ReactElement> = {
   ajouter: IconePlus,
@@ -37,6 +38,7 @@ const ICONES: Record<EntreeConfirmation, () => ReactElement> = {
   concentration: IconeCourbe,
   evolution: IconeAnalyse,
   evolutionPoids: IconeAnalyse,
+  evolutionSommeil: IconeAnalyse,
   accueil: IconeEtoiles,
 };
 

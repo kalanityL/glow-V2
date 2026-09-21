@@ -3010,3 +3010,78 @@
 .tiroir > .indice-defilement {
   bottom: 10px;
 }
+
+/* ── LA PAGE D'UN SOMMEIL (2026-09-21) : deux colonnes Endormissement /
+   Réveil, la durée déduite, la note en étoiles. ─────────────────────── */
+.sommeil__colonnes {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+
+.sommeil__colonne {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+}
+
+.sommeil__colonne .prise__etiquette {
+  margin: 0;
+}
+
+.sommeil__duree {
+  margin: 0;
+  text-align: center;
+  font-family: var(--font-body);
+  font-size: 15px;
+  color: var(--encre-chapeau);
+}
+
+.sommeil__duree span {
+  color: var(--encre);
+  font-variant-numeric: tabular-nums;
+}
+
+.sommeil__qualite {
+  margin: -8px 0 0;
+  text-align: center;
+  font-family: var(--font-body);
+  font-size: 13px;
+  color: var(--encre-chapeau);
+}
+
+/* LES CINQ ÉTOILES (2026-09-21, « système d'étoiles qu'on peut cliquer ou
+   slider pour remplir ; par défaut 3 remplies ») : une rangée qui reçoit
+   le doigt d'un bout à l'autre ; une étoile vide est un contour gris, une
+   pleine est de l'or des étoiles de l'accueil. */
+.etoiles-note {
+  display: flex;
+  justify-content: center;
+  gap: 6px;
+  margin: -6px 0 0;
+  padding: 4px 0;
+  touch-action: none;
+  cursor: pointer;
+  user-select: none;
+}
+
+.etoiles-note:focus-visible {
+  outline: none;
+}
+
+.etoiles-note__etoile {
+  width: 34px;
+  height: 34px;
+  fill: transparent;
+  stroke: var(--option-filet);
+  stroke-width: 1.5;
+  stroke-linejoin: round;
+  transition: fill 120ms, stroke 120ms;
+}
+
+.etoiles-note__etoile--pleine {
+  fill: #f2c14e;
+  stroke: #e0ad2f;
+}

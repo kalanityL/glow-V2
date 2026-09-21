@@ -1,4 +1,4 @@
-import { CLE_BASE, donneesVides, type AppData, type InjectionLog, type UserProfile, type WeightLog } from '../donnees/v1';
+import { CLE_BASE, donneesVides, type AppData, type InjectionLog, type SleepLog, type UserProfile, type WeightLog } from '../donnees/v1';
 import { enregistrer, lireEnregistre } from '../plateforme/navigateur';
 
 /**
@@ -39,6 +39,17 @@ function priseLue(x: unknown): InjectionLog | null {
   return p as unknown as InjectionLog;
 }
 
+function sommeilLu(x: unknown): SleepLog | null {
+  if (typeof x !== 'object' || x === null) return null;
+  const s = x as Record<string, unknown>;
+  if (typeof s.id !== 'string') return null;
+  for (const c of ['date', 'bedDate']) if (typeof s[c] !== 'string' || !DATE.test(s[c] as string)) return null;
+  for (const c of ['time', 'bedTime']) if (typeof s[c] !== 'string' || !HEURE.test(s[c] as string)) return null;
+  if (s.kind !== 'nuit' && s.kind !== 'sieste') return null;
+  if (typeof s.quality !== 'number' || !Number.isFinite(s.quality)) return null;
+  return s as unknown as SleepLog;
+}
+
 /** Le document relu et vérifié, ou une base vide. */
 export function lireBase(texte: string | null = lireEnregistre(CLE_BASE)): AppData {
   const vide = donneesVides();
@@ -58,6 +69,7 @@ export function lireBase(texte: string | null = lireEnregistre(CLE_BASE)): AppDa
     weightHistory: Array.isArray(d.weightHistory) ? d.weightHistory.map(peseeLue).filter((p): p is WeightLog => p !== null) : [],
     dailyLogs: Array.isArray(d.dailyLogs) ? (d.dailyLogs as AppData['dailyLogs']) : [],
     injectionHistory: Array.isArray(d.injectionHistory) ? d.injectionHistory.map(priseLue).filter((p): p is InjectionLog => p !== null) : [],
+    sleepLogs: Array.isArray(d.sleepLogs) ? d.sleepLogs.map(sommeilLu).filter((s): s is SleepLog => s !== null) : [],
   };
 }
 

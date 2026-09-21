@@ -6,6 +6,7 @@ import type {
 } from '../domaine/avatar';
 import type { Forme } from '../domaine/traitements';
 import type { Zone } from '../domaine/prises';
+import type { SleepKind } from '../donnees/v1';
 import type { EntreeConfirmation } from '../screens/PageConfirmation';
 import type { Systeme, Unite } from '../domaine/unites';
 import type { Langue } from './langues';
@@ -293,6 +294,28 @@ export interface Textes {
     /** Le message de la V1, avec la date écrite, et la question. */
     remplacer: (date: string) => string;
   };
+  /** LA PAGE D'UN SOMMEIL (2026-09-21, « fais moi l'écran nouveau sommeil et
+   *  confirmation ») : le formulaire de la V1 (`SleepForm.tsx`) et ses
+   *  règles (`useSleepForm.ts`), dans ses mots. */
+  sommeil: {
+    titre: string;
+    titreModification: string;
+    natures: Record<SleepKind, string>;
+    endormissement: string;
+    reveil: string;
+    duree: string;
+    /** « Notez votre nuit » / « Notez votre sieste » (2026-09-21). */
+    qualite: (nature: SleepKind) => string;
+    /** Les six crans, de 0 à 5. */
+    qualites: readonly string[];
+    refusDureeNulle: string;
+    questionLongue: (nature: SleepKind, duree: string) => string;
+    refusRecouvrement: (plage: string, modification: boolean) => string;
+    refusPlafond: (plafond: number) => string;
+    /** Le bouton, la question des douze heures armée. */
+    confirmerChoix: string;
+    mettreAJour: string;
+  };
   /**
    * L'ÉCRAN DE CONFIRMATION D'UNE PRISE (2026-09-20, son image) : le titre
    * selon la forme, le sous-titre, la ligne de la zone, le titre de la liste
@@ -307,6 +330,8 @@ export interface Textes {
     /** Les titres de l'écran d'une pesée (2026-09-21). */
     titrePesee: string;
     titrePeseeMiseAJour: string;
+    titreSommeil: string;
+    titreSommeilMiseAJour: string;
     sousTitre: string;
     zone: string;
     maintenant: string;
@@ -583,6 +608,26 @@ const FR: Textes = {
     titreModification: 'Modifier la pesée',
     remplacer: (date) => `Une saisie existe déjà le ${date}. La mettre à jour ?`,
   },
+  sommeil: {
+    titre: 'Nouveau sommeil',
+    titreModification: 'Modifier le sommeil',
+    natures: { nuit: 'Nuit', sieste: 'Sieste' },
+    endormissement: 'Endormissement',
+    reveil: 'Réveil',
+    duree: 'Durée :',
+    qualite: (nature) => (nature === 'nuit' ? 'Notez votre nuit' : 'Notez votre sieste'),
+    qualites: ['Très mauvaise', 'Mauvaise', 'Passable', 'Correcte', 'Bonne', 'Excellente'],
+    refusDureeNulle: 'L’heure de réveil et l’heure d’endormissement sont identiques : aucune durée de sommeil à enregistrer.',
+    questionLongue: (nature, duree) =>
+      `Êtes-vous sûre de vouloir enregistrer ${nature === 'nuit' ? 'une nuit' : 'une sieste'} de ${duree} ? Sinon, vérifiez les dates et heures d’endormissement et de réveil.`,
+    refusRecouvrement: (plage, modification) =>
+      `Deux sommeils ne peuvent pas se recouvrir : cette plage recoupe le sommeil déjà enregistré ${plage}. ${
+        modification ? 'La modification n’a pas été enregistrée : la ligne garde ses valeurs d’avant.' : 'Rien n’a été enregistré.'
+      }`,
+    refusPlafond: (plafond) => `Limite atteinte pour cette journée : ${plafond} saisies de sommeil au maximum. Rien n’a été enregistré.`,
+    confirmerChoix: 'Confirmer mon choix',
+    mettreAJour: 'Mettre à jour le sommeil',
+  },
   confirmation: {
     titre: {
       injection: 'Injection enregistrée !',
@@ -594,6 +639,8 @@ const FR: Textes = {
     },
     titrePesee: 'Pesée enregistrée !',
     titrePeseeMiseAJour: 'Pesée mise à jour !',
+    titreSommeil: 'Sommeil enregistré !',
+    titreSommeilMiseAJour: 'Sommeil mis à jour !',
     sousTitre: 'Votre suivi est à jour.',
     zone: 'Zone d’injection',
     maintenant: 'Vous pouvez maintenant :',
@@ -605,6 +652,7 @@ const FR: Textes = {
       concentration: 'Concentration sanguine',
       evolution: 'Évolution du traitement',
       evolutionPoids: 'Évolution du poids',
+      evolutionSommeil: 'Évolution du sommeil',
       accueil: 'Retour à l’accueil',
     },
   },

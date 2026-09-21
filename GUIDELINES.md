@@ -700,6 +700,27 @@ de la ligne du jour qui garde identité, drapeau et mensurations ; la pesée
 de départ la plus ancienne, reconnue à son drapeau). Pas encore : les
 mensurations de la V1.
 
+**La page d'un sommeil** (2026-09-21, « fais moi l'écran nouveau sommeil
+et confirmation ») : la case « Sommeil » du tiroir du « + » y mène. Le
+formulaire de la V1 (`SleepForm.tsx`, `useSleepForm.ts`) et ses règles
+(SPEC § « Le sommeil ») : la nature (Nuit / Sieste, deux boutons) ; deux
+instants complets, Endormissement et Réveil, chacun son jour et son heure
+sur deux colonnes — une nuit part de la veille 23:00 → 07:00, une sieste du
+jour même 14:00 → 15:00, changer de nature ne déplace les instants que s'ils
+sont encore ceux proposés ; la durée déduite (« 8 h », « 7 h 45 »), jamais
+saisie ; **la note en étoiles** (« notez votre nuit ou notez votre sieste :
+5 étoiles qu'on peut cliquer ou slider pour remplir, par défaut 3 ») — la
+qualité de 0 à 5 de la V1, son mot dessous ; les notes ; « Valider ». Trois
+jugements au clic, dans l'ordre et les mots de la V1 : durée nulle,
+refusée ; plus de douze heures, une question et le bouton « Confirmer mon
+choix », toute retouche la désarme ; recouvrement d'un sommeil enregistré,
+refusé en nommant la plage. Quinze par date de réveil au plus, refusé.
+Écrit dans `sleepLogs` (`domaine/sommeils.ts`, testé). Sa confirmation est
+le même écran : « Sommeil enregistré ! » / « Sommeil mis à jour ! », la
+carte (nature et durée, endormissement, réveil, qualité) qui rouvre le
+formulaire en modification, puis Ajouter, Journal, Évolution du sommeil,
+Accueil.
+
 **Toute page de l'application porte la barre du bas** (`BarreDuBas`, avec
 ses deux tiroirs) et, hors de l'accueil, **l'entête des pages**
 (`EntetePage` : la marque en petit et les deux outils sur une ligne, le

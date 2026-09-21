@@ -1,4 +1,5 @@
-import type { AppData, InjectionLog, WeightLog } from '../donnees/v1';
+import type { AppData, InjectionLog, SleepLog, WeightLog } from '../donnees/v1';
+import { avecLeSommeil } from '../domaine/sommeils';
 import { avecLaPrise } from '../domaine/prises';
 import { avecLaPesee, garderLeDepart, sansLaPesee } from '../domaine/pesees';
 import { effacerEnregistre, lireEnregistre } from '../plateforme/navigateur';
@@ -17,6 +18,10 @@ export function consignerPrise(prise: InjectionLog, remplace?: InjectionLog): Ap
     ...base,
     injectionHistory: avecLaPrise(remplace ? base.injectionHistory.filter((p) => p.id !== remplace.id) : base.injectionHistory, prise),
   }));
+}
+
+export function consignerSommeil(sommeil: SleepLog): AppData {
+  return modifierBase((base) => ({ ...base, sleepLogs: avecLeSommeil(base.sleepLogs ?? [], sommeil) }));
 }
 
 export function consignerPesee(pesee: WeightLog, remplace?: WeightLog): AppData {
