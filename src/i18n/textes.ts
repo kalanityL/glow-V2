@@ -308,15 +308,16 @@ export interface Textes {
         (2026-09-21, « mettre hier, aujourd'hui ou date »). */
     hier: string;
     aujourdhui: string;
-    /** La durée écrite en phrase : « 13 h de sommeil » (2026-09-21, « Durée :
-        13 h -> 13 h de sommeil ») — et sa suite seule, pour l'écran, où la
-        durée garde sa largeur fixe. */
+    /** La durée écrite en phrase : « Durée : 8 h 05 » (2026-09-21 au soir,
+        « 8 h 05 de sommeil-> Durée : xx ») — et le mot seul, avant, pour
+        l'écran, où la durée garde sa largeur fixe. */
     duree: (duree: string) => string;
-    dureeSuite: string;
+    dureeAvant: string;
     /** Sur le troisième écran : « nuit de 7 h 15 », « sieste de 1 h »
         (2026-09-21). */
     natureDe: (nature: SleepKind, duree: string) => string;
-    /** « Notez votre nuit » / « Notez votre sieste » (2026-09-21). */
+    /** « Notez la qualité de ce sommeil » (2026-09-21 au soir) ; la nature
+        reste passée, le jour où la phrase la nommerait. */
     qualite: (nature: SleepKind) => string;
     /** Les six crans, de 0 à 5. */
     qualites: readonly string[];
@@ -646,10 +647,15 @@ const FR: Textes = {
     reveil: 'Réveil',
     hier: 'Hier',
     aujourdhui: 'Aujourd’hui',
-    duree: (duree) => `${duree} de sommeil`,
-    dureeSuite: 'de sommeil',
+    /* « Durée : 8 h 05 » (2026-09-21 au soir, « 8 h 05 de sommeil-> Durée :
+       xx ») — « 13 h de sommeil » a vécu la journée. */
+    duree: (duree) => `Durée : ${duree}`,
+    dureeAvant: 'Durée :',
     natureDe: (nature, duree) => `${nature === 'nuit' ? 'nuit' : 'sieste'} de ${duree}`,
-    qualite: (nature) => (nature === 'nuit' ? 'Notez votre nuit' : 'Notez votre sieste'),
+    /* « Notez la qualité de ce sommeil », nuit ou sieste (2026-09-21 au
+       soir, « Notez votre nuit-> notez la qualité de ce sommeil ») —
+       « Notez votre nuit » / « Notez votre sieste » ont vécu la journée. */
+    qualite: () => 'Notez la qualité de ce sommeil',
     qualites: ['Très mauvaise', 'Mauvaise', 'Passable', 'Correcte', 'Bonne', 'Excellente'],
     refusDureeNulle: 'L’heure de réveil et l’heure d’endormissement sont identiques : aucune durée de sommeil à enregistrer.',
     questionLongue: (nature, duree) =>

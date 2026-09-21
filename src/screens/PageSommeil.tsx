@@ -305,10 +305,10 @@ export function PageSommeil({
             </div>
 
             {/* LA DURÉE, DÉDUITE — jamais saisie. */}
-            {/* « 13 h de sommeil » (2026-09-21, « Durée : 13 h -> 13 h de
-                sommeil ») : la durée à largeur fixe, puis les mots. */}
+            {/* « Durée : 8 h 05 » (2026-09-21 au soir, « 8 h 05 de sommeil->
+                Durée : xx ») : le mot, puis la durée à largeur fixe. */}
             <p className="sommeil__duree">
-              <span>{dureeEcrite(duree)}</span> {textes.sommeil.dureeSuite}
+              {textes.sommeil.dureeAvant} <span>{dureeEcrite(duree)}</span>
             </p>
             <div
               className="sommeil__jauge"
