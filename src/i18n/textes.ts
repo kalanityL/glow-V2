@@ -496,6 +496,7 @@ const FR: Textes = {
     /* Ses deux photos (2026-09-20 au soir) : les identifiants sont restés
        — `fond` est une réponse enregistrée —, les noms suivent les images. */
     fonds: {
+      vide: 'Aucun',
       photo: 'Fleurs',
       ciel: 'Brasserie',
       /* Les noms de sa planche (2026-09-20 au soir). */

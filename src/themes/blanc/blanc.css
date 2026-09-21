@@ -148,6 +148,8 @@
      ont remplacé la photo du 16 septembre (fond-haut2) et le ciel de midi
      de la V1. Embarquées dans `src/assets/images/` comme les polices, en
      JPEG (les PNG de 1,4 et 1,7 Mo pesaient six fois plus). */
+  /* Le fond vide (2026-09-21) : aucune image, le fond du thème se voit. */
+  --fond-vide: none;
   --fond-photo: url(../../assets/images/fond-fleur.jpg);
   --fond-ciel: url(../../assets/images/fond-brasserie.jpg);
   /* Les dix fonds de sa planche (2026-09-20 au soir), découpés d'elle —

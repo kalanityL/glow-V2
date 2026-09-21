@@ -758,8 +758,9 @@ ensoleillé » de la V1 — **devenus ses deux photos le 2026-09-20 au soir**
 le fond bleu par fond-brasserie.png ») : « Fleurs », un mur clair sous du
 jasmin, et « Brasserie », la terrasse d'un café ; les identifiants `photo`
 et `ciel` sont restés, `fond` étant une réponse enregistrée ; les images
-sont embarquées en JPEG dans `src/assets/images/` —, **puis les dix fonds
-de sa planche** (le même soir, « extrais les 10 fonds et ajoute les a la
+sont embarquées en JPEG dans `src/assets/images/` —, **puis « Aucun », le fond vide** (2026-09-21, « ajouter a theme l'option
+fond vide » : pas d'image, le fond uni du thème, en premier cadre), **puis
+les dix fonds de sa planche** (le même soir, « extrais les 10 fonds et ajoute les a la
 page theme ») : Nature printanière, Coucher de soleil, Bord de mer, Forêt,
 Café parisien, Nuit étoilée, Minimaliste clair, Aquarelle, Montagnes,
 Abstrait glow — découpés de la planche (le haut de chaque case, au-dessus

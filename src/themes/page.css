@@ -716,6 +716,10 @@
    pose le même jeton sur `.theme-<id>` avec une classe ; à spécificité
    égale elle gagnait, et le choix ne prenait jamais (« le fond selectionné
    doit mettre à jour le fond de page », 2026-09-20). */
+.page.page--fond-vide {
+  --accueil-fond-image: var(--fond-vide);
+}
+
 .page.page--fond-photo {
   --accueil-fond-image: var(--fond-photo);
 }
@@ -1906,6 +1910,11 @@
   grid-template-columns: repeat(3, 1fr);
   gap: 10px;
   margin: 12px 0 0;
+}
+
+/* Le cadre du fond vide : le fond uni du thème, tel qu'il se voit. */
+.carte-fond--vide {
+  background: var(--fond);
 }
 
 .carte-fond--photo {

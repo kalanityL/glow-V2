@@ -7,6 +7,9 @@
  * `--fond-ciel`), consommé par `.page--fond-<id>`.
  */
 export const FONDS = [
+  /* LE FOND VIDE (2026-09-21, « ajouter a theme l'option fond vide ») : pas
+     d'image, le fond uni du thème. */
+  'vide',
   'photo',
   'ciel',
   /* LES DIX FONDS DE SA PLANCHE (2026-09-20 au soir, « extrais les 10 fonds

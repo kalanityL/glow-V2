@@ -200,6 +200,8 @@
   /* Pas de photo derrière l'accueil : elle appartient aux thèmes clairs. Le
      jeton est déclaré, à `none`, pour que la règle qui le lit trouve
      toujours une valeur. */
+  /* Le fond vide (2026-09-21) : aucune image, le fond du thème se voit. */
+  --fond-vide: none;
   --fond-photo: none;
   --fond-ciel: none;
   --fond-nature-printaniere: none;
