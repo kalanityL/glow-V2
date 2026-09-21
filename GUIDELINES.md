@@ -727,7 +727,10 @@ mensurations de la V1.
 et confirmation ») : la case « Sommeil » du tiroir du « + » y mène. Le
 formulaire de la V1 (`SleepForm.tsx`, `useSleepForm.ts`) et ses règles
 (SPEC § « Le sommeil ») : **d'abord la nature seule, Nuit ou Sieste, deux
-gros boutons ; puis la suite, avec une toute petite encoche de retour**
+gros boutons — aucun marqué d'avance sur un nouveau sommeil (2026-09-21 au
+soir, « nouveau sommeil : pas de selection par defaut nuit/sieste » ; en
+modification, la nature du sommeil l'est) ; puis la suite, avec une toute
+petite encoche de retour**
 (« d'abord 2 gros boutons : nuit ou sieste ; ensuite la suite du
 formulaire, avec une très petite encoche de retour ») — **et la suite tient
 sur un écran si elle tient sans défiler, sinon elle se coupe après la

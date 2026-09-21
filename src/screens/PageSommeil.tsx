@@ -80,6 +80,12 @@ export function PageSommeil({
   const modification = initiale !== undefined;
   const aujourdhui = dateLocale(new Date());
   const [nature, setNature] = useState<SleepKind>(initiale?.kind ?? 'nuit');
+  /* AUCUNE NATURE CHOISIE D'AVANCE (2026-09-21 au soir, « nouveau sommeil :
+     pas de selection par defaut nuit/sieste ») : au premier écran d'un
+     nouveau sommeil, aucun des deux boutons n'est marqué tant qu'on n'en a
+     pas touché un ; la nuit reste la valeur de départ de la suite. En
+     modification, la nature du sommeil est marquée. */
+  const [natureChoisie, setNatureChoisie] = useState(initiale !== undefined);
   const [dateCoucher, setDateCoucher] = useState(initiale?.bedDate ?? veille(aujourdhui));
   const [heureCoucher, setHeureCoucher] = useState(initiale?.bedTime ?? HEURES_PAR_DEFAUT.nuit.coucher);
   const [dateReveil, setDateReveil] = useState(initiale?.date ?? aujourdhui);
@@ -286,9 +292,10 @@ export function PageSommeil({
                   <button
                     key={n}
                     type="button"
-                    className={`prise__bouton sommeil__nature${nature === n ? ' prise__bouton--choisi' : ''}`}
+                    className={`prise__bouton sommeil__nature${natureChoisie && nature === n ? ' prise__bouton--choisi' : ''}`}
                     onClick={() => {
                       changerNature(n);
+                      setNatureChoisie(true);
                       setEtape('suite');
                     }}
                   >
