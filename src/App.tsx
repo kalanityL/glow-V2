@@ -14,7 +14,7 @@ import { dateLocale, formaterDateLongue } from './domaine/dates';
 import { avecLaPesee, poidsLePlusRecent, type Pesee } from './domaine/pesees';
 import { detecterLangue } from './i18n/useTextes';
 import type { ModuleId } from './app/modules';
-import type { Prise } from './domaine/prises';
+import { avecLaPrise, type Prise } from './domaine/prises';
 import type { FondId } from './app/fonds';
 /* La mise en page d'abord, les jetons des thèmes ensuite : les feuilles de
    thème doivent pouvoir battre la structure, jamais l'inverse. */
@@ -101,7 +101,8 @@ export default function App() {
   /* Validée, la prise mène à L'ÉCRAN DE CONFIRMATION (2026-09-20, son
      image) : la dernière prise, et ce qu'on peut faire maintenant. */
   const validerPrise = (prise: Prise) => {
-    setPrises((avant) => (modification ? [...avant.slice(0, -1), prise] : [...avant, prise]));
+    /* Deux par jour au plus (SPEC) : la troisième remplace la dernière du jour. */
+    setPrises((avant) => avecLaPrise(modification ? avant.slice(0, -1) : avant, prise));
     setMiseAJour(modification);
     setModification(false);
     setPage('confirmation');

@@ -1968,8 +1968,17 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 18px;
+  gap: 0;
   padding-top: 18px;
+}
+
+/* TOUTE LA ZONE SOUS LE CHIFFRE GLISSE (2026-09-21, « il faut que toute la
+   zone entre le bas des chiffres et le haut du bouton valider puisse slider
+   le poid, pas uniquement la zone de hauteur de cran ») : la graduation
+   prend toute la hauteur qui reste, ses crans posés en bas, et c'est tout
+   le cadre qui défile — le doigt peut partir de n'importe où dessous. */
+.poids .graduation {
+  min-height: 132px;
 }
 
 /* Le chiffre, en grand, dans la police de titre ; son unité petite à côté. */
@@ -2070,6 +2079,7 @@
   grid-area: 1 / 1;
   min-width: 0;
   width: 100%;
+  height: 100%;
   overflow-x: auto;
   overflow-y: hidden;
   scrollbar-width: none;
@@ -2084,7 +2094,8 @@
 }
 
 .graduation__piste {
-  height: calc(var(--graduation-nombres) + var(--graduation-cran) * 2);
+  min-height: calc(var(--graduation-nombres) + var(--graduation-cran) * 2);
+  height: 100%;
   padding-inline: calc(50% - var(--graduation-pas) / 2);
   width: max-content;
 }
@@ -2140,7 +2151,7 @@
 .graduation__nombre {
   position: absolute;
   left: 50%;
-  top: 0;
+  bottom: calc(var(--graduation-cran) * 2 + 6px);
   transform: translateX(-50%);
   font-family: var(--font-body);
   font-size: 12px;

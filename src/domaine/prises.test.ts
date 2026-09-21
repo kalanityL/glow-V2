@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { doseDepuisSaisie, heureRonde } from './prises';
+import { avecLaPrise, doseDepuisSaisie, heureRonde } from './prises';
 
 describe('heureRonde', () => {
   it('ramène à la minute ronde inférieure', () => {
@@ -30,5 +30,27 @@ describe('doseDepuisSaisie', () => {
     expect(doseDepuisSaisie('-1')).toBeNull();
     expect(doseDepuisSaisie('0.0001')).toBeNull();
     expect(doseDepuisSaisie('1000001')).toBeNull();
+  });
+});
+
+describe('avecLaPrise', () => {
+  const prise = (date: string, heure: string, doseMg: number) => ({
+    date,
+    heure,
+    doseMg,
+    zone: 'abdomen-gauche' as const,
+    traitement: 'ozempic',
+  });
+
+  it('ajoute sous le plafond de deux par jour, dans l’ordre', () => {
+    const journal = avecLaPrise([prise('2026-09-20', '20:00', 0.25)], prise('2026-09-20', '08:00', 0.25));
+    expect(journal.map((p) => p.heure)).toEqual(['08:00', '20:00']);
+  });
+
+  it('la troisième du jour remplace la dernière de la journée', () => {
+    const journal = [prise('2026-09-19', '08:00', 0.25), prise('2026-09-20', '08:00', 0.25), prise('2026-09-20', '20:00', 0.5)];
+    const apres = avecLaPrise(journal, prise('2026-09-20', '12:00', 1));
+    expect(apres).toHaveLength(3);
+    expect(apres.filter((p) => p.date === '2026-09-20').map((p) => p.doseMg)).toEqual([0.25, 1]);
   });
 });

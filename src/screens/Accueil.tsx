@@ -30,10 +30,12 @@ export interface FondProps {
 
 /**
  * UN CLIC SUR LE FOND (2026-09-20, « clique sur fond d'écran depuis n'importe
- * quelle page : ouvre comme si on avait cliqué sur menu couleur ») : le clic
- * qui tombe sur l'élément lui-même, et non sur un de ses enfants — une carte,
- * une pastille, un bouton, une vitre —, ouvre le bloc « Thème ». Posé sur
- * chaque zone de page où le fond se voit.
+ * quelle page : ouvre comme si on avait cliqué sur menu couleur » — puis
+ * 2026-09-21, « clic sur fond de page ouvre theme => sauf si un formulaire
+ * est ouvert ; uniquement sur la home page ») : le clic qui tombe sur
+ * l'élément lui-même, et non sur un de ses enfants — une carte, une
+ * pastille, un bouton, une vitre —, ouvre le bloc « Thème ». SUR L'ACCUEIL
+ * SEULEMENT : les autres pages ne l'écoutent plus.
  */
 export function surLeFond(onOuvrir: () => void) {
   return (evenement: React.MouseEvent) => {

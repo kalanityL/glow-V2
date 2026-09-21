@@ -285,7 +285,8 @@ export interface Textes {
   pesee: {
     titre: string;
     titreModification: string;
-    remplacer: string;
+    /** Le message de la V1, avec la date écrite, et la question. */
+    remplacer: (date: string) => string;
   };
   /**
    * L'ÉCRAN DE CONFIRMATION D'UNE PRISE (2026-09-20, son image) : le titre
@@ -567,7 +568,7 @@ const FR: Textes = {
   pesee: {
     titre: 'Nouvelle pesée',
     titreModification: 'Modifier la pesée',
-    remplacer: 'Une pesée existe déjà ce jour-là. La remplacer ?',
+    remplacer: (date) => `Une pesée existe déjà le ${date}. La remplacer ?`,
   },
   confirmation: {
     titre: {

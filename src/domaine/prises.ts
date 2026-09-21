@@ -75,3 +75,22 @@ export interface Prise {
   /** L'identifiant du traitement, écrit depuis le profil (SPEC). */
   traitement: string;
 }
+
+/** Le plafond de prises par jour (SPEC) : deux. */
+export const PRISES_PAR_JOUR_MAX = 2;
+
+/**
+ * LE JOURNAL AVEC CETTE PRISE (SPEC, « Consigner une prise », reprise avec
+ * le formulaire le 2026-09-21) : une ligne à sa date, sous le plafond de
+ * deux par jour — consigner une troisième prise sur une journée déjà pleine
+ * REMPLACE LA DERNIÈRE ligne de cette journée. Le journal reste dans
+ * l'ordre des dates et des heures.
+ */
+export function avecLaPrise(prises: readonly Prise[], prise: Prise): Prise[] {
+  const duJour = prises.filter((p) => p.date === prise.date);
+  const gardees =
+    duJour.length >= PRISES_PAR_JOUR_MAX ? prises.filter((p) => p !== duJour[duJour.length - 1]) : [...prises];
+  return [...gardees, prise].sort((a, b) =>
+    a.date === b.date ? a.heure.localeCompare(b.heure) : a.date.localeCompare(b.date),
+  );
+}

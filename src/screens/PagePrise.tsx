@@ -1,7 +1,7 @@
 import { useEffect, useState, type FormEvent } from 'react';
 import { BarreDuBas } from './BarreDuBas';
 import { EntetePage } from './EntetePage';
-import { surLeFond, type FondProps } from './Accueil';
+import type { FondProps } from './Accueil';
 import { BlocTraitement } from './BlocTraitement';
 import { Choix } from '../components/Choix';
 import { ChoixDate } from '../components/ChoixDate';
@@ -144,9 +144,8 @@ export function PagePrise({
   return (
     <div
       className={`page page--photo page--fond-${fond.apercu ?? fond.courant} ${classeDuTheme('blanc')}`}
-      onClick={surLeFond(fond.onOuvrirBloc)}
     >
-      <div className="page__colonne" onClick={surLeFond(fond.onOuvrirBloc)}>
+      <div className="page__colonne">
         <EntetePage titre={textes.accueil.traitement[forme]} onAccueil={onAccueil} />
 
         <form className="carte prise" onSubmit={valider} noValidate>

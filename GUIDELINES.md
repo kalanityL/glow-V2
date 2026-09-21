@@ -272,6 +272,17 @@ thèmes ne repeignent pas, et qui ne sont pas dans les templates non plus.
   focus, partout où l'on tape ou choisit : le fond et le filet
   s'assombrissent d'un rien, plus d'anneau. Vaut pour la page d'une prise,
   d'une pesée, les lignes de « Mon compte », les champs de l'onboarding.
+- **UN FORMULAIRE REPRIS DE LA V1 REPREND AUSSI SES RÈGLES** (2026-09-21,
+  « regle pour TOUS les formulaires à inscrire qqpart pour toujours t'en
+  souvenir : les formulaires récupérés de la v1 récuperent aussi les regles
+  qui s'y attachent (nb d'entrées par jour max notament et les messages qui
+  s'y attachent) ») : le plafond d'entrées par jour, ce qui arrive quand il
+  est atteint, les refus et leurs messages — dans les mots de la V1
+  (`VOCABULAIRE.md`, SPEC § « Les capacités »). Aujourd'hui : la pesée, une
+  par jour, « Une pesée existe déjà le JJ/MM/AAAA. » et la question de la
+  remplacer ; la prise, deux par jour, la troisième remplace la dernière de
+  la journée (SPEC). Tout formulaire à venir se vérifie contre la SPEC
+  avant d'être rendu.
 - **AUCUN `select` NATIF, JAMAIS ; AUCUN CHOIX NE SORT DE L'ÉCRAN** (2026-09-20,
   règle absolue : « AUCUN SELECT NE DOIT JAMAIS DEPASSER DE L'ECRAN. Style
   des selects heure et calendrier et TOUS les selects, toujours : tout est
@@ -518,7 +529,10 @@ de la V1) ; **rien en gras sur le formulaire**, le bouton compris ; la zone
 la dose parmi les paliers de la spécialité — désormais dans
 `domaine/traitements.ts`, des faits de boîte, pas un conseil — ou « Autre
 dose » tapée ; « + Notes » ; « Valider » au milieu. Une dose absente ou
-nulle est refusée et la règle se dit. **Les prises validées ne sont gardées
+nulle est refusée et la règle se dit. **Deux prises par jour au plus**
+(SPEC, règle reprise avec le formulaire, 2026-09-21) : la troisième
+consignée sur une journée pleine remplace la dernière de cette journée
+(`domaine/prises.ts`, `avecLaPrise`). **Les prises validées ne sont gardées
 qu'en mémoire, dans `App`** : ni journal, ni enregistrement sur l'appareil.
 
 **L'écran de confirmation d'une prise** (2026-09-20, son image, puis
@@ -563,8 +577,9 @@ mots de la V1), la date et l'heure côte à côte, LA RÈGLE CRANTÉE du poids �
 `poidsLePlusRecent`, testé) : celui de la pesée dont la date — celle du
 formulaire — est la plus proche d'aujourd'hui sans être future, aujourd'hui
 compris ; sans pesée, le poids du profil. Une pesée par jour (SPEC) :
-valider sur un jour déjà pesé demande « La remplacer ? » Non / Oui, et
-rien ne s'écrit sans ce oui. Sa confirmation est LE MÊME ÉCRAN que celui
+valider sur un jour déjà pesé dit, dans les mots de la V1, « Une pesée
+existe déjà le JJ/MM/AAAA. La remplacer ? » Non / Oui, et rien ne s'écrit
+sans ce oui. Sa confirmation est LE MÊME ÉCRAN que celui
 de la prise (« exactement meme principe »), `PageConfirmation` devenu
 générique : « Pesée enregistrée ! » / « Pesée mise à jour ! », la carte
 (poids, date et heure) qui rouvre le formulaire en modification, puis
@@ -691,7 +706,9 @@ ancré** (2026-09-20). **Un clic sur le fond de n'importe quelle page ouvre
 le bloc « Thème »** (« clique sur fond d'écran depuis n'importe quelle
 page : ouvre comme si on avait cliqué sur menu couleur ») : le clic qui
 tombe sur une zone de page elle-même, pas sur une carte, une pastille, un
-bouton ou une vitre.
+bouton ou une vitre — **sur l'accueil seulement, depuis le 2026-09-21**
+(« sauf si un formulaire est ouvert ; uniquement sur la home page ») : les
+autres pages, formulaires compris, ne l'écoutent plus.
 
 **La page « Mon compte »** — « Mon profil » jusqu'au soir du 2026-09-19
 (« page mon profil devient mon compte. Onglet information/avatar/mon

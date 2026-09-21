@@ -1,7 +1,7 @@
 import { useState, type FormEvent } from 'react';
 import { BarreDuBas } from './BarreDuBas';
 import { EntetePage } from './EntetePage';
-import { surLeFond, type FondProps } from './Accueil';
+import type { FondProps } from './Accueil';
 import { ChoixDate } from '../components/ChoixDate';
 import { ChoixHeure } from '../components/ChoixHeure';
 import { ReglePoids } from '../components/ReglePoids';
@@ -89,9 +89,8 @@ export function PagePesee({
   return (
     <div
       className={`page page--photo page--fond-${fond.apercu ?? fond.courant} ${classeDuTheme('blanc')}`}
-      onClick={surLeFond(fond.onOuvrirBloc)}
     >
-      <div className="page__colonne" onClick={surLeFond(fond.onOuvrirBloc)}>
+      <div className="page__colonne">
         <EntetePage titre={textes.accueil.modules.balance} onAccueil={onAccueil} />
 
         <form className="carte prise" onSubmit={valider} noValidate>
@@ -151,7 +150,9 @@ export function PagePesee({
 
           {remplacer ? (
             <div className="prise__proposition">
-              <p className="regle regle--manquee prise__question">{textes.pesee.remplacer}</p>
+              <p className="regle regle--manquee prise__question">
+                {textes.pesee.remplacer(formaterDateCourte(date, langue))}
+              </p>
               <div className="boutons">
                 <button type="button" className="bouton bouton--second" onClick={() => setRemplacer(false)}>
                   {textes.non}

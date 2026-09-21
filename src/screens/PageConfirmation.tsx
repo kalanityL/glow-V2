@@ -1,7 +1,7 @@
 import { useState, type ReactElement, type ReactNode } from 'react';
 import { BarreDuBas } from './BarreDuBas';
 import { EntetePage } from './EntetePage';
-import { surLeFond, type FondProps } from './Accueil';
+import type { FondProps } from './Accueil';
 import {
   IconeAnalyse,
   IconeChevronDroit,
@@ -99,9 +99,8 @@ export function PageConfirmation({
   return (
     <div
       className={`page page--photo page--fond-${fond.apercu ?? fond.courant} ${classeDuTheme('blanc')}`}
-      onClick={surLeFond(fond.onOuvrirBloc)}
     >
-      <div className="page__colonne" onClick={surLeFond(fond.onOuvrirBloc)}>
+      <div className="page__colonne">
         <EntetePage titre={titrePage} onAccueil={onAccueil} />
 
         <div className="confirmation">
