@@ -280,7 +280,10 @@ thèmes ne repeignent pas, et qui ne sont pas dans les templates non plus.
   calendrier plein à l'encre ; seul le bouton qui valide est à l'accent. Le
   focus, partout où l'on tape ou choisit : le fond et le filet
   s'assombrissent d'un rien, plus d'anneau. Vaut pour la page d'une prise,
-  d'une pesée, les lignes de « Mon compte », les champs de l'onboarding.
+  d'une pesée, les lignes de « Mon compte », les champs de l'onboarding —
+et les réponses à choisir (`.option`, l'avatar de « Mon compte » compris :
+« modif avatar : bouton activé/desactivé -> mettre meme style que
+formulaire »), qui ont la matière des boutons de dosage et de zone.
 - **CHAQUE DONNÉE EST ÉCRITE DANS LA BASE DE LA V1, TELLE QUELLE** (2026-09-21,
   « NON NON NON. Pour chaque formulaire tu reprends de la v1 la structure
   de la base de données correspondante. chaque formulaire et chaque

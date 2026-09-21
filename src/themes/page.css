@@ -240,8 +240,12 @@
   transform: scale(0.94);
 }
 
+/* Le liseré d'une couleur choisie, sobre comme le reste (2026-09-21) : à
+   distance, dans le bleu grisé des boutons choisis. */
 .pastille--choisie {
-  box-shadow: 0 0 0 2px var(--fond-page, transparent), 0 0 0 4px var(--accent);
+  box-shadow:
+    0 0 0 2px var(--fond-page, transparent),
+    0 0 0 4px color-mix(in srgb, var(--accent) 45%, var(--option-choisi-fond));
 }
 
 /* ── LE CHOIX DU THÈME ──────────────────────────────────────────────────── */
@@ -548,26 +552,31 @@
   text-align: center;
 }
 
+/* LA MÊME MATIÈRE QUE LES BOUTONS DES FORMULAIRES (2026-09-21, « modif
+   avatar : bouton activé/desactivé -> mettre meme style que formulaire »,
+   et la charte des formulaires, qui vaut pour l'onboarding) : non choisi,
+   gris très clair cerné d'un gris à peine plus foncé, texte gris ; choisi,
+   le bleu pâle des réponses choisies cerné d'un bleu grisé, texte à
+   l'encre. Le contour ne change pas d'épaisseur : rien ne bouge au clic. */
 .option {
   width: 100%;
   padding: 15px 16px;
   text-align: left;
-  border: 1px solid var(--option-filet);
+  border: 1px solid color-mix(in srgb, var(--option-filet) 55%, var(--option-fond));
   border-radius: 14px;
-  background: var(--option-fond);
-  color: var(--encre);
+  background: color-mix(in srgb, var(--option-filet) 22%, var(--option-fond));
+  color: var(--encre-chapeau);
   font-family: var(--font-body);
   font-weight: 500;
   font-size: 15px;
   cursor: pointer;
-  /* Le liseré du choix est une `box-shadow` et non une bordure épaissie : une
-     bordure qui grossit déplacerait le texte au moment du clic. */
-  transition: box-shadow 150ms, background 150ms;
+  transition: background 150ms, border-color 150ms;
 }
 
 .option--choisi {
+  border-color: color-mix(in srgb, var(--accent) 18%, var(--option-choisi-fond));
   background: var(--option-choisi-fond);
-  box-shadow: 0 0 0 2px var(--accent);
+  color: var(--encre);
 }
 
 /* ── LE BOUTON ──────────────────────────────────────────────────────────── */
