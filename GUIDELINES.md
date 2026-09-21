@@ -705,7 +705,10 @@ mensurations de la V1.
 **La page d'un sommeil** (2026-09-21, « fais moi l'écran nouveau sommeil
 et confirmation ») : la case « Sommeil » du tiroir du « + » y mène. Le
 formulaire de la V1 (`SleepForm.tsx`, `useSleepForm.ts`) et ses règles
-(SPEC § « Le sommeil ») : la nature (Nuit / Sieste, deux boutons) ; deux
+(SPEC § « Le sommeil ») : **d'abord la nature seule, Nuit ou Sieste, deux
+gros boutons ; puis la suite, avec une toute petite encoche de retour**
+(« d'abord 2 gros boutons : nuit ou sieste ; ensuite la suite du
+formulaire, avec une très petite encoche de retour ») ; deux
 instants complets, Endormissement et Réveil, chacun son jour et son heure
 sur deux colonnes — une nuit part de la veille 23:00 → 07:00, une sieste du
 jour même 14:00 → 15:00, changer de nature ne déplace les instants que s'ils
@@ -714,7 +717,9 @@ sont encore ceux proposés — **et, au-dessus de chaque heure, un cadran**
 12 / 3 / 6 / 9 et une petite boule positionnée à l'heure […] on peut faire
 glisser la boule […] synchronisation totale […] passer par 12 et continuer
 fait passer aux heures > 12 et les étiquettes passent en 12 15 18 21 ») :
-la boule est à l'angle de l'heure, elle se glisse et l'heure suit sur les
+le cercle porte les crans d'une montre (soixante, les douze des heures plus
+longs — « fait apparaitre les crans comme sur une montre à cadran ») ; la
+boule est à l'angle de l'heure, elle se glisse et l'heure suit sur les
 minutes rondes, l'heure change et la boule suit ; passer le haut du cadran
 bascule la moitié du jour et les repères deviennent 12 15 18 21 ; la durée déduite (« 8 h », « 7 h 45 »), jamais
 saisie ; **la note en étoiles** (« notez votre nuit ou notez votre sieste :

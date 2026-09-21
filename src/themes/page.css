@@ -3121,3 +3121,48 @@
 .cadran__boule {
   fill: var(--encre);
 }
+
+/* DEUX GROS BOUTONS pour la nature (2026-09-21), et l'encoche de retour,
+   toute petite, en tête de la suite. */
+.sommeil__natures {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  padding: 8px 0;
+}
+
+.sommeil__nature {
+  min-height: 112px;
+  font-size: 18px;
+}
+
+.sommeil__retour {
+  align-self: flex-start;
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  margin: -6px 0 -8px -6px;
+  padding: 2px 8px 2px 4px;
+  border: 0;
+  border-radius: 10px;
+  background: none;
+  color: var(--encre-chapeau);
+  font-family: var(--font-body);
+  font-size: 13px;
+  cursor: pointer;
+}
+
+.sommeil__retour .icone {
+  width: 14px;
+  height: 14px;
+}
+
+.cadran__cran {
+  stroke: var(--option-filet);
+  stroke-width: 1;
+}
+
+.cadran__cran--heure {
+  stroke: var(--encre-chapeau);
+  stroke-width: 1.4;
+}

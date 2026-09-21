@@ -103,16 +103,33 @@ export function CadranHeure({ valeur, onValeur, nom }: { valeur: string; onValeu
       }}
     >
       <circle className="cadran__cercle" cx={CENTRE} cy={CENTRE} r={RAYON} />
-      <text className="cadran__repere" x={CENTRE} y={CENTRE - RAYON + 11} textAnchor="middle">
+      {/* LES CRANS D'UNE MONTRE (2026-09-21, « fait apparaitre les crans
+          comme sur une montre à cadran ») : soixante, un par minute, les
+          douze des heures plus longs. */}
+      {Array.from({ length: 60 }, (_, i) => {
+        const a = ((i * 6 - 90) * Math.PI) / 180;
+        const longueur = i % 5 === 0 ? 5 : 2.5;
+        return (
+          <line
+            key={i}
+            className={`cadran__cran${i % 5 === 0 ? ' cadran__cran--heure' : ''}`}
+            x1={CENTRE + (RAYON - 1) * Math.cos(a)}
+            y1={CENTRE + (RAYON - 1) * Math.sin(a)}
+            x2={CENTRE + (RAYON - 1 - longueur) * Math.cos(a)}
+            y2={CENTRE + (RAYON - 1 - longueur) * Math.sin(a)}
+          />
+        );
+      })}
+      <text className="cadran__repere" x={CENTRE} y={CENTRE - RAYON + 15} textAnchor="middle">
         {reperes[0]}
       </text>
-      <text className="cadran__repere" x={CENTRE + RAYON - 6} y={CENTRE + 3.5} textAnchor="end">
+      <text className="cadran__repere" x={CENTRE + RAYON - 9} y={CENTRE + 3.5} textAnchor="end">
         {reperes[1]}
       </text>
-      <text className="cadran__repere" x={CENTRE} y={CENTRE + RAYON - 6} textAnchor="middle">
+      <text className="cadran__repere" x={CENTRE} y={CENTRE + RAYON - 9} textAnchor="middle">
         {reperes[2]}
       </text>
-      <text className="cadran__repere" x={CENTRE - RAYON + 6} y={CENTRE + 3.5} textAnchor="start">
+      <text className="cadran__repere" x={CENTRE - RAYON + 9} y={CENTRE + 3.5} textAnchor="start">
         {reperes[3]}
       </text>
       <circle className="cadran__boule" cx={boule.x} cy={boule.y} r={6.5} />

@@ -7,7 +7,7 @@ import { ChoixHeure } from '../components/ChoixHeure';
 import { NoteEtoiles } from '../components/NoteEtoiles';
 import { CadranHeure } from '../components/CadranHeure';
 import { IndiceDefilement } from '../components/IndiceDefilement';
-import { IconeCalendrier, IconeCoche, IconeCroix, IconeHorloge, IconePlus, IconeSommeil } from '../components/Icones';
+import { IconeCalendrier, IconeChevronGauche, IconeCoche, IconeCroix, IconeHorloge, IconePlus, IconeSommeil } from '../components/Icones';
 import { detecterLangue, useTextes } from '../i18n/useTextes';
 import { classeDuTheme } from '../themes/themes';
 import { dateLocale, formaterDateCourte } from '../domaine/dates';
@@ -84,6 +84,11 @@ export function PageSommeil({
   const [notes, setNotes] = useState(initiale?.notes ?? '');
   const [notesOuvertes, setNotesOuvertes] = useState(Boolean(initiale?.notes));
   const [edite, setEdite] = useState<'dateCoucher' | 'heureCoucher' | 'dateReveil' | 'heureReveil' | null>(null);
+  /* DEUX ÉTAPES (2026-09-21, « d'abord 2 gros boutons : nuit ou sieste ;
+     ensuite la suite du formulaire, avec une très petite encoche de
+     retour ») : la nature d'abord, seule ; puis le reste, avec une encoche
+     qui ramène au choix. En modification, on arrive sur la suite. */
+  const [etape, setEtape] = useState<'nature' | 'suite'>(modification ? 'suite' : 'nature');
   /* Le refus, dit sous le formulaire ; la question des douze heures, armée. */
   const [refus, setRefus] = useState<string | null>(null);
   const [questionArmee, setQuestionArmee] = useState(false);
@@ -201,22 +206,32 @@ export function PageSommeil({
             </button>
           </div>
 
-          <div className="prise__corps">
-            {/* LA NATURE : nuit ou sieste, deux boutons. */}
-            <div className="prise__boutons prise__boutons--zones" role="radiogroup" aria-label={textes.accueil.modules.sommeil}>
-              {NATURES.map((n) => (
-                <button
-                  key={n}
-                  type="button"
-                  role="radio"
-                  aria-checked={nature === n}
-                  className={`prise__bouton${nature === n ? ' prise__bouton--choisi' : ''}`}
-                  onClick={() => changerNature(n)}
-                >
-                  {textes.sommeil.natures[n]}
-                </button>
-              ))}
+          {etape === 'nature' ? (
+            <div className="prise__corps">
+              {/* LA NATURE D'ABORD : nuit ou sieste, deux gros boutons. */}
+              <div className="sommeil__natures" role="group" aria-label={textes.accueil.modules.sommeil}>
+                {NATURES.map((n) => (
+                  <button
+                    key={n}
+                    type="button"
+                    className={`prise__bouton sommeil__nature${nature === n ? ' prise__bouton--choisi' : ''}`}
+                    onClick={() => {
+                      changerNature(n);
+                      setEtape('suite');
+                    }}
+                  >
+                    {textes.sommeil.natures[n]}
+                  </button>
+                ))}
+              </div>
             </div>
+          ) : (
+          <div className="prise__corps">
+            {/* L'ENCOCHE DE RETOUR, toute petite, et la nature choisie. */}
+            <button type="button" className="sommeil__retour" onClick={() => setEtape('nature')} aria-label={textes.retour}>
+              <IconeChevronGauche />
+              <span>{textes.sommeil.natures[nature]}</span>
+            </button>
 
             {/* DEUX INSTANTS COMPLETS, chacun sa date et son heure. */}
             <div className="sommeil__colonnes">
@@ -263,7 +278,9 @@ export function PageSommeil({
             {refus ? <p className="regle regle--manquee prise__regle">{refus}</p> : null}
             <IndiceDefilement />
           </div>
+          )}
 
+          {etape === 'suite' ? (
           <div className="prise__pied">
             {modification ? (
               <button type="button" className="bouton bouton--second prise__valider" onClick={onAnnuler}>
@@ -275,6 +292,7 @@ export function PageSommeil({
               <span>{questionArmee ? textes.sommeil.confirmerChoix : modification ? textes.sommeil.mettreAJour : textes.prise.valider}</span>
             </button>
           </div>
+          ) : null}
         </form>
       </div>
 
