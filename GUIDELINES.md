@@ -281,6 +281,32 @@ thèmes ne repeignent pas, et qui ne sont pas dans les templates non plus.
   focus, partout où l'on tape ou choisit : le fond et le filet
   s'assombrissent d'un rien, plus d'anneau. Vaut pour la page d'une prise,
   d'une pesée, les lignes de « Mon compte », les champs de l'onboarding.
+- **CHAQUE DONNÉE EST ÉCRITE DANS LA BASE DE LA V1, TELLE QUELLE** (2026-09-21,
+  « NON NON NON. Pour chaque formulaire tu reprends de la v1 la structure
+  de la base de données correspondante. chaque formulaire et chaque
+  données, y compris les infos du compte etc.. ») : l'objet racine
+  `AppData` de la V1 — `profile` (`UserProfile`, avec `AvatarConfig`),
+  `weightHistory` (`WeightLog`), `injectionHistory` (`InjectionLog`) et
+  les autres tables —, en un seul document JSON sous LA CLÉ DE LA V1,
+  `glp1_app_companion_data` (`src/donnees/v1.ts`, repris de
+  `V1/src/types.ts` et de la SPEC § « L'objet racine »). **Les noms des
+  champs sont ceux de la V1, en anglais** : c'est la structure de la base,
+  pas un texte d'interface — exception à la règle du français. Les tables
+  que la V2 n'écrit pas encore sont conservées telles quelles à chaque
+  écriture, et prennent leur type de la V1 le jour où leur formulaire
+  arrive. Les identifiants sont ceux de la V1 (`w-<horloge>`,
+  `inj-<horloge>`, `starting-weight-log`), les zones aussi
+  (`abdomen_gauche`…), le poids en kilogrammes quelle que soit l'unité
+  affichée, le poids de départ une pesée marquée de son drapeau. Les
+  conversions entre les réponses de l'onboarding et le profil de la V1
+  sont dans `src/donnees/conversions.ts`, testées ; ce que la V1 ne sait
+  pas porter (langue, thème, fond, objectif, date de naissance, adresse,
+  mot de passe, forme du traitement) vit sous sa propre clé `glp1_v2_reponses`,
+  hors de la racine, comme la V1 fait de tout ce qui n'est pas une ligne
+  de suivi. Tout passe par `src/app/base.ts` : chaque écriture relit le
+  document, ne remplace que sa part, réécrit le tout. L'enregistrement
+  d'avant (`glp1low.*`, 20 et 21 septembre) est migré une fois puis
+  effacé.
 - **UN FORMULAIRE REPRIS DE LA V1 REPREND AUSSI SES RÈGLES** (2026-09-21,
   « regle pour TOUS les formulaires à inscrire qqpart pour toujours t'en
   souvenir : les formulaires récupérés de la v1 récuperent aussi les regles
@@ -562,11 +588,11 @@ nulle est refusée et la règle se dit. **Deux prises par jour au plus**
 (SPEC, règle reprise avec le formulaire, 2026-09-21) : la troisième
 consignée sur une journée pleine remplace la dernière de cette journée
 (`domaine/prises.ts`, `avecLaPrise`). **Les prises et les pesées sont
-enregistrées sur l'appareil** (2026-09-21, « tu effaces toutes les
-modifications qd je reload ? ») : `app/journaux.ts`, même forme que les
-réponses — une clé, une version, chaque ligne relue vérifiée et une ligne
-abîmée écartée sans perdre le journal —, relus au départ et écrits à chaque
-changement (`app/useJournaux.ts`).
+enregistrées sur l'appareil, dans la base de la V1** (2026-09-21, « tu
+effaces toutes les modifications qd je reload ? », puis « tu reprends de
+la v1 la structure de la base ») : `app/journaux.ts` écrit `injectionHistory`
+et `weightHistory` par `app/base.ts`, chaque ligne relue vérifiée et une
+ligne abîmée écartée sans perdre le journal.
 
 **L'écran de confirmation d'une prise** (2026-09-20, son image, puis
 « ecran de confirmation : que souhaitez vous -> vous pouvez maintenant :
@@ -611,15 +637,25 @@ mots de la V1), la date et l'heure côte à côte, LA RÈGLE CRANTÉE du poids �
 formulaire — est la plus proche d'aujourd'hui sans être future, aujourd'hui
 compris ; sans pesée, le poids du profil. Une pesée par jour (SPEC) :
 valider sur un jour déjà pesé dit, dans les mots de la V1, « Une pesée
-existe déjà le JJ/MM/AAAA. La remplacer ? » Non / Oui — Non ferme le
-formulaire sans rien écrire (« non -> ferme le formulaire sans
-enregistrer »), et rien ne s'écrit sans ce oui. Sa confirmation est LE MÊME ÉCRAN que celui
+existe déjà le JJ/MM/AAAA. » — puis, depuis le 2026-09-21 au soir, « Une
+saisie existe déjà le JJ/MM/AAAA. La mettre à jour ? » — Non / Oui — Non
+ferme le formulaire sans rien écrire (« non -> ferme le formulaire sans
+enregistrer »), et rien ne s'écrit sans ce oui ; mise à jour, la
+confirmation titre « Pesée mise à jour ! » (« si mise à jour, remplacer
+Pesée mise à jour ! »). Sa confirmation est LE MÊME ÉCRAN que celui
 de la prise (« exactement meme principe »), `PageConfirmation` devenu
-générique : « Pesée enregistrée ! » / « Pesée mise à jour ! », la carte
-(poids, date et heure) qui rouvre le formulaire en modification, puis
+générique : « Pesée enregistrée ! » / « Pesée mise à jour ! », la carte —
+l'icône de la balance et le poids côte à côte sans intitulé (« supprimer le
+label poids et mettre directement icone balance et valeur de poids à
+côté »), la date, et l'heure précédée de son icône (« mettre icone heure
+devant l'heure », sur toute confirmation) — qui rouvre le formulaire en
+modification, puis
 Ajouter un autre élément, Voir dans le journal, Évolution du poids, Retour à
-l'accueil. Les pesées sont enregistrées sur l'appareil avec les prises
-(`app/journaux.ts`). Pas encore : les mensurations de la V1.
+l'accueil. Les pesées sont la table `weightHistory` de la V1, avec ses
+invariants (`domaine/pesees.ts`, testé : au plus une par jour, mise à jour
+de la ligne du jour qui garde identité, drapeau et mensurations ; la pesée
+de départ la plus ancienne, reconnue à son drapeau). Pas encore : les
+mensurations de la V1.
 
 **Toute page de l'application porte la barre du bas** (`BarreDuBas`, avec
 ses deux tiroirs) et, hors de l'accueil, **l'entête des pages**

@@ -53,9 +53,11 @@ section :**
 **Ce qui n'existe pas encore (et que les écrans annoncent, éteint) :** les
 pages Journal, Analyse, Concentration sanguine, Évolution du traitement /
 du poids ; les cases du « + » autres que Traitement et Balance ; les
-mensurations de la pesée ; l'enregistrement des prises et des pesées SUR
-L'APPAREIL (elles vivent en mémoire dans `App`, perdues au rechargement —
-`app/enregistrement.ts` est versionné, c'est là que ça ira).
+mensurations de la pesée. TOUT EST ÉCRIT DANS LA BASE DE LA V1 depuis le
+21/09 au soir (`src/donnees/v1.ts`, clé `glp1_app_companion_data`,
+`app/base.ts`) : chaque nouveau formulaire prend le type de sa table dans
+`V1/src/types.ts` et ses règles dans la SPEC — c'est la règle, dans
+GUIDELINES.
 
 **À vérifier à l'écran, par elle :** les gestes (glisser la règle, les
 panneaux, le tiroir depuis l'écran de confirmation) ; la barre d'état du

@@ -8,9 +8,8 @@ import {
   peutValider,
   type EtapeId,
 } from '../screens/onboarding/parcours';
-import { REPONSES_INITIALES, type Reponses } from '../screens/onboarding/reponses';
-import { CLE_REPONSES, deserialiser, serialiser } from './enregistrement';
-import { enregistrer, lireEnregistre } from '../plateforme/navigateur';
+import type { Reponses } from '../screens/onboarding/reponses';
+import { ecrireReponses, lireReponsesEnregistrees, migrerAncienEnregistrement } from './enregistrement';
 
 /**
  * LE PARCOURS : les réponses ET le rang de l'étape, ensemble.
@@ -35,11 +34,12 @@ export function useParcours() {
      montage, écrites à chaque changement. Ce qui est enregistré et comment
      on le relit est dans `app/enregistrement.ts` ; le stockage lui-même est
      un verbe de la plateforme. */
-  const [reponses, setReponses] = useState<Reponses>(
-    () => deserialiser(lireEnregistre(CLE_REPONSES)) ?? REPONSES_INITIALES,
-  );
+  const [reponses, setReponses] = useState<Reponses>(() => {
+    migrerAncienEnregistrement();
+    return lireReponsesEnregistrees();
+  });
   useEffect(() => {
-    enregistrer(CLE_REPONSES, serialiser(reponses));
+    ecrireReponses(reponses);
   }, [reponses]);
   const [rang, setRang] = useState(0);
   /* ENTRÉ DANS L'APPLICATION (2026-09-16, « a la fin du formulaire on arrive à

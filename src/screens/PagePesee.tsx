@@ -10,8 +10,9 @@ import { detecterLangue, useTextes } from '../i18n/useTextes';
 import { classeDuTheme } from '../themes/themes';
 import { dateLocale, formaterDateCourte } from '../domaine/dates';
 import { heureLocale, heureRonde } from '../domaine/prises';
-import { peseeDuJour, type Pesee } from '../domaine/pesees';
-import type { UnitePoids } from '../domaine/unites';
+import { peseeDuJour } from '../domaine/pesees';
+import { poidsDepuisKg, poidsEnKg, type UnitePoids } from '../domaine/unites';
+import { idPesee, type WeightLog } from '../donnees/v1';
 import type { Forme } from '../domaine/traitements';
 import type { ModuleId } from '../app/modules';
 
@@ -53,11 +54,11 @@ export function PagePesee({
   poidsPropose: string;
   unite: UnitePoids;
   /** Le journal, pour savoir si le jour est déjà pesé. */
-  pesees: readonly Pesee[];
+  pesees: readonly WeightLog[];
   forme: Forme | null;
   /** La pesée à modifier : le formulaire part d'elle. */
-  initiale?: Pesee;
-  onValider: (pesee: Pesee) => void;
+  initiale?: WeightLog;
+  onValider: (pesee: WeightLog) => void;
   onAnnuler?: () => void;
   onAccueil: () => void;
   onOuvrirCompte: () => void;
@@ -69,18 +70,28 @@ export function PagePesee({
   const modification = initiale !== undefined;
   const maintenant = new Date();
   const [date, setDate] = useState(initiale?.date ?? dateLocale(maintenant));
-  const [heure, setHeure] = useState(initiale?.heure ?? heureRonde(heureLocale(maintenant)));
-  const [poids, setPoids] = useState(initiale?.poids ?? poidsPropose);
+  const [heure, setHeure] = useState(initiale?.time ?? heureRonde(heureLocale(maintenant)));
+  const [poids, setPoids] = useState(initiale ? poidsDepuisKg(initiale.weight, unite) : poidsPropose);
   const [editeDate, setEditeDate] = useState(false);
   const [editeHeure, setEditeHeure] = useState(false);
   /* Le jour déjà pesé : la question se dit, et attend son oui. */
   const [remplacer, setRemplacer] = useState(false);
 
-  const consigner = () => onValider({ date, heure, poids });
+  /* LA LIGNE DE LA V1 : son identifiant (gardé en modification), le poids
+     en kilogrammes quelle que soit l'unité affichée, le drapeau de départ
+     tel qu'il était. */
+  const consigner = () =>
+    onValider({
+      id: initiale?.id ?? idPesee(),
+      date,
+      time: heure,
+      weight: poidsEnKg(poids, unite),
+      isStartingWeight: initiale?.isStartingWeight ?? false,
+    });
   const valider = (evenement: FormEvent) => {
     evenement.preventDefault();
     const dejaLa = peseeDuJour(pesees, date);
-    if (dejaLa && dejaLa !== initiale && !(modification && initiale?.date === date)) {
+    if (dejaLa && dejaLa.id !== initiale?.id) {
       setRemplacer(true);
       return;
     }

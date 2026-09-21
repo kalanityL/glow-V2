@@ -75,3 +75,20 @@ export function tailleAffichee(cm: number, unite: UniteTaille): number {
 export function tailleEnCm(valeur: number, unite: UniteTaille): number {
   return unite === 'in' ? Math.round(valeur * CM_PAR_POUCE) : valeur;
 }
+
+/** Une livre, en kilogrammes. */
+const KG_PAR_LIVRE = 0.45359237;
+
+/** Un poids stocké dans son unité (« 95.0 », « 209.4 ») → kilogrammes, un
+    décimal — la base de la V1 est métrique quelle que soit la préférence. */
+export function poidsEnKg(stocke: string, unite: UnitePoids): number {
+  const valeur = Number(stocke);
+  const kg = unite === 'lb' ? valeur * KG_PAR_LIVRE : valeur;
+  return Math.round(kg * 10) / 10;
+}
+
+/** Des kilogrammes → le poids stocké dans son unité, un décimal, un point. */
+export function poidsDepuisKg(kg: number, unite: UnitePoids): string {
+  const valeur = unite === 'lb' ? kg / KG_PAR_LIVRE : kg;
+  return (Math.round(valeur * 10) / 10).toFixed(1);
+}

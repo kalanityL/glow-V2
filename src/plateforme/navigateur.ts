@@ -146,6 +146,15 @@ export function lireEnregistre(cle: string): string | null {
   }
 }
 
+/** Efface une clé enregistrée — une migration finie retire l'ancienne. */
+export function effacerEnregistre(cle: string): void {
+  try {
+    localStorage.removeItem(cle);
+  } catch {
+    /* Stockage indisponible. */
+  }
+}
+
 export function enregistrer(cle: string, texte: string): void {
   try {
     localStorage.setItem(cle, texte);

@@ -307,8 +307,6 @@ export interface Textes {
     /** Les titres de l'écran d'une pesée (2026-09-21). */
     titrePesee: string;
     titrePeseeMiseAJour: string;
-    /** La ligne du poids sur la carte d'une pesée. */
-    poids: string;
     sousTitre: string;
     zone: string;
     maintenant: string;
@@ -548,22 +546,22 @@ const FR: Textes = {
     },
     /* Les zones de la V1, avec leurs majuscules. */
     zones: {
-      'abdomen-gauche': 'Abdomen Gauche',
-      'abdomen-droit': 'Abdomen Droit',
-      'cuisse-gauche': 'Cuisse Gauche',
-      'cuisse-droite': 'Cuisse Droite',
-      'bras-gauche': 'Bras Gauche',
-      'bras-droit': 'Bras Droit',
-      'voie-orale': 'Prise Orale',
+      abdomen_gauche: 'Abdomen Gauche',
+      abdomen_droit: 'Abdomen Droit',
+      cuisse_gauche: 'Cuisse Gauche',
+      cuisse_droite: 'Cuisse Droite',
+      bras_gauche: 'Bras Gauche',
+      bras_droit: 'Bras Droit',
+      prise_orale: 'Prise Orale',
     },
     zonesCourtes: {
-      'abdomen-gauche': 'Abdomen G',
-      'abdomen-droit': 'Abdomen D',
-      'bras-gauche': 'Bras G',
-      'bras-droit': 'Bras D',
-      'cuisse-gauche': 'Cuisse G',
-      'cuisse-droite': 'Cuisse D',
-      'voie-orale': 'Prise orale',
+      abdomen_gauche: 'Abdomen G',
+      abdomen_droit: 'Abdomen D',
+      bras_gauche: 'Bras G',
+      bras_droit: 'Bras D',
+      cuisse_gauche: 'Cuisse G',
+      cuisse_droite: 'Cuisse D',
+      prise_orale: 'Prise orale',
     },
     zone: 'Zone d’injection',
     autre: 'Autre',
@@ -582,7 +580,7 @@ const FR: Textes = {
   pesee: {
     titre: 'Nouvelle pesée',
     titreModification: 'Modifier la pesée',
-    remplacer: (date) => `Une pesée existe déjà le ${date}. La remplacer ?`,
+    remplacer: (date) => `Une saisie existe déjà le ${date}. La mettre à jour ?`,
   },
   confirmation: {
     titre: {
@@ -595,7 +593,6 @@ const FR: Textes = {
     },
     titrePesee: 'Pesée enregistrée !',
     titrePeseeMiseAJour: 'Pesée mise à jour !',
-    poids: 'Poids',
     sousTitre: 'Votre suivi est à jour.',
     zone: 'Zone d’injection',
     maintenant: 'Vous pouvez maintenant :',

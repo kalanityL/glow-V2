@@ -2804,6 +2804,9 @@
 }
 
 .confirmation__valeur {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
   margin-left: auto;
   color: var(--encre-chapeau);
 }

@@ -5,24 +5,27 @@
  * conversions.
  */
 
-/** Les zones d'injection, dans l'ordre de ses boutons (2026-09-21,
-    « Abdomen G/D - bras G/D - cuisse G/D ») ; « voie orale » pour un
-    comprimé. */
-export const ZONES_INJECTION = [
-  'abdomen-gauche',
-  'abdomen-droit',
-  'bras-gauche',
-  'bras-droit',
-  'cuisse-gauche',
-  'cuisse-droite',
-] as const;
+import { SITES, type InjectionLog, type Site } from '../donnees/v1';
 
-export type Zone = (typeof ZONES_INJECTION)[number] | 'voie-orale';
+/** Les zones d'injection, DANS LES MOTS DE LA BASE DE LA V1 (`site`), dans
+    l'ordre de ses boutons (2026-09-21, « Abdomen G/D - bras G/D - cuisse
+    G/D ») ; « prise orale » pour un comprimé. */
+export const ZONES_INJECTION = [
+  'abdomen_gauche',
+  'abdomen_droit',
+  'bras_gauche',
+  'bras_droit',
+  'cuisse_gauche',
+  'cuisse_droite',
+] as const satisfies readonly Site[];
+
+export type Zone = Site;
+export { SITES };
 
 /** La zone proposée d'avance pour une injection, sans historique : la
     première. La V1 tire au sort hors des zones voisines ; sans journal, il
     n'y a pas de voisines. */
-export const ZONE_PAR_DEFAUT: Zone = 'abdomen-gauche';
+export const ZONE_PAR_DEFAUT: Zone = 'abdomen_gauche';
 
 /** LES MINUTES RONDES (V1, décision du 2026-08-08) : une heure de prise ne
     se choisit que sur celles-ci. */
@@ -65,17 +68,8 @@ export function doseDepuisSaisie(texte: string): number | null {
 /** La longueur d'une note, partout (V1, décision du 2026-08-09). */
 export const NOTE_MAX = 280;
 
-/** Une prise consignée. La dose en milligrammes ; les notes absentes plutôt
-    que vides. */
-export interface Prise {
-  date: string;
-  heure: string;
-  doseMg: number;
-  zone: Zone;
-  notes?: string;
-  /** L'identifiant du traitement, écrit depuis le profil (SPEC). */
-  traitement: string;
-}
+/** Une prise consignée : LA LIGNE DE LA V1 (`InjectionLog`). */
+export type Prise = InjectionLog;
 
 /** Le plafond de prises par jour (SPEC) : deux. */
 export const PRISES_PAR_JOUR_MAX = 2;
@@ -91,7 +85,7 @@ export function avecLaPrise(prises: readonly Prise[], prise: Prise): Prise[] {
   const duJour = prises.filter((p) => p.date === prise.date);
   const gardees =
     duJour.length >= PRISES_PAR_JOUR_MAX ? prises.filter((p) => p !== duJour[duJour.length - 1]) : [...prises];
-  return [...gardees, prise].sort((a, b) =>
-    a.date === b.date ? a.heure.localeCompare(b.heure) : a.date.localeCompare(b.date),
+  return [...gardees.filter((p) => p.id !== prise.id), prise].sort((a, b) =>
+    a.date === b.date ? a.time.localeCompare(b.time) : a.date.localeCompare(b.date),
   );
 }

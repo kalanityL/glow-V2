@@ -44,6 +44,8 @@ export interface LigneConfirmation {
   icone: ReactNode;
   nom: string;
   valeur: string;
+  /** Une icône devant la valeur (2026-09-21, « mettre icone heure devant l'heure »). */
+  iconeValeur?: ReactNode;
 }
 
 /**
@@ -113,7 +115,10 @@ export function PageConfirmation({
               <div key={ligne.nom} className="confirmation__ligne">
                 {ligne.icone}
                 <span>{ligne.nom}</span>
-                <span className="confirmation__valeur">{ligne.valeur}</span>
+                <span className="confirmation__valeur">
+                  {ligne.iconeValeur}
+                  {ligne.valeur}
+                </span>
               </div>
             ))}
           </button>

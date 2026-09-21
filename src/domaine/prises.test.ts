@@ -34,23 +34,25 @@ describe('doseDepuisSaisie', () => {
 });
 
 describe('avecLaPrise', () => {
-  const prise = (date: string, heure: string, doseMg: number) => ({
+  let n = 0;
+  const prise = (date: string, time: string, dose: number) => ({
+    id: `inj-${++n}`,
     date,
-    heure,
-    doseMg,
-    zone: 'abdomen-gauche' as const,
-    traitement: 'ozempic',
+    time,
+    dose,
+    site: 'abdomen_gauche' as const,
+    brand: 'ozempic',
   });
 
   it('ajoute sous le plafond de deux par jour, dans l’ordre', () => {
     const journal = avecLaPrise([prise('2026-09-20', '20:00', 0.25)], prise('2026-09-20', '08:00', 0.25));
-    expect(journal.map((p) => p.heure)).toEqual(['08:00', '20:00']);
+    expect(journal.map((p) => p.time)).toEqual(['08:00', '20:00']);
   });
 
   it('la troisième du jour remplace la dernière de la journée', () => {
     const journal = [prise('2026-09-19', '08:00', 0.25), prise('2026-09-20', '08:00', 0.25), prise('2026-09-20', '20:00', 0.5)];
     const apres = avecLaPrise(journal, prise('2026-09-20', '12:00', 1));
     expect(apres).toHaveLength(3);
-    expect(apres.filter((p) => p.date === '2026-09-20').map((p) => p.doseMg)).toEqual([0.25, 1]);
+    expect(apres.filter((p) => p.date === '2026-09-20').map((p) => p.dose)).toEqual([0.25, 1]);
   });
 });

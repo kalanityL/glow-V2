@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useParcours } from './app/useParcours';
 import { useJournaux } from './app/useJournaux';
 import { useTextes } from './i18n/useTextes';
@@ -8,14 +8,15 @@ import { Compte } from './screens/Compte';
 import { PagePrise } from './screens/PagePrise';
 import { PageConfirmation, ENTREES_PESEE, ENTREES_PRISE } from './screens/PageConfirmation';
 import { PagePesee } from './screens/PagePesee';
-import { IconeBalance, IconeCalendrier, IconeComprime, IconeLieu, IconeSeringue } from './components/Icones';
+import { IconeBalance, IconeCalendrier, IconeComprime, IconeHorloge, IconeLieu, IconeSeringue } from './components/Icones';
 import { TRAITEMENTS } from './domaine/traitements';
-import { UNITES_DU_SYSTEME } from './domaine/unites';
+import { UNITES_DU_SYSTEME, poidsDepuisKg } from './domaine/unites';
 import { dateLocale, formaterDateLongue } from './domaine/dates';
-import { avecLaPesee, poidsLePlusRecent, type Pesee } from './domaine/pesees';
+import { peseeDuJour, poidsLePlusRecent } from './domaine/pesees';
 import { detecterLangue } from './i18n/useTextes';
 import type { ModuleId } from './app/modules';
-import { avecLaPrise, type Prise } from './domaine/prises';
+import type { InjectionLog, WeightLog } from './donnees/v1';
+import { traitementDepuisBrand } from './donnees/conversions';
 import type { FondId } from './app/fonds';
 /* La mise en page d'abord, les jetons des thèmes ensuite : les feuilles de
    thème doivent pouvoir battre la structure, jamais l'inverse. */
@@ -62,7 +63,16 @@ export default function App() {
   /* LES JOURNAUX SUR L'APPAREIL (2026-09-21, « les poids et injections
      saisies disparaissent ?? ») : relus au départ, écrits à chaque
      changement (`useJournaux`) — ils ne vivent plus en mémoire seulement. */
-  const { prises, pesees, setPrises, setPesees } = useJournaux();
+  const journaux = useJournaux();
+  const { pesees } = journaux;
+  /* Le poids de départ édité dans « Mon compte » réécrit la pesée marquée :
+     les journaux se relisent. */
+  useEffect(() => {
+    journaux.relire();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [parcours.reponses.poids]);
+  /* La dernière ligne consignée, pour la confirmation et sa modification. */
+  const [dernierePrise, setDernierePrise] = useState<InjectionLog | null>(null);
   /* LA MODIFICATION DE LA DERNIÈRE PRISE (2026-09-20, « clic sur bloc
      récapitulatif : réouvre le formulaire avec les données enregistrées
      par defaut ») : le formulaire part d'elle, « Mettre à jour » la
@@ -84,29 +94,35 @@ export default function App() {
      injection ») : le poids proposé d'avance est celui de la pesée la plus
      proche d'aujourd'hui qui n'est pas dans le futur, sinon le poids du
      profil. Une pesée par jour : la nouvelle remplace celle du même jour. */
-  const [dernierePesee, setDernierePesee] = useState<Pesee | null>(null);
+  const [dernierePesee, setDernierePesee] = useState<WeightLog | null>(null);
   const aujourdhui = dateLocale(new Date());
-  const poidsPropose = poidsLePlusRecent(pesees, aujourdhui) ?? parcours.reponses.poids;
-  const validerPesee = (pesee: Pesee) => {
-    setPesees((avant) => avecLaPesee(modification && dernierePesee ? avant.filter((p) => p !== dernierePesee) : avant, pesee));
-    setDernierePesee(pesee);
-    setMiseAJour(modification);
+  const langue = detecterLangue();
+  const unites = UNITES_DU_SYSTEME[parcours.reponses.systeme];
+  const kgLePlusRecent = poidsLePlusRecent(pesees, aujourdhui);
+  const poidsPropose = kgLePlusRecent === null ? parcours.reponses.poids : poidsDepuisKg(kgLePlusRecent, unites.poids);
+  /* Validée, la pesée est écrite dans la base ; la ligne du jour, si elle
+     existait, est mise à jour — et la confirmation le dit (« si mise à
+     jour, remplacer Pesée mise à jour ! »). */
+  const validerPesee = (pesee: WeightLog) => {
+    const existante = peseeDuJour(pesees, pesee.date);
+    const apres = journaux.consignerPesee(pesee, modification && dernierePesee ? dernierePesee : undefined);
+    setDernierePesee(peseeDuJour(apres, pesee.date) ?? pesee);
+    setMiseAJour(modification || existante !== undefined);
     setModification(false);
     setPage('confirmation-pesee');
   };
-  const langue = detecterLangue();
-  const unites = UNITES_DU_SYSTEME[parcours.reponses.systeme];
   const poidsEcrit = (stocke: string) => `${stocke.replace('.', textes.separateurDecimal)} ${textes.unites[unites.poids]}`;
   /* Validée, la prise mène à L'ÉCRAN DE CONFIRMATION (2026-09-20, son
      image) : la dernière prise, et ce qu'on peut faire maintenant. */
-  const validerPrise = (prise: Prise) => {
+  const validerPrise = (prise: InjectionLog) => {
     /* Deux par jour au plus (SPEC) : la troisième remplace la dernière du jour. */
-    setPrises((avant) => avecLaPrise(modification ? avant.slice(0, -1) : avant, prise));
+    const apres = journaux.consignerPrise(prise, modification && dernierePrise ? dernierePrise : undefined);
+    setDernierePrise(apres.find((p) => p.id === prise.id) ?? prise);
     setMiseAJour(modification);
     setModification(false);
     setPage('confirmation');
   };
-  const derniere = prises[prises.length - 1] ?? null;
+  const derniere = dernierePrise;
 
   /* LE FOND DE PAGE (2026-09-20) : l'enregistré vient des réponses ; l'APERÇU,
      provisoire, vit ici — le bloc « Thème » le pose sous les yeux, « Choisir »
@@ -179,17 +195,24 @@ export default function App() {
               lignes={[
                 {
                   icone: parcours.reponses.formeTraitement === 'comprime' ? <IconeComprime /> : <IconeSeringue />,
-                  nom: TRAITEMENTS.find((t) => t.id === derniere.traitement)?.nom ?? '',
-                  valeur: `${String(derniere.doseMg).replace('.', textes.separateurDecimal)} mg`,
+                  nom: TRAITEMENTS.find((t) => t.id === traitementDepuisBrand(derniere.brand))?.nom ?? '',
+                  valeur: `${String(derniere.dose).replace('.', textes.separateurDecimal)} mg`,
                 },
                 {
                   icone: <IconeCalendrier />,
                   nom: formaterDateLongue(derniere.date, textes.calendrier.mois, langue),
-                  valeur: derniere.heure,
+                  valeur: derniere.time,
+                  iconeValeur: <IconeHorloge />,
                 },
                 ...(parcours.reponses.formeTraitement === 'comprime'
                   ? []
-                  : [{ icone: <IconeLieu />, nom: textes.confirmation.zone, valeur: textes.prise.zones[derniere.zone] }]),
+                  : [
+                      {
+                        icone: <IconeLieu />,
+                        nom: textes.confirmation.zone,
+                        valeur: textes.prise.zones[derniere.site as keyof typeof textes.prise.zones] ?? derniere.site,
+                      },
+                    ]),
               ]}
               entrees={ENTREES_PRISE}
               forme={parcours.reponses.formeTraitement}
@@ -224,11 +247,15 @@ export default function App() {
               titrePage={textes.accueil.modules.balance}
               titre={miseAJour ? textes.confirmation.titrePeseeMiseAJour : textes.confirmation.titrePesee}
               lignes={[
-                { icone: <IconeBalance />, nom: textes.confirmation.poids, valeur: poidsEcrit(dernierePesee.poids) },
+                /* L'icône et le poids côte à côte, sans intitulé (2026-09-21,
+                   « supprimer le label poids et mettre directement icone
+                   balance et valeur de poids à côté »). */
+                { icone: <IconeBalance />, nom: poidsEcrit(poidsDepuisKg(dernierePesee.weight, unites.poids)), valeur: '' },
                 {
                   icone: <IconeCalendrier />,
                   nom: formaterDateLongue(dernierePesee.date, textes.calendrier.mois, langue),
-                  valeur: dernierePesee.heure,
+                  valeur: dernierePesee.time ?? '',
+                  iconeValeur: <IconeHorloge />,
                 },
               ]}
               entrees={ENTREES_PESEE}

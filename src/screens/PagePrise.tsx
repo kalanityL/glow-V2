@@ -22,6 +22,8 @@ import {
 } from '../domaine/prises';
 import type { ModuleId } from '../app/modules';
 import type { useParcours } from '../app/useParcours';
+import { idPrise } from '../donnees/v1';
+import { brandDepuisTraitement } from '../donnees/conversions';
 import { appliquerChoixTraitement, choixTraitementDe } from '../app/choixTraitement';
 
 /**
@@ -99,19 +101,19 @@ export function PagePrise({
   const separateur = textes.separateurDecimal;
   const mgEcrit = (mg: number) => String(mg).replace('.', separateur);
   const modification = initiale !== undefined;
-  const doseInitialeEstUnPalier = initiale ? paliers.includes(initiale.doseMg) : true;
+  const doseInitialeEstUnPalier = initiale ? paliers.includes(initiale.dose) : true;
 
   const maintenant = new Date();
   const [date, setDate] = useState(initiale?.date ?? dateLocale(maintenant));
-  const [heure, setHeure] = useState(initiale?.heure ?? heureRonde(heureLocale(maintenant)));
+  const [heure, setHeure] = useState(initiale?.time ?? heureRonde(heureLocale(maintenant)));
   const [editeDate, setEditeDate] = useState(false);
   const [editeHeure, setEditeHeure] = useState(false);
-  const [zone, setZone] = useState<Zone>(initiale?.zone ?? (orale ? 'voie-orale' : ZONE_PAR_DEFAUT));
+  const [zone, setZone] = useState<Zone>((initiale?.site as Zone | undefined) ?? (orale ? 'prise_orale' : ZONE_PAR_DEFAUT));
   const [palier, setPalier] = useState<number>(
-    initiale && doseInitialeEstUnPalier ? initiale.doseMg : (paliers[0] ?? 0),
+    initiale && doseInitialeEstUnPalier ? initiale.dose : (paliers[0] ?? 0),
   );
   const [autreDose, setAutreDose] = useState(!doseInitialeEstUnPalier);
-  const [doseTapee, setDoseTapee] = useState(initiale && !doseInitialeEstUnPalier ? mgEcrit(initiale.doseMg) : '');
+  const [doseTapee, setDoseTapee] = useState(initiale && !doseInitialeEstUnPalier ? mgEcrit(initiale.dose) : '');
   const [refuse, setRefuse] = useState(false);
   const [notesOuvertes, setNotesOuvertes] = useState(Boolean(initiale?.notes));
   const [notes, setNotes] = useState(initiale?.notes ?? '');
@@ -123,7 +125,7 @@ export function PagePrise({
      et la zone qui va avec la forme. */
   useEffect(() => {
     setPalier(paliers[0] ?? 0);
-    setZone((avant) => (orale ? 'voie-orale' : avant === 'voie-orale' ? ZONE_PAR_DEFAUT : avant));
+    setZone((avant) => (orale ? 'prise_orale' : avant === 'prise_orale' ? ZONE_PAR_DEFAUT : avant));
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [traitement, forme]);
 
@@ -135,13 +137,16 @@ export function PagePrise({
       return;
     }
     setRefuse(false);
+    /* LA LIGNE DE LA V1 : son identifiant (gardé en modification), le
+       traitement écrit depuis le profil, dans les mots de la V1. */
     onValider({
+      id: initiale?.id ?? idPrise(),
       date,
-      heure,
-      doseMg: dose,
-      zone,
-      notes: notes.trim() ? notes.trim() : undefined,
-      traitement,
+      time: heure,
+      dose,
+      site: zone,
+      ...(notes.trim() ? { notes: notes.trim() } : {}),
+      brand: brandDepuisTraitement(traitement),
     });
   };
 
