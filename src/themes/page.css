@@ -2463,8 +2463,10 @@
 }
 
 .prise__bouton--choisi {
-  /* Un bleu clair franc, celui du contour de son image. */
-  border-color: color-mix(in srgb, var(--accent) 45%, #ffffff);
+  /* Le contour de son image : à peine plus soutenu que le fond, un bleu
+     grisé — pas un bleu franc (2026-09-21, « non ça n'est pas le meme bleu
+     clair de contour », après un contour trop vif). */
+  border-color: color-mix(in srgb, var(--accent) 18%, var(--option-choisi-fond));
   background: var(--option-choisi-fond);
   color: var(--encre);
 }

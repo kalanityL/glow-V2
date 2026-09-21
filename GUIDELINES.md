@@ -537,8 +537,10 @@ image** (« utilise ces styles pour les boutons de dosage et de zone (pas
 les ronds radio) ») : non choisi, gris très clair sans filet et texte gris ;
 choisi, le bleu pâle des réponses choisies cerné d'un bleu plus soutenu, le
 texte à l'encre du formulaire, jamais bleu ; non choisi cerné d'un gris à
-peine plus foncé que son fond, choisi cerné d'un bleu clair franc (« les
-couleurs de contours ne sont pas conforme à l'image », corrigé) ; le nom
+peine plus foncé que son fond, choisi cerné d'un bleu grisé à peine plus soutenu que son fond (« les
+couleurs de contours ne sont pas conforme à l'image », puis « ça n'est pas
+le meme bleu clair de contour » — corrigé deux fois, la seconde vers le
+plus discret) ; le nom
 du traitement et l'intitulé de la zone à l'encre ; **le bandeau de titre
 et le bouton Valider sont figés, le corps du formulaire défile entre eux**
 (« bandeau titre et bouton valider figés, c'est le reste qui scrolle »),
