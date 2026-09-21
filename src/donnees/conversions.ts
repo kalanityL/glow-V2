@@ -1,6 +1,7 @@
 import type { Avatar, Coiffure, Expression, FormeVisage, Genre } from '../domaine/avatar';
 import type { Reponses } from '../screens/onboarding/reponses';
 import { UNITES_DU_SYSTEME, poidsDepuisKg, poidsEnKg } from '../domaine/unites';
+import { TRAITEMENTS, type Forme } from '../domaine/traitements';
 import { ageA, dateLocale } from '../domaine/dates';
 import { avecLeDepart, peseeDeDepart } from '../domaine/pesees';
 import type { AppData, AvatarConfig, UserProfile } from './v1';
@@ -97,6 +98,13 @@ export function brandDepuisTraitement(traitement: string | null): string {
   return traitement === 'foundayo' ? 'orforglipron' : traitement;
 }
 
+/** La forme d'une spécialité du catalogue ; `null` sans traitement ou hors
+    catalogue. */
+export function formeDuTraitement(traitement: string | null): Forme | null {
+  if (!traitement) return null;
+  return TRAITEMENTS.find((t) => t.id === traitement)?.forme ?? null;
+}
+
 export function traitementDepuisBrand(brand: string | undefined): string | null {
   if (!brand || brand === 'aucun') return null;
   return brand === 'orforglipron' ? 'foundayo' : brand;
@@ -161,8 +169,13 @@ export function reponsesDepuisBase(base: AppData, horsBase: Partial<ReponsesHors
     poids: depart ? poidsDepuisKg(depart.weight, unites.poids) : defaut.poids,
     avatar: p.avatar ? avatarDepuisAvatarConfig(p.avatar, defaut.avatar) : defaut.avatar,
     traitement,
-    /* Un traitement en base sans forme hors base : la forme vient du catalogue. */
-    formeTraitement: horsBase.formeTraitement ?? (traitement ? null : null),
+    /* UN TRAITEMENT EN BASE SANS FORME HORS BASE : LA FORME VIENT DU
+       CATALOGUE (2026-09-21 au soir, « mon traitement est wegovy injection
+       mais ajouter traitement ne m'amene pas au formulaire d'ajout ») — le
+       commentaire le disait, le code rendait `null` : le bloc « Mon
+       traitement » s'ouvrait sans forme et le « + » n'arrivait jamais à la
+       prise. Chaque spécialité connaît sa forme. */
+    formeTraitement: horsBase.formeTraitement ?? formeDuTraitement(traitement),
     traitementCommence: horsBase.traitementCommence ?? traitement !== null,
   };
 }
