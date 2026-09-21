@@ -66,6 +66,20 @@ export function dateDecalee(date: string, jours: number): string {
   return dateLocale(new Date(a, m - 1, j + jours));
 }
 
+/** LES JOURS QUI ONT UN MOT (2026-09-21 au soir, « pour les dates : hier /
+    avant hier / aujourd'hui / demain / apres demain / sinon la date ») :
+    l'écart en jours entre `date` et `aujourdhui` quand il vaut un mot, de
+    -2 (avant-hier) à 2 (après-demain), `null` sinon — l'appelant écrit
+    alors la date. */
+export type JourRelatif = 'avantHier' | 'hier' | 'aujourdhui' | 'demain' | 'apresDemain';
+const JOURS_RELATIFS: Record<string, JourRelatif> = { '-2': 'avantHier', '-1': 'hier', '0': 'aujourdhui', '1': 'demain', '2': 'apresDemain' };
+export function jourRelatif(date: string, aujourdhui: string): JourRelatif | null {
+  const [a, m, j] = date.split('-').map(Number);
+  const [a0, m0, j0] = aujourdhui.split('-').map(Number);
+  const ecart = Math.round((new Date(a, m - 1, j).getTime() - new Date(a0, m0 - 1, j0).getTime()) / 86_400_000);
+  return JOURS_RELATIFS[String(ecart)] ?? null;
+}
+
 /** L'âge en années révolues à la date `aujourdhui`, l'une et l'autre en
     `AAAA-MM-JJ` : l'anniversaire compte le jour même. */
 export function ageA(dateNaissance: string, aujourdhui: string): number {

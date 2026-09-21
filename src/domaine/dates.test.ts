@@ -1,5 +1,21 @@
 import { describe, expect, it } from 'vitest';
-import { ageA, anneeDe, anneeMoisDe, dateDecalee, dateDepuisAnnee, dateLocale, formaterDateCourte, grilleDuMois, lireDateCourte, moisDecale } from './dates';
+import { ageA, anneeDe, anneeMoisDe, dateDecalee, dateDepuisAnnee, dateLocale, formaterDateCourte, grilleDuMois, jourRelatif, lireDateCourte, moisDecale } from './dates';
+
+describe('jourRelatif', () => {
+  it('nomme de l’avant-veille au surlendemain, et se tait au-delà', () => {
+    const j = '2026-09-21';
+    expect(jourRelatif('2026-09-19', j)).toBe('avantHier');
+    expect(jourRelatif('2026-09-20', j)).toBe('hier');
+    expect(jourRelatif('2026-09-21', j)).toBe('aujourdhui');
+    expect(jourRelatif('2026-09-22', j)).toBe('demain');
+    expect(jourRelatif('2026-09-23', j)).toBe('apresDemain');
+    expect(jourRelatif('2026-09-18', j)).toBeNull();
+    expect(jourRelatif('2026-09-24', j)).toBeNull();
+    /* Le passage d'un mois, et le changement d'heure d'octobre (2026-10-25). */
+    expect(jourRelatif('2026-10-01', '2026-09-30')).toBe('demain');
+    expect(jourRelatif('2026-10-24', '2026-10-26')).toBe('avantHier');
+  });
+});
 
 describe('dateDecalee', () => {
   it('avance et recule d’un jour, mois et année compris', () => {

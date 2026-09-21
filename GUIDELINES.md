@@ -770,7 +770,10 @@ exception consignée** (« on a dit que tu mets exactement les couleurs qd
 je te donne une capture ») — **« Hier » et « Aujourd'hui » valent pour les deux
 bords, quelle que soit la date choisie** (« la règle pour aujourd'hui /
 hier reste : si date choisie est hier ou aujourd'hui, mettre hier ou
-aujourd'hui ») ; deux
+aujourd'hui ») — **et d'avant-hier à après-demain depuis le soir du
+2026-09-21** (« pour les dates : hier / avant hier / aujourd'hui / demain /
+apres demain / sinon la date » : `jourRelatif`, testé, et les cinq mots
+dans le dictionnaire ; au-delà, la date) ; deux
 instants complets, Endormissement et Réveil, chacun son jour et son heure
 sur deux colonnes — une nuit part de la veille 23:00 → 07:00, une sieste du
 jour même 14:00 → 15:00, changer de nature ne déplace les instants que s'ils

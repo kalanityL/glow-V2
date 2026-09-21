@@ -6,6 +6,7 @@ import type {
 } from '../domaine/avatar';
 import type { Forme } from '../domaine/traitements';
 import type { RefusConnexion } from '../domaine/connexion';
+import type { JourRelatif } from '../domaine/dates';
 import type { Zone } from '../domaine/prises';
 import type { SleepKind } from '../donnees/v1';
 import type { EntreeConfirmation } from '../screens/PageConfirmation';
@@ -304,10 +305,10 @@ export interface Textes {
     natures: Record<SleepKind, string>;
     endormissement: string;
     reveil: string;
-    /** Le jour de l'endormissement en mots quand c'est hier ou aujourd'hui
-        (2026-09-21, « mettre hier, aujourd'hui ou date »). */
-    hier: string;
-    aujourdhui: string;
+    /** Le jour en mots quand il en a un (2026-09-21, « mettre hier,
+        aujourd'hui ou date », puis le soir : « hier / avant hier /
+        aujourd'hui / demain / apres demain / sinon la date »). */
+    jours: Record<JourRelatif, string>;
     /** La durée écrite en phrase : « Durée : 8 h 05 » (2026-09-21 au soir,
         « 8 h 05 de sommeil-> Durée : xx ») — et le mot seul, avant, pour
         l'écran, où la durée garde sa largeur fixe. */
@@ -645,8 +646,13 @@ const FR: Textes = {
     natures: { nuit: 'Nuit', sieste: 'Sieste' },
     endormissement: 'Endormissement',
     reveil: 'Réveil',
-    hier: 'Hier',
-    aujourdhui: 'Aujourd’hui',
+    jours: {
+      avantHier: 'Avant-hier',
+      hier: 'Hier',
+      aujourdhui: 'Aujourd’hui',
+      demain: 'Demain',
+      apresDemain: 'Après-demain',
+    },
     /* « Durée : 8 h 05 » (2026-09-21 au soir, « 8 h 05 de sommeil-> Durée :
        xx ») — « 13 h de sommeil » a vécu la journée. */
     duree: (duree) => `Durée : ${duree}`,

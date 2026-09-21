@@ -11,7 +11,7 @@ import { IndiceDefilement } from '../components/IndiceDefilement';
 import { IconeChevronGauche, IconeCoche, IconeCroix, IconeHorloge, IconePlus, IconeSommeil } from '../components/Icones';
 import { detecterLangue, useTextes } from '../i18n/useTextes';
 import { classeDuTheme } from '../themes/themes';
-import { dateDecalee, dateLocale, formaterDateCourte } from '../domaine/dates';
+import { dateDecalee, dateLocale, formaterDateCourte, jourRelatif } from '../domaine/dates';
 import { NOTE_MAX } from '../domaine/prises';
 import {
   HEURES_PAR_DEFAUT,
@@ -186,8 +186,13 @@ export function PageSommeil({
      mettre hier, aujourd'hui ou date », puis « la règle pour aujourd'hui /
      hier reste : si date choisie est hier ou aujourd'hui, mettre hier ou
      aujourd'hui ») : « Hier », « Aujourd'hui », sinon la date. */
-  const jourEcrit = (date: string) =>
-    date === aujourdhui ? textes.sommeil.aujourdhui : date === veille(aujourdhui) ? textes.sommeil.hier : formaterDateCourte(date, langue);
+  const jourEcrit = (date: string) => {
+    /* D'avant-hier à après-demain en mots, sinon la date (2026-09-21 au
+       soir, « hier / avant hier / aujourd'hui / demain / apres demain /
+       sinon la date »). */
+    const mot = jourRelatif(date, aujourdhui);
+    return mot ? textes.sommeil.jours[mot] : formaterDateCourte(date, langue);
+  };
 
   const colonne = (
     nom: string,
