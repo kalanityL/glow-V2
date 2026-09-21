@@ -57,3 +57,6 @@ Règles de tenue (voir GUIDELINES.md, « Manière de travailler ») :
 - [ ] tous les 1ers du mois, une offre : new month new life : 1er mois à
       -50% ; bandeau  d'annonce bas vitré foncé comme sur shipt cf mobbin -
       se retrouve aussi sur la partie mes abos de mon compte.
+
+- [ ] pour le 1er du mois gratuit : limiter ls enregistrer à 15 repas / 15
+      sommeils / 5 activité
