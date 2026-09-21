@@ -138,10 +138,25 @@ export function Compte({
      langue, et se relit avec l'un ou l'autre. */
   const poidsEcrit = (stocke: string) => stocke.replace('.', separateur);
 
+  /* ALLER À UN VOLET : l'onglet change tout de suite, et le carrousel est
+     amené APRÈS le rendu, D'UN COUP (2026-09-21, son téléphone : « j'ai
+     validé les modifs, l'onglet revient sur information mais on voit le
+     contenu de avatar ») — un glissement lancé au clic, pendant que
+     « Valider » réécrivait l'avatar et faisait re-rendre les volets, était
+     interrompu par Chrome Android et l'aimant du carrousel le ramenait sur
+     l'avatar. La demande est notée, l'effet la sert une fois la page
+     rendue. */
+  const voletDemande = useRef<Volet | null>(null);
   const aller = (cible: Volet) => {
-    montrerVolet(carrousel.current, VOLETS.indexOf(cible));
+    voletDemande.current = cible;
     setVolet(cible);
   };
+  useEffect(() => {
+    if (voletDemande.current === null) return;
+    const cible = voletDemande.current;
+    voletDemande.current = null;
+    montrerVolet(carrousel.current, VOLETS.indexOf(cible), false);
+  }, [volet]);
 
   return (
     <div

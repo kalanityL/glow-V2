@@ -161,8 +161,8 @@ export function remonterEnHaut(element: Element | null): void {
 }
 
 /** Fait glisser un carrousel horizontal jusqu'à son volet `index`. */
-export function montrerVolet(carrousel: Element | null, index: number): void {
-  carrousel?.scrollTo({ left: carrousel.clientWidth * index, behavior: 'smooth' });
+export function montrerVolet(carrousel: Element | null, index: number, doux = true): void {
+  carrousel?.scrollTo({ left: carrousel.clientWidth * index, behavior: doux ? 'smooth' : 'auto' });
 }
 
 /** Le volet d'un carrousel horizontal qui occupe l'écran. */
