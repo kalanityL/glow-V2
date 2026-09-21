@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { avecLeSommeil, dureeEcrite, dureeMinutes, peutAjouterSommeil, seRecouvrent, sommeilEnConflit, veille } from './sommeils';
+import { avecLeSommeil, dureeEcrite, dureeMinutes, jaugeDuSommeil, peutAjouterSommeil, seRecouvrent, sommeilEnConflit, veille } from './sommeils';
 import type { SleepLog } from '../donnees/v1';
 
 const nuit: SleepLog = { id: 's-1', bedDate: '2026-09-11', bedTime: '23:00', date: '2026-09-12', time: '07:00', kind: 'nuit', quality: 3 };
@@ -41,5 +41,24 @@ describe('avecLeSommeil / peutAjouterSommeil / veille', () => {
   });
   it('connaît la veille', () => {
     expect(veille('2026-09-01')).toBe('2026-08-31');
+  });
+});
+
+describe('jaugeDuSommeil', () => {
+  it('une nuit : se remplit jusqu’à 8 h, s’intensifie jusqu’à 12 h, puis reste', () => {
+    expect(jaugeDuSommeil('nuit', 4 * 60)).toEqual({ remplissage: 0.5, intensite: 0 });
+    expect(jaugeDuSommeil('nuit', 8 * 60)).toEqual({ remplissage: 1, intensite: 0 });
+    expect(jaugeDuSommeil('nuit', 10 * 60)).toEqual({ remplissage: 1, intensite: 0.5 });
+    expect(jaugeDuSommeil('nuit', 12 * 60)).toEqual({ remplissage: 1, intensite: 1 });
+    expect(jaugeDuSommeil('nuit', 15 * 60)).toEqual({ remplissage: 1, intensite: 1 });
+  });
+  it('une sieste : pleine à 1 h 30, intense à 3 h', () => {
+    expect(jaugeDuSommeil('sieste', 45)).toEqual({ remplissage: 0.5, intensite: 0 });
+    expect(jaugeDuSommeil('sieste', 90)).toEqual({ remplissage: 1, intensite: 0 });
+    expect(jaugeDuSommeil('sieste', 135)).toEqual({ remplissage: 1, intensite: 0.5 });
+    expect(jaugeDuSommeil('sieste', 240)).toEqual({ remplissage: 1, intensite: 1 });
+  });
+  it('une durée nulle : vide', () => {
+    expect(jaugeDuSommeil('nuit', 0)).toEqual({ remplissage: 0, intensite: 0 });
   });
 });

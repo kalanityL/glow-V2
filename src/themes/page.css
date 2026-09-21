@@ -3266,3 +3266,29 @@
   stroke: #364868;
   stroke-width: 1.4;
 }
+
+/* LA JAUGE DU SOMMEIL (2026-09-21) : un rail au gris des champs, un plein
+   dont la largeur est le remplissage et dont le bleu va, avec l'intensité,
+   du bleu clair du « + » à son bleu foncé, puis plus foncé encore. Les deux
+   nombres viennent du code (`--remplissage`, `--intensite`, 0 à 1). */
+.sommeil__jauge {
+  width: 100%;
+  height: 8px;
+  margin: -6px 0 0;
+  border-radius: 4px;
+  background: color-mix(in srgb, var(--option-filet) 45%, var(--option-fond));
+  overflow: hidden;
+}
+
+.sommeil__jauge-plein {
+  display: block;
+  height: 100%;
+  width: calc(var(--remplissage, 0) * 100%);
+  border-radius: 4px;
+  background: color-mix(
+    in srgb,
+    var(--menu-ajouter-debut) calc((1 - var(--intensite, 0)) * 100%),
+    color-mix(in srgb, var(--menu-ajouter-fin) 70%, #0b1f5c)
+  );
+  transition: width 120ms, background 120ms;
+}

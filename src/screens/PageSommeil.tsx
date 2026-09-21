@@ -1,4 +1,4 @@
-import { useState, type FormEvent } from 'react';
+import { useState, type CSSProperties, type FormEvent } from 'react';
 import { BarreDuBas, type AjoutTraitement } from './BarreDuBas';
 import { EntetePage } from './EntetePage';
 import type { FondProps } from './Accueil';
@@ -20,6 +20,7 @@ import {
   SOMMEILS_PAR_JOUR_MAX,
   dureeEcrite,
   dureeMinutes,
+  jaugeDuSommeil,
   peutAjouterSommeil,
   sommeilEnConflit,
   veille,
@@ -95,6 +96,9 @@ export function PageSommeil({
 
   const plage = { bedDate: dateCoucher, bedTime: heureCoucher, date: dateReveil, time: heureReveil };
   const duree = dureeMinutes(plage);
+  /* LA JAUGE suit la durée en temps réel : elle se remplit jusqu'à la durée
+     pleine, puis son bleu s'intensifie jusqu'à la durée haute. */
+  const jauge = jaugeDuSommeil(nature, duree);
 
   /* Toute retouche désarme la question et efface le refus. */
   const retouche = <T,>(poser: (v: T) => void) => (v: T) => {
@@ -241,6 +245,17 @@ export function PageSommeil({
             <p className="sommeil__duree">
               {textes.sommeil.duree} <span>{dureeEcrite(duree)}</span>
             </p>
+            <div
+              className="sommeil__jauge"
+              role="progressbar"
+              aria-label={textes.sommeil.duree}
+              aria-valuemin={0}
+              aria-valuemax={100}
+              aria-valuenow={Math.round(jauge.remplissage * 100)}
+              style={{ '--remplissage': jauge.remplissage, '--intensite': jauge.intensite } as CSSProperties}
+            >
+              <span className="sommeil__jauge-plein" />
+            </div>
 
             {/* LA NOTE EN ÉTOILES (2026-09-21, « notez votre nuit ou notez
                 votre sieste »). */}

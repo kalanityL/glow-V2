@@ -96,3 +96,27 @@ export function veille(date: string): string {
   const [a, m, j] = date.split('-').map(Number);
   return dateLocale(new Date(a, m - 1, j - 1));
 }
+
+/**
+ * LA JAUGE D'UN SOMMEIL (2026-09-21, « barre de progression : nuit : barre
+ * complètement remplie à 8 h, de 8 à 12 h de durée le bleu devient de plus
+ * en plus foncé ; de 0 à 8 h le bleu reste le même, la barre se remplit ;
+ * plus de 12 h la barre ne change plus de couleur ; idem pour sieste avec
+ * barre complètement remplie à 1 h 30 et s'intensifie jusqu'à 3 h ») : deux
+ * nombres de 0 à 1 — le REMPLISSAGE, la durée rapportée à la durée pleine ;
+ * et L'INTENSITÉ, de 0 à la pleine durée, montant jusqu'à 1 à la durée
+ * haute, où elle reste.
+ */
+export const JAUGE: Record<SleepKind, { pleine: number; haute: number }> = {
+  nuit: { pleine: 8 * 60, haute: 12 * 60 },
+  sieste: { pleine: 90, haute: 3 * 60 },
+};
+
+export function jaugeDuSommeil(nature: SleepKind, minutes: number): { remplissage: number; intensite: number } {
+  const { pleine, haute } = JAUGE[nature];
+  const m = Math.max(0, minutes);
+  return {
+    remplissage: Math.min(1, m / pleine),
+    intensite: m <= pleine ? 0 : Math.min(1, (m - pleine) / (haute - pleine)),
+  };
+}

@@ -741,7 +741,15 @@ minutes rondes, l'heure change et la boule suit ; passer le haut du cadran
 bascule la moitié du jour et les repères deviennent 12 15 18 21 ; **les
 heures et la durée ont une largeur fixée** (chiffres tabulaires, une case
 constante alignée à gauche — « pour que ça ne saute pas qd on modifie ») ; la durée déduite (« 8 h », « 7 h 45 »), jamais
-saisie ; **la note en étoiles** (« notez votre nuit ou notez votre sieste :
+saisie, **et sa jauge** (2026-09-21, « barre de progression : nuit : barre
+complètement remplie à 8h, de 8 à 12h de durée le bleu devient de plus en
+plus foncé ; de 0 à 8h le bleu reste le même, la barre se remplit ; plus de
+12h la barre ne change plus ; idem pour sieste, remplie à 1h30,
+s'intensifie jusqu'à 3h ») : elle se remplit jusqu'à la durée pleine (8 h
+la nuit, 1 h 30 la sieste) dans le bleu clair du « + », puis son bleu
+s'intensifie jusqu'à la durée haute (12 h, 3 h) et n'en bouge plus — en
+temps réel avec les heures (`domaine/sommeils.ts`, `jaugeDuSommeil`,
+testé) ; **la note en étoiles** (« notez votre nuit ou notez votre sieste :
 5 étoiles qu'on peut cliquer ou slider pour remplir, par défaut 3 ») — la
 qualité de 0 à 5 de la V1, sans mot dessous (« pas de label aux
 étoiles »), les étoiles pleines dans le dégradé bleu du bouton « + »
