@@ -1,4 +1,8 @@
 import { useId, useRef, type PointerEvent } from 'react';
+import { STAR_PATHS } from './Logomark';
+
+/** La grande étoile du bloc-logo, dans le carré de 24 du logo. */
+const ETOILE_DU_LOGO = STAR_PATHS[0];
 
 /**
  * LA NOTE EN ÉTOILES (2026-09-21, « notez votre nuit ou notez votre sieste :
@@ -90,7 +94,12 @@ export function NoteEtoiles({
           focusable="false"
           style={i <= valeur ? { fill: `url(#${degrade})` } : undefined}
         >
-          <path d="M11.525 2.295a.53.53 0 0 1 .95 0l2.31 4.679a2.123 2.123 0 0 0 1.595 1.16l5.166.756a.53.53 0 0 1 .294.904l-3.736 3.638a2.123 2.123 0 0 0-.611 1.878l.882 5.14a.53.53 0 0 1-.771.56l-4.618-2.428a2.122 2.122 0 0 0-1.973 0L6.396 21.01a.53.53 0 0 1-.77-.56l.881-5.139a2.122 2.122 0 0 0-.611-1.879L2.16 9.795a.53.53 0 0 1 .294-.906l5.165-.755a2.122 2.122 0 0 0 1.597-1.16z" />
+          {/* L'ÉTOILE DU LOGO (2026-09-21, « notez votre nuit : utiliser la
+              forme d'étoile du logo de glow ») : la grande étoile à quatre
+              branches du bloc-logo, seule — ses deux satellites sont le
+              motif de la marque, pas la forme d'une étoile. Le tracé est
+              celui de `Logomark`, une retouche vaut pour tous. */}
+          <path d={ETOILE_DU_LOGO} />
         </svg>
       ))}
     </div>

@@ -785,7 +785,10 @@ temps réel avec les heures (`domaine/sommeils.ts`, `jaugeDuSommeil`,
 testé) ; **la note en étoiles** (« notez votre nuit ou notez votre sieste :
 5 étoiles qu'on peut cliquer ou slider pour remplir, par défaut 3 ») — la
 qualité de 0 à 5 de la V1, sans mot dessous (« pas de label aux
-étoiles »), les étoiles pleines dans le dégradé bleu du bouton « + »
+étoiles »), **de la forme de l'étoile du logo** (2026-09-21 au soir,
+« notez votre nuit : utiliser la forme d'étoile du logo de glow » : la
+grande étoile à quatre branches de `Logomark`, seule, le même tracé
+`STAR_PATHS[0]`), les étoiles pleines dans le dégradé bleu du bouton « + »
 (« couleur des étoiles de notation : bleu dégradé du bouton + » — ses deux
 bouts en jetons, `--menu-ajouter-debut` / `--menu-ajouter-fin`) ; le jour de l'endormissement en mots — « Hier »,
 « Aujourd'hui », sinon la date — et le calendrier au clic (« endormissement :
