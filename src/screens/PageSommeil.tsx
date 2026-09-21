@@ -11,7 +11,7 @@ import { IndiceDefilement } from '../components/IndiceDefilement';
 import { IconeChevronGauche, IconeCoche, IconeCroix, IconeHorloge, IconePlus, IconeSommeil } from '../components/Icones';
 import { detecterLangue, useTextes } from '../i18n/useTextes';
 import { classeDuTheme } from '../themes/themes';
-import { dateLocale, formaterDateCourte } from '../domaine/dates';
+import { dateDecalee, dateLocale, formaterDateCourte } from '../domaine/dates';
 import { NOTE_MAX } from '../domaine/prises';
 import {
   HEURES_PAR_DEFAUT,
@@ -212,7 +212,9 @@ export function PageSommeil({
       )}
       {/* LE CADRAN, au-dessus de l'heure (2026-09-21) : la boule se glisse,
           l'heure suit ; l'heure change, la boule suit. */}
-      <CadranHeure valeur={heure} onValeur={poserHeure} nom={nom} />
+      {/* Passer minuit sur le cadran change le jour du bord (2026-09-21 au
+          soir) : le calendrier suit la boule. */}
+      <CadranHeure valeur={heure} onValeur={poserHeure} onJour={(jours) => poserDate(dateDecalee(date, jours))} nom={nom} />
       {edite === cleHeure ? (
         <ChoixHeure valeur={heure} onChoix={poserHeure} nom={nom} icone={<IconeHorloge />} ouvertDAbord onFerme={() => setEdite(null)} />
       ) : (

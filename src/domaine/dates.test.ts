@@ -1,5 +1,16 @@
 import { describe, expect, it } from 'vitest';
-import { ageA, anneeDe, anneeMoisDe, dateDepuisAnnee, dateLocale, formaterDateCourte, grilleDuMois, lireDateCourte, moisDecale } from './dates';
+import { ageA, anneeDe, anneeMoisDe, dateDecalee, dateDepuisAnnee, dateLocale, formaterDateCourte, grilleDuMois, lireDateCourte, moisDecale } from './dates';
+
+describe('dateDecalee', () => {
+  it('avance et recule d’un jour, mois et année compris', () => {
+    expect(dateDecalee('2026-09-21', 1)).toBe('2026-09-22');
+    expect(dateDecalee('2026-09-21', -1)).toBe('2026-09-20');
+    expect(dateDecalee('2026-09-30', 1)).toBe('2026-10-01');
+    expect(dateDecalee('2026-01-01', -1)).toBe('2025-12-31');
+    expect(dateDecalee('2028-02-28', 1)).toBe('2028-02-29');
+    expect(dateDecalee('2026-09-21', 0)).toBe('2026-09-21');
+  });
+});
 
 describe('dateDepuisAnnee / anneeDe', () => {
   it('fait un 1er janvier, et retrouve l’année', () => {

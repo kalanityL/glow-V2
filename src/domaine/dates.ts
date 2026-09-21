@@ -59,6 +59,13 @@ export function dateLocale(d: Date): string {
   return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
 }
 
+/** La date décalée de `jours` jours (négatif : en arrière), en local — le
+    mois et l'année suivent ; `2026-02-28` + 1 = `2026-03-01`. */
+export function dateDecalee(date: string, jours: number): string {
+  const [a, m, j] = date.split('-').map(Number);
+  return dateLocale(new Date(a, m - 1, j + jours));
+}
+
 /** L'âge en années révolues à la date `aujourdhui`, l'une et l'autre en
     `AAAA-MM-JJ` : l'anniversaire compte le jour même. */
 export function ageA(dateNaissance: string, aujourdhui: string): number {

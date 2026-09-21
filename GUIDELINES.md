@@ -780,7 +780,13 @@ le cercle porte les crans d'une montre (soixante, les douze des heures plus
 longs — « fait apparaitre les crans comme sur une montre à cadran ») ; la
 boule est à l'angle de l'heure, elle se glisse et l'heure suit sur les
 minutes rondes, l'heure change et la boule suit ; passer le haut du cadran
-bascule la moitié du jour et les repères deviennent 12 15 18 21 ; **les
+bascule la moitié du jour et les repères deviennent 12 15 18 21 ; **passer
+minuit change le jour du bord** (2026-09-21 au soir, « cadran horloge
+reglage heure -> modifie pour que le passage avant ou apres 23:59 modifie
+la date ») : en glissant, franchir 23:59 vers l'avant met le lendemain,
+vers l'arrière la veille — compté sur la valeur arrondie, une fois par
+passage, jamais en passant midi (`CadranHeure`, `onJour` ; `dateDecalee`,
+testée) ; **les
 heures et la durée ont une largeur fixée** (chiffres tabulaires, une case
 constante alignée à gauche — « pour que ça ne saute pas qd on modifie ») ; la durée déduite, écrite « Durée : 8 h 05 » (2026-09-21 au soir, « 8 h 05
 de sommeil-> Durée : xx » — « 13 h de sommeil » a vécu la journée), jamais

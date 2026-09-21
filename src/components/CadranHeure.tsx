@@ -45,9 +45,29 @@ function surMinuteRonde(minutes: number): number {
   return heure * 60 + proche;
 }
 
-export function CadranHeure({ valeur, onValeur, nom }: { valeur: string; onValeur: (heure: string) => void; nom: string }) {
+export function CadranHeure({
+  valeur,
+  onValeur,
+  onJour,
+  nom,
+}: {
+  valeur: string;
+  onValeur: (heure: string) => void;
+  /** PASSER MINUIT CHANGE LE JOUR (2026-09-21 au soir, « cadran horloge
+      reglage heure -> modifie pour que le passage avant ou apres 23:59
+      modifie la date ») : en glissant, franchir 23:59 vers l'avant appelle
+      `onJour(1)`, le refranchir vers l'arrière `onJour(-1)` — le jour du
+      bord suit la boule. Sans lui, l'heure s'enroule comme avant. */
+  onJour?: (jours: number) => void;
+  nom: string;
+}) {
   const cadran = useRef<SVGSVGElement>(null);
-  const glisse = useRef<{ angle: number; minutes: number } | null>(null);
+  /* Pendant un glissement : l'angle d'avant, les minutes NON ENROULÉES
+     depuis le départ (elles peuvent passer sous zéro ou au-delà du jour),
+     et le jour déjà rapporté à l'appelant — pour ne compter chaque
+     passage de minuit qu'une fois, sur la valeur ARRONDIE, pas sur la
+     brute (23:57 arrondit à 00:00 : c'est déjà le lendemain). */
+  const glisse = useRef<{ angle: number; minutes: number; jour: number } | null>(null);
   const minutes = minutesDe(valeur);
   const apresMidi = minutes >= MINUTES_PAR_TOUR;
   const angle = angleDe(minutes);
@@ -104,8 +124,9 @@ export function CadranHeure({ valeur, onValeur, nom }: { valeur: string; onValeu
         e.currentTarget.setPointerCapture(e.pointerId);
         const a = angleSous(e);
         /* La boule saute sous le doigt, dans la moitié du jour où l'on est. */
-        const nouvelles = surMinuteRonde((apresMidi ? MINUTES_PAR_TOUR : 0) + (a / 360) * MINUTES_PAR_TOUR);
-        glisse.current = { angle: a, minutes: nouvelles };
+        const brutes = (apresMidi ? MINUTES_PAR_TOUR : 0) + (a / 360) * MINUTES_PAR_TOUR;
+        const nouvelles = surMinuteRonde(brutes) % MINUTES_PAR_JOUR;
+        glisse.current = { angle: a, minutes: brutes, jour: 0 };
         if (nouvelles !== minutes) onValeur(valeurDe(nouvelles));
       }}
       onPointerMove={(e) => {
@@ -117,10 +138,17 @@ export function CadranHeure({ valeur, onValeur, nom }: { valeur: string; onValeu
         if (delta > 180) delta -= 360;
         if (delta < -180) delta += 360;
         const brutes = glisse.current.minutes + (delta / 360) * MINUTES_PAR_TOUR;
-        const enroulees = ((brutes % MINUTES_PAR_JOUR) + MINUTES_PAR_JOUR) % MINUTES_PAR_JOUR;
-        glisse.current = { angle: a, minutes: enroulees };
-        const rondes = surMinuteRonde(enroulees) % MINUTES_PAR_JOUR;
-        if (rondes !== minutes) onValeur(valeurDe(rondes));
+        /* L'arrondi se fait dans le jour, puis le jour est remis : 23:57
+           arrondit à 00:00 DU LENDEMAIN, et c'est le jour de la valeur
+           arrondie qui compte. */
+        const jourBrut = Math.floor(brutes / MINUTES_PAR_JOUR);
+        const rondes = surMinuteRonde(brutes - jourBrut * MINUTES_PAR_JOUR) + jourBrut * MINUTES_PAR_JOUR;
+        const jour = Math.floor(rondes / MINUTES_PAR_JOUR);
+        const jourDAvant = glisse.current.jour;
+        glisse.current = { angle: a, minutes: brutes, jour };
+        if (jour !== jourDAvant) onJour?.(jour - jourDAvant);
+        const heure = rondes - jour * MINUTES_PAR_JOUR;
+        if (heure !== minutes) onValeur(valeurDe(heure));
       }}
       onPointerUp={() => {
         glisse.current = null;
