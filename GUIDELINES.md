@@ -618,7 +618,12 @@ rien ne bouge en passant les cent. **Une seule source à la fois**
 rendu) : la règle (`components/ReglePoids.tsx`) ne ramène jamais la
 graduation sur un poids qu'elle vient de lire — l'effet qui la place ne
 joue que pour un poids venu d'ailleurs (ouverture, frappe, autre
-traitement) ; sa piste de dix mille crans se rend une fois par unité. La géométrie de la graduation (le pas
+traitement). **Sa piste n'est dessinée qu'autour du poids** (2026-09-21,
+« il y a un petit delai […] qd on ouvre qqchose avec la regle graduée » —
+210 ms mesurés pour 9 981 crans) : le rail a la largeur de tous les crans,
+seuls 400 de chaque côté du centre sont dans la page, la fenêtre se
+recentre en glissant ; le nombre n'est écrit que sur les kilos (« N'étiquette
+pas les crans de demi kilos non plus »). La géométrie de la graduation (le pas
 d'un cran, les hauteurs) est dans `page.css` ; le code n'en lit qu'un
 rapport (`domaine/mesures.ts`).
 « OK » au pied, éteint sans changement ; fermer sans valider propose

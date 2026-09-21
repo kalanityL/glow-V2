@@ -2084,10 +2084,19 @@
 }
 
 .graduation__piste {
-  display: flex;
   height: calc(var(--graduation-nombres) + var(--graduation-cran) * 2);
   padding-inline: calc(50% - var(--graduation-pas) / 2);
   width: max-content;
+}
+
+/* LE RAIL a la largeur de TOUS les crans (`--crans`, posé par le code), même
+   si seuls ceux d'une fenêtre sont dans la page (2026-09-21) : le chemin du
+   défilement ne change pas, le rapport lu reste juste. Chaque cran est posé
+   à sa place sur le rail (`--cran`). */
+.graduation__rail {
+  position: relative;
+  width: calc(var(--crans) * var(--graduation-pas));
+  height: 100%;
 }
 
 /* Un cran : sa marque au milieu, le pied sur la ligne de base commune (au
@@ -2098,8 +2107,9 @@
    endroit foncé, il est fixe, il correspond au centre de la règle, ça n'est
    pas un cran ») : le seul élément foncé est la tige. */
 .graduation__cran {
-  position: relative;
-  flex: none;
+  position: absolute;
+  top: 0;
+  left: calc(var(--cran) * var(--graduation-pas));
   width: var(--graduation-pas);
   height: 100%;
   scroll-snap-align: center;
@@ -2125,7 +2135,8 @@
   background: var(--graduation-dizaine);
 }
 
-/* Le nombre, au-dessus de son cran, tous les demis. */
+/* Le nombre, au-dessus de son cran, sur les kilos seulement (2026-09-21,
+   « N'étiquette pas les crans de demi kilos non plus »). */
 .graduation__nombre {
   position: absolute;
   left: 50%;
