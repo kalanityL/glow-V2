@@ -129,6 +129,12 @@ export function surDefilementDisponible(zone: HTMLElement | null, quand: (dispon
   };
 }
 
+/** Fait défiler une zone vers le bas d'une page de ce qu'elle montre, en
+    glissant — moins un peu, pour que la dernière ligne vue reste en vue. */
+export function defilerDUnePage(zone: HTMLElement | null): void {
+  zone?.scrollBy({ top: Math.max(40, zone.clientHeight * 0.8), behavior: 'smooth' });
+}
+
 /** Amène l'élément au milieu de sa zone de défilement. */
 export function centrerDansSaListe(element: Element | null): void {
   element?.scrollIntoView({ block: 'center' });

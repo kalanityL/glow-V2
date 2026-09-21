@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { IconeChevronBas } from './Icones';
-import { surDefilementDisponible } from '../plateforme/navigateur';
+import { defilerDUnePage, surDefilementDisponible } from '../plateforme/navigateur';
 
 /**
  * L'INDICE DE DÉFILEMENT (2026-09-21, d'après son image — la pastille
@@ -9,8 +9,10 @@ import { surDefilementDisponible } from '../plateforme/navigateur';
  * picto de ce genre là, adapte le style au theme de la v2, sobre et
  * discret ») : posé EN DERNIER ENFANT de tout ce qui défile, il colle au
  * bas de la zone visible (`position: sticky`) tant qu'il reste du contenu
- * dessous, et s'efface au bout. Il ne prend pas de place et ne reçoit pas
- * les clics. Il trouve sa zone tout seul : son parent.
+ * dessous, et s'efface au bout. Il ne prend pas de place ; SA PASTILLE SE
+ * TOUCHE (2026-09-21, « clic sur le bouton doit faire scroller ») : elle
+ * fait défiler la zone d'une page de ce qu'elle montre. Il trouve sa zone
+ * tout seul : son parent.
  */
 export function IndiceDefilement() {
   const indice = useRef<HTMLSpanElement>(null);
@@ -18,9 +20,14 @@ export function IndiceDefilement() {
   useEffect(() => surDefilementDisponible(indice.current?.parentElement ?? null, setVisible), []);
   return (
     <span ref={indice} className={`indice-defilement${visible ? ' indice-defilement--visible' : ''}`} aria-hidden="true">
-      <span className="indice-defilement__pastille">
+      <button
+        type="button"
+        tabIndex={-1}
+        className="indice-defilement__pastille"
+        onClick={() => defilerDUnePage(indice.current?.parentElement ?? null)}
+      >
         <IconeChevronBas />
-      </span>
+      </button>
     </span>
   );
 }

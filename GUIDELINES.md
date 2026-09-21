@@ -349,8 +349,11 @@ thèmes ne repeignent pas, et qui ne sont pas dans les templates non plus.
   volets de « Mon compte », les panneaux de choix, les colonnes d'heures,
   le calendrier) — collé au bas de la zone visible tant qu'il reste du
   contenu dessous, effacé au bout ; une petite pastille ronde au fond des
-  champs, cernée de leur filet, le chevron en gris. Toute nouvelle zone
-  qui défile le reçoit.
+  champs, cernée de leur filet, le chevron en gris ; **touchée, elle fait
+  défiler d'une page** (« clic sur le bouton doit faire scroller »). Il se
+  pose dans L'ÉLÉMENT QUI DÉFILE — pas dans son cadre (l'avatar de « Mon
+  compte » : la zone des réglages, pas le volet). Toute nouvelle zone qui
+  défile le reçoit.
 - **RIEN NE DÉBORDE JAMAIS, NULLE PART** (V1, sine qua non). Aucun élément ne
   dépasse l'écran du téléphone ni son conteneur. Quand un écran est plus haut
   que le téléphone : d'abord mettre côte à côte, resserrer, ou séparer en deux

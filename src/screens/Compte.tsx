@@ -314,9 +314,12 @@ export function Compte({
               </div>
               <div className="carte__defilant">
                 <EtapeAvatar avatar={brouillonAvatar} onAvatar={setBrouillonAvatar} sansTitre />
+                {/* C'est cette zone qui défile, pas le volet (2026-09-21,
+                    « pkoi il n'apparait pas sur le bloc de modif de
+                    l'avatar ? ») : l'indice est ici. */}
+                <IndiceDefilement />
               </div>
             </div>
-            <IndiceDefilement />
           </section>
 
           <section

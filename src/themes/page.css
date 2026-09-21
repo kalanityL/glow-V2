@@ -2919,11 +2919,16 @@
   opacity: 1;
 }
 
+/* La pastille est un bouton : elle seule reçoit les clics (2026-09-21,
+   « clic sur le bouton doit faire scroller »). */
 .indice-defilement__pastille {
   display: grid;
   place-items: center;
   width: 26px;
   height: 26px;
+  padding: 0;
+  pointer-events: auto;
+  cursor: pointer;
   border: 1px solid var(--option-filet);
   border-radius: 50%;
   background: var(--option-fond);
