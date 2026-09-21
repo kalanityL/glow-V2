@@ -3135,7 +3135,8 @@
 .etoiles-note {
   display: flex;
   justify-content: center;
-  gap: 6px;
+  /* 10 px : les auréoles voisines se touchent sans se recouvrir. */
+  gap: 10px;
   margin: -6px 0 0;
   padding: 4px 0 8px;
   touch-action: none;
@@ -3155,7 +3156,7 @@
      dégradé — aucun trait autour. */
   fill: var(--option-filet);
   stroke: none;
-  transition: fill 120ms, filter 120ms;
+  transition: fill 120ms;
 }
 
 /* Une étoile pleine porte le dégradé du « + » (son remplissage est posé
@@ -3168,21 +3169,33 @@
   stop-color: var(--menu-ajouter-fin);
 }
 
-/* L'EFFET GLOW (2026-09-21 au soir, « mets leur un effet glow style les
-   comme les etoiles de image pour claude/etoiles », son `etoiles.png`
-   relevé au pixel) : dans son image, le halo est la lumière de l'étoile
-   elle-même, fondue dans le fond ; il s'étend le long d'une branche de
-   0,9 fois la demi-longueur de la branche au-delà de sa pointe, et
-   davantage entre les branches (1,7 fois le rayon du creux). Ici la
-   branche fait 12,75 px de demi-longueur (9/24 de 34) : deux ombres
-   portées sans décalage, l'une serrée qui densifie le pied du halo,
-   l'autre à 9 px de flou qui va jusqu'à ~14 px de la pointe (mesuré au rendu : 0,4 fois la demi-branche au-delà de la pointe, 2 fois le creux entre les branches — un flou d'ombre est rond, la lumière de l'image s'étire le long des branches) — dans la
-   couleur de l'étoile (le bout foncé du dégradé du « + »), à demi
-   transparente, comme le halo de l'image est l'étoile éclairant son fond.
-   `filter` est une propriété nommée, un flou d'ombre en natif. */
-.etoiles-note__etoile--pleine {
-  filter: drop-shadow(0 0 2px color-mix(in srgb, var(--menu-ajouter-fin) 55%, transparent))
-    drop-shadow(0 0 9px color-mix(in srgb, var(--menu-ajouter-fin) 45%, transparent));
+/* L'AURÉOLE (2026-09-21 au soir, « mets leur un effet glow style les
+   comme les etoiles de image pour claude/etoiles », puis « cet effet glow
+   donne une impression d'image flou mal définie. fait un meilleur effet
+   glow ») : un disque de lumière derrière chaque étoile pleine — un
+   dégradé radial dans la couleur de l'étoile (le bout foncé du dégradé du
+   « + »), dense au centre, éteint au bord, dessiné par le composant ; le
+   SVG déborde de son carré pour le porter. L'étoile, elle, reste nette :
+   aucun flou sur sa silhouette (le `drop-shadow` d'avant se lisait comme
+   une image mal définie). Dans son `etoiles.png`, relevé au pixel, le
+   halo est cette lumière ronde fondue dans le fond. */
+.etoiles-note__etoile {
+  overflow: visible;
+}
+
+.etoiles-note__halo-centre {
+  stop-color: var(--menu-ajouter-fin);
+  stop-opacity: 0.55;
+}
+
+.etoiles-note__halo-milieu {
+  stop-color: var(--menu-ajouter-fin);
+  stop-opacity: 0.2;
+}
+
+.etoiles-note__halo-bord {
+  stop-color: var(--menu-ajouter-fin);
+  stop-opacity: 0;
 }
 
 /* LE CADRAN D'UNE HEURE (2026-09-21) : un cercle au filet des champs, quatre

@@ -1,8 +1,10 @@
 import { useId, useRef, type PointerEvent } from 'react';
-import { STAR_PATHS } from './Logomark';
 
-/** La grande étoile du bloc-logo, dans le carré de 24 du logo. */
-const ETOILE_DU_LOGO = STAR_PATHS[0];
+/** L'ÉTOILE À CINQ BRANCHES — celle d'origine, rétablie (2026-09-21 au
+    soir, « remet la forme d'étoile initiale, pas la forme d'étoile du
+    logo », après un passage par l'étoile du logo le même soir). */
+const ETOILE =
+  'M11.525 2.295a.53.53 0 0 1 .95 0l2.31 4.679a2.123 2.123 0 0 0 1.595 1.16l5.166.756a.53.53 0 0 1 .294.904l-3.736 3.638a2.123 2.123 0 0 0-.611 1.878l.882 5.14a.53.53 0 0 1-.771.56l-4.618-2.428a2.122 2.122 0 0 0-1.973 0L6.396 21.01a.53.53 0 0 1-.77-.56l.881-5.139a2.122 2.122 0 0 0-.611-1.879L2.16 9.795a.53.53 0 0 1 .294-.906l5.165-.755a2.122 2.122 0 0 0 1.597-1.16z';
 
 /**
  * LA NOTE EN ÉTOILES (2026-09-21, « notez votre nuit ou notez votre sieste :
@@ -33,7 +35,9 @@ export function NoteEtoiles({
      sur les arrêts du dégradé par la feuille. */
   /* L'identifiant de React porte des signes que `url(#…)` ne lit pas : on
      le nettoie. */
-  const degrade = `etoiles-${useId().replace(/[^a-zA-Z0-9]/g, '')}`;
+  const id = useId().replace(/[^a-zA-Z0-9]/g, '');
+  const degrade = `etoiles-${id}`;
+  const halo = `etoiles-halo-${id}`;
 
   const noteSous = (x: number): number => {
     const r = rangee.current?.getBoundingClientRect();
@@ -83,6 +87,19 @@ export function NoteEtoiles({
             <stop offset="0" className="etoiles-note__debut" />
             <stop offset="1" className="etoiles-note__fin" />
           </linearGradient>
+          {/* L'AURÉOLE (2026-09-21 au soir, « cet effet glow donne une
+              impression d'image flou mal définie. fait un meilleur effet
+              glow ») : un disque de lumière en dégradé radial DERRIÈRE
+              l'étoile, qui reste nette par-dessus — dans son image, le halo
+              est une lumière ronde qui se fond dans le fond, pas la
+              silhouette de l'étoile floutée. Le flou d'ombre d'avant
+              (`filter: drop-shadow`) épousait les bords et se lisait comme
+              une image mal définie. */}
+          <radialGradient id={halo} cx="0.5" cy="0.5" r="0.5">
+            <stop offset="0" className="etoiles-note__halo-centre" />
+            <stop offset="0.45" className="etoiles-note__halo-milieu" />
+            <stop offset="1" className="etoiles-note__halo-bord" />
+          </radialGradient>
         </defs>
       </svg>
       {[1, 2, 3, 4, 5].map((i) => (
@@ -94,12 +111,15 @@ export function NoteEtoiles({
           focusable="false"
           style={i <= valeur ? { fill: `url(#${degrade})` } : undefined}
         >
-          {/* L'ÉTOILE DU LOGO (2026-09-21, « notez votre nuit : utiliser la
-              forme d'étoile du logo de glow ») : la grande étoile à quatre
-              branches du bloc-logo, seule — ses deux satellites sont le
-              motif de la marque, pas la forme d'une étoile. Le tracé est
-              celui de `Logomark`, une retouche vaut pour tous. */}
-          <path d={ETOILE_DU_LOGO} />
+          {i <= valeur ? (
+            /* Le disque déborde du carré de 24 : la feuille laisse le SVG
+               déborder (`overflow: visible`). Son rayon, 15, porte la
+               lumière à 0,5 fois le rayon de l'étoile au-delà de ses
+               pointes — les disques voisins se touchent sans se recouvrir,
+               l'espace entre étoiles étant élargi. */
+            <circle className="etoiles-note__halo" cx="12" cy="12" r="15" fill={`url(#${halo})`} />
+          ) : null}
+          <path d={ETOILE} />
         </svg>
       ))}
     </div>
