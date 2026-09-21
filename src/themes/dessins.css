@@ -52,36 +52,21 @@
 
 /* ── L'avatar : ce que la personne ne choisit pas ───────────────────────── */
 
-/* Les valeurs sont celles du prototype modulaire du 2026-09-21
-   (`avatar_prototype_svg/`), relevées dans ses fichiers, à l'octet près. */
-
-/* Tous les traits ont le même contour : le `<g stroke="#241A18"
-   stroke-width="5" …>` de chaque fichier du prototype. */
-.avatar__traits {
-  stroke: #241a18;
-  stroke-width: 5;
-  stroke-linejoin: round;
-  stroke-linecap: round;
-}
-
 .avatar__blanc { fill: #ffffff; }
-.avatar__pupille { fill: #241a18; }
+.avatar__pupille { fill: #1a1a1a; }
+.avatar__bouche { stroke: #d32f2f; }
+.avatar__nez { stroke: rgba(0, 0, 0, 0.15); }
+.avatar__lunettes { stroke: #333333; }
 
-/* Un trait sans remplissage : le nez (`fill="none"` dans le prototype). */
-.avatar__ligne { fill: none; }
+/* Le fard suit l'expression : rien pour « déterminée » et « calme ». */
+.avatar__fard { fill: transparent; }
+.avatar__fard--joyeuse { fill: rgba(239, 68, 68, 0.2); }
+.avatar__fard--fiere { fill: rgba(244, 63, 94, 0.3); }
 
-/* Le sourcil et la bouche neutre n'ont PAS de remplissage dans le prototype,
-   donc le noir par défaut du SVG entre la courbe et sa corde : c'est ce qui
-   épaissit le sourcil en son milieu. Gardé tel quel, et dit ici. */
-.avatar__sourcil { fill: #000000; }
-.avatar__bouche--neutre { fill: #000000; }
-
-/* Les lèvres pleines, aux deux rouges du prototype. */
-.avatar__bouche--sourire { fill: #b64d57; }
-.avatar__bouche--pulpeuse { fill: #a94450; }
-
-/* Le pan de la capuche, à peine translucide sur le sweat (`opacity=".82"`). */
-.avatar__capuche { opacity: 0.82; }
+/* Le vêtement porte la couleur du genre — c'est ce qui le rend visible. */
+.avatar__vetement--homme { fill: #3b82f6; }
+.avatar__vetement--femme { fill: #ec4899; }
+.avatar__vetement--neutre { fill: #8b5cf6; }
 
 /* ── Le G de Google, sur le bouton de connexion (2026-09-21) ────────────── */
 

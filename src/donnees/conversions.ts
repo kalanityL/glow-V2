@@ -1,4 +1,4 @@
-import { avatarDepuisInconnu, type Avatar, type Coiffure, type FormeVisage } from '../domaine/avatar';
+import type { Avatar, Coiffure, Expression, FormeVisage, Genre } from '../domaine/avatar';
 import type { Reponses } from '../screens/onboarding/reponses';
 import { UNITES_DU_SYSTEME, poidsDepuisKg, poidsEnKg } from '../domaine/unites';
 import { ageA, dateLocale } from '../domaine/dates';
@@ -17,19 +17,13 @@ import type { AppData, AvatarConfig, UserProfile } from './v1';
  * fait de tout ce qui n'est pas une ligne de suivi (`ReponsesHorsBase`).
  */
 
-/** Les réponses que la base de la V1 ne sait pas porter — et, depuis le
-    prototype modulaire (2026-09-21), la part de l'avatar qu'elle ne sait pas
-    porter non plus (`AvatarHorsBase`). */
+/** Les réponses que la base de la V1 ne sait pas porter. */
 export type ReponsesHorsBase = Pick<
   Reponses,
   'langue' | 'theme' | 'fond' | 'systeme' | 'objectif' | 'traitementCommence' | 'formeTraitement' | 'dateNaissance' | 'email' | 'motDePasse'
-> & { avatar: AvatarHorsBase };
+>;
 
-/** Les réponses hors base qui sont des réponses entières — l'avatar, lui,
-    n'est hors base qu'en partie. */
-export type CleHorsBase = Exclude<keyof ReponsesHorsBase, 'avatar'>;
-
-export const CLES_HORS_BASE: readonly CleHorsBase[] = [
+export const CLES_HORS_BASE: readonly (keyof ReponsesHorsBase)[] = [
   'langue',
   'theme',
   'fond',
@@ -42,49 +36,28 @@ export const CLES_HORS_BASE: readonly CleHorsBase[] = [
   'motDePasse',
 ];
 
-/* ── L'avatar : ce que la V1 sait porter, dans ses mots ── */
-
-/**
- * L'AVATAR DU PROTOTYPE MODULAIRE (2026-09-21) ET L'`AvatarConfig` DE LA V1.
- * La V1 porte le genre, la forme du visage, la coiffure et les trois couleurs
- * — ce qu'elle porte s'écrit chez elle, dans ses mots. Ce qu'elle ne connaît
- * pas — la forme des yeux, le nez, la bouche, le vêtement et sa couleur —
- * est hors base (`AvatarHorsBase`). Ce qu'elle connaît et que le prototype n'a
- * plus — les lunettes, l'expression, le visage en cœur — s'écrit à sa valeur
- * neutre : la base de la V1 reste la base, telle quelle.
- */
-export type AvatarHorsBase = Pick<Avatar, 'formeYeux' | 'nez' | 'bouche' | 'vetement' | 'couleurVetement'>;
-
-export const CLES_AVATAR_HORS_BASE: readonly (keyof AvatarHorsBase)[] = ['formeYeux', 'nez', 'bouche', 'vetement', 'couleurVetement'];
+/* ── L'avatar : les mêmes traits, les mots de la V1 ── */
 
 const FORME_VISAGE_V1: Record<FormeVisage, AvatarConfig['faceShape']> = {
   ovale: 'oval',
   rond: 'round',
   carre: 'square',
+  coeur: 'heart',
 };
-/** Le cœur de la V1 n'a pas de tracé dans le prototype : il se relit ovale. */
-const FORME_VISAGE_V2: Record<AvatarConfig['faceShape'], FormeVisage> = {
-  oval: 'ovale',
-  round: 'rond',
-  square: 'carre',
-  heart: 'ovale',
+const FORME_VISAGE_V2 = Object.fromEntries(Object.entries(FORME_VISAGE_V1).map(([v2, v1]) => [v1, v2])) as Record<
+  AvatarConfig['faceShape'],
+  FormeVisage
+>;
+const EXPRESSION_V1: Record<Expression, AvatarConfig['expression']> = {
+  joyeuse: 'happy',
+  determinee: 'determined',
+  fiere: 'proud',
+  calme: 'calm',
 };
-/** Le carré est la coiffure LONGUE du prototype : la V1 l'écrit `long`. */
-const COIFFURE_V1: Record<Coiffure, AvatarConfig['hairStyle']> = {
-  carre: 'long',
-  court: 'court',
-  boucle: 'boucle',
-};
-/** Les coiffures de la V1 sans tracé se relisent au plus proche : la frange
-    est longue, la brosse est courte, l'absence de cheveux devient courte. */
-const COIFFURE_V2: Record<AvatarConfig['hairStyle'], Coiffure> = {
-  long: 'carre',
-  court: 'court',
-  boucle: 'boucle',
-  frange: 'carre',
-  brosse: 'court',
-  chauve: 'court',
-};
+const EXPRESSION_V2 = Object.fromEntries(Object.entries(EXPRESSION_V1).map(([v2, v1]) => [v1, v2])) as Record<
+  AvatarConfig['expression'],
+  Expression
+>;
 
 export function avatarConfigDepuisAvatar(avatar: Avatar): AvatarConfig {
   return {
@@ -92,33 +65,26 @@ export function avatarConfigDepuisAvatar(avatar: Avatar): AvatarConfig {
     faceShape: FORME_VISAGE_V1[avatar.formeVisage],
     skinColor: avatar.couleurPeau,
     eyeColor: avatar.couleurYeux,
-    hairStyle: COIFFURE_V1[avatar.coiffure],
+    hairStyle: avatar.coiffure,
     hairColor: avatar.couleurCheveux,
-    hasGlasses: false,
-    expression: 'happy',
+    hasGlasses: avatar.lunettes,
+    expression: EXPRESSION_V1[avatar.expression],
   };
 }
 
-/** La part hors base de l'avatar, et rien d'autre. */
-export function avatarHorsBaseDepuisAvatar(avatar: Avatar): AvatarHorsBase {
-  return Object.fromEntries(CLES_AVATAR_HORS_BASE.map((c) => [c, avatar[c]])) as AvatarHorsBase;
-}
-
-/** L'avatar relu : la part de la V1 dans ses mots, la part hors base telle
-    quelle, et `defaut` pour ce qui manque ou n'est pas lisible. */
-export function avatarDepuisAvatarConfig(config: AvatarConfig, defaut: Avatar, horsBase: Partial<AvatarHorsBase> = {}): Avatar {
-  return avatarDepuisInconnu(
-    {
-      ...horsBase,
-      genre: config.gender,
-      formeVisage: FORME_VISAGE_V2[config.faceShape],
-      coiffure: COIFFURE_V2[config.hairStyle],
-      couleurPeau: config.skinColor,
-      couleurYeux: config.eyeColor,
-      couleurCheveux: config.hairColor,
-    },
-    defaut,
-  );
+export function avatarDepuisAvatarConfig(config: AvatarConfig, defaut: Avatar): Avatar {
+  return {
+    genre: (['femme', 'homme', 'neutre'] as Genre[]).includes(config.gender) ? config.gender : defaut.genre,
+    formeVisage: FORME_VISAGE_V2[config.faceShape] ?? defaut.formeVisage,
+    couleurPeau: typeof config.skinColor === 'string' ? config.skinColor : defaut.couleurPeau,
+    couleurYeux: typeof config.eyeColor === 'string' ? config.eyeColor : defaut.couleurYeux,
+    coiffure: (['court', 'long', 'boucle', 'frange', 'brosse', 'chauve'] as Coiffure[]).includes(config.hairStyle)
+      ? config.hairStyle
+      : defaut.coiffure,
+    couleurCheveux: typeof config.hairColor === 'string' ? config.hairColor : defaut.couleurCheveux,
+    lunettes: Boolean(config.hasGlasses),
+    expression: EXPRESSION_V2[config.expression] ?? defaut.expression,
+  };
 }
 
 /* ── Le traitement : un identifiant a changé de nom ── */
@@ -193,7 +159,7 @@ export function reponsesDepuisBase(base: AppData, horsBase: Partial<ReponsesHors
     tailleCm: typeof p.height === 'number' && p.height > 0 ? p.height : defaut.tailleCm,
     poidsCible: typeof p.targetWeight === 'number' && p.targetWeight > 0 ? poidsDepuisKg(p.targetWeight, unites.poids) : defaut.poidsCible,
     poids: depart ? poidsDepuisKg(depart.weight, unites.poids) : defaut.poids,
-    avatar: p.avatar ? avatarDepuisAvatarConfig(p.avatar, defaut.avatar, horsBase.avatar) : avatarDepuisInconnu(horsBase.avatar, defaut.avatar),
+    avatar: p.avatar ? avatarDepuisAvatarConfig(p.avatar, defaut.avatar) : defaut.avatar,
     traitement,
     /* Un traitement en base sans forme hors base : la forme vient du catalogue. */
     formeTraitement: horsBase.formeTraitement ?? (traitement ? null : null),

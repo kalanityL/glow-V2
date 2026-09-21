@@ -14,23 +14,10 @@ describe('les réponses hors base', () => {
     expect('prenom' in lu).toBe(false);
   });
 
-  it('ignore ce qui n’est pas lisible, ou d’une version à venir', () => {
+  it('ignore ce qui n’est pas lisible, ou d’une autre version', () => {
     expect(deserialiserHorsBase(null)).toEqual({});
     expect(deserialiserHorsBase('pas du json')).toEqual({});
     expect(deserialiserHorsBase(JSON.stringify({ version: VERSION_HORS_BASE + 1, reponses: { email: 'x' } }))).toEqual({});
-  });
-
-  it('écrit la part hors base de l’avatar, et la relit', () => {
-    const reponses = { ...REPONSES_INITIALES, avatar: { ...REPONSES_INITIALES.avatar, nez: 'large' as const, vetement: 'capuche' as const, couleurVetement: '#244B73' } };
-    const lu = deserialiserHorsBase(serialiserHorsBase(reponses));
-    expect(lu.avatar).toEqual({ formeYeux: 'amande', nez: 'large', bouche: 'sourire', vetement: 'capuche', couleurVetement: '#244B73' });
-    expect(lu.avatar && 'genre' in lu.avatar).toBe(false);
-  });
-
-  it('relit une version 1 (d’avant le prototype modulaire), sans avatar hors base', () => {
-    const lu = deserialiserHorsBase(JSON.stringify({ version: 1, reponses: { email: 'camille@exemple.fr', theme: 'blanc' } }));
-    expect(lu).toEqual({ email: 'camille@exemple.fr', theme: 'blanc' });
-    expect(lireReponses(lireBase(JSON.stringify(donneesVides())), lu).avatar).toMatchObject({ nez: REPONSES_INITIALES.avatar.nez, vetement: REPONSES_INITIALES.avatar.vetement });
   });
 });
 
@@ -44,12 +31,11 @@ describe('lireReponses : la base de la V1 et les réponses hors base', () => {
       poidsCible: '72.0',
       traitement: 'foundayo',
       formeTraitement: 'comprime' as const,
-      avatar: { ...REPONSES_INITIALES.avatar, genre: 'homme' as const, coiffure: 'court' as const, bouche: 'pulpeuse' as const },
+      avatar: { ...REPONSES_INITIALES.avatar, genre: 'homme' as const, expression: 'fiere' as const },
     };
     const base = baseDepuisReponses(reponses, donneesVides(), '2026-09-21');
     expect(base.profile).toMatchObject({ name: 'Camille', height: 172, targetWeight: 72, glp1Brand: 'orforglipron', gender: 'homme' });
-    expect(base.profile.avatar).toMatchObject({ hairStyle: 'court', expression: 'happy', hasGlasses: false });
-    expect('bouche' in base.profile.avatar).toBe(false);
+    expect(base.profile.avatar.expression).toBe('proud');
     expect(base.weightHistory[0]).toMatchObject({ id: 'starting-weight-log', weight: 96, isStartingWeight: true, time: '08:00' });
     const relues = lireReponses(lireBase(JSON.stringify(base)), deserialiserHorsBase(serialiserHorsBase(reponses)));
     expect(relues).toEqual(reponses);
