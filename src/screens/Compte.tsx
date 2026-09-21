@@ -96,8 +96,13 @@ export function Compte({
   fond,
   onAjouter,
   ajoutTraitement,
+  onDeconnexion,
 }: {
   parcours: ReturnType<typeof useParcours>;
+  /** « Se déconnecter », au pied du volet « Mon compte » — seulement quand
+      le verrou de connexion est armé (2026-09-21) : sans verrou, il n'y a
+      pas de session à oublier. */
+  onDeconnexion?: () => void;
   /** Le fond de page et ses gestes, tenus par `App`. */
   fond: FondProps;
   /** « Accueil » de la barre du bas ramène à l'accueil. */
@@ -366,6 +371,13 @@ export function Compte({
                 autoComplete="new-password"
                 masque
               />
+              {/* La sortie de la session mémorisée (2026-09-21) : un lien
+                  sobre, pas un bouton — il ne dispute rien aux champs. */}
+              {onDeconnexion ? (
+                <button type="button" className="compte__deconnexion" onClick={onDeconnexion}>
+                  {textes.connexion.seDeconnecter}
+                </button>
+              ) : null}
             </div>
             <IndiceDefilement />
           </section>

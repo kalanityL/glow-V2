@@ -33,9 +33,13 @@ commit qui la met en œuvre.
   photo ni le tirage au hasard). Ne jamais aller puiser dans la V1 de
   soi-même.
 - **Socle** : React 19, TypeScript, Vite, Vitest. **Rien d'autre** — pas de
-  Tailwind, pas de Firebase, pas de bibliothèque de composants ni d'icônes.
+  Tailwind, pas de bibliothèque de composants ni d'icônes.
   On ajoute au fur et à mesure, jamais par recopie ; une dépendance de plus se
-  justifie dans le commit qui l'ajoute.
+  justifie dans le commit qui l'ajoute. **Une seule ajoutée, consignée :
+  `firebase`** (2026-09-21, « brancher sur la v2 en ligne la meme
+  identification que la v1 et utiliser les memes comptes ») — pour le
+  verrou de connexion, et rien d'autre : ni Firestore, ni stockage ; aucune
+  donnée de santé ne passe par lui (voir § 4, « Le verrou de connexion »).
 - **Le produit** (SPEC V1, à garder en tête) : aucune donnée de santé ne
   quitte l'appareil sans un geste explicite ; aucune restitution ne peut se
   lire comme une recommandation médicale ; pas de conseil nutritionnel,
@@ -968,6 +972,43 @@ fondu (« essaie l'image fond haut sur toute la jauteur de l'ecran en fond »,
 son fondu ont vécu un après-midi) ; elle est un jeton des thèmes clairs
 (`--accueil-fond-image`, `none` sur les ciels) et un FICHIER embarqué dans
 `src/assets/images/`, comme les polices — jamais une ressource distante.
+
+**Le verrou de connexion** (2026-09-21, « peux tu brancher sur la v2 en
+ligne la meme identification que la v1 et utiliser les memes comptes pour
+que je n'ai rien à faire dans l'interface firebase ? ») : LA MÊME
+IDENTIFICATION QUE LA V1, LES MÊMES COMPTES — Firebase Authentication du
+projet `glow-private`, la configuration de la V1 recopiée telle quelle
+(`plateforme/firebase.config.ts` : pas des secrets, la sécurité est la
+liste des comptes du projet), les comptes créés par elle dans la console
+pour la V1 ouvrent la V2, e-mail et mot de passe ou compte Google. **Tout
+le SDK vit dans `plateforme/compte.ts`**, second fichier de la plateforme
+à côté de `navigateur.ts` : le reste ne connaît que `Compte` et cinq
+verbes ; le jour de React Native, c'est le seul fichier à réécrire. **Le
+verrou n'est armé que sur le build de production** (`main.tsx`,
+`import.meta.env.PROD`) : la V2 EN LIGNE demande un compte, ses mots ; le
+poste de développement, les captures et les scénarios n'en ont pas — pour
+voir l'écran de connexion en local, `npm run build` puis `npx vite
+preview --port 4173`. Armé, `screens/Verrou.tsx` (l'`AuthGate` de la V1)
+ne rend l'application qu'à une session connectée, et une page vide du
+fond enregistré le temps que le SDK restaure la session mémorisée ; la
+session est mémorisée sans limite, jusqu'à « Se déconnecter », un lien au
+pied du volet « Mon compte » (absent sans verrou). **L'écran de
+connexion** (`screens/Connexion.tsx`) est la page de connexion de la V1
+dans le téléphone et à la charte des formulaires : le mot-symbole, « Accès
+privé — connectez-vous pour continuer », les deux champs, un refus dit en
+place et en gris dans les mots de la V1 (`domaine/connexion.ts`, un refus
+nommé par code du SDK, testé ; les phrases dans le dictionnaire), « Se
+connecter » à l'accent, « ou » sans ligne, « Continuer avec Google » en
+second bouton avec le G de Google dessiné sur place (ses couleurs dans
+`dessins.css`), la note « Les comptes sont créés par l'administratrice —
+pas d'inscription libre. ». La fenêtre de Google (`signInWithPopup`, celle
+de la V1) n'est pas un popup de l'application : c'est la page de Google,
+hors de l'écran. Le domaine `glow-private-v2.web.app` est un site Hosting
+du projet : Firebase l'autorise de lui-même pour la connexion Google —
+sinon le refus « Ce domaine n'est pas autorisé dans la console Firebase »
+le dirait, et il faudrait l'ajouter dans Authentication → Settings →
+Authorized domains. Rien d'autre ne passe par Firebase : les données
+restent sur l'appareil.
 
 ## 5. Non traité, au 2026-09-20
 - Les réponses sont enregistrées SUR L'APPAREIL depuis le 2026-09-20

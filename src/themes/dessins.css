@@ -67,3 +67,12 @@
 .avatar__vetement--homme { fill: #3b82f6; }
 .avatar__vetement--femme { fill: #ec4899; }
 .avatar__vetement--neutre { fill: #8b5cf6; }
+
+/* ── Le G de Google, sur le bouton de connexion (2026-09-21) ────────────── */
+
+/* Les quatre couleurs de la marque Google : des couleurs de dessin, ni du
+   thème ni du template. Celles de la V1 (`LoginPage.tsx`). */
+.google__rouge { fill: #ea4335; }
+.google__bleu { fill: #4285f4; }
+.google__jaune { fill: #fbbc05; }
+.google__vert { fill: #34a853; }

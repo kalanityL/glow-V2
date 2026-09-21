@@ -42,17 +42,17 @@ et RESTAURÉ PAR `sed` INVERSE, jamais par `git checkout`.
   l'écran fait 850 px (`app-root--long`, cadre 914 px, la fenêtre défile) ;
   `/` inchangé. Servi en ligne sans rien changer (rewrite `**`).
 
-**Deux réponses données, sans commit, à reprendre si elle tranche :**
-- LE MOT DE PASSE : la V2 en ligne N'EST PAS protégée (aucun verrou ; les
-  données ne vivent que sur l'appareil). La V1 a un verrou Firebase
-  Authentication (e-mail + mot de passe, Google ; comptes créés par elle
-  dans la console ; désarmé quand `apiKey` est vide dans
-  `src/shared/platform/firebase.config.ts`). Option A recommandée : le
-  même verrou dans la V2 (même projet `glow-private`, mêmes comptes ;
-  installer `firebase`, écran de connexion au design V2, garde dans
-  `main.tsx`, domaine `glow-private-v2.web.app` à autoriser dans la
-  console) — entorse au « pas de dépendance » de GUIDELINES, à consigner.
-  Elle n'a pas encore dit « option A ».
+**LE VERROU DE CONNEXION EST FAIT** (2026-09-21, « brancher sur la v2 en
+ligne la meme identification que la v1 et utiliser les memes comptes ») :
+tout dans GUIDELINES § 4, « Le verrou de connexion ». Armé en production
+seulement ; en local, `npm run build` puis `npx vite preview --port 4173`
+pour voir l'écran de connexion. Vérifié au rendu, et un faux mot de passe
+reçoit bien « E-mail ou mot de passe incorrect. » du vrai projet.
+- [ ] À vérifier par elle, en ligne : « Continuer avec Google » sur
+      `glow-private-v2.web.app` — si le refus « Ce domaine n'est pas
+      autorisé » apparaît, ajouter le domaine dans la console (Authentication
+      → Settings → Authorized domains). L'e-mail + mot de passe, lui, ne
+      dépend pas de cette liste.
 - L'HÉBERGEMENT : Firebase Hosting (Google), projet `glow-private`, site
   `glow-private-v2`, déployé depuis sa machine par `firebase deploy`.
 

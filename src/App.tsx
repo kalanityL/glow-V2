@@ -23,6 +23,7 @@ import { dureeEcrite, dureeMinutes } from './domaine/sommeils';
 import { traitementDepuisBrand } from './donnees/conversions';
 import type { FondId } from './app/fonds';
 import { cheminDeLaPage } from './plateforme/navigateur';
+import { Verrou } from './screens/Verrou';
 /* La mise en page d'abord, les jetons des thèmes ensuite : les feuilles de
    thème doivent pouvoir battre la structure, jamais l'inverse. */
 import './themes/page.css';
@@ -45,7 +46,7 @@ import './themes/fonds-palette.css';
  * Le cadre et le bouton sont repris de la version Mixte, réécrits en CSS
  * ordinaire — ce dépôt n'a ni Tailwind ni bibliothèque d'icônes.
  */
-export default function App() {
+export default function App({ verrou = false }: { /** Le verrou de connexion, armé par `main.tsx` en production (2026-09-21). */ verrou?: boolean }) {
   const textes = useTextes();
 
   /* LE PARCOURS VIT ICI, et non dans l'onboarding : le bouton « retour » de la
@@ -234,11 +235,15 @@ export default function App() {
               <Batterie />
             </span>
           </div>
-          {!parcours.entre ? (
+          {/* LE VERROU (2026-09-21) : armé, rien ne se rend sans une session
+              connectée — l'écran de connexion, dans le téléphone, sur le fond
+              enregistré de la personne. */}
+          <Verrou arme={verrou} classeFond={`page--fond-${parcours.reponses.fond}`}>
+          {(session) => !parcours.entre ? (
             <Onboarding parcours={parcours} />
           ) : page === 'compte' ? (
             <Compte parcours={parcours} onAccueil={() => setPage('accueil')} fond={fond} onAjouter={ajouter}
-              ajoutTraitement={ajoutTraitement} />
+              ajoutTraitement={ajoutTraitement} onDeconnexion={session.onDeconnexion} />
           ) : page === 'confirmation' && derniere && parcours.reponses.formeTraitement ? (
             <PageConfirmation
               titrePage={textes.accueil.traitement[parcours.reponses.formeTraitement]}
@@ -405,6 +410,7 @@ export default function App() {
               ajoutTraitement={ajoutTraitement}
             />
           )}
+          </Verrou>
         </div>
 
         {/* La barre du bas, hors écran : elle figure le menu natif du

@@ -5,6 +5,7 @@ import type {
   Genre,
 } from '../domaine/avatar';
 import type { Forme } from '../domaine/traitements';
+import type { RefusConnexion } from '../domaine/connexion';
 import type { Zone } from '../domaine/prises';
 import type { SleepKind } from '../donnees/v1';
 import type { EntreeConfirmation } from '../screens/PageConfirmation';
@@ -357,6 +358,24 @@ export interface Textes {
     moisPrecedent: string;
     moisSuivant: string;
   };
+  /**
+   * L'ÉCRAN DE CONNEXION (2026-09-21, « brancher sur la v2 en ligne la
+   * meme identification que la v1 et utiliser les memes comptes ») : les
+   * mots de la page de connexion de la V1 (`LoginPage.tsx`), et ses refus
+   * (`auth.errors.ts`), un par code du SDK — le générique en dernier.
+   */
+  connexion: {
+    chapeau: string;
+    seConnecter: string;
+    ou: string;
+    google: string;
+    note: string;
+    /** Les deux champs vides : dit avant d'appeler qui que ce soit. */
+    champsVides: string;
+    refus: Record<RefusConnexion, string>;
+    /** Le lien qui oublie la session, sur « Mon compte ». */
+    seDeconnecter: string;
+  };
   /** Le bouton « retour » de la barre du bas : lu par les lecteurs d'écran. */
   retour: string;
   /** La croix qui ferme un tiroir : lue par les lecteurs d'écran. */
@@ -676,6 +695,26 @@ const FR: Textes = {
     jours: ['L', 'M', 'M', 'J', 'V', 'S', 'D'],
     moisPrecedent: 'Mois précédent',
     moisSuivant: 'Mois suivant',
+  },
+  connexion: {
+    chapeau: 'Accès privé — connectez-vous pour continuer',
+    seConnecter: 'Se connecter',
+    ou: 'ou',
+    google: 'Continuer avec Google',
+    note: 'Les comptes sont créés par l’administratrice — pas d’inscription libre.',
+    champsVides: 'Renseignez l’e-mail et le mot de passe.',
+    refus: {
+      adresse: 'L’adresse e-mail n’est pas valide.',
+      identifiants: 'E-mail ou mot de passe incorrect.',
+      compteDesactive: 'Ce compte a été désactivé.',
+      tropDEssais: 'Trop de tentatives. Réessayez dans quelques minutes.',
+      reseau: 'Connexion impossible. Vérifiez votre accès à Internet.',
+      fenetreFermee: 'La fenêtre Google a été refermée avant la fin.',
+      fenetreBloquee: 'Le navigateur a bloqué la fenêtre Google. Autorisez les pop-ups puis réessayez.',
+      domaine: 'Ce domaine n’est pas autorisé dans la console Firebase.',
+      autre: 'La connexion a échoué. Réessayez.',
+    },
+    seDeconnecter: 'Se déconnecter',
   },
   retour: 'Retour',
   fermer: 'Fermer',

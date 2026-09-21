@@ -3318,3 +3318,127 @@
 .sommeil__duree--phrase {
   color: var(--encre);
 }
+
+/* ── L'ÉCRAN DE CONNEXION (2026-09-21) ──────────────────────────────────── */
+
+/* La carte de connexion, seule sur la page, centrée en hauteur — comme la
+   page de connexion de la V1, qui centrait sa carte dans la fenêtre. Sur un
+   écran plus court que la carte, la colonne défile. */
+.connexion {
+  justify-content: center;
+  overflow-y: auto;
+}
+
+.connexion__carte {
+  flex: none;
+  margin: auto 0;
+}
+
+/* Le mot-symbole en tête, dans la livrée de l'entête des pages — la marque,
+   pas un titre. Centré, comme sur la carte de la V1. */
+.connexion__marque {
+  display: flex;
+  justify-content: center;
+  margin: 4px 0 0;
+}
+
+.connexion__marque .wordmark {
+  font-family: var(--font-marque);
+  font-size: 30px;
+}
+
+.connexion__marque .wordmark__g {
+  background: linear-gradient(
+    to right,
+    var(--marque-degrade-debut),
+    color-mix(in srgb, var(--marque-degrade-debut), var(--marque-degrade-fin))
+  );
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  -webkit-text-fill-color: transparent;
+}
+
+.connexion__marque .wordmark__low {
+  background: linear-gradient(
+    to right,
+    color-mix(in srgb, var(--marque-degrade-debut), var(--marque-degrade-fin)),
+    var(--marque-degrade-fin)
+  );
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  -webkit-text-fill-color: transparent;
+}
+
+.connexion__marque .wordmark__lp1 {
+  background: none;
+  color: var(--marque-accent);
+}
+
+/* « Accès privé — connectez-vous pour continuer » : en gris, sous la marque,
+   dans la taille du texte courant. */
+.connexion__chapeau {
+  margin: 8px 0 4px;
+  text-align: center;
+  font-size: 14px;
+  line-height: 1.5;
+  color: var(--encre-chapeau);
+}
+
+/* Un refus se dit en gris, comme dans tout formulaire (charte). */
+.connexion__refus {
+  color: var(--encre-chapeau);
+}
+
+.connexion__bouton {
+  margin-top: 18px;
+}
+
+/* « ou », seul entre les deux chemins : pas de ligne de part et d'autre —
+   la charte ne veut pas de ligne séparatrice. */
+.connexion__ou {
+  margin: 12px 0;
+  text-align: center;
+  font-size: 13px;
+  color: var(--encre-chapeau);
+}
+
+/* Le bouton Google : le second bouton, avec son G devant le mot. */
+.connexion__google {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+}
+
+.connexion__google-g {
+  width: 16px;
+  height: 16px;
+  flex: none;
+}
+
+/* La note du pied de la carte de la V1, en petit et en gris. */
+.connexion__note {
+  margin: 16px 0 0;
+  text-align: center;
+  font-size: 12px;
+  line-height: 1.4;
+  color: var(--encre-chapeau);
+}
+
+/* « Se déconnecter », au pied du volet « Mon compte » : un lien à l'encre,
+   souligné, comme les liens des formulaires (charte). */
+.compte__deconnexion {
+  display: block;
+  margin: 8px auto 0;
+  padding: 10px 0;
+  border: 0;
+  background: none;
+  color: var(--encre);
+  font-family: var(--font-body);
+  font-size: 14px;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  cursor: pointer;
+}
