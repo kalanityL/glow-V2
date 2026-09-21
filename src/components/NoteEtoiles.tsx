@@ -52,10 +52,17 @@ export function NoteEtoiles({
      le nettoie. */
   const degrade = `etoiles-${useId().replace(/[^a-zA-Z0-9]/g, '')}`;
 
+  /* LA NOTE SOUS LE DOIGT se lit sur LES ÉTOILES, pas sur la rangée
+     (2026-09-21 au soir, vu en vérifiant le son : la rangée est plus large
+     que ses étoiles, centrées, et toucher la cinquième donnait 4) : de la
+     gauche de la première à la droite de la dernière, cinq parts égales. */
   const noteSous = (x: number): number => {
-    const r = rangee.current?.getBoundingClientRect();
-    if (!r || r.width === 0) return valeur;
-    const part = (x - r.left) / r.width;
+    const etoiles = rangee.current?.querySelectorAll('.etoiles-note__etoile');
+    if (!etoiles || etoiles.length === 0) return valeur;
+    const gauche = etoiles[0].getBoundingClientRect().left;
+    const droite = etoiles[etoiles.length - 1].getBoundingClientRect().right;
+    if (droite <= gauche) return valeur;
+    const part = (x - gauche) / (droite - gauche);
     return Math.max(0, Math.min(5, Math.ceil(part * 5)));
   };
   const surGlissement = (e: PointerEvent) => {
