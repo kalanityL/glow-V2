@@ -307,7 +307,11 @@ export interface Textes {
         (2026-09-21, « mettre hier, aujourd'hui ou date »). */
     hier: string;
     aujourdhui: string;
-    duree: string;
+    /** La durée écrite en phrase : « 13 h de sommeil » (2026-09-21, « Durée :
+        13 h -> 13 h de sommeil ») — et sa suite seule, pour l'écran, où la
+        durée garde sa largeur fixe. */
+    duree: (duree: string) => string;
+    dureeSuite: string;
     /** « Notez votre nuit » / « Notez votre sieste » (2026-09-21). */
     qualite: (nature: SleepKind) => string;
     /** Les six crans, de 0 à 5. */
@@ -620,7 +624,8 @@ const FR: Textes = {
     reveil: 'Réveil',
     hier: 'Hier',
     aujourdhui: 'Aujourd’hui',
-    duree: 'Durée :',
+    duree: (duree) => `${duree} de sommeil`,
+    dureeSuite: 'de sommeil',
     qualite: (nature) => (nature === 'nuit' ? 'Notez votre nuit' : 'Notez votre sieste'),
     qualites: ['Très mauvaise', 'Mauvaise', 'Passable', 'Correcte', 'Bonne', 'Excellente'],
     refusDureeNulle: 'L’heure de réveil et l’heure d’endormissement sont identiques : aucune durée de sommeil à enregistrer.',

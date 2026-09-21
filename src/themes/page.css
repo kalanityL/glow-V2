@@ -3113,7 +3113,9 @@
 .sommeil__duree span {
   display: inline-block;
   width: 6ch;
-  text-align: left;
+  /* La durée d'abord, les mots après (2026-09-21) : alignée à droite, les
+     mots ne bougent pas. */
+  text-align: right;
   color: var(--encre);
   font-variant-numeric: tabular-nums;
 }

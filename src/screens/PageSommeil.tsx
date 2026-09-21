@@ -242,13 +242,15 @@ export function PageSommeil({
             </div>
 
             {/* LA DURÉE, DÉDUITE — jamais saisie. */}
+            {/* « 13 h de sommeil » (2026-09-21, « Durée : 13 h -> 13 h de
+                sommeil ») : la durée à largeur fixe, puis les mots. */}
             <p className="sommeil__duree">
-              {textes.sommeil.duree} <span>{dureeEcrite(duree)}</span>
+              <span>{dureeEcrite(duree)}</span> {textes.sommeil.dureeSuite}
             </p>
             <div
               className="sommeil__jauge"
               role="progressbar"
-              aria-label={textes.sommeil.duree}
+              aria-label={textes.sommeil.duree(dureeEcrite(duree))}
               aria-valuemin={0}
               aria-valuemax={100}
               aria-valuenow={Math.round(jauge.remplissage * 100)}
