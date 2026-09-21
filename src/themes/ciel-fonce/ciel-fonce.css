@@ -118,6 +118,10 @@
   --option-fond: rgba(255, 255, 255, 0.06);
   --option-filet: rgba(255, 255, 255, 0.14);
   --option-choisi-fond: rgba(95, 192, 255, 0.14);
+  /* LE BANDEAU DE TITRE D'UN FORMULAIRE (2026-09-21, « prendre couleur par
+     defaut de la v1 de fond de couleur de bandeau titre ») : le
+     `--glow-band-bg` de la V1, #f0f9ff. */
+  --formulaire-bandeau-fond: #f0f9ff;
 
   /* LE PANNEAU FLOTTANT des roues du sélecteur. Son fond est OPAQUE et pris
      dans le ciel du thème : il passe par-dessus le texte de la page, et une

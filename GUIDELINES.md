@@ -536,7 +536,14 @@ pour gauche et droite ; pas sous forme orale) — **aux couleurs de son
 image** (« utilise ces styles pour les boutons de dosage et de zone (pas
 les ronds radio) ») : non choisi, gris très clair sans filet et texte gris ;
 choisi, le bleu pâle des réponses choisies cerné d'un bleu plus soutenu, le
-texte à l'encre du formulaire, jamais bleu ;
+texte à l'encre du formulaire, jamais bleu ; non choisi cerné d'un gris à
+peine plus foncé que son fond, choisi cerné d'un bleu clair franc (« les
+couleurs de contours ne sont pas conforme à l'image », corrigé) ; le nom
+du traitement et l'intitulé de la zone à l'encre ; **le bandeau de titre
+et le bouton Valider sont figés, le corps du formulaire défile entre eux**
+(« bandeau titre et bouton valider figés, c'est le reste qui scrolle »),
+et le bandeau prend la couleur par défaut de la V1
+(`--formulaire-bandeau-fond`, le `--glow-band-bg` #f0f9ff de la V1) ;
 la dose parmi les paliers de la spécialité — désormais dans
 `domaine/traitements.ts`, des faits de boîte, pas un conseil — ou « Autre
 dose » tapée ; « + Notes » ; « Valider » au milieu. Une dose absente ou

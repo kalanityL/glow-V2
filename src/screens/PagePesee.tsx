@@ -103,67 +103,73 @@ export function PagePesee({
             </button>
           </div>
 
-          <div className="prise__moment">
-            {editeDate ? (
-              <ChoixDate
-                valeur={date}
-                onChoix={(d) => {
-                  setDate(d);
-                  setRemplacer(false);
-                }}
-                nom={textes.groupes.age}
-                icone={<IconeCalendrier />}
-                ouvertDAbord
-                onFerme={() => setEditeDate(false)}
-              />
-            ) : (
-              <button type="button" className="prise__quand" onClick={() => setEditeDate(true)}>
-                <IconeCalendrier />
-                <span>{formaterDateCourte(date, langue)}</span>
-              </button>
-            )}
-            {editeHeure ? (
-              <ChoixHeure
-                valeur={heure}
-                onChoix={setHeure}
-                nom={textes.pesee.titre}
-                icone={<IconeHorloge />}
-                ouvertDAbord
-                onFerme={() => setEditeHeure(false)}
-              />
-            ) : (
-              <button type="button" className="prise__quand" onClick={() => setEditeHeure(true)}>
-                <IconeHorloge />
-                <span>{heure}</span>
-              </button>
-            )}
-          </div>
-
-          <ReglePoids
-            valeur={poids}
-            unite={unite}
-            nom={textes.groupes.poids}
-            onValeur={(stocke) => {
-              setPoids(stocke);
-              setRemplacer(false);
-            }}
-          />
-
-          {remplacer ? (
-            <div className="prise__proposition">
-              <p className="regle regle--manquee prise__question">
-                {textes.pesee.remplacer(formaterDateCourte(date, langue))}
-              </p>
-              <div className="boutons">
-                <button type="button" className="bouton bouton--second" onClick={onAccueil}>
-                  {textes.non}
+          {/* LE CORPS DÉFILE ENTRE L'ENTÊTE ET LE PIED, figés (2026-09-21,
+              « bandeau titre et bouton valider figés, c'est le reste qui
+              scrolle »). */}
+          <div className="prise__corps">
+            <div className="prise__moment">
+              {editeDate ? (
+                <ChoixDate
+                  valeur={date}
+                  onChoix={(d) => {
+                    setDate(d);
+                    setRemplacer(false);
+                  }}
+                  nom={textes.groupes.age}
+                  icone={<IconeCalendrier />}
+                  ouvertDAbord
+                  onFerme={() => setEditeDate(false)}
+                />
+              ) : (
+                <button type="button" className="prise__quand" onClick={() => setEditeDate(true)}>
+                  <IconeCalendrier />
+                  <span>{formaterDateCourte(date, langue)}</span>
                 </button>
-                <button type="button" className="bouton" onClick={consigner}>
-                  {textes.oui}
+              )}
+              {editeHeure ? (
+                <ChoixHeure
+                  valeur={heure}
+                  onChoix={setHeure}
+                  nom={textes.pesee.titre}
+                  icone={<IconeHorloge />}
+                  ouvertDAbord
+                  onFerme={() => setEditeHeure(false)}
+                />
+              ) : (
+                <button type="button" className="prise__quand" onClick={() => setEditeHeure(true)}>
+                  <IconeHorloge />
+                  <span>{heure}</span>
                 </button>
-              </div>
+              )}
             </div>
-          ) : null}
+
+            <ReglePoids
+              valeur={poids}
+              unite={unite}
+              nom={textes.groupes.poids}
+              onValeur={(stocke) => {
+                setPoids(stocke);
+                setRemplacer(false);
+              }}
+            />
+
+            {remplacer ? (
+              <div className="prise__proposition">
+                <p className="regle regle--manquee prise__question">
+                  {textes.pesee.remplacer(formaterDateCourte(date, langue))}
+                </p>
+                <div className="boutons">
+                  <button type="button" className="bouton bouton--second" onClick={onAccueil}>
+                    {textes.non}
+                  </button>
+                  <button type="button" className="bouton" onClick={consigner}>
+                    {textes.oui}
+                  </button>
+                </div>
+              </div>
+            ) : null}
+
+          </div>
 
           <div className="prise__pied">
             {modification ? (

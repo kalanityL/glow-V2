@@ -41,6 +41,10 @@
   --option-fond: #ffffff;
   --option-filet: #cbd5e1;
   --option-choisi-fond: #dbeafe;
+  /* LE BANDEAU DE TITRE D'UN FORMULAIRE (2026-09-21, « prendre couleur par
+     defaut de la v1 de fond de couleur de bandeau titre ») : le
+     `--glow-band-bg` de la V1, #f0f9ff. */
+  --formulaire-bandeau-fond: #f0f9ff;
 
   /* LE PANNEAU FLOTTANT des roues du sélecteur : une carte blanche, opaque,
      cernée de Gris 300, décollée par une ombre d'ardoise. */

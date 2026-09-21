@@ -163,165 +163,171 @@ export function PagePrise({
             </button>
           </div>
 
-          {/* LA DATE ET L'HEURE D'ABORD (2026-09-21), éditées en place comme
-              dans la V1 : la valeur est un bouton ; touchée, elle devient une
-              boîte, l'icône à gauche, et déroule son panneau. */}
-          <div className="prise__moment">
-            {editeDate ? (
-              <ChoixDate
-                valeur={date}
-                onChoix={setDate}
-                nom={textes.groupes.age}
-                icone={<IconeCalendrier />}
-                ouvertDAbord
-                onFerme={() => setEditeDate(false)}
-              />
-            ) : (
-              <button type="button" className="prise__quand" onClick={() => setEditeDate(true)}>
-                <IconeCalendrier />
-                <span>{formaterDateCourte(date, langue)}</span>
-              </button>
-            )}
-            {editeHeure ? (
-              <ChoixHeure
-                valeur={heure}
-                onChoix={setHeure}
-                nom={textes.prise.titre[forme]}
-                icone={<IconeHorloge />}
-                ouvertDAbord
-                onFerme={() => setEditeHeure(false)}
-              />
-            ) : (
-              <button type="button" className="prise__quand" onClick={() => setEditeHeure(true)}>
-                <IconeHorloge />
-                <span>{heure}</span>
-              </button>
-            )}
-          </div>
-
-          {/* LE NOM DU TRAITEMENT, sur sa ligne, entier (2026-09-20, « il ne
-              doit pas etre coupé ») ; touché, il propose la mise à jour. */}
-          <button type="button" className="prise__marque" onClick={() => setProposition(!proposition)}>
-            {specialite?.nom}
-          </button>
-          {proposition ? (
-            <div className="prise__proposition">
-              <p className="regle regle--manquee prise__question">{textes.prise.mettreAJour}</p>
-              <div className="boutons">
-                <button type="button" className="bouton bouton--second" onClick={() => setProposition(false)}>
-                  {textes.non}
+          {/* LE CORPS DÉFILE ENTRE L'ENTÊTE ET LE PIED, figés (2026-09-21,
+              « bandeau titre et bouton valider figés, c'est le reste qui
+              scrolle »). */}
+          <div className="prise__corps">
+            {/* LA DATE ET L'HEURE D'ABORD (2026-09-21), éditées en place comme
+                dans la V1 : la valeur est un bouton ; touchée, elle devient une
+                boîte, l'icône à gauche, et déroule son panneau. */}
+            <div className="prise__moment">
+              {editeDate ? (
+                <ChoixDate
+                  valeur={date}
+                  onChoix={setDate}
+                  nom={textes.groupes.age}
+                  icone={<IconeCalendrier />}
+                  ouvertDAbord
+                  onFerme={() => setEditeDate(false)}
+                />
+              ) : (
+                <button type="button" className="prise__quand" onClick={() => setEditeDate(true)}>
+                  <IconeCalendrier />
+                  <span>{formaterDateCourte(date, langue)}</span>
                 </button>
-                <button
-                  type="button"
-                  className="bouton"
-                  onClick={() => {
-                    setProposition(false);
-                    setBlocTraitement(true);
-                  }}
-                >
-                  {textes.oui}
+              )}
+              {editeHeure ? (
+                <ChoixHeure
+                  valeur={heure}
+                  onChoix={setHeure}
+                  nom={textes.prise.titre[forme]}
+                  icone={<IconeHorloge />}
+                  ouvertDAbord
+                  onFerme={() => setEditeHeure(false)}
+                />
+              ) : (
+                <button type="button" className="prise__quand" onClick={() => setEditeHeure(true)}>
+                  <IconeHorloge />
+                  <span>{heure}</span>
                 </button>
-              </div>
+              )}
             </div>
-          ) : null}
 
-          {/* UN BOUTON PAR PALIER, le premier choisi d'avance, et « Autre »
-              qui ouvre la saisie d'un dosage (2026-09-21). */}
-          <div className="prise__boutons" role="radiogroup" aria-label={textes.prise.autreDoseVide}>
-            {paliers.map((mg) => {
-              const choisi = !autreDose && palier === mg;
-              return (
-                <button
-                  key={mg}
-                  type="button"
-                  role="radio"
-                  aria-checked={choisi}
-                  className={`prise__bouton${choisi ? ' prise__bouton--choisi' : ''}`}
-                  onClick={() => {
-                    setAutreDose(false);
-                    setPalier(mg);
-                    setRefuse(false);
-                  }}
-                >
-                  {mgEcrit(mg)} mg
-                </button>
-              );
-            })}
-            <button
-              type="button"
-              role="radio"
-              aria-checked={autreDose}
-              className={`prise__bouton${autreDose ? ' prise__bouton--choisi' : ''}`}
-              onClick={() => {
-                setAutreDose(true);
-                setRefuse(false);
-              }}
-            >
-              {textes.prise.autre}
+            {/* LE NOM DU TRAITEMENT, sur sa ligne, entier (2026-09-20, « il ne
+                doit pas etre coupé ») ; touché, il propose la mise à jour. */}
+            <button type="button" className="prise__marque" onClick={() => setProposition(!proposition)}>
+              {specialite?.nom}
             </button>
-          </div>
-          {autreDose ? (
-            <input
-              className="prise__dose"
-              type="text"
-              inputMode="decimal"
-              placeholder={textes.prise.autreDoseVide}
-              aria-label={textes.prise.autreDoseVide}
-              value={doseTapee}
-              autoFocus
-              onChange={(e) => {
-                setDoseTapee(e.target.value);
-                if (doseDepuisSaisie(e.target.value) !== null) setRefuse(false);
-              }}
-            />
-          ) : null}
-          {refuse ? <p className="regle regle--manquee prise__regle">{textes.prise.regleDose}</p> : null}
-
-          {/* LA ZONE D'INJECTION : son intitulé et six boutons (2026-09-21) —
-              pas sous forme orale, où elle vaut « voie orale ». */}
-          {!orale ? (
-            <>
-              <p className="prise__etiquette">{textes.prise.zone}</p>
-              <div className="prise__boutons prise__boutons--zones" role="radiogroup" aria-label={textes.prise.zone}>
-                {ZONES_INJECTION.map((z) => (
+            {proposition ? (
+              <div className="prise__proposition">
+                <p className="regle regle--manquee prise__question">{textes.prise.mettreAJour}</p>
+                <div className="boutons">
+                  <button type="button" className="bouton bouton--second" onClick={() => setProposition(false)}>
+                    {textes.non}
+                  </button>
                   <button
-                    key={z}
+                    type="button"
+                    className="bouton"
+                    onClick={() => {
+                      setProposition(false);
+                      setBlocTraitement(true);
+                    }}
+                  >
+                    {textes.oui}
+                  </button>
+                </div>
+              </div>
+            ) : null}
+
+            {/* UN BOUTON PAR PALIER, le premier choisi d'avance, et « Autre »
+                qui ouvre la saisie d'un dosage (2026-09-21). */}
+            <div className="prise__boutons" role="radiogroup" aria-label={textes.prise.autreDoseVide}>
+              {paliers.map((mg) => {
+                const choisi = !autreDose && palier === mg;
+                return (
+                  <button
+                    key={mg}
                     type="button"
                     role="radio"
-                    aria-checked={zone === z}
-                    className={`prise__bouton${zone === z ? ' prise__bouton--choisi' : ''}`}
-                    onClick={() => setZone(z)}
+                    aria-checked={choisi}
+                    className={`prise__bouton${choisi ? ' prise__bouton--choisi' : ''}`}
+                    onClick={() => {
+                      setAutreDose(false);
+                      setPalier(mg);
+                      setRefuse(false);
+                    }}
                   >
-                    {textes.prise.zonesCourtes[z]}
+                    {mgEcrit(mg)} mg
                   </button>
-                ))}
-              </div>
-            </>
-          ) : null}
-
-          {/* LES NOTES : un lien qui déplie deux lignes. Replier n'efface pas. */}
-          {notesOuvertes ? (
-            <>
-              <button type="button" className="prise__lien" onClick={() => setNotesOuvertes(false)}>
-                <IconeCroix />
-                <span>{textes.prise.masquerNotes}</span>
+                );
+              })}
+              <button
+                type="button"
+                role="radio"
+                aria-checked={autreDose}
+                className={`prise__bouton${autreDose ? ' prise__bouton--choisi' : ''}`}
+                onClick={() => {
+                  setAutreDose(true);
+                  setRefuse(false);
+                }}
+              >
+                {textes.prise.autre}
               </button>
-              <textarea
-                className="prise__notes"
-                rows={2}
-                maxLength={NOTE_MAX}
-                placeholder={textes.prise.notesVide}
-                aria-label={textes.prise.notes}
-                value={notes}
-                onChange={(e) => setNotes(e.target.value)}
+            </div>
+            {autreDose ? (
+              <input
+                className="prise__dose"
+                type="text"
+                inputMode="decimal"
+                placeholder={textes.prise.autreDoseVide}
+                aria-label={textes.prise.autreDoseVide}
+                value={doseTapee}
+                autoFocus
+                onChange={(e) => {
+                  setDoseTapee(e.target.value);
+                  if (doseDepuisSaisie(e.target.value) !== null) setRefuse(false);
+                }}
               />
-            </>
-          ) : (
-            <button type="button" className="prise__lien" onClick={() => setNotesOuvertes(true)}>
-              <IconePlus />
-              <span>{textes.prise.notes}</span>
-            </button>
-          )}
+            ) : null}
+            {refuse ? <p className="regle regle--manquee prise__regle">{textes.prise.regleDose}</p> : null}
+
+            {/* LA ZONE D'INJECTION : son intitulé et six boutons (2026-09-21) —
+                pas sous forme orale, où elle vaut « voie orale ». */}
+            {!orale ? (
+              <>
+                <p className="prise__etiquette">{textes.prise.zone}</p>
+                <div className="prise__boutons prise__boutons--zones" role="radiogroup" aria-label={textes.prise.zone}>
+                  {ZONES_INJECTION.map((z) => (
+                    <button
+                      key={z}
+                      type="button"
+                      role="radio"
+                      aria-checked={zone === z}
+                      className={`prise__bouton${zone === z ? ' prise__bouton--choisi' : ''}`}
+                      onClick={() => setZone(z)}
+                    >
+                      {textes.prise.zonesCourtes[z]}
+                    </button>
+                  ))}
+                </div>
+              </>
+            ) : null}
+
+            {/* LES NOTES : un lien qui déplie deux lignes. Replier n'efface pas. */}
+            {notesOuvertes ? (
+              <>
+                <button type="button" className="prise__lien" onClick={() => setNotesOuvertes(false)}>
+                  <IconeCroix />
+                  <span>{textes.prise.masquerNotes}</span>
+                </button>
+                <textarea
+                  className="prise__notes"
+                  rows={2}
+                  maxLength={NOTE_MAX}
+                  placeholder={textes.prise.notesVide}
+                  aria-label={textes.prise.notes}
+                  value={notes}
+                  onChange={(e) => setNotes(e.target.value)}
+                />
+              </>
+            ) : (
+              <button type="button" className="prise__lien" onClick={() => setNotesOuvertes(true)}>
+                <IconePlus />
+                <span>{textes.prise.notes}</span>
+              </button>
+            )}
+
+          </div>
 
           <div className="prise__pied">
             {modification ? (

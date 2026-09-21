@@ -2215,18 +2215,31 @@
 .prise {
   display: flex;
   flex-direction: column;
-  gap: 16px;
-  /* Plus haute que l'écran — notes dépliées, règle dite —, la carte DÉFILE
-     EN ELLE-MÊME plutôt que d'être coupée (GUIDELINES : rien ne déborde,
-     jamais une coupe) : elle se laisse rétrécir par la colonne. */
+  /* Le rembourrage est sur les trois parts, pas sur la carte : le bandeau
+     va d'un bord à l'autre. */
+  padding: 0;
+  overflow: hidden;
+  /* Plus haute que l'écran, la carte se laisse rétrécir par la colonne, et
+     c'est SON CORPS qui défile — l'entête et le pied restent figés
+     (2026-09-21, « bandeau titre et bouton valider figés, c'est le reste
+     qui scrolle »). */
   flex: 0 1 auto;
   min-height: 0;
-  overflow-y: auto;
 }
 
-/* Rien dans la carte ne se laisse écraser : c'est la carte qui défile, pas
+.prise__corps {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 16px;
+}
+
+/* Rien dans le corps ne se laisse écraser : c'est le corps qui défile, pas
    le champ des notes qui s'aplatit. */
-.prise > * {
+.prise__corps > * {
   flex: none;
 }
 
@@ -2238,9 +2251,13 @@
    gris, dans la police et la taille du texte courant ; seul le bouton qui
    valide est à l'accent. */
 .prise__entete {
+  flex: none;
   display: flex;
   align-items: center;
   gap: 10px;
+  padding: 12px 16px;
+  /* Le bandeau, à la couleur par défaut de la V1 (2026-09-21). */
+  background: var(--formulaire-bandeau-fond);
 }
 
 .prise__entete > .icone {
@@ -2274,7 +2291,9 @@
   font-family: var(--font-body);
   font-weight: 500;
   font-size: 15px;
-  color: var(--encre-chapeau);
+  /* À l'encre (2026-09-21, « mounjaro et zone d'injection passent en
+     couleur de texte normal »). */
+  color: var(--encre);
   cursor: pointer;
 }
 
@@ -2414,7 +2433,7 @@
   margin: 0 0 -8px;
   font-family: var(--font-body);
   font-size: 15px;
-  color: var(--encre-chapeau);
+  color: var(--encre);
 }
 
 .prise__boutons {
@@ -2429,7 +2448,10 @@
 
 .prise__bouton {
   padding: 12px 8px;
-  border: 1px solid transparent;
+  /* Cerné d'un gris à peine plus foncé que le fond, comme sur son image
+     (2026-09-21, « les couleurs de contours ne sont pas conforme à
+     l'image »). */
+  border: 1px solid color-mix(in srgb, var(--option-filet) 55%, var(--option-fond));
   border-radius: 12px;
   background: color-mix(in srgb, var(--option-filet) 22%, var(--option-fond));
   color: var(--encre-chapeau);
@@ -2441,7 +2463,8 @@
 }
 
 .prise__bouton--choisi {
-  border-color: color-mix(in srgb, var(--accent) 35%, var(--option-choisi-fond));
+  /* Un bleu clair franc, celui du contour de son image. */
+  border-color: color-mix(in srgb, var(--accent) 45%, #ffffff);
   background: var(--option-choisi-fond);
   color: var(--encre);
 }
@@ -2455,10 +2478,11 @@
 /* « Valider » au milieu, à sa largeur, la coche devant — comme la V1 ; en
    modification, « Annuler » à côté. */
 .prise__pied {
+  flex: none;
   display: flex;
   justify-content: center;
   gap: 10px;
-  padding-top: 4px;
+  padding: 4px 16px 16px;
 }
 
 .prise__valider {
