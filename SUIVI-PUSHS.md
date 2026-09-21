@@ -10,6 +10,19 @@ du push seul, jusqu'au jour où un déploiement existera.
 
 ---
 
+## 2026-09-21 — sixième push · 1 commit (`fd237aa..ffb1bf6`) · déployé
+
+**Poussé et déployé sur sa demande** (« push et deploy »), sixième
+déploiement sur `https://glow-private-v2.web.app`. Entrée écrite avant le
+push.
+
+**Vérifié avant envoi :** `tsc` silencieux, `npm test` 67/67,
+`npm run build` vert (`index-B9jdgiLu.js`).
+
+**Ce que le lot contient :** l'indice de défilement ne se montre plus
+quand il reste moins qu'une pastille à voir (sa capture : la pastille
+posée sur « Oui » pour la marge sous les boutons).
+
 ## 2026-09-21 — cinquième push · 2 commits (`a764a77..141bfee`) · déployé
 
 **Poussé et déployé sur sa demande** (« push et deploy ce qui est pret »),
