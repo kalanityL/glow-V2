@@ -969,6 +969,51 @@ son fondu ont vécu un après-midi) ; elle est un jeton des thèmes clairs
 (`--accueil-fond-image`, `none` sur les ciels) et un FICHIER embarqué dans
 `src/assets/images/`, comme les polices — jamais une ressource distante.
 
+**L'avatar modulaire** (2026-09-21 au soir, « tu as tout ce qu'il faut pour
+mettre à jour notre fonctionnalité d'avatar dans ../avatar. Go. » — le
+dossier est `~/Desktop/GLOW/avatars/avatar_prototype_svg/`, livré par un
+agent indépendant, dans un worktree) : le dessin de la V1 est remplacé par
+SON PROTOTYPE — un canevas de 500 × 600, huit couches dans l'ordre de son
+manifeste (le corps, le visage, les yeux, les sourcils, le nez, la bouche, la
+coiffure, le vêtement), composées en un seul SVG (`components/Avatar.tsx`),
+les tracés recopiés tels quels de ses fichiers (`components/avatarTraces.ts`,
+jamais arrondis) ; le rendu est mesuré au pixel contre la superposition des
+huit fichiers du prototype : identique, sur deux compositions. **La forme et
+la teinte sont séparées** — hypothèse dite, à trancher par elle : le
+prototype mêle les deux dans ses noms (« skin1 », « brown », « bob_2 » : un
+même tracé de carré en trois couleurs), ici la forme vient du fichier et la
+couleur du nuancier — le nuancier existant (six peaux, cinq yeux, six
+cheveux) plus deux teintes de vêtement relevées dans ses fichiers (le crème
+`#F7F4EE`, le marine `#244B73`). Les réglages : le genre, la peau, le visage
+(ovale, rond, carré), la forme des yeux (en amande, ronds, tombants), la
+couleur des yeux, la coiffure (carré, courts, bouclés — trois tracés, pas
+neuf), la couleur des cheveux, le nez (droit, retroussé, large), la bouche
+(neutre, sourire, pulpeuse), le vêtement (t-shirt, sweat à capuche) et sa
+couleur ; les mots sont dans le dictionnaire. **Le genre amène la coiffure
+et le vêtement de départ** (femme : carré, t-shirt crème — la femme aux
+cheveux longs du 2026-09-20, le carré étant la coiffure longue du
+prototype ; homme : courts, sweat marine ; neutre : bouclés, t-shirt
+marine) — hypothèse dite. **La peau colore le visage ET le corps** : le
+prototype donnait au cou une teinte fixe qui jurerait sous une autre peau —
+hypothèse dite. **Ce que le prototype n'a pas n'est plus à l'écran** : les
+lunettes, les expressions, le visage en cœur, la frange, la brosse,
+l'absence de cheveux — on ne l'invente pas. Les couleurs du dessin (le
+contour `#241A18` de tous les traits, le blanc de l'œil, la pupille, les
+deux rouges des lèvres, le pan translucide de la capuche — et le noir par
+défaut du SVG que le prototype laisse au sourcil et à la bouche neutre)
+sont des classes de `themes/dessins.css`. **La base** : `AvatarConfig` de la
+V1 reçoit ce qu'elle sait porter (le genre, la forme du visage, la coiffure
+— carré→`long` —, les trois couleurs) et ses champs sans tracé à leur valeur
+neutre (`hasGlasses: false`, `expression: 'happy'`) ; ce qu'elle ne sait pas
+porter (la forme des yeux, le nez, la bouche, le vêtement et sa couleur)
+vit sous `glp1_v2_reponses`, dont la forme passe en version 2 — une
+version 1 se relit telle quelle, sans avatar hors base ; un profil de la
+V1 se relit au plus proche (le cœur en ovale, la frange en carré, la brosse
+et l'absence de cheveux en courts) ; un avatar de l'ancien modèle se relit
+sans rien casser (`avatarDepuisInconnu`, testé). Non traité : des vignettes
+dessinées à la place des mots pour les formes ; le portrait dans le rond de
+l'accueil montre la figure entière, plus petite qu'avant.
+
 ## 5. Non traité, au 2026-09-20
 - Les réponses sont enregistrées SUR L'APPAREIL depuis le 2026-09-20
   (« changement d'information dans "mon compte" persistent au reload ») :
@@ -979,6 +1024,7 @@ son fondu ont vécu un après-midi) ; elle est un jeton des thèmes clairs
 - L'accueil n'a que son entête, son salut et son menu ; rien n'y est
   cliquable, la zone du milieu est vide.
 - Les roues ne se parcourent pas aux flèches du clavier.
-- L'écran de l'avatar défile (sept réglages) — le portrait et les boutons
-  restent en place, seuls les réglages défilent.
+- L'écran de l'avatar défile (onze réglages depuis le prototype modulaire
+  du 2026-09-21) — le portrait et les boutons restent en place, seuls les
+  réglages défilent.
 - La langue est une maquette.

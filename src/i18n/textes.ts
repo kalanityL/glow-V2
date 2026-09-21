@@ -1,8 +1,11 @@
 import type {
+  Bouche,
   Coiffure,
-  Expression,
   FormeVisage,
+  FormeYeux,
   Genre,
+  Nez,
+  Vetement,
 } from '../domaine/avatar';
 import type { Forme } from '../domaine/traitements';
 import type { Zone } from '../domaine/prises';
@@ -112,8 +115,12 @@ export interface Textes {
     yeux: string;
     coiffure: string;
     visage: string;
-    expression: string;
-    lunettes: string;
+    /** Les réglages du prototype modulaire (2026-09-21). */
+    formeYeux: string;
+    nez: string;
+    bouche: string;
+    vetement: string;
+    couleurVetement: string;
   };
   onboarding: {
     langueUnites: {
@@ -373,7 +380,10 @@ export interface Textes {
   genres: Record<Genre, string>;
   coiffures: Record<Coiffure, string>;
   formesVisage: Record<FormeVisage, string>;
-  expressions: Record<Expression, string>;
+  formesYeux: Record<FormeYeux, string>;
+  nez: Record<Nez, string>;
+  bouches: Record<Bouche, string>;
+  vetements: Record<Vetement, string>;
   couleurs: Record<string, string>;
   /** Les deux façons de prendre un traitement. Les NOMS des spécialités, eux,
    *  ne se traduisent pas : voir `domaine/traitements.ts`. */
@@ -407,8 +417,11 @@ const FR: Textes = {
     yeux: 'Yeux',
     coiffure: 'Coiffure',
     visage: 'Visage',
-    expression: 'Expression',
-    lunettes: 'Lunettes',
+    formeYeux: 'Forme des yeux',
+    nez: 'Nez',
+    bouche: 'Bouche',
+    vetement: 'Vêtement',
+    couleurVetement: 'Couleur du vêtement',
   },
   themes: {
     ciel: 'Ciel',
@@ -687,25 +700,36 @@ const FR: Textes = {
     homme: 'Homme',
     neutre: 'Neutre',
   },
+  /* Les trois coiffures du prototype : le carré (« bob »), les cheveux
+     courts, les boucles. */
   coiffures: {
+    carre: 'Carré',
     court: 'Courts',
-    long: 'Longs',
     boucle: 'Bouclés',
-    frange: 'Frange',
-    brosse: 'En brosse',
-    chauve: 'Sans cheveux',
   },
   formesVisage: {
     ovale: 'Ovale',
     rond: 'Rond',
     carre: 'Carré',
-    coeur: 'Cœur',
   },
-  expressions: {
-    joyeuse: 'Joyeuse',
-    determinee: 'Déterminée',
-    fiere: 'Fière',
-    calme: 'Calme',
+  formesYeux: {
+    amande: 'En amande',
+    rond: 'Ronds',
+    tombant: 'Tombants',
+  },
+  nez: {
+    droit: 'Droit',
+    retrousse: 'Retroussé',
+    large: 'Large',
+  },
+  bouches: {
+    neutre: 'Neutre',
+    sourire: 'Sourire',
+    pulpeuse: 'Pulpeuse',
+  },
+  vetements: {
+    tshirt: 'T-shirt',
+    capuche: 'Sweat à capuche',
   },
   couleurs: {
     '#FFE5D9': 'Clair',
@@ -725,6 +749,9 @@ const FR: Textes = {
     '#1A1A1A': 'Noir',
     '#E76F51': 'Roux',
     '#DFE2E6': 'Gris polaire',
+    /* Les deux teintes de vêtement du prototype. */
+    '#F7F4EE': 'Crème',
+    '#244B73': 'Marine',
   },
   formes: {
     injection: 'Injection',
