@@ -53,6 +53,12 @@ export function CadranHeure({ valeur, onValeur, nom }: { valeur: string; onValeu
   const angle = angleDe(minutes);
   const rad = ((angle - 90) * Math.PI) / 180;
   const boule = { x: CENTRE + RAYON * Math.cos(rad), y: CENTRE + RAYON * Math.sin(rad) };
+  /* L'ARC depuis le haut jusqu'à la boule, et un bout d'aiguille qui pointe
+     vers le centre (2026-09-21, son image). */
+  const haut = { x: CENTRE, y: CENTRE - RAYON };
+  const grandArc = angle > 180 ? 1 : 0;
+  const arc = angle === 0 ? '' : `M ${haut.x} ${haut.y} A ${RAYON} ${RAYON} 0 ${grandArc} 1 ${boule.x} ${boule.y}`;
+  const aiguille = { x: CENTRE + (RAYON - 14) * Math.cos(rad), y: CENTRE + (RAYON - 14) * Math.sin(rad) };
   const reperes = apresMidi ? ['12', '15', '18', '21'] : ['12', '3', '6', '9'];
 
   const angleSous = (e: PointerEvent): number => {
@@ -132,7 +138,9 @@ export function CadranHeure({ valeur, onValeur, nom }: { valeur: string; onValeu
       <text className="cadran__repere" x={CENTRE - RAYON + 9} y={CENTRE + 3.5} textAnchor="start">
         {reperes[3]}
       </text>
-      <circle className="cadran__boule" cx={boule.x} cy={boule.y} r={6.5} />
+      {arc ? <path className="cadran__arc" d={arc} /> : null}
+      <line className="cadran__aiguille" x1={aiguille.x} y1={aiguille.y} x2={boule.x} y2={boule.y} />
+      <circle className="cadran__boule" cx={boule.x} cy={boule.y} r={7} />
     </svg>
   );
 }

@@ -7,7 +7,7 @@ import { ChoixHeure } from '../components/ChoixHeure';
 import { NoteEtoiles } from '../components/NoteEtoiles';
 import { CadranHeure } from '../components/CadranHeure';
 import { IndiceDefilement } from '../components/IndiceDefilement';
-import { IconeCalendrier, IconeChevronGauche, IconeCoche, IconeCroix, IconeHorloge, IconePlus, IconeSommeil } from '../components/Icones';
+import { IconeChevronGauche, IconeCoche, IconeCroix, IconeHorloge, IconePlus, IconeSommeil } from '../components/Icones';
 import { detecterLangue, useTextes } from '../i18n/useTextes';
 import { classeDuTheme } from '../themes/themes';
 import { dateLocale, formaterDateCourte } from '../domaine/dates';
@@ -169,13 +169,15 @@ export function PageSommeil({
     enMots = false,
   ) => (
     <div className="sommeil__colonne">
-      <span className="prise__etiquette">{nom}</span>
+      {/* SON DESSIN (2026-09-21, « utilise ce design sauf rien en gras ; ne
+          mets pas les pictos endormissement / réveil ») : une carte par
+          bord, son nom et son jour dessous, le cadran, l'heure en pastille. */}
+      <span className="sommeil__nom">{nom}</span>
       {edite === cleDate ? (
-        <ChoixDate valeur={date} onChoix={poserDate} nom={nom} icone={<IconeCalendrier />} ouvertDAbord onFerme={() => setEdite(null)} />
+        <ChoixDate valeur={date} onChoix={poserDate} nom={nom} ouvertDAbord onFerme={() => setEdite(null)} />
       ) : (
-        <button type="button" className="prise__quand" onClick={() => setEdite(cleDate)}>
-          <IconeCalendrier />
-          <span>{jourEcrit(date, enMots)}</span>
+        <button type="button" className="sommeil__jour" onClick={() => setEdite(cleDate)}>
+          {jourEcrit(date, enMots)}
         </button>
       )}
       {/* LE CADRAN, au-dessus de l'heure (2026-09-21) : la boule se glisse,
@@ -184,7 +186,7 @@ export function PageSommeil({
       {edite === cleHeure ? (
         <ChoixHeure valeur={heure} onChoix={poserHeure} nom={nom} icone={<IconeHorloge />} ouvertDAbord onFerme={() => setEdite(null)} />
       ) : (
-        <button type="button" className="prise__quand" onClick={() => setEdite(cleHeure)}>
+        <button type="button" className="sommeil__heure" onClick={() => setEdite(cleHeure)}>
           <IconeHorloge />
           <span>{heure}</span>
         </button>

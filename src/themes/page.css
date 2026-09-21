@@ -3028,16 +3028,67 @@
   gap: 8px;
 }
 
+/* CHAQUE BORD EST UNE CARTE (2026-09-21, son dessin, « sauf rien en
+   gras ») : un fond à peine teinté, le nom à l'encre, le jour en gris
+   dessous, le cadran, l'heure en pastille. */
 .sommeil__colonne {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 6px;
+  gap: 2px;
   min-width: 0;
+  padding: 12px 8px;
+  border-radius: 18px;
+  background: color-mix(in srgb, var(--option-choisi-fond) 35%, var(--option-fond));
 }
 
-.sommeil__colonne .prise__etiquette {
-  margin: 0;
+.sommeil__nom {
+  font-family: var(--font-body);
+  font-weight: 500;
+  font-size: 15px;
+  color: var(--encre);
+}
+
+.sommeil__jour {
+  padding: 0;
+  border: 0;
+  background: none;
+  font-family: var(--font-body);
+  font-weight: 500;
+  font-size: 14px;
+  color: var(--encre-chapeau);
+  cursor: pointer;
+}
+
+/* L'heure en pastille, sous le cadran : le bleu pâle des réponses choisies,
+   l'horloge et le chiffre, un peu plus grand — pas en gras. */
+.sommeil__heure {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 6px;
+  padding: 8px 16px;
+  border: 0;
+  border-radius: 14px;
+  background: var(--option-choisi-fond);
+  color: var(--encre);
+  font-family: var(--font-body);
+  font-weight: 500;
+  font-size: 19px;
+  font-variant-numeric: tabular-nums;
+  cursor: pointer;
+}
+
+.sommeil__heure .icone {
+  width: 18px;
+  height: 18px;
+  color: var(--encre-chapeau);
+}
+
+.sommeil__heure span {
+  display: inline-block;
+  width: 5ch;
+  text-align: left;
 }
 
 .sommeil__duree {
@@ -3061,16 +3112,11 @@
   font-variant-numeric: tabular-nums;
 }
 
-.sommeil__colonne .prise__quand span,
 .sommeil__colonne .choix__valeur {
-  font-variant-numeric: tabular-nums;
-}
-
-.sommeil__colonne .prise__quand + .cadran + .prise__quand span,
-.sommeil__colonne .choix .choix__valeur {
   display: inline-block;
   width: 5ch;
   text-align: left;
+  font-variant-numeric: tabular-nums;
 }
 
 
@@ -3112,9 +3158,11 @@
    repères en gris, la boule à l'encre — sobre. Il reçoit le doigt. */
 .cadran {
   display: block;
-  width: 104px;
-  height: 104px;
-  margin: 2px 0 -2px;
+  width: 100%;
+  max-width: 150px;
+  height: auto;
+  aspect-ratio: 1;
+  margin: 4px 0 0;
   touch-action: none;
   cursor: pointer;
   user-select: none;
@@ -3138,8 +3186,25 @@
   pointer-events: none;
 }
 
+/* L'arc du haut à la boule, dans le bleu pâle ; le bout d'aiguille et la
+   boule à l'encre, la boule cerclée de blanc (son dessin). */
+.cadran__arc {
+  fill: none;
+  stroke: var(--option-choisi-fond);
+  stroke-width: 3;
+  stroke-linecap: round;
+}
+
+.cadran__aiguille {
+  stroke: var(--encre);
+  stroke-width: 2;
+  stroke-linecap: round;
+}
+
 .cadran__boule {
   fill: var(--encre);
+  stroke: var(--module-fond);
+  stroke-width: 2;
 }
 
 /* DEUX GROS BOUTONS pour la nature (2026-09-21), et l'encoche de retour,
