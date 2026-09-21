@@ -14,11 +14,15 @@ que de te faire lire le fichier. Le TODO de la V1 est importé tel quel dans
 ## NOTE DE REPRISE — CLEAR DU 2026-09-21 AU SOIR (le sommeil, le téléphone long)
 
 **Rien ne tourne, rien n'est à moitié fait.** Aucun workflow ni agent en
-cours. TOUT EST POUSSÉ ET DÉPLOYÉ (le 21/09 au soir, « push et deploy tout
-v1 et v2 ») : V2 huitième push `4605149`, en ligne sur
-`glow-private-v2.web.app` (`index-CEFH7fmb.js`) ; V1 push `e9a96b84`, en
-ligne sur `glow-private.web.app` (`index-CkQLwi94.js`). Aucun commit non
-poussé nulle part. Pousser et déployer SEULEMENT sur son ordre, ÉCRIRE
+cours. LA V2 EN LIGNE EST LE VERROU (le 21/09 au soir, déployé par elle
+depuis la conversation, `! firebase deploy --only hosting:v2`, le
+classificateur me l'ayant refusé) : `glow-private-v2.web.app` sert
+`index-Dbp3y_6I.js`, le build du commit `bd7ecd0` (le verrou seul, sans
+l'avatar modulaire — retiré). V1 push `e9a96b84`, en ligne sur
+`glow-private.web.app` (`index-CkQLwi94.js`), vérifiée inchangée. LES
+COMMITS DE LA V2 DEPUIS `4605149` NE SONT PAS POUSSÉS (le verrou, la
+fusion de l'avatar et son inverse, les notes) : neuvième push à écrire
+dans `SUIVI-PUSHS.md` quand elle dira « pousse ». Pousser et déployer SEULEMENT sur son ordre, ÉCRIRE
 L'ENTRÉE DE `SUIVI-PUSHS.md` AVANT le push ; la V1 se pousse et se déploie
 à part, depuis son dépôt (`firebase deploy --only hosting`, jamais les
 règles Firestore sans ordre).
