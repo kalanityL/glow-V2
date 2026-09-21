@@ -3074,14 +3074,16 @@
   color: var(--encre);
   font-family: var(--font-body);
   font-weight: 500;
-  font-size: 19px;
+  /* La taille des heures du design d'avant (2026-09-21, « remets les heures
+     en chiffre à la même taille qu'avec le design précédent »). */
+  font-size: 15px;
   font-variant-numeric: tabular-nums;
   cursor: pointer;
 }
 
 .sommeil__heure .icone {
-  width: 18px;
-  height: 18px;
+  width: 16px;
+  height: 16px;
   color: var(--encre-chapeau);
 }
 
