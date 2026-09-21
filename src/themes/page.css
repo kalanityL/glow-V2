@@ -3150,16 +3150,16 @@
 .etoiles-note__etoile {
   width: 34px;
   height: 34px;
-  fill: transparent;
-  stroke: var(--option-filet);
-  stroke-width: 1.5;
-  stroke-linejoin: round;
-  transition: fill 120ms, stroke 120ms;
+  /* SANS CONTOUR (2026-09-21 au soir, « effet glow et pas de contour ») :
+     une étoile vide est un aplat au gris des filets, une pleine un aplat
+     dégradé — aucun trait autour. */
+  fill: var(--option-filet);
+  stroke: none;
+  transition: fill 120ms, filter 120ms;
 }
 
 /* Une étoile pleine porte le dégradé du « + » (son remplissage est posé
-   par le composant, vers le dégradé dont les arrêts sont ici) ; son contour
-   est le bout foncé du dégradé. */
+   par le composant, vers le dégradé dont les arrêts sont ici). */
 .etoiles-note__debut {
   stop-color: var(--menu-ajouter-debut);
 }
@@ -3168,8 +3168,21 @@
   stop-color: var(--menu-ajouter-fin);
 }
 
+/* L'EFFET GLOW (2026-09-21 au soir, « mets leur un effet glow style les
+   comme les etoiles de image pour claude/etoiles », son `etoiles.png`
+   relevé au pixel) : dans son image, le halo est la lumière de l'étoile
+   elle-même, fondue dans le fond ; il s'étend le long d'une branche de
+   0,9 fois la demi-longueur de la branche au-delà de sa pointe, et
+   davantage entre les branches (1,7 fois le rayon du creux). Ici la
+   branche fait 12,75 px de demi-longueur (9/24 de 34) : deux ombres
+   portées sans décalage, l'une serrée qui densifie le pied du halo,
+   l'autre à 9 px de flou qui va jusqu'à ~14 px de la pointe (mesuré au rendu : 0,4 fois la demi-branche au-delà de la pointe, 2 fois le creux entre les branches — un flou d'ombre est rond, la lumière de l'image s'étire le long des branches) — dans la
+   couleur de l'étoile (le bout foncé du dégradé du « + »), à demi
+   transparente, comme le halo de l'image est l'étoile éclairant son fond.
+   `filter` est une propriété nommée, un flou d'ombre en natif. */
 .etoiles-note__etoile--pleine {
-  stroke: var(--menu-ajouter-fin);
+  filter: drop-shadow(0 0 2px color-mix(in srgb, var(--menu-ajouter-fin) 55%, transparent))
+    drop-shadow(0 0 9px color-mix(in srgb, var(--menu-ajouter-fin) 45%, transparent));
 }
 
 /* LE CADRAN D'UNE HEURE (2026-09-21) : un cercle au filet des champs, quatre

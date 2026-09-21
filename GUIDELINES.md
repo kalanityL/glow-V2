@@ -788,7 +788,16 @@ qualité de 0 à 5 de la V1, sans mot dessous (« pas de label aux
 étoiles »), **de la forme de l'étoile du logo** (2026-09-21 au soir,
 « notez votre nuit : utiliser la forme d'étoile du logo de glow » : la
 grande étoile à quatre branches de `Logomark`, seule, le même tracé
-`STAR_PATHS[0]`), les étoiles pleines dans le dégradé bleu du bouton « + »
+`STAR_PATHS[0]`), **sans contour et avec un halo** (le même soir, « mets
+leur un effet glow style les comme les etoiles de image pour
+claude/etoiles », puis « effet glow et pas de contour » — son
+`Images-pour-claude/etoiles.png` relevé au pixel : des étoiles blanches
+sur bleu nuit, le halo est la lumière de l'étoile fondue dans le fond,
+0,9 fois la demi-branche au-delà de la pointe, 1,7 fois le creux entre les
+branches ; ici deux ombres portées sans décalage dans la couleur de
+l'étoile, 2 px et 9 px de flou — mesuré au rendu 0,35 et 2,1 : un flou
+d'ombre est rond, la lumière de l'image s'étire le long des branches ;
+une étoile vide est un aplat au gris des filets), les étoiles pleines dans le dégradé bleu du bouton « + »
 (« couleur des étoiles de notation : bleu dégradé du bouton + » — ses deux
 bouts en jetons, `--menu-ajouter-debut` / `--menu-ajouter-fin`) ; le jour de l'endormissement en mots — « Hier »,
 « Aujourd'hui », sinon la date — et le calendrier au clic (« endormissement :
