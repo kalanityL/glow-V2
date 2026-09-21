@@ -303,6 +303,10 @@ export interface Textes {
     natures: Record<SleepKind, string>;
     endormissement: string;
     reveil: string;
+    /** Le jour de l'endormissement en mots quand c'est hier ou aujourd'hui
+        (2026-09-21, « mettre hier, aujourd'hui ou date »). */
+    hier: string;
+    aujourdhui: string;
     duree: string;
     /** « Notez votre nuit » / « Notez votre sieste » (2026-09-21). */
     qualite: (nature: SleepKind) => string;
@@ -614,6 +618,8 @@ const FR: Textes = {
     natures: { nuit: 'Nuit', sieste: 'Sieste' },
     endormissement: 'Endormissement',
     reveil: 'Réveil',
+    hier: 'Hier',
+    aujourdhui: 'Aujourd’hui',
     duree: 'Durée :',
     qualite: (nature) => (nature === 'nuit' ? 'Notez votre nuit' : 'Notez votre sieste'),
     qualites: ['Très mauvaise', 'Mauvaise', 'Passable', 'Correcte', 'Bonne', 'Excellente'],

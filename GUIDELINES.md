@@ -710,7 +710,11 @@ jour même 14:00 → 15:00, changer de nature ne déplace les instants que s'ils
 sont encore ceux proposés ; la durée déduite (« 8 h », « 7 h 45 »), jamais
 saisie ; **la note en étoiles** (« notez votre nuit ou notez votre sieste :
 5 étoiles qu'on peut cliquer ou slider pour remplir, par défaut 3 ») — la
-qualité de 0 à 5 de la V1, son mot dessous ; les notes ; « Valider ». Trois
+qualité de 0 à 5 de la V1, sans mot dessous (« pas de label aux
+étoiles ») ; le jour de l'endormissement en mots — « Hier »,
+« Aujourd'hui », sinon la date — et le calendrier au clic (« endormissement :
+mettre hier, aujourd'hui ou date, qd on clique ça ouvre le calendrier ») ;
+les notes ; « Valider ». Trois
 jugements au clic, dans l'ordre et les mots de la V1 : durée nulle,
 refusée ; plus de douze heures, une question et le bouton « Confirmer mon
 choix », toute retouche la désarme ; recouvrement d'un sommeil enregistré,

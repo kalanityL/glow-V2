@@ -142,6 +142,16 @@ export function PageSommeil({
     });
   };
 
+  /* LE JOUR DE L'ENDORMISSEMENT EN MOTS (2026-09-21, « endormissement :
+     mettre hier, aujourd'hui ou date, qd on clique ça ouvre le
+     calendrier ») : « Hier », « Aujourd'hui », sinon la date. */
+  const jourEcrit = (date: string, enMots: boolean) =>
+    enMots && date === aujourdhui
+      ? textes.sommeil.aujourdhui
+      : enMots && date === veille(aujourdhui)
+        ? textes.sommeil.hier
+        : formaterDateCourte(date, langue);
+
   const colonne = (
     nom: string,
     cleDate: 'dateCoucher' | 'dateReveil',
@@ -150,6 +160,7 @@ export function PageSommeil({
     cleHeure: 'heureCoucher' | 'heureReveil',
     heure: string,
     poserHeure: (h: string) => void,
+    enMots = false,
   ) => (
     <div className="sommeil__colonne">
       <span className="prise__etiquette">{nom}</span>
@@ -158,7 +169,7 @@ export function PageSommeil({
       ) : (
         <button type="button" className="prise__quand" onClick={() => setEdite(cleDate)}>
           <IconeCalendrier />
-          <span>{formaterDateCourte(date, langue)}</span>
+          <span>{jourEcrit(date, enMots)}</span>
         </button>
       )}
       {edite === cleHeure ? (
@@ -205,7 +216,7 @@ export function PageSommeil({
 
             {/* DEUX INSTANTS COMPLETS, chacun sa date et son heure. */}
             <div className="sommeil__colonnes">
-              {colonne(textes.sommeil.endormissement, 'dateCoucher', dateCoucher, retouche(setDateCoucher), 'heureCoucher', heureCoucher, retouche(setHeureCoucher))}
+              {colonne(textes.sommeil.endormissement, 'dateCoucher', dateCoucher, retouche(setDateCoucher), 'heureCoucher', heureCoucher, retouche(setHeureCoucher), true)}
               {colonne(textes.sommeil.reveil, 'dateReveil', dateReveil, retouche(setDateReveil), 'heureReveil', heureReveil, retouche(setHeureReveil))}
             </div>
 
@@ -217,8 +228,9 @@ export function PageSommeil({
             {/* LA NOTE EN ÉTOILES (2026-09-21, « notez votre nuit ou notez
                 votre sieste »). */}
             <p className="prise__etiquette">{textes.sommeil.qualite(nature)}</p>
+            {/* Pas de mot sous les étoiles (2026-09-21, « pas de label aux
+                étoiles ») : le nom de la valeur ne se dit qu'à qui écoute. */}
             <NoteEtoiles valeur={qualite} onValeur={retouche(setQualite)} nom={textes.sommeil.qualite(nature)} noms={textes.sommeil.qualites} />
-            <p className="sommeil__qualite">{textes.sommeil.qualites[qualite]}</p>
 
             {notesOuvertes ? (
               <>

@@ -2404,18 +2404,21 @@
 /* La date et l'heure en édition : la boîte de choix, plus basse que celles
    du formulaire, l'icône à gauche (2026-09-20, « En mode edition, les
    icones calendriers et horloge -> passe les à gauche »). */
-.prise__moment .choix {
+.prise__moment .choix,
+.sommeil__colonne .choix {
   padding: 8px 32px 8px 12px;
   font-size: 15px;
 }
 
-.prise__moment .choix .icone {
+.prise__moment .choix .icone,
+.sommeil__colonne .choix .icone {
   width: 16px;
   height: 16px;
   color: var(--encre-chapeau);
 }
 
-.prise__moment .choix__chevron {
+.prise__moment .choix__chevron,
+.sommeil__colonne .choix__chevron {
   right: 12px;
 }
 
@@ -3044,13 +3047,6 @@
   font-variant-numeric: tabular-nums;
 }
 
-.sommeil__qualite {
-  margin: -8px 0 0;
-  text-align: center;
-  font-family: var(--font-body);
-  font-size: 13px;
-  color: var(--encre-chapeau);
-}
 
 /* LES CINQ ÉTOILES (2026-09-21, « système d'étoiles qu'on peut cliquer ou
    slider pour remplir ; par défaut 3 remplies ») : une rangée qui reçoit
@@ -3061,7 +3057,7 @@
   justify-content: center;
   gap: 6px;
   margin: -6px 0 0;
-  padding: 4px 0;
+  padding: 4px 0 8px;
   touch-action: none;
   cursor: pointer;
   user-select: none;
