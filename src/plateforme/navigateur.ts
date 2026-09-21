@@ -249,3 +249,44 @@ export function surFinDeDefilement(element: Element | null, action: () => void):
 export function defilerHorizontalA(element: Element | null, position: number, doux: boolean): void {
   element?.scrollTo({ left: position, behavior: doux ? 'smooth' : 'auto' });
 }
+
+/* LES CLICS EN ATTENTE : une file, jouée un clic à la fois. */
+let clicsEnAttente = 0;
+let clicsEnCours = false;
+let tourDeClic = 0;
+
+/** L'écart entre deux clics, et la file au plus long : lentement, chaque
+    cran s'entend ; vite, un roulement régulier plutôt qu'une rafale. */
+const ECART_CLICS_MS = 45;
+const FILE_CLICS_MAX = 6;
+
+/**
+ * FAIT CLIQUER, `nombre` fois, en tournant sur les morceaux donnés
+ * (2026-09-21, « ouvre le son roue de la fortune, et utilise les morceaux
+ * de ce son pour qd on modifie un poids, les clics doivent correspondre au
+ * passage d'un cran de la règle graduée ») : chaque demande entre dans une
+ * file qui joue un clic toutes les 45 ms, et ne garde que six clics
+ * d'avance. Les sons sont des FICHIERS embarqués (`src/assets/sons/`),
+ * jamais distants. Un navigateur qui refuse le son (pas de geste
+ * préalable) se tait : rien ne se casse. En natif, le lecteur audio du
+ * téléphone derrière le même verbe.
+ */
+export function jouerClics(morceaux: readonly string[], nombre = 1): void {
+  if (morceaux.length === 0) return;
+  clicsEnAttente = Math.min(clicsEnAttente + nombre, FILE_CLICS_MAX);
+  if (clicsEnCours) return;
+  clicsEnCours = true;
+  const suivant = () => {
+    if (clicsEnAttente <= 0) {
+      clicsEnCours = false;
+      return;
+    }
+    clicsEnAttente -= 1;
+    tourDeClic = (tourDeClic + 1) % morceaux.length;
+    new Audio(morceaux[tourDeClic]).play().catch(() => {
+      /* Le son refusé se tait. */
+    });
+    setTimeout(suivant, ECART_CLICS_MS);
+  };
+  suivant();
+}

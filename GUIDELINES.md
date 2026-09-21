@@ -771,10 +771,18 @@ page à part entiere »).
 ouvre qqchose comme ça […] la barre du bas se met à jour au bon endroit en
 temps réel ») : le chiffre en grand, éditable sur place, et dessous une
 graduation qui glisse sous une tige fixe — les deux se suivent à chaque
-geste et à chaque frappe, **sans aucun son** (2026-09-20 au soir,
-« supprime completement l'effet bruit lors de la modification d'un
-poids » — les clics de cran du matin sont partis, avec leur fichier et la
-file qui les jouait). **La graduation** (2026-09-20, « met les chiffres
+geste et à chaque frappe. **Chaque cran franchi en glissant clique**
+(2026-09-21, « ouvre le son roue de la fortune, et utilise les morceaux de
+ce son pour qd on modifie un poids, les clics doivent correspondre au
+passage d'un cran de la règle graduée » — après le silence de la veille,
+« supprime completement l'effet bruit ») : huit clics découpés de son
+enregistrement `son-pour-claude/SFB-roue-fortune-1.mp3` (les attaques
+isolées de la fin du tour, 30 à 90 ms, normalisées, fondu de sortie),
+embarqués dans `src/assets/sons/cran-1..8.wav`, joués à tour de rôle par
+une file à 45 ms qui ne garde que six clics d'avance
+(`plateforme/navigateur.ts`, `jouerClics`) : lentement, chaque cran ;
+vite, un roulement. Le placement programmé (ouverture, frappe) ne clique
+pas. **La graduation** (2026-09-20, « met les chiffres
 de la regle graduée au dessus des crans, tous les 5 kilos […] positionne
 une tige verticale noire, 4 fois plus grande qu'un cran, au milieu de
 l'écran, dont le bout supérieur se place sur la regle graduée ») : les

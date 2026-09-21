@@ -3,7 +3,22 @@ import { ChampEnLigne } from './ChampEnLigne';
 import { useTextes } from '../i18n/useTextes';
 import { POIDS_MAX, POIDS_MIN, poidsDepuisRapport, poidsDepuisSaisie, rapportDuPoids } from '../domaine/mesures';
 import type { UnitePoids } from '../domaine/unites';
-import { defilementHorizontal, defilerHorizontalA, surFinDeDefilement } from '../plateforme/navigateur';
+import { defilementHorizontal, defilerHorizontalA, jouerClics, surFinDeDefilement } from '../plateforme/navigateur';
+/* LES CLICS DE LA ROUE DE LA FORTUNE (2026-09-21, « ouvre le son roue de la
+   fortune, et utilise les morceaux de ce son […] les clics doivent
+   correspondre au passage d'un cran ») : huit clics découpés de son
+   enregistrement (`son-pour-claude/SFB-roue-fortune-1.mp3`, les attaques
+   isolées de la fin du tour), joués à tour de rôle — un par cran franchi. */
+import cran1 from '../assets/sons/cran-1.wav';
+import cran2 from '../assets/sons/cran-2.wav';
+import cran3 from '../assets/sons/cran-3.wav';
+import cran4 from '../assets/sons/cran-4.wav';
+import cran5 from '../assets/sons/cran-5.wav';
+import cran6 from '../assets/sons/cran-6.wav';
+import cran7 from '../assets/sons/cran-7.wav';
+import cran8 from '../assets/sons/cran-8.wav';
+
+const CLICS = [cran1, cran2, cran3, cran4, cran5, cran6, cran7, cran8];
 
 /**
  * LA RÈGLE CRANTÉE DU POIDS — le chiffre en grand, qui s'édite sur place, et
@@ -14,7 +29,8 @@ import { defilementHorizontal, defilerHorizontalA, surFinDeDefilement } from '..
  * amène la graduation, à chaque frappe. Un cran par dixième ; le kilo a le
  * grand cran, le demi le moyen ; le nombre tous les demis. L'aimant est
  * immédiat : le geste fini, la graduation est amenée d'un coup sur le cran
- * du poids lu. En silence.
+ * du poids lu. CHAQUE CRAN FRANCHI CLIQUE (2026-09-21), du son de sa roue
+ * de la fortune.
  *
  * LA GRADUATION EST DU DÉFILEMENT NATIF (le doigt, la molette) : sa position
  * se lit en RAPPORT du chemin total — la géométrie (le pas d'un cran) est
@@ -159,6 +175,13 @@ export function ReglePoids({
     const lu = poidsDepuisRapport(position / course, unite);
     recentrer(cranDe(lu));
     if (lu === derniereLue.current) return;
+    /* Un clic par cran franchi — un cran est un dixième — depuis le dernier
+       poids lu ; le placement programmé, lui, ne franchit rien : il est
+       arrêté au-dessus. */
+    if (derniereLue.current !== null) {
+      const crans = Math.abs(Math.round(Number(lu) * 10) - Math.round(Number(derniereLue.current) * 10));
+      if (crans > 0) jouerClics(CLICS, crans);
+    }
     derniereLue.current = lu;
     onValeur(lu);
   };
