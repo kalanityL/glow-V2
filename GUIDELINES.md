@@ -712,7 +712,11 @@ formulaire, avec une très petite encoche de retour ») ; **chaque bord est
 une carte, d'après son dessin** (« utilise ce design sauf rien en gras ; ne
 mets pas les pictos endormissement / réveil ») : le nom, le jour en gris
 dessous (« Hier », « Aujourd'hui » ou la date, le calendrier au clic), le
-cadran avec l'arc du haut jusqu'à la boule, l'heure en pastille avec son
+cadran avec l'arc du haut jusqu'à la boule (la boule seule, sans bout
+d'aiguille — « uniquement la boule, pas la petite barre intérieure ») — en
+dégradé, du gris du cercle
+au bleu près de la boule, relevé sur l'image (« il y manque un dégradé
+dans la coloration du cercle ») —, l'heure en pastille avec son
 horloge — **aux couleurs de son image `horloge.png`, relevées au pixel et
 écrites telles quelles, pas en jetons du thème : exception consignée**
 (« on a dit que tu mets exactement les couleurs qd je te donne une

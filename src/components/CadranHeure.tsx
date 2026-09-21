@@ -1,4 +1,4 @@
-import { useRef, type PointerEvent } from 'react';
+import { useId, useRef, type PointerEvent } from 'react';
 import { MINUTES_RONDES } from '../domaine/prises';
 
 /**
@@ -47,18 +47,19 @@ function surMinuteRonde(minutes: number): number {
 
 export function CadranHeure({ valeur, onValeur, nom }: { valeur: string; onValeur: (heure: string) => void; nom: string }) {
   const cadran = useRef<SVGSVGElement>(null);
+  const degrade = useId();
   const glisse = useRef<{ angle: number; minutes: number } | null>(null);
   const minutes = minutesDe(valeur);
   const apresMidi = minutes >= MINUTES_PAR_TOUR;
   const angle = angleDe(minutes);
   const rad = ((angle - 90) * Math.PI) / 180;
   const boule = { x: CENTRE + RAYON * Math.cos(rad), y: CENTRE + RAYON * Math.sin(rad) };
-  /* L'ARC depuis le haut jusqu'à la boule, et un bout d'aiguille qui pointe
-     vers le centre (2026-09-21, son image). */
+  /* L'ARC depuis le haut jusqu'à la boule (2026-09-21, son image). */
   const haut = { x: CENTRE, y: CENTRE - RAYON };
   const grandArc = angle > 180 ? 1 : 0;
   const arc = angle === 0 ? '' : `M ${haut.x} ${haut.y} A ${RAYON} ${RAYON} 0 ${grandArc} 1 ${boule.x} ${boule.y}`;
-  const aiguille = { x: CENTRE + (RAYON - 14) * Math.cos(rad), y: CENTRE + (RAYON - 14) * Math.sin(rad) };
+  /* La boule seule, sans bout d'aiguille (2026-09-21, « uniquement la
+     boule, pas la petite barre intérieure »). */
   const reperes = apresMidi ? ['12', '15', '18', '21'] : ['12', '3', '6', '9'];
 
   const angleSous = (e: PointerEvent): number => {
@@ -138,8 +139,17 @@ export function CadranHeure({ valeur, onValeur, nom }: { valeur: string; onValeu
       <text className="cadran__repere" x={CENTRE - RAYON + 9} y={CENTRE + 3.5} textAnchor="start">
         {reperes[3]}
       </text>
-      {arc ? <path className="cadran__arc" d={arc} /> : null}
-      <line className="cadran__aiguille" x1={aiguille.x} y1={aiguille.y} x2={boule.x} y2={boule.y} />
+      {/* L'ARC EN DÉGRADÉ (2026-09-21, « il y manque un dégradé dans la
+          coloration du cercle ») : relevé sur son image, du gris du cercle
+          en haut (220, 225, 235) au bleu près de la boule (135, 166, 238),
+          le long de l'arc — un dégradé posé du haut vers la boule. */}
+      <defs>
+        <linearGradient id={degrade} gradientUnits="userSpaceOnUse" x1={haut.x} y1={haut.y} x2={boule.x} y2={boule.y}>
+          <stop offset="0" stopColor="#dce1eb" />
+          <stop offset="1" stopColor="#87a6ee" />
+        </linearGradient>
+      </defs>
+      {arc ? <path className="cadran__arc" d={arc} stroke={`url(#${degrade})`} /> : null}
       <circle className="cadran__boule" cx={boule.x} cy={boule.y} r={7} />
     </svg>
   );
