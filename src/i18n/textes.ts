@@ -257,11 +257,16 @@ export interface Textes {
     /** Le titre en modification — les mots de la V1 (`InjectionForm.tsx`). */
     titreModification: Record<Forme, string>;
     zones: Record<Zone, string>;
+    /** Les zones en court, sur les boutons (2026-09-21, « Abdomen G/D - bras
+        G/D - cuisse G/D : ou g d valent pour gauche et droite »). */
+    zonesCourtes: Record<Zone, string>;
+    /** L'intitulé au-dessus des boutons de zone. */
+    zone: string;
+    /** Le bouton du dosage personnalisé. */
+    autre: string;
     /** Un palier écrit : « 0,25 mg (Initiation) », « 2,4 mg (Dose max) »,
         « 1 mg » entre les deux. */
     palier: (mg: string, rang: 'initiation' | 'max' | null) => string;
-    autreDose: string;
-    prereglages: string;
     /** Le champ de l'autre dose, vide. */
     autreDoseVide: string;
     notes: string;
@@ -551,10 +556,19 @@ const FR: Textes = {
       'bras-droit': 'Bras Droit',
       'voie-orale': 'Prise Orale',
     },
+    zonesCourtes: {
+      'abdomen-gauche': 'Abdomen G',
+      'abdomen-droit': 'Abdomen D',
+      'bras-gauche': 'Bras G',
+      'bras-droit': 'Bras D',
+      'cuisse-gauche': 'Cuisse G',
+      'cuisse-droite': 'Cuisse D',
+      'voie-orale': 'Prise orale',
+    },
+    zone: 'Zone d’injection',
+    autre: 'Autre',
     palier: (mg, rang) =>
       `${mg} mg${rang === 'initiation' ? ' (Initiation)' : rang === 'max' ? ' (Dose max)' : ''}`,
-    autreDose: 'Autre dose',
-    prereglages: 'Préréglages',
     autreDoseVide: 'Autre dose de GLP-1 (mg)',
     notes: 'Notes',
     masquerNotes: 'Masquer les notes',

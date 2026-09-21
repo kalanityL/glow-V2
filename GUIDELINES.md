@@ -524,8 +524,15 @@ fermé, on est de retour sur le formulaire au traitement mis à jour** (le
 premier palier de la nouvelle spécialité, la zone selon la forme) ; la
 date et l'heure côte à côte, éditées en place — en édition, la boîte porte
 son icône à gauche et déroule son panneau (l'heure sur les minutes rondes
-de la V1) ; **rien en gras sur le formulaire**, le bouton compris ; la zone
-(pas sous forme orale) ;
+de la V1) ; **rien en gras sur le formulaire**, le bouton compris ; **dans
+l'ordre du 2026-09-21** (« d'abord date et heure ; puis nom du médicament
+et a la place du select, des boutons pour chaque dosage avec un dosage
+preselectionné, et un bouton autre […] ; plus besoin du lien autre dose ;
+on ajoute le label zone d'injection avec 6 boutons ») : la date et l'heure
+d'abord, puis le nom du traitement, UN BOUTON PAR PALIER (le premier choisi
+d'avance) et « Autre » qui ouvre la saisie, puis « Zone d'injection » et six
+boutons — Abdomen G, Abdomen D, Bras G, Bras D, Cuisse G, Cuisse D (G et D
+pour gauche et droite ; pas sous forme orale) ;
 la dose parmi les paliers de la spécialité — désormais dans
 `domaine/traitements.ts`, des faits de boîte, pas un conseil — ou « Autre
 dose » tapée ; « + Notes » ; « Valider » au milieu. Une dose absente ou

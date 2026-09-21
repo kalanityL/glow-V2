@@ -2402,6 +2402,45 @@
   margin: -8px 0 0;
 }
 
+/* UN BOUTON PAR CHOIX (2026-09-21, « des boutons pour chaque dosage […] 6
+   boutons » pour la zone) : en grille, la matière des champs ; le choisi
+   plein à l'encre — sobre, comme le jour choisi du calendrier. */
+.prise__etiquette {
+  margin: 0 0 -8px;
+  font-family: var(--font-body);
+  font-size: 15px;
+  color: var(--encre-chapeau);
+}
+
+.prise__boutons {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(84px, 1fr));
+  gap: 8px;
+}
+
+.prise__boutons--zones {
+  grid-template-columns: 1fr 1fr;
+}
+
+.prise__bouton {
+  padding: 12px 8px;
+  border: 1px solid var(--option-filet);
+  border-radius: 12px;
+  background: var(--option-fond);
+  color: var(--encre);
+  font-family: var(--font-body);
+  font-weight: 500;
+  font-size: 15px;
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.prise__bouton--choisi {
+  border-color: var(--encre);
+  background: var(--encre);
+  color: var(--module-fond);
+}
+
 /* Dans un formulaire, ce qui se dit se dit en gris, jamais en bleu
    (2026-09-21) — la question de la mise à jour, la règle refusée. */
 .prise .regle--manquee {

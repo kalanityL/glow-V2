@@ -3,7 +3,6 @@ import { BarreDuBas } from './BarreDuBas';
 import { EntetePage } from './EntetePage';
 import type { FondProps } from './Accueil';
 import { BlocTraitement } from './BlocTraitement';
-import { Choix } from '../components/Choix';
 import { ChoixDate } from '../components/ChoixDate';
 import { ChoixHeure } from '../components/ChoixHeure';
 import { IconeCalendrier, IconeCoche, IconeComprime, IconeCroix, IconeHorloge, IconePlus, IconeSeringue } from '../components/Icones';
@@ -36,12 +35,17 @@ import { appliquerChoixTraitement, choixTraitementDe } from '../app/choixTraitem
  * NOM DU TRAITEMENT sur sa ligne, entier, jamais coupé — touché, il
  * PROPOSE de mettre à jour le traitement, et « Oui » ouvre le bloc « Mon
  * traitement » ; fermé, on est de retour sur le formulaire, au traitement
- * mis à jour (2026-09-20) ; la date et l'heure côte à côte, éditées en
- * place, l'icône à gauche ; la zone (pas sous forme orale) ; la dose parmi
- * les paliers de la spécialité, ou une autre tapée ; « + Notes » ;
- * « Valider ». RIEN EN GRAS. AUCUN `select` NATIF : chaque choix déroule un
- * panneau dessiné, dans l'écran, au thème (`Choix`, `ChoixDate`,
- * `ChoixHeure`).
+ * mis à jour (2026-09-20). DANS L'ORDRE DU 2026-09-21 (« d'abord date et
+ * heure ; puis nom du médicament et a la place du select, des boutons pour
+ * chaque dosage avec un dosage preselectionné, et un bouton autre qui
+ * permet de rentrer un dosage personnalisé ; plus besoin du lien autre
+ * dose ; on ajoute le label zone d'injection avec 6 boutons ») : la date
+ * et l'heure côte à côte, éditées en place, l'icône à gauche ; le nom du
+ * traitement, puis UN BOUTON PAR PALIER, le premier choisi d'avance, et
+ * « Autre » qui ouvre la saisie d'un dosage ; puis « Zone d'injection » et
+ * six boutons — Abdomen G/D, Bras G/D, Cuisse G/D (pas sous forme orale) ;
+ * « + Notes » ; « Valider ». RIEN EN GRAS. AUCUN `select` NATIF : la date
+ * et l'heure déroulent leur panneau dessiné (`ChoixDate`, `ChoixHeure`).
  *
  * Ce qu'il fait : ce que la SPEC dit d'une prise. La date d'aujourd'hui et
  * l'heure de maintenant ramenée à la minute ronde inférieure sont
@@ -159,35 +163,9 @@ export function PagePrise({
             </button>
           </div>
 
-          {/* LE NOM DU TRAITEMENT, sur sa ligne, entier (2026-09-20, « il ne
-              doit pas etre coupé ») ; touché, il propose la mise à jour. */}
-          <button type="button" className="prise__marque" onClick={() => setProposition(!proposition)}>
-            {specialite?.nom}
-          </button>
-          {proposition ? (
-            <div className="prise__proposition">
-              <p className="regle regle--manquee prise__question">{textes.prise.mettreAJour}</p>
-              <div className="boutons">
-                <button type="button" className="bouton bouton--second" onClick={() => setProposition(false)}>
-                  {textes.non}
-                </button>
-                <button
-                  type="button"
-                  className="bouton"
-                  onClick={() => {
-                    setProposition(false);
-                    setBlocTraitement(true);
-                  }}
-                >
-                  {textes.oui}
-                </button>
-              </div>
-            </div>
-          ) : null}
-
-          {/* LA DATE ET L'HEURE, éditées en place comme dans la V1 : la
-              valeur est un bouton ; touchée, elle devient une boîte, l'icône
-              à gauche (2026-09-20), et déroule son panneau. */}
+          {/* LA DATE ET L'HEURE D'ABORD (2026-09-21), éditées en place comme
+              dans la V1 : la valeur est un bouton ; touchée, elle devient une
+              boîte, l'icône à gauche, et déroule son panneau. */}
           <div className="prise__moment">
             {editeDate ? (
               <ChoixDate
@@ -221,17 +199,67 @@ export function PagePrise({
             )}
           </div>
 
-          {/* LA ZONE — pas sous forme orale, où elle vaut « voie orale ». */}
-          {!orale ? (
-            <Choix
-              valeur={zone}
-              options={ZONES_INJECTION.map((z) => ({ valeur: z, nom: textes.prise.zones[z] }))}
-              onChoix={(z) => setZone(z as Zone)}
-              nom={textes.prise.zones[zone]}
-            />
+          {/* LE NOM DU TRAITEMENT, sur sa ligne, entier (2026-09-20, « il ne
+              doit pas etre coupé ») ; touché, il propose la mise à jour. */}
+          <button type="button" className="prise__marque" onClick={() => setProposition(!proposition)}>
+            {specialite?.nom}
+          </button>
+          {proposition ? (
+            <div className="prise__proposition">
+              <p className="regle regle--manquee prise__question">{textes.prise.mettreAJour}</p>
+              <div className="boutons">
+                <button type="button" className="bouton bouton--second" onClick={() => setProposition(false)}>
+                  {textes.non}
+                </button>
+                <button
+                  type="button"
+                  className="bouton"
+                  onClick={() => {
+                    setProposition(false);
+                    setBlocTraitement(true);
+                  }}
+                >
+                  {textes.oui}
+                </button>
+              </div>
+            </div>
           ) : null}
 
-          {/* LA DOSE : les paliers de la spécialité, ou une autre tapée. */}
+          {/* UN BOUTON PAR PALIER, le premier choisi d'avance, et « Autre »
+              qui ouvre la saisie d'un dosage (2026-09-21). */}
+          <div className="prise__boutons" role="radiogroup" aria-label={textes.prise.autreDoseVide}>
+            {paliers.map((mg) => {
+              const choisi = !autreDose && palier === mg;
+              return (
+                <button
+                  key={mg}
+                  type="button"
+                  role="radio"
+                  aria-checked={choisi}
+                  className={`prise__bouton${choisi ? ' prise__bouton--choisi' : ''}`}
+                  onClick={() => {
+                    setAutreDose(false);
+                    setPalier(mg);
+                    setRefuse(false);
+                  }}
+                >
+                  {mgEcrit(mg)} mg
+                </button>
+              );
+            })}
+            <button
+              type="button"
+              role="radio"
+              aria-checked={autreDose}
+              className={`prise__bouton${autreDose ? ' prise__bouton--choisi' : ''}`}
+              onClick={() => {
+                setAutreDose(true);
+                setRefuse(false);
+              }}
+            >
+              {textes.prise.autre}
+            </button>
+          </div>
           {autreDose ? (
             <input
               className="prise__dose"
@@ -246,31 +274,30 @@ export function PagePrise({
                 if (doseDepuisSaisie(e.target.value) !== null) setRefuse(false);
               }}
             />
-          ) : (
-            <Choix
-              valeur={String(palier)}
-              options={paliers.map((mg, i) => ({
-                valeur: String(mg),
-                nom: textes.prise.palier(mgEcrit(mg), i === 0 ? 'initiation' : i === paliers.length - 1 ? 'max' : null),
-              }))}
-              onChoix={(mg) => {
-                setPalier(Number(mg));
-                setRefuse(false);
-              }}
-              nom={textes.prise.autreDoseVide}
-            />
-          )}
-          <button
-            type="button"
-            className="prise__lien"
-            onClick={() => {
-              setAutreDose(!autreDose);
-              setRefuse(false);
-            }}
-          >
-            {autreDose ? textes.prise.prereglages : textes.prise.autreDose}
-          </button>
+          ) : null}
           {refuse ? <p className="regle regle--manquee prise__regle">{textes.prise.regleDose}</p> : null}
+
+          {/* LA ZONE D'INJECTION : son intitulé et six boutons (2026-09-21) —
+              pas sous forme orale, où elle vaut « voie orale ». */}
+          {!orale ? (
+            <>
+              <p className="prise__etiquette">{textes.prise.zone}</p>
+              <div className="prise__boutons prise__boutons--zones" role="radiogroup" aria-label={textes.prise.zone}>
+                {ZONES_INJECTION.map((z) => (
+                  <button
+                    key={z}
+                    type="button"
+                    role="radio"
+                    aria-checked={zone === z}
+                    className={`prise__bouton${zone === z ? ' prise__bouton--choisi' : ''}`}
+                    onClick={() => setZone(z)}
+                  >
+                    {textes.prise.zonesCourtes[z]}
+                  </button>
+                ))}
+              </div>
+            </>
+          ) : null}
 
           {/* LES NOTES : un lien qui déplie deux lignes. Replier n'efface pas. */}
           {notesOuvertes ? (

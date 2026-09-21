@@ -5,15 +5,16 @@
  * conversions.
  */
 
-/** Les zones d'injection, dans l'ordre de la V1 ; « voie orale » pour un
+/** Les zones d'injection, dans l'ordre de ses boutons (2026-09-21,
+    « Abdomen G/D - bras G/D - cuisse G/D ») ; « voie orale » pour un
     comprimé. */
 export const ZONES_INJECTION = [
   'abdomen-gauche',
   'abdomen-droit',
-  'cuisse-gauche',
-  'cuisse-droite',
   'bras-gauche',
   'bras-droit',
+  'cuisse-gauche',
+  'cuisse-droite',
 ] as const;
 
 export type Zone = (typeof ZONES_INJECTION)[number] | 'voie-orale';
