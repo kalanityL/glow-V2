@@ -2974,7 +2974,11 @@
   /* Au-dessus de ce qui défile sous lui — cartes, boutons, cadres. */
   z-index: 3;
   display: flex;
-  justify-content: center;
+  /* DANS LE COIN DROIT, pas au milieu (2026-09-21, « pas très heureux le
+     positionnement de la coche de scroll » — posée sur la troisième
+     étoile) : le contenu se centre, le coin est presque toujours vide. */
+  justify-content: flex-end;
+  padding-right: 2px;
   align-items: flex-end;
   height: 0;
   overflow: visible;
@@ -2997,6 +3001,8 @@
   padding: 0;
   pointer-events: auto;
   cursor: pointer;
+  /* Pas d'anneau de focus après un clic. */
+  outline: none;
   border: 1px solid var(--option-filet);
   border-radius: 50%;
   background: var(--option-fond);
