@@ -10,6 +10,26 @@ du push seul, jusqu'au jour où un déploiement existera.
 
 ---
 
+## 2026-09-21 — cinquième push · 2 commits (`a764a77..141bfee`) · déployé
+
+**Poussé et déployé sur sa demande** (« push et deploy ce qui est pret »),
+cinquième déploiement sur `https://glow-private-v2.web.app`. Cette entrée
+est écrite avant le push et part avec lui.
+
+**Vérifié avant envoi :** `tsc` silencieux, `npm test` 67/67,
+`npm run build` vert (`index-C0s6BmvW.js`).
+
+**Ce que le lot contient — ses captures de téléphone du matin :**
+- G et LOW qui n'apparaissaient pas dans les entêtes sur Chrome Android :
+  le dégradé découpé par le texte est posé sur chaque lettre ;
+- les tiroirs et les blocs qui laissaient voir la page : la photo repeinte
+  dessous est ancrée sur la hauteur de l'écran, plus de `position: fixed` ;
+- le champ des notes qui s'ouvrait sous le bord : il se montre en entier ;
+- « Valider » l'avatar qui ramenait l'onglet mais pas le volet : le
+  carrousel est amené après le rendu, d'un coup.
+
+**Non vérifié sur Android** — c'est ce déploiement qui le vérifiera.
+
 ## 2026-09-21 — quatrième push · 34 commits (`c54f5af..9552398`) · déployé
 
 **Poussé et déployé sur sa demande** (« push et deploy »), quatrième
