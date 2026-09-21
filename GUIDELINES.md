@@ -356,7 +356,10 @@ cerné de bleu grisé, jamais l'anneau bleu franc.
   volets de « Mon compte », les panneaux de choix, les colonnes d'heures,
   le calendrier) — collé au bas de la zone visible tant qu'il reste du
   contenu dessous, effacé au bout ; une petite pastille ronde au fond des
-  champs, cernée de leur filet, le chevron en gris ; **touchée, elle fait
+  champs, cernée de leur filet, le chevron en gris ; **elle ne se montre
+  que s'il reste plus qu'une pastille à voir** (44 px — son téléphone : posée
+  sur « Oui » pour la marge sous les boutons, « le positionnement de
+  l'indicateur est fâcheux ») ; **touchée, elle fait
   défiler d'une page** (« clic sur le bouton doit faire scroller »). Il se
   pose dans L'ÉLÉMENT QUI DÉFILE — pas dans son cadre (l'avatar de « Mon
   compte » : la zone des réglages, pas le volet). Toute nouvelle zone qui

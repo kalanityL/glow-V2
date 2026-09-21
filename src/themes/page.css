@@ -2966,7 +2966,8 @@
    effacée au bout du défilement. ─────────────────────────────────────── */
 .indice-defilement {
   position: sticky;
-  bottom: 6px;
+  /* Au ras du bord : elle mord le moins possible sur la dernière ligne. */
+  bottom: 2px;
   /* Au-dessus de ce qui défile sous lui — cartes, boutons, cadres. */
   z-index: 3;
   display: flex;

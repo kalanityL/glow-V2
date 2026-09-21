@@ -117,7 +117,13 @@ export function surDefilementHors(
  */
 export function surDefilementDisponible(zone: HTMLElement | null, quand: (disponible: boolean) => void): () => void {
   if (!zone) return () => {};
-  const mesurer = () => quand(zone.scrollHeight - zone.scrollTop - zone.clientHeight > 4);
+  /* UN RESTE D'UNE PASTILLE NE SE SIGNALE PAS (2026-09-21, son téléphone :
+     la pastille posée sur « Oui » pour quelques pixels de marge sous les
+     boutons — « le positionnement de l'indicateur est fâcheux ») : quand
+     ce qui reste sous le bord tient dans la hauteur de la pastille et son
+     air, elle cacherait plus qu'elle n'annonce. */
+  const RESTE_MIN = 44;
+  const mesurer = () => quand(zone.scrollHeight - zone.scrollTop - zone.clientHeight > RESTE_MIN);
   mesurer();
   zone.addEventListener('scroll', mesurer, { passive: true });
   const tailles = new ResizeObserver(mesurer);
