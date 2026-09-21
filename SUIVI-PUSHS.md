@@ -10,6 +10,38 @@ du push seul, jusqu'au jour où un déploiement existera.
 
 ---
 
+## 2026-09-21 — huitième push · 9 commits (`31380c6..HEAD`) · déployé
+
+**Poussé et déployé sur sa demande** (« push et deploy tout v1 et v2 »),
+huitième déploiement sur `https://glow-private-v2.web.app`. Entrée écrite
+avant le push. La V1 est poussée et déployée le même soir, depuis son
+dépôt, avec sa propre entrée.
+
+**Vérifié avant envoi :** `tsc` silencieux, `npm test` 78/78,
+`npm run build` vert (`index-CEFH7fmb.js`).
+
+**Ce que le lot contient :**
+- LA JAUGE DE LA DURÉE du sommeil : se remplit jusqu'au repère (8 h la
+  nuit, 1 h 30 la sieste) puis son bleu s'intensifie jusqu'au double ;
+  deux fois plus fine (4 px) ; « 13 h de sommeil » à la place de
+  « Durée : 13 h ».
+- LE SOMMEIL EN TROIS ÉCRANS quand la suite ne tient pas dans l'écran
+  (mesuré au rendu) : nature, les deux bords et la jauge, puis la note —
+  proposée d'avance de la dernière du même genre ; le fil d'Ariane sur une
+  ligne « 10/09/2026 23:45 · 11/09/2026 07:00 » et « nuit de 7 h 15 » ;
+  « Valider » en troisième écran, jamais « Mettre à jour ».
+- Un message qui apparaît se montre : la zone qui défile se place sur
+  lui, partout (`montrerEnEntier`).
+- `/long` : la même application dans un cadre dont l'écran fait 850 px,
+  pour voir ce que voit un téléphone d'aujourd'hui ; `/` inchangé.
+- La note de reprise du soir dans `TODO-CLAUDE.md`.
+
+**Répondu sans commit :** la V2 en ligne n'a pas de verrou (la V1 en a un,
+Firebase Authentication) ; l'option de le reprendre attend sa décision.
+
+**Non vérifié sur Android :** les gestes du sommeil, `/long` sur un vrai
+navigateur.
+
 ## 2026-09-21 — septième push · 17 commits (`2034715..d0ad92a`) · déployé
 
 **Poussé et déployé sur sa demande** (« ok push et deploy tout »), septième
