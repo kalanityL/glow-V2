@@ -14,13 +14,14 @@ que de te faire lire le fichier. Le TODO de la V1 est importé tel quel dans
 ## NOTE DE REPRISE — CLEAR DU 2026-09-21 AU SOIR (le sommeil, le téléphone long)
 
 **Rien ne tourne, rien n'est à moitié fait.** Aucun workflow ni agent en
-cours. Tout est commité : 7 commits non poussés en V2 depuis `1c9e5ab`
-(l'entrée du septième push, le 21/09), et 3 en V1 (`69b3ff7b`, `3fc02a3d`,
-`fbfc8797` — la recherche d'aliments multi-mots, « riz cuit » → « Riz blanc
-cuit »). Le site en ligne (`glow-private-v2.web.app`) est au septième
-déploiement (`d0ad92a`) — il ne porte rien de ce qui suit. Pousser et
-déployer SEULEMENT sur son ordre, ÉCRIRE L'ENTRÉE DE `SUIVI-PUSHS.md` AVANT
-le push ; la V1 se pousse et se déploie à part, depuis son dépôt.
+cours. TOUT EST POUSSÉ ET DÉPLOYÉ (le 21/09 au soir, « push et deploy tout
+v1 et v2 ») : V2 huitième push `4605149`, en ligne sur
+`glow-private-v2.web.app` (`index-CEFH7fmb.js`) ; V1 push `e9a96b84`, en
+ligne sur `glow-private.web.app` (`index-CkQLwi94.js`). Aucun commit non
+poussé nulle part. Pousser et déployer SEULEMENT sur son ordre, ÉCRIRE
+L'ENTRÉE DE `SUIVI-PUSHS.md` AVANT le push ; la V1 se pousse et se déploie
+à part, depuis son dépôt (`firebase deploy --only hosting`, jamais les
+règles Firestore sans ordre).
 
 **Le serveur** : 3002, `npm run dev -- --port 3002 --strictPort`. Chrome se
 pilote par `scripts/piloter-chrome.mjs` (DevTools, ports 9333/9340) ; les
