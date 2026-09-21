@@ -578,8 +578,9 @@ mots de la V1), la date et l'heure côte à côte, LA RÈGLE CRANTÉE du poids �
 formulaire — est la plus proche d'aujourd'hui sans être future, aujourd'hui
 compris ; sans pesée, le poids du profil. Une pesée par jour (SPEC) :
 valider sur un jour déjà pesé dit, dans les mots de la V1, « Une pesée
-existe déjà le JJ/MM/AAAA. La remplacer ? » Non / Oui, et rien ne s'écrit
-sans ce oui. Sa confirmation est LE MÊME ÉCRAN que celui
+existe déjà le JJ/MM/AAAA. La remplacer ? » Non / Oui — Non ferme le
+formulaire sans rien écrire (« non -> ferme le formulaire sans
+enregistrer »), et rien ne s'écrit sans ce oui. Sa confirmation est LE MÊME ÉCRAN que celui
 de la prise (« exactement meme principe »), `PageConfirmation` devenu
 générique : « Pesée enregistrée ! » / « Pesée mise à jour ! », la carte
 (poids, date et heure) qui rouvre le formulaire en modification, puis

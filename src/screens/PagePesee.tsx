@@ -30,7 +30,8 @@ import type { ModuleId } from '../app/modules';
  *
  * UNE PESÉE PAR JOUR (SPEC) : valider sur un jour déjà pesé propose de
  * remplacer — la question se dit sous le formulaire, avec Non / Oui —,
- * rien ne s'écrit sans ce oui. En modification, « Annuler » et « Mettre à
+ * rien ne s'écrit sans ce oui ; NON FERME LE FORMULAIRE SANS RIEN ÉCRIRE
+ * (2026-09-21, « non -> ferme le formulaire sans enregistrer »). En modification, « Annuler » et « Mettre à
  * jour » ; la pesée mise à jour remplace celle qu'on modifiait.
  *
  * Pas encore : les mensurations de la V1 (« + Ajouter des mensurations »).
@@ -154,7 +155,7 @@ export function PagePesee({
                 {textes.pesee.remplacer(formaterDateCourte(date, langue))}
               </p>
               <div className="boutons">
-                <button type="button" className="bouton bouton--second" onClick={() => setRemplacer(false)}>
+                <button type="button" className="bouton bouton--second" onClick={onAccueil}>
                   {textes.non}
                 </button>
                 <button type="button" className="bouton" onClick={consigner}>
