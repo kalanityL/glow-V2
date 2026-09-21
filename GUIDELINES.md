@@ -714,9 +714,11 @@ mets pas les pictos endormissement / réveil ») : le nom, le jour en gris
 dessous (« Hier », « Aujourd'hui » ou la date, le calendrier au clic), le
 cadran avec l'arc du haut jusqu'à la boule (la boule seule, sans bout
 d'aiguille — « uniquement la boule, pas la petite barre intérieure ») — en
-dégradé, du gris du cercle
-au bleu près de la boule, relevé sur l'image (« il y manque un dégradé
-dans la coloration du cercle ») —, l'heure en pastille avec son
+dégradé LE LONG DE L'ARC, du gris du cercle à 0 jusqu'au bleu à la boule
+quel que soit l'angle (« il y manque un dégradé dans la coloration du
+cercle », « le dégradé doit partir de 0 et arriver jusqu'à la boule » —
+par segments de 4°, un dégradé linéaire ne suivant pas un cercle), relevé
+sur l'image —, l'heure en pastille avec son
 horloge — **aux couleurs de son image `horloge.png`, relevées au pixel et
 écrites telles quelles, pas en jetons du thème : exception consignée**
 (« on a dit que tu mets exactement les couleurs qd je te donne une

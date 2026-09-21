@@ -1,4 +1,4 @@
-import { useId, useRef, type PointerEvent } from 'react';
+import { useRef, type PointerEvent } from 'react';
 import { MINUTES_RONDES } from '../domaine/prises';
 
 /**
@@ -47,17 +47,36 @@ function surMinuteRonde(minutes: number): number {
 
 export function CadranHeure({ valeur, onValeur, nom }: { valeur: string; onValeur: (heure: string) => void; nom: string }) {
   const cadran = useRef<SVGSVGElement>(null);
-  const degrade = useId();
   const glisse = useRef<{ angle: number; minutes: number } | null>(null);
   const minutes = minutesDe(valeur);
   const apresMidi = minutes >= MINUTES_PAR_TOUR;
   const angle = angleDe(minutes);
   const rad = ((angle - 90) * Math.PI) / 180;
   const boule = { x: CENTRE + RAYON * Math.cos(rad), y: CENTRE + RAYON * Math.sin(rad) };
-  /* L'ARC depuis le haut jusqu'à la boule (2026-09-21, son image). */
-  const haut = { x: CENTRE, y: CENTRE - RAYON };
-  const grandArc = angle > 180 ? 1 : 0;
-  const arc = angle === 0 ? '' : `M ${haut.x} ${haut.y} A ${RAYON} ${RAYON} 0 ${grandArc} 1 ${boule.x} ${boule.y}`;
+  /* L'ARC depuis le haut jusqu'à la boule (2026-09-21, son image), EN
+     DÉGRADÉ LE LONG DE L'ARC (« le dégradé doit partir de 0 ») : du gris du
+     cercle à 0 au bleu à la boule, quel que soit l'angle — un dégradé
+     linéaire ne suit pas un cercle (à 23:45, ses deux bouts se touchaient),
+     l'arc est donc dessiné par petits segments de 4°, chacun de sa
+     couleur, interpolée du gris (220, 225, 235) au bleu (135, 166, 238). */
+  const PAS = 4;
+  const segments = Math.ceil(angle / PAS);
+  const point = (deg: number) => {
+    const r = ((deg - 90) * Math.PI) / 180;
+    return { x: CENTRE + RAYON * Math.cos(r), y: CENTRE + RAYON * Math.sin(r) };
+  };
+  const couleur = (t: number) => {
+    const de = [220, 225, 235];
+    const a = [135, 166, 238];
+    return `rgb(${de.map((v, i) => Math.round(v + (a[i] - v) * t)).join(' ')})`;
+  };
+  const arc = Array.from({ length: segments }, (_, i) => {
+    const d0 = i * PAS;
+    const d1 = Math.min(angle, (i + 1) * PAS);
+    const p0 = point(d0);
+    const p1 = point(d1);
+    return { d: `M ${p0.x} ${p0.y} A ${RAYON} ${RAYON} 0 0 1 ${p1.x} ${p1.y}`, couleur: couleur(segments === 1 ? 1 : i / (segments - 1)) };
+  });
   /* La boule seule, sans bout d'aiguille (2026-09-21, « uniquement la
      boule, pas la petite barre intérieure »). */
   const reperes = apresMidi ? ['12', '15', '18', '21'] : ['12', '3', '6', '9'];
@@ -143,13 +162,9 @@ export function CadranHeure({ valeur, onValeur, nom }: { valeur: string; onValeu
           coloration du cercle ») : relevé sur son image, du gris du cercle
           en haut (220, 225, 235) au bleu près de la boule (135, 166, 238),
           le long de l'arc — un dégradé posé du haut vers la boule. */}
-      <defs>
-        <linearGradient id={degrade} gradientUnits="userSpaceOnUse" x1={haut.x} y1={haut.y} x2={boule.x} y2={boule.y}>
-          <stop offset="0" stopColor="#dce1eb" />
-          <stop offset="1" stopColor="#87a6ee" />
-        </linearGradient>
-      </defs>
-      {arc ? <path className="cadran__arc" d={arc} stroke={`url(#${degrade})`} /> : null}
+      {arc.map((s, i) => (
+        <path key={i} className="cadran__arc" d={s.d} stroke={s.couleur} />
+      ))}
       <circle className="cadran__boule" cx={boule.x} cy={boule.y} r={7} />
     </svg>
   );

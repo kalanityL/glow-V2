@@ -3197,11 +3197,12 @@
 }
 
 /* L'arc du haut à la boule, et la boule cerclée de blanc (son dessin). */
-/* L'arc porte son dégradé en attribut (du gris du cercle au bleu). */
+/* L'arc, par segments qui portent chacun leur couleur (du gris du cercle
+   au bleu, le long de l'arc) ; les bouts droits, pour qu'ils se joignent. */
 .cadran__arc {
   fill: none;
   stroke-width: 3;
-  stroke-linecap: round;
+  stroke-linecap: butt;
 }
 
 
