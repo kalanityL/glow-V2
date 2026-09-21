@@ -148,15 +148,12 @@ export function PageSommeil({
     });
   };
 
-  /* LE JOUR DE L'ENDORMISSEMENT EN MOTS (2026-09-21, « endormissement :
-     mettre hier, aujourd'hui ou date, qd on clique ça ouvre le
-     calendrier ») : « Hier », « Aujourd'hui », sinon la date. */
-  const jourEcrit = (date: string, enMots: boolean) =>
-    enMots && date === aujourdhui
-      ? textes.sommeil.aujourdhui
-      : enMots && date === veille(aujourdhui)
-        ? textes.sommeil.hier
-        : formaterDateCourte(date, langue);
+  /* LE JOUR EN MOTS, POUR LES DEUX BORDS (2026-09-21, « endormissement :
+     mettre hier, aujourd'hui ou date », puis « la règle pour aujourd'hui /
+     hier reste : si date choisie est hier ou aujourd'hui, mettre hier ou
+     aujourd'hui ») : « Hier », « Aujourd'hui », sinon la date. */
+  const jourEcrit = (date: string) =>
+    date === aujourdhui ? textes.sommeil.aujourdhui : date === veille(aujourdhui) ? textes.sommeil.hier : formaterDateCourte(date, langue);
 
   const colonne = (
     nom: string,
@@ -166,7 +163,6 @@ export function PageSommeil({
     cleHeure: 'heureCoucher' | 'heureReveil',
     heure: string,
     poserHeure: (h: string) => void,
-    enMots = false,
   ) => (
     <div className="sommeil__colonne">
       {/* SON DESSIN (2026-09-21, « utilise ce design sauf rien en gras ; ne
@@ -177,7 +173,7 @@ export function PageSommeil({
         <ChoixDate valeur={date} onChoix={poserDate} nom={nom} ouvertDAbord onFerme={() => setEdite(null)} />
       ) : (
         <button type="button" className="sommeil__jour" onClick={() => setEdite(cleDate)}>
-          {jourEcrit(date, enMots)}
+          {jourEcrit(date)}
         </button>
       )}
       {/* LE CADRAN, au-dessus de l'heure (2026-09-21) : la boule se glisse,
@@ -237,7 +233,7 @@ export function PageSommeil({
 
             {/* DEUX INSTANTS COMPLETS, chacun sa date et son heure. */}
             <div className="sommeil__colonnes">
-              {colonne(textes.sommeil.endormissement, 'dateCoucher', dateCoucher, retouche(setDateCoucher), 'heureCoucher', heureCoucher, retouche(setHeureCoucher), true)}
+              {colonne(textes.sommeil.endormissement, 'dateCoucher', dateCoucher, retouche(setDateCoucher), 'heureCoucher', heureCoucher, retouche(setHeureCoucher))}
               {colonne(textes.sommeil.reveil, 'dateReveil', dateReveil, retouche(setDateReveil), 'heureReveil', heureReveil, retouche(setHeureReveil))}
             </div>
 

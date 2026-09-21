@@ -713,7 +713,10 @@ une carte, d'après son dessin** (« utilise ce design sauf rien en gras ; ne
 mets pas les pictos endormissement / réveil ») : le nom, le jour en gris
 dessous (« Hier », « Aujourd'hui » ou la date, le calendrier au clic), le
 cadran avec l'arc du haut jusqu'à la boule, l'heure en pastille bleu pâle
-avec son horloge ; deux
+avec son horloge — **« Hier » et « Aujourd'hui » valent pour les deux
+bords, quelle que soit la date choisie** (« la règle pour aujourd'hui /
+hier reste : si date choisie est hier ou aujourd'hui, mettre hier ou
+aujourd'hui ») ; deux
 instants complets, Endormissement et Réveil, chacun son jour et son heure
 sur deux colonnes — une nuit part de la veille 23:00 → 07:00, une sieste du
 jour même 14:00 → 15:00, changer de nature ne déplace les instants que s'ils
