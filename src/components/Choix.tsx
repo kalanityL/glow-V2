@@ -1,3 +1,4 @@
+import { IndiceDefilement } from './IndiceDefilement';
 import { useCallback, useRef, useState, type ReactNode } from 'react';
 import { Panneau } from './Panneau';
 import { centrerDansSaListe } from '../plateforme/navigateur';
@@ -87,6 +88,7 @@ export function Choix({
                 </li>
               );
             })}
+            <IndiceDefilement />
           </ul>
         </Panneau>
       ) : null}

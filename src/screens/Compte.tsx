@@ -1,3 +1,4 @@
+import { IndiceDefilement } from '../components/IndiceDefilement';
 import { useEffect, useRef, useState } from 'react';
 import { Avatar } from '../components/Avatar';
 import { ChampEnLigne } from '../components/ChampEnLigne';
@@ -280,6 +281,7 @@ export function Compte({
                 </button>
               </div>
             </div>
+            <IndiceDefilement />
           </section>
 
           {/* LE VOLET DE L'AVATAR (2026-09-20, « avatar : image de l'avatar
@@ -314,6 +316,7 @@ export function Compte({
                 <EtapeAvatar avatar={brouillonAvatar} onAvatar={setBrouillonAvatar} sansTitre />
               </div>
             </div>
+            <IndiceDefilement />
           </section>
 
           <section
@@ -344,6 +347,7 @@ export function Compte({
                 masque
               />
             </div>
+            <IndiceDefilement />
           </section>
         </div>
 

@@ -340,6 +340,17 @@ thèmes ne repeignent pas, et qui ne sont pas dans les templates non plus.
   le scénario de la règle crantée (le chiffre contre le cran sous la tige).
   L'état se force et se restaure par `sed` sur les `useState`, jamais par
   `git checkout`.
+- **TOUT DÉFILEMENT DISPONIBLE SE SIGNALE** (2026-09-21, d'après son image,
+  la pastille à flèche de l'écran de choix de compte de Google : « quand un
+  scroll est disponible n'importe ou sur le site, le signaler avec un
+  petit picto de ce genre là — sobre et discret ») : `components/IndiceDefilement.tsx`,
+  posé EN DERNIER ENFANT de toute zone qui défile verticalement (le corps
+  des formulaires, la confirmation, le contenu d'un bloc, le tiroir, les
+  volets de « Mon compte », les panneaux de choix, les colonnes d'heures,
+  le calendrier) — collé au bas de la zone visible tant qu'il reste du
+  contenu dessous, effacé au bout ; une petite pastille ronde au fond des
+  champs, cernée de leur filet, le chevron en gris. Toute nouvelle zone
+  qui défile le reçoit.
 - **RIEN NE DÉBORDE JAMAIS, NULLE PART** (V1, sine qua non). Aucun élément ne
   dépasse l'écran du téléphone ni son conteneur. Quand un écran est plus haut
   que le téléphone : d'abord mettre côte à côte, resserrer, ou séparer en deux

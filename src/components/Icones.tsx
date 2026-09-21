@@ -333,6 +333,15 @@ export function IconeCoche() {
   );
 }
 
+/** Lucide `chevron-down` — l'indice de défilement. */
+export function IconeChevronBas() {
+  return (
+    <Icone>
+      <path d="m6 9 6 6 6-6" />
+    </Icone>
+  );
+}
+
 /** Lucide `chevron-left` — le mois d'avant. */
 export function IconeChevronGauche() {
   return (

@@ -15,6 +15,7 @@ import { poidsDepuisKg, poidsEnKg, type UnitePoids } from '../domaine/unites';
 import { idPesee, type WeightLog } from '../donnees/v1';
 import type { Forme } from '../domaine/traitements';
 import type { ModuleId } from '../app/modules';
+import { IndiceDefilement } from '../components/IndiceDefilement';
 
 /**
  * LA PAGE D'UNE PESÉE (2026-09-21, « ajouter balance : idem que ajouter
@@ -180,6 +181,7 @@ export function PagePesee({
               </div>
             ) : null}
 
+            <IndiceDefilement />
           </div>
 
           <div className="prise__pied">

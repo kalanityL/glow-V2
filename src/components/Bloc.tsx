@@ -1,3 +1,4 @@
+import { IndiceDefilement } from './IndiceDefilement';
 import { useEffect, useRef, type ReactNode } from 'react';
 import { IconeCroix } from './Icones';
 import { useTextes } from '../i18n/useTextes';
@@ -54,7 +55,10 @@ export function Bloc({
             <IconeCroix />
           </button>
         </div>
-        <div className="bloc__contenu">{children}</div>
+        <div className="bloc__contenu">
+          {children}
+          <IndiceDefilement />
+        </div>
         {pied ? <div className="bloc__pied">{pied}</div> : null}
       </div>
     </>

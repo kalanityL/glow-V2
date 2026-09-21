@@ -1,3 +1,4 @@
+import { IndiceDefilement } from './IndiceDefilement';
 import { useEffect, useRef, type ReactNode } from 'react';
 import { IconeCroix } from './Icones';
 import { useTextes } from '../i18n/useTextes';
@@ -63,6 +64,7 @@ export function Tiroir({
           <IconeCroix />
         </button>
         <div className="tiroir__contenu">{children}</div>
+        <IndiceDefilement />
       </div>
     </>
   );

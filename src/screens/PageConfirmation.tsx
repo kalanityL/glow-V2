@@ -18,6 +18,7 @@ import type { ModuleId } from '../app/modules';
    glp1low_validation_injection.svg ») : un fichier embarqué, comme les
    polices et la photo — jamais une ressource distante. */
 import imageValidation from '../assets/images/validation-prise.svg';
+import { IndiceDefilement } from '../components/IndiceDefilement';
 
 /** Les entrées possibles de l'écran ; chaque écran dit lesquelles, DANS
     SON ORDRE (2026-09-20, « nouvelle element : en 1er ») : ajouter
@@ -146,6 +147,7 @@ export function PageConfirmation({
               );
             })}
           </div>
+          <IndiceDefilement />
         </div>
       </div>
 

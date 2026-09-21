@@ -109,6 +109,26 @@ export function surDefilementHors(
   return () => window.removeEventListener('scroll', auDefilement, { capture: true });
 }
 
+/**
+ * DIT SI UN DÉFILEMENT VERTICAL RESTE DISPONIBLE dans `zone` — s'il y a du
+ * contenu sous le bord visible —, maintenant et à chaque changement : le
+ * défilement lui-même, et la taille de la zone ou de son contenu
+ * (`ResizeObserver`). Rend de quoi se désabonner.
+ */
+export function surDefilementDisponible(zone: HTMLElement | null, quand: (disponible: boolean) => void): () => void {
+  if (!zone) return () => {};
+  const mesurer = () => quand(zone.scrollHeight - zone.scrollTop - zone.clientHeight > 4);
+  mesurer();
+  zone.addEventListener('scroll', mesurer, { passive: true });
+  const observateur = new ResizeObserver(mesurer);
+  observateur.observe(zone);
+  for (const enfant of Array.from(zone.children)) observateur.observe(enfant);
+  return () => {
+    zone.removeEventListener('scroll', mesurer);
+    observateur.disconnect();
+  };
+}
+
 /** Amène l'élément au milieu de sa zone de défilement. */
 export function centrerDansSaListe(element: Element | null): void {
   element?.scrollIntoView({ block: 'center' });

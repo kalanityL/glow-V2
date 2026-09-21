@@ -2893,3 +2893,50 @@
   color: var(--bouton-encre);
   opacity: 0.85;
 }
+
+/* ── L'INDICE DE DÉFILEMENT (2026-09-21, d'après son image : « quand un
+   scroll est disponible n'importe ou sur le site, le signaler avec un petit
+   picto de ce genre là — sobre et discret ») : en dernier enfant de tout ce
+   qui défile, sans hauteur, collé au bas de la zone visible ; une petite
+   pastille ronde, le fond des champs cerné de leur filet, le chevron en gris ;
+   effacée au bout du défilement. ─────────────────────────────────────── */
+.indice-defilement {
+  position: sticky;
+  bottom: 6px;
+  /* Au-dessus de ce qui défile sous lui — cartes, boutons, cadres. */
+  z-index: 3;
+  display: flex;
+  justify-content: center;
+  align-items: flex-end;
+  height: 0;
+  overflow: visible;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 150ms;
+}
+
+.indice-defilement--visible {
+  opacity: 1;
+}
+
+.indice-defilement__pastille {
+  display: grid;
+  place-items: center;
+  width: 26px;
+  height: 26px;
+  border: 1px solid var(--option-filet);
+  border-radius: 50%;
+  background: var(--option-fond);
+  color: var(--encre-chapeau);
+  box-shadow: 0 2px 6px rgb(15 23 42 / 0.08);
+}
+
+.indice-defilement__pastille .icone {
+  width: 14px;
+  height: 14px;
+}
+
+/* Le tiroir défile lui-même : l'indice y est posé après le contenu. */
+.tiroir > .indice-defilement {
+  bottom: 10px;
+}

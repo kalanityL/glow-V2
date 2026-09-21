@@ -1,3 +1,4 @@
+import { IndiceDefilement } from './IndiceDefilement';
 import { useCallback, useRef, useState, type ReactNode } from 'react';
 import { Panneau } from './Panneau';
 import { IconeChevronDroit, IconeChevronGauche } from './Icones';
@@ -105,6 +106,7 @@ export function ChoixDate({
                 </button>
               ))}
             </div>
+            <IndiceDefilement />
           </div>
         </Panneau>
       ) : null}

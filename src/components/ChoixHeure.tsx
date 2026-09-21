@@ -1,3 +1,4 @@
+import { IndiceDefilement } from './IndiceDefilement';
 import { useCallback, useRef, useState, type ReactNode } from 'react';
 import { Panneau } from './Panneau';
 import { MINUTES_RONDES } from '../domaine/prises';
@@ -71,6 +72,7 @@ export function ChoixHeure({
                 </button>
               </li>
             ))}
+            <IndiceDefilement />
           </ul>
           <ul className="heures__colonne" role="listbox">
             {minutes.map((m) => (
@@ -91,6 +93,7 @@ export function ChoixHeure({
                 </button>
               </li>
             ))}
+            <IndiceDefilement />
           </ul>
         </Panneau>
       ) : null}

@@ -25,6 +25,7 @@ import type { useParcours } from '../app/useParcours';
 import { idPrise } from '../donnees/v1';
 import { brandDepuisTraitement } from '../donnees/conversions';
 import { appliquerChoixTraitement, choixTraitementDe } from '../app/choixTraitement';
+import { IndiceDefilement } from '../components/IndiceDefilement';
 
 /**
  * LA PAGE D'UNE PRISE (2026-09-20, « ajouter->injection : envoie vers une
@@ -332,6 +333,7 @@ export function PagePrise({
               </button>
             )}
 
+            <IndiceDefilement />
           </div>
 
           <div className="prise__pied">
