@@ -1,5 +1,5 @@
 import { Avatar } from '../components/Avatar';
-import { BarreDuBas } from './BarreDuBas';
+import { BarreDuBas, type AjoutTraitement } from './BarreDuBas';
 import type { ModuleId } from '../app/modules';
 import { IconeDuModule } from './iconesModules';
 import { Cocarde } from '../components/Cocarde';
@@ -88,6 +88,7 @@ export function Accueil({
   onOuvrirCompte,
   fond,
   onAjouter,
+  ajoutTraitement,
 }: {
   reponses: Reponses;
   /** Le fond de page et ses gestes, tenus par `App`. */
@@ -97,6 +98,7 @@ export function Accueil({
   onOuvrirCompte: () => void;
   /** Une case du tiroir du « + » : voir `App`. */
   onAjouter: (module: ModuleId) => void;
+  ajoutTraitement?: AjoutTraitement | null;
 }) {
   const textes = useTextes();
   /* LE MENU PRINCIPAL EN TIROIR (2026-09-19) : ouvert par l'entrée « Menu »
@@ -209,6 +211,7 @@ export function Accueil({
         forme={reponses.formeTraitement}
         fond={fond}
         onAjouter={onAjouter}
+        ajoutTraitement={ajoutTraitement}
       />
     </div>
   );

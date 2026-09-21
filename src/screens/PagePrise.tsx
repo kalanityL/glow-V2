@@ -1,5 +1,5 @@
 import { useEffect, useState, type FormEvent } from 'react';
-import { BarreDuBas } from './BarreDuBas';
+import { BarreDuBas, type AjoutTraitement } from './BarreDuBas';
 import { EntetePage } from './EntetePage';
 import type { FondProps } from './Accueil';
 import { BlocTraitement } from './BlocTraitement';
@@ -75,6 +75,7 @@ export function PagePrise({
   onOuvrirCompte,
   onValider,
   onAjouter,
+  ajoutTraitement,
   fond,
   initiale,
   onAnnuler,
@@ -87,6 +88,7 @@ export function PagePrise({
   onOuvrirCompte: () => void;
   onValider: (prise: Prise) => void;
   onAjouter: (module: ModuleId) => void;
+  ajoutTraitement?: AjoutTraitement | null;
   fond: FondProps;
   /** La prise à modifier : le formulaire part d'elle. Absente, c'est une
       nouvelle prise. */
@@ -365,6 +367,7 @@ export function PagePrise({
         forme={forme}
         fond={fond}
         onAjouter={onAjouter}
+        ajoutTraitement={ajoutTraitement}
       />
     </div>
   );

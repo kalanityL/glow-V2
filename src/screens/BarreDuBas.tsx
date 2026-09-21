@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import type { ModuleId } from '../app/modules';
+import { BlocTraitement, type ChoixTraitement } from './BlocTraitement';
 import {
   IconeAnalyse,
   IconeEtoiles,
@@ -33,6 +34,13 @@ import type { FondProps } from './Accueil';
  * tiroirs sont rendus AVANT la barre, dans la page : la barre garde le
  * dessus.
  */
+/** Ce que le bloc « Mon traitement » ouvert par le « + » lit et écrit. */
+export interface AjoutTraitement {
+  courant: ChoixTraitement;
+  onEnregistrer: (choix: ChoixTraitement) => void;
+  onFermer: () => void;
+}
+
 export function BarreDuBas({
   active,
   onAccueil,
@@ -40,6 +48,7 @@ export function BarreDuBas({
   forme,
   fond,
   onAjouter,
+  ajoutTraitement,
   demandeAjout,
 }: {
   /** L'entrée de la page courante, allumée. */
@@ -53,6 +62,10 @@ export function BarreDuBas({
   fond: FondProps;
   /** Une case du tiroir du « + » touchée : le tiroir se ferme, la page change. */
   onAjouter: (module: ModuleId) => void;
+  /** LE BLOC « MON TRAITEMENT » OUVERT PAR LE « + » (2026-09-21, « ajouter
+      traitement si traitement aucun : ouvre le formulaire de traitement ») :
+      rendu ici, dans la page, comme le bloc « Thème ». */
+  ajoutTraitement?: AjoutTraitement | null;
   /** UNE DEMANDE D'OUVRIR LE TIROIR DU « + » venue de la page (2026-09-20,
       l'écran de confirmation : « nouvel element : ouvre la meme chose que
       bouton plus ») : un compteur, chaque incrément ouvre. */
@@ -84,6 +97,13 @@ export function BarreDuBas({
 
   return (
     <>
+      {ajoutTraitement ? (
+        <BlocTraitement
+          courant={ajoutTraitement.courant}
+          onEnregistrer={ajoutTraitement.onEnregistrer}
+          onFermer={ajoutTraitement.onFermer}
+        />
+      ) : null}
       {tiroirs.menu !== 'ferme' ? (
         <TiroirMenu
           onFermer={fermerMenu}

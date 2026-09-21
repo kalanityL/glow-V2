@@ -1,5 +1,5 @@
 import { useState, type FormEvent } from 'react';
-import { BarreDuBas } from './BarreDuBas';
+import { BarreDuBas, type AjoutTraitement } from './BarreDuBas';
 import { EntetePage } from './EntetePage';
 import type { FondProps } from './Accueil';
 import { ChoixDate } from '../components/ChoixDate';
@@ -49,6 +49,7 @@ export function PagePesee({
   onAccueil,
   onOuvrirCompte,
   onAjouter,
+  ajoutTraitement,
   fond,
 }: {
   /** Le poids proposé d'avance, forme stockée. */
@@ -64,6 +65,7 @@ export function PagePesee({
   onAccueil: () => void;
   onOuvrirCompte: () => void;
   onAjouter: (module: ModuleId) => void;
+  ajoutTraitement?: AjoutTraitement | null;
   fond: FondProps;
 }) {
   const textes = useTextes();
@@ -205,6 +207,7 @@ export function PagePesee({
         forme={forme}
         fond={fond}
         onAjouter={onAjouter}
+        ajoutTraitement={ajoutTraitement}
       />
     </div>
   );

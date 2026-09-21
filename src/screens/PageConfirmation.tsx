@@ -1,5 +1,5 @@
 import { useState, type ReactElement, type ReactNode } from 'react';
-import { BarreDuBas } from './BarreDuBas';
+import { BarreDuBas, type AjoutTraitement } from './BarreDuBas';
 import { EntetePage } from './EntetePage';
 import type { FondProps } from './Accueil';
 import {
@@ -73,6 +73,7 @@ export function PageConfirmation({
   onAccueil,
   onOuvrirCompte,
   onAjouter,
+  ajoutTraitement,
   fond,
 }: {
   /** Le titre de la page, dans l'entête des pages. */
@@ -88,6 +89,7 @@ export function PageConfirmation({
   onAccueil: () => void;
   onOuvrirCompte: () => void;
   onAjouter: (module: ModuleId) => void;
+  ajoutTraitement?: AjoutTraitement | null;
   fond: FondProps;
 }) {
   const textes = useTextes();
@@ -158,6 +160,7 @@ export function PageConfirmation({
         forme={forme}
         fond={fond}
         onAjouter={onAjouter}
+        ajoutTraitement={ajoutTraitement}
         demandeAjout={demandeAjout}
       />
     </div>

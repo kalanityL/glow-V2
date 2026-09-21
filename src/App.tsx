@@ -1,6 +1,8 @@
 import { useEffect, useState } from 'react';
 import { useParcours } from './app/useParcours';
 import { useJournaux } from './app/useJournaux';
+import { appliquerChoixTraitement, choixTraitementDe } from './app/choixTraitement';
+import type { AjoutTraitement } from './screens/BarreDuBas';
 import { useTextes } from './i18n/useTextes';
 import { Onboarding } from './screens/Onboarding';
 import { Accueil } from './screens/Accueil';
@@ -79,10 +81,33 @@ export default function App() {
      remplace, et la confirmation le dit. */
   const [modification, setModification] = useState(false);
   const [miseAJour, setMiseAJour] = useState(false);
+  /* SANS TRAITEMENT, LE « + » OUVRE D'ABORD LE BLOC « MON TRAITEMENT »
+     (2026-09-21, « ajouter traitement si traitement aucun : ouvre le
+     formulaire de traitement, si un traitement est choisi on arrive ensuite
+     au formulaire nouveau comprimé / injection ») ; un traitement complet
+     enregistré, la page de la prise s'ouvre. */
+  const [blocTraitementOuvert, setBlocTraitementOuvert] = useState(false);
+  const ajoutTraitement: AjoutTraitement | null = blocTraitementOuvert
+    ? {
+        courant: choixTraitementDe(parcours.reponses),
+        onEnregistrer: (choix) => {
+          appliquerChoixTraitement(parcours, choix);
+          if (choix.forme && choix.forme !== 'aucun' && choix.traitement) {
+            setModification(false);
+            setPage('prise');
+          }
+        },
+        onFermer: () => setBlocTraitementOuvert(false),
+      }
+    : null;
   const ajouter = (module: ModuleId) => {
-    if (module === 'traitement' && parcours.reponses.formeTraitement && parcours.reponses.traitement) {
-      setModification(false);
-      setPage('prise');
+    if (module === 'traitement') {
+      if (parcours.reponses.formeTraitement && parcours.reponses.traitement) {
+        setModification(false);
+        setPage('prise');
+      } else {
+        setBlocTraitementOuvert(true);
+      }
     }
     if (module === 'balance') {
       setModification(false);
@@ -183,7 +208,8 @@ export default function App() {
           {!parcours.entre ? (
             <Onboarding parcours={parcours} />
           ) : page === 'compte' ? (
-            <Compte parcours={parcours} onAccueil={() => setPage('accueil')} fond={fond} onAjouter={ajouter} />
+            <Compte parcours={parcours} onAccueil={() => setPage('accueil')} fond={fond} onAjouter={ajouter}
+              ajoutTraitement={ajoutTraitement} />
           ) : page === 'confirmation' && derniere && parcours.reponses.formeTraitement ? (
             <PageConfirmation
               titrePage={textes.accueil.traitement[parcours.reponses.formeTraitement]}
@@ -223,6 +249,7 @@ export default function App() {
               onAccueil={() => setPage('accueil')}
               onOuvrirCompte={() => setPage('compte')}
               onAjouter={ajouter}
+              ajoutTraitement={ajoutTraitement}
               fond={fond}
             />
           ) : page === 'pesee' ? (
@@ -240,6 +267,7 @@ export default function App() {
               onAccueil={() => setPage('accueil')}
               onOuvrirCompte={() => setPage('compte')}
               onAjouter={ajouter}
+              ajoutTraitement={ajoutTraitement}
               fond={fond}
             />
           ) : page === 'confirmation-pesee' && dernierePesee ? (
@@ -267,6 +295,7 @@ export default function App() {
               onAccueil={() => setPage('accueil')}
               onOuvrirCompte={() => setPage('compte')}
               onAjouter={ajouter}
+              ajoutTraitement={ajoutTraitement}
               fond={fond}
             />
           ) : page === 'prise' && parcours.reponses.formeTraitement && parcours.reponses.traitement ? (
@@ -278,6 +307,7 @@ export default function App() {
               onOuvrirCompte={() => setPage('compte')}
               onValider={validerPrise}
               onAjouter={ajouter}
+              ajoutTraitement={ajoutTraitement}
               fond={fond}
               initiale={modification && derniere ? derniere : undefined}
               onAnnuler={() => {
@@ -291,6 +321,7 @@ export default function App() {
               onOuvrirCompte={() => setPage('compte')}
               fond={fond}
               onAjouter={ajouter}
+              ajoutTraitement={ajoutTraitement}
             />
           )}
         </div>

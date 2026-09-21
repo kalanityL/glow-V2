@@ -12,7 +12,7 @@ import {
   IconeCourriel,
   IconeToise,
 } from '../components/Icones';
-import { BarreDuBas } from './BarreDuBas';
+import { BarreDuBas, type AjoutTraitement } from './BarreDuBas';
 import type { ModuleId } from '../app/modules';
 import { appliquerChoixTraitement, choixTraitementDe } from '../app/choixTraitement';
 import { EntetePage } from './EntetePage';
@@ -95,6 +95,7 @@ export function Compte({
   onAccueil,
   fond,
   onAjouter,
+  ajoutTraitement,
 }: {
   parcours: ReturnType<typeof useParcours>;
   /** Le fond de page et ses gestes, tenus par `App`. */
@@ -103,6 +104,7 @@ export function Compte({
   onAccueil: () => void;
   /** Une case du tiroir du « + » : voir `App`. */
   onAjouter: (module: ModuleId) => void;
+  ajoutTraitement?: AjoutTraitement | null;
 }) {
   const textes = useTextes();
   const langue = detecterLangue();
@@ -380,6 +382,7 @@ export function Compte({
         forme={reponses.formeTraitement}
         fond={fond}
         onAjouter={onAjouter}
+        ajoutTraitement={ajoutTraitement}
       />
     </div>
   );

@@ -569,7 +569,13 @@ tiroir ferme l'autre en même temps** : l'un descend pendant que l'autre monte.
 page ultra simple avec uniquement le fomulaire d'ajout d'injection de la v1
 avec la meme mise en page, mais pas en bloc reste page vitré, en mode page
 simple ») : la case « Traitement » du tiroir du « + » y mène, quand un
-traitement est répondu (sinon la case ne fait rien encore). Une page
+traitement est répondu — **sinon, la case ouvre d'abord le bloc « Mon
+traitement »** (2026-09-21, « ajouter traitement si traitement aucun :
+ouvre le formulaire de traitement, si un traitement est choisi on arrive
+ensuite au formulaire nouveau comprimé / injection ») : rendu par la barre
+du bas dans la page, comme le bloc « Thème » ; un traitement complet
+enregistré, la page de la prise s'ouvre ; fermé sans traitement, rien. Une
+page
 ordinaire — l'entête des pages, la barre du bas — dont le contenu n'est
 qu'une carte : le formulaire de la V1 (`InjectionForm.tsx`), mise en page
 comprise — l'icône de la forme, le titre en capitales, la croix qui ramène
