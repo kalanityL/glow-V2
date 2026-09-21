@@ -312,6 +312,9 @@ export interface Textes {
         durée garde sa largeur fixe. */
     duree: (duree: string) => string;
     dureeSuite: string;
+    /** Sur le troisième écran : « nuit de 7 h 15 », « sieste de 1 h »
+        (2026-09-21). */
+    natureDe: (nature: SleepKind, duree: string) => string;
     /** « Notez votre nuit » / « Notez votre sieste » (2026-09-21). */
     qualite: (nature: SleepKind) => string;
     /** Les six crans, de 0 à 5. */
@@ -626,6 +629,7 @@ const FR: Textes = {
     aujourdhui: 'Aujourd’hui',
     duree: (duree) => `${duree} de sommeil`,
     dureeSuite: 'de sommeil',
+    natureDe: (nature, duree) => `${nature === 'nuit' ? 'nuit' : 'sieste'} de ${duree}`,
     qualite: (nature) => (nature === 'nuit' ? 'Notez votre nuit' : 'Notez votre sieste'),
     qualites: ['Très mauvaise', 'Mauvaise', 'Passable', 'Correcte', 'Bonne', 'Excellente'],
     refusDureeNulle: 'L’heure de réveil et l’heure d’endormissement sont identiques : aucune durée de sommeil à enregistrer.',

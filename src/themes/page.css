@@ -3300,9 +3300,10 @@
    l'endormissement, le réveil, séparés d'un point médian, en gris. */
 .sommeil__fil {
   display: flex;
-  flex-wrap: wrap;
+  flex-wrap: nowrap;
   justify-content: center;
-  gap: 6px;
+  gap: 8px;
+  white-space: nowrap;
   margin: 0;
   font-family: var(--font-body);
   font-size: 14px;
@@ -3311,4 +3312,9 @@
 
 .sommeil__fil-point {
   color: var(--option-filet);
+}
+
+/* « nuit de 7 h 15 » : la phrase entière, sans case à largeur fixe. */
+.sommeil__duree--phrase {
+  color: var(--encre);
 }

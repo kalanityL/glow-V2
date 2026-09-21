@@ -333,9 +333,9 @@ export function PageSommeil({
                 consigné. En tête, LE FIL D'ARIANE (2026-09-21, « Sieste ·
                 hier/aujourd'hui date endormissement + heure · hier/aujourd'hui
                 date réveil + heure »). */}
+            {/* Sur une ligne, sans la nature (2026-09-21) : « 10/09/2026 23:45 ·
+                11/09/2026 07:00 », puis « nuit de 7 h 15 ». */}
             <p className="sommeil__fil">
-              <span>{textes.sommeil.natures[nature]}</span>
-              <span className="sommeil__fil-point" aria-hidden="true">·</span>
               <span>
                 {jourEcrit(dateCoucher)} {heureCoucher}
               </span>
@@ -344,9 +344,7 @@ export function PageSommeil({
                 {jourEcrit(dateReveil)} {heureReveil}
               </span>
             </p>
-            <p className="sommeil__duree">
-              <span>{dureeEcrite(duree)}</span> {textes.sommeil.dureeSuite}
-            </p>
+            <p className="sommeil__duree sommeil__duree--phrase">{textes.sommeil.natureDe(nature, dureeEcrite(duree))}</p>
             {noteEtNotes}
             <IndiceDefilement />
           </div>
@@ -361,7 +359,8 @@ export function PageSommeil({
             ) : null}
             <button type="submit" className="bouton prise__valider">
               <IconeCoche />
-              <span>{questionArmee ? textes.sommeil.confirmerChoix : modification || etape === 'note' ? textes.sommeil.mettreAJour : textes.prise.valider}</span>
+              {/* Le troisième écran dit « Valider », pas « Mettre à jour » (2026-09-21). */}
+              <span>{questionArmee ? textes.sommeil.confirmerChoix : modification ? textes.sommeil.mettreAJour : textes.prise.valider}</span>
             </button>
           </div>
           ) : null}
