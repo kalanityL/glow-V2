@@ -1968,18 +1968,27 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 18px;
+  gap: 0;
   padding-top: 18px;
+  /* L'air SOUS la piste, déjà là — l'espace jusqu'au bouton — lui est
+     donné (voir la piste) et repris ici : rien n'est ajouté. */
+  margin-bottom: calc(-1 * var(--graduation-air-bas, 0px));
 }
 
 /* TOUTE LA ZONE SOUS LE CHIFFRE GLISSE (2026-09-21, « il faut que toute la
    zone entre le bas des chiffres et le haut du bouton valider puisse slider
-   le poid, pas uniquement la zone de hauteur de cran ») : le cadre qui
-   défile est plus haut que la piste — les crans restent À LEUR PLACE, sous
-   le chiffre, et l'espace vide dessous glisse aussi (« pkoi tu as changé
-   l'espace entre les crans et le poids ? » : il ne devait pas bouger). */
-.poids .graduation {
-  min-height: 116px;
+   le poid, pas uniquement la zone de hauteur de cran », puis « C'est les
+   vspaces qui existaient DEJA qui doivent etre glissables. aucun espace a
+   ajouter ») : les espaces qui existaient déjà — les 18 px entre le
+   chiffre et les crans, l'air entre les crans et le bouton — sont DANS le
+   cadre qui défile, comme rembourrage de la piste, au lieu d'être autour.
+   Rien ne bouge à l'écran, mais le doigt peut partir de n'importe où. */
+.bloc .poids {
+  --graduation-air-bas: 8px;
+}
+
+.prise .poids {
+  --graduation-air-bas: 16px;
 }
 
 /* Le chiffre, en grand, dans la police de titre ; son unité petite à côté. */
@@ -2095,8 +2104,11 @@
 }
 
 .graduation__piste {
+  box-sizing: content-box;
   height: calc(var(--graduation-nombres) + var(--graduation-cran) * 2);
-  padding-inline: calc(50% - var(--graduation-pas) / 2);
+  /* Les espaces d'avant, devenus rembourrage : 18 px au-dessus, l'air
+     d'en dessous. */
+  padding: 18px calc(50% - var(--graduation-pas) / 2) var(--graduation-air-bas, 0px);
   width: max-content;
 }
 
@@ -2176,7 +2188,7 @@
   justify-self: start;
   margin-left: 50%;
   align-self: start;
-  margin-top: var(--graduation-nombres);
+  margin-top: calc(18px + var(--graduation-nombres));
   /* DEUX PIXELS (2026-09-20, « épaisseur tige bleue : 2px » — un pixel
      comme les crans l'instant d'avant) : le bord gauche sur celui du cran
      qu'elle désigne, elle le RECOUVRE (« tige bleue par dessus et rend
