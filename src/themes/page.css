@@ -2403,8 +2403,13 @@
 }
 
 /* UN BOUTON PAR CHOIX (2026-09-21, « des boutons pour chaque dosage […] 6
-   boutons » pour la zone) : en grille, la matière des champs ; le choisi
-   plein à l'encre — sobre, comme le jour choisi du calendrier. */
+   boutons » pour la zone), AUX COULEURS DE SON IMAGE (le même jour,
+   « utilise ces styles pour les boutons de dosage et de zone (pas les
+   ronds radio) ; couleur de texte desactivé : gris clair ; couleur de texte
+   activé : pas bleu, couleur de texte actuel du formulaire ») : les
+   non-choisis sur un gris très clair, sans filet, le texte en gris ; le
+   choisi sur le bleu pâle des réponses choisies, cerné du même bleu plus
+   soutenu, le texte à l'encre. */
 .prise__etiquette {
   margin: 0 0 -8px;
   font-family: var(--font-body);
@@ -2424,10 +2429,10 @@
 
 .prise__bouton {
   padding: 12px 8px;
-  border: 1px solid var(--option-filet);
+  border: 1px solid transparent;
   border-radius: 12px;
-  background: var(--option-fond);
-  color: var(--encre);
+  background: color-mix(in srgb, var(--option-filet) 22%, var(--option-fond));
+  color: var(--encre-chapeau);
   font-family: var(--font-body);
   font-weight: 500;
   font-size: 15px;
@@ -2436,9 +2441,9 @@
 }
 
 .prise__bouton--choisi {
-  border-color: var(--encre);
-  background: var(--encre);
-  color: var(--module-fond);
+  border-color: color-mix(in srgb, var(--accent) 35%, var(--option-choisi-fond));
+  background: var(--option-choisi-fond);
+  color: var(--encre);
 }
 
 /* Dans un formulaire, ce qui se dit se dit en gris, jamais en bleu

@@ -532,7 +532,11 @@ on ajoute le label zone d'injection avec 6 boutons ») : la date et l'heure
 d'abord, puis le nom du traitement, UN BOUTON PAR PALIER (le premier choisi
 d'avance) et « Autre » qui ouvre la saisie, puis « Zone d'injection » et six
 boutons — Abdomen G, Abdomen D, Bras G, Bras D, Cuisse G, Cuisse D (G et D
-pour gauche et droite ; pas sous forme orale) ;
+pour gauche et droite ; pas sous forme orale) — **aux couleurs de son
+image** (« utilise ces styles pour les boutons de dosage et de zone (pas
+les ronds radio) ») : non choisi, gris très clair sans filet et texte gris ;
+choisi, le bleu pâle des réponses choisies cerné d'un bleu plus soutenu, le
+texte à l'encre du formulaire, jamais bleu ;
 la dose parmi les paliers de la spécialité — désormais dans
 `domaine/traitements.ts`, des faits de boîte, pas un conseil — ou « Autre
 dose » tapée ; « + Notes » ; « Valider » au milieu. Une dose absente ou
