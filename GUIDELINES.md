@@ -754,8 +754,10 @@ dégradé linéaire ne suivant pas un cercle), **l'arc et la boule dans les
 bleus des étoiles de la note depuis le soir du 2026-09-21** (« assorti le
 bleu degradé du cadran de montre et celui de la boule avec le bleu des
 étoiles de notation /5 » : du bleu clair au bleu foncé du « + »,
-`--menu-ajouter-debut` → `--menu-ajouter-fin`, chaque segment portant sa
-part du chemin en propriété personnalisée et la feuille la mêlant ; la
+du bleu clair éclairci du fond de la carte au `--menu-ajouter-fin`
+entier — « marque plus le degradé », les deux bleus du « + » étant trop
+proches —, chaque segment portant sa part du chemin en propriété
+personnalisée et la feuille la mêlant ; la
 boule au bleu foncé, cerclée du fond de la carte — le gris-vers-bleu et la
 boule bleu nuit relevés sur l'image ont vécu la journée) —, l'heure en
 pastille avec son horloge — **le reste du cadran (intérieur, cercle,

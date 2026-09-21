@@ -3216,7 +3216,12 @@
    qu'ils se joignent. */
 .cadran__arc {
   fill: none;
-  stroke: color-mix(in srgb, var(--menu-ajouter-fin) calc(var(--part, 1) * 100%), var(--menu-ajouter-debut));
+  /* LE DÉGRADÉ SE VOIT (2026-09-21 au soir, « marque plus le degradé ») :
+     les deux bleus du « + » sont proches ; le départ est le bleu clair
+     éclairci du fond de la carte (trois cinquièmes de fond), l'arrivée le
+     bleu foncé entier — d'un bleu pâle en haut au bleu plein à la boule. */
+  --arc-debut: color-mix(in srgb, var(--menu-ajouter-debut) 40%, var(--module-fond));
+  stroke: color-mix(in srgb, var(--menu-ajouter-fin) calc(var(--part, 1) * 100%), var(--arc-debut));
   stroke-width: 3;
   stroke-linecap: butt;
 }
