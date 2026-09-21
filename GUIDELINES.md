@@ -124,6 +124,15 @@ Elles décident de la FORME du code, pas seulement de son contenu.
   change), pas se contenter de « Deploy complete ».
 - **« Préparer un clear »** = committer tout ce qui ne l'est pas, mettre à
   jour la note de reprise, dire ce qui reste non poussé.
+- **UNE IMAGE DE RÉFÉRENCE SE MESURE, ELLE NE S'ESTIME PAS** (2026-09-21,
+  après deux contours faux : « pourquoi as tu fait cette erreur ? » — les
+  couleurs avaient été estimées à l'œil sur une vignette, puis corrigées
+  dans le mauvais sens). Toute image qu'elle donne pour modèle — couleurs,
+  espacements, proportions — est ouverte et RELEVÉE AU PIXEL (PIL) avant
+  d'écrire un seul jeton, comme le sont ses propres captures pour vérifier ;
+  les valeurs relevées sont citées dans le commit, et la capture du
+  résultat est mesurée contre elles. Une image collée dans la conversation
+  et absente du disque : le dire, et lui demander le fichier.
 
 ### Les fichiers de travail, et leur tenue
 - **`TODO.md` est le sien.** Claude n'y ajoute rien de lui-même et n'y coche
