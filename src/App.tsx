@@ -129,9 +129,12 @@ export default function App() {
   /* LES SOMMEILS (2026-09-21, « fais moi l'écran nouveau sommeil et
      confirmation ») : la table `sleepLogs` de la V1. */
   const [dernierSommeil, setDernierSommeil] = useState<SleepLog | null>(null);
-  const validerSommeil = (sommeil: SleepLog) => {
+  /* `fini` faux : le second écran a consigné avec la note d'avance, la page
+     continue vers la note (2026-09-21) ; vrai : la confirmation suit. */
+  const validerSommeil = (sommeil: SleepLog, fini: boolean) => {
     journaux.consignerSommeil(sommeil);
     setDernierSommeil(sommeil);
+    if (!fini) return;
     setMiseAJour(modification);
     setModification(false);
     setPage('confirmation-sommeil');

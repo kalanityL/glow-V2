@@ -708,7 +708,20 @@ formulaire de la V1 (`SleepForm.tsx`, `useSleepForm.ts`) et ses règles
 (SPEC § « Le sommeil ») : **d'abord la nature seule, Nuit ou Sieste, deux
 gros boutons ; puis la suite, avec une toute petite encoche de retour**
 (« d'abord 2 gros boutons : nuit ou sieste ; ensuite la suite du
-formulaire, avec une très petite encoche de retour ») ; **chaque bord est
+formulaire, avec une très petite encoche de retour ») — **et la suite tient
+sur un écran si elle tient sans défiler, sinon elle se coupe après la
+jauge** (2026-09-21, « le reste : si ça tient sur une page sans scroll, sur
+une page. Sinon on coupe après la barre de progression et Valider envoie
+sur l'écran suivant où on donne une note et où on peut ajouter une note ;
+validation de l'écran de durée enregistre le sommeil avec la note par
+défaut et sans commentaire, le 3ème écran met à jour — ainsi si le 3ème
+écran est fermé, on aura quand même une note/5 ») : la suite est mesurée
+avant la peinture ; en deux écrans, Valider consigne le sommeil avec la
+note d'avance, et le troisième écran — son fil d'Ariane en tête, « Sieste ·
+Hier 14:00 · Aujourd'hui 15:00 » (« fil d'ariane pour 3ème écran ») — le
+met à jour ; **la note proposée d'avance est celle du dernier sommeil de
+même nature** (« reprendre la note de la nuit précédente la plus proche ;
+idem pour sieste », `noteParDefaut`, testé), 3 sans aucun ; **chaque bord est
 une carte, d'après son dessin** (« utilise ce design sauf rien en gras ; ne
 mets pas les pictos endormissement / réveil ») : le nom, le jour en gris
 dessous (« Hier », « Aujourd'hui » ou la date, le calendrier au clic), le

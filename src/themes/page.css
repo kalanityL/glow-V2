@@ -3295,3 +3295,20 @@
   );
   transition: width 120ms, background 120ms;
 }
+
+/* LE FIL D'ARIANE du troisième écran du sommeil (2026-09-21) : la nature,
+   l'endormissement, le réveil, séparés d'un point médian, en gris. */
+.sommeil__fil {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 6px;
+  margin: 0;
+  font-family: var(--font-body);
+  font-size: 14px;
+  color: var(--encre-chapeau);
+}
+
+.sommeil__fil-point {
+  color: var(--option-filet);
+}

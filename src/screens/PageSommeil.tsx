@@ -1,4 +1,4 @@
-import { useState, type CSSProperties, type FormEvent } from 'react';
+import { useLayoutEffect, useRef, useState, type CSSProperties, type FormEvent } from 'react';
 import { BarreDuBas, type AjoutTraitement } from './BarreDuBas';
 import { EntetePage } from './EntetePage';
 import type { FondProps } from './Accueil';
@@ -16,11 +16,11 @@ import {
   HEURES_PAR_DEFAUT,
   LONGUE_DUREE_MIN,
   NATURES,
-  QUALITE_PAR_DEFAUT,
   SOMMEILS_PAR_JOUR_MAX,
   dureeEcrite,
   dureeMinutes,
   jaugeDuSommeil,
+  noteParDefaut,
   peutAjouterSommeil,
   sommeilEnConflit,
   veille,
@@ -64,7 +64,9 @@ export function PageSommeil({
   sommeils: readonly SleepLog[];
   forme: Forme | null;
   initiale?: SleepLog;
-  onValider: (sommeil: SleepLog) => void;
+  /** Le sommeil consigné ; `fini` dit si l'écran de confirmation suit — ou
+      si la page continue, vers la note (2026-09-21). */
+  onValider: (sommeil: SleepLog, fini: boolean) => void;
   onAnnuler?: () => void;
   onAccueil: () => void;
   onOuvrirCompte: () => void;
@@ -81,7 +83,9 @@ export function PageSommeil({
   const [heureCoucher, setHeureCoucher] = useState(initiale?.bedTime ?? HEURES_PAR_DEFAUT.nuit.coucher);
   const [dateReveil, setDateReveil] = useState(initiale?.date ?? aujourdhui);
   const [heureReveil, setHeureReveil] = useState(initiale?.time ?? HEURES_PAR_DEFAUT.nuit.reveil);
-  const [qualite, setQualite] = useState(initiale?.quality ?? QUALITE_PAR_DEFAUT);
+  /* LA NOTE PROPOSÉE D'AVANCE : celle du dernier sommeil de même nature
+     (2026-09-21) ; changer de nature au premier écran la repose. */
+  const [qualite, setQualite] = useState(initiale?.quality ?? noteParDefaut(sommeils, initiale?.kind ?? 'nuit', aujourdhui, HEURES_PAR_DEFAUT.nuit.reveil));
   const [notes, setNotes] = useState(initiale?.notes ?? '');
   const [notesOuvertes, setNotesOuvertes] = useState(Boolean(initiale?.notes));
   const [edite, setEdite] = useState<'dateCoucher' | 'heureCoucher' | 'dateReveil' | 'heureReveil' | null>(null);
@@ -89,7 +93,24 @@ export function PageSommeil({
      ensuite la suite du formulaire, avec une très petite encoche de
      retour ») : la nature d'abord, seule ; puis le reste, avec une encoche
      qui ramène au choix. En modification, on arrive sur la suite. */
-  const [etape, setEtape] = useState<'nature' | 'suite'>(modification ? 'suite' : 'nature');
+  const [etape, setEtape] = useState<'nature' | 'suite' | 'note'>(modification ? 'suite' : 'nature');
+  /* UN OU DEUX ÉCRANS APRÈS LA NATURE (2026-09-21, « le reste : si ça tient
+     sur une page sans scroll, sur une page. Sinon on coupe après la barre de
+     progression et Valider envoie sur l'écran suivant où on donne une note
+     et où on peut ajouter une note ») : la suite est rendue entière une
+     fois, mesurée avant la peinture ; si elle déborde, la note et les notes
+     passent au troisième écran. Validé, le second écran ENREGISTRE le
+     sommeil avec la note d'avance et sans commentaire ; le troisième le met
+     à jour — fermé avant, le sommeil a quand même sa note. */
+  const corps = useRef<HTMLDivElement>(null);
+  const [enDeuxEcrans, setEnDeuxEcrans] = useState<boolean | null>(null);
+  useLayoutEffect(() => {
+    if (etape !== 'suite' || enDeuxEcrans !== null) return;
+    const zone = corps.current;
+    if (zone) setEnDeuxEcrans(zone.scrollHeight > zone.clientHeight + 1);
+  }, [etape, enDeuxEcrans]);
+  /* L'identifiant du sommeil déjà consigné par le second écran. */
+  const [idConsigne, setIdConsigne] = useState<string | null>(initiale?.id ?? null);
   /* Le refus, dit sous le formulaire ; la question des douze heures, armée. */
   const [refus, setRefus] = useState<string | null>(null);
   const [questionArmee, setQuestionArmee] = useState(false);
@@ -115,6 +136,7 @@ export function PageSommeil({
       setDateCoucher(n === 'nuit' ? veille(dateReveil) : dateReveil);
     }
     retouche(setNature)(n);
+    if (!modification) setQualite(noteParDefaut(sommeils, n, dateReveil, heureReveil));
   };
 
   const valider = (evenement: FormEvent) => {
@@ -128,20 +150,21 @@ export function PageSommeil({
       setQuestionArmee(true);
       return;
     }
-    const conflit = sommeilEnConflit(sommeils, plage, initiale?.id);
+    const conflit = sommeilEnConflit(sommeils, plage, idConsigne ?? undefined);
     if (conflit) {
       const ecrite = `du ${formaterDateCourte(conflit.bedDate, langue)} ${conflit.bedTime} au ${formaterDateCourte(conflit.date, langue)} ${conflit.time}`;
       setRefus(textes.sommeil.refusRecouvrement(ecrite, modification));
       setQuestionArmee(false);
       return;
     }
-    if (!peutAjouterSommeil(sommeils, dateReveil, initiale?.id)) {
+    if (!peutAjouterSommeil(sommeils, dateReveil, idConsigne ?? undefined)) {
       setRefus(textes.sommeil.refusPlafond(SOMMEILS_PAR_JOUR_MAX));
       setQuestionArmee(false);
       return;
     }
-    onValider({
-      id: initiale?.id ?? idSommeil(),
+    const id = idConsigne ?? idSommeil();
+    const sommeil: SleepLog = {
+      id,
       date: dateReveil,
       time: heureReveil,
       bedDate: dateCoucher,
@@ -149,7 +172,13 @@ export function PageSommeil({
       kind: nature,
       quality: qualite,
       ...(notes.trim() ? { notes: notes.trim() } : {}),
-    });
+    };
+    /* En deux écrans, le second consigne avec la note d'avance et passe la
+       main au troisième ; le troisième met à jour et finit. */
+    const continuer = etape === 'suite' && enDeuxEcrans === true;
+    setIdConsigne(id);
+    onValider(sommeil, !continuer);
+    if (continuer) setEtape('note');
   };
 
   /* LE JOUR EN MOTS, POUR LES DEUX BORDS (2026-09-21, « endormissement :
@@ -194,6 +223,39 @@ export function PageSommeil({
     </div>
   );
 
+  /* LA NOTE EN ÉTOILES (2026-09-21, « notez votre nuit ou notez votre
+     sieste » ; pas de mot dessous) et les notes : sur la suite quand tout
+     tient, sinon sur le troisième écran. */
+  const noteEtNotes = (
+    <>
+      <p className="prise__etiquette">{textes.sommeil.qualite(nature)}</p>
+      <NoteEtoiles valeur={qualite} onValeur={retouche(setQualite)} nom={textes.sommeil.qualite(nature)} noms={textes.sommeil.qualites} />
+      {notesOuvertes ? (
+        <>
+          <button type="button" className="prise__lien" onClick={() => setNotesOuvertes(false)}>
+            <IconeCroix />
+            <span>{textes.prise.masquerNotes}</span>
+          </button>
+          <textarea
+            ref={montrerEnEntier}
+            className="prise__notes"
+            rows={2}
+            maxLength={NOTE_MAX}
+            placeholder={textes.prise.notesVide}
+            aria-label={textes.prise.notes}
+            value={notes}
+            onChange={(e) => setNotes(e.target.value)}
+          />
+        </>
+      ) : (
+        <button type="button" className="prise__lien" onClick={() => setNotesOuvertes(true)}>
+          <IconePlus />
+          <span>{textes.prise.notes}</span>
+        </button>
+      )}
+    </>
+  );
+
   return (
     <div className={`page page--photo page--fond-${fond.apercu ?? fond.courant} ${classeDuTheme('blanc')}`}>
       <div className="page__colonne">
@@ -227,8 +289,8 @@ export function PageSommeil({
                 ))}
               </div>
             </div>
-          ) : (
-          <div className="prise__corps">
+          ) : etape === 'suite' ? (
+          <div className="prise__corps" ref={corps}>
             {/* L'ENCOCHE DE RETOUR, toute petite, et la nature choisie. */}
             <button type="button" className="sommeil__retour" onClick={() => setEtape('nature')} aria-label={textes.retour}>
               <IconeChevronGauche />
@@ -259,43 +321,37 @@ export function PageSommeil({
               <span className="sommeil__jauge-plein" />
             </div>
 
-            {/* LA NOTE EN ÉTOILES (2026-09-21, « notez votre nuit ou notez
-                votre sieste »). */}
-            <p className="prise__etiquette">{textes.sommeil.qualite(nature)}</p>
-            {/* Pas de mot sous les étoiles (2026-09-21, « pas de label aux
-                étoiles ») : le nom de la valeur ne se dit qu'à qui écoute. */}
-            <NoteEtoiles valeur={qualite} onValeur={retouche(setQualite)} nom={textes.sommeil.qualite(nature)} noms={textes.sommeil.qualites} />
-
-            {notesOuvertes ? (
-              <>
-                <button type="button" className="prise__lien" onClick={() => setNotesOuvertes(false)}>
-                  <IconeCroix />
-                  <span>{textes.prise.masquerNotes}</span>
-                </button>
-                <textarea
-                  ref={montrerEnEntier}
-                  className="prise__notes"
-                  rows={2}
-                  maxLength={NOTE_MAX}
-                  placeholder={textes.prise.notesVide}
-                  aria-label={textes.prise.notes}
-                  value={notes}
-                  onChange={(e) => setNotes(e.target.value)}
-                />
-              </>
-            ) : (
-              <button type="button" className="prise__lien" onClick={() => setNotesOuvertes(true)}>
-                <IconePlus />
-                <span>{textes.prise.notes}</span>
-              </button>
-            )}
+            {enDeuxEcrans !== true ? noteEtNotes : null}
 
             {refus ? <p className="regle regle--manquee prise__regle">{refus}</p> : null}
             <IndiceDefilement />
           </div>
+          ) : (
+          <div className="prise__corps">
+            {/* LE TROISIÈME ÉCRAN : la note et les notes, sur un sommeil déjà
+                consigné. En tête, LE FIL D'ARIANE (2026-09-21, « Sieste ·
+                hier/aujourd'hui date endormissement + heure · hier/aujourd'hui
+                date réveil + heure »). */}
+            <p className="sommeil__fil">
+              <span>{textes.sommeil.natures[nature]}</span>
+              <span className="sommeil__fil-point" aria-hidden="true">·</span>
+              <span>
+                {jourEcrit(dateCoucher)} {heureCoucher}
+              </span>
+              <span className="sommeil__fil-point" aria-hidden="true">·</span>
+              <span>
+                {jourEcrit(dateReveil)} {heureReveil}
+              </span>
+            </p>
+            <p className="sommeil__duree">
+              <span>{dureeEcrite(duree)}</span> {textes.sommeil.dureeSuite}
+            </p>
+            {noteEtNotes}
+            <IndiceDefilement />
+          </div>
           )}
 
-          {etape === 'suite' ? (
+          {etape !== 'nature' ? (
           <div className="prise__pied">
             {modification ? (
               <button type="button" className="bouton bouton--second prise__valider" onClick={onAnnuler}>
@@ -304,7 +360,7 @@ export function PageSommeil({
             ) : null}
             <button type="submit" className="bouton prise__valider">
               <IconeCoche />
-              <span>{questionArmee ? textes.sommeil.confirmerChoix : modification ? textes.sommeil.mettreAJour : textes.prise.valider}</span>
+              <span>{questionArmee ? textes.sommeil.confirmerChoix : modification || etape === 'note' ? textes.sommeil.mettreAJour : textes.prise.valider}</span>
             </button>
           </div>
           ) : null}

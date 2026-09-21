@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { avecLeSommeil, dureeEcrite, dureeMinutes, jaugeDuSommeil, peutAjouterSommeil, seRecouvrent, sommeilEnConflit, veille } from './sommeils';
+import { avecLeSommeil, dureeEcrite, dureeMinutes, jaugeDuSommeil, noteParDefaut, peutAjouterSommeil, seRecouvrent, sommeilEnConflit, veille } from './sommeils';
 import type { SleepLog } from '../donnees/v1';
 
 const nuit: SleepLog = { id: 's-1', bedDate: '2026-09-11', bedTime: '23:00', date: '2026-09-12', time: '07:00', kind: 'nuit', quality: 3 };
@@ -60,5 +60,23 @@ describe('jaugeDuSommeil', () => {
   });
   it('une durée nulle : vide', () => {
     expect(jaugeDuSommeil('nuit', 0)).toEqual({ remplissage: 0, intensite: 0 });
+  });
+});
+
+describe('noteParDefaut', () => {
+  const j = [
+    { ...nuit, id: 'n1', date: '2026-09-10', quality: 2 },
+    { ...nuit, id: 'n2', date: '2026-09-18', quality: 5 },
+    { ...nuit, id: 's1', date: '2026-09-15', kind: 'sieste' as const, quality: 1 },
+    { ...nuit, id: 'n3', date: '2026-09-25', quality: 4 },
+  ];
+  it('reprend la note du sommeil de même nature le plus proche avant', () => {
+    expect(noteParDefaut(j, 'nuit', '2026-09-21', '07:00')).toBe(5);
+    expect(noteParDefaut(j, 'sieste', '2026-09-21', '15:00')).toBe(1);
+    expect(noteParDefaut(j, 'nuit', '2026-09-12', '07:00')).toBe(2);
+  });
+  it('sans sommeil avant, la qualité de 3', () => {
+    expect(noteParDefaut(j, 'nuit', '2026-09-01', '07:00')).toBe(3);
+    expect(noteParDefaut([], 'sieste', '2026-09-21', '15:00')).toBe(3);
   });
 });

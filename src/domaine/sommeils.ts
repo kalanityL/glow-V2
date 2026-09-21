@@ -120,3 +120,19 @@ export function jaugeDuSommeil(nature: SleepKind, minutes: number): { remplissag
     intensite: m <= pleine ? 0 : Math.min(1, (m - pleine) / (haute - pleine)),
   };
 }
+
+/**
+ * LA NOTE PROPOSÉE D'AVANCE (2026-09-21, « note par défaut d'une nuit :
+ * reprendre la note de la nuit précédente la plus proche ; idem pour
+ * sieste ») : celle du sommeil de même nature le plus récent AVANT ce
+ * réveil ; sans aucun, la qualité de 3.
+ */
+export function noteParDefaut(sommeils: readonly SleepLog[], nature: SleepKind, date: string, time: string): number {
+  let retenu: SleepLog | null = null;
+  for (const s of sommeils) {
+    if (s.kind !== nature) continue;
+    if (s.date > date || (s.date === date && s.time >= time)) continue;
+    if (!retenu || s.date > retenu.date || (s.date === retenu.date && s.time > retenu.time)) retenu = s;
+  }
+  return retenu?.quality ?? QUALITE_PAR_DEFAUT;
+}
