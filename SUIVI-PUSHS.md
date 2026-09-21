@@ -10,6 +10,51 @@ du push seul, jusqu'au jour où un déploiement existera.
 
 ---
 
+## 2026-09-21 — quatrième push · 34 commits (`c54f5af..9552398`) · déployé
+
+**Poussé et déployé sur sa demande** (« push et deploy »), quatrième
+déploiement sur `https://glow-private-v2.web.app` ; celui de la V1 n'est
+pas touché. Cette entrée est écrite AVANT le push et part avec lui.
+
+**Vérifié avant envoi :** `tsc` silencieux, `npm test` 67/67,
+`npm run build` vert (`index-C65X9RpW.js`).
+
+**Ce que le lot contient** — du 20 septembre au soir au 21 :
+- LA BASE DE LA V1, reprise telle quelle : l'objet racine `AppData` sous
+  la clé `glp1_app_companion_data` — profil (avec l'avatar dans les mots de
+  la V1), pesées (`WeightLog`, le départ marqué de son drapeau), prises
+  (`InjectionLog`) —, ses identifiants, ses zones, ses invariants ; ce que
+  la V1 ne porte pas sous `glp1_v2_reponses` ; l'enregistrement d'avant
+  migré une fois. Tout ce qu'on saisit survit au rechargement.
+- La page d'une PRISE (le formulaire de la V1 : date et heure d'abord, le
+  traitement et un bouton par dosage plus « Autre », six boutons de zone,
+  les notes, deux prises par jour) et la page d'une PESÉE (la règle crantée,
+  le poids proposé = la pesée la plus récente non future, une par jour,
+  « Une saisie existe déjà le … La mettre à jour ? »), toutes deux en
+  modification depuis l'écran de confirmation ; sans traitement, le « + »
+  ouvre d'abord « Mon traitement ».
+- L'ÉCRAN DE CONFIRMATION générique, avec son image de validation ; la carte
+  qui rouvre le formulaire ; « Vous pouvez maintenant : ».
+- La règle crantée : au dixième, tige bleue de 2 px sur son cran, aimant
+  immédiat, piste dessinée autour du poids (ouverture 4 fois plus rapide),
+  toute la zone sous le chiffre qui glisse, en silence.
+- LA CHARTE DES FORMULAIRES (sobre, sans icône en couleur, sans ligne, sans
+  bleu, focus léger, bandeau de titre à la couleur de la V1 figé avec le
+  bouton, corps qui défile) et le même bouton choisi partout, aux couleurs
+  de son image.
+- AUCUN `select` NATIF : les choix, l'heure et le calendrier en panneaux
+  dessinés dans l'écran ; l'indice de défilement partout où ça défile.
+- Les fonds : Fleurs, Brasserie, les dix de sa planche, « Aucun » ; le logo
+  et l'entête aux couleurs de l'image (`scripts/palette-fonds.py`) ; l'image
+  nette ; le clic sur le fond n'ouvre le thème que sur l'accueil.
+- Le pilote de Chrome par DevTools (`scripts/piloter-chrome.mjs`) pour
+  vérifier les gestes, et la règle : une image de référence se mesure.
+
+**Défauts corrigés en route :** le chiffre et la graduation qui se
+contredisaient (une seule source à la fois) ; la tige emportée hors de vue
+par le défilement ; l'indice de défilement absent de l'avatar et après
+« Injection » ; l'oubli des hashs de commit dans les réponses.
+
 ## 2026-09-20 — troisième push · 49 commits (`183a88d..deb6fad`) · déployé
 
 **Poussé et déployé sur sa demande** (« push deploy »), troisième
