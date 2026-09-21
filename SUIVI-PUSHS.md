@@ -10,6 +10,35 @@ du push seul, jusqu'au jour où un déploiement existera.
 
 ---
 
+## 2026-09-21 — septième push · 17 commits (`2034715..d0ad92a`) · déployé
+
+**Poussé et déployé sur sa demande** (« ok push et deploy tout »), septième
+déploiement sur `https://glow-private-v2.web.app`. Entrée écrite avant le
+push.
+
+**Vérifié avant envoi :** `tsc` silencieux, `npm test` 73/73,
+`npm run build` vert (`index-BLgHfq0U.js`).
+
+**Ce que le lot contient :**
+- LA PAGE D'UN SOMMEIL et sa confirmation : le formulaire de la V1 et ses
+  règles (durée nulle refusée, question au-delà de douze heures,
+  recouvrement refusé, quinze par jour), en deux temps — Nuit ou Sieste en
+  gros boutons, puis la suite avec son encoche ; chaque bord en carte
+  d'après son dessin `horloge.png` (couleurs relevées au pixel), avec un
+  CADRAN dont la boule se glisse, les crans d'une montre, l'arc en dégradé
+  le long de l'arc ; « Hier » / « Aujourd'hui » ; la note en cinq étoiles
+  dans le dégradé du « + », sans mot ; largeurs fixées.
+- Le clic hors d'un bloc au doigt comme à la souris.
+- L'indice de défilement dans le coin droit, sans anneau.
+- Les réponses à choisir de l'avatar au style des formulaires.
+- Le fond « Café parisien » remplacé par sa nouvelle image.
+- La règle crantée qui clique à chaque cran, du son de sa roue de la
+  fortune (huit morceaux découpés, une file à 45 ms).
+- Son TODO : la limite du 1er mois gratuit.
+
+**Non vérifié sur Android :** le clic hors bloc au doigt, le glissement de
+la boule du cadran, les étoiles au doigt, les clics.
+
 ## 2026-09-21 — sixième push · 1 commit (`fd237aa..ffb1bf6`) · déployé
 
 **Poussé et déployé sur sa demande** (« push et deploy »), sixième
