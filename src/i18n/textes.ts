@@ -684,7 +684,10 @@ const FR: Textes = {
       comprime: 'Prise mise à jour !',
     },
     titrePesee: 'Pesée enregistrée !',
-    titrePeseeMiseAJour: 'Pesée mise à jour !',
+    /* « Balance mise à jour ! » (2026-09-21 au soir, « Pesée mise à jour
+       !->Balance mise à jour ! ») — le nom de la page (VOCABULAIRE :
+       « LE titre de la page est balance, donc balance »). */
+    titrePeseeMiseAJour: 'Balance mise à jour !',
     titreSommeil: 'Sommeil enregistré !',
     titreSommeilMiseAJour: 'Sommeil mis à jour !',
     sousTitre: 'Votre suivi est à jour.',

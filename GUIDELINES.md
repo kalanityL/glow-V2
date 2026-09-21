@@ -707,10 +707,11 @@ existe déjà le JJ/MM/AAAA. » — puis, depuis le 2026-09-21 au soir, « Une
 saisie existe déjà le JJ/MM/AAAA. La mettre à jour ? » — Non / Oui — Non
 ferme le formulaire sans rien écrire (« non -> ferme le formulaire sans
 enregistrer »), et rien ne s'écrit sans ce oui ; mise à jour, la
-confirmation titre « Pesée mise à jour ! » (« si mise à jour, remplacer
-Pesée mise à jour ! »). Sa confirmation est LE MÊME ÉCRAN que celui
+confirmation titre « Balance mise à jour ! » (« si mise à jour, remplacer
+Pesée mise à jour ! », puis le soir du 2026-09-21 « Pesée mise à jour
+!->Balance mise à jour ! » — le nom de la page). Sa confirmation est LE MÊME ÉCRAN que celui
 de la prise (« exactement meme principe »), `PageConfirmation` devenu
-générique : « Pesée enregistrée ! » / « Pesée mise à jour ! », la carte —
+générique : « Pesée enregistrée ! » / « Balance mise à jour ! », la carte —
 l'icône de la balance et le poids côte à côte sans intitulé (« supprimer le
 label poids et mettre directement icone balance et valeur de poids à
 côté »), la date, et l'heure précédée de son icône (« mettre icone heure
