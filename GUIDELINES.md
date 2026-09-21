@@ -283,7 +283,11 @@ thèmes ne repeignent pas, et qui ne sont pas dans les templates non plus.
   d'une pesée, les lignes de « Mon compte », les champs de l'onboarding —
 et les réponses à choisir (`.option`, l'avatar de « Mon compte » compris :
 « modif avatar : bouton activé/desactivé -> mettre meme style que
-formulaire »), qui ont la matière des boutons de dosage et de zone.
+formulaire », puis « idem pour tous les endroits où il y a ce genre de
+bouton »), qui ont la matière des boutons de dosage et de zone — et de
+même le cadre choisi du thème, le cran choisi d'une roue (sans gras), le
+jour choisi du calendrier, la valeur choisie d'un panneau : le bleu pâle
+cerné de bleu grisé, jamais l'anneau bleu franc.
 - **CHAQUE DONNÉE EST ÉCRITE DANS LA BASE DE LA V1, TELLE QUELLE** (2026-09-21,
   « NON NON NON. Pour chaque formulaire tu reprends de la v1 la structure
   de la base de données correspondante. chaque formulaire et chaque

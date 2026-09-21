@@ -53,6 +53,12 @@ export async function ouvrirChrome(url, { port = 9333, largeur = 520, hauteur = 
   /** Le centre d'un élément, pour y viser un geste. */
   const centre = (selecteur) =>
     lire(`(() => { const r = document.querySelector(${JSON.stringify(selecteur)}).getBoundingClientRect(); return { x: r.x + r.width / 2, y: r.y + r.height / 2 }; })()`);
+  /** Clique au centre de l'élément que rend une expression JavaScript. */
+  const clicSur = async (expression) => {
+    const { x, y } = await lire(`(() => { const r = (${expression}).getBoundingClientRect(); return { x: r.x + r.width / 2, y: r.y + r.height / 2 }; })()`);
+    await send('Input.dispatchMouseEvent', { type: 'mousePressed', x, y, button: 'left', clickCount: 1 });
+    await send('Input.dispatchMouseEvent', { type: 'mouseReleased', x, y, button: 'left', clickCount: 1 });
+  };
   const clic = async (selecteur) => {
     const { x, y } = await centre(selecteur);
     await send('Input.dispatchMouseEvent', { type: 'mousePressed', x, y, button: 'left', clickCount: 1 });
@@ -64,5 +70,5 @@ export async function ouvrirChrome(url, { port = 9333, largeur = 520, hauteur = 
     await sommeil(300);
     spawn('rm', ['-rf', profil]);
   };
-  return { send, lire, centre, clic, sommeil, fermer };
+  return { send, lire, centre, clic, clicSur, sommeil, fermer };
 }

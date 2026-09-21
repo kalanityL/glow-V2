@@ -120,12 +120,22 @@ export function surDefilementDisponible(zone: HTMLElement | null, quand: (dispon
   const mesurer = () => quand(zone.scrollHeight - zone.scrollTop - zone.clientHeight > 4);
   mesurer();
   zone.addEventListener('scroll', mesurer, { passive: true });
-  const observateur = new ResizeObserver(mesurer);
-  observateur.observe(zone);
-  for (const enfant of Array.from(zone.children)) observateur.observe(enfant);
+  const tailles = new ResizeObserver(mesurer);
+  tailles.observe(zone);
+  for (const enfant of Array.from(zone.children)) tailles.observe(enfant);
+  /* CE QUI APPARAÎT APRÈS COUP (2026-09-21, « je clique sur aucun puis sur
+     injection : la petite indication de scroll n'est pas là ») : une liste
+     qui se déplie est un enfant nouveau, que l'observateur de tailles ne
+     connaissait pas — on le mesure, et on l'observe à son tour. */
+  const enfants = new MutationObserver(() => {
+    for (const enfant of Array.from(zone.children)) tailles.observe(enfant);
+    mesurer();
+  });
+  enfants.observe(zone, { childList: true, subtree: true });
   return () => {
     zone.removeEventListener('scroll', mesurer);
-    observateur.disconnect();
+    tailles.disconnect();
+    enfants.disconnect();
   };
 }
 

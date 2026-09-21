@@ -286,8 +286,10 @@
   transform: scale(0.98);
 }
 
+/* Le cadre choisi, cerné du bleu grisé des boutons choisis (2026-09-21,
+   « idem pour tous les endroits où il y a ce genre de bouton »). */
 .carte-theme--choisi {
-  box-shadow: 0 0 0 2px var(--accent);
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--accent) 45%, var(--option-choisi-fond));
 }
 
 /* ── UN SÉLECTEUR DE MESURE ─────────────────────────────────────────────── */
@@ -415,7 +417,8 @@
 
 .roue__cran--choisi {
   background: var(--option-choisi-fond);
-  font-weight: 700;
+  /* Rien en gras (2026-09-21, la charte des formulaires). */
+  font-weight: 500;
 }
 
 /* L'unité, commune au sélecteur et à toute saisie à venir : une étiquette, pas
@@ -2609,6 +2612,7 @@
 
 /* La valeur choisie : le fond des réponses choisies, l'accent. */
 .panneau__option--choisie {
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--accent) 18%, var(--option-choisi-fond));
   background: var(--option-choisi-fond);
   color: var(--encre);
 }
@@ -2726,9 +2730,11 @@
   border-color: var(--bille-eteinte);
 }
 
+/* Le jour choisi, comme un bouton choisi (2026-09-21). */
 .calendrier__jour--choisi {
-  background: var(--encre);
-  color: var(--module-fond);
+  border-color: color-mix(in srgb, var(--accent) 18%, var(--option-choisi-fond));
+  background: var(--option-choisi-fond);
+  color: var(--encre);
   opacity: 1;
 }
 
