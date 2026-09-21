@@ -1968,17 +1968,18 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 0;
+  gap: 18px;
   padding-top: 18px;
 }
 
 /* TOUTE LA ZONE SOUS LE CHIFFRE GLISSE (2026-09-21, « il faut que toute la
    zone entre le bas des chiffres et le haut du bouton valider puisse slider
-   le poid, pas uniquement la zone de hauteur de cran ») : la graduation
-   prend toute la hauteur qui reste, ses crans posés en bas, et c'est tout
-   le cadre qui défile — le doigt peut partir de n'importe où dessous. */
+   le poid, pas uniquement la zone de hauteur de cran ») : le cadre qui
+   défile est plus haut que la piste — les crans restent À LEUR PLACE, sous
+   le chiffre, et l'espace vide dessous glisse aussi (« pkoi tu as changé
+   l'espace entre les crans et le poids ? » : il ne devait pas bouger). */
 .poids .graduation {
-  min-height: 132px;
+  min-height: 116px;
 }
 
 /* Le chiffre, en grand, dans la police de titre ; son unité petite à côté. */
@@ -2094,8 +2095,7 @@
 }
 
 .graduation__piste {
-  min-height: calc(var(--graduation-nombres) + var(--graduation-cran) * 2);
-  height: 100%;
+  height: calc(var(--graduation-nombres) + var(--graduation-cran) * 2);
   padding-inline: calc(50% - var(--graduation-pas) / 2);
   width: max-content;
 }
@@ -2151,7 +2151,7 @@
 .graduation__nombre {
   position: absolute;
   left: 50%;
-  bottom: calc(var(--graduation-cran) * 2 + 6px);
+  top: 0;
   transform: translateX(-50%);
   font-family: var(--font-body);
   font-size: 12px;
@@ -2171,10 +2171,12 @@
   grid-area: 1 / 1;
   /* Posée COMME UN CRAN : le bord gauche au milieu de la largeur, comme le
      trait d'un cran l'est au milieu du sien (`left: 50%`) — centrée, elle
-     tombait un demi-pixel à côté. */
+     tombait un demi-pixel à côté. En haut du cadre, sous les nombres, sur
+     la ligne des crans : le cadre est plus haut que la piste. */
   justify-self: start;
   margin-left: 50%;
-  align-self: end;
+  align-self: start;
+  margin-top: var(--graduation-nombres);
   /* DEUX PIXELS (2026-09-20, « épaisseur tige bleue : 2px » — un pixel
      comme les crans l'instant d'avant) : le bord gauche sur celui du cran
      qu'elle désigne, elle le RECOUVRE (« tige bleue par dessus et rend
