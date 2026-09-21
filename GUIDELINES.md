@@ -390,7 +390,16 @@ cerné de bleu grisé, jamais l'anneau bleu franc.
   aurait l'air d'être la bonne réponse. Une réponse orpheline prend toute la
   largeur. Traiter les styles **par famille, pas par chaîne**.
 - **Le cadre du téléphone** : toute la largeur sous 768 px, 45 % de la fenêtre
-  au-dessus, borné 300–480 px ; 80 % de la hauteur.
+  au-dessus, borné 300–480 px ; 96 % de la hauteur (80 % jusqu'au 2026-09-16).
+  **Sur `/long`, et là seulement, l'écran fait 850 px** (2026-09-21, « ne
+  touche pas à http://localhost:3002/ sur http://localhost:3002/long fait
+  sert exactement la meme chose mais dans une simulation de telephone où
+  la hauteur d ecran sans les bords du téléphone fasse 850px ») : la même
+  application, dans un cadre de hauteur fixe (914 px : 850 d'écran, deux
+  bordures de 10, la barre du bas de 44) qui peut dépasser la fenêtre — elle
+  défile alors, le cadre reste centré en largeur ; le chemin est lu par
+  `cheminDeLaPage()` (`plateforme/navigateur.ts`) et pose `app-root--long`
+  (`index.css`). Sur `/`, rien ne change.
 - **Aucune animation de tracé, aucun `transition: all`** : les propriétés qui
   bougent sont nommées ; un fondu léger est le maximum, et il doit se
   transposer en natif. **Une exception, consignée** (2026-09-20, « le menu

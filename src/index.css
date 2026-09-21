@@ -41,6 +41,28 @@ body {
   }
 }
 
+/* LE TÉLÉPHONE LONG, SUR `/long` SEULEMENT (2026-09-21, « ne touche pas à
+   http://localhost:3002/ sur http://localhost:3002/long fait sert exactement
+   la meme chose mais dans une simulation de telephone où la hauteur d ecran
+   sans les bords du téléphone fasse 850px ») : le cadre ne suit plus la
+   fenêtre, il a la hauteur fixe qui donne à l'écran ses 850 px. Il peut
+   donc dépasser la fenêtre : la racine grandit avec lui au lieu de le
+   rogner, et c'est la fenêtre qui défile — `min-height` garde le cadre
+   centré dans une fenêtre plus haute que lui. Sur `/`, rien ne change. */
+.app-root--long {
+  height: auto;
+  min-height: 100dvh;
+  overflow: visible;
+}
+
+.app-root--long .phone-frame {
+  /* 850 px d'écran, plus les deux bordures de 10 px du cadre, plus la barre
+     du bas (44 px, mesurée : 2 rem de bouton et 0,375 rem de rembourrage de
+     chaque côté). L'écran prend ce que le cadre lui laisse (`flex: 1`),
+     c'est donc le cadre qu'on fixe. */
+  height: 914px;
+}
+
 /* Le téléphone lui-même : bordure épaisse sombre, coins très arrondis. */
 .phone-frame {
   position: relative;

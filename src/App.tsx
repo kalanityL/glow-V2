@@ -22,6 +22,7 @@ import type { InjectionLog, SleepLog, WeightLog } from './donnees/v1';
 import { dureeEcrite, dureeMinutes } from './domaine/sommeils';
 import { traitementDepuisBrand } from './donnees/conversions';
 import type { FondId } from './app/fonds';
+import { cheminDeLaPage } from './plateforme/navigateur';
 /* La mise en page d'abord, les jetons des thèmes ensuite : les feuilles de
    thème doivent pouvoir battre la structure, jamais l'inverse. */
 import './themes/page.css';
@@ -192,8 +193,17 @@ export default function App() {
     else parcours.reculer();
   };
 
+  /* LE TÉLÉPHONE LONG (2026-09-21, « ne touche pas à http://localhost:3002/
+     sur http://localhost:3002/long fait sert exactement la meme chose mais
+     dans une simulation de telephone où la hauteur d ecran sans les bords
+     du téléphone fasse 850px ») : sur `/long`, et là seulement, le cadre a
+     une hauteur fixe qui donne à l'écran 850 px (`index.css`) ; sur `/`,
+     rien ne change. L'adresse est lue une fois, à l'ouverture : elle ne
+     bouge pas pendant la vie de la page. */
+  const telephoneLong = cheminDeLaPage() === '/long';
+
   return (
-    <div className="app-root">
+    <div className={telephoneLong ? 'app-root app-root--long' : 'app-root'}>
       {/* Le contour du téléphone, dessiné en dur — bordure épaisse sombre et
           coins arrondis à toutes les largeurs — pour qu'on distingue ce qui
           est l'écran de ce qui ne l'est pas. */}

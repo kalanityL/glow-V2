@@ -18,6 +18,17 @@ export function languesDuLecteur(): readonly string[] {
 }
 
 /**
+ * LE CHEMIN DE LA PAGE OUVERTE (2026-09-21, « sur http://localhost:3002/long
+ * fait sert exactement la meme chose mais dans une simulation de telephone
+ * où la hauteur d ecran […] fasse 850px ») : `/`, `/long`… Web seulement —
+ * en natif il n'y a pas d'adresse, et le cadre du téléphone qui s'en sert
+ * n'existe pas non plus. `/` quand il n'y a pas de fenêtre (les tests).
+ */
+export function cheminDeLaPage(): string {
+  return typeof window === 'undefined' ? '/' : window.location.pathname;
+}
+
+/**
  * Appelle `quand` à chaque clic HORS de `dedans`, et à la touche Échap.
  * Renvoie ce qui arrête l'écoute. C'est la fermeture ordinaire d'un panneau.
  *
