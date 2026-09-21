@@ -129,8 +129,12 @@ body {
 .phone-screen {
   --zone-sure-haut: 1.75rem;
   /* L'écran est un CONTENEUR (2026-09-20) : la page calcule sa marge sur la
-     largeur de l'écran du téléphone (`cqw`), pas sur celle de la fenêtre. */
-  container-type: inline-size;
+     largeur de l'écran du téléphone (`cqw`), pas sur celle de la fenêtre —
+     et, depuis le 2026-09-21, les tiroirs et les blocs repeignent la photo
+     sur sa hauteur (`cqh`) : un conteneur de TAILLE. Sa hauteur ne dépend
+     pas de son contenu (il prend ce que le cadre lui laisse), la
+     contrainte ne change rien. */
+  container-type: size;
   position: relative;
   flex: 1;
   min-height: 0;

@@ -145,6 +145,11 @@ export function defilerDUnePage(zone: HTMLElement | null): void {
   zone?.scrollBy({ top: Math.max(40, zone.clientHeight * 0.8), behavior: 'smooth' });
 }
 
+/** Amène l'élément entier dans la zone visible, au plus près. */
+export function montrerEnEntier(element: Element | null): void {
+  element?.scrollIntoView({ block: 'nearest' });
+}
+
 /** Amène l'élément au milieu de sa zone de défilement. */
 export function centrerDansSaListe(element: Element | null): void {
   element?.scrollIntoView({ block: 'center' });

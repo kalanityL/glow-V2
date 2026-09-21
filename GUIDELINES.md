@@ -361,6 +361,14 @@ cerné de bleu grisé, jamais l'anneau bleu franc.
   pose dans L'ÉLÉMENT QUI DÉFILE — pas dans son cadre (l'avatar de « Mon
   compte » : la zone des réglages, pas le volet). Toute nouvelle zone qui
   défile le reçoit.
+- **LE TÉLÉPHONE EST LA RÉFÉRENCE, ET CHROME ANDROID A SES PIÈGES**
+  (2026-09-21, ses captures) : un fond découpé par le texte
+  (`background-clip: text`) ne peint pas un enfant transformé — le fond et
+  sa découpe vont SUR la lettre, avec `-webkit-text-fill-color` ; un
+  `position: fixed` dans un ancêtre transformé ou rogné ne couvre pas la
+  bonne surface — on ancre en absolu sur la hauteur de l'écran (`cqh`,
+  l'écran est un conteneur de taille). Un champ qui s'ouvre se montre en
+  entier (« quand on ouvre note, il faut que tout le champ soit visible »).
 - **RIEN NE DÉBORDE JAMAIS, NULLE PART** (V1, sine qua non). Aucun élément ne
   dépasse l'écran du téléphone ni son conteneur. Quand un écran est plus haut
   que le téléphone : d'abord mettre côte à côte, resserrer, ou séparer en deux
@@ -542,7 +550,12 @@ de la page vitré flou », 2026-09-19) — c'est la seule chose qui couvre une
 page, et elle ne l'assombrit pas. **Le fond du tiroir est en très légère
 transparence sur la PHOTO de la page qui l'ouvre, jamais sur son contenu**
 (2026-09-20) : la photo est repeinte sous le tiroir, alignée sur celle de la
-page, sous un voile blanc à 78 %. Il glisse aussi à la fermeture. Ses trois sections, dans son ordre :
+page, sous un voile blanc à 78 % — **ancrée au bas du tiroir et de la
+hauteur de l'écran (`100cqh`), jamais `position: fixed`** (2026-09-21, son
+téléphone : « les menus ne devraient pas laisser voir ce qu'il y a sous
+eux, c'est une transparence directe vers le fond » — `fixed` dans un
+ancêtre transformé et rogné ne couvrait pas la bonne surface sur Chrome
+Android) ; même chose pour les blocs. Il glisse aussi à la fermeture. Ses trois sections, dans son ordre :
 Préférences (Modules, Notifications, Couleurs, Badges), Exporter un bilan
 (Créer, Disponibles), GLP1LOW et vous — le mot-symbole dessiné, puis « et
 vous » — (Mon compte, Sondage, Avis et Feedback, FAQ, Ciel) ; mots courts et

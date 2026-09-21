@@ -962,12 +962,38 @@
    LOW la fin, comme sur l'image. L/P/1, elle, garde sa propre couleur : son
    fond est retiré et son encre remise. En natif, un masque de texte sur un
    dégradé. */
-.entete--accueil .wordmark__lockup,
-.entete--page .wordmark__lockup {
-  background: linear-gradient(to right, var(--marque-degrade-debut), var(--marque-degrade-fin));
+/* LE DÉGRADÉ EST DÉCOUPÉ PAR CHAQUE LETTRE, PAS PAR LE LOCKUP (2026-09-21,
+   son téléphone : « le g et low n'apparaissent pas dans le header ni le
+   header mini ») : G et LOW sont étirés (`transform`), et Chrome sur
+   Android peint un élément transformé dans sa propre couche — un fond
+   découpé par le texte du PARENT ne l'atteint plus, les lettres restaient
+   transparentes. Le fond et sa découpe sont donc sur la lettre même, avec
+   `-webkit-text-fill-color`, la forme que tous les navigateurs honorent :
+   G prend la première moitié du dégradé, LOW la seconde. */
+.entete--accueil .wordmark__g,
+.entete--page .wordmark__g {
+  background: linear-gradient(
+    to right,
+    var(--marque-degrade-debut),
+    color-mix(in srgb, var(--marque-degrade-debut), var(--marque-degrade-fin))
+  );
   -webkit-background-clip: text;
   background-clip: text;
   color: transparent;
+  -webkit-text-fill-color: transparent;
+}
+
+.entete--accueil .wordmark__low,
+.entete--page .wordmark__low {
+  background: linear-gradient(
+    to right,
+    color-mix(in srgb, var(--marque-degrade-debut), var(--marque-degrade-fin)),
+    var(--marque-degrade-fin)
+  );
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  -webkit-text-fill-color: transparent;
 }
 
 .entete--accueil .wordmark__lp1,
@@ -1592,8 +1618,18 @@
    premier calque du même fond. */
 .tiroir::before {
   content: '';
-  position: fixed;
-  inset: 0;
+  /* ANCRÉ, PAS FIXE (2026-09-21, son téléphone : « les menus ne devraient
+     pas laisser voir ce qu'il y a sous eux, c'est une transparence directe
+     vers le fond ») : `position: fixed` dans un ancêtre transformé et rogné
+     ne couvrait pas la bonne surface sur Chrome Android, et le tiroir
+     laissait voir la page. Le fond est posé au bas du tiroir, de toute la
+     hauteur de l'écran (`100cqh`, l'écran est un conteneur de taille) :
+     même cadrage que la photo de la page, sans dépendre de rien. */
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 100cqh;
   z-index: -1;
   background:
     linear-gradient(rgba(255, 255, 255, 0.78), rgba(255, 255, 255, 0.78)),
@@ -1867,8 +1903,12 @@
 
 .bloc::before {
   content: '';
-  position: fixed;
-  inset: 0;
+  /* Ancré au bas de l'écran, de sa hauteur (2026-09-21) : voir le tiroir. */
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: calc(-1 * (100cqh - 100%));
+  height: 100cqh;
   z-index: -1;
   background:
     linear-gradient(rgba(255, 255, 255, 0.78), rgba(255, 255, 255, 0.78)),

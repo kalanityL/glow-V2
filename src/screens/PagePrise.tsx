@@ -21,6 +21,7 @@ import {
   type Zone,
 } from '../domaine/prises';
 import type { ModuleId } from '../app/modules';
+import { montrerEnEntier } from '../plateforme/navigateur';
 import type { useParcours } from '../app/useParcours';
 import { idPrise } from '../donnees/v1';
 import { brandDepuisTraitement } from '../donnees/conversions';
@@ -319,6 +320,10 @@ export function PagePrise({
                   <span>{textes.prise.masquerNotes}</span>
                 </button>
                 <textarea
+                  /* Le champ entier sous les yeux dès qu'il s'ouvre (2026-09-21,
+                     « quand on ouvre note, il faut que tout le champ soit
+                     visible ») : le corps défile jusqu'à lui. */
+                  ref={montrerEnEntier}
                   className="prise__notes"
                   rows={2}
                   maxLength={NOTE_MAX}
