@@ -3135,8 +3135,7 @@
 .etoiles-note {
   display: flex;
   justify-content: center;
-  /* 10 px : les auréoles voisines se touchent sans se recouvrir. */
-  gap: 10px;
+  gap: 6px;
   margin: -6px 0 0;
   padding: 4px 0 8px;
   touch-action: none;
@@ -3167,35 +3166,6 @@
 
 .etoiles-note__fin {
   stop-color: var(--menu-ajouter-fin);
-}
-
-/* L'AURÉOLE (2026-09-21 au soir, « mets leur un effet glow style les
-   comme les etoiles de image pour claude/etoiles », puis « cet effet glow
-   donne une impression d'image flou mal définie. fait un meilleur effet
-   glow ») : un disque de lumière derrière chaque étoile pleine — un
-   dégradé radial dans la couleur de l'étoile (le bout foncé du dégradé du
-   « + »), dense au centre, éteint au bord, dessiné par le composant ; le
-   SVG déborde de son carré pour le porter. L'étoile, elle, reste nette :
-   aucun flou sur sa silhouette (le `drop-shadow` d'avant se lisait comme
-   une image mal définie). Dans son `etoiles.png`, relevé au pixel, le
-   halo est cette lumière ronde fondue dans le fond. */
-.etoiles-note__etoile {
-  overflow: visible;
-}
-
-.etoiles-note__halo-centre {
-  stop-color: var(--menu-ajouter-fin);
-  stop-opacity: 0.55;
-}
-
-.etoiles-note__halo-milieu {
-  stop-color: var(--menu-ajouter-fin);
-  stop-opacity: 0.2;
-}
-
-.etoiles-note__halo-bord {
-  stop-color: var(--menu-ajouter-fin);
-  stop-opacity: 0;
 }
 
 /* LE CADRAN D'UNE HEURE (2026-09-21) : un cercle au filet des champs, quatre

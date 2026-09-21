@@ -785,7 +785,7 @@ temps réel avec les heures (`domaine/sommeils.ts`, `jaugeDuSommeil`,
 testé) ; **la note en étoiles** (« notez votre nuit ou notez votre sieste :
 5 étoiles qu'on peut cliquer ou slider pour remplir, par défaut 3 ») — la
 qualité de 0 à 5 de la V1, sans mot dessous (« pas de label aux
-étoiles »), **à cinq branches, sans contour, auréolées** (2026-09-21 au soir : « notez
+étoiles »), **à cinq branches, sans contour, SANS HALO** (2026-09-21 au soir : « notez
 votre nuit : utiliser la forme d'étoile du logo de glow », puis « remet
 la forme d'étoile initiale, pas la forme d'étoile du logo » — l'étoile
 du logo a vécu une heure ; « mets leur un effet glow style les comme les
@@ -794,13 +794,11 @@ puis « cet effet glow donne une impression d'image flou mal définie. fait
 un meilleur effet glow » — son `Images-pour-claude/etoiles.png` relevé au
 pixel : des étoiles blanches sur bleu nuit, le halo est une LUMIÈRE RONDE
 fondue dans le fond, pas la silhouette floutée ; un `drop-shadow` a vécu
-une demi-heure et se lisait comme une image mal définie. Depuis : un
-DISQUE en dégradé radial derrière chaque étoile pleine, dans la couleur
-de l'étoile — sur la carte blanche, un halo blanc ne se verrait pas —,
-dense au centre, éteint au bord, rayon 15 dans le carré de 24, le SVG
-débordant pour le porter ; l'étoile reste nette par-dessus ; une étoile
-vide est un aplat au gris des filets ; 10 px entre les étoiles pour que
-les auréoles se touchent sans se recouvrir), les étoiles pleines dans le dégradé bleu du bouton « + »
+une demi-heure et se lisait comme une image mal définie. Puis un
+DISQUE en dégradé radial derrière chaque étoile pleine, une demi-heure
+encore : « enleve le glow c'est moche ». Depuis : AUCUN HALO, des aplats
+nets — une étoile vide est un aplat au gris des filets, une pleine son
+dégradé, aucun trait autour ; ne pas reproposer de halo), les étoiles pleines dans le dégradé bleu du bouton « + »
 (« couleur des étoiles de notation : bleu dégradé du bouton + » — ses deux
 bouts en jetons, `--menu-ajouter-debut` / `--menu-ajouter-fin`) ; le jour de l'endormissement en mots — « Hier »,
 « Aujourd'hui », sinon la date — et le calendrier au clic (« endormissement :

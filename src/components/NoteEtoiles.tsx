@@ -35,9 +35,7 @@ export function NoteEtoiles({
      sur les arrêts du dégradé par la feuille. */
   /* L'identifiant de React porte des signes que `url(#…)` ne lit pas : on
      le nettoie. */
-  const id = useId().replace(/[^a-zA-Z0-9]/g, '');
-  const degrade = `etoiles-${id}`;
-  const halo = `etoiles-halo-${id}`;
+  const degrade = `etoiles-${useId().replace(/[^a-zA-Z0-9]/g, '')}`;
 
   const noteSous = (x: number): number => {
     const r = rangee.current?.getBoundingClientRect();
@@ -87,19 +85,6 @@ export function NoteEtoiles({
             <stop offset="0" className="etoiles-note__debut" />
             <stop offset="1" className="etoiles-note__fin" />
           </linearGradient>
-          {/* L'AURÉOLE (2026-09-21 au soir, « cet effet glow donne une
-              impression d'image flou mal définie. fait un meilleur effet
-              glow ») : un disque de lumière en dégradé radial DERRIÈRE
-              l'étoile, qui reste nette par-dessus — dans son image, le halo
-              est une lumière ronde qui se fond dans le fond, pas la
-              silhouette de l'étoile floutée. Le flou d'ombre d'avant
-              (`filter: drop-shadow`) épousait les bords et se lisait comme
-              une image mal définie. */}
-          <radialGradient id={halo} cx="0.5" cy="0.5" r="0.5">
-            <stop offset="0" className="etoiles-note__halo-centre" />
-            <stop offset="0.45" className="etoiles-note__halo-milieu" />
-            <stop offset="1" className="etoiles-note__halo-bord" />
-          </radialGradient>
         </defs>
       </svg>
       {[1, 2, 3, 4, 5].map((i) => (
@@ -111,14 +96,6 @@ export function NoteEtoiles({
           focusable="false"
           style={i <= valeur ? { fill: `url(#${degrade})` } : undefined}
         >
-          {i <= valeur ? (
-            /* Le disque déborde du carré de 24 : la feuille laisse le SVG
-               déborder (`overflow: visible`). Son rayon, 15, porte la
-               lumière à 0,5 fois le rayon de l'étoile au-delà de ses
-               pointes — les disques voisins se touchent sans se recouvrir,
-               l'espace entre étoiles étant élargi. */
-            <circle className="etoiles-note__halo" cx="12" cy="12" r="15" fill={`url(#${halo})`} />
-          ) : null}
           <path d={ETOILE} />
         </svg>
       ))}
