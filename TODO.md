@@ -60,3 +60,5 @@ Règles de tenue (voir GUIDELINES.md, « Manière de travailler ») :
 
 - [ ] pour le 1er du mois gratuit : limiter ls enregistrer à 15 repas / 15
       sommeils / 5 activité
+
+- [ ] parametre effets sonores choix sons pour les différents effets

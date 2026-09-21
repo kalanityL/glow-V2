@@ -853,14 +853,30 @@ geste et à chaque frappe. **Chaque cran franchi en glissant clique**
 (2026-09-21, « ouvre le son roue de la fortune, et utilise les morceaux de
 ce son pour qd on modifie un poids, les clics doivent correspondre au
 passage d'un cran de la règle graduée » — après le silence de la veille,
-« supprime completement l'effet bruit ») : huit clics découpés de son
-enregistrement `son-pour-claude/SFB-roue-fortune-1.mp3` (les attaques
-isolées de la fin du tour, 30 à 90 ms, normalisées, fondu de sortie),
-embarqués dans `src/assets/sons/cran-1..8.wav`, joués à tour de rôle par
+« supprime completement l'effet bruit ») : joués à tour de rôle par
 une file à 45 ms qui ne garde que six clics d'avance
 (`plateforme/navigateur.ts`, `jouerClics`) : lentement, chaque cran ;
 vite, un roulement. Le placement programmé (ouverture, frappe) ne clique
-pas. **La graduation** (2026-09-20, « met les chiffres
+pas. **LE SON EST « BULLE » DEPUIS LE SOIR DU 2026-09-21**, après une
+simulation de vingt clics (« fais une simulation de 20 sons différents
+[…] plus légers, plus metalic ou glass, change de note » puis « son bulle
+pour le poids / son plastique : ajoute le pour qd on tourne l'heure avec
+le cadran de l'horloge / garde tous les autres sons disponibles on s'en
+servira dans les parametres ») : **le catalogue des sons est embarqué en
+entier** — vingt sons synthétisés (métal, verre, bois et plastique, la
+note qui change) rendus en `.wav` par `scripts/rendre-sons.mjs` (la même
+écriture Web Audio que la simulation, rendue hors ligne par le Chrome de
+la machine, un fichier par variante : un pour un sinus, quatre pour un
+souffle tiré au sort, huit pour une gamme, dix pour « Monte avec le
+poids »), et la roue de la fortune (`cran-1..8.wav`, découpée de son
+enregistrement `son-pour-claude/SFB-roue-fortune-1.mp3`) ; le catalogue
+TypeScript `app/sons-catalogue.ts` est ENGENDRÉ par le script, à relancer
+à chaque son ; les deux choix d'elle sont dans `app/sons.ts` (`SON_DU_POIDS`,
+`SON_DU_CADRAN`) ; les noms des sons ne sont pas dans le dictionnaire tant
+que l'écran des effets sonores (son TODO : « parametre effets sonores
+choix sons pour les différents effets ») n'existe pas. **Le cadran d'une
+heure clique aussi**, « Plastique », à chaque minute ronde franchie en
+glissant la boule, par la même file. **La graduation** (2026-09-20, « met les chiffres
 de la regle graduée au dessus des crans, tous les 5 kilos […] positionne
 une tige verticale noire, 4 fois plus grande qu'un cran, au milieu de
 l'écran, dont le bout supérieur se place sur la regle graduée ») : les

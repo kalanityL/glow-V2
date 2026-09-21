@@ -1,5 +1,14 @@
 import { useRef, type CSSProperties, type PointerEvent } from 'react';
 import { MINUTES_RONDES } from '../domaine/prises';
+import { jouerClics } from '../plateforme/navigateur';
+import { SON_DU_CADRAN, morceauxDuSon } from '../app/sons';
+
+/* LE CLIC D'UN CRAN D'HEURE (2026-09-21 au soir, « son plastique : ajoute
+   le pour qd on tourne l'heure avec le cadran de l'horloge ») : à chaque
+   minute ronde franchie en glissant la boule, un clic « Plastique », par la
+   même file que la règle du poids (45 ms, six d'avance). L'heure posée
+   d'ailleurs (la roue, l'ouverture) ne clique pas. */
+const CLICS = morceauxDuSon(SON_DU_CADRAN);
 
 /**
  * LE CADRAN D'UNE HEURE (2026-09-21, « au dessus de chaque heure en chiffre
@@ -127,7 +136,10 @@ export function CadranHeure({
         const brutes = (apresMidi ? MINUTES_PAR_TOUR : 0) + (a / 360) * MINUTES_PAR_TOUR;
         const nouvelles = surMinuteRonde(brutes) % MINUTES_PAR_JOUR;
         glisse.current = { angle: a, minutes: brutes, jour: 0 };
-        if (nouvelles !== minutes) onValeur(valeurDe(nouvelles));
+        if (nouvelles !== minutes) {
+          jouerClics(CLICS);
+          onValeur(valeurDe(nouvelles));
+        }
       }}
       onPointerMove={(e) => {
         if (!glisse.current) return;
@@ -148,7 +160,10 @@ export function CadranHeure({
         glisse.current = { angle: a, minutes: brutes, jour };
         if (jour !== jourDAvant) onJour?.(jour - jourDAvant);
         const heure = rondes - jour * MINUTES_PAR_JOUR;
-        if (heure !== minutes) onValeur(valeurDe(heure));
+        if (heure !== minutes) {
+          jouerClics(CLICS);
+          onValeur(valeurDe(heure));
+        }
       }}
       onPointerUp={() => {
         glisse.current = null;

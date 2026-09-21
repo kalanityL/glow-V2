@@ -4,21 +4,13 @@ import { useTextes } from '../i18n/useTextes';
 import { POIDS_MAX, POIDS_MIN, poidsDepuisRapport, poidsDepuisSaisie, rapportDuPoids } from '../domaine/mesures';
 import type { UnitePoids } from '../domaine/unites';
 import { defilementHorizontal, defilerHorizontalA, jouerClics, surFinDeDefilement } from '../plateforme/navigateur';
-/* LES CLICS DE LA ROUE DE LA FORTUNE (2026-09-21, « ouvre le son roue de la
-   fortune, et utilise les morceaux de ce son […] les clics doivent
-   correspondre au passage d'un cran ») : huit clics découpés de son
-   enregistrement (`son-pour-claude/SFB-roue-fortune-1.mp3`, les attaques
-   isolées de la fin du tour), joués à tour de rôle — un par cran franchi. */
-import cran1 from '../assets/sons/cran-1.wav';
-import cran2 from '../assets/sons/cran-2.wav';
-import cran3 from '../assets/sons/cran-3.wav';
-import cran4 from '../assets/sons/cran-4.wav';
-import cran5 from '../assets/sons/cran-5.wav';
-import cran6 from '../assets/sons/cran-6.wav';
-import cran7 from '../assets/sons/cran-7.wav';
-import cran8 from '../assets/sons/cran-8.wav';
+/* LE CLIC D'UN CRAN (2026-09-21, « les clics doivent correspondre au
+   passage d'un cran ») : un par cran franchi. Le son fut la roue de la
+   fortune découpée (le matin) ; c'est « Bulle » depuis le soir (« son bulle
+   pour le poids »), choisi dans `app/sons.ts` parmi le catalogue embarqué. */
+import { SON_DU_POIDS, morceauxDuSon } from '../app/sons';
 
-const CLICS = [cran1, cran2, cran3, cran4, cran5, cran6, cran7, cran8];
+const CLICS = morceauxDuSon(SON_DU_POIDS);
 
 /**
  * LA RÈGLE CRANTÉE DU POIDS — le chiffre en grand, qui s'édite sur place, et

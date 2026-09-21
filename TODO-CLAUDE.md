@@ -79,7 +79,12 @@ cadran, les étoiles, le clic hors bloc), les clics sonores de la règle,
 le rendu de `/long` sur un vrai navigateur.
 
 **Son TODO porte** : limiter le 1er mois gratuit à 15 repas / 15 sommeils /
-5 activités.
+5 activités ; l'écran des effets sonores (« parametre effets sonores choix
+sons pour les différents effets », 21/09 au soir) — le catalogue des vingt
+sons est déjà embarqué (`app/sons-catalogue.ts`), leurs noms iront dans le
+dictionnaire ce jour-là ; « Monte avec le poids » a dix morceaux, un par
+dixième de kilo, que `jouerClics` joue à tour de rôle : ce jour-là, la
+règle devra choisir le morceau du dixième lu.
 
 **Ce qui reste des documents (note du 15/09), toujours vrai :**
 
