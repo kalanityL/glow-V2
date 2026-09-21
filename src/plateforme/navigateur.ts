@@ -39,10 +39,15 @@ export function surClicDehors(
   const auClavier = (evenement: KeyboardEvent) => {
     if (evenement.key === 'Escape') quand();
   };
-  document.addEventListener('mousedown', auClic);
+  /* Au doigt comme à la souris (2026-09-21, « qd on clique hors d'un bloc
+     fermable : meme comportement que si on avait cliqué sur la croix ») :
+     `pointerdown` part dès que le doigt se pose, là où `mousedown` n'est
+     rejoué sur un téléphone qu'après le relâcher, et pas toujours. */
+  const evenement = 'onpointerdown' in window ? 'pointerdown' : 'mousedown';
+  document.addEventListener(evenement, auClic);
   document.addEventListener('keydown', auClavier);
   return () => {
-    document.removeEventListener('mousedown', auClic);
+    document.removeEventListener(evenement, auClic);
     document.removeEventListener('keydown', auClavier);
   };
 }
