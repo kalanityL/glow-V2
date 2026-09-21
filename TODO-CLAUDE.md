@@ -11,58 +11,63 @@ que de te faire lire le fichier. Le TODO de la V1 est importé tel quel dans
 
 ---
 
-## NOTE DE REPRISE — CLEAR DU 2026-09-21 (l'application prend forme)
+## NOTE DE REPRISE — CLEAR DU 2026-09-21 AU SOIR (le sommeil, le téléphone long)
 
 **Rien ne tourne, rien n'est à moitié fait.** Aucun workflow ni agent en
-cours. Tout est commité : 13 commits non poussés depuis `c54f5af` (le
-troisième push et son entrée de suivi, le 20/09). Le site en ligne
-(`glow-private-v2.web.app`) est au troisième déploiement, du 20/09 au soir —
-il ne porte rien de ce qui suit. Pousser et déployer SEULEMENT sur son
-ordre, et ÉCRIRE L'ENTRÉE DE `SUIVI-PUSHS.md` AVANT le push (oublié le
-20/09, réparé dans un commit de suite).
+cours. Tout est commité : 7 commits non poussés en V2 depuis `1c9e5ab`
+(l'entrée du septième push, le 21/09), et 3 en V1 (`69b3ff7b`, `3fc02a3d`,
+`fbfc8797` — la recherche d'aliments multi-mots, « riz cuit » → « Riz blanc
+cuit »). Le site en ligne (`glow-private-v2.web.app`) est au septième
+déploiement (`d0ad92a`) — il ne porte rien de ce qui suit. Pousser et
+déployer SEULEMENT sur son ordre, ÉCRIRE L'ENTRÉE DE `SUIVI-PUSHS.md` AVANT
+le push ; la V1 se pousse et se déploie à part, depuis son dépôt.
 
-**Le serveur** : 3002, `npm run dev -- --port 3002 --strictPort` (règle de
-début de session). Les docs sur 3003 : `python3 scripts/servir-docs.py 3003`.
-L'extension Chrome n'est PAS connectée : les clics ne se vérifient pas ; les
-captures se font avec Chrome sans fenêtre, en forçant l'état par `sed` sur
-les `useState` — et en RESTAURANT PAR `sed` INVERSE, jamais par
-`git checkout` (un checkout a emporté du travail non commité le 20/09).
+**Le serveur** : 3002, `npm run dev -- --port 3002 --strictPort`. Chrome se
+pilote par `scripts/piloter-chrome.mjs` (DevTools, ports 9333/9340) ; les
+captures avec Chrome sans fenêtre, état forcé par `sed` sur les `useState`
+et RESTAURÉ PAR `sed` INVERSE, jamais par `git checkout`.
 
-**Ce qui est FAIT depuis la note du 15/09 — tout dans GUIDELINES, section par
-section :**
-- l'accueil, les tiroirs (menu, « + »), « Mon compte » avec ses blocs
-  (traitement, poids, thème), les marges, la persistance sur l'appareil ;
-- le bloc du poids devenu LA RÈGLE CRANTÉE (`components/ReglePoids.tsx`) :
-  chiffre en cases fixes, graduation au dixième, tige bleue de 2 px sur son
-  cran, aimant immédiat, en silence ;
-- la page d'une PRISE (`PagePrise`) : le formulaire de la V1, le nom du
-  traitement qui propose sa mise à jour, rien en gras, TOUS LES CHOIX EN
-  PANNEAUX DESSINÉS DANS L'ÉCRAN (`Panneau`, `Choix`, `ChoixHeure`,
-  `ChoixDate` — règle absolue : aucun `select` natif) ;
-- la page d'une PESÉE (`PagePesee`) : idem, avec la règle ; poids proposé =
-  la pesée la plus récente non future (`domaine/pesees.ts`) ; une pesée par
-  jour, remplacement sur oui ;
-- L'ÉCRAN DE CONFIRMATION générique (`PageConfirmation`) : son image
-  (`validation-prise.svg`), la carte qui rouvre le formulaire en
-  modification, « Vous pouvez maintenant : », seul « Ajouter » agit ;
-- douze fonds de page (Fleurs, Brasserie, et les dix de sa planche),
-  l'image nette, et LA PALETTE PAR FOND — `scripts/palette-fonds.py` lit les
-  images et écrit `src/themes/fonds-palette.css` (logo, entête, `--fond-encre`) ;
-  à relancer à chaque fond ajouté.
+**FAIT depuis la note du matin (tout dans GUIDELINES) :**
+- LA PAGE D'UN SOMMEIL (`PageSommeil`) et sa confirmation : Nuit/Sieste
+  en gros boutons, puis les deux bords en cartes d'après `horloge.png`
+  (`CadranHeure` : boule qui se glisse, crans de montre, arc en dégradé de
+  0 à la boule), la jauge de durée 4 px (se remplit puis s'intensifie),
+  « 13 h de sommeil », les étoiles dans le dégradé du « + » ; EN TROIS
+  ÉCRANS quand la suite ne tient pas (mesuré au rendu), la note d'avance du
+  dernier sommeil de même nature, le fil d'Ariane « 10/09 23:45 · 11/09
+  07:00 / nuit de 7 h 15 », « Valider » en troisième écran ;
+- un message qui apparaît se montre (`montrerEnEntier`), partout ;
+- `/long` (commit `09a89d5`) : la même application dans un cadre dont
+  l'écran fait 850 px (`app-root--long`, cadre 914 px, la fenêtre défile) ;
+  `/` inchangé. Servi en ligne sans rien changer (rewrite `**`).
 
-**Ce qui n'existe pas encore (et que les écrans annoncent, éteint) :** les
-pages Journal, Analyse, Concentration sanguine, Évolution du traitement /
-du poids ; les cases du « + » autres que Traitement et Balance ; les
-mensurations de la pesée. TOUT EST ÉCRIT DANS LA BASE DE LA V1 depuis le
-21/09 au soir (`src/donnees/v1.ts`, clé `glp1_app_companion_data`,
-`app/base.ts`) : chaque nouveau formulaire prend le type de sa table dans
-`V1/src/types.ts` et ses règles dans la SPEC — c'est la règle, dans
-GUIDELINES.
+**Deux réponses données, sans commit, à reprendre si elle tranche :**
+- LE MOT DE PASSE : la V2 en ligne N'EST PAS protégée (aucun verrou ; les
+  données ne vivent que sur l'appareil). La V1 a un verrou Firebase
+  Authentication (e-mail + mot de passe, Google ; comptes créés par elle
+  dans la console ; désarmé quand `apiKey` est vide dans
+  `src/shared/platform/firebase.config.ts`). Option A recommandée : le
+  même verrou dans la V2 (même projet `glow-private`, mêmes comptes ;
+  installer `firebase`, écran de connexion au design V2, garde dans
+  `main.tsx`, domaine `glow-private-v2.web.app` à autoriser dans la
+  console) — entorse au « pas de dépendance » de GUIDELINES, à consigner.
+  Elle n'a pas encore dit « option A ».
+- L'HÉBERGEMENT : Firebase Hosting (Google), projet `glow-private`, site
+  `glow-private-v2`, déployé depuis sa machine par `firebase deploy`.
 
-**À vérifier à l'écran, par elle :** les gestes (glisser la règle, les
-panneaux, le tiroir depuis l'écran de confirmation) ; la barre d'état du
-téléphone reste sombre sur un fond sombre ; les dix fonds de la planche
-sont petits (≈ 200 px de large) — lui demander les originaux.
+**Ce qui n'existe pas encore (les écrans l'annoncent, éteint) :** Journal,
+Analyse, Concentration sanguine, Évolution du traitement / du poids ; les
+cases du « + » autres que Traitement, Balance et Sommeil ; les mensurations
+de la pesée. TOUT S'ÉCRIT DANS LA BASE DE LA V1 (`src/donnees/v1.ts`, clé
+`glp1_app_companion_data`, `app/base.ts`) : chaque formulaire prend le type
+de sa table dans `V1/src/types.ts` et ses règles dans la SPEC.
+
+**Non vérifié sur Android (à ses yeux) :** les gestes (glisser la boule du
+cadran, les étoiles, le clic hors bloc), les clics sonores de la règle,
+le rendu de `/long` sur un vrai navigateur.
+
+**Son TODO porte** : limiter le 1er mois gratuit à 15 repas / 15 sommeils /
+5 activités.
 
 **Ce qui reste des documents (note du 15/09), toujours vrai :**
 
