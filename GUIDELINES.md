@@ -264,7 +264,12 @@ thèmes ne repeignent pas, et qui ne sont pas dans les templates non plus.
   l'écran, aucun voile sombre, jamais `alert`/`confirm`/`prompt`. Tout
   s'ouvre DANS la page : un bloc à l'endroit du geste, une page ou sous-page,
   ou un message écrit là où le geste a lieu — en italique et à l'accent du
-  thème. Ce qui n'est pas un popup : un panneau déroulant qui se ferme au
+  thème. **Un message qui apparaît se montre** (2026-09-21, « si un bouton
+  valider ou autre actionne un message d'erreur, positionner la fenêtre
+  pour avoir ce message visible — valable partout sur le site ») :
+  `components/MessageEnPlace.tsx` — refus, règle manquée, question —
+  amène la zone qui défile sur lui dès qu'il apparaît ; tout nouveau
+  message passe par lui. Ce qui n'est pas un popup : un panneau déroulant qui se ferme au
   clic à côté (les roues des sélecteurs). Sur une sortie : **un bouton,
   jamais une redirection minutée**.
 - **LA CHARTE DES FORMULAIRES** (2026-09-21, d'après son image « Ajouter un

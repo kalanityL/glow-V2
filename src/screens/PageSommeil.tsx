@@ -1,3 +1,4 @@
+import { MessageEnPlace } from '../components/MessageEnPlace';
 import { useLayoutEffect, useRef, useState, type CSSProperties, type FormEvent } from 'react';
 import { BarreDuBas, type AjoutTraitement } from './BarreDuBas';
 import { EntetePage } from './EntetePage';
@@ -323,7 +324,7 @@ export function PageSommeil({
 
             {enDeuxEcrans !== true ? noteEtNotes : null}
 
-            {refus ? <p className="regle regle--manquee prise__regle">{refus}</p> : null}
+            {refus ? <MessageEnPlace classe="prise__regle">{refus}</MessageEnPlace> : null}
             <IndiceDefilement />
           </div>
           ) : (

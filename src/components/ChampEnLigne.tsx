@@ -1,3 +1,4 @@
+import { montrerEnEntier } from '../plateforme/navigateur';
 import { useEffect, useState, type ReactNode } from 'react';
 
 interface ChampEnLigneProps {
@@ -143,7 +144,11 @@ export function ChampEnLigne({
         </button>
       )}
       {unite ? <span className="enligne__unite">{unite}</span> : null}
-      {refuse && regle ? <span className="regle regle--manquee enligne__regle">{regle}</span> : null}
+      {refuse && regle ? (
+        <span ref={montrerEnEntier} className="regle regle--manquee enligne__regle">
+          {regle}
+        </span>
+      ) : null}
     </span>
   );
 

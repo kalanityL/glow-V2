@@ -1,3 +1,4 @@
+import { MessageEnPlace } from '../components/MessageEnPlace';
 import { useState, type FormEvent } from 'react';
 import { BarreDuBas, type AjoutTraitement } from './BarreDuBas';
 import { EntetePage } from './EntetePage';
@@ -169,9 +170,7 @@ export function PagePesee({
 
             {remplacer ? (
               <div className="prise__proposition">
-                <p className="regle regle--manquee prise__question">
-                  {textes.pesee.remplacer(formaterDateCourte(date, langue))}
-                </p>
+                <MessageEnPlace classe="prise__question">{textes.pesee.remplacer(formaterDateCourte(date, langue))}</MessageEnPlace>
                 <div className="boutons">
                   <button type="button" className="bouton bouton--second" onClick={onAccueil}>
                     {textes.non}

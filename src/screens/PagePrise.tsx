@@ -1,3 +1,4 @@
+import { MessageEnPlace } from '../components/MessageEnPlace';
 import { useEffect, useState, type FormEvent } from 'react';
 import { BarreDuBas, type AjoutTraitement } from './BarreDuBas';
 import { EntetePage } from './EntetePage';
@@ -219,7 +220,7 @@ export function PagePrise({
             </button>
             {proposition ? (
               <div className="prise__proposition">
-                <p className="regle regle--manquee prise__question">{textes.prise.mettreAJour}</p>
+                <MessageEnPlace classe="prise__question">{textes.prise.mettreAJour}</MessageEnPlace>
                 <div className="boutons">
                   <button type="button" className="bouton bouton--second" onClick={() => setProposition(false)}>
                     {textes.non}
@@ -288,7 +289,7 @@ export function PagePrise({
                 }}
               />
             ) : null}
-            {refuse ? <p className="regle regle--manquee prise__regle">{textes.prise.regleDose}</p> : null}
+            {refuse ? <MessageEnPlace classe="prise__regle">{textes.prise.regleDose}</MessageEnPlace> : null}
 
             {/* LA ZONE D'INJECTION : son intitulé et six boutons (2026-09-21) —
                 pas sous forme orale, où elle vaut « voie orale ». */}
