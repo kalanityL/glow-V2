@@ -41,6 +41,13 @@ et RESTAURÉ PAR `sed` INVERSE, jamais par `git checkout`.
 - `/long` (commit `09a89d5`) : la même application dans un cadre dont
   l'écran fait 850 px (`app-root--long`, cadre 914 px, la fenêtre défile) ;
   `/` inchangé. Servi en ligne sans rien changer (rewrite `**`).
+- L'AVATAR MODULAIRE (le soir, par un agent indépendant dans un worktree,
+  branche `worktree-agent-ae33afaaf63172488`, à fusionner dans `main`) :
+  le prototype de `~/Desktop/GLOW/avatars/avatar_prototype_svg/` composé
+  en un SVG, mesuré au pixel contre lui (identique) ; les réglages dans le
+  créateur ; la base de la V1 + la part hors base en version 2 ; cinq
+  hypothèses dans « À arbitrer ». Vérifié au rendu : l'accueil, le volet
+  Avatar de « Mon compte » (deux compositions), l'étape de l'onboarding.
 
 **LE VERROU DE CONNEXION EST FAIT** (2026-09-21, « brancher sur la v2 en
 ligne la meme identification que la v1 et utiliser les memes comptes ») :
@@ -166,6 +173,27 @@ la V2.
       l'avatar (« Composez votre avatar ») sont de moi.
 - [ ] **De la V1, non repris dans l'avatar** : l'import d'une photo (demande
       de stocker un fichier) et le tirage au hasard.
+- [ ] **L'avatar modulaire (2026-09-21 au soir, par l'agent du chantier) —
+      cinq hypothèses prises pour livrer, à trancher** (GUIDELINES § 4,
+      « L'avatar modulaire ») :
+      1. la forme et la teinte sont séparées : le nuancier existant reste
+         (peau, yeux, cheveux), les teintes du prototype (« skin1-3 »,
+         « brown/blue », « bob_1-3 ») ne sont pas reprises comme choix —
+         sauf les deux du vêtement (crème, marine) ;
+      2. le genre amène la coiffure ET le vêtement de départ (femme : carré
+         + t-shirt crème ; homme : courts + sweat marine ; neutre : bouclés
+         + t-shirt marine) ;
+      3. la peau colore aussi le corps (le prototype avait un cou fixe) ;
+      4. les lunettes, les expressions, le cœur, la frange, la brosse et
+         « sans cheveux » disparaissent de l'écran (pas de tracé) ; un
+         ancien profil se relit au plus proche (cœur→ovale, frange→carré,
+         brosse/chauve→courts) ;
+      5. les mots : « En amande / Ronds / Tombants », « Droit / Retroussé /
+         Large », « Neutre / Sourire / Pulpeuse », « T-shirt / Sweat à
+         capuche », « Carré » pour le bob — de moi, pas d'elle.
+      Non fait : des vignettes dessinées pour choisir une forme (des mots
+      pour l'instant) ; le rond de l'accueil montre la figure entière,
+      plus petite qu'avant (cadrer sur la tête = une règle de feuille).
 
 ## Sur sa demande, plus tard — ne pas dépiler seul
 
