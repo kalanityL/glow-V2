@@ -3048,9 +3048,29 @@
   color: var(--encre-chapeau);
 }
 
+/* LES LARGEURS FIXÉES (2026-09-21, « fixer les largeurs d'heures et
+   minutes pour les heures d'endormissement, de réveil et la durée, pour que
+   ça ne saute pas qd on modifie ») : chiffres tabulaires, et une case de
+   largeur constante pour l'heure et pour la durée — « 8 h » comme
+   « 7 h 45 » —, alignée à gauche pour que rien ne bouge autour. */
 .sommeil__duree span {
+  display: inline-block;
+  width: 6ch;
+  text-align: left;
   color: var(--encre);
   font-variant-numeric: tabular-nums;
+}
+
+.sommeil__colonne .prise__quand span,
+.sommeil__colonne .choix__valeur {
+  font-variant-numeric: tabular-nums;
+}
+
+.sommeil__colonne .prise__quand + .cadran + .prise__quand span,
+.sommeil__colonne .choix .choix__valeur {
+  display: inline-block;
+  width: 5ch;
+  text-align: left;
 }
 
 

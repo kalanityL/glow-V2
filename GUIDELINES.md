@@ -721,7 +721,9 @@ le cercle porte les crans d'une montre (soixante, les douze des heures plus
 longs — « fait apparaitre les crans comme sur une montre à cadran ») ; la
 boule est à l'angle de l'heure, elle se glisse et l'heure suit sur les
 minutes rondes, l'heure change et la boule suit ; passer le haut du cadran
-bascule la moitié du jour et les repères deviennent 12 15 18 21 ; la durée déduite (« 8 h », « 7 h 45 »), jamais
+bascule la moitié du jour et les repères deviennent 12 15 18 21 ; **les
+heures et la durée ont une largeur fixée** (chiffres tabulaires, une case
+constante alignée à gauche — « pour que ça ne saute pas qd on modifie ») ; la durée déduite (« 8 h », « 7 h 45 »), jamais
 saisie ; **la note en étoiles** (« notez votre nuit ou notez votre sieste :
 5 étoiles qu'on peut cliquer ou slider pour remplir, par défaut 3 ») — la
 qualité de 0 à 5 de la V1, sans mot dessous (« pas de label aux
