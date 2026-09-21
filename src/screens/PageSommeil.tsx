@@ -5,6 +5,7 @@ import type { FondProps } from './Accueil';
 import { ChoixDate } from '../components/ChoixDate';
 import { ChoixHeure } from '../components/ChoixHeure';
 import { NoteEtoiles } from '../components/NoteEtoiles';
+import { CadranHeure } from '../components/CadranHeure';
 import { IndiceDefilement } from '../components/IndiceDefilement';
 import { IconeCalendrier, IconeCoche, IconeCroix, IconeHorloge, IconePlus, IconeSommeil } from '../components/Icones';
 import { detecterLangue, useTextes } from '../i18n/useTextes';
@@ -172,6 +173,9 @@ export function PageSommeil({
           <span>{jourEcrit(date, enMots)}</span>
         </button>
       )}
+      {/* LE CADRAN, au-dessus de l'heure (2026-09-21) : la boule se glisse,
+          l'heure suit ; l'heure change, la boule suit. */}
+      <CadranHeure valeur={heure} onValeur={poserHeure} nom={nom} />
       {edite === cleHeure ? (
         <ChoixHeure valeur={heure} onChoix={poserHeure} nom={nom} icone={<IconeHorloge />} ouvertDAbord onFerme={() => setEdite(null)} />
       ) : (

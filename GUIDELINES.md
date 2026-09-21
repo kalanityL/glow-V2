@@ -709,7 +709,14 @@ formulaire de la V1 (`SleepForm.tsx`, `useSleepForm.ts`) et ses règles
 instants complets, Endormissement et Réveil, chacun son jour et son heure
 sur deux colonnes — une nuit part de la veille 23:00 → 07:00, une sieste du
 jour même 14:00 → 15:00, changer de nature ne déplace les instants que s'ils
-sont encore ceux proposés ; la durée déduite (« 8 h », « 7 h 45 »), jamais
+sont encore ceux proposés — **et, au-dessus de chaque heure, un cadran**
+(`components/CadranHeure.tsx`, 2026-09-21 : « un cercle d'horloge avec
+12 / 3 / 6 / 9 et une petite boule positionnée à l'heure […] on peut faire
+glisser la boule […] synchronisation totale […] passer par 12 et continuer
+fait passer aux heures > 12 et les étiquettes passent en 12 15 18 21 ») :
+la boule est à l'angle de l'heure, elle se glisse et l'heure suit sur les
+minutes rondes, l'heure change et la boule suit ; passer le haut du cadran
+bascule la moitié du jour et les repères deviennent 12 15 18 21 ; la durée déduite (« 8 h », « 7 h 45 »), jamais
 saisie ; **la note en étoiles** (« notez votre nuit ou notez votre sieste :
 5 étoiles qu'on peut cliquer ou slider pour remplir, par défaut 3 ») — la
 qualité de 0 à 5 de la V1, sans mot dessous (« pas de label aux

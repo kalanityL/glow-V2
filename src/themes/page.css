@@ -3087,3 +3087,37 @@
   fill: #f2c14e;
   stroke: #e0ad2f;
 }
+
+/* LE CADRAN D'UNE HEURE (2026-09-21) : un cercle au filet des champs, quatre
+   repères en gris, la boule à l'encre — sobre. Il reçoit le doigt. */
+.cadran {
+  display: block;
+  width: 104px;
+  height: 104px;
+  margin: 2px 0 -2px;
+  touch-action: none;
+  cursor: pointer;
+  user-select: none;
+}
+
+.cadran:focus-visible {
+  outline: none;
+}
+
+.cadran__cercle {
+  fill: var(--option-fond);
+  stroke: var(--option-filet);
+  stroke-width: 1.5;
+}
+
+.cadran__repere {
+  fill: var(--encre-chapeau);
+  font-family: var(--font-body);
+  font-size: 10px;
+  font-weight: 500;
+  pointer-events: none;
+}
+
+.cadran__boule {
+  fill: var(--encre);
+}
