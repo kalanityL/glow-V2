@@ -1,4 +1,13 @@
 import { useId, useRef, type PointerEvent } from 'react';
+import { jouerClics } from '../plateforme/navigateur';
+import { SON_DE_LA_NOTE, morceauxDuSon } from '../app/sons';
+
+/* LE CLIC D'UNE ÉTOILE (2026-09-21 au soir, « ajouter son cristal à
+   variation de qualité sommeil ») : chaque étoile franchie, en touchant, en
+   glissant ou au clavier, joue « Cristal » — un clic par étoile, par la
+   même file que la règle du poids. La note posée d'ailleurs (l'ouverture)
+   ne clique pas. */
+const CLICS = morceauxDuSon(SON_DE_LA_NOTE);
 
 /** L'ÉTOILE À CINQ BRANCHES — celle d'origine, rétablie (2026-09-21 au
     soir, « remet la forme d'étoile initiale, pas la forme d'étoile du
@@ -30,6 +39,12 @@ export function NoteEtoiles({
 }) {
   const rangee = useRef<HTMLDivElement>(null);
   const glisse = useRef(false);
+  /* Toute note qui change par un geste passe ici : le clic, puis la note. */
+  const poser = (n: number) => {
+    if (n === valeur) return;
+    jouerClics(CLICS, Math.abs(n - valeur));
+    onValeur(n);
+  };
   /* LE DÉGRADÉ DU « + » (2026-09-21, « couleur des étoiles de notation : bleu
      dégradé du bouton + ») : ses deux bouts sont des jetons du thème, posés
      sur les arrêts du dégradé par la feuille. */
@@ -45,8 +60,7 @@ export function NoteEtoiles({
   };
   const surGlissement = (e: PointerEvent) => {
     if (!glisse.current) return;
-    const n = noteSous(e.clientX);
-    if (n !== valeur) onValeur(n);
+    poser(noteSous(e.clientX));
   };
 
   return (
@@ -65,7 +79,7 @@ export function NoteEtoiles({
         e.currentTarget.setPointerCapture(e.pointerId);
         const n = noteSous(e.clientX);
         /* La seule étoile pleine touchée à nouveau se vide : le zéro. */
-        onValeur(n === 1 && valeur === 1 ? 0 : n);
+        poser(n === 1 && valeur === 1 ? 0 : n);
       }}
       onPointerMove={surGlissement}
       onPointerUp={() => {
@@ -75,8 +89,8 @@ export function NoteEtoiles({
         glisse.current = false;
       }}
       onKeyDown={(e) => {
-        if (e.key === 'ArrowRight' || e.key === 'ArrowUp') onValeur(Math.min(5, valeur + 1));
-        if (e.key === 'ArrowLeft' || e.key === 'ArrowDown') onValeur(Math.max(0, valeur - 1));
+        if (e.key === 'ArrowRight' || e.key === 'ArrowUp') poser(Math.min(5, valeur + 1));
+        if (e.key === 'ArrowLeft' || e.key === 'ArrowDown') poser(Math.max(0, valeur - 1));
       }}
     >
       <svg width="0" height="0" aria-hidden="true" focusable="false" style={{ position: 'absolute' }}>

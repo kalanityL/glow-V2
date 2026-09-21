@@ -879,7 +879,9 @@ TypeScript `app/sons-catalogue.ts` est ENGENDRÉ par le script, à relancer
 que l'écran des effets sonores (son TODO : « parametre effets sonores
 choix sons pour les différents effets ») n'existe pas. **Le cadran d'une
 heure clique aussi**, « Plastique », à chaque minute ronde franchie en
-glissant la boule, par la même file. **La graduation** (2026-09-20, « met les chiffres
+glissant la boule, par la même file ; **et les étoiles de la qualité du
+sommeil**, « Cristal », un clic par étoile franchie (« ajouter son cristal
+à variation de qualité sommeil », le même soir) — `SON_DE_LA_NOTE`. **La graduation** (2026-09-20, « met les chiffres
 de la regle graduée au dessus des crans, tous les 5 kilos […] positionne
 une tige verticale noire, 4 fois plus grande qu'un cran, au milieu de
 l'écran, dont le bout supérieur se place sur la regle graduée ») : les

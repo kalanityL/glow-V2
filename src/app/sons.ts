@@ -17,6 +17,10 @@ export const SON_DU_POIDS: SonId = 'bulle';
 /** Le clic d'un cran d'heure sur le cadran : « Plastique ». */
 export const SON_DU_CADRAN: SonId = 'plastique';
 
+/** Le clic d'une étoile de la qualité du sommeil : « Cristal » (2026-09-21
+    au soir, « ajouter son cristal à variation de qualité sommeil »). */
+export const SON_DE_LA_NOTE: SonId = 'cristal';
+
 export function morceauxDuSon(son: SonId): readonly string[] {
   return SONS[son];
 }
