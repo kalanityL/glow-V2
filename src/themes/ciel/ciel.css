@@ -92,6 +92,11 @@
   --menu-encre: var(--encre-chapeau);
   --menu-actif: var(--accent);
   --menu-ajouter-fond: var(--bouton-fond);
+  /* Les deux bouts du dégradé du « + », pour ce qui doit le porter en SVG
+     — les étoiles de notation (2026-09-21, « couleur des étoiles de
+     notation : bleu dégradé du bouton + »). */
+  --menu-ajouter-debut: var(--accent);
+  --menu-ajouter-fin: var(--accent);
   --menu-ajouter-encre: var(--bouton-encre);
   --menu-ajouter-ombre: var(--panneau-ombre);
 

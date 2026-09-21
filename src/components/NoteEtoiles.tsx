@@ -1,4 +1,4 @@
-import { useRef, type PointerEvent } from 'react';
+import { useId, useRef, type PointerEvent } from 'react';
 
 /**
  * LA NOTE EN ÉTOILES (2026-09-21, « notez votre nuit ou notez votre sieste :
@@ -24,6 +24,12 @@ export function NoteEtoiles({
 }) {
   const rangee = useRef<HTMLDivElement>(null);
   const glisse = useRef(false);
+  /* LE DÉGRADÉ DU « + » (2026-09-21, « couleur des étoiles de notation : bleu
+     dégradé du bouton + ») : ses deux bouts sont des jetons du thème, posés
+     sur les arrêts du dégradé par la feuille. */
+  /* L'identifiant de React porte des signes que `url(#…)` ne lit pas : on
+     le nettoie. */
+  const degrade = `etoiles-${useId().replace(/[^a-zA-Z0-9]/g, '')}`;
 
   const noteSous = (x: number): number => {
     const r = rangee.current?.getBoundingClientRect();
@@ -67,6 +73,14 @@ export function NoteEtoiles({
         if (e.key === 'ArrowLeft' || e.key === 'ArrowDown') onValeur(Math.max(0, valeur - 1));
       }}
     >
+      <svg width="0" height="0" aria-hidden="true" focusable="false" style={{ position: 'absolute' }}>
+        <defs>
+          <linearGradient id={degrade} x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0" className="etoiles-note__debut" />
+            <stop offset="1" className="etoiles-note__fin" />
+          </linearGradient>
+        </defs>
+      </svg>
       {[1, 2, 3, 4, 5].map((i) => (
         <svg
           key={i}
@@ -74,6 +88,7 @@ export function NoteEtoiles({
           viewBox="0 0 24 24"
           aria-hidden="true"
           focusable="false"
+          style={i <= valeur ? { fill: `url(#${degrade})` } : undefined}
         >
           <path d="M11.525 2.295a.53.53 0 0 1 .95 0l2.31 4.679a2.123 2.123 0 0 0 1.595 1.16l5.166.756a.53.53 0 0 1 .294.904l-3.736 3.638a2.123 2.123 0 0 0-.611 1.878l.882 5.14a.53.53 0 0 1-.771.56l-4.618-2.428a2.122 2.122 0 0 0-1.973 0L6.396 21.01a.53.53 0 0 1-.77-.56l.881-5.139a2.122 2.122 0 0 0-.611-1.879L2.16 9.795a.53.53 0 0 1 .294-.906l5.165-.755a2.122 2.122 0 0 0 1.597-1.16z" />
         </svg>

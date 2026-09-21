@@ -122,6 +122,11 @@
   --menu-encre: #6c7793;
   --menu-actif: #2f6cf5;
   --menu-ajouter-fond: linear-gradient(to bottom, #4ba2f5 0%, #2b65f5 100%);
+  /* Les deux bouts du dégradé du « + », pour ce qui doit le porter en SVG
+     — les étoiles de notation (2026-09-21, « couleur des étoiles de
+     notation : bleu dégradé du bouton + »). */
+  --menu-ajouter-debut: #4ba2f5;
+  --menu-ajouter-fin: #2b65f5;
   --menu-ajouter-encre: #ffffff;
   --menu-ajouter-ombre: 0 8px 18px -6px rgba(47, 108, 245, 0.55);
 

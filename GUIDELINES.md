@@ -744,7 +744,9 @@ constante alignée à gauche — « pour que ça ne saute pas qd on modifie ») 
 saisie ; **la note en étoiles** (« notez votre nuit ou notez votre sieste :
 5 étoiles qu'on peut cliquer ou slider pour remplir, par défaut 3 ») — la
 qualité de 0 à 5 de la V1, sans mot dessous (« pas de label aux
-étoiles ») ; le jour de l'endormissement en mots — « Hier »,
+étoiles »), les étoiles pleines dans le dégradé bleu du bouton « + »
+(« couleur des étoiles de notation : bleu dégradé du bouton + » — ses deux
+bouts en jetons, `--menu-ajouter-debut` / `--menu-ajouter-fin`) ; le jour de l'endormissement en mots — « Hier »,
 « Aujourd'hui », sinon la date — et le calendrier au clic (« endormissement :
 mettre hier, aujourd'hui ou date, qd on clique ça ouvre le calendrier ») ;
 les notes ; « Valider ». Trois

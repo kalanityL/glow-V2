@@ -3129,7 +3129,7 @@
 /* LES CINQ ÉTOILES (2026-09-21, « système d'étoiles qu'on peut cliquer ou
    slider pour remplir ; par défaut 3 remplies ») : une rangée qui reçoit
    le doigt d'un bout à l'autre ; une étoile vide est un contour gris, une
-   pleine est de l'or des étoiles de l'accueil. */
+   pleine porte le dégradé bleu du bouton « + » (2026-09-21). */
 .etoiles-note {
   display: flex;
   justify-content: center;
@@ -3155,9 +3155,19 @@
   transition: fill 120ms, stroke 120ms;
 }
 
+/* Une étoile pleine porte le dégradé du « + » (son remplissage est posé
+   par le composant, vers le dégradé dont les arrêts sont ici) ; son contour
+   est le bout foncé du dégradé. */
+.etoiles-note__debut {
+  stop-color: var(--menu-ajouter-debut);
+}
+
+.etoiles-note__fin {
+  stop-color: var(--menu-ajouter-fin);
+}
+
 .etoiles-note__etoile--pleine {
-  fill: #f2c14e;
-  stroke: #e0ad2f;
+  stroke: var(--menu-ajouter-fin);
 }
 
 /* LE CADRAN D'UNE HEURE (2026-09-21) : un cercle au filet des champs, quatre
