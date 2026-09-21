@@ -3028,9 +3028,11 @@
   gap: 8px;
 }
 
-/* CHAQUE BORD EST UNE CARTE (2026-09-21, son dessin, « sauf rien en
-   gras ») : un fond à peine teinté, le nom à l'encre, le jour en gris
-   dessous, le cadran, l'heure en pastille. */
+/* CHAQUE BORD EST UNE CARTE (2026-09-21, son dessin `horloge.png`, « sauf
+   rien en gras ») — LES COULEURS SONT CELLES DE SON IMAGE, RELEVÉES AU
+   PIXEL (« on a dit que tu mets exactement les couleurs qd je te donne une
+   capture ») et non des jetons du thème : exception consignée. Fond de
+   carte (249, 250, 253) ; nom (1, 1, 13) ; jour (84, 103, 135). */
 .sommeil__colonne {
   display: flex;
   flex-direction: column;
@@ -3039,14 +3041,14 @@
   min-width: 0;
   padding: 12px 8px;
   border-radius: 18px;
-  background: color-mix(in srgb, var(--option-choisi-fond) 35%, var(--option-fond));
+  background: #f9fafd;
 }
 
 .sommeil__nom {
   font-family: var(--font-body);
   font-weight: 500;
   font-size: 15px;
-  color: var(--encre);
+  color: #01010d;
 }
 
 .sommeil__jour {
@@ -3056,7 +3058,7 @@
   font-family: var(--font-body);
   font-weight: 500;
   font-size: 14px;
-  color: var(--encre-chapeau);
+  color: #546787;
   cursor: pointer;
 }
 
@@ -3070,8 +3072,10 @@
   padding: 8px 16px;
   border: 0;
   border-radius: 14px;
-  background: var(--option-choisi-fond);
-  color: var(--encre);
+  /* Son image : pastille (237, 242, 251), chiffre (1, 2, 20), horloge
+     (59, 74, 105). */
+  background: #edf2fb;
+  color: #010214;
   font-family: var(--font-body);
   font-weight: 500;
   /* La taille des heures du design d'avant (2026-09-21, « remets les heures
@@ -3084,7 +3088,7 @@
 .sommeil__heure .icone {
   width: 16px;
   height: 16px;
-  color: var(--encre-chapeau);
+  color: #3b4a69;
 }
 
 .sommeil__heure span {
@@ -3174,14 +3178,18 @@
   outline: none;
 }
 
+/* Son image, relevée au pixel : intérieur (250, 251, 253), cercle
+   (220, 225, 235), repères (41, 59, 92), crans des minutes (196, 203, 219),
+   crans des heures (54, 72, 106), arc (146, 175, 241), boule (30, 45, 82)
+   cerclée de (250, 250, 250), aiguille (34, 50, 83). */
 .cadran__cercle {
-  fill: var(--option-fond);
-  stroke: var(--option-filet);
+  fill: #fafbfd;
+  stroke: #dce1eb;
   stroke-width: 1.5;
 }
 
 .cadran__repere {
-  fill: var(--encre-chapeau);
+  fill: #293b5c;
   font-family: var(--font-body);
   font-size: 10px;
   font-weight: 500;
@@ -3192,20 +3200,20 @@
    boule à l'encre, la boule cerclée de blanc (son dessin). */
 .cadran__arc {
   fill: none;
-  stroke: var(--option-choisi-fond);
+  stroke: #92afef;
   stroke-width: 3;
   stroke-linecap: round;
 }
 
 .cadran__aiguille {
-  stroke: var(--encre);
+  stroke: #223253;
   stroke-width: 2;
   stroke-linecap: round;
 }
 
 .cadran__boule {
-  fill: var(--encre);
-  stroke: var(--module-fond);
+  fill: #1e2d52;
+  stroke: #fafafa;
   stroke-width: 2;
 }
 
@@ -3245,11 +3253,11 @@
 }
 
 .cadran__cran {
-  stroke: var(--option-filet);
+  stroke: #c4cbdb;
   stroke-width: 1;
 }
 
 .cadran__cran--heure {
-  stroke: var(--encre-chapeau);
+  stroke: #364868;
   stroke-width: 1.4;
 }
