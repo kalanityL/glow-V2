@@ -72,17 +72,17 @@
   --fond-encre: hsl(52 64% 16%);
 }
 
-/* fond-cafe-parisien.jpg — teinte 31°, 49 % de pixels vifs, haut clair (0.68). */
+/* fond-cafe-parisien.jpg — teinte 29°, 68 % de pixels vifs, haut clair (0.61). */
 .page.page--fond-cafe-parisien {
-  --logo-from: hsl(31 79% 48%);
-  --logo-via: hsl(31 79% 28%);
-  --logo-to: hsl(31 63% 72%);
-  --marque-degrade-debut: hsl(31 63% 16%);
-  --marque-degrade-fin: hsl(31 63% 16%);
-  --marque-accent: hsl(31 79% 32%);
-  --devise-encre: hsl(31 79% 32%);
-  --rond-encre: hsl(31 63% 20%);
-  --fond-encre: hsl(31 63% 16%);
+  --logo-from: hsl(29 80% 48%);
+  --logo-via: hsl(29 80% 28%);
+  --logo-to: hsl(29 64% 72%);
+  --marque-degrade-debut: hsl(29 64% 16%);
+  --marque-degrade-fin: hsl(29 64% 16%);
+  --marque-accent: hsl(29 80% 32%);
+  --devise-encre: hsl(29 80% 32%);
+  --rond-encre: hsl(29 64% 20%);
+  --fond-encre: hsl(29 64% 16%);
 }
 
 /* fond-nuit-etoilee.jpg — teinte 222°, 44 % de pixels vifs, haut sombre (0.08). */
