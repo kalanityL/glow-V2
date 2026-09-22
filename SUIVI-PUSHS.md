@@ -10,6 +10,48 @@ du push seul, jusqu'au jour où un déploiement existera.
 
 ---
 
+## 2026-09-22 — neuvième push · 23 commits (`4605149..HEAD`) · déployé
+
+**Poussé et déployé sur sa demande** (« prepare un clear push et deploy »),
+neuvième déploiement sur `https://glow-private-v2.web.app`. Entrée écrite
+avant le push. Le verrou de connexion, lui, était déjà en ligne depuis le
+21/09 au soir (déployé par elle, `! firebase deploy --only hosting:v2`).
+
+**Vérifié avant envoi :** `npm run build` vert — `tsc` silencieux,
+`npm test` 85/85, `index-BNkmTDcm.js`.
+
+**Ce que le lot contient :**
+- LE VERROU DE CONNEXION : l'identification de la V1, même projet
+  Firebase, mêmes comptes ; armé en production seulement ; « Se
+  déconnecter » sur « Mon compte » ; la dépendance `firebase`, la seule.
+  La connexion Google en ligne marche depuis qu'elle a ajouté
+  `glow-private-v2.web.app` aux domaines autorisés (un site Hosting
+  supplémentaire ne l'est pas de lui-même).
+- L'AVATAR MODULAIRE, ESSAYÉ ET RETIRÉ : les SVG de `../avatars` sont le
+  dessin plat qu'elle a refusé ; la fusion est défaite par commit inverse,
+  l'avatar de la V1 reste.
+- LE SOMMEIL : « Notez la qualité de ce sommeil », « Durée : 8 h 05 » ;
+  aucune nature marquée d'avance ; les étoiles à cinq branches nettes sans
+  contour (l'étoile du logo et deux halos ont vécu une heure chacun) ; le
+  cadran dont l'arc et la boule sont dans les bleus des étoiles, le
+  dégradé marqué du pâle au plein ; passer minuit en glissant change le
+  jour ; le jour en mots d'avant-hier à après-demain, sinon la date ;
+  toucher une étoile donne bien l'étoile touchée.
+- LES SONS : après une simulation de vingt clics, le catalogue entier
+  embarqué en fichiers rendus par `scripts/rendre-sons.mjs` ; « Bulle »
+  pour la règle du poids, « Plastique » pour le cadran, « Cristal » pour
+  les étoiles ; jamais incrustés dans le bundle. Sa ligne « parametre
+  effets sonores » dans `TODO.md`.
+- LA BALANCE : « Balance mise à jour ! » ; et le « + » mène bien à la
+  prise quand la forme du traitement manque hors base (relue du
+  catalogue).
+- Les tests excluent les worktrees des agents (`.claude/**`).
+
+**Répondu sans commit :** la simulation des réglages de l'avatar actuel
+(agrandir, déplacer, écarter ; sourcils en courbure), en artifact.
+
+**Non vérifié sur Android :** les sons, les gestes des cadrans.
+
 ## 2026-09-21 — huitième push · 9 commits (`31380c6..HEAD`) · déployé
 
 **Poussé et déployé sur sa demande** (« push et deploy tout v1 et v2 »),

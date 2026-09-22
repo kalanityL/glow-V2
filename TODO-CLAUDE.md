@@ -11,61 +11,51 @@ que de te faire lire le fichier. Le TODO de la V1 est importé tel quel dans
 
 ---
 
-## NOTE DE REPRISE — CLEAR DU 2026-09-21 AU SOIR (le sommeil, le téléphone long)
+## NOTE DE REPRISE — CLEAR DU 2026-09-22 (le verrou, les sons, le sommeil peaufiné)
 
-**Rien ne tourne, rien n'est à moitié fait.** Aucun workflow ni agent en
-cours. LA V2 EN LIGNE EST LE VERROU (le 21/09 au soir, déployé par elle
-depuis la conversation, `! firebase deploy --only hosting:v2`, le
-classificateur me l'ayant refusé) : `glow-private-v2.web.app` sert
-`index-Dbp3y_6I.js`, le build du commit `bd7ecd0` (le verrou seul, sans
-l'avatar modulaire — retiré). V1 push `e9a96b84`, en ligne sur
-`glow-private.web.app` (`index-CkQLwi94.js`), vérifiée inchangée. LES
-COMMITS DE LA V2 DEPUIS `4605149` NE SONT PAS POUSSÉS (le verrou, la
-fusion de l'avatar et son inverse, les notes) : neuvième push à écrire
-dans `SUIVI-PUSHS.md` quand elle dira « pousse ». Pousser et déployer SEULEMENT sur son ordre, ÉCRIRE
-L'ENTRÉE DE `SUIVI-PUSHS.md` AVANT le push ; la V1 se pousse et se déploie
-à part, depuis son dépôt (`firebase deploy --only hosting`, jamais les
-règles Firestore sans ordre).
+**Rien ne tourne, rien n'est à moitié fait.** Aucun agent en cours. TOUT
+EST POUSSÉ (neuvième push, 23 commits `4605149..HEAD`, entrée écrite dans
+`SUIVI-PUSHS.md`) ET DÉPLOYÉ sur `glow-private-v2.web.app` sur son ordre
+du 22/09 (« prepare un clear push et deploy » ; empreinte attendue
+`index-BNkmTDcm.js` — si le déploiement a été refusé au classificateur,
+c'est elle qui le lance : `! firebase deploy --only hosting:v2`). V1
+inchangée (`index-CkQLwi94.js`). Pousser et déployer SEULEMENT sur son
+ordre, ÉCRIRE L'ENTRÉE DE `SUIVI-PUSHS.md` AVANT le push.
 
-**Le serveur** : 3002, `npm run dev -- --port 3002 --strictPort`. Chrome se
-pilote par `scripts/piloter-chrome.mjs` (DevTools, ports 9333/9340) ; les
-captures avec Chrome sans fenêtre, état forcé par `sed` sur les `useState`
-et RESTAURÉ PAR `sed` INVERSE, jamais par `git checkout`.
+**LA MACHINE MANQUE DE MÉMOIRE** (Chrome 6 à 8 Go sur 17) : Claude Code
+tue les serveurs en arrière-plan toutes les quelques minutes, et Chrome
+sans fenêtre ne se lance plus par moments. Relancer `npm run dev -- --port
+3002 --strictPort` quand la page est blanche ; elle peut le lancer
+elle-même avec `!` devant. Chrome se pilote par
+`scripts/piloter-chrome.mjs` (ports 9340+) ; toujours `pkill -f
+"remote-debugging-port=<port>"` après, JAMAIS un `pkill` de tous les Chrome
+sans fenêtre (un agent a tué une capture de la session parente).
 
-**FAIT depuis la note du matin (tout dans GUIDELINES) :**
-- LA PAGE D'UN SOMMEIL (`PageSommeil`) et sa confirmation : Nuit/Sieste
-  en gros boutons, puis les deux bords en cartes d'après `horloge.png`
-  (`CadranHeure` : boule qui se glisse, crans de montre, arc en dégradé de
-  0 à la boule), la jauge de durée 4 px (se remplit puis s'intensifie),
-  « 13 h de sommeil », les étoiles dans le dégradé du « + » ; EN TROIS
-  ÉCRANS quand la suite ne tient pas (mesuré au rendu), la note d'avance du
-  dernier sommeil de même nature, le fil d'Ariane « 10/09 23:45 · 11/09
-  07:00 / nuit de 7 h 15 », « Valider » en troisième écran ;
-- un message qui apparaît se montre (`montrerEnEntier`), partout ;
-- `/long` (commit `09a89d5`) : la même application dans un cadre dont
-  l'écran fait 850 px (`app-root--long`, cadre 914 px, la fenêtre défile) ;
-  `/` inchangé. Servi en ligne sans rien changer (rewrite `**`).
-- L'AVATAR MODULAIRE, ESSAYÉ ET RETIRÉ (le soir) : les SVG de
-  `../avatars` sont le dessin plat qu'elle a refusé (« trop moche ») ;
-  fusion `0ca2db7` défaite par commit inverse, l'avatar de la V1 reste.
-  Le style voulu est celui de `UX:UI chatGPT/avatar/*.jpeg` (images
-  peintes, pas des pièces). Voir GUIDELINES § 4. La branche
-  `worktree-agent-ae33afaaf63172488` et son worktree existent encore.
-
-**LE VERROU DE CONNEXION EST FAIT** (2026-09-21, « brancher sur la v2 en
-ligne la meme identification que la v1 et utiliser les memes comptes ») :
-tout dans GUIDELINES § 4, « Le verrou de connexion ». Armé en production
-seulement ; en local, `npm run build` puis `npx vite preview --port 4173`
-pour voir l'écran de connexion. Vérifié au rendu, et un faux mot de passe
-reçoit bien « E-mail ou mot de passe incorrect. » du vrai projet.
-- [x] « Continuer avec Google » en ligne : la fenêtre Google se refermait
-      aussitôt — `glow-private-v2.web.app` n'était pas dans les domaines
-      autorisés du projet (lu par le point public `getProjectConfig` avec
-      la clé d'API). Elle l'a ajouté dans la console le 21/09 au soir :
-      « fait - ça marche ». Un site Hosting supplémentaire n'est PAS
-      autorisé de lui-même : tout nouveau domaine s'ajoute à la main.
-- L'HÉBERGEMENT : Firebase Hosting (Google), projet `glow-private`, site
-  `glow-private-v2`, déployé depuis sa machine par `firebase deploy`.
+**FAIT le 21/09 au soir et le 22/09 (tout dans GUIDELINES) :**
+- LE VERROU DE CONNEXION (GUIDELINES § 4) : Firebase Authentication de la
+  V1, `plateforme/compte.ts`, `screens/Verrou.tsx`, `screens/Connexion.tsx`,
+  armé en production seulement (`main.tsx`) ; en local, `npm run build`
+  puis `npx vite preview --port 4173` pour le voir. La connexion Google
+  marche depuis qu'elle a ajouté le domaine dans la console.
+- L'AVATAR MODULAIRE essayé par un agent et RETIRÉ (« trop moche ») : les
+  SVG de `../avatars` sont plats ; le style voulu est celui de
+  `UX:UI chatGPT/avatar/*.jpeg`. Deux pistes proposées (pièces en images
+  sur un canevas commun, ou vectoriel dessiné) ; puis « on va faire autre
+  chose ». La branche `worktree-agent-ae33afaaf63172488` et son worktree
+  existent encore, fusion défaite.
+- LA SIMULATION DES RÉGLAGES DE L'AVATAR ACTUEL (artifact
+  https://claude.ai/code/artifact/6ffee016-3b34-42d5-a153-98eb90b46f40,
+  fichier `scratchpad/avatar-reglages.html` de cette session) : curseurs
+  par élément, sourcils en courbure « plat ↔ circonflexe », valeurs à
+  dicter en bas. Elle n'a rien dicté encore.
+- LES SONS (artifact de la simulation :
+  https://claude.ai/code/artifact/b8484e6b-40a6-4284-97ec-7c994d1781db) :
+  catalogue embarqué, `scripts/rendre-sons.mjs`, `app/sons.ts` (Bulle,
+  Plastique, Cristal).
+- LE SOMMEIL : textes, nature sans défaut, étoiles nettes sans halo (ne
+  pas reproposer de halo), cadran assorti et dégradé, minuit change le
+  jour, jours en mots, note sous le doigt corrigée.
+- « Balance mise à jour ! » ; la forme du traitement relue du catalogue.
 
 **Ce qui n'existe pas encore (les écrans l'annoncent, éteint) :** Journal,
 Analyse, Concentration sanguine, Évolution du traitement / du poids ; les
