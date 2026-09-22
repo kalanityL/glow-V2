@@ -1,4 +1,4 @@
-import { useState, type ReactElement, type ReactNode } from 'react';
+import { useEffect, useRef, useState, type ReactElement, type ReactNode } from 'react';
 import { BarreDuBas, type AjoutTraitement } from './BarreDuBas';
 import { EntetePage } from './EntetePage';
 import type { FondProps } from './Accueil';
@@ -19,6 +19,10 @@ import type { ModuleId } from '../app/modules';
    polices et la photo — jamais une ressource distante. */
 import imageValidation from '../assets/images/validation-prise.svg';
 import { IndiceDefilement } from '../components/IndiceDefilement';
+import { jouerClics } from '../plateforme/navigateur';
+import { SON_DE_LA_CONFIRMATION, morceauxDuSon } from '../app/sons';
+
+const GLING = morceauxDuSon(SON_DE_LA_CONFIRMATION);
 
 /** Les entrées possibles de l'écran ; chaque écran dit lesquelles, DANS
     SON ORDRE (2026-09-20, « nouvelle element : en 1er ») : ajouter
@@ -97,6 +101,19 @@ export function PageConfirmation({
   const textes = useTextes();
   /* La demande d'ouvrir le tiroir du « + » : un compteur que la barre écoute. */
   const [demandeAjout, setDemandeAjout] = useState(0);
+
+  /* LE GLING (2026-09-22, « joue 7 :petite cloche a chaque page de
+     confirmation ») : joué une fois, à l'instant où la page apparaît —
+     chaque confirmation, enregistrement ou mise à jour, est une page qui
+     naît. Un navigateur qui refuse le son se tait. Le drapeau : en
+     développement, le mode strict monte l'écran deux fois, et la file des
+     clics l'aurait joué deux fois à 45 ms d'écart (vu au Chrome piloté). */
+  const glingJoue = useRef(false);
+  useEffect(() => {
+    if (glingJoue.current) return;
+    glingJoue.current = true;
+    jouerClics(GLING);
+  }, []);
 
   /* Seul « Ajouter » agit (2026-09-20, « retour à l'accueil comme les
      autres désactivés ») ; la barre du bas et le bouton du téléphone

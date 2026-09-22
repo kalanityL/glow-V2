@@ -21,6 +21,13 @@ export const SON_DU_CADRAN: SonId = 'plastique';
     au soir, « ajouter son cristal à variation de qualité sommeil »). */
 export const SON_DE_LA_NOTE: SonId = 'cristal';
 
+/** LE GLING DE LA CONFIRMATION (2026-09-22, « joue 7 :petite cloche a
+    chaque page de confirmation », après la simulation « quatre notes ») :
+    « Petite cloche », quatre notes montantes d'une frappe enregistrée,
+    joué à l'instant où toute page de confirmation d'enregistrement
+    apparaît. */
+export const SON_DE_LA_CONFIRMATION: SonId = 'petite-cloche';
+
 export function morceauxDuSon(son: SonId): readonly string[] {
   return SONS[son];
 }

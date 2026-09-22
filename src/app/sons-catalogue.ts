@@ -12,6 +12,7 @@ import cran5 from '../assets/sons/cran-5.wav';
 import cran6 from '../assets/sons/cran-6.wav';
 import cran7 from '../assets/sons/cran-7.wav';
 import cran8 from '../assets/sons/cran-8.wav';
+import petiteCloche1 from '../assets/sons/petite-cloche-1.wav';
 import ticDeMontre1 from '../assets/sons/tic-de-montre-1.wav';
 import ticDeMontre2 from '../assets/sons/tic-de-montre-2.wav';
 import ticDeMontre3 from '../assets/sons/tic-de-montre-3.wav';
@@ -75,12 +76,14 @@ import monteAvecLePoids8 from '../assets/sons/monte-avec-le-poids-8.wav';
 import monteAvecLePoids9 from '../assets/sons/monte-avec-le-poids-9.wav';
 import monteAvecLePoids10 from '../assets/sons/monte-avec-le-poids-10.wav';
 
-export const SONS_IDS = ['roue', 'tic-de-montre', 'cliquet', 'piece-de-monnaie', 'aiguille', 'ressort', 'clochette', 'aimant', 'ting', 'clink', 'goutte', 'cristal', 'carillon-de-verre', 'bulle', 'tac-de-bois', 'touche-de-clavier', 'plastique', 'gamme-qui-monte', 'gamme-qui-descend', 'deux-notes', 'monte-avec-le-poids'] as const;
+export const SONS_IDS = ['roue', 'petite-cloche', 'tic-de-montre', 'cliquet', 'piece-de-monnaie', 'aiguille', 'ressort', 'clochette', 'aimant', 'ting', 'clink', 'goutte', 'cristal', 'carillon-de-verre', 'bulle', 'tac-de-bois', 'touche-de-clavier', 'plastique', 'gamme-qui-monte', 'gamme-qui-descend', 'deux-notes', 'monte-avec-le-poids'] as const;
 export type SonId = (typeof SONS_IDS)[number];
 
 export const SONS: Record<SonId, readonly string[]> = {
   /* Roue de la fortune — son enregistrement découpé (2026-09-21 au matin). */
   roue: [cran1, cran2, cran3, cran4, cran5, cran6, cran7, cran8],
+  /* Petite cloche — quatre notes d'une frappe enregistrée, rendues par `rendre-petite-cloche.sh` (2026-09-22). */
+  'petite-cloche': [petiteCloche1],
   /* Tic de montre — Métal, 4 200 Hz. */
   'tic-de-montre': [ticDeMontre1, ticDeMontre2, ticDeMontre3, ticDeMontre4],
   /* Cliquet — Métal, 2 500 Hz. */

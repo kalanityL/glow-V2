@@ -842,6 +842,30 @@ carte (nature et durée, endormissement, réveil, qualité) qui rouvre le
 formulaire en modification, puis Ajouter, Journal, Évolution du sommeil,
 Accueil.
 
+**Toute page de confirmation d'enregistrement fait « gling » en
+apparaissant** (2026-09-22, « joue 7 :petite cloche a chaque page de
+confirmation ») : `PageConfirmation` joue `SON_DE_LA_CONFIRMATION`
+(`app/sons.ts`) une fois, à sa naissance — enregistrement ou mise à jour,
+prise, pesée, sommeil, et toute confirmation à venir qui passe par cet
+écran. Le son est « Petite cloche », choisi dans une simulation en trois
+temps (le même jour : dix sons libres de droits dans l'esprit de son
+`gling.mov`, puis dix de plus au plus près du gling isolé de son fond,
+puis « je crois que le son initial est 4 notes jouees rapidement, refais
+tous les sons precedents mais avec 4 notes et que je puisse modifier la
+vitesse ») : une frappe de « Small Bell #2 » (steffcaffrey, Freesound
+452379, CC0) jouée quatre fois transposée sur mi5 · sol#5 · si5 · mi6, la
+première douce et la dernière pleine, une note tous les 90 ms — les
+réglages de la page tels qu'elle les a écoutés ; une autre vitesse ou un
+autre motif se dicte. Rendu EN FICHIER (`src/assets/sons/petite-cloche-1.wav`,
+2,97 s avec sa résonance) par `scripts/rendre-petite-cloche.sh` depuis la
+frappe gardée hors du dépôt avec l'enregistrement de la roue
+(`son-pour-claude/petite-cloche-frappe.mp3`) ; il entre au catalogue
+(`sons-catalogue.ts`, écrit à la main tel que `rendre-sons.mjs` l'écrit,
+sans relancer le rendu au hasard des souffles) sous l'identifiant
+`petite-cloche`, joué par le même verbe `jouerClics`. Les dix-neuf autres
+timbres de la simulation ne sont pas embarqués : ce sont des fichiers
+tiers, à reprendre si l'écran des effets sonores les veut.
+
 **Toute page de l'application porte la barre du bas** (`BarreDuBas`, avec
 ses deux tiroirs) et, hors de l'accueil, **l'entête des pages**
 (`EntetePage` : la marque en petit et les deux outils sur une ligne, le

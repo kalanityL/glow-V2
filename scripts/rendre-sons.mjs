@@ -22,7 +22,8 @@
  * gammes ont une note par morceau (huit), « Deux notes » deux, « Monte avec
  * le poids » dix (un par dixième de kilo). La roue de la fortune, elle, est
  * son enregistrement découpé (`cran-1..8.wav`, 2026-09-21 au matin) : elle
- * reste au catalogue, sans être rendue ici.
+ * reste au catalogue, sans être rendue ici — comme la petite cloche de la
+ * confirmation (`petite-cloche-1.wav`, rendue par `rendre-petite-cloche.sh`).
  *
  * Chaque fichier : mono, 44 100 Hz, 16 bits, coupé au silence, normalisé à
  * -1 dB de crête (0,9) — comme les morceaux de la roue l'avaient été.
@@ -168,14 +169,17 @@ const catalogue = `/* ENGENDRÉ PAR \`scripts/rendre-sons.mjs\` (2026-09-21) —
    d'interface, qui iront dans le dictionnaire le jour de l'écran des
    effets sonores (son TODO). */
 ${roue.map((v, i) => `import ${v} from '../assets/sons/cran-${i + 1}.wav';`).join('\n')}
+import petiteCloche1 from '../assets/sons/petite-cloche-1.wav';
 ${lignesImport.join('\n')}
 
-export const SONS_IDS = ['roue', ${SONS.map((s) => `'${s.id}'`).join(', ')}] as const;
+export const SONS_IDS = ['roue', 'petite-cloche', ${SONS.map((s) => `'${s.id}'`).join(', ')}] as const;
 export type SonId = (typeof SONS_IDS)[number];
 
 export const SONS: Record<SonId, readonly string[]> = {
   /* Roue de la fortune — son enregistrement découpé (2026-09-21 au matin). */
   roue: [${roue.join(', ')}],
+  /* Petite cloche — quatre notes d'une frappe enregistrée, rendues par `rendre-petite-cloche.sh` (2026-09-22). */
+  'petite-cloche': [petiteCloche1],
 ${lignesCatalogue.join('\n')}
 };
 `;
