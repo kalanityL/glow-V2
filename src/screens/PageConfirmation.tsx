@@ -9,6 +9,7 @@ import {
   IconeEtoiles,
   IconeJournal,
   IconePlus,
+  IconeProfil,
 } from '../components/Icones';
 import { useTextes } from '../i18n/useTextes';
 import { classeDuTheme } from '../themes/themes';
@@ -27,14 +28,23 @@ const GLING = morceauxDuSon(SON_DE_LA_CONFIRMATION);
 /** Les entrées possibles de l'écran ; chaque écran dit lesquelles, DANS
     SON ORDRE (2026-09-20, « nouvelle element : en 1er ») : ajouter
     d'abord, l'accueil en dernier. */
-export const ENTREES_CONFIRMATION = ['ajouter', 'journal', 'concentration', 'evolution', 'evolutionPoids', 'evolutionSommeil', 'accueil'] as const;
+export const ENTREES_CONFIRMATION = ['ajouter', 'journal', 'concentration', 'evolution', 'evolutionPoids', 'evolutionSommeil'] as const;
 export type EntreeConfirmation = (typeof ENTREES_CONFIRMATION)[number];
 
+/** D'OÙ L'ON VIENT (2026-09-23, « 1er choix, pas en bleu : "retourner à"+
+    l endroit d'ou vient ») : la page où le « + » a été touché — l'accueil
+    ou « Mon compte » ; un formulaire ouvert depuis une confirmation garde
+    l'origine de celle-ci. */
+export const ORIGINES = ['accueil', 'compte'] as const;
+export type Origine = (typeof ORIGINES)[number];
+
 /** Les entrées de l'écran d'une prise, et celles d'une pesée (2026-09-21,
-    « page de confirmation : exactement meme principe »). */
-export const ENTREES_PRISE: readonly EntreeConfirmation[] = ['ajouter', 'journal', 'concentration', 'evolution', 'accueil'];
-export const ENTREES_PESEE: readonly EntreeConfirmation[] = ['ajouter', 'journal', 'evolutionPoids', 'accueil'];
-export const ENTREES_SOMMEIL: readonly EntreeConfirmation[] = ['ajouter', 'journal', 'evolutionSommeil', 'accueil'];
+    « page de confirmation : exactement meme principe »). « Retour à
+    l'accueil », qui fermait la liste éteint, est parti le 2026-09-23 : le
+    premier choix ramène d'où l'on vient. */
+export const ENTREES_PRISE: readonly EntreeConfirmation[] = ['ajouter', 'journal', 'concentration', 'evolution'];
+export const ENTREES_PESEE: readonly EntreeConfirmation[] = ['ajouter', 'journal', 'evolutionPoids'];
+export const ENTREES_SOMMEIL: readonly EntreeConfirmation[] = ['ajouter', 'journal', 'evolutionSommeil'];
 
 const ICONES: Record<EntreeConfirmation, () => ReactElement> = {
   ajouter: IconePlus,
@@ -43,7 +53,14 @@ const ICONES: Record<EntreeConfirmation, () => ReactElement> = {
   evolution: IconeAnalyse,
   evolutionPoids: IconeAnalyse,
   evolutionSommeil: IconeAnalyse,
+};
+
+/** L'icône de l'endroit d'où l'on vient (« icone correspondant selon,la d
+    ou on vient ») : celle de l'accueil dans la barre du bas, celle du
+    profil pour « Mon compte ». */
+const ICONES_ORIGINE: Record<Origine, () => ReactElement> = {
   accueil: IconeEtoiles,
+  compte: IconeProfil,
 };
 
 /** Une ligne de la carte récapitulative : l'icône, le mot, la valeur à droite. */
@@ -64,16 +81,21 @@ export interface LigneConfirmation {
  * confirmation injection ») : son image de validation, le titre et « Votre
  * suivi est à jour. » ; la carte récapitulative en lignes de même style —
  * UN BOUTON, qui rouvre le formulaire en modification ; « Vous pouvez
- * maintenant : » et ses entrées SANS SOUS-TITRE, la première pleine :
- * AJOUTER UN AUTRE ÉLÉMENT, qui ouvre le tiroir du « + » ; les autres
- * éteintes tant que leurs pages n'existent pas, le retour à l'accueil aussi
- * (« retour à l'accueil comme les autres désactivés »). RIEN EN GRAS.
+ * maintenant : » et ses entrées SANS SOUS-TITRE — D'ABORD « RETOURNER À »
+ * L'ENDROIT D'OÙ L'ON VIENT, avec son icône, sur carte et pas à l'accent
+ * (2026-09-23, « 1er choix, pas en bleu : "retourner à"+ l endroit d'ou
+ * vient ; icone correspondant selon,la d ou on vient » — l'ancien « Retour
+ * à l'accueil », éteint en dernier, est parti avec) ; puis AJOUTER UN
+ * AUTRE ÉLÉMENT, pleine, qui ouvre le tiroir du « + » ; puis les autres,
+ * éteintes tant que leurs pages n'existent pas. RIEN EN GRAS.
  */
 export function PageConfirmation({
   titrePage,
   titre,
   lignes,
   entrees,
+  origine,
+  onRetour,
   forme,
   onModifier,
   onAccueil,
@@ -88,6 +110,9 @@ export function PageConfirmation({
   titre: string;
   lignes: readonly LigneConfirmation[];
   entrees: readonly EntreeConfirmation[];
+  /** D'où l'on vient, et le geste qui y ramène. */
+  origine: Origine;
+  onRetour: () => void;
   /** La forme du traitement, pour la case du tiroir du « + ». */
   forme: Forme | null;
   /** La carte touchée : rouvrir le formulaire sur ce qui vient d'être consigné. */
@@ -115,10 +140,11 @@ export function PageConfirmation({
     jouerClics(GLING);
   }, []);
 
-  /* Seul « Ajouter » agit (2026-09-20, « retour à l'accueil comme les
-     autres désactivés ») ; la barre du bas et le bouton du téléphone
-     ramènent à l'accueil. */
+  /* Parmi les entrées, seule « Ajouter » agit (2026-09-20, « retour à
+     l'accueil comme les autres désactivés ») ; le retour d'où l'on vient
+     est le premier choix, avant elles. */
   const agit = (entree: EntreeConfirmation) => (entree === 'ajouter' ? () => setDemandeAjout((n) => n + 1) : null);
+  const IconeOrigine = ICONES_ORIGINE[origine];
 
   return (
     <div
@@ -147,14 +173,21 @@ export function PageConfirmation({
 
           <h3 className="confirmation__maintenant">{textes.confirmation.maintenant}</h3>
           <div className="confirmation__entrees">
-            {entrees.map((entree, i) => {
+            <button type="button" className="confirmation__entree" onClick={onRetour}>
+              <span className="confirmation__pastille">
+                <IconeOrigine />
+              </span>
+              <span className="confirmation__entreeNom">{textes.confirmation.retourVers[origine]}</span>
+              <IconeChevronDroit />
+            </button>
+            {entrees.map((entree) => {
               const Icone = ICONES[entree];
               const action = agit(entree);
               return (
                 <button
                   key={entree}
                   type="button"
-                  className={`confirmation__entree${i === 0 ? ' confirmation__entree--pleine' : ''}`}
+                  className={`confirmation__entree${entree === 'ajouter' ? ' confirmation__entree--pleine' : ''}`}
                   disabled={!action}
                   aria-disabled={!action}
                   onClick={action ?? undefined}

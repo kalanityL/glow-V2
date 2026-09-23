@@ -8,7 +8,7 @@ import { Onboarding } from './screens/Onboarding';
 import { Accueil } from './screens/Accueil';
 import { Compte } from './screens/Compte';
 import { PagePrise } from './screens/PagePrise';
-import { PageConfirmation, ENTREES_PESEE, ENTREES_PRISE, ENTREES_SOMMEIL } from './screens/PageConfirmation';
+import { PageConfirmation, ENTREES_PESEE, ENTREES_PRISE, ENTREES_SOMMEIL, type Origine } from './screens/PageConfirmation';
 import { PagePesee } from './screens/PagePesee';
 import { PageSommeil } from './screens/PageSommeil';
 import { IconeBalance, IconeCalendrier, IconeCoche, IconeComprime, IconeHorloge, IconeLieu, IconeSeringue, IconeSommeil } from './components/Icones';
@@ -104,7 +104,13 @@ export default function App({ verrou = false }: { /** Le verrou de connexion, ar
         onFermer: () => setBlocTraitementOuvert(false),
       }
     : null;
+  /* D'OÙ L'ON VIENT (2026-09-23, « "retourner à"+ l endroit d'ou vient ») :
+     la page où le « + » est touché — l'accueil ou « Mon compte » ; touché
+     depuis une confirmation ou un formulaire, l'origine ne bouge pas. La
+     confirmation y ramène par son premier choix. */
+  const [origine, setOrigine] = useState<Origine>('accueil');
   const ajouter = (module: ModuleId) => {
+    if (page === 'accueil' || page === 'compte') setOrigine(page);
     if (module === 'traitement') {
       if (parcours.reponses.formeTraitement && parcours.reponses.traitement) {
         setModification(false);
@@ -275,6 +281,8 @@ export default function App({ verrou = false }: { /** Le verrou de connexion, ar
                     ]),
               ]}
               entrees={ENTREES_PRISE}
+              origine={origine}
+              onRetour={() => setPage(origine)}
               forme={parcours.reponses.formeTraitement}
               onModifier={() => {
                 setModification(true);
@@ -345,6 +353,8 @@ export default function App({ verrou = false }: { /** Le verrou de connexion, ar
                 { icone: <IconeCoche />, nom: textes.sommeil.qualites[dernierSommeil.quality] ?? '', valeur: `${dernierSommeil.quality} / 5` },
               ]}
               entrees={ENTREES_SOMMEIL}
+              origine={origine}
+              onRetour={() => setPage(origine)}
               forme={parcours.reponses.formeTraitement}
               onModifier={() => {
                 setModification(true);
@@ -373,6 +383,8 @@ export default function App({ verrou = false }: { /** Le verrou de connexion, ar
                 },
               ]}
               entrees={ENTREES_PESEE}
+              origine={origine}
+              onRetour={() => setPage(origine)}
               forme={parcours.reponses.formeTraitement}
               onModifier={() => {
                 setModification(true);

@@ -9,7 +9,7 @@ import type { RefusConnexion } from '../domaine/connexion';
 import type { JourRelatif } from '../domaine/dates';
 import type { Zone } from '../domaine/prises';
 import type { SleepKind } from '../donnees/v1';
-import type { EntreeConfirmation } from '../screens/PageConfirmation';
+import type { EntreeConfirmation, Origine } from '../screens/PageConfirmation';
 import type { Systeme, Unite } from '../domaine/unites';
 import type { Langue } from './langues';
 import type { Objectif } from '../screens/onboarding/reponses';
@@ -349,6 +349,9 @@ export interface Textes {
     sousTitre: string;
     zone: string;
     maintenant: string;
+    /** Le premier choix, « Retourner à » l'endroit d'où l'on vient
+        (2026-09-23). */
+    retourVers: Record<Origine, string>;
     /** Les entrées, sans sous-titre (2026-09-20, « pas de sous titre »). */
     entrees: Record<EntreeConfirmation, string>;
   };
@@ -693,6 +696,12 @@ const FR: Textes = {
     sousTitre: 'Votre suivi est à jour.',
     zone: 'Zone d’injection',
     maintenant: 'Vous pouvez maintenant :',
+    /* « "retourner à"+ l endroit d'ou vient » (2026-09-23) : l'accueil, ou
+       la page « Mon compte », par son nom. */
+    retourVers: {
+      accueil: 'Retourner à l’accueil',
+      compte: 'Retourner à Mon compte',
+    },
     /* Ses mots du 2026-09-20 : « voir la concentration -> concentration
        sanguine ; voir l'évolution : Evolution du traitement ». */
     entrees: {
@@ -702,7 +711,6 @@ const FR: Textes = {
       evolution: 'Évolution du traitement',
       evolutionPoids: 'Évolution du poids',
       evolutionSommeil: 'Évolution du sommeil',
-      accueil: 'Retour à l’accueil',
     },
   },
   calendrier: {

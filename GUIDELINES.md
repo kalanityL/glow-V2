@@ -866,6 +866,20 @@ sans relancer le rendu au hasard des souffles) sous l'identifiant
 timbres de la simulation ne sont pas embarqués : ce sont des fichiers
 tiers, à reprendre si l'écran des effets sonores les veut.
 
+**Le premier choix d'une confirmation ramène d'où l'on vient** (2026-09-23,
+« page de confirmation : Vous pouvez maintenant : 1er choix, pas en bleu :
+"retourner à"+ l endroit d'ou vient ; icone correspondant selon,la d ou on
+vient ») : sous « Vous pouvez maintenant : », d'abord « Retourner à
+l'accueil » ou « Retourner à Mon compte » — la page où le « + » a été
+touché (`Origine`, mémorisée dans `App` au moment du « + » ; un formulaire
+ouvert depuis une confirmation garde l'origine de celle-ci) —, avec
+l'icône de cet endroit (les étoiles de l'accueil, le profil de
+« Mon compte »), sur carte et PAS à l'accent ; puis « Ajouter un autre
+élément », toujours pleine ; puis les entrées éteintes. « Retour à
+l'accueil », qui fermait la liste éteint depuis le 2026-09-20, est retiré
+entièrement (entrée, texte, icône). Lecture prise : « pas en bleu » vise
+ce premier choix ; « Ajouter » garde sa couleur, elle n'en a pas parlé.
+
 **Toute page de l'application porte la barre du bas** (`BarreDuBas`, avec
 ses deux tiroirs) et, hors de l'accueil, **l'entête des pages**
 (`EntetePage` : la marque en petit et les deux outils sur une ligne, le
