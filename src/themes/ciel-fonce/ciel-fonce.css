@@ -182,10 +182,15 @@
   /* La tige, dans le bleu du thème (2026-09-20, « tige bleue »). */
   --graduation-repere: var(--accent);
 
-  /* Le menu du bas : pas de couleurs propres ici, il prend celles du thème —
-     la surface des réponses, son filet, l'encre du chapeau, l'accent, le
-     bouton. Les jetons sont déclarés pour que la règle trouve une valeur. */
-  --menu-fond: var(--option-fond);
+  /* Le menu du bas : hors son fond, pas de couleurs propres ici, il prend
+     celles du thème — le filet des réponses, l'encre du chapeau, l'accent,
+     le bouton. Les jetons sont déclarés pour que la règle trouve une valeur. */
+  /* LA BARRE EST UNE VITRE (2026-09-26, « effet transparent vitré sur le
+     menu du bas comme pour la v1 ») : sur un ciel sombre à encre blanche,
+     le verre du menu du thème sombre de la V1, Bleu nuit — « la nuit du
+     Sidéral #07243d à 55 % » (`V1/src/versions/mixte/themes/bleu-nuit/
+     bleu-nuit.css:967`). Le flou est dans `page.css`. */
+  --menu-fond: rgba(7, 36, 61, 0.55);
   --menu-filet: var(--option-filet);
   --menu-encre: var(--encre-chapeau);
   --menu-actif: var(--accent);

@@ -555,7 +555,17 @@ Lucide de la V1, recopiés sans la bibliothèque dans `components/Icones.tsx`),
 sans point d'exclamation, et les trois étoiles du logo en doré à la place du
 soleil. **Rien n'y est cliquable** tant que les pages n'existent pas : des
 blocs, pas des boutons — **sauf le portrait, qui ouvre la page Profil**
-(2026-09-19).
+(2026-09-19). **Le menu du bas est une vitre depuis le 2026-09-26** (« effet
+transparent vitré sur le menu du bas comme pour la v1 ») : son fond est un
+jeton translucide — le blanc de son image à 55 % sur Blanc et Dégradé doux,
+la nuit du Bleu nuit de la V1 `rgba(7, 36, 61, 0.55)` sur les deux ciels —
+et `page.css` lui donne le flou et la saturation du menu de la V1 dans son
+dernier état, `blur(16px) saturate(1.4)` (`V1/src/index.css:4410-4414`,
+`bleu-ensoleille.css:894-898`, `bleu-nuit.css:967`) ; ce qui passe dessous
+— la photo, le bas d'un tiroir — se devine flouté, le « + », les icônes, le
+filet de son image et la mise en page ne bougent pas. L'ombre portée vers
+le haut du menu de la V1 (`0 -6px 18px -10px rgb(0 0 0 / 0.35)`) n'est pas
+reprise.
 
 **Le menu principal** (2026-09-19, « remplace le lien profil du menu par une
 icone menu qui ouvre un menu […] garder le design actuel », puis « ouvre le

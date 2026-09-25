@@ -129,7 +129,13 @@
      vif, entrées éteintes en gris bleuté, disque « Ajouter » en dégradé
      vertical du bleu clair au bleu franc, croix blanche, halo bleu pâle
      sous le disque. */
-  --menu-fond: #ffffff;
+  /* LA BARRE EST UNE VITRE (2026-09-26, « effet transparent vitré sur le
+     menu du bas comme pour la v1 ») : le blanc de son image, posé à 55 % —
+     l'opacité du verre du menu de la V1 (`rgb(1 167 177 / 0.55)` sur
+     Nostalgic, `V1/src/index.css:4410-4414` ; `rgb(219 240 253 / 0.55)` sur
+     Bleu ensoleillé, `bleu-ensoleille.css:894-898`). Le flou est dans
+     `page.css`. */
+  --menu-fond: rgba(255, 255, 255, 0.55);
   --menu-filet: #f5f7f9;
   --menu-encre: #6c7793;
   --menu-actif: #2f6cf5;

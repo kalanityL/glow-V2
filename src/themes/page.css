@@ -1167,6 +1167,15 @@
    tu as les couleurs exactes pour le menu du bas ») : les thèmes clairs les
    posent aux valeurs relevées sur son image, les ciels les prennent dans
    leurs jetons existants. */
+/* LA BARRE EST UNE VITRE (2026-09-26, « effet transparent vitré sur le menu
+   du bas comme pour la v1 ») : son fond est un jeton TRANSLUCIDE, et ce qui
+   passe dessous — la photo de fond, le bas d'un tiroir — se devine flouté.
+   Le flou et la saturation sont ceux du menu du bas de la V1, dans son
+   dernier état (`.nost-root .glow-frosted-bar`, `V1/src/index.css:4410-4414`,
+   et le même verre sur Bleu ensoleillé, `bleu-ensoleille.css:894-898`) :
+   16 px et 1,4 — des mesures, pas des couleurs ; l'opacité, elle, est dans
+   `--menu-fond` de chaque thème. Le « + » et les icônes n'en sont pas
+   touchés : ils sont peints par-dessus, opaques. */
 .menu {
   display: flex;
   align-items: flex-end;
@@ -1174,6 +1183,8 @@
   padding: 8px 6px 10px;
   border-top: 1px solid var(--menu-filet);
   background: var(--menu-fond);
+  -webkit-backdrop-filter: blur(16px) saturate(1.4);
+  backdrop-filter: blur(16px) saturate(1.4);
 }
 
 .menu__entree {
