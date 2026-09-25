@@ -1,7 +1,7 @@
 /* ENGENDRÉ PAR `scripts/engendrer-activites.mjs` (2026-09-25) — NE PAS ÉDITER
    À LA MAIN : corriger `docs/pour-claude/compendium/arbre.json` et relancer.
    Le catalogue des activités physiques : son tri du Compendium of Physical
-   Activities 2024 (pacompendium.com), 766 activités et leur MET, en neuf
+   Activities 2024 (pacompendium.com), 762 activités et leur MET, en neuf
    catégories. Les noms des activités sont des DONNÉES du catalogue (comme
    les noms des traitements), en français ; l'intitulé anglais d'origine
    reste à côté, pour la recherche et pour retrouver l'activité dans le
@@ -487,16 +487,6 @@ export const CATALOGUE_ACTIVITES: Record<CategorieActivite, readonly NoeudActivi
           sous: [],
         },
       ],
-    },
-    {
-      nom: "Marche athlétique",
-      activites: [
-        { code: "15525", met: 10.3, nom: "Marche athlétique, 3.1 m/s (6.9 mph)", en: "Race Walking, 3.1 m/s (6.9 mph)" },
-        { code: "15527", met: 13.8, nom: "Marche athlétique, 3.7 m/s (8.3 mph)", en: "Race Walking, 3.7 m/s (8.3 mph)" },
-        { code: "15528", met: 15.5, nom: "Marche athlétique, vitesse de course, 4.0 m/s (8.95 mph)", en: "Race Walking, racing speed, 4.0 m/s (8.95 mph)" },
-        { code: "17110", met: 6.5, nom: "Marche athlétique", en: "Race walking", estime: true },
-      ],
-      sous: [],
     },
     {
       nom: "Course à pied",

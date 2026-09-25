@@ -1659,40 +1659,6 @@
     ]
    },
    {
-    "nom": "Marche athlétique",
-    "activites": [
-     {
-      "code": "15525",
-      "met": 10.3,
-      "nom": "Marche athlétique, 3.1 m/s (6.9 mph)",
-      "en": "Race Walking, 3.1 m/s (6.9 mph)",
-      "estime": false
-     },
-     {
-      "code": "15527",
-      "met": 13.8,
-      "nom": "Marche athlétique, 3.7 m/s (8.3 mph)",
-      "en": "Race Walking, 3.7 m/s (8.3 mph)",
-      "estime": false
-     },
-     {
-      "code": "15528",
-      "met": 15.5,
-      "nom": "Marche athlétique, vitesse de course, 4.0 m/s (8.95 mph)",
-      "en": "Race Walking, racing speed, 4.0 m/s (8.95 mph)",
-      "estime": false
-     },
-     {
-      "code": "17110",
-      "met": 6.5,
-      "nom": "Marche athlétique",
-      "en": "Race walking",
-      "estime": true
-     }
-    ],
-    "sous": []
-   },
-   {
     "nom": "Course à pied",
     "activites": [
      {

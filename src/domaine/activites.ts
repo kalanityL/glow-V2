@@ -68,7 +68,6 @@ export const DUREES_PROPOSEES = [15, 30, 45, 60] as const;
 export const DISTANCE_PAR_DEFAUT_KM: Readonly<Record<string, number>> = {
   Marche: 5,
   Randonnée: 5,
-  'Marche athlétique': 5,
   'Course à pied': 5,
   'Raquettes à neige': 5,
   Vélo: 10,

@@ -1026,7 +1026,9 @@ d'avance du sport
 par defaut : a pied et raquette 5km ; à velo/roller : 10km ; natation :
 1km ; rameur : 4km ; patinage, ski : pas de possibilité de mettre la
 distance » ; le vélo elliptique avec le vélo, le canoë-kayak-aviron avec
-le rameur, deux rapprochements de moi). « Catégories » et neuf tuiles, les catégories de SON tri du Compendium of
+le rameur, deux rapprochements de moi). **« Marche athlétique » est retirée de l'arbre** (2026-09-26, « supprime
+"marche athlétique" de la liste des sports ») : ses quatre activités
+aussi, `arbre.json` corrigé et le catalogue régénéré. « Catégories » et neuf tuiles, les catégories de SON tri du Compendium of
 Physical Activities 2024 (la simulation « Compendium des activités
 physiques » des 24 et 25 septembre : Ballon et balles, Raquettes, Roues,
 Pédestre, Cheval, Individuel, Activités aquatiques, Activités hivernales,
