@@ -1766,11 +1766,15 @@
    l'image l'écrit sur deux (« Effets / secondaires »), la rangée prend la
    hauteur de la plus haute. Pas de sous-titre : elle n'en veut pas. Les
    colonnes sont égales (GUIDELINES) ; la marge latérale reste celle de la
-   page (20 px sur l'image, 16 ici au plus large). */
+   page (20 px sur l'image, 16 ici au plus large). PUIS TOUT EN PLUS PETIT
+   (2026-09-25, « menu + : nom des catégories pas en gras, en + petit / tout
+   en + petit (icone pastille rectangle) ») : les mesures de l'image sont
+   réduites d'un quart environ — pastille 48, icône 24, coins 12, gouttière
+   10, chevron 20 — et le nom passe à 14 px sans gras. */
 .tiroir__cases {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 14px;
+  gap: 10px;
   /* Le titre du tiroir garde ses 10 px de marge dessous : de sa ligne de
      base au haut des cartes, l'image compte 17 px. */
   margin-top: 0;
@@ -1786,11 +1790,11 @@
   grid-template-columns: minmax(0, 1fr) auto;
   grid-template-rows: auto auto;
   align-items: start;
-  row-gap: 8px;
+  row-gap: 6px;
   min-width: 0;
-  padding: 12px 18px 14px 20px;
+  padding: 10px 14px 12px 14px;
   border: 0;
-  border-radius: 14px;
+  border-radius: 12px;
   background: var(--module-fond);
   box-shadow: var(--ajout-carte-ombre);
   color: inherit;
@@ -1799,53 +1803,55 @@
   cursor: pointer;
 }
 
-/* La pastille de 64 px (48 auparavant), bleu pâle, l'icône en bleu — les
-   deux relevés sur l'image, en jetons du thème. */
+/* La pastille, bleu pâle, l'icône en bleu — les deux relevés sur l'image,
+   en jetons du thème ; 64 px sur l'image, 48 depuis le 2026-09-25 (« tout
+   en + petit »). */
 .tiroir__case .tiroir__icone {
-  width: 64px;
-  height: 64px;
+  width: 48px;
+  height: 48px;
   background: var(--ajout-pastille-fond);
   color: var(--ajout-icone-encre);
 }
 
-/* L'ICÔNE : LA NÔTRE (« garde nos icones »), de 32 px — la moitié de la
-   pastille, comme sur l'image (33 px mesurés dans 64). LE TRAIT NE GROSSIT
-   PAS AVEC L'ICÔNE (2026-09-20, « augmentation de la taille des icones ne
-   veut pas dire augmentation de la taille du trait. meme taille de trait
-   pour icone du menu et icone du menu + ») : 2 sur 24 ferait 2,67 px à
-   32 px ; divisé par 32/18, 1,125 pour faire 1,5 px à l'écran comme dans le
-   menu (et 1,0125 pour la fenêtre resserrée, 1,8 × 18/32). Les icônes de
-   l'image, plus épaisses, ne sont pas reprises. */
+/* L'ICÔNE : LA NÔTRE (« garde nos icones »), la moitié de la pastille
+   comme sur l'image (33 px mesurés dans 64) : 24 px dans 48 depuis le
+   2026-09-25. LE TRAIT NE GROSSIT PAS AVEC L'ICÔNE (2026-09-20,
+   « augmentation de la taille des icones ne veut pas dire augmentation de
+   la taille du trait. meme taille de trait pour icone du menu et icone du
+   menu + ») : à 24 px dans une fenêtre de 24, un trait de 1,5 fait 1,5 px à
+   l'écran comme dans le menu (1,35 pour la fenêtre resserrée, 1,8 × 18/24).
+   Les icônes de l'image, plus épaisses, ne sont pas reprises. */
 .tiroir__case .tiroir__icone .icone {
-  width: 32px;
-  height: 32px;
-  stroke-width: 1.125;
+  width: 24px;
+  height: 24px;
+  stroke-width: 1.5;
 }
 
 .tiroir__case .tiroir__icone .icone--resserree {
-  stroke-width: 1.0125;
+  stroke-width: 1.35;
 }
 
 /* Le chevron « › », en haut à droite, centré sur la hauteur de la pastille,
-   en bleu grisé : 8 × 14 px sur l'image, la fenêtre de 24 px de Lucide
-   au trait de 2 le donne tel quel. Il ne dit rien que la carte ne dise
+   en bleu grisé : 8 × 14 px sur l'image dans une fenêtre de 24, 20 depuis
+   le 2026-09-25 (« tout en + petit »). Il ne dit rien que la carte ne dise
    déjà : caché aux lecteurs d'écran. */
 .tiroir__case-chevron {
   align-self: center;
-  width: 24px;
-  height: 24px;
+  width: 20px;
+  height: 20px;
   color: var(--ajout-chevron-encre);
 }
 
-/* Le titre : 16 px en gras (hauteur de capitale de 11–12 px sur l'image),
-   en bleu nuit, sur deux lignes s'il le faut ; sur toute la largeur de la
-   carte, sous la pastille et le chevron. */
+/* Le nom : 16 px en gras sur l'image ; 14 px SANS GRAS depuis le
+   2026-09-25 (« nom des catégories pas en gras, en + petit »), en bleu
+   nuit, sur deux lignes s'il le faut ; sur toute la largeur de la carte,
+   sous la pastille et le chevron. */
 .tiroir__case-nom {
   grid-column: 1 / -1;
   min-width: 0;
   font-family: var(--font-body);
-  font-weight: 700;
-  font-size: 16px;
+  font-weight: 400;
+  font-size: 14px;
   line-height: 1.25;
   color: var(--ajout-titre-encre);
 }

@@ -615,7 +615,7 @@ propres couleurs. NON REPRIS de l'image, à sa demande : les sous-titres
 20/09), son titre « Ajouter une entrée » (le nôtre, sur la ligne de la
 croix, la croix telle quelle) ; et, de nous-mêmes, le fond du tiroir reste
 la photo voilée du 20/09 (l'image a un fond blanc uni) et la marge latérale
-celle de la page.
+celle de la page. **Puis tout en plus petit** (2026-09-25, « menu + : nom des catégories pas en gras, en + petit / tout en + petit (icone pastille rectangle) ») : pastille 48, icône 24, coins 12, gouttière 10, chevron 20, le nom à 14 px sans gras.
 
 **La page d'une prise** (2026-09-20, « ajouter->injection : envoie vers une
 page ultra simple avec uniquement le fomulaire d'ajout d'injection de la v1
