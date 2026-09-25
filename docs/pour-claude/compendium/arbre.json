@@ -1,0 +1,6469 @@
+[
+ {
+  "id": "ballon-et-balles",
+  "noeuds": [
+   {
+    "nom": "Basket-ball",
+    "activites": [
+     {
+      "code": "15040",
+      "met": 8.0,
+      "nom": "Basket-ball, match (Taylor Code 490)",
+      "en": "Basketball, game (Taylor Code 490)",
+      "estime": false
+     },
+     {
+      "code": "15050",
+      "met": 6.0,
+      "nom": "Basket-ball, hors match, en général (Taylor Code 480)",
+      "en": "Basketball, non-game, general (Taylor Code 480)",
+      "estime": false
+     },
+     {
+      "code": "15055",
+      "met": 7.5,
+      "nom": "Basket-ball, en général",
+      "en": "Basketball, general",
+      "estime": false
+     },
+     {
+      "code": "15060",
+      "met": 7.0,
+      "nom": "Basket-ball, arbitrage (Taylor Code 500)",
+      "en": "Basketball, officiating (Taylor Code 500)",
+      "estime": false
+     },
+     {
+      "code": "15062",
+      "met": 5.8,
+      "nom": "Basket-ball, arbitrage",
+      "en": "Basketball, officiating",
+      "estime": false
+     },
+     {
+      "code": "15070",
+      "met": 5.0,
+      "nom": "Basket-ball, tirs au panier",
+      "en": "Basketball, shooting baskets",
+      "estime": false
+     },
+     {
+      "code": "15072",
+      "met": 9.3,
+      "nom": "Basket-ball, exercices, entraînement",
+      "en": "Basketball, drills, practice",
+      "estime": false
+     }
+    ],
+    "sous": []
+   },
+   {
+    "nom": "Football",
+    "activites": [
+     {
+      "code": "15195",
+      "met": 7.8,
+      "nom": "Futsal",
+      "en": "Futsal",
+      "estime": false
+     },
+     {
+      "code": "15605",
+      "met": 9.5,
+      "nom": "Football, en compétition",
+      "en": "Soccer, competitive",
+      "estime": false
+     },
+     {
+      "code": "15610",
+      "met": 7.0,
+      "nom": "Football, en loisir, en général (Taylor Code 540)",
+      "en": "Soccer, casual, general (Taylor Code 540)",
+      "estime": false
+     },
+     {
+      "code": "15615",
+      "met": 3.5,
+      "nom": "Football en marchant",
+      "en": "Walking football/soccer",
+      "estime": false
+     }
+    ],
+    "sous": []
+   },
+   {
+    "nom": "Football américain",
+    "activites": [
+     {
+      "code": "15210",
+      "met": 8.0,
+      "nom": "Football américain, en compétition",
+      "en": "Football, competitive",
+      "estime": false
+     },
+     {
+      "code": "15230",
+      "met": 8.0,
+      "nom": "Football américain, touch, flag, en général (Taylor Code 510)",
+      "en": "Football, touch, flag, general (Taylor Code 510)",
+      "estime": false
+     },
+     {
+      "code": "15232",
+      "met": 4.0,
+      "nom": "Football américain, touch, flag, effort léger",
+      "en": "Football, touch, flag, light effort",
+      "estime": true
+     },
+     {
+      "code": "15235",
+      "met": 2.5,
+      "nom": "Football américain ou baseball, jouer à se lancer la balle",
+      "en": "Football or baseball, playing catch",
+      "estime": true
+     }
+    ],
+    "sous": []
+   },
+   {
+    "nom": "Rugby",
+    "activites": [
+     {
+      "code": "15560",
+      "met": 8.3,
+      "nom": "Rugby, à XV, en équipe, en compétition",
+      "en": "Rugby, union, team, competitive",
+      "estime": false
+     },
+     {
+      "code": "15562",
+      "met": 6.3,
+      "nom": "Rugby, à toucher, hors compétition",
+      "en": "Rugby, touch, non-competitive",
+      "estime": false
+     }
+    ],
+    "sous": []
+   },
+   {
+    "nom": "Handball",
+    "activites": [
+     {
+      "code": "15320",
+      "met": 12.0,
+      "nom": "Handball (jeu de balle au mur), en général (Taylor Code 520)",
+      "en": "Handball, general (Taylor Code 520)",
+      "estime": false
+     },
+     {
+      "code": "15330",
+      "met": 8.0,
+      "nom": "Handball, en équipe",
+      "en": "Handball, team",
+      "estime": true
+     }
+    ],
+    "sous": []
+   },
+   {
+    "nom": "Hockey",
+    "activites": [
+     {
+      "code": "15205",
+      "met": 10.5,
+      "nom": "Floorball",
+      "en": "Floorball",
+      "estime": false
+     },
+     {
+      "code": "15350",
+      "met": 7.8,
+      "nom": "Hockey, sur gazon",
+      "en": "Hockey, field",
+      "estime": false
+     },
+     {
+      "code": "15360",
+      "met": 8.0,
+      "nom": "Hockey, sur glace, en général",
+      "en": "Hockey, ice, general",
+      "estime": true
+     },
+     {
+      "code": "15362",
+      "met": 10.0,
+      "nom": "Hockey, sur glace, en compétition",
+      "en": "Hockey, ice, competitive",
+      "estime": true
+     }
+    ],
+    "sous": []
+   },
+   {
+    "nom": "Volley-ball",
+    "activites": [
+     {
+      "code": "15710",
+      "met": 4.0,
+      "nom": "Volley-ball (Taylor Code 400)",
+      "en": "Volleyball (Taylor Code 400)",
+      "estime": false
+     },
+     {
+      "code": "15711",
+      "met": 6.0,
+      "nom": "Volley-ball, en compétition, en gymnase",
+      "en": "Volleyball, competitive, in gymnasium",
+      "estime": false
+     },
+     {
+      "code": "15720",
+      "met": 3.0,
+      "nom": "Volley-ball, hors compétition, équipe de 6 à 9, en général",
+      "en": "Volleyball, non-competitive, 6 – 9 member team, general",
+      "estime": false
+     },
+     {
+      "code": "15725",
+      "met": 8.0,
+      "nom": "Volley-ball, de plage, sur sable",
+      "en": "Volleyball, beach, in sand",
+      "estime": true
+     },
+     {
+      "code": "15731",
+      "met": 7.0,
+      "nom": "Wallyball, en général",
+      "en": "Wallyball, general",
+      "estime": true
+     }
+    ],
+    "sous": []
+   },
+   {
+    "nom": "Softball et baseball",
+    "activites": [
+     {
+      "code": "15620",
+      "met": 5.0,
+      "nom": "Softball ou baseball, lancer rapide ou lent, en général, effort modéré (Taylor Code 440)",
+      "en": "Softball or baseball, fast or slow pitch, general, moderate effort (Taylor Code 440)",
+      "estime": false
+     },
+     {
+      "code": "15625",
+      "met": 4.0,
+      "nom": "Softball, entraînement",
+      "en": "Softball, practice",
+      "estime": false
+     },
+     {
+      "code": "15630",
+      "met": 4.0,
+      "nom": "Softball, arbitrage",
+      "en": "Softball, officiating",
+      "estime": true
+     },
+     {
+      "code": "15640",
+      "met": 6.0,
+      "nom": "Softball, lancer",
+      "en": "Softball, pitching",
+      "estime": true
+     }
+    ],
+    "sous": []
+   },
+   {
+    "nom": "Golf",
+    "activites": [
+     {
+      "code": "15255",
+      "met": 4.5,
+      "nom": "Golf, en général",
+      "en": "Golf, general",
+      "estime": false
+     },
+     {
+      "code": "15265",
+      "met": 4.3,
+      "nom": "Golf, marche, en portant les clubs",
+      "en": "Golf, walking, carrying clubs",
+      "estime": false
+     },
+     {
+      "code": "15270",
+      "met": 3.5,
+      "nom": "Golf, miniature, practice",
+      "en": "Golf, miniature, driving range",
+      "estime": false
+     },
+     {
+      "code": "15285",
+      "met": 4.5,
+      "nom": "Golf, marche, en tirant le chariot",
+      "en": "Golf, walking, pulling clubs",
+      "estime": false
+     },
+     {
+      "code": "15290",
+      "met": 3.5,
+      "nom": "Golf, en voiturette (Taylor Code 070)",
+      "en": "Golf, using power cart (Taylor Code 070)",
+      "estime": false
+     }
+    ],
+    "sous": []
+   },
+   {
+    "nom": "Bowling",
+    "activites": [
+     {
+      "code": "15090",
+      "met": 3.0,
+      "nom": "Bowling (Taylor Code 390)",
+      "en": "Bowling (Taylor Code 390)",
+      "estime": false
+     },
+     {
+      "code": "15092",
+      "met": 3.8,
+      "nom": "Bowling, en intérieur, salle de bowling",
+      "en": "Bowling, indoor, bowling alley",
+      "estime": false
+     }
+    ],
+    "sous": []
+   },
+   {
+    "nom": "Cricket, batteur, lanceur, chasseur",
+    "activites": [
+     {
+      "code": "15150",
+      "met": 4.8,
+      "nom": "Cricket, batteur, lanceur, chasseur",
+      "en": "Cricket, batting, bowling, fielding",
+      "estime": false
+     }
+    ],
+    "sous": []
+   },
+   {
+    "nom": "Kickball",
+    "activites": [
+     {
+      "code": "15450",
+      "met": 7.0,
+      "nom": "Kickball",
+      "en": "Kickball",
+      "estime": true
+     }
+    ],
+    "sous": []
+   },
+   {
+    "nom": "Crosse (lacrosse)",
+    "activites": [
+     {
+      "code": "15460",
+      "met": 8.0,
+      "nom": "Crosse (lacrosse)",
+      "en": "Lacrosse",
+      "estime": true
+     }
+    ],
+    "sous": []
+   },
+   {
+    "nom": "Netball",
+    "activites": [
+     {
+      "code": "15477",
+      "met": 7.0,
+      "nom": "Netball",
+      "en": "Netball",
+      "estime": true
+     }
+    ],
+    "sous": []
+   },
+   {
+    "nom": "Croquet",
+    "activites": [
+     {
+      "code": "15160",
+      "met": 3.3,
+      "nom": "Croquet",
+      "en": "Croquet",
+      "estime": false
+     }
+    ],
+    "sous": []
+   },
+   {
+    "nom": "Pétanque, boulingrin, bocce, en extérieur",
+    "activites": [
+     {
+      "code": "15465",
+      "met": 3.3,
+      "nom": "Pétanque, boulingrin, bocce, en extérieur",
+      "en": "Lawn bowling, bocce ball, outdoor",
+      "estime": false
+     }
+    ],
+    "sous": []
+   },
+   {
+    "nom": "Pelote basque (jai alai)",
+    "activites": [
+     {
+      "code": "15420",
+      "met": 12.0,
+      "nom": "Pelote basque (jai alai)",
+      "en": "Jai alai",
+      "estime": true
+     }
+    ],
+    "sous": []
+   },
+   {
+    "nom": "Hacky sack",
+    "activites": [
+     {
+      "code": "15310",
+      "met": 4.0,
+      "nom": "Hacky sack",
+      "en": "Hacky sack",
+      "estime": true
+     }
+    ],
+    "sous": []
+   },
+   {
+    "nom": "Jonglage",
+    "activites": [
+     {
+      "code": "15440",
+      "met": 4.0,
+      "nom": "Jonglage",
+      "en": "Juggling",
+      "estime": true
+     }
+    ],
+    "sous": []
+   },
+   {
+    "nom": "Curling",
+    "activites": [
+     {
+      "code": "15170",
+      "met": 4.0,
+      "nom": "Curling",
+      "en": "Curling",
+      "estime": true
+     }
+    ],
+    "sous": []
+   }
+  ]
+ },
+ {
+  "id": "raquettes",
+  "noeuds": [
+   {
+    "nom": "Badminton",
+    "activites": [
+     {
+      "code": "15020",
+      "met": 7.0,
+      "nom": "Badminton, en compétition (Taylor Code 450)",
+      "en": "Badminton, competitive (Taylor Code 450)",
+      "estime": false
+     },
+     {
+      "code": "15025",
+      "met": 9.0,
+      "nom": "Badminton, en compétition, match",
+      "en": "Badminton, competitive, match play",
+      "estime": false
+     },
+     {
+      "code": "15030",
+      "met": 5.5,
+      "nom": "Badminton, loisir en simple et en double, en général",
+      "en": "Badminton, social singles and doubles, general",
+      "estime": false
+     }
+    ],
+    "sous": []
+   },
+   {
+    "nom": "Tennis",
+    "activites": [
+     {
+      "code": "15675",
+      "met": 6.8,
+      "nom": "Tennis, en général, effort modéré",
+      "en": "Tennis, general, moderate effort",
+      "estime": false
+     },
+     {
+      "code": "15676",
+      "met": 8.0,
+      "nom": "Tennis, en général, en compétition",
+      "en": "Tennis, general, competitive",
+      "estime": false
+     },
+     {
+      "code": "15680",
+      "met": 6.0,
+      "nom": "Tennis, double (Taylor Code 430)",
+      "en": "Tennis, doubles (Taylor Code 430)",
+      "estime": false
+     },
+     {
+      "code": "15685",
+      "met": 4.5,
+      "nom": "Tennis, double",
+      "en": "Tennis, doubles",
+      "estime": false
+     },
+     {
+      "code": "15690",
+      "met": 8.0,
+      "nom": "Tennis, simple (Taylor Code 420)",
+      "en": "Tennis, singles (Taylor Code 420)",
+      "estime": false
+     },
+     {
+      "code": "15695",
+      "met": 5.0,
+      "nom": "Tennis, échanges de balles, hors match, effort modéré",
+      "en": "Tennis, hitting balls, non-game play, moderate effort",
+      "estime": true
+     }
+    ],
+    "sous": []
+   },
+   {
+    "nom": "Squash",
+    "activites": [
+     {
+      "code": "15650",
+      "met": 12.0,
+      "nom": "Squash (Taylor Code 530)",
+      "en": "Squash (Taylor Code 530)",
+      "estime": false
+     },
+     {
+      "code": "15652",
+      "met": 7.3,
+      "nom": "Squash, en général",
+      "en": "Squash, general",
+      "estime": false
+     }
+    ],
+    "sous": []
+   },
+   {
+    "nom": "Racquetball",
+    "activites": [
+     {
+      "code": "15520",
+      "met": 10.0,
+      "nom": "Racquetball, en compétition",
+      "en": "Racquetball, competitive",
+      "estime": true
+     },
+     {
+      "code": "15530",
+      "met": 7.0,
+      "nom": "Racquetball, en général (Taylor Code 470)",
+      "en": "Racquetball, general (Taylor Code 470)",
+      "estime": false
+     }
+    ],
+    "sous": []
+   },
+   {
+    "nom": "Paddleball",
+    "activites": [
+     {
+      "code": "15490",
+      "met": 10.0,
+      "nom": "Paddleball, en compétition",
+      "en": "Paddleball, competitive",
+      "estime": true
+     },
+     {
+      "code": "15500",
+      "met": 6.0,
+      "nom": "Paddleball, en loisir, en général (Taylor Code 460)",
+      "en": "Paddleball, casual, general (Taylor Code 460)",
+      "estime": false
+     }
+    ],
+    "sous": []
+   },
+   {
+    "nom": "Tennis de table, ping-pong (Taylor Code 410)",
+    "activites": [
+     {
+      "code": "15660",
+      "met": 4.0,
+      "nom": "Tennis de table, ping-pong (Taylor Code 410)",
+      "en": "Table tennis, ping pong (Taylor Code 410)",
+      "estime": false
+     }
+    ],
+    "sous": []
+   }
+  ]
+ },
+ {
+  "id": "roues",
+  "noeuds": [
+   {
+    "nom": "Vélo",
+    "activites": [
+     {
+      "code": "01070",
+      "met": 5.0,
+      "nom": "Monocycle",
+      "en": "Unicycling",
+      "estime": true
+     }
+    ],
+    "sous": [
+     {
+      "nom": "Vélo",
+      "activites": [
+       {
+        "code": "01008",
+        "met": 8.5,
+        "nom": "Vélo, BMX",
+        "en": "Bicycling, BMX",
+        "estime": true
+       },
+       {
+        "code": "01010",
+        "met": 4.0,
+        "nom": "Vélo, <10 mph, loisir, pour aller au travail ou pour le plaisir (Taylor Code 115)",
+        "en": "Bicycling, <10 mph, leisure, to work or for pleasure (Taylor Code 115)",
+        "estime": false
+       },
+       {
+        "code": "01011",
+        "met": 6.8,
+        "nom": "Vélo, trajet domicile-travail, allure choisie",
+        "en": "Bicycling, to/from work, self selected pace",
+        "estime": false
+       },
+       {
+        "code": "01013",
+        "met": 5.8,
+        "nom": "Vélo, sur chemin de terre ou route de ferme, allure modérée",
+        "en": "Bicycling, on dirt or farm road, moderate pace",
+        "estime": false
+       },
+       {
+        "code": "01014",
+        "met": 7.0,
+        "nom": "Vélo, en général",
+        "en": "Bicycling, general",
+        "estime": false
+       },
+       {
+        "code": "01015",
+        "met": 4.3,
+        "nom": "Vélo, allure choisie, facile",
+        "en": "Bicycling, self-selected easy pace",
+        "estime": false
+       },
+       {
+        "code": "01016",
+        "met": 7.0,
+        "nom": "Vélo, allure choisie, modérée",
+        "en": "Bicycling, self-selected moderate pace",
+        "estime": false
+       },
+       {
+        "code": "01017",
+        "met": 9.0,
+        "nom": "Vélo, allure choisie, vigoureuse",
+        "en": "Bicycling, self-selected vigorous pace",
+        "estime": false
+       },
+       {
+        "code": "01018",
+        "met": 3.5,
+        "nom": "Vélo, loisir, 5.5 mph",
+        "en": "Bicycling, leisure 5.5 mph",
+        "estime": false
+       },
+       {
+        "code": "01019",
+        "met": 5.8,
+        "nom": "Vélo, loisir, 9.4 mph",
+        "en": "Bicycling, leisure, 9.4 mph",
+        "estime": false
+       },
+       {
+        "code": "01020",
+        "met": 6.8,
+        "nom": "Vélo, 10-11.9 mph, loisir, lent, effort léger",
+        "en": "Bicycling, 10-11.9 mph, leisure, slow, light effort",
+        "estime": false
+       },
+       {
+        "code": "01030",
+        "met": 8.0,
+        "nom": "Vélo, 12-13.9 mph, loisir, effort modéré",
+        "en": "Bicycling, 12-13.9 mph, leisure, moderate effort",
+        "estime": false
+       },
+       {
+        "code": "01040",
+        "met": 10.0,
+        "nom": "Vélo, 14-15.9 mph, course ou loisir, rapide, effort vigoureux",
+        "en": "Bicycling, 14-15.9 mph, racing or leisure, fast, vigorous effort",
+        "estime": false
+       },
+       {
+        "code": "01050",
+        "met": 12.0,
+        "nom": "Vélo, 16-19 mph, course/sans aspiration ou >19 mph en aspiration, très rapide, course en général",
+        "en": "Bicycling, 16-19 mph, racing/not drafting or >19 mph drafting, very fast, racing general",
+        "estime": true
+       },
+       {
+        "code": "01060",
+        "met": 16.8,
+        "nom": "Vélo, >20 mph, course, sans aspiration",
+        "en": "Bicycling, >20 mph, racing, not drafting",
+        "estime": false
+       },
+       {
+        "code": "01065",
+        "met": 8.5,
+        "nom": "Vélo, 12 mph, assis, mains sur les cocottes ou en bas du guidon, 80 rpm",
+        "en": "Bicycling, 12 mph, seated, hands on brake hoods or bar drops, 80 rpm",
+        "estime": false
+       },
+       {
+        "code": "01066",
+        "met": 9.0,
+        "nom": "Vélo, 12 mph, en danseuse, mains sur les cocottes, 60 rpm",
+        "en": "Bicycling, 12 mph, standing, hands on brake hoods, 60 rpm",
+        "estime": false
+       },
+       {
+        "code": "01003",
+        "met": 14.0,
+        "nom": "VTT, vélo de montagne, en montée, effort vigoureux",
+        "en": "Bicycling, mountain, uphill, vigorous",
+        "estime": false
+       },
+       {
+        "code": "01004",
+        "met": 16.0,
+        "nom": "VTT, vélo de montagne, course de compétition",
+        "en": "Bicycling, mountain, competitive racing",
+        "estime": false
+       },
+       {
+        "code": "01009",
+        "met": 8.5,
+        "nom": "VTT, vélo de montagne, en général",
+        "en": "Bicycling, mountain, general",
+        "estime": true
+       },
+       {
+        "code": "01080",
+        "met": 6.8,
+        "nom": "Vélo électrique (à assistance électrique) sans assistance électronique",
+        "en": "E-bike (electrically assisted) without electronic support",
+        "estime": false
+       },
+       {
+        "code": "01084",
+        "met": 6.0,
+        "nom": "Vélo électrique (à assistance électrique) avec assistance électronique faible",
+        "en": "E-bike (electrically assisted) with light electronic support",
+        "estime": false
+       },
+       {
+        "code": "01088",
+        "met": 4.0,
+        "nom": "Vélo électrique (à assistance électrique) avec assistance électronique forte",
+        "en": "E-bike (electrically assisted) with high electronic support",
+        "estime": false
+       }
+      ],
+      "sous": []
+     },
+     {
+      "nom": "Vélo stationnaire",
+      "activites": [
+       {
+        "code": "01200",
+        "met": 6.8,
+        "nom": "Vélo, stationnaire, en général",
+        "en": "Bicycling, stationary, general",
+        "estime": false
+       },
+       {
+        "code": "01210",
+        "met": 3.5,
+        "nom": "Vélo, stationnaire, 25-30 watts, effort très léger à léger",
+        "en": "Bicycling, stationary, 25-30 watts, very light to light effort",
+        "estime": false
+       },
+       {
+        "code": "01214",
+        "met": 4.0,
+        "nom": "Vélo, stationnaire, 50 watts, effort léger",
+        "en": "Bicycling, stationary, 50 watts, light effort",
+        "estime": false
+       },
+       {
+        "code": "01216",
+        "met": 5.0,
+        "nom": "Vélo, stationnaire, 60 watts, effort léger à modéré",
+        "en": "Bicycling, stationary, 60 watts, light to moderate effort",
+        "estime": false
+       },
+       {
+        "code": "01218",
+        "met": 5.8,
+        "nom": "Vélo, stationnaire, 70-80 watts",
+        "en": "Bicycling, stationary, 70-80 watts",
+        "estime": false
+       },
+       {
+        "code": "01220",
+        "met": 6.0,
+        "nom": "Vélo, stationnaire, 90-100 watts, effort modéré à vigoureux",
+        "en": "Bicycling, stationary, 90-100 watts,  moderate to vigorous",
+        "estime": false
+       },
+       {
+        "code": "01224",
+        "met": 6.8,
+        "nom": "Vélo, stationnaire, 101-125 watts",
+        "en": "Bicycling, stationary, 101-125 watts",
+        "estime": false
+       },
+       {
+        "code": "01228",
+        "met": 8.0,
+        "nom": "Vélo, stationnaire, 126-150 watts",
+        "en": "Bicycling, stationary, 126-150 watts",
+        "estime": false
+       },
+       {
+        "code": "01232",
+        "met": 10.3,
+        "nom": "Vélo, stationnaire, 151-199 watts",
+        "en": "Bicycling, stationary, 151-199 watts",
+        "estime": false
+       },
+       {
+        "code": "01236",
+        "met": 10.8,
+        "nom": "Vélo, stationnaire, 200-229 watts, effort vigoureux",
+        "en": "Bicycling, stationary, 200-229 watts, vigorous",
+        "estime": false
+       },
+       {
+        "code": "01240",
+        "met": 12.5,
+        "nom": "Vélo, stationnaire, 230-250 watts, effort très vigoureux",
+        "en": "Bicycling, stationary, 230-250 watts, very vigorous",
+        "estime": false
+       },
+       {
+        "code": "01244",
+        "met": 13.8,
+        "nom": "Vélo, stationnaire, 270-305 watts, effort très vigoureux",
+        "en": "Bicycling, stationary, 270-305 watts, very vigorous",
+        "estime": false
+       },
+       {
+        "code": "01248",
+        "met": 16.3,
+        "nom": "Vélo, stationnaire, >325 watts, effort très vigoureux",
+        "en": "Bicycling, stationary, >325 watts, very vigorous",
+        "estime": false
+       },
+       {
+        "code": "01270",
+        "met": 9.0,
+        "nom": "Vélo, stationnaire, cours de RPM/Spinning",
+        "en": "Bicycling, stationary, RPM/Spin bike class",
+        "estime": false
+       },
+       {
+        "code": "01290",
+        "met": 8.8,
+        "nom": "Vélo, cyclisme virtuel interactif, ergocycle en salle",
+        "en": "Bicycling, interactive virtual cycling, indoor cycle ergometer",
+        "estime": false
+       },
+       {
+        "code": "01305",
+        "met": 8.8,
+        "nom": "Vélo, entraînement fractionné à haute intensité",
+        "en": "Bicycling, high intensity interval training",
+        "estime": false
+       },
+       {
+        "code": "01252",
+        "met": 5.5,
+        "nom": "Vélo, concentrique seulement, 100 W",
+        "en": "Bicycling, concentric only, 100 W",
+        "estime": false
+       },
+       {
+        "code": "01254",
+        "met": 11.0,
+        "nom": "Vélo, concentrique seulement, 200 W",
+        "en": "Bicycling, concentric only, 200 W",
+        "estime": false
+       },
+       {
+        "code": "01262",
+        "met": 2.3,
+        "nom": "Vélo, excentrique seulement, 100 à 149 W",
+        "en": "Bicycling, eccentric only, 100 to 149 W",
+        "estime": false
+       },
+       {
+        "code": "01264",
+        "met": 4.0,
+        "nom": "Vélo, excentrique seulement, 200 W",
+        "en": "Bicycling, eccentric only, 200 W",
+        "estime": false
+       }
+      ],
+      "sous": []
+     }
+    ]
+   },
+   {
+    "nom": "Roller",
+    "activites": [
+     {
+      "code": "15590",
+      "met": 7.0,
+      "nom": "Patin à roulettes (Taylor Code 360)",
+      "en": "Skating, roller (Taylor Code 360)",
+      "estime": false
+     },
+     {
+      "code": "15591",
+      "met": 7.5,
+      "nom": "Roller, patin en ligne, 14.4 km/h (9.0 mph), rythme de loisir",
+      "en": "Roller blading, in-line skating, 14.4 km/h (9.0 mph), recreational pace",
+      "estime": false
+     },
+     {
+      "code": "15592",
+      "met": 9.8,
+      "nom": "Roller, patin en ligne, 17.7 km/h (11.0 mph), rythme modéré, entraînement",
+      "en": "Roller blading, in-line skating, 17.7 km/h (11.0 mph), moderate pace, exercise training",
+      "estime": false
+     },
+     {
+      "code": "15593",
+      "met": 12.3,
+      "nom": "Roller, patin en ligne, 21.0 à 21.7 km/h (13.0 à 13.6 mph), rythme rapide, entraînement",
+      "en": "Roller blading, in-line skating, 21.0 to 21.7 km/h (13.0 to 13.6 mph), fast pace, exercise training",
+      "estime": false
+     },
+     {
+      "code": "15594",
+      "met": 15.5,
+      "nom": "Roller, patin en ligne, 24.0 km/h (15.0 mph), effort maximal",
+      "en": "Rollerblading, in-line skating, 24.0 km/h (15.0 mph), maximal effort",
+      "estime": false
+     }
+    ],
+    "sous": []
+   },
+   {
+    "nom": "Skateboard",
+    "activites": [
+     {
+      "code": "15580",
+      "met": 5.0,
+      "nom": "Skateboard, en général, effort modéré",
+      "en": "Skateboarding, general, moderate effort",
+      "estime": true
+     },
+     {
+      "code": "15582",
+      "met": 6.0,
+      "nom": "Skateboard, en compétition, effort vigoureux",
+      "en": "Skateboarding, competitive, vigorous effort",
+      "estime": true
+     },
+     {
+      "code": "15595",
+      "met": 6.8,
+      "nom": "Skateboard, longboard, 13.3 km/h, vitesse lente",
+      "en": "Skateboard, longboard, 13.3 km/h, slow speed",
+      "estime": false
+     },
+     {
+      "code": "15596",
+      "met": 8.3,
+      "nom": "Skateboard, longboard, 16.2 km/h, vitesse habituelle",
+      "en": "Skateboard, longboard, 16.2 km/h, typical speed",
+      "estime": false
+     },
+     {
+      "code": "15597",
+      "met": 10.5,
+      "nom": "Skateboard, longboard, 18.4 km/h, vitesse rapide",
+      "en": "Skateboard, longboard, 18.4 km/h, fast speed",
+      "estime": false
+     }
+    ],
+    "sous": []
+   }
+  ]
+ },
+ {
+  "id": "pedestre",
+  "noeuds": [
+   {
+    "nom": "Marche",
+    "activites": [
+     {
+      "code": "17145",
+      "met": 4.3,
+      "nom": "Utilisation d’un scooter de genou médical",
+      "en": "Using medical knee scooter",
+      "estime": false
+     }
+    ],
+    "sous": [
+     {
+      "nom": "Marche",
+      "activites": [
+       {
+        "code": "17151",
+        "met": 2.3,
+        "nom": "Marche, moins de 2.0 mph, à plat, flânerie, très lente",
+        "en": "Walking, less than 2.0 mph, level, strolling, very slow",
+        "estime": false
+       },
+       {
+        "code": "17152",
+        "met": 2.8,
+        "nom": "Marche, 2.0 à 2.4 mph, à plat, rythme lent, surface ferme",
+        "en": "Walking, 2.0 to 2.4 mph, level, slow pace, firm surface",
+        "estime": false
+       },
+       {
+        "code": "17170",
+        "met": 3.0,
+        "nom": "Marche, 2.5 mph, surface ferme et plane",
+        "en": "Walking, 2.5 mph, firm, level surface",
+        "estime": false
+       },
+       {
+        "code": "17180",
+        "met": 3.3,
+        "nom": "Marche, 2.5 mph, en descente",
+        "en": "Walking, 2.5 mph, downhill",
+        "estime": false
+       },
+       {
+        "code": "17190",
+        "met": 3.8,
+        "nom": "Marche, 2.8 à 3.4 mph, terrain plat, allure modérée, surface ferme",
+        "en": "Walking, 2.8 to 3.4 mph, level, moderate pace, firm surface",
+        "estime": false
+       },
+       {
+        "code": "17200",
+        "met": 4.8,
+        "nom": "Marche, 3.5 à 3.9 mph, terrain plat, allure rapide, surface ferme, marche pour l’exercice",
+        "en": "Walking, 3.5 to 3.9 mph, level, brisk, firm surface, walking for exercise",
+        "estime": false
+       },
+       {
+        "code": "17220",
+        "met": 5.5,
+        "nom": "Marche, 4.0 à 4.4 mph (6.4 à 7.1 km/h), terrain plat, surface ferme, allure très rapide",
+        "en": "Walking, 4.0 to 4.4 mph (6.4 to 7.1 km/h), level, firm surface, very brisk pace",
+        "estime": false
+       },
+       {
+        "code": "17230",
+        "met": 7.0,
+        "nom": "Marche, 4.5 à 4.9 mph, terrain plat, surface ferme, allure très, très rapide",
+        "en": "Walking, 4.5 to 4.9 mph, level, firm surface, very, very brisk",
+        "estime": false
+       },
+       {
+        "code": "17231",
+        "met": 8.5,
+        "nom": "Marche, 5.0 à 5.5 mph (8.8 à 8.9 km/h), terrain plat, surface ferme",
+        "en": "Walking, 5.0 to 5.5 mph (8.8 to 8.9 km/h), level, firm surface",
+        "estime": false
+       },
+       {
+        "code": "17150",
+        "met": 2.3,
+        "nom": "Marche, à la maison",
+        "en": "Walking, household",
+        "estime": false
+       },
+       {
+        "code": "17160",
+        "met": 3.5,
+        "nom": "Marche pour le plaisir (Taylor Code 010)",
+        "en": "Walking for pleasure (Taylor Code 010)",
+        "estime": false
+       },
+       {
+        "code": "17161",
+        "met": 2.5,
+        "nom": "Marche de la maison à la voiture ou au bus, de la voiture ou du bus vers une destination, de la voiture ou du bus vers le lieu de travail et retour",
+        "en": "Walking from house to car or bus, from car or bus to go places, from car or bus to and from the worksite",
+        "estime": true
+       },
+       {
+        "code": "17162",
+        "met": 2.5,
+        "nom": "Marche jusqu’à la maison d’un voisin ou de la famille, pour des raisons sociales",
+        "en": "Walking to neighbor’s house or family’s house for social reasons",
+        "estime": true
+       },
+       {
+        "code": "17165",
+        "met": 3.0,
+        "nom": "Promenade du chien",
+        "en": "Walking the dog",
+        "estime": true
+       },
+       {
+        "code": "17250",
+        "met": 3.5,
+        "nom": "Marche, pour le plaisir, pause au travail",
+        "en": "Walking, for pleasure, work break",
+        "estime": false
+       },
+       {
+        "code": "17270",
+        "met": 4.0,
+        "nom": "Marche, pour aller au travail ou en cours (Taylor Code 015)",
+        "en": "Walking, to work or class (Taylor Code 015)",
+        "estime": false
+       },
+       {
+        "code": "17280",
+        "met": 2.5,
+        "nom": "Marche, aller-retour vers des toilettes extérieures",
+        "en": "Walking, to and from an outhouse",
+        "estime": true
+       },
+       {
+        "code": "17255",
+        "met": 4.0,
+        "nom": "Marche, vitesse choisie, piste intérieure ou extérieur, surface ferme",
+        "en": "Walking, self-selected speed, indoor track or outdoors, firm surface",
+        "estime": false
+       },
+       {
+        "code": "17260",
+        "met": 4.8,
+        "nom": "Marche, piste en herbe",
+        "en": "Walking, grass track",
+        "estime": false
+       },
+       {
+        "code": "17262",
+        "met": 4.5,
+        "nom": "Marche, allure normale, champ labouré ou sable",
+        "en": "Walking, normal pace, plowed field or sand",
+        "estime": false
+       },
+       {
+        "code": "17320",
+        "met": 6.0,
+        "nom": "Marche, à reculons, 3.5 mph, terrain plat",
+        "en": "Walking, backward, 3.5 mph, level",
+        "estime": false
+       },
+       {
+        "code": "17325",
+        "met": 7.8,
+        "nom": "Marche, à reculons, 3.5 mph, en montée, pente de 5%",
+        "en": "Walking, backward, 3.5 mph, uphill, 5% grade",
+        "estime": false
+       },
+       {
+        "code": "17330",
+        "met": 8.0,
+        "nom": "Marche, Teabag walk, Monty Python Ministry of Silly Walks",
+        "en": "Walking, Teabag walk, Monty Python Ministry of Silly Walks",
+        "estime": false
+       },
+       {
+        "code": "17332",
+        "met": 3.5,
+        "nom": "Marche, Putey walk, Monty Python Ministry of Silly Walks",
+        "en": "Walking, Putey walk, Monty Python Ministry of Silly Walks",
+        "estime": false
+       }
+      ],
+      "sous": []
+     },
+     {
+      "nom": "Marche sur tapis roulant",
+      "activites": [
+       {
+        "code": "17455",
+        "met": 8.3,
+        "nom": "Marche, tapis roulant courbe, 3.0 à 5.0 mph, allure rapide",
+        "en": "Walking, Curved treadmill, 3.0 to 5.0 mph, brisk pace",
+        "estime": false
+       },
+       {
+        "code": "17492",
+        "met": 1.5,
+        "nom": "Marche, avec un déambulateur ou en démarche pas-à-pas sur tapis roulant, 0.7 mph (1.1 km/h), pente 0%",
+        "en": "Walking, with a walker or step-to gait on treadmill, 0.7 mph (1.1 km/h), 0% grade",
+        "estime": false
+       },
+       {
+        "code": "17340",
+        "met": 2.1,
+        "nom": "Marche, tapis roulant, moins de 1.0 mph, pente 0%",
+        "en": "Walking, treadmill, less than 1.0 mph, 0% grade",
+        "estime": false
+       },
+       {
+        "code": "17343",
+        "met": 2.3,
+        "nom": "Marche, tapis roulant, 1.0 mph, pente 0%",
+        "en": "Walking, treadmill, 1.0 mph, 0% grade",
+        "estime": false
+       },
+       {
+        "code": "17346",
+        "met": 2.8,
+        "nom": "Marche, tapis roulant, 1.2 à 1.9 mph, pente 0% (1.9 à 3.1 km/h)",
+        "en": "Walking, treadmill, 1.2 to 1.9 mph, 0% grade (1.9 to 3.1 km/h)",
+        "estime": false
+       },
+       {
+        "code": "17349",
+        "met": 3.0,
+        "nom": "Marche, tapis roulant, 2.0 à 2.4 mph (3.2 à 3.9 km/h), pente 0%",
+        "en": "Walking, treadmill, 2.0 to 2.4 mph (3.2 to 3.9 km/h), 0% grade",
+        "estime": false
+       },
+       {
+        "code": "17352",
+        "met": 3.5,
+        "nom": "Marche, tapis roulant, 2.5 à 2.9 mph (4.0 à 4.7 km/h), pente 0%",
+        "en": "Walking, treadmill, 2.5 to 2.9 mph (4.0 to 4.7 km/h), 0% grade",
+        "estime": false
+       },
+       {
+        "code": "17355",
+        "met": 3.8,
+        "nom": "Marche, tapis roulant, 3.0 à 3.4 mph (4.8 à 5.5 km/h), pente 0%",
+        "en": "Walking, treadmill, 3.0 to 3.4 mph (4.8 to 5.5 km/h), 0% grade",
+        "estime": false
+       },
+       {
+        "code": "17358",
+        "met": 4.8,
+        "nom": "Marche, tapis roulant, 3.5 à 3.9 mph (5.6 à 6.3 km/h), pente 0%",
+        "en": "Walking, treadmill, 3.5 to 3.9 mph (5.6 to 6.3 km/h), 0% grade",
+        "estime": false
+       },
+       {
+        "code": "17361",
+        "met": 5.8,
+        "nom": "Marche, tapis roulant, 4.0 à 4.4 mph (6.4 à 7.1 km/h), pente 0%",
+        "en": "Walking, treadmill, 4.0 to 4.4 mph (6.4 to 7.1 km/h), 0% grade",
+        "estime": false
+       },
+       {
+        "code": "17364",
+        "met": 6.8,
+        "nom": "Marche, tapis roulant, 4.5 à 4.9 mph (7.2 à 7.9 km/h), pente 0%",
+        "en": "Walking, treadmill, 4.5 to 4.9 mph (7.2 to 7.9 km/h), 0% grade",
+        "estime": false
+       },
+       {
+        "code": "17367",
+        "met": 8.3,
+        "nom": "Marche, tapis roulant, 5.0 à 5.5 mph (8.0 à 8.9 km/h), pente 0%",
+        "en": "Walking, treadmill, 5.0 to 5.5 mph (8.0 to 8.9 km/h), 0% grade",
+        "estime": false
+       },
+       {
+        "code": "17382",
+        "met": 3.3,
+        "nom": "Marche, tapis roulant, en descente (pente de -3% à -12%), 2.8 à 3.1 mph",
+        "en": "Walking, treadmill, downhill (-3% to -12% grade), 2.8 to 3.1 mph",
+        "estime": false
+       },
+       {
+        "code": "17412",
+        "met": 3.3,
+        "nom": "Marche, tapis roulant, en descente (pente de -5% à -25%), 2.8 mph, avec bâtons de marche nordique",
+        "en": "Walking, treadmill, downhill (-5% to -25% grade), 2.8 mph, with Nordic Poles",
+        "estime": false
+       },
+       {
+        "code": "17475",
+        "met": 7.8,
+        "nom": "Marche, tapis roulant, à reculons, 2.5 mph, pente +10%",
+        "en": "Walking treadmill, backwards, 2.5 mph, +10% grade",
+        "estime": false
+       },
+       {
+        "code": "17434",
+        "met": 4.8,
+        "nom": "Marche, tapis roulant, 2.5 mph, pente 0%, 5 à 20 degrés C, charge de 40 lb (18.2 kg)",
+        "en": "Walking, treadmill, 2.5 mph, 0% grade, 5 to 20 degrees C, 40 lb (18.2 kg) load",
+        "estime": false
+       },
+       {
+        "code": "17438",
+        "met": 5.8,
+        "nom": "Marche, tapis roulant, 2.5 mph, pente 0%, -10 à 0 degrés C, charge de 40 lb (18.2 kg)",
+        "en": "Walking, treadmill, 2.5 mph, 0% grade, -10 to 0 degrees C, 40 lb (18.2 kg) load",
+        "estime": false
+       }
+      ],
+      "sous": []
+     },
+     {
+      "nom": "Montée de côtes",
+      "activites": [
+       {
+        "code": "17032",
+        "met": 5.0,
+        "nom": "Montée de côtes, sans charge, pente de 5 à 20 %, rythme très lent",
+        "en": "Climbing hills, no load, 5 to 20% grade, very slow pace",
+        "estime": false
+       },
+       {
+        "code": "17034",
+        "met": 5.3,
+        "nom": "Montée de côtes, sans charge, pente de 1 à 5 %, rythme modéré à soutenu",
+        "en": "Climbing hills, no load, 1 to 5% grade, moderate-to-brisk pace",
+        "estime": false
+       },
+       {
+        "code": "17035",
+        "met": 7.0,
+        "nom": "Montée de côtes, sans charge, pente de 6 à 10 %, rythme modéré à soutenu",
+        "en": "Climbing hills, no load, 6 to 10% grade, moderate-to-brisk pace",
+        "estime": false
+       },
+       {
+        "code": "17036",
+        "met": 8.8,
+        "nom": "Montée de côtes, sans charge, pente de 11 à 20 %, rythme lent à modéré",
+        "en": "Climbing hills, no load, 11 to 20% grade, slow-to-moderate pace",
+        "estime": false
+       },
+       {
+        "code": "17037",
+        "met": 10.0,
+        "nom": "Montée de côtes, sans charge, 4.0 à 5.0 mph, pente de 3 à 5 %, rythme très rapide",
+        "en": "Climbing hills, no load, 4.0 to 5.0 mph, 3 to 5% grade, very fast pace",
+        "estime": false
+       },
+       {
+        "code": "17038",
+        "met": 8.5,
+        "nom": "Montée de côtes, sans charge, pente raide (30 %), rythme lent (moins de 1.2 mph)",
+        "en": "Climbing hills, no load, steep grade (30%), slow pace (less than 1.2 mph)",
+        "estime": false
+       },
+       {
+        "code": "17039",
+        "met": 15.5,
+        "nom": "Montée de côtes, sans charge, pente très raide (30-40 %), 1.2 à 1.8 mph",
+        "en": "Climbing hills, no load, very steep grade (30-40%), 1.2 to 1.8 mph",
+        "estime": false
+       },
+       {
+        "code": "17040",
+        "met": 16.3,
+        "nom": "Montée de côtes, sans charge, pente raide (10-40 %), 1.8 à 5.0 mph",
+        "en": "Climbing hills, no load, steep grade (10-40%), 1.8 to 5.0 mph",
+        "estime": false
+       },
+       {
+        "code": "17033",
+        "met": 3.8,
+        "nom": "Montée de côtes, charge de 15-50 lb, pente de 1 à 2 %, rythme lent",
+        "en": "Climbing hills, 15-50 lb load, 1 to 2% grade, slow pace",
+        "estime": false
+       },
+       {
+        "code": "17045",
+        "met": 6.5,
+        "nom": "Montée de côtes, charge de 10 à 20 lb, pente de 5 à 10 %, modéré",
+        "en": "Climbing hills, 10 to 20 lb load, 5 to 10% grade, moderate",
+        "estime": false
+       },
+       {
+        "code": "17050",
+        "met": 7.5,
+        "nom": "Montée de côtes, charge de 21 à 40 lb, pente de 3 à 10 %, rythme modéré à soutenu",
+        "en": "Climbing hills, 21 to 40 lb load, 3 to 10% grade, moderate-to-brisk pace",
+        "estime": false
+       },
+       {
+        "code": "17060",
+        "met": 10.0,
+        "nom": "Montée de côtes, charge de 20+ pound, pente de 5 à 20 %, rythme modéré à soutenu",
+        "en": "Climbing hills, 20+ pound load, 5 to 20% grade, moderate to brisk pace",
+        "estime": false
+       }
+      ],
+      "sous": []
+     },
+     {
+      "nom": "Marche nordique",
+      "activites": [
+       {
+        "code": "17302",
+        "met": 4.3,
+        "nom": "Marche, pour l’exercice, 2.5 à 3.5 mph (4.0 à 5.6 km/h), avec bâtons, marche nordique, terrain plat, allure modérée",
+        "en": "Walking, for exercise, 2.5 to 3.5 mph (4.0 to 5.6 km/h), with ski poles, Nordic walking, level, moderate pace",
+        "estime": false
+       },
+       {
+        "code": "17304",
+        "met": 5.3,
+        "nom": "Marche, pour l’exercice, 3.6 à 4.4 mph (5.8 à 7.1 km/h), avec bâtons, marche nordique, terrain plat, allure modérée",
+        "en": "Walking, for exercise, 3.6 to 4.4 mph (5.8 to 7.1 km/h), with ski poles, Nordic walking, level, moderate pace",
+        "estime": false
+       },
+       {
+        "code": "17305",
+        "met": 8.5,
+        "nom": "Marche, pour l’exercice, 4.5 à 5.0 mph, avec bâtons, marche nordique, terrain plat, allure rapide",
+        "en": "Walking, for exercise, 4.5 to 5.0 mph, with ski poles, Nordic walking, level, fast pace",
+        "estime": false
+       },
+       {
+        "code": "17310",
+        "met": 8.8,
+        "nom": "Marche, pour l’exercice, avec bâtons, marche nordique, en montée, allure modérée",
+        "en": "Walking, for exercise, with ski poles, Nordic walking, uphill, moderate pace",
+        "estime": false
+       },
+       {
+        "code": "17313",
+        "met": 10.8,
+        "nom": "Marche, pour l’exercice, avec bâtons, marche nordique, terrain plat, avec une charge de 20 à 30 lb (9.0 à 15.0 kg)",
+        "en": "Walking, for exercise, with ski poles, Nordic walking, level ground, carrying 20 to 30 lb load (9.0 to 15.0 kg)",
+        "estime": false
+       },
+       {
+        "code": "17315",
+        "met": 12.3,
+        "nom": "Marche, pour l’exercice, avec bâtons, marche nordique, en montée, avec une charge de 20 à 30 lb (9.0 à 15.0 kg)",
+        "en": "Walking, for exercise, with ski poles, Nordic walking, uphill, carrying 20 to 30 lb load (9.0 to 15.0 kg)",
+        "estime": false
+       }
+      ],
+      "sous": []
+     },
+     {
+      "nom": "Marche au pas",
+      "activites": [
+       {
+        "code": "17088",
+        "met": 4.5,
+        "nom": "Marche au pas, vitesse modérée, militaire, sans paquetage",
+        "en": "Marching, moderate speed, military, no pack",
+        "estime": false
+       },
+       {
+        "code": "17090",
+        "met": 8.0,
+        "nom": "Marche au pas rapide, militaire, sans paquetage",
+        "en": "Marching rapidly, military, no pack",
+        "estime": false
+       }
+      ],
+      "sous": []
+     },
+     {
+      "nom": "Pousser une poussette ou un fauteuil roulant",
+      "activites": [
+       {
+        "code": "17100",
+        "met": 3.8,
+        "nom": "Pousser ou tirer une poussette avec enfant ou marcher avec des enfants, 2.5 à 3.1 mph",
+        "en": "Pushing or pulling stroller with child or walking with children, 2.5 to 3.1 mph",
+        "estime": false
+       },
+       {
+        "code": "17105",
+        "met": 3.8,
+        "nom": "Pousser un fauteuil roulant, hors cadre professionnel",
+        "en": "Pushing a wheelchair, non-occupational",
+        "estime": false
+       }
+      ],
+      "sous": []
+     },
+     {
+      "nom": "Marche avec béquilles",
+      "activites": [
+       {
+        "code": "17140",
+        "met": 4.5,
+        "nom": "Marche avec béquilles, terrain plat, en général",
+        "en": "Using crutches, level ground, general",
+        "estime": false
+       },
+       {
+        "code": "17142",
+        "met": 7.0,
+        "nom": "Marche avec béquilles, rythme rapide",
+        "en": "Using crutches, fast pace",
+        "estime": false
+       }
+      ],
+      "sous": []
+     },
+     {
+      "nom": "Porter une charge sur terrain plat",
+      "activites": [
+       {
+        "code": "17016",
+        "met": 4.0,
+        "nom": "Porter une charge de 5 à 14 lb (2.3 à 6.4 kg) (par ex. valise, cartons, courses), terrain plat, rythme modéré",
+        "en": "Carrying 5 to 14 lb (2.3 to 6.4 kg) load (e.g. suitcase, boxes, groceries), level ground, moderate pace",
+        "estime": false
+       },
+       {
+        "code": "17018",
+        "met": 4.5,
+        "nom": "Porter une charge de 15 – 155 lb (6.8 – 70.4 kg) (par ex. valise, cartons, meubles), terrain plat ou en descendant l’escalier, rythme lent",
+        "en": "Carrying 15 – 155 lb (6.8 – 70.4 kg) load (e.g. suitcase, boxes, furniture), level ground or downstairs, slow pace",
+        "estime": false
+       },
+       {
+        "code": "17019",
+        "met": 6.5,
+        "nom": "Porter une charge de 50 à 150 pound (par ex. aliments pour chevaux ou bovins, tubes de clôture, meubles), terrain plat, rythme modéré",
+        "en": "Carrying 50 to 150 pound load (e.g., equine or bovine feed, fence pipes, furniture), level ground, moderate pace",
+        "estime": false
+       },
+       {
+        "code": "17021",
+        "met": 2.3,
+        "nom": "Porter un enfant d’environ 10 lb, marche lente",
+        "en": "Carrying ~10 lb child, slow walking",
+        "estime": false
+       },
+       {
+        "code": "17076",
+        "met": 4.5,
+        "nom": "Transport d’eau, portage sur la tête, marche sur terrain plat",
+        "en": "Hauling water, head hauling, walking on flat surface",
+        "estime": false
+       },
+       {
+        "code": "17031",
+        "met": 3.8,
+        "nom": "Charger et/ou décharger une voiture, marche impliquée",
+        "en": "Loading  and/or unloading a car, implied walking",
+        "estime": false
+       }
+      ],
+      "sous": []
+     }
+    ]
+   },
+   {
+    "nom": "Randonnée",
+    "activites": [
+     {
+      "code": "17085",
+      "met": 2.5,
+      "nom": "Observation des oiseaux, en marchant et en s’arrêtant",
+      "en": "Bird watching, walking and stopping",
+      "estime": true
+     }
+    ],
+    "sous": [
+     {
+      "nom": "Randonnée",
+      "activites": [
+       {
+        "code": "17010",
+        "met": 7.0,
+        "nom": "Randonnée avec sac à dos (Taylor Code 050)",
+        "en": "Backpacking (Taylor Code 050)",
+        "estime": false
+       },
+       {
+        "code": "17011",
+        "met": 3.5,
+        "nom": "Marche avec un sac à dos de journée, terrain plat, en ville",
+        "en": "Walking with a day pack, level ground, assumed in the city",
+        "estime": false
+       },
+       {
+        "code": "17012",
+        "met": 7.8,
+        "nom": "Randonnée avec sac à dos, randonnée avec sac de journée, marche organisée avec sac de journée",
+        "en": "Backpacking,  hiking with a daypack, organized walking with daypack",
+        "estime": false
+       },
+       {
+        "code": "17080",
+        "met": 6.0,
+        "nom": "Randonnée, en pleine nature (Taylor Code 040)",
+        "en": "Hiking, cross country (Taylor Code 040)",
+        "estime": false
+       },
+       {
+        "code": "17081",
+        "met": 3.8,
+        "nom": "Randonnée lente ou flânerie à travers champs et coteaux, sans charge",
+        "en": "Hiking slowly or ambling through fields and hillsides, no load",
+        "estime": false
+       },
+       {
+        "code": "17082",
+        "met": 5.3,
+        "nom": "Randonnée ou marche à rythme normal à travers champs et coteaux, sans charge",
+        "en": "Hiking or walking at a normal pace through fields and hillsides, no load",
+        "estime": false
+       }
+      ],
+      "sous": []
+     }
+    ]
+   },
+   {
+    "nom": "Marche athlétique",
+    "activites": [
+     {
+      "code": "15525",
+      "met": 10.3,
+      "nom": "Marche athlétique, 3.1 m/s (6.9 mph)",
+      "en": "Race Walking, 3.1 m/s (6.9 mph)",
+      "estime": false
+     },
+     {
+      "code": "15527",
+      "met": 13.8,
+      "nom": "Marche athlétique, 3.7 m/s (8.3 mph)",
+      "en": "Race Walking, 3.7 m/s (8.3 mph)",
+      "estime": false
+     },
+     {
+      "code": "15528",
+      "met": 15.5,
+      "nom": "Marche athlétique, vitesse de course, 4.0 m/s (8.95 mph)",
+      "en": "Race Walking, racing speed, 4.0 m/s (8.95 mph)",
+      "estime": false
+     },
+     {
+      "code": "17110",
+      "met": 6.5,
+      "nom": "Marche athlétique",
+      "en": "Race walking",
+      "estime": true
+     }
+    ],
+    "sous": []
+   },
+   {
+    "nom": "Course à pied",
+    "activites": [
+     {
+      "code": "12600",
+      "met": 11.5,
+      "nom": "Course à cloche-pied sautillée, 5.5-6.0 mph",
+      "en": "Skipping, 5.5-6.0 mph",
+      "estime": false
+     }
+    ],
+    "sous": [
+     {
+      "nom": "Course",
+      "activites": [
+       {
+        "code": "12145",
+        "met": 10.5,
+        "nom": "Course, allure choisie",
+        "en": "Running, self-selected pace",
+        "estime": false
+       },
+       {
+        "code": "12150",
+        "met": 8.0,
+        "nom": "Course (Taylor Code 200)",
+        "en": "Running (Taylor Code 200)",
+        "estime": false
+       },
+       {
+        "code": "12010",
+        "met": 6.0,
+        "nom": "Alternance jogging/marche (part de jogging de moins de 10 minutes) (Taylor Code 180)",
+        "en": "Jog/walk combination (jogging component of less than 10 minutes) (Taylor Code 180)",
+        "estime": false
+       },
+       {
+        "code": "12020",
+        "met": 7.5,
+        "nom": "Jogging, en général, allure choisie",
+        "en": "Jogging, general, self-selected pace",
+        "estime": false
+       },
+       {
+        "code": "12025",
+        "met": 4.8,
+        "nom": "Jogging, sur place",
+        "en": "Jogging, in place",
+        "estime": false
+       },
+       {
+        "code": "12026",
+        "met": 3.3,
+        "nom": "Jogging, 2.6 à 3.7 mph",
+        "en": "Jogging 2.6 to 3.7 mph",
+        "estime": false
+       },
+       {
+        "code": "12027",
+        "met": 4.5,
+        "nom": "Jogging sur mini-trampoline",
+        "en": "Jogging on a mini-tramp",
+        "estime": true
+       },
+       {
+        "code": "12028",
+        "met": 6.5,
+        "nom": "Course, 4 à 4.2 mph (13 min/mile)",
+        "en": "Running, 4 to 4.2 mph (13 min/mile)",
+        "estime": false
+       },
+       {
+        "code": "12029",
+        "met": 7.8,
+        "nom": "Course, 4.3 à 4.8 mph",
+        "en": "Running 4.3 to 4.8 mph",
+        "estime": false
+       },
+       {
+        "code": "12030",
+        "met": 8.5,
+        "nom": "Course, 5.0 à 5.2 mph (12 min/mile)",
+        "en": "Running, 5.0 to 5.2 mph (12 min/mile)",
+        "estime": false
+       },
+       {
+        "code": "12045",
+        "met": 9.0,
+        "nom": "Course, 5.5 -5.8 mph",
+        "en": "Running, 5.5 -5.8 mph",
+        "estime": false
+       },
+       {
+        "code": "12050",
+        "met": 9.3,
+        "nom": "Course, 6-6.3 mph (10 min/mile)",
+        "en": "Running, 6-6.3 mph (10 min/mile)",
+        "estime": false
+       },
+       {
+        "code": "12060",
+        "met": 10.5,
+        "nom": "Course, 6.7 mph (9 min/mile)",
+        "en": "Running, 6.7 mph (9 min/mile)",
+        "estime": false
+       },
+       {
+        "code": "12070",
+        "met": 11.0,
+        "nom": "Course, 7 mph (8.5 min/mile)",
+        "en": "Running, 7 mph (8.5 min/mile)",
+        "estime": false
+       },
+       {
+        "code": "12080",
+        "met": 11.8,
+        "nom": "Course, 7.5 mph (8 min/mile)",
+        "en": "Running, 7.5 mph (8 min/mile)",
+        "estime": false
+       },
+       {
+        "code": "12090",
+        "met": 12.0,
+        "nom": "Course, 8 mph (7.5 min/mile)",
+        "en": "Running, 8 mph (7.5 min/mile)",
+        "estime": false
+       },
+       {
+        "code": "12100",
+        "met": 12.5,
+        "nom": "Course, 8.6 mph (7 min/mile)",
+        "en": "Running, 8.6 mph (7 min/mile)",
+        "estime": false
+       },
+       {
+        "code": "12110",
+        "met": 13.0,
+        "nom": "Course, 9 mph (6.5 min/mile)",
+        "en": "Running, 9 mph (6.5 min/mile)",
+        "estime": false
+       },
+       {
+        "code": "12115",
+        "met": 14.8,
+        "nom": "Course, 9.3 à 9.6 mph",
+        "en": "Running, 9.3 to 9.6 mph",
+        "estime": false
+       },
+       {
+        "code": "12120",
+        "met": 14.8,
+        "nom": "Course, 10 mph (6 min/mile)",
+        "en": "Running, 10 mph (6 min/mile)",
+        "estime": false
+       },
+       {
+        "code": "12130",
+        "met": 16.8,
+        "nom": "Course, 11 mph (5.5 min/mile)",
+        "en": "Running, 11 mph (5.5 min/mile)",
+        "estime": false
+       },
+       {
+        "code": "12132",
+        "met": 18.5,
+        "nom": "Course, 12 mph (5.0 min/mile)",
+        "en": "Running, 12 mph (5.0 min/mile)",
+        "estime": false
+       },
+       {
+        "code": "12134",
+        "met": 19.8,
+        "nom": "Course, 13 mph (4.6 min/mile)",
+        "en": "Running, 13 mph (4.6 min/mile)",
+        "estime": false
+       },
+       {
+        "code": "12135",
+        "met": 23.0,
+        "nom": "Course, 14 mph (4.3 min/mile)",
+        "en": "Running, 14 mph (4.3 min/mile)",
+        "estime": false
+       },
+       {
+        "code": "12140",
+        "met": 9.3,
+        "nom": "Course, cross-country",
+        "en": "Running, cross country",
+        "estime": false
+       },
+       {
+        "code": "12350",
+        "met": 16.0,
+        "nom": "Course, terrain vallonné, ±100m de dénivelé",
+        "en": "Running, hilly terrain, ±100m change in elevation",
+        "estime": false
+       },
+       {
+        "code": "12200",
+        "met": 13.3,
+        "nom": "Course, marathon",
+        "en": "Running, marathon",
+        "estime": false
+       },
+       {
+        "code": "12620",
+        "met": 13.0,
+        "nom": "Triathlon, course",
+        "en": "Triathlon, Running",
+        "estime": false
+       },
+       {
+        "code": "12180",
+        "met": 10.0,
+        "nom": "Course, sur piste, entraînement en équipe",
+        "en": "Running, on a track, team practice",
+        "estime": true
+       },
+       {
+        "code": "12184",
+        "met": 18.0,
+        "nom": "Course, sur piste, 500-1500m, en compétition",
+        "en": "Running, on track, 500-1500m, competitive",
+        "estime": false
+       },
+       {
+        "code": "12186",
+        "met": 19.3,
+        "nom": "Course, sur piste, 2000-3000m, en compétition",
+        "en": "Running, on track, 2000-3000m, competitive",
+        "estime": false
+       },
+       {
+        "code": "12170",
+        "met": 15.0,
+        "nom": "Course, escaliers, en montée",
+        "en": "Running, stairs, up",
+        "estime": true
+       },
+       {
+        "code": "12255",
+        "met": 10.3,
+        "nom": "Course en montée, 4.5mph, pente de 5%",
+        "en": "Running uphill, 4.5mph, 5% incline",
+        "estime": false
+       },
+       {
+        "code": "12260",
+        "met": 13.3,
+        "nom": "Course en montée, 6.0 mph, pente de 5%",
+        "en": "Running uphill, 6.0 mph, 5% incline",
+        "estime": false
+       },
+       {
+        "code": "12265",
+        "met": 15.5,
+        "nom": "Course en montée, 7.0 mph, pente de 5%",
+        "en": "Running uphill, 7.0 mph, 5% incline",
+        "estime": false
+       },
+       {
+        "code": "12325",
+        "met": 17.5,
+        "nom": "Course en montée, 5.0 à 5.9 mph, pente de 15%",
+        "en": "Running uphill, 5.0 to 5.9 mph, 15% incline",
+        "estime": false
+       },
+       {
+        "code": "12335",
+        "met": 8.8,
+        "nom": "Course en montée, 0.6 à 0.79 mph, pente de 30%",
+        "en": "Running uphill, 0.6 to 0.79 mph, 30% incline",
+        "estime": false
+       },
+       {
+        "code": "12337",
+        "met": 10.3,
+        "nom": "Course en montée, 0.8 à 0.99 mph, pente de 30%",
+        "en": "Running uphill, 0.8 to 0.99 mph, 30% incline",
+        "estime": false
+       },
+       {
+        "code": "12339",
+        "met": 11.8,
+        "nom": "Course en montée, 1.0 à 1.19 mph, pente de 30%",
+        "en": "Running uphill, 1.0 to 1.19 mph, 30% incline",
+        "estime": false
+       },
+       {
+        "code": "12341",
+        "met": 13.5,
+        "nom": "Course en montée, 1.2 à 1.39 mph, pente de 30-40%",
+        "en": "Running uphill, 1.2 to 1.39 mph, 30-40% incline",
+        "estime": false
+       },
+       {
+        "code": "12343",
+        "met": 14.8,
+        "nom": "Course en montée, 1.4 à 1.59 mph, pente de 30%",
+        "en": "Running uphill, 1.4 to 1.59 mph, 30% incline",
+        "estime": false
+       },
+       {
+        "code": "12345",
+        "met": 16.3,
+        "nom": "Course en montée, >1.6mph, pente de 10-30%",
+        "en": "Running uphill, >1.6mph, 10-30% incline",
+        "estime": false
+       },
+       {
+        "code": "12352",
+        "met": 5.8,
+        "nom": "Course en descente, 5.0 à 5.9 mph, -10% à -15%",
+        "en": "Running downhill, 5.0 to 5.9 mph, -10% to -15%",
+        "estime": false
+       },
+       {
+        "code": "12353",
+        "met": 7.5,
+        "nom": "Course en descente, 6.0 à 6.9 mph, -10% à -15%",
+        "en": "Running downhill, 6.0 to 6.9 mph, -10% to -15%",
+        "estime": true
+       },
+       {
+        "code": "12355",
+        "met": 9.0,
+        "nom": "Course en descente, 7.0 à 8.9 mph, -10% à -15%",
+        "en": "Running downhill, 7.0 to 8.9 mph, -10% to -15%",
+        "estime": false
+       },
+       {
+        "code": "12358",
+        "met": 9.3,
+        "nom": "Course en descente, 6.0 à 7.9 mph, -3% à -9%",
+        "en": "Running downhill, 6.0 to 7.9 mph, -3% to -9%",
+        "estime": false
+       },
+       {
+        "code": "12361",
+        "met": 13.8,
+        "nom": "Course en descente, 8.0 à 10.5 mph, -3% à -9%",
+        "en": "Running downhill, 8.0 to 10.5 mph, -3% to -9%",
+        "estime": false
+       },
+       {
+        "code": "12508",
+        "met": 8.5,
+        "nom": "Course, 5.0 – 5.9 mph, sac à dos de 1.0 à 3.0 kg",
+        "en": "Running, 5.0 – 5.9 mph, 1.0 to 3.0 kg backpack",
+        "estime": false
+       },
+       {
+        "code": "12510",
+        "met": 9.5,
+        "nom": "Course, 6.0 – 6.9 mph, sac à dos de 1.0 à 3.0 kg",
+        "en": "Running, 6.0 – 6.9 mph, 1.0 to 3.0 kg backpack",
+        "estime": false
+       },
+       {
+        "code": "12512",
+        "met": 9.8,
+        "nom": "Course, 7.0 – 7.9 mph, sac à dos de 1.0 à 3.0 kg",
+        "en": "Running, 7.0 – 7.9 mph, 1.0 to 3.0 kg backpack",
+        "estime": false
+       },
+       {
+        "code": "12514",
+        "met": 12.0,
+        "nom": "Course, 8.0 – 8.9 mph, sac à dos de 1.0 à 3.0 kg",
+        "en": "Running, 8.0 – 8.9 mph, 1.0 to 3.0 kg backpack",
+        "estime": false
+       },
+       {
+        "code": "12555",
+        "met": 7.8,
+        "nom": "Course, pieds nus, 3.5-5.9 mph",
+        "en": "Running, barefoot, 3.5-5.9 mph",
+        "estime": false
+       },
+       {
+        "code": "12560",
+        "met": 12.0,
+        "nom": "Course, pieds nus, 6.0-7.9 mph",
+        "en": "Running, barefoot, 6.0-7.9 mph",
+        "estime": false
+       },
+       {
+        "code": "12565",
+        "met": 13.5,
+        "nom": "Course, pieds nus, 8.0-8.9 mph",
+        "en": "Running, barefoot, 8.0-8.9 mph",
+        "estime": false
+       },
+       {
+        "code": "12190",
+        "met": 8.0,
+        "nom": "Course, entraînement, en poussant un fauteuil roulant ou une poussette",
+        "en": "Running, training, pushing a wheelchair or baby carrier",
+        "estime": true
+       },
+       {
+        "code": "12585",
+        "met": 8.0,
+        "nom": "Course, poussette de jogging, en intérieur, 5 mph",
+        "en": "Running, jogging stroller, indoors, 5 mph",
+        "estime": true
+       },
+       {
+        "code": "12588",
+        "met": 9.0,
+        "nom": "Course, poussette de jogging, en intérieur, 6 mph",
+        "en": "Running, jogging stroller, indoors, 6 mph",
+        "estime": false
+       },
+       {
+        "code": "12593",
+        "met": 10.0,
+        "nom": "Course, poussette de jogging, en extérieur, 5 mph",
+        "en": "Running, jogging stroller, outdoors, 5 mph",
+        "estime": true
+       },
+       {
+        "code": "12595",
+        "met": 11.5,
+        "nom": "Course, poussette de jogging, en extérieur, 6 mph",
+        "en": "Running, jogging stroller, outdoors, 6 mph",
+        "estime": false
+       }
+      ],
+      "sous": []
+     },
+     {
+      "nom": "Course sur tapis de course courbe",
+      "activites": [
+       {
+        "code": "12405",
+        "met": 5.3,
+        "nom": "Course/jogging, tapis de course courbe, 3.0 à 3.9 mph",
+        "en": "Running/jogging, curved treadmill, 3.0 to 3.9 mph",
+        "estime": false
+       },
+       {
+        "code": "12408",
+        "met": 6.5,
+        "nom": "Course/jogging, tapis de course courbe, 4.0 à 4.9 mph",
+        "en": "Running/jogging, curved treadmill, 4.0 to 4.9 mph",
+        "estime": false
+       },
+       {
+        "code": "12410",
+        "met": 11.0,
+        "nom": "Course, tapis de course courbe, 5.0 à 5.9 mph",
+        "en": "Running curved treadmill, 5.0 to 5.9 mph",
+        "estime": false
+       },
+       {
+        "code": "12412",
+        "met": 12.0,
+        "nom": "Course, tapis de course courbe, 7.0 à 7.9 mph",
+        "en": "Running curved treadmill, 7.0 to 7.9 mph",
+        "estime": true
+       },
+       {
+        "code": "12414",
+        "met": 14.0,
+        "nom": "Course, tapis de course courbe, 8.0 à 8.9 mph",
+        "en": "Running curved treadmill, 8.0 to 8.9 mph",
+        "estime": false
+       },
+       {
+        "code": "12416",
+        "met": 16.8,
+        "nom": "Course, tapis de course courbe, 9.0 à 9.9 mph",
+        "en": "Running curved treadmill, 9.0 to 9.9 mph",
+        "estime": false
+       }
+      ],
+      "sous": []
+     }
+    ]
+   },
+   {
+    "nom": "Athlétisme",
+    "activites": [
+     {
+      "code": "15732",
+      "met": 4.0,
+      "nom": "Athlétisme (par ex. poids, disque, marteau)",
+      "en": "Track and field (e.g., shot, discus, hammer throw)",
+      "estime": true
+     },
+     {
+      "code": "15733",
+      "met": 6.0,
+      "nom": "Athlétisme (par ex. saut en hauteur, saut en longueur, triple saut, javelot, saut à la perche)",
+      "en": "Track and field (e.g., high jump, long jump, triple jump, javelin, pole vault)",
+      "estime": true
+     },
+     {
+      "code": "15734",
+      "met": 10.0,
+      "nom": "Athlétisme (par ex. steeple, haies)",
+      "en": "Track and field (e.g., steeplechase, hurdles)",
+      "estime": true
+     }
+    ],
+    "sous": []
+   }
+  ]
+ },
+ {
+  "id": "cheval",
+  "noeuds": [
+   {
+    "nom": "Équitation",
+    "activites": [
+     {
+      "code": "15370",
+      "met": 5.5,
+      "nom": "Équitation, en général",
+      "en": "Horseback riding, general",
+      "estime": false
+     },
+     {
+      "code": "15380",
+      "met": 4.5,
+      "nom": "Pansage du cheval, soins, sellage",
+      "en": "Horse grooming, maintenance, saddling tasks",
+      "estime": false
+     },
+     {
+      "code": "15390",
+      "met": 5.8,
+      "nom": "Équitation, au trot",
+      "en": "Horseback riding, trotting",
+      "estime": false
+     },
+     {
+      "code": "15395",
+      "met": 7.3,
+      "nom": "Équitation, au petit galop ou au galop",
+      "en": "Horseback riding, canter or gallop",
+      "estime": false
+     },
+     {
+      "code": "15400",
+      "met": 3.8,
+      "nom": "Équitation, au pas",
+      "en": "Horseback riding, walking",
+      "estime": false
+     },
+     {
+      "code": "15402",
+      "met": 9.0,
+      "nom": "Équitation, saut d’obstacles",
+      "en": "Horseback riding, jumping",
+      "estime": false
+     },
+     {
+      "code": "15403",
+      "met": 6.0,
+      "nom": "Équitation, reining",
+      "en": "Horseback riding, reining",
+      "estime": false
+     },
+     {
+      "code": "15406",
+      "met": 2.1,
+      "nom": "Équitation, simulateur",
+      "en": "Horseback riding, simulator",
+      "estime": false
+     },
+     {
+      "code": "15408",
+      "met": 1.8,
+      "nom": "Attelage, conduite, debout ou assis",
+      "en": "Horse cart, driving, standing or sitting",
+      "estime": false
+     }
+    ],
+    "sous": []
+   },
+   {
+    "nom": "Rodéo",
+    "activites": [
+     {
+      "code": "15542",
+      "met": 4.0,
+      "nom": "Rodéo, en général, effort léger",
+      "en": "Rodeo sports, general, light effort",
+      "estime": true
+     },
+     {
+      "code": "15544",
+      "met": 5.5,
+      "nom": "Rodéo, en général, effort modéré",
+      "en": "Rodeo sports, general, moderate effort",
+      "estime": true
+     },
+     {
+      "code": "15546",
+      "met": 7.0,
+      "nom": "Rodéo, en général, effort vigoureux",
+      "en": "Rodeo sports, general, vigorous effort",
+      "estime": true
+     }
+    ],
+    "sous": []
+   },
+   {
+    "nom": "Polo, à cheval",
+    "activites": [
+     {
+      "code": "15510",
+      "met": 8.0,
+      "nom": "Polo, à cheval",
+      "en": "Polo, on horseback",
+      "estime": true
+     }
+    ],
+    "sous": []
+   }
+  ]
+ },
+ {
+  "id": "individuel",
+  "noeuds": [
+   {
+    "nom": "Yoga",
+    "activites": [
+     {
+      "code": "02101",
+      "met": 2.3,
+      "nom": "Étirements, doux",
+      "en": "Stretching, mild",
+      "estime": false
+     }
+    ],
+    "sous": [
+     {
+      "nom": "Yoga",
+      "activites": [
+       {
+        "code": "02150",
+        "met": 2.3,
+        "nom": "Yoga, Hatha",
+        "en": "Yoga, Hatha",
+        "estime": false
+       },
+       {
+        "code": "02153",
+        "met": 8.0,
+        "nom": "Yoga, Hatha, haute intensité",
+        "en": "Yoga, Hatha, high intensity",
+        "estime": false
+       },
+       {
+        "code": "02155",
+        "met": 3.0,
+        "nom": "Yoga, Hot",
+        "en": "Yoga, Hot",
+        "estime": false
+       },
+       {
+        "code": "02160",
+        "met": 4.0,
+        "nom": "Yoga, Power",
+        "en": "Yoga, Power",
+        "estime": true
+       },
+       {
+        "code": "02170",
+        "met": 2.0,
+        "nom": "Yoga, Nadisodhana",
+        "en": "Yoga, Nadisodhana",
+        "estime": false
+       },
+       {
+        "code": "02175",
+        "met": 2.3,
+        "nom": "Yoga, en général",
+        "en": "Yoga, General",
+        "estime": false
+       },
+       {
+        "code": "02180",
+        "met": 3.5,
+        "nom": "Yoga, Surya Namaskar",
+        "en": "Yoga, Surya Namaskar",
+        "estime": false
+       },
+       {
+        "code": "02185",
+        "met": 2.7,
+        "nom": "Yoga, Vinyasa",
+        "en": "Yoga, Vinyasa",
+        "estime": false
+       }
+      ],
+      "sous": []
+     }
+    ]
+   },
+   {
+    "nom": "Pilates",
+    "activites": [
+     {
+      "code": "02107",
+      "met": 8.5,
+      "nom": "Pound, combinaison de Pilates et de mouvements du corps avec percussions",
+      "en": "Pound, combination of Pilates and body movements with drumming",
+      "estime": false
+     }
+    ],
+    "sous": [
+     {
+      "nom": "Pilates",
+      "activites": [
+       {
+        "code": "02103",
+        "met": 1.8,
+        "nom": "Pilates, traditionnel, au tapis",
+        "en": "Pilates, traditional, mat",
+        "estime": false
+       },
+       {
+        "code": "02105",
+        "met": 2.8,
+        "nom": "Pilates, en général",
+        "en": "Pilates, general",
+        "estime": false
+       }
+      ],
+      "sous": []
+     }
+    ]
+   },
+   {
+    "nom": "Callisthénie",
+    "activites": [
+     {
+      "code": "02064",
+      "met": 3.8,
+      "nom": "Exercice à la maison, en général",
+      "en": "Home exercise, general",
+      "estime": false
+     },
+     {
+      "code": "02108",
+      "met": 4.5,
+      "nom": "Pole dance, cours d’exercice",
+      "en": "Pole dancing, exercise class",
+      "estime": false
+     },
+     {
+      "code": "02225",
+      "met": 2.3,
+      "nom": "Robot d’assistance à l’exercice d’équilibre (BEAR), simulation de ski, tennis, rodéo",
+      "en": "Balance Exercise Assist Robot (BEAR), simulated skiing, tennis, rodeo",
+      "estime": false
+     },
+     {
+      "code": "02300",
+      "met": 3.0,
+      "nom": "Exercice au bâton, Life-Build-Line",
+      "en": "Wand exercise, Life-Build-Line",
+      "estime": false
+     }
+    ],
+    "sous": [
+     {
+      "nom": "Callisthénie",
+      "activites": [
+       {
+        "code": "02020",
+        "met": 7.5,
+        "nom": "Callisthénie (par ex. pompes, redressements assis, tractions, jumping jacks, burpees, battle ropes), effort vigoureux",
+        "en": "Calisthenics (e.g., pushups, sit ups, pull-ups, jumping jacks, burpees, battling ropes), vigorous effort",
+        "estime": false
+       },
+       {
+        "code": "02022",
+        "met": 3.8,
+        "nom": "Callisthénie (par ex. pompes, redressements assis, tractions, fentes), effort modéré",
+        "en": "Calisthenics (e.g., pushups, sit ups, pull-ups, lunges), moderate effort",
+        "estime": false
+       },
+       {
+        "code": "02024",
+        "met": 2.8,
+        "nom": "Callisthénie (par ex. enroulements, crunchs abdominaux, planche), effort léger",
+        "en": "Calisthenics (e.g., curl ups, abdominal crunches, plank),  light effort",
+        "estime": false
+       },
+       {
+        "code": "02030",
+        "met": 3.5,
+        "nom": "Callisthénie, effort léger ou modéré, en général (par ex. exercices du dos), avec passages au sol et relevés (Taylor Code 150)",
+        "en": "Calisthenics, light or moderate effort, general (e.g., back exercises), going up & down from floor (Taylor Code 150)",
+        "estime": false
+       },
+       {
+        "code": "02056",
+        "met": 3.0,
+        "nom": "Exercices de renforcement au poids du corps (par ex. squat, fente, pompe, crunch), en général",
+        "en": "Body weight resistance exercises (e.g., squat, lunge, push-up, crunch), general",
+        "estime": false
+       },
+       {
+        "code": "02057",
+        "met": 6.5,
+        "nom": "Exercices de renforcement au poids du corps (par ex. squat, fente, pompe, crunch), haute intensité",
+        "en": "Body weight resistance exercises (e.g., squat, lunge, push-up, crunch), high intensity",
+        "estime": false
+       }
+      ],
+      "sous": []
+     },
+     {
+      "nom": "Exercice assis-debout",
+      "activites": [
+       {
+        "code": "02340",
+        "met": 2.8,
+        "nom": "Exercice assis-debout, 6-12 fois/min",
+        "en": "Sit to stand exercise, 6-12 times/min",
+        "estime": false
+       },
+       {
+        "code": "02344",
+        "met": 4.0,
+        "nom": "Exercice assis-debout, 18-24 fois/min",
+        "en": "Sit to stand exercise, 18-24 times/min",
+        "estime": false
+       }
+      ],
+      "sous": []
+     },
+     {
+      "nom": "Ballon d’exercice",
+      "activites": [
+       {
+        "code": "02112",
+        "met": 2.8,
+        "nom": "Ballon d’exercice thérapeutique, exercice Fitball",
+        "en": "Therapeutic exercise ball, Fitball exercise",
+        "estime": false
+       },
+       {
+        "code": "02114",
+        "met": 9.5,
+        "nom": "Ballon d’exercice thérapeutique, exercice Fitball, haute intensité",
+        "en": "Therapeutic exercise ball, Fitball exercise, high intensity",
+        "estime": false
+       }
+      ],
+      "sous": []
+     }
+    ]
+   },
+   {
+    "nom": "Cardio",
+    "activites": [
+     {
+      "code": "02008",
+      "met": 5.0,
+      "nom": "Parcours d’obstacles de type militaire, programme d’entraînement boot camp",
+      "en": "Army type obstacle course exercise, boot camp training program",
+      "estime": false
+     },
+     {
+      "code": "02065",
+      "met": 9.3,
+      "nom": "Simulateur d’escalier, en général",
+      "en": "Stair treadmill ergometer, general",
+      "estime": false
+     },
+     {
+      "code": "02078",
+      "met": 11.0,
+      "nom": "Course navette, avant/arrière/latérale",
+      "en": "Shuttle running, forward/backward/lateral",
+      "estime": false
+     },
+     {
+      "code": "02085",
+      "met": 10.5,
+      "nom": "Exercice sur planche de glisse (slide board), en général",
+      "en": "Slide board exercise, general",
+      "estime": false
+     },
+     {
+      "code": "02110",
+      "met": 6.8,
+      "nom": "Enseigner des cours d’exercice (par ex. aérobic, aquatique)",
+      "en": "Teaching exercise classes (e.g., aerobic, water)",
+      "estime": false
+     },
+     {
+      "code": "02230",
+      "met": 5.8,
+      "nom": "Hooping (anciennement hula® hooping)",
+      "en": "Hooping (formerly known as hula® hooping)",
+      "estime": false
+     }
+    ],
+    "sous": [
+     {
+      "nom": "Entraînement en circuit",
+      "activites": [
+       {
+        "code": "02032",
+        "met": 6.0,
+        "nom": "Entraînement en circuit, exercices au poids du corps",
+        "en": "Circuit training, body weight exercises",
+        "estime": false
+       },
+       {
+        "code": "02034",
+        "met": 3.5,
+        "nom": "Entraînement en circuit, effort léger",
+        "en": "Circuit training, light effort",
+        "estime": false
+       },
+       {
+        "code": "02035",
+        "met": 5.0,
+        "nom": "Entraînement en circuit, effort modéré",
+        "en": "Circuit training, moderate effort",
+        "estime": false
+       },
+       {
+        "code": "02040",
+        "met": 7.5,
+        "nom": "Entraînement en circuit, avec kettlebells, quelques mouvements aérobies avec repos minimal, en général, intensité vigoureuse",
+        "en": "Circuit training, including kettlebells, some aerobic movement with minimal rest, general, vigorous intensity",
+        "estime": false
+       },
+       {
+        "code": "02045",
+        "met": 3.5,
+        "nom": "Curves™, enchaînements d’exercices chez les femmes",
+        "en": "Curves™ exercise routines in women",
+        "estime": false
+       }
+      ],
+      "sous": []
+     },
+     {
+      "nom": "Ergomètre à bras",
+      "activites": [
+       {
+        "code": "02115",
+        "met": 2.8,
+        "nom": "Exercice du haut du corps, ergomètre à bras, en général, léger",
+        "en": "Upper body exercise, arm ergometer, general, light",
+        "estime": false
+       },
+       {
+        "code": "02116",
+        "met": 2.0,
+        "nom": "Ergomètre à bras, vélo à bras, 15W",
+        "en": "Arm Ergometer, hand bike, 15W",
+        "estime": false
+       },
+       {
+        "code": "02117",
+        "met": 2.8,
+        "nom": "Ergomètre à bras, vélo à bras, 25-30W",
+        "en": "Arm Ergometer, hand bike, 25-30W",
+        "estime": false
+       },
+       {
+        "code": "02118",
+        "met": 3.5,
+        "nom": "Ergomètre à bras, vélo à bras, 45W",
+        "en": "Arm Ergometer, hand bike, 45W",
+        "estime": false
+       },
+       {
+        "code": "02119",
+        "met": 4.3,
+        "nom": "Exercice du haut du corps, vélo stationnaire – Airdyne (bras seulement) 40 rpm, intensité modérée",
+        "en": "Upper body exercise, stationary bicycle – Airdyne (arms only) 40 rpm, moderate intensity",
+        "estime": false
+       }
+      ],
+      "sous": []
+     },
+     {
+      "nom": "Vidéo d’exercice",
+      "activites": [
+       {
+        "code": "02140",
+        "met": 2.5,
+        "nom": "Vidéo, séances d’exercice, programmes de conditionnement télévisés (par ex. yoga, étirements, assis), effort léger",
+        "en": "Video, exercise workouts, TV conditioning programs (e.g., yoga, stretching, seated), light effort",
+        "estime": false
+       },
+       {
+        "code": "02143",
+        "met": 4.0,
+        "nom": "Vidéo, séances d’exercice, programmes de conditionnement télévisés (par ex. entraînement cardio-musculation), effort modéré",
+        "en": "Video, exercise workouts, TV conditioning programs (e.g., cardio-resistance training), moderate",
+        "estime": true
+       },
+       {
+        "code": "02145",
+        "met": 6.0,
+        "nom": "Vidéo, séances d’exercice, programmes de conditionnement télévisés (par ex. entraînement cardio-musculation), effort vigoureux",
+        "en": "Video, exercise workouts, TV conditioning programs (e.g., cardio-resistance training), vigorous",
+        "estime": false
+       }
+      ],
+      "sous": []
+     },
+     {
+      "nom": "Activité physique autochtone néo-zélandaise",
+      "activites": [
+       {
+        "code": "02200",
+        "met": 5.3,
+        "nom": "Activité physique autochtone néo-zélandaise (par ex. Haka Powhiri, Poi, Moteatea, etc.), en général, effort modéré",
+        "en": "Native New Zealander PA, (e.g., Haka Powhiri, Poi, Moteatea, etc.), general moderate effort",
+        "estime": false
+       },
+       {
+        "code": "02205",
+        "met": 6.8,
+        "nom": "Activité physique autochtone néo-zélandaise, en général, effort vigoureux",
+        "en": "Native New Zealander PA, general, vigorous effort",
+        "estime": false
+       }
+      ],
+      "sous": []
+     },
+     {
+      "nom": "Exercice fractionné à haute intensité",
+      "activites": [
+       {
+        "code": "02210",
+        "met": 7.0,
+        "nom": "Exercice fractionné à haute intensité, effort modéré",
+        "en": "High intensity interval exercise,  moderate effort",
+        "estime": false
+       },
+       {
+        "code": "02214",
+        "met": 11.0,
+        "nom": "Exercice fractionné à haute intensité, burpees, mountain climbers, squat jumps, Tabata, effort vigoureux",
+        "en": "High intensity interval exercise,  burpees, mountain climbers, squat jumps, Tabata, vigorous effort",
+        "estime": false
+       }
+      ],
+      "sous": []
+     },
+     {
+      "nom": "Exergaming",
+      "activites": [
+       {
+        "code": "02280",
+        "met": 7.9,
+        "nom": "Fitness en réalité virtuelle, Supernatural™ « Flow », « Boxing », intensité vigoureuse",
+        "en": "Virtual Reality Fitness,  Supernatural™ “Flow”, “Boxing” vigorous intensity",
+        "estime": false
+       },
+       {
+        "code": "02284",
+        "met": 9.3,
+        "nom": "ExerCube, séries d’entraînement",
+        "en": "ExerCube, workout series",
+        "estime": false
+       },
+       {
+        "code": "02288",
+        "met": 13.0,
+        "nom": "Blackbox, système d’exergaming en réalité virtuelle immersive, intensité vigoureuse",
+        "en": "Blackbox Immersive virtual reality exergaming system, vigorous intensity",
+        "estime": false
+       }
+      ],
+      "sous": []
+     }
+    ]
+   },
+   {
+    "nom": "Aérobic",
+    "activites": [
+     {
+      "code": "02000",
+      "met": 7.3,
+      "nom": "Aérobic, en général",
+      "en": "Aerobic, general",
+      "estime": false
+     },
+     {
+      "code": "02001",
+      "met": 5.5,
+      "nom": "Aérobic, step, avec step de 4 inch",
+      "en": "Aerobic, step, with 4-inch step",
+      "estime": false
+     },
+     {
+      "code": "02002",
+      "met": 7.3,
+      "nom": "Aérobic, step, avec step de 6 – 8 inch",
+      "en": "Aerobic, step, with 6 – 8 inch step",
+      "estime": false
+     },
+     {
+      "code": "02003",
+      "met": 9.0,
+      "nom": "Aérobic, step, avec step de 10 – 12 inch",
+      "en": "Aerobic, step, with 10 – 12 inch step",
+      "estime": false
+     },
+     {
+      "code": "02004",
+      "met": 7.8,
+      "nom": "Cours de step sur banc, en général",
+      "en": "Bench step class, general",
+      "estime": false
+     },
+     {
+      "code": "02005",
+      "met": 4.8,
+      "nom": "Danse aérobic, faible impact, effort modéré",
+      "en": "Aerobic dance, low impact, moderate effort",
+      "estime": false
+     },
+     {
+      "code": "02006",
+      "met": 8.0,
+      "nom": "Danse aérobic, fort impact, effort vigoureux",
+      "en": "Aerobic dance, high impact, vigorous effort",
+      "estime": false
+     },
+     {
+      "code": "02007",
+      "met": 10.0,
+      "nom": "Danse aérobic avec des poids de 10-15 lb",
+      "en": "Aerobic dance wearing 10-15 lb weights",
+      "estime": false
+     },
+     {
+      "code": "02090",
+      "met": 6.0,
+      "nom": "Slimnastics, jazzercise",
+      "en": "Slimnastics, jazzercise",
+      "estime": true
+     }
+    ],
+    "sous": []
+   },
+   {
+    "nom": "Vélo elliptique",
+    "activites": [
+     {
+      "code": "02048",
+      "met": 5.0,
+      "nom": "Vélo elliptique, effort modéré",
+      "en": "Elliptical trainer, moderate effort",
+      "estime": false
+     },
+     {
+      "code": "02049",
+      "met": 9.0,
+      "nom": "Vélo elliptique, effort vigoureux",
+      "en": "Elliptical trainer, vigorous effort",
+      "estime": false
+     }
+    ],
+    "sous": []
+   },
+   {
+    "nom": "Rameur",
+    "activites": [
+     {
+      "code": "02070",
+      "met": 7.3,
+      "nom": "Rameur, ergomètre stationnaire, en général, effort vigoureux",
+      "en": "Rowing, stationary ergometer, general, vigorous effort",
+      "estime": false
+     },
+     {
+      "code": "02071",
+      "met": 5.0,
+      "nom": "Rameur, ergomètre stationnaire, en général, <100 watts, effort modéré",
+      "en": "Rowing, stationary ergometer, general, <100 watts,  moderate effort",
+      "estime": false
+     },
+     {
+      "code": "02072",
+      "met": 7.5,
+      "nom": "Rameur, stationnaire, 100 à 149 watts, effort vigoureux",
+      "en": "Rowing, stationary, 100 to 149 watts, vigorous effort",
+      "estime": false
+     },
+     {
+      "code": "02073",
+      "met": 11.0,
+      "nom": "Rameur, stationnaire, 150 à 199 watts, effort vigoureux",
+      "en": "Rowing, stationary, 150 to 199 watts, vigorous effort",
+      "estime": false
+     },
+     {
+      "code": "02074",
+      "met": 14.0,
+      "nom": "Rameur, stationnaire, ≥ 200 watts, effort très vigoureux",
+      "en": "Rowing, stationary, ≥ 200 watts, very vigorous effort",
+      "estime": false
+     }
+    ],
+    "sous": []
+   },
+   {
+    "nom": "Muscu",
+    "activites": [
+     {
+      "code": "02240",
+      "met": 9.0,
+      "nom": "Impulse Training System, appareil d’exercice inertiel",
+      "en": "Impulse Training System, Inertial Exercise Trainer",
+      "estime": false
+     }
+    ],
+    "sous": [
+     {
+      "nom": "Musculation",
+      "activites": [
+       {
+        "code": "02050",
+        "met": 6.0,
+        "nom": "Musculation (haltérophilie – poids libres, machines de type Nautilus ou Universal), force athlétique ou culturisme, effort vigoureux (Taylor Code 210)",
+        "en": "Resistance (weight lifting – free weight, nautilus or universal-type), power lifting or body building, vigorous effort (Taylor Code 210)",
+        "estime": false
+       },
+       {
+        "code": "02052",
+        "met": 5.0,
+        "nom": "Musculation (avec charges), squats, soulevé de terre, effort lent ou explosif",
+        "en": "Resistance (weight) training, squats, deadlift, slow or explosive effort",
+        "estime": false
+       },
+       {
+        "code": "02054",
+        "met": 3.5,
+        "nom": "Musculation (avec charges), exercices multiples, 8-15 répétitions à résistance variée",
+        "en": "Resistance (weight) training, multiple exercises, 8-15 reps at varied resistance",
+        "estime": false
+       },
+       {
+        "code": "02055",
+        "met": 5.8,
+        "nom": "Musculation, circuit, supersets antagonistes, entraînement en action cardiaque périphérique",
+        "en": "Resistance Training, circuit, reciprocal supersets, peripheral heart action training",
+        "estime": false
+       },
+       {
+        "code": "02058",
+        "met": 9.8,
+        "nom": "Swings avec kettlebell",
+        "en": "Kettlebell swings",
+        "estime": false
+       }
+      ],
+      "sous": []
+     },
+     {
+      "nom": "Club de remise en forme",
+      "activites": [
+       {
+        "code": "02060",
+        "met": 5.5,
+        "nom": "Exercice en club de remise en forme, en général (Taylor Code 160)",
+        "en": "Health club exercise, general (Taylor Code 160)",
+        "estime": false
+       },
+       {
+        "code": "02061",
+        "met": 5.0,
+        "nom": "Cours en club de remise en forme, en général, cardio et musculation combinés en une séance",
+        "en": "Health club exercise classes, general, gym/weight training combined in one visit",
+        "estime": false
+       },
+       {
+        "code": "02062",
+        "met": 7.8,
+        "nom": "Exercice en club de remise en forme, cours de conditionnement physique",
+        "en": "Health club exercise, conditioning classes",
+        "estime": false
+       }
+      ],
+      "sous": []
+     }
+    ]
+   },
+   {
+    "nom": "Danse",
+    "activites": [
+     {
+      "code": "03014",
+      "met": 4.8,
+      "nom": "Claquettes",
+      "en": "Tap",
+      "estime": false
+     },
+     {
+      "code": "03075",
+      "met": 8.5,
+      "nom": "Flamenco",
+      "en": "Flamenco dance",
+      "estime": false
+     },
+     {
+      "code": "03080",
+      "met": 10.3,
+      "nom": "Comédie musicale, chant/danse",
+      "en": "Musical Theater, Singing/dancing",
+      "estime": false
+     }
+    ],
+    "sous": [
+     {
+      "nom": "Salsa",
+      "activites": [
+       {
+        "code": "03005",
+        "met": 6.0,
+        "nom": "Salsa afro-cubaine (cha-cha-cha cubain, mambo, rumba afro, pas de son a contratiempo, mouvements orisha/santo)",
+        "en": "Afro-Cuban salsa (Cuban cha-cha-cha, mambo, Afro rumba, contratiempo son steps, orisha/santo movements)",
+        "estime": false
+       },
+       {
+        "code": "03090",
+        "met": 4.8,
+        "nom": "Salsa, avec partenaire",
+        "en": "Salsa Dancing, with partner",
+        "estime": false
+       },
+       {
+        "code": "03091",
+        "met": 6.3,
+        "nom": "Salsa, sur vidéo",
+        "en": "Salsa dancing, to a video",
+        "estime": false
+       }
+      ],
+      "sous": []
+     },
+     {
+      "nom": "Ballet, danse moderne et jazz",
+      "activites": [
+       {
+        "code": "03010",
+        "met": 5.0,
+        "nom": "Ballet, moderne ou jazz, en général, répétition ou cours",
+        "en": "Ballet, modern, or jazz general, rehearsal or class",
+        "estime": false
+       },
+       {
+        "code": "03011",
+        "met": 6.3,
+        "nom": "Exercices de ballet (pliés, tendus, jetés, ronds de jambe, fondus, grands battements, grand adage, sautés, temps levés)",
+        "en": "Ballet exercises (plie, tendus, jetes, rond de Jambes, fondus, grand battement, grand adage, sautes, temp Leve’s)",
+        "estime": false
+       },
+       {
+        "code": "03012",
+        "met": 6.8,
+        "nom": "Ballet, moderne ou jazz, représentation, effort vigoureux",
+        "en": "Ballet, modern, or jazz, performance, vigorous effort",
+        "estime": false
+       },
+       {
+        "code": "03078",
+        "met": 4.5,
+        "nom": "Danse jazz, en général",
+        "en": "Jazz dancing, general",
+        "estime": false
+       }
+      ],
+      "sous": []
+     },
+     {
+      "nom": "Danses traditionnelles",
+      "activites": [
+       {
+        "code": "03025",
+        "met": 4.5,
+        "nom": "Danses ethniques ou culturelles (par ex. grecque, du Moyen-Orient, hula, salsa, merengue, bamba y plena, flamenco, danse du ventre et swing)",
+        "en": "Ethnic or cultural dancing (e.g. Greek, Middle Eastern, hula, salsa, merengue, bamba y plena,  flamenco, belly, and swing)",
+        "estime": true
+       },
+       {
+        "code": "03050",
+        "met": 5.5,
+        "nom": "Danse Jingle anishinaabe, allure soutenue, autres danses amérindiennes traditionnelles pratiquées par les femmes, effort modéré",
+        "en": "Anishinaabe Jingle dancing, brisk pace, other traditional American Indian dancing performed by women, moderate effort",
+        "estime": false
+       },
+       {
+        "code": "03060",
+        "met": 3.5,
+        "nom": "Danse caribéenne (Abakua, Béguine, Bellair, Bongo, Brukin’s, quadrilles caribéens, Dinki Mini, Gere, Gumbay, Ibo, Jonkonnu, Kumina, Oreisha, Jambu)",
+        "en": "Caribbean dance (Abakua, Beguine, Bellair, Bongo, Brukin’s, Caribbean Quadrills, Dinki  Mini, Gere, Gumbay, Ibo, Jonkonnu, Kumina,  Oreisha, Jambu)",
+        "estime": false
+       }
+      ],
+      "sous": []
+     },
+     {
+      "nom": "Danse de place chinoise",
+      "activites": [
+       {
+        "code": "03028",
+        "met": 5.5,
+        "nom": "Danse de place chinoise, ballet et danse tibétaine",
+        "en": "Chinese square dance, Ballet & Tibetan dance",
+        "estime": false
+       },
+       {
+        "code": "03029",
+        "met": 7.3,
+        "nom": "Danse de place chinoise, danse aérobic",
+        "en": "Chinese square dance, aerobic dance",
+        "estime": false
+       }
+      ],
+      "sous": []
+     },
+     {
+      "nom": "Danse de salon",
+      "activites": [
+       {
+        "code": "03030",
+        "met": 5.5,
+        "nom": "Danse de salon, rapide (Taylor Code 125)",
+        "en": "Ballroom dancing, fast (Taylor Code 125)",
+        "estime": false
+       },
+       {
+        "code": "03038",
+        "met": 11.3,
+        "nom": "Danse de salon, compétition, en général",
+        "en": "Ballroom dancing, competitive, general",
+        "estime": false
+       },
+       {
+        "code": "03039",
+        "met": 13.0,
+        "nom": "Danse de salon, compétition de danse sportive (valse moderne, tango, valse viennoise, slow fox, quickstep, samba, cha-cha, rumba, paso doble, jive)",
+        "en": "Ballroom dance, DanceSport competition (modern waltz, tango, Viennese waltz, slow fox, quick step, samba, chacha, rumba, paso doble, jive)",
+        "estime": false
+       },
+       {
+        "code": "03040",
+        "met": 3.0,
+        "nom": "Danse de salon, lente, exemples : valse, foxtrot, slow, samba, tango, rumba, danse du XIXe siècle, mambo, cha-cha",
+        "en": "Ballroom, slow, examples: waltz, foxtrot, slow dancing, samba tango, rumba, 19th century dance, mambo, cha cha",
+        "estime": false
+       },
+       {
+        "code": "03042",
+        "met": 6.0,
+        "nom": "Danse de salon, loisir (valse, foxtrot, cha-cha, swing)",
+        "en": "Ballroom Dance, Recreational (Waltz, Foxtrot, Cha-cha, Swing)",
+        "estime": false
+       }
+      ],
+      "sous": []
+     },
+     {
+      "nom": "Danse folklorique",
+      "activites": [
+       {
+        "code": "03031",
+        "met": 9.8,
+        "nom": "Danse en boîte de nuit ou danse folklorique, effort vigoureux (par ex. boîte de nuit, disco, folk, line dance, danse irlandaise, polka, contredanse)",
+        "en": "Nightclub or folk dancing, vigorous effort (e.g., nightclub, disco, folk, line dancing, Irish step dancing, polka, contra)",
+        "estime": false
+       },
+       {
+        "code": "03033",
+        "met": 5.0,
+        "nom": "Danse folklorique, effort modéré",
+        "en": "Folk dancing, moderate effort",
+        "estime": false
+       },
+       {
+        "code": "03093",
+        "met": 5.5,
+        "nom": "Square dance, western américain, country",
+        "en": "Square Dancing, American Western, country",
+        "estime": false
+       }
+      ],
+      "sous": []
+     },
+     {
+      "nom": "Danse contemporaine",
+      "activites": [
+       {
+        "code": "03070",
+        "met": 3.8,
+        "nom": "Danse contemporaine, en général",
+        "en": "Contemporary dancing, general",
+        "estime": false
+       },
+       {
+        "code": "03072",
+        "met": 4.3,
+        "nom": "Danse contemporaine, boîte de nuit",
+        "en": "Contemporary dancing, nightclub",
+        "estime": false
+       }
+      ],
+      "sous": []
+     },
+     {
+      "nom": "Danse polynésienne",
+      "activites": [
+       {
+        "code": "03085",
+        "met": 5.8,
+        "nom": "Danse polynésienne, hula hawaïen lent, haka maori, tongienne",
+        "en": "Polynesian dance, Hawaiian hula slow, Maori haka, Tongan",
+        "estime": false
+       },
+       {
+        "code": "03086",
+        "met": 7.0,
+        "nom": "Danse polynésienne, hula hawaïen rapide, sasa samoan, style fidjien rapide, Tinikling philippin",
+        "en": "Polynesian dance, Hawaiian hula fast, Samoan sasa, Fijian style fast, Filipino Tinikling",
+        "estime": false
+       },
+       {
+        "code": "03087",
+        "met": 8.8,
+        "nom": "Danse polynésienne, slap samoan, tahitienne",
+        "en": "Polynesian dance, Samoan slap, Tahitian",
+        "estime": false
+       }
+      ],
+      "sous": []
+     }
+    ]
+   },
+   {
+    "nom": "Zumba",
+    "activites": [
+     {
+      "code": "02310",
+      "met": 6.5,
+      "nom": "Zumba, cours collectif",
+      "en": "Zumba, group class",
+      "estime": false
+     },
+     {
+      "code": "02315",
+      "met": 5.5,
+      "nom": "Zumba, vidéo à la maison",
+      "en": "Zumba, home video",
+      "estime": false
+     }
+    ],
+    "sous": []
+   },
+   {
+    "nom": "Corde à sauter",
+    "activites": [
+     {
+      "code": "15550",
+      "met": 12.3,
+      "nom": "Corde à sauter, rythme rapide, 120-160 sauts/min",
+      "en": "Rope jumping, fast pace, 120-160 skips/min",
+      "estime": false
+     },
+     {
+      "code": "15551",
+      "met": 11.8,
+      "nom": "Corde à sauter, rythme modéré, en général, 100 à 120 sauts/min, saut à pieds joints, rebond simple",
+      "en": "Rope jumping, moderate pace, general, 100 to 120 skips/min, 2 foot skip, plain bounce",
+      "estime": false
+     },
+     {
+      "code": "15552",
+      "met": 8.3,
+      "nom": "Corde à sauter, rythme lent, < 100 sauts/min, saut à pieds joints, rebond rythmé",
+      "en": "Rope jumping, slow pace, < 100 skips/min, 2 foot skip, rhythm bounce",
+      "estime": false
+     },
+     {
+      "code": "15554",
+      "met": 10.0,
+      "nom": "Corde à sauter, double tour ou plus",
+      "en": "Rope jumping, double under or more",
+      "estime": false
+     }
+    ],
+    "sous": [
+     {
+      "nom": "Corde à sauter",
+      "activites": [
+       {
+        "code": "02068",
+        "met": 11.0,
+        "nom": "Corde à sauter, en général",
+        "en": "Rope skipping exercise, general",
+        "estime": false
+       },
+       {
+        "code": "02069",
+        "met": 9.0,
+        "nom": "Corde à sauter, machine Digi-Jump, 120 sauts/minute",
+        "en": "Jumping rope, Digi-Jump Machine, 120 jumps/minute",
+        "estime": false
+       }
+      ],
+      "sous": []
+     }
+    ]
+   },
+   {
+    "nom": "Trampoline",
+    "activites": [
+     {
+      "code": "15700",
+      "met": 6.3,
+      "nom": "Trampoline, en loisir",
+      "en": "Trampoline, recreational",
+      "estime": false
+     },
+     {
+      "code": "15702",
+      "met": 10.3,
+      "nom": "Trampoline, en compétition",
+      "en": "Trampoline, competitive",
+      "estime": false
+     }
+    ],
+    "sous": []
+   },
+   {
+    "nom": "Boxe",
+    "activites": [
+     {
+      "code": "15100",
+      "met": 12.3,
+      "nom": "Boxe, sur le ring, en général",
+      "en": "Boxing, in ring, general",
+      "estime": false
+     },
+     {
+      "code": "15110",
+      "met": 5.8,
+      "nom": "Boxe, sac de frappe",
+      "en": "Boxing, punching bag",
+      "estime": false
+     },
+     {
+      "code": "15113",
+      "met": 7.0,
+      "nom": "Boxe, sac de frappe, 60 b/min",
+      "en": "Boxing, punching bag, 60 b/min",
+      "estime": false
+     },
+     {
+      "code": "15115",
+      "met": 8.5,
+      "nom": "Boxe, sac de frappe, 120 b/min",
+      "en": "Boxing, punching bag, 120 b/min",
+      "estime": false
+     },
+     {
+      "code": "15118",
+      "met": 10.8,
+      "nom": "Boxe, sac de frappe, 180 b/min",
+      "en": "Boxing, punching bag, 180 b/min",
+      "estime": false
+     },
+     {
+      "code": "15120",
+      "met": 7.8,
+      "nom": "Boxe, sparring",
+      "en": "Boxing, sparring",
+      "estime": false
+     },
+     {
+      "code": "15125",
+      "met": 9.3,
+      "nom": "Boxe, round de boxe simulé, exercice",
+      "en": "Boxing, simulated boxing round, exercise",
+      "estime": false
+     }
+    ],
+    "sous": []
+   },
+   {
+    "nom": "Arts martiaux",
+    "activites": [
+     {
+      "code": "15425",
+      "met": 5.3,
+      "nom": "Arts martiaux, différents types, rythme lent, débutants, entraînement",
+      "en": "Martial Arts, different types, slower pace, novice performers, practice",
+      "estime": false
+     },
+     {
+      "code": "15430",
+      "met": 10.3,
+      "nom": "Arts martiaux, différents types, rythme modéré (par ex. judo, jujitsu, karaté, kick-boxing, taekwondo, tae-bo, boxe thaï)",
+      "en": "Martial Arts, different types, moderate pace (e.g., judo, jujitsu, karate, kick boxing, tae kwon do, tai-bo, Muay Thai boxing)",
+      "estime": false
+     },
+     {
+      "code": "15432",
+      "met": 14.3,
+      "nom": "Taekwondo, simulation de combat",
+      "en": "Taekwondo, combat simulation",
+      "estime": false
+     },
+     {
+      "code": "15433",
+      "met": 11.3,
+      "nom": "Judo",
+      "en": "Judo",
+      "estime": false
+     },
+     {
+      "code": "15444",
+      "met": 6.5,
+      "nom": "Kendo, style kihon-keiko, intensité modérée",
+      "en": "Kendo, kihon-keiko style, moderate intensity",
+      "estime": false
+     },
+     {
+      "code": "15445",
+      "met": 9.6,
+      "nom": "Kendo, style kirikaeshi, intensité élevée",
+      "en": "Kendo, kirikaeshi style, high intensity",
+      "estime": false
+     },
+     {
+      "code": "15446",
+      "met": 11.3,
+      "nom": "Kendo, style kakari-keiko, intensité très élevée",
+      "en": "Kendo, kakari keiko style, very high intensity",
+      "estime": false
+     },
+     {
+      "code": "15455",
+      "met": 5.5,
+      "nom": "Gymnastique kung-fu",
+      "en": "Kung Fu Gymnastics",
+      "estime": false
+     },
+     {
+      "code": "15457",
+      "met": 7.3,
+      "nom": "Kick-boxing",
+      "en": "Kickboxing",
+      "estime": false
+     }
+    ],
+    "sous": [
+     {
+      "nom": "Tai-chi",
+      "activites": [
+       {
+        "code": "15670",
+        "met": 3.3,
+        "nom": "Tai-chi, qi gong, en général",
+        "en": "Tai chi, qi gong, general",
+        "estime": false
+       },
+       {
+        "code": "15672",
+        "met": 1.5,
+        "nom": "Tai-chi, qi gong, assis, effort léger",
+        "en": "Tai chi, qi gong, sitting, light effort",
+        "estime": false
+       },
+       {
+        "code": "15674",
+        "met": 6.0,
+        "nom": "Tai-chi-chuan, style Yang",
+        "en": "Tai chi chuan, Yang style",
+        "estime": false
+       }
+      ],
+      "sous": []
+     }
+    ]
+   },
+   {
+    "nom": "Escrime",
+    "activites": [
+     {
+      "code": "15200",
+      "met": 6.0,
+      "nom": "Escrime, en général",
+      "en": "Fencing, general",
+      "estime": false
+     },
+     {
+      "code": "15203",
+      "met": 9.8,
+      "nom": "Escrime, épée, en compétition",
+      "en": "Fencing, epee, competitive",
+      "estime": false
+     }
+    ],
+    "sous": []
+   },
+   {
+    "nom": "Escalade",
+    "activites": [
+     {
+      "code": "15506",
+      "met": 6.5,
+      "nom": "Remontée sur corde (nœud de Prusik)",
+      "en": "Prusik climbing",
+      "estime": false
+     },
+     {
+      "code": "15533",
+      "met": 8.0,
+      "nom": "Escalade ou alpinisme (Taylor Code 060), (anciennement code 17120)",
+      "en": "Rock or mountain climbing (Taylor Code 060), (formerly code 17120)",
+      "estime": false
+     },
+     {
+      "code": "15534",
+      "met": 8.8,
+      "nom": "Escalade, bloc, sans corde",
+      "en": "Rock climbing, free boulder",
+      "estime": false
+     },
+     {
+      "code": "15535",
+      "met": 7.3,
+      "nom": "Escalade, ascension en paroi, difficulté élevée",
+      "en": "Rock climbing, ascending rock, high difficulty",
+      "estime": false
+     },
+     {
+      "code": "15536",
+      "met": 10.5,
+      "nom": "Escalade, escalade de vitesse, très difficile",
+      "en": "Rock climbing, speed climbing, very difficult",
+      "estime": false
+     },
+     {
+      "code": "15537",
+      "met": 5.8,
+      "nom": "Escalade, ascension ou traversée en paroi, difficulté faible à modérée",
+      "en": "Rock climbing, ascending or traversing rock, low-to-moderate difficulty",
+      "estime": false
+     },
+     {
+      "code": "15538",
+      "met": 10.5,
+      "nom": "Escalade, mur d’escalade rotatif, 4-6 m/min",
+      "en": "Rock climbing, treadwall, 4-6 m/min",
+      "estime": false
+     },
+     {
+      "code": "15539",
+      "met": 10.5,
+      "nom": "Escalade, mur d’escalade rotatif, 7-10 m/min",
+      "en": "Rock climbing, treadwall, 7-10 m/min",
+      "estime": false
+     },
+     {
+      "code": "15540",
+      "met": 5.0,
+      "nom": "Escalade, rappel",
+      "en": "Rock climbing, rappelling,",
+      "estime": true
+     }
+    ],
+    "sous": []
+   },
+   {
+    "nom": "Frisbee",
+    "activites": [
+     {
+      "code": "15240",
+      "met": 3.0,
+      "nom": "Frisbee, en général",
+      "en": "Frisbee playing, general",
+      "estime": true
+     },
+     {
+      "code": "15250",
+      "met": 8.0,
+      "nom": "Frisbee, ultimate",
+      "en": "Frisbee, ultimate",
+      "estime": true
+     },
+     {
+      "code": "15252",
+      "met": 3.8,
+      "nom": "Disc-golf",
+      "en": "Frisbee golf",
+      "estime": false
+     }
+    ],
+    "sous": []
+   },
+   {
+    "nom": "Gymnastique, en général",
+    "activites": [
+     {
+      "code": "15300",
+      "met": 3.8,
+      "nom": "Gymnastique, en général",
+      "en": "Gymnastics, general",
+      "estime": false
+     }
+    ],
+    "sous": []
+   },
+   {
+    "nom": "Lutte, en compétition (un combat = 5 minutes)",
+    "activites": [
+     {
+      "code": "15730",
+      "met": 6.0,
+      "nom": "Lutte, en compétition (un combat = 5 minutes)",
+      "en": "Wrestling, competitive (one match = 5 minutes)",
+      "estime": true
+     }
+    ],
+    "sous": []
+   },
+   {
+    "nom": "Parachutisme, base jump, saut à l’élastique",
+    "activites": [
+     {
+      "code": "15600",
+      "met": 3.5,
+      "nom": "Parachutisme, base jump, saut à l’élastique",
+      "en": "Skydiving, base-jumping, bungee jumping",
+      "estime": true
+     }
+    ],
+    "sous": []
+   },
+   {
+    "nom": "Tir à l’arc (hors chasse)",
+    "activites": [
+     {
+      "code": "15010",
+      "met": 4.3,
+      "nom": "Tir à l’arc (hors chasse)",
+      "en": "Archery (non-hunting)",
+      "estime": false
+     }
+    ],
+    "sous": []
+   },
+   {
+    "nom": "Fléchettes, murales ou sur gazon",
+    "activites": [
+     {
+      "code": "15180",
+      "met": 2.5,
+      "nom": "Fléchettes, murales ou sur gazon",
+      "en": "Darts, wall or lawn",
+      "estime": true
+     }
+    ],
+    "sous": []
+   }
+  ]
+ },
+ {
+  "id": "aquatiques",
+  "noeuds": [
+   {
+    "nom": "Natation",
+    "activites": [
+     {
+      "code": "18270",
+      "met": 13.8,
+      "nom": "Natation, papillon, en général",
+      "en": "Swimming, butterfly, general",
+      "estime": false
+     },
+     {
+      "code": "18310",
+      "met": 6.0,
+      "nom": "Natation, tranquille, sans longueurs, en général",
+      "en": "Swimming, leisurely, not lap swimming, general",
+      "estime": false
+     },
+     {
+      "code": "18320",
+      "met": 7.0,
+      "nom": "Natation, nage indienne, en général",
+      "en": "Swimming, sidestroke, general",
+      "estime": false
+     },
+     {
+      "code": "18330",
+      "met": 8.0,
+      "nom": "Natation, synchronisée",
+      "en": "Swimming, synchronized",
+      "estime": true
+     },
+     {
+      "code": "18230",
+      "met": 9.8,
+      "nom": "Natation, longueurs, nage libre, rapide, effort vigoureux",
+      "en": "Swimming laps, freestyle, fast, vigorous effort",
+      "estime": false
+     },
+     {
+      "code": "18240",
+      "met": 5.8,
+      "nom": "Natation, longueurs, nage libre, lente, loisir",
+      "en": "Swimming laps, freestyle, slow, recreational",
+      "estime": false
+     },
+     {
+      "code": "18250",
+      "met": 9.5,
+      "nom": "Natation, dos, entraînement ou compétition",
+      "en": "Swimming, backstroke, training or competition",
+      "estime": false
+     },
+     {
+      "code": "18255",
+      "met": 4.8,
+      "nom": "Natation, dos, loisir",
+      "en": "Swimming, backstroke, recreational",
+      "estime": false
+     },
+     {
+      "code": "18260",
+      "met": 10.3,
+      "nom": "Natation, brasse, en général, entraînement ou compétition",
+      "en": "Swimming, breaststroke, general, training or  competition",
+      "estime": false
+     },
+     {
+      "code": "18265",
+      "met": 5.3,
+      "nom": "Natation, brasse, loisir",
+      "en": "Swimming breaststroke, recreational",
+      "estime": false
+     },
+     {
+      "code": "18280",
+      "met": 10.5,
+      "nom": "Natation, crawl, vitesse rapide, ~75 yards/minute, effort vigoureux",
+      "en": "Swimming, crawl, fast speed, ~75 yards/minute,  vigorous effort",
+      "estime": false
+     },
+     {
+      "code": "18290",
+      "met": 8.0,
+      "nom": "Natation, crawl, vitesse moyenne, ~50 yards/minute, effort vigoureux",
+      "en": "Swimming, crawl, medium speed, ~50 yards/minute, vigorous effort",
+      "estime": false
+     },
+     {
+      "code": "18292",
+      "met": 5.8,
+      "nom": "Natation, crawl, vitesse lente, 30-45 yards/minute, effort modéré",
+      "en": "Swimming, crawl, slow speed, 30-45 yards/minute, moderate effort",
+      "estime": false
+     },
+     {
+      "code": "18294",
+      "met": 14.5,
+      "nom": "Natation, crawl, nageurs d’élite, compétition, >90 yards/minute",
+      "en": "Swimming, crawl, elite swimmers, competition, >90 yards/minute",
+      "estime": false
+     },
+     {
+      "code": "18285",
+      "met": 10.5,
+      "nom": "Natation, eau libre, 5k",
+      "en": "Swimming, open water, 5k",
+      "estime": false
+     },
+     {
+      "code": "18300",
+      "met": 6.0,
+      "nom": "Natation, lac, océan, rivière (Taylor Codes 280, 295)",
+      "en": "Swimming, lake, ocean, river (Taylor Codes 280,  295)",
+      "estime": true
+     },
+     {
+      "code": "18340",
+      "met": 9.8,
+      "nom": "Natation, nage sur place, rapide, effort vigoureux",
+      "en": "Swimming, treading water, fast, vigorous effort",
+      "estime": false
+     },
+     {
+      "code": "18350",
+      "met": 3.5,
+      "nom": "Natation, nage sur place, effort modéré, en général",
+      "en": "Swimming, treading water, moderate effort,  general",
+      "estime": false
+     }
+    ],
+    "sous": []
+   },
+   {
+    "nom": "Plongée",
+    "activites": [
+     {
+      "code": "18180",
+      "met": 15.8,
+      "nom": "Plongée libre, rapide",
+      "en": "Skindiving, fast",
+      "estime": false
+     },
+     {
+      "code": "18190",
+      "met": 11.8,
+      "nom": "Plongée libre, modérée",
+      "en": "Skindiving, moderate",
+      "estime": false
+     },
+     {
+      "code": "18200",
+      "met": 7.0,
+      "nom": "Plongée libre, plongée sous-marine, en général (Taylor Code 310)",
+      "en": "Skindiving, scuba diving, general (Taylor Code 310)",
+      "estime": false
+     },
+     {
+      "code": "18202",
+      "met": 5.3,
+      "nom": "Plongée sous-marine, en général, effort léger",
+      "en": "Scuba diving, general, light effort",
+      "estime": false
+     },
+     {
+      "code": "18204",
+      "met": 5.8,
+      "nom": "Plongée sous-marine, en général, effort modéré",
+      "en": "Scuba diving, general, moderate effort",
+      "estime": false
+     },
+     {
+      "code": "18206",
+      "met": 5.5,
+      "nom": "Plongée sous-marine, plongeur professionnel",
+      "en": "Scuba diving, professional diver",
+      "estime": false
+     },
+     {
+      "code": "18208",
+      "met": 6.8,
+      "nom": "Plongée sous-marine, plongeur de loisir",
+      "en": "Scuba diving, recreational diver",
+      "estime": false
+     },
+     {
+      "code": "18210",
+      "met": 5.0,
+      "nom": "Plongée avec tuba, snorkeling (Taylor Code 320)",
+      "en": "Snorkeling (Taylor Code 320)",
+      "estime": false
+     }
+    ],
+    "sous": []
+   },
+   {
+    "nom": "Aquagym",
+    "activites": [
+     {
+      "code": "18355",
+      "met": 5.5,
+      "nom": "Aquagym, gymnastique aquatique, en général",
+      "en": "Water aerobics, water calisthenics, general",
+      "estime": false
+     },
+     {
+      "code": "18356",
+      "met": 3.8,
+      "nom": "Aquagym, exercices de résistance",
+      "en": "Water aerobics, resistance exercises",
+      "estime": false
+     },
+     {
+      "code": "18358",
+      "met": 7.5,
+      "nom": "Aquagym, haute intensité",
+      "en": "Water aerobics, high intensity",
+      "estime": false
+     },
+     {
+      "code": "02120",
+      "met": 5.3,
+      "nom": "Aquagym, callisthénie aquatique, exercice aquatique",
+      "en": "Water aerobics, water calisthenics, water exercise",
+      "estime": false
+     }
+    ],
+    "sous": []
+   },
+   {
+    "nom": "Course aquatique",
+    "activites": [
+     {
+      "code": "18366",
+      "met": 9.8,
+      "nom": "Jogging aquatique, effort vigoureux",
+      "en": "Water jogging, vigorous effort",
+      "estime": false
+     },
+     {
+      "code": "18374",
+      "met": 6.5,
+      "nom": "Course aquatique, 30 pas/min, lente",
+      "en": "Water running, 30 steps/min, slow",
+      "estime": false
+     },
+     {
+      "code": "18375",
+      "met": 7.5,
+      "nom": "Course aquatique, 40 pas/min, modérée",
+      "en": "Water running, 40 steps/min, moderate",
+      "estime": false
+     },
+     {
+      "code": "18376",
+      "met": 8.5,
+      "nom": "Course aquatique, 50 pas/min, rapide",
+      "en": "Water running, 50 steps/min, fast",
+      "estime": false
+     },
+     {
+      "code": "18377",
+      "met": 9.8,
+      "nom": "Course aquatique, 60 pas/min, très rapide",
+      "en": "Water running, 60 steps/min, very fast",
+      "estime": false
+     }
+    ],
+    "sous": []
+   },
+   {
+    "nom": "Marche aquatique",
+    "activites": [
+     {
+      "code": "18367",
+      "met": 2.5,
+      "nom": "Marche aquatique, effort léger, allure lente",
+      "en": "Water walking, light effort, slow pace",
+      "estime": false
+     },
+     {
+      "code": "18368",
+      "met": 4.8,
+      "nom": "Marche aquatique, effort modéré, allure modérée",
+      "en": "Water walking, moderate effort, moderate pace",
+      "estime": false
+     },
+     {
+      "code": "18369",
+      "met": 6.8,
+      "nom": "Marche aquatique, effort vigoureux, allure rapide",
+      "en": "Water walking, vigorous effort, brisk pace",
+      "estime": false
+     }
+    ],
+    "sous": []
+   },
+   {
+    "nom": "Vélo aquatique",
+    "activites": [
+     {
+      "code": "18404",
+      "met": 2.8,
+      "nom": "Vélo aquatique, 25 W, 40-50 RPM",
+      "en": "Aquatic cycling, 25 W, 40-50 RPM",
+      "estime": false
+     },
+     {
+      "code": "18408",
+      "met": 4.8,
+      "nom": "Vélo aquatique, 25 W, 60-70 RPM",
+      "en": "Aquatic cycling, 25 W, 60-70 RPM",
+      "estime": false
+     },
+     {
+      "code": "18412",
+      "met": 3.8,
+      "nom": "Vélo aquatique, 50 W, 40-50 RPM",
+      "en": "Aquatic cycling, 50 W, 40-50 RPM",
+      "estime": false
+     },
+     {
+      "code": "18416",
+      "met": 6.0,
+      "nom": "Vélo aquatique, 50 W, 60-70 RPM",
+      "en": "Aquatic cycling,  50 W, 60-70 RPM",
+      "estime": false
+     },
+     {
+      "code": "18420",
+      "met": 5.0,
+      "nom": "Vélo aquatique, 75 W, 40-50 RPM",
+      "en": "Aquatic cycling, 75 W, 40-50 RPM",
+      "estime": false
+     },
+     {
+      "code": "18424",
+      "met": 6.3,
+      "nom": "Vélo aquatique, 75 W, 60-70 RPM",
+      "en": "Aquatic cycling, 75 W, 60-70 RPM",
+      "estime": false
+     },
+     {
+      "code": "18428",
+      "met": 6.3,
+      "nom": "Vélo aquatique, 100 W, 40-50 RPM",
+      "en": "Aquatic cycling, 100 W, 40-50 RPM",
+      "estime": false
+     },
+     {
+      "code": "18432",
+      "met": 7.5,
+      "nom": "Vélo aquatique, 100 W, 60-70 RPM",
+      "en": "Aquatic cycling, 100 W, 60-70 RPM",
+      "estime": false
+     },
+     {
+      "code": "18436",
+      "met": 8.5,
+      "nom": "Vélo aquatique, 80-89 RPM",
+      "en": "Aquatic cycling, 80-89 RPM",
+      "estime": false
+     },
+     {
+      "code": "18440",
+      "met": 10.3,
+      "nom": "Vélo aquatique, 90+ RPM",
+      "en": "Aquatic cycling, 90+ RPM",
+      "estime": false
+     }
+    ],
+    "sous": []
+   },
+   {
+    "nom": "Canoë, kayak et aviron",
+    "activites": [
+     {
+      "code": "18060",
+      "met": 12.5,
+      "nom": "Canoë, aviron, kayak, compétition, > 6 mph, effort vigoureux",
+      "en": "Canoeing, rowing, kayaking, competition, > 6 mph, vigorous effort",
+      "estime": false
+     },
+     {
+      "code": "18370",
+      "met": 5.0,
+      "nom": "Rafting, kayak ou canoë en eau vive",
+      "en": "Whitewater rafting, kayaking, or canoeing",
+      "estime": true
+     },
+     {
+      "code": "18020",
+      "met": 4.0,
+      "nom": "Canoë, en sortie de camping (Taylor Code 270)",
+      "en": "Canoeing, on camping trip (Taylor Code 270)",
+      "estime": false
+     },
+     {
+      "code": "18025",
+      "met": 3.3,
+      "nom": "Canoë, récolte du riz sauvage, en battant les tiges pour faire tomber le riz",
+      "en": "Canoeing, harvesting wild rice, knocking rice off the stalks",
+      "estime": false
+     },
+     {
+      "code": "18030",
+      "met": 7.0,
+      "nom": "Canoë, portage",
+      "en": "Canoeing, portaging",
+      "estime": true
+     },
+     {
+      "code": "18040",
+      "met": 2.8,
+      "nom": "Canoë, aviron, 2.0-3.9 mph, effort léger",
+      "en": "Canoeing, rowing, 2.0-3.9 mph, light effort",
+      "estime": false
+     },
+     {
+      "code": "18050",
+      "met": 5.8,
+      "nom": "Canoë, aviron, 4.0-5.9 mph, effort modéré",
+      "en": "Canoeing, rowing, 4.0-5.9 mph, moderate effort",
+      "estime": false
+     },
+     {
+      "code": "18070",
+      "met": 3.5,
+      "nom": "Canoë, aviron, pour le plaisir, en général (Taylor Code 250)",
+      "en": "Canoeing, rowing, for pleasure, general (Taylor Code 250)",
+      "estime": false
+     },
+     {
+      "code": "18100",
+      "met": 5.0,
+      "nom": "Kayak, effort modéré",
+      "en": "Kayaking, moderate effort",
+      "estime": false
+     },
+     {
+      "code": "18104",
+      "met": 13.5,
+      "nom": "Kayak, compétition",
+      "en": "kayaking, competition",
+      "estime": false
+     },
+     {
+      "code": "18106",
+      "met": 9.0,
+      "nom": "Kayak, slalom, eau plate",
+      "en": "kayaking, slalom, flat water",
+      "estime": false
+     },
+     {
+      "code": "18080",
+      "met": 12.0,
+      "nom": "Canoë ou aviron, en compétition, en pointe ou en couple (Taylor Code 260)",
+      "en": "Canoeing or rowing, in competition, crew or sculling (Taylor Code 260)",
+      "estime": false
+     },
+     {
+      "code": "18112",
+      "met": 15.5,
+      "nom": "Aviron, équipage simulé en bassin, une seule rame, 33 coups/min",
+      "en": "Rowing, simulated crew in a water tank, single oar, 33 strokes/min,",
+      "estime": false
+     },
+     {
+      "code": "18114",
+      "met": 15.5,
+      "nom": "Aviron, skiff, ergomètre, ergomètre sur rails, vitesse de course (32+ coups/min, >10 mph)",
+      "en": "Rowing, single scull, ergometer, ergometer on slides, racing speed (32+ strokes/min, >10 mph)",
+      "estime": false
+     }
+    ],
+    "sous": []
+   },
+   {
+    "nom": "Voile",
+    "activites": [
+     {
+      "code": "18120",
+      "met": 3.0,
+      "nom": "Voile, bateau et planche, planche à voile, char à glace, en général (Taylor Code 235)",
+      "en": "Sailing, boat and board sailing, windsurfing, ice sailing, general (Taylor Code 235)",
+      "estime": false
+     },
+     {
+      "code": "18130",
+      "met": 4.5,
+      "nom": "Voile, en compétition, en général",
+      "en": "Sailing, in competition, general",
+      "estime": false
+     },
+     {
+      "code": "18132",
+      "met": 9.3,
+      "nom": "Voile, en compétition, effort intense",
+      "en": "Sailing, in competition, high effort",
+      "estime": false
+     },
+     {
+      "code": "18140",
+      "met": 3.3,
+      "nom": "Voile, Sunfish/Laser/Hobby Cat, quillards, voile en mer, yachting, loisir",
+      "en": "Sailing, Sunfish/Laser/Hobby Cat, Keel boats, ocean sailing, yachting, leisure",
+      "estime": false
+     },
+     {
+      "code": "18142",
+      "met": 2.0,
+      "nom": "Voile, dériveur",
+      "en": "Sailing, dingy",
+      "estime": false
+     }
+    ],
+    "sous": []
+   },
+   {
+    "nom": "Surf",
+    "activites": [
+     {
+      "code": "18220",
+      "met": 3.0,
+      "nom": "Surf, bodysurf ou planche, en général",
+      "en": "Surfing, body or board, general",
+      "estime": true
+     },
+     {
+      "code": "18221",
+      "met": 6.8,
+      "nom": "Planche de surf, rame",
+      "en": "Surfboard, paddling",
+      "estime": false
+     },
+     {
+      "code": "18222",
+      "met": 5.0,
+      "nom": "Surf, bodysurf ou planche, en compétition",
+      "en": "Surfing, body or board, competitive",
+      "estime": true
+     }
+    ],
+    "sous": []
+   },
+   {
+    "nom": "Stand up paddle",
+    "activites": [
+     {
+      "code": "18224",
+      "met": 6.5,
+      "nom": "Stand up paddle, en général",
+      "en": "Stand up paddle boarding, general",
+      "estime": false
+     },
+     {
+      "code": "18225",
+      "met": 2.8,
+      "nom": "Stand up paddle, debout, 10-19 coups/min",
+      "en": "Stand up Paddleboard, standing, 10-19 strokes/min",
+      "estime": false
+     },
+     {
+      "code": "18226",
+      "met": 3.8,
+      "nom": "Stand up paddle, debout, 20-29 coups/min",
+      "en": "Stand up Paddleboard, standing, 20-29 strokes/min",
+      "estime": false
+     },
+     {
+      "code": "18227",
+      "met": 5.0,
+      "nom": "Stand up paddle, debout, 30-39 coups/min",
+      "en": "Stand up Paddleboard, standing, 30-39 strokes/min",
+      "estime": false
+     },
+     {
+      "code": "18228",
+      "met": 9.8,
+      "nom": "Stand up paddle, debout, 40-49 coups/min",
+      "en": "Stand up Paddleboard, standing, 40-49 strokes/min",
+      "estime": false
+     },
+     {
+      "code": "18229",
+      "met": 11.0,
+      "nom": "Stand up paddle, debout, 50-69 coups/min",
+      "en": "Stand up Paddleboard, standing, 50-69 strokes/min",
+      "estime": false
+     }
+    ],
+    "sous": []
+   },
+   {
+    "nom": "Planche à voile",
+    "activites": [
+     {
+      "code": "18380",
+      "met": 5.0,
+      "nom": "Planche à voile, sans pomper pour la vitesse",
+      "en": "Windsurfing, not pumping for speed",
+      "estime": false
+     },
+     {
+      "code": "18385",
+      "met": 11.0,
+      "nom": "Planche à voile ou kitesurf, épreuve de traversée",
+      "en": "Windsurfing or kitesurfing, crossing trial",
+      "estime": false
+     },
+     {
+      "code": "18390",
+      "met": 14.0,
+      "nom": "Planche à voile, compétition, en pompant pour la vitesse",
+      "en": "Windsurfing, competition, pumping for speed",
+      "estime": false
+     }
+    ],
+    "sous": []
+   },
+   {
+    "nom": "Plongeon, tremplin ou plateforme",
+    "activites": [
+     {
+      "code": "18090",
+      "met": 3.0,
+      "nom": "Plongeon, tremplin ou plateforme",
+      "en": "Diving, springboard or platform",
+      "estime": true
+     }
+    ],
+    "sous": []
+   },
+   {
+    "nom": "Water-polo",
+    "activites": [
+     {
+      "code": "18360",
+      "met": 10.0,
+      "nom": "Water-polo",
+      "en": "Water polo",
+      "estime": true
+     }
+    ],
+    "sous": []
+   },
+   {
+    "nom": "Volley-ball aquatique",
+    "activites": [
+     {
+      "code": "18365",
+      "met": 3.0,
+      "nom": "Volley-ball aquatique",
+      "en": "Water volleyball",
+      "estime": true
+     }
+    ],
+    "sous": []
+   },
+   {
+    "nom": "Pédalo",
+    "activites": [
+     {
+      "code": "18110",
+      "met": 4.0,
+      "nom": "Pédalo",
+      "en": "Paddle boat",
+      "estime": true
+     }
+    ],
+    "sous": []
+   },
+   {
+    "nom": "Ski nautique ou wakeboard (Taylor Code 220)",
+    "activites": [
+     {
+      "code": "18150",
+      "met": 6.0,
+      "nom": "Ski nautique ou wakeboard (Taylor Code 220)",
+      "en": "Skiing, water or wake boarding (Taylor Code 220)",
+      "estime": false
+     }
+    ],
+    "sous": []
+   },
+   {
+    "nom": "Tubing, descente d’une rivière en flottant sur une bouée, en général",
+    "activites": [
+     {
+      "code": "18352",
+      "met": 2.3,
+      "nom": "Tubing, descente d’une rivière en flottant sur une bouée, en général",
+      "en": "Tubing, floating on a river, general",
+      "estime": true
+     }
+    ],
+    "sous": []
+   }
+  ]
+ },
+ {
+  "id": "hivernales",
+  "noeuds": [
+   {
+    "nom": "Patinage",
+    "activites": [
+     {
+      "code": "19018",
+      "met": 14.0,
+      "nom": "Patinage, danse sur glace",
+      "en": "Skating, ice dancing",
+      "estime": false
+     },
+     {
+      "code": "19020",
+      "met": 5.5,
+      "nom": "Patinage, sur glace, 9 mph ou moins",
+      "en": "Skating, ice, 9 mph or less",
+      "estime": true
+     },
+     {
+      "code": "19030",
+      "met": 7.0,
+      "nom": "Patinage, sur glace, en général (Taylor Code 360)",
+      "en": "Skating, ice, general (Taylor Code 360)",
+      "estime": false
+     },
+     {
+      "code": "19040",
+      "met": 9.0,
+      "nom": "Patinage, sur glace, rapide, plus de 9 mph mais sans compétition",
+      "en": "Skating, ice, rapidly, more than 9 mph but not competitive",
+      "estime": true
+     },
+     {
+      "code": "19045",
+      "met": 9.0,
+      "nom": "Patinage sur tapis roulant, 6 – 6.9 mph, pente 2%",
+      "en": "Skating Treadmill, 6 – 6.9 mph, 2% grade",
+      "estime": false
+     },
+     {
+      "code": "19046",
+      "met": 10.0,
+      "nom": "Patinage sur tapis roulant, 7 – 7.9 mph, pente 2%",
+      "en": "Skating Treadmill, 7 – 7.9 mph, 2% grade",
+      "estime": false
+     },
+     {
+      "code": "19047",
+      "met": 10.5,
+      "nom": "Patinage sur tapis roulant, 8 – 8.9 mph, pente 2%",
+      "en": "Skating Treadmill, 8 – 8.9 mph, 2% grade",
+      "estime": false
+     },
+     {
+      "code": "19048",
+      "met": 11.0,
+      "nom": "Patinage sur tapis roulant, 9 – 9.9 mph, pente 2%",
+      "en": "Skating Treadmill, 9 – 9.9 mph, 2% grade",
+      "estime": false
+     },
+     {
+      "code": "19050",
+      "met": 13.8,
+      "nom": "Patinage, de vitesse, compétition",
+      "en": "Skating, speed, competitive",
+      "estime": false
+     }
+    ],
+    "sous": []
+   },
+   {
+    "nom": "Ski",
+    "activites": [],
+    "sous": [
+     {
+      "nom": "Ski de fond",
+      "activites": [
+       {
+        "code": "19075",
+        "met": 7.0,
+        "nom": "Ski, en général",
+        "en": "Skiing, general",
+        "estime": true
+       },
+       {
+        "code": "19115",
+        "met": 9.5,
+        "nom": "Ski, entraînement de ski de fond à haute intensité",
+        "en": "Skiing, cross-country skiing high-intensity training",
+        "estime": false
+       },
+       {
+        "code": "19130",
+        "met": 15.5,
+        "nom": "Ski, de fond, neige dure, en montée, effort maximal, alpinisme sur neige",
+        "en": "Skiing, cross country, hard snow, uphill, maximum, snow mountaineering",
+        "estime": false
+       },
+       {
+        "code": "19135",
+        "met": 13.3,
+        "nom": "Ski, de fond, pas de patineur",
+        "en": "Skiing, cross-country, skating",
+        "estime": false
+       },
+       {
+        "code": "19080",
+        "met": 6.8,
+        "nom": "Ski, de fond, 2.5 mph, lent ou effort léger, marche à ski",
+        "en": "Skiing, cross country, 2.5 mph, slow or light effort, ski walking",
+        "estime": false
+       },
+       {
+        "code": "19090",
+        "met": 8.5,
+        "nom": "Ski, de fond, 4.0-4.9 mph, vitesse et effort modérés, en général",
+        "en": "Skiing, cross country, 4.0-4.9 mph, moderate speed and effort, general",
+        "estime": false
+       },
+       {
+        "code": "19100",
+        "met": 11.3,
+        "nom": "Ski, de fond, 5.0-7.9 mph, vitesse soutenue, effort vigoureux",
+        "en": "Skiing, cross country, 5.0-7.9 mph, brisk speed, vigorous effort",
+        "estime": false
+       },
+       {
+        "code": "19110",
+        "met": 14.0,
+        "nom": "Ski, de fond, skieur d’élite, >8.0-11.9 mph, course",
+        "en": "Skiing, cross country, elite skier, >8.0-11.9 mph, racing",
+        "estime": false
+       },
+       {
+        "code": "19112",
+        "met": 16.0,
+        "nom": "Ski, de fond, 12-16 mph, skieur d’élite, course",
+        "en": "Skiing, cross country, 12-16 mph, elite skier, racing",
+        "estime": false
+       },
+       {
+        "code": "19140",
+        "met": 13.5,
+        "nom": "Ski, de fond, biathlon, technique du pas de patineur",
+        "en": "Skiing, cross-country, biathlon, skating technique",
+        "estime": false
+       },
+       {
+        "code": "19142",
+        "met": 12.8,
+        "nom": "Entraînement de biathlon, pente de 5 degrés, 8 km/h (5 mph), avec/sans carabine",
+        "en": "Biathlon training, 5 degree incline, 8 km/h (5 mph), with/without rifle",
+        "estime": false
+       },
+       {
+        "code": "19144",
+        "met": 15.8,
+        "nom": "Entraînement de biathlon, pente de 5 degrés, 10.7 km/h (6.6 mph), avec/sans carabine",
+        "en": "Biathlon training, 5 degree incline, 10.7 km/h (6.6 mph), with/without rifle",
+        "estime": false
+       }
+      ],
+      "sous": []
+     },
+     {
+      "nom": "Ski alpin et snowboard",
+      "activites": [
+       {
+        "code": "19146",
+        "met": 9.3,
+        "nom": "Ski, slalom",
+        "en": "Skiing, slalom",
+        "estime": false
+       },
+       {
+        "code": "19150",
+        "met": 4.3,
+        "nom": "Ski, de descente, alpin ou snowboard, effort léger, temps actif seulement",
+        "en": "Skiing, downhill, alpine or snowboarding, light effort, active time only",
+        "estime": false
+       },
+       {
+        "code": "19160",
+        "met": 6.3,
+        "nom": "Ski, de descente, alpin ou snowboard, effort modéré, en général, temps actif seulement",
+        "en": "Skiing, downhill, alpine or snowboarding, moderate effort, general, active time only",
+        "estime": false
+       },
+       {
+        "code": "19170",
+        "met": 8.0,
+        "nom": "Ski, de descente, alpin ou snowboard, effort vigoureux, temps actif seulement",
+        "en": "Skiing, downhill, alpine or snowboarding, vigorous effort, active time only",
+        "estime": true
+       },
+       {
+        "code": "19174",
+        "met": 7.3,
+        "nom": "Ski, entraînement de ski alpin à haute intensité",
+        "en": "Skiing, Alpine skiing high-intensity training",
+        "estime": false
+       },
+       {
+        "code": "19201",
+        "met": 7.5,
+        "nom": "Snowboard, loisir, allure modérée, montagne",
+        "en": "snowboarding, recreational, moderate pace, mountain",
+        "estime": false
+       }
+      ],
+      "sous": []
+     },
+     {
+      "nom": "Ski à roulettes",
+      "activites": [
+       {
+        "code": "19300",
+        "met": 12.5,
+        "nom": "Ski, à roulettes, coureurs d’élite",
+        "en": "Skiing, roller, elite racers",
+        "estime": false
+       },
+       {
+        "code": "19305",
+        "met": 5.5,
+        "nom": "Ski à roulettes, 10 – 12.9 km/h, sans pente",
+        "en": "Rollerskiing, 10 – 12.9 km/h, no incline",
+        "estime": false
+       },
+       {
+        "code": "19310",
+        "met": 6.8,
+        "nom": "Ski à roulettes, 13 – 16.9 km/h, sans pente",
+        "en": "Rollerskiing, 13 – 16.9 km/h, no incline",
+        "estime": false
+       },
+       {
+        "code": "19315",
+        "met": 8.3,
+        "nom": "Ski à roulettes, 17 – 19.9 km/h, sans pente",
+        "en": "Rollerskiing, 17 – 19.9 km/h, no incline",
+        "estime": false
+       },
+       {
+        "code": "19320",
+        "met": 10.5,
+        "nom": "Ski à roulettes, 20 – 23.9 km/h, sans pente",
+        "en": "Rollerskiing, 20 – 23.9 km/h, no incline",
+        "estime": false
+       },
+       {
+        "code": "19325",
+        "met": 15.0,
+        "nom": "Ski à roulettes, 24 – 27.9 km/h, sans pente",
+        "en": "Rollerskiing, 24 – 27.9 km/h, no incline",
+        "estime": false
+       },
+       {
+        "code": "19330",
+        "met": 12.5,
+        "nom": "Ski à roulettes, 10-15 km/h, pente de 2-5 degrés",
+        "en": "Rollerskiing, 10-15 km/h, 2-5 degree incline",
+        "estime": false
+       },
+       {
+        "code": "19335",
+        "met": 14.3,
+        "nom": "Ski à roulettes, 16-22 km/h, pente de 2-5 degrés",
+        "en": "Rollerskiing, 16-22 km/h, 2-5 degree incline",
+        "estime": false
+       },
+       {
+        "code": "19340",
+        "met": 12.3,
+        "nom": "Ski à roulettes, 6-9 km/h, pente de 6-10 degrés",
+        "en": "Rollerskiing, 6-9 km/h, 6-10 degree incline",
+        "estime": false
+       },
+       {
+        "code": "19345",
+        "met": 16.0,
+        "nom": "Ski à roulettes, >10 km/h, pente de 6-10 degrés",
+        "en": "Rollerskiing, >10 km/h, 6-10 degree incline",
+        "estime": false
+       }
+      ],
+      "sous": []
+     },
+     {
+      "nom": "Simulateur de ski",
+      "activites": [
+       {
+        "code": "02080",
+        "met": 6.8,
+        "nom": "Simulateur de ski, en général",
+        "en": "Ski machine, general",
+        "estime": false
+       },
+       {
+        "code": "02082",
+        "met": 10.5,
+        "nom": "Ergomètre de ski, ski de fond, poussée double, vitesse lente à modérée",
+        "en": "Ski ergometer, cross country, double poling, slow to moderate speed",
+        "estime": false
+       },
+       {
+        "code": "02084",
+        "met": 18.0,
+        "nom": "Ergomètre de ski, ski de fond, poussée double, vitesse rapide à maximale",
+        "en": "Ski ergometer, cross country, double poling, fast to maximum speed",
+        "estime": false
+       }
+      ],
+      "sous": []
+     }
+    ]
+   },
+   {
+    "nom": "Raquettes à neige",
+    "activites": [
+     {
+      "code": "19190",
+      "met": 5.3,
+      "nom": "Raquettes à neige, effort modéré",
+      "en": "Snow shoeing, moderate effort",
+      "estime": false
+     },
+     {
+      "code": "19192",
+      "met": 10.0,
+      "nom": "Raquettes à neige, effort vigoureux",
+      "en": "Snow shoeing, vigorous effort",
+      "estime": false
+     }
+    ],
+    "sous": []
+   },
+   {
+    "nom": "Motoneige",
+    "activites": [
+     {
+      "code": "19200",
+      "met": 3.8,
+      "nom": "Motoneige, conduite, allure modérée, terrain plat",
+      "en": "Snowmobiling, driving, moderate pace, flat land",
+      "estime": false
+     },
+     {
+      "code": "19202",
+      "met": 2.0,
+      "nom": "Motoneige, passager, effort léger",
+      "en": "Snowmobiling, passenger, light",
+      "estime": true
+     }
+    ],
+    "sous": []
+   },
+   {
+    "nom": "Alpinisme",
+    "activites": [
+     {
+      "code": "19400",
+      "met": 9.0,
+      "nom": "Alpinisme, descente, marche en descente encordé",
+      "en": "Mountaineering, downhill climbing, walking down with rope",
+      "estime": false
+     },
+     {
+      "code": "19405",
+      "met": 10.3,
+      "nom": "Alpinisme, descente/ski de fond",
+      "en": "Mountaineering, downhill climbing/cross-country skiing",
+      "estime": false
+     }
+    ],
+    "sous": []
+   },
+   {
+    "nom": "Saut à ski, montée en portant les skis",
+    "activites": [
+     {
+      "code": "19060",
+      "met": 7.0,
+      "nom": "Saut à ski, montée en portant les skis",
+      "en": "Ski jumping, climb up carrying skis",
+      "estime": true
+     }
+    ],
+    "sous": []
+   },
+   {
+    "nom": "Luge, toboggan, bobsleigh, luge de compétition (Taylor Code 370)",
+    "activites": [
+     {
+      "code": "19180",
+      "met": 7.0,
+      "nom": "Luge, toboggan, bobsleigh, luge de compétition (Taylor Code 370)",
+      "en": "Sledding, tobogganing, bobsledding, luge (Taylor Code 370)",
+      "estime": false
+     }
+    ],
+    "sous": []
+   }
+  ]
+ },
+ {
+  "id": "autre",
+  "noeuds": [
+   {
+    "nom": "Chasse et pêche",
+    "activites": [],
+    "sous": [
+     {
+      "nom": "Pêche",
+      "activites": [
+       {
+        "code": "04001",
+        "met": 3.5,
+        "nom": "Pêche, en général",
+        "en": "Fishing, general",
+        "estime": false
+       },
+       {
+        "code": "04005",
+        "met": 4.5,
+        "nom": "Pêche, pêche au crabe",
+        "en": "Fishing, crab fishing",
+        "estime": false
+       },
+       {
+        "code": "04007",
+        "met": 4.0,
+        "nom": "Pêche, attraper des poissons à la main",
+        "en": "Fishing, catching fish with hands",
+        "estime": false
+       },
+       {
+        "code": "04010",
+        "met": 4.3,
+        "nom": "Lié à la pêche, déterrer des vers, à la pelle",
+        "en": "Fishing related, digging worms, with shovel",
+        "estime": false
+       },
+       {
+        "code": "04030",
+        "met": 2.0,
+        "nom": "Pêche depuis un bateau ou un canoë, assis",
+        "en": "Fishing from boat or canoe, sitting",
+        "estime": false
+       },
+       {
+        "code": "04060",
+        "met": 2.0,
+        "nom": "Pêche, sur glace, assis",
+        "en": "Fishing, ice, sitting",
+        "estime": true
+       },
+       {
+        "code": "04061",
+        "met": 1.8,
+        "nom": "Pêche, au jig ou à la ligne, debout, en général",
+        "en": "Fishing, jig or line, standing, general",
+        "estime": false
+       },
+       {
+        "code": "04065",
+        "met": 2.3,
+        "nom": "Pêche au harpon, debout",
+        "en": "Fishing with a spear, standing",
+        "estime": false
+       },
+       {
+        "code": "04020",
+        "met": 4.0,
+        "nom": "Pêche depuis la berge, en marchant",
+        "en": "Fishing from river bank and walking",
+        "estime": true
+       },
+       {
+        "code": "04040",
+        "met": 3.5,
+        "nom": "Pêche depuis la berge, debout (Taylor Code 660)",
+        "en": "Fishing from river bank, standing (Taylor Code 660)",
+        "estime": false
+       },
+       {
+        "code": "04050",
+        "met": 6.0,
+        "nom": "Pêche en rivière, en waders (Taylor Code 670)",
+        "en": "Fishing in stream, in waders (Taylor Code 670)",
+        "estime": false
+       },
+       {
+        "code": "04062",
+        "met": 3.5,
+        "nom": "Pêche, à l’épuisette, poser le filet et récupérer le poisson, en général",
+        "en": "Fishing, dip net, setting net and retrieving fish, general",
+        "estime": true
+       },
+       {
+        "code": "04063",
+        "met": 3.8,
+        "nom": "Pêche, au filet fixe, poser le filet et récupérer le poisson, en général",
+        "en": "Fishing, set net, setting net and retrieving fish, general",
+        "estime": false
+       },
+       {
+        "code": "04064",
+        "met": 3.0,
+        "nom": "Pêche, à la roue à poissons, poser le filet et récupérer le poisson, en général",
+        "en": "Fishing, fishing wheel, setting net and retrieving fish, general",
+        "estime": true
+       },
+       {
+        "code": "19010",
+        "met": 6.0,
+        "nom": "Déplacement d’une cabane de pêche sur glace, installation/perçage des trous",
+        "en": "Moving icehouse, set up/drill holes",
+        "estime": true
+       },
+       {
+        "code": "19011",
+        "met": 2.0,
+        "nom": "Pêche sur glace",
+        "en": "Ice fishing",
+        "estime": false
+       }
+      ],
+      "sous": []
+     },
+     {
+      "nom": "Chasse",
+      "activites": [
+       {
+        "code": "04070",
+        "met": 2.5,
+        "nom": "Chasse, à l’arc ou à l’arbalète",
+        "en": "Hunting, bow and arrow or crossbow",
+        "estime": true
+       },
+       {
+        "code": "04083",
+        "met": 4.0,
+        "nom": "Chasse aux grands animaux marins",
+        "en": "Hunting large marine animals",
+        "estime": true
+       },
+       {
+        "code": "04100",
+        "met": 5.0,
+        "nom": "Chasse, en général",
+        "en": "Hunting, general",
+        "estime": true
+       },
+       {
+        "code": "04123",
+        "met": 3.3,
+        "nom": "Chasse au cochon sauvage",
+        "en": "Hunting pigs, wild",
+        "estime": false
+       },
+       {
+        "code": "04124",
+        "met": 2.0,
+        "nom": "Piégeage du gibier, en général",
+        "en": "Trapping game, general",
+        "estime": true
+       },
+       {
+        "code": "04125",
+        "met": 9.5,
+        "nom": "Chasse – randonnée avec le matériel de chasse",
+        "en": "Hunting – hiking with hunting gear",
+        "estime": false
+       },
+       {
+        "code": "04080",
+        "met": 6.0,
+        "nom": "Chasse, cerf, wapiti, gros gibier (Taylor Code 170)",
+        "en": "Hunting, deer, elk, large game (Taylor Code 170)",
+        "estime": false
+       },
+       {
+        "code": "04081",
+        "met": 9.8,
+        "nom": "Chasse au gros gibier, traîner la carcasse",
+        "en": "Hunting large game, dragging carcass",
+        "estime": false
+       },
+       {
+        "code": "04085",
+        "met": 2.5,
+        "nom": "Chasse, gros gibier depuis un mirador, marche limitée",
+        "en": "Hunting, large game from a hunting stand, limited walking",
+        "estime": true
+       },
+       {
+        "code": "04086",
+        "met": 2.0,
+        "nom": "Chasse au gros gibier depuis une voiture, un avion ou un bateau",
+        "en": "Hunting large game from a car, plane, or boat",
+        "estime": true
+       },
+       {
+        "code": "04090",
+        "met": 2.5,
+        "nom": "Chasse, canard, en marchant dans l’eau",
+        "en": "Hunting, duck, wading",
+        "estime": true
+       },
+       {
+        "code": "04110",
+        "met": 6.0,
+        "nom": "Chasse, faisans ou tétras (Taylor Code 680)",
+        "en": "Hunting, pheasants or grouse (Taylor Code 680)",
+        "estime": false
+       },
+       {
+        "code": "04115",
+        "met": 3.3,
+        "nom": "Chasse aux oiseaux",
+        "en": "Hunting birds",
+        "estime": false
+       },
+       {
+        "code": "04095",
+        "met": 3.0,
+        "nom": "Chasse à la roussette, à l’écureuil",
+        "en": "Hunting flying fox, squirrel",
+        "estime": false
+       },
+       {
+        "code": "04120",
+        "met": 5.0,
+        "nom": "Chasse, lapin, écureuil, tétras des prairies, raton laveur, petit gibier (Taylor Code 690)",
+        "en": "Hunting, rabbit, squirrel, prairie chick, raccoon, small game (Taylor Code 690)",
+        "estime": false
+       }
+      ],
+      "sous": []
+     },
+     {
+      "nom": "Tir",
+      "activites": [
+       {
+        "code": "04130",
+        "met": 2.5,
+        "nom": "Tir au pistolet ou tir au plateau, debout",
+        "en": "Pistol shooting or trap shooting, standing",
+        "estime": true
+       },
+       {
+        "code": "04140",
+        "met": 2.3,
+        "nom": "Exercices de tir à la carabine, allongé",
+        "en": "Rifle exercises, shooting, lying down",
+        "estime": false
+       },
+       {
+        "code": "04145",
+        "met": 2.5,
+        "nom": "Exercices de tir à la carabine, à genoux ou debout",
+        "en": "Rifle exercises, shooting, kneeling or standing",
+        "estime": false
+       }
+      ],
+      "sous": []
+     },
+     {
+      "nom": "Cueillette",
+      "activites": [
+       {
+        "code": "04150",
+        "met": 2.8,
+        "nom": "Cueillette, sac à dos de 0-9.9 kg",
+        "en": "Foraging, 0-9.9kg backpack",
+        "estime": false
+       },
+       {
+        "code": "04152",
+        "met": 3.0,
+        "nom": "Cueillette, sac à dos de 10-15 kg",
+        "en": "Foraging, 10-15kg backpack",
+        "estime": false
+       }
+      ],
+      "sous": []
+     }
+    ]
+   },
+   {
+    "nom": "Ménage et entretien de la maison",
+    "activites": [
+     {
+      "code": "05022",
+      "met": 3.3,
+      "nom": "Nettoyer les vitres, laver les vitres, en général",
+      "en": "Cleaning windows, washing windows, general",
+      "estime": false
+     },
+     {
+      "code": "05024",
+      "met": 4.5,
+      "nom": "Cirer les sols, debout, en marchant lentement, avec une cireuse électrique",
+      "en": "Polishing floors, standing, walking slowly, using electric polishing machine",
+      "estime": false
+     },
+     {
+      "code": "05032",
+      "met": 2.5,
+      "nom": "Épousseter ou cirer les meubles, en général",
+      "en": "Dusting or polishing furniture, general",
+      "estime": false
+     },
+     {
+      "code": "05043",
+      "met": 3.0,
+      "nom": "Passer l’aspirateur, en général, effort modéré",
+      "en": "Vacuuming, general, moderate effort",
+      "estime": false
+     },
+     {
+      "code": "05070",
+      "met": 1.8,
+      "nom": "Repassage",
+      "en": "Ironing",
+      "estime": false
+     },
+     {
+      "code": "05100",
+      "met": 3.0,
+      "nom": "Faire le lit, changer les draps",
+      "en": "Making bed, changing linens",
+      "estime": false
+     },
+     {
+      "code": "05148",
+      "met": 2.0,
+      "nom": "Arroser les plantes",
+      "en": "Watering  plants",
+      "estime": false
+     },
+     {
+      "code": "05149",
+      "met": 2.5,
+      "nom": "Faire un feu à l’intérieur",
+      "en": "Building a fire inside",
+      "estime": true
+     },
+     {
+      "code": "05300",
+      "met": 1.3,
+      "nom": "Se laver les mains",
+      "en": "Handwashing",
+      "estime": false
+     }
+    ],
+    "sous": [
+     {
+      "nom": "Balayer",
+      "activites": [
+       {
+        "code": "05010",
+        "met": 3.3,
+        "nom": "Ménage, balayer une moquette ou un sol, en général",
+        "en": "Cleaning, sweeping carpet or floors, general",
+        "estime": false
+       },
+       {
+        "code": "05011",
+        "met": 2.3,
+        "nom": "Ménage, balayer, lentement, effort léger",
+        "en": "Cleaning, sweeping, slow, light effort",
+        "estime": false
+       },
+       {
+        "code": "05012",
+        "met": 3.8,
+        "nom": "Ménage, balayer, rapidement, effort modéré",
+        "en": "Cleaning, sweeping, fast, moderate effort",
+        "estime": false
+       },
+       {
+        "code": "05140",
+        "met": 3.0,
+        "nom": "Balayer le garage, le trottoir ou l’extérieur de la maison",
+        "en": "Sweeping garage, sidewalk, or outside house",
+        "estime": false
+       }
+      ],
+      "sous": []
+     },
+     {
+      "nom": "Passer la serpillière",
+      "activites": [
+       {
+        "code": "05021",
+        "met": 3.5,
+        "nom": "Ménage, passer la serpillière, debout, effort modéré",
+        "en": "Cleaning, mopping, standing, moderate effort",
+        "estime": false
+       },
+       {
+        "code": "05023",
+        "met": 2.5,
+        "nom": "Passer la serpillière, debout, effort léger",
+        "en": "Mopping, standing, light effort",
+        "estime": false
+       }
+      ],
+      "sous": []
+     },
+     {
+      "nom": "Plusieurs tâches ménagères à la fois",
+      "activites": [
+       {
+        "code": "05025",
+        "met": 2.8,
+        "nom": "Plusieurs tâches ménagères à la fois, effort léger",
+        "en": "Multiple household tasks all at once, light effort",
+        "estime": false
+       },
+       {
+        "code": "05026",
+        "met": 3.3,
+        "nom": "Plusieurs tâches ménagères à la fois, effort modéré",
+        "en": "Multiple household tasks all at once, moderate effort",
+        "estime": false
+       },
+       {
+        "code": "05027",
+        "met": 4.3,
+        "nom": "Plusieurs tâches ménagères à la fois, effort vigoureux",
+        "en": "Multiple household tasks all at once, vigorous effort",
+        "estime": false
+       }
+      ],
+      "sous": []
+     },
+     {
+      "nom": "Ménage",
+      "activites": [
+       {
+        "code": "05020",
+        "met": 3.5,
+        "nom": "Ménage lourd ou de fond (par ex. laver la voiture, nettoyer le garage), effort modéré",
+        "en": "Cleaning  heavy or major (e.g., wash car, clean garage), moderate effort",
+        "estime": true
+       },
+       {
+        "code": "05030",
+        "met": 3.3,
+        "nom": "Ménage, maison ou chalet, en général, effort modéré",
+        "en": "Cleaning, house or cabin, general, moderate effort",
+        "estime": false
+       },
+       {
+        "code": "05040",
+        "met": 2.5,
+        "nom": "Ménage, en général (ranger, changer les draps, sortir les poubelles), effort léger",
+        "en": "Cleaning, general (straightening up, changing linen, carrying out trash), light effort",
+        "estime": false
+       }
+      ],
+      "sous": []
+     },
+     {
+      "nom": "Faire la vaisselle",
+      "activites": [
+       {
+        "code": "05041",
+        "met": 2.0,
+        "nom": "Faire la vaisselle, debout ou en général (sans distinction debout/en marchant)",
+        "en": "Wash dishes, standing or in general (not broken into stand/walk components)",
+        "estime": false
+       },
+       {
+        "code": "05042",
+        "met": 2.0,
+        "nom": "Faire la vaisselle, débarrasser la table, en marchant, effort léger",
+        "en": "Wash dishes, clearing dishes from table, walking, light effort",
+        "estime": false
+       }
+      ],
+      "sous": []
+     },
+     {
+      "nom": "Lessive",
+      "activites": [
+       {
+        "code": "05090",
+        "met": 2.3,
+        "nom": "Lessive, plier ou étendre le linge, mettre le linge au lave-linge ou au sèche-linge, faire une valise, laver le linge à la main, debout, effort léger",
+        "en": "Laundry, fold or hang clothes, put clothes in washer or dryer, packing suitcase, washing clothes by hand,  implied standing, light effort",
+        "estime": false
+       },
+       {
+        "code": "05091",
+        "met": 2.0,
+        "nom": "Lessive, plier ou étendre le linge, assis",
+        "en": "Laundry, fold or hang clothes, sitting",
+        "estime": false
+       },
+       {
+        "code": "05092",
+        "met": 4.0,
+        "nom": "Lessive, effort modéré",
+        "en": "Laundry,  moderate effort",
+        "estime": false
+       },
+       {
+        "code": "05095",
+        "met": 2.0,
+        "nom": "Lessive, ranger les vêtements, rassembler des vêtements pour une valise, ranger le linge, en marchant",
+        "en": "Laundry,  putting away clothes, gathering clothes to pack, putting away laundry, implied walking",
+        "estime": false
+       }
+      ],
+      "sous": []
+     },
+     {
+      "nom": "Couture",
+      "activites": [
+       {
+        "code": "05080",
+        "met": 1.3,
+        "nom": "Tricot, couture, effort léger, emballer des cadeaux, assis",
+        "en": "Knitting, sewing, light effort, wrapping presents, sitting",
+        "estime": false
+       },
+       {
+        "code": "05082",
+        "met": 2.8,
+        "nom": "Couture à la machine",
+        "en": "Sewing with a machine",
+        "estime": false
+       }
+      ],
+      "sous": []
+     },
+     {
+      "nom": "Déménagement",
+      "activites": [
+       {
+        "code": "05120",
+        "met": 5.8,
+        "nom": "Déménager des meubles, des objets de la maison, porter des cartons",
+        "en": "Moving furniture, household items, carrying boxes",
+        "estime": false
+       },
+       {
+        "code": "05121",
+        "met": 5.0,
+        "nom": "Déménagement, soulever des charges légères",
+        "en": "Moving, lifting light loads",
+        "estime": false
+       },
+       {
+        "code": "05146",
+        "met": 3.8,
+        "nom": "Debout, faire/défaire des cartons, soulever occasionnellement des objets légers de la maison, charger ou décharger une voiture, effort modéré",
+        "en": "Standing, packing/unpacking boxes, occasional lifting lightweight household items, loading or unloading items into a car, moderate effort",
+        "estime": false
+       },
+       {
+        "code": "05150",
+        "met": 9.0,
+        "nom": "Monter des objets de la maison par l’escalier, porter des cartons ou des meubles",
+        "en": "Moving household items upstairs, carrying boxes or furniture",
+        "estime": true
+       }
+      ],
+      "sous": []
+     },
+     {
+      "nom": "Rangement",
+      "activites": [
+       {
+        "code": "05125",
+        "met": 4.8,
+        "nom": "Ranger une pièce",
+        "en": "Organizing a room",
+        "estime": false
+       },
+       {
+        "code": "05147",
+        "met": 3.0,
+        "nom": "En marchant, ranger des objets de la maison, effort modéré",
+        "en": "Implied walking, putting away household items, moderate effort",
+        "estime": false
+       }
+      ],
+      "sous": []
+     },
+     {
+      "nom": "Récurer les sols",
+      "activites": [
+       {
+        "code": "05130",
+        "met": 3.5,
+        "nom": "Récurer les sols, à quatre pattes, récurer la salle de bain, la baignoire, effort modéré",
+        "en": "Scrubbing floors, on hands and knees, scrubbing bathroom, bathtub, moderate effort",
+        "estime": false
+       },
+       {
+        "code": "05131",
+        "met": 2.0,
+        "nom": "Récurer les sols, à quatre pattes, récurer la salle de bain, la baignoire, effort léger",
+        "en": "Scrubbing floors, on hands and knees, scrubbing bathroom, bathtub, light effort",
+        "estime": false
+       },
+       {
+        "code": "05132",
+        "met": 6.5,
+        "nom": "Récurer les sols, à quatre pattes, récurer la salle de bain, la baignoire, effort vigoureux",
+        "en": "Scrubbing floors, on hands and knees, scrubbing bathroom, bathtub, vigorous effort",
+        "estime": false
+       }
+      ],
+      "sous": []
+     },
+     {
+      "nom": "Petites tâches du quotidien",
+      "activites": [
+       {
+        "code": "05160",
+        "met": 2.0,
+        "nom": "Debout, tâches à effort léger (faire le plein, changer une ampoule, etc.)",
+        "en": "Standing, light effort tasks (pump gas, change light bulb, etc.)",
+        "estime": true
+       },
+       {
+        "code": "05165",
+        "met": 3.5,
+        "nom": "En marchant, tâches à effort modéré, hors ménage (se préparer à partir, fermer/verrouiller les portes, fermer les fenêtres, etc.)",
+        "en": "Walking, moderate effort tasks, non-cleaning (readying to leave, shut/lock doors, close windows, etc.",
+        "estime": false
+       }
+      ],
+      "sous": []
+     }
+    ]
+   },
+   {
+    "nom": "Jardinage",
+    "activites": [
+     {
+      "code": "08055",
+      "met": 2.8,
+      "nom": "Conduire un tracteur",
+      "en": "Driving tractor",
+      "estime": false
+     },
+     {
+      "code": "08060",
+      "met": 5.8,
+      "nom": "Jardinage avec des outils électriques lourds, utiliser une tronçonneuse, passer le motoculteur",
+      "en": "Gardening with heavy power tools, using chain saw, tilling a garden",
+      "estime": false
+     },
+     {
+      "code": "08070",
+      "met": 4.0,
+      "nom": "Canaux d’irrigation, ouvrir et fermer les vannes",
+      "en": "Irrigation channels, opening and closing ports",
+      "estime": false
+     },
+     {
+      "code": "08090",
+      "met": 5.0,
+      "nom": "Poser du gazon en rouleau",
+      "en": "Laying sod",
+      "estime": true
+     },
+     {
+      "code": "08220",
+      "met": 3.0,
+      "nom": "En marchant, épandre de l’engrais ou semer une pelouse, épandeur à pousser",
+      "en": "Walking, applying fertilizer or seeding a lawn, push applicator",
+      "estime": false
+     },
+     {
+      "code": "08230",
+      "met": 4.0,
+      "nom": "Arroser la pelouse ou le jardin, debout ou en marchant",
+      "en": "Watering lawn or garden, standing or walking",
+      "estime": false
+     }
+    ],
+    "sous": [
+     {
+      "nom": "Porter du bois",
+      "activites": [
+       {
+        "code": "08009",
+        "met": 4.1,
+        "nom": "Porter, charger ou empiler du bois, charger/décharger ou porter du bois de construction, effort léger à modéré",
+        "en": "Carrying, loading or stacking wood, loading/unloading or carrying lumber, light-to- moderate effort",
+        "estime": false
+       },
+       {
+        "code": "08010",
+        "met": 5.5,
+        "nom": "Porter, charger ou empiler du bois, charger/décharger ou porter du bois de construction, effort modéré",
+        "en": "Carrying, loading or stacking wood, loading/unloading or carrying lumber, moderate effort",
+        "estime": false
+       }
+      ],
+      "sous": []
+     },
+     {
+      "nom": "Couper du bois",
+      "activites": [
+       {
+        "code": "08019",
+        "met": 4.5,
+        "nom": "Couper du bois, fendre des bûches, effort modéré",
+        "en": "Chopping wood, splitting logs, moderate effort",
+        "estime": false
+       },
+       {
+        "code": "08020",
+        "met": 6.5,
+        "nom": "Couper du bois, fendre des bûches, effort vigoureux",
+        "en": "Chopping wood, splitting logs, vigorous effort",
+        "estime": false
+       }
+      ],
+      "sous": []
+     },
+     {
+      "nom": "Abattre des arbres",
+      "activites": [
+       {
+        "code": "08057",
+        "met": 8.3,
+        "nom": "Abattre des arbres, grande taille",
+        "en": "Felling trees, large size",
+        "estime": false
+       },
+       {
+        "code": "08058",
+        "met": 5.3,
+        "nom": "Abattre des arbres, petite à moyenne taille",
+        "en": "Felling trees, small-medium size",
+        "estime": false
+       }
+      ],
+      "sous": []
+     },
+     {
+      "nom": "Débroussailler",
+      "activites": [
+       {
+        "code": "08025",
+        "met": 3.5,
+        "nom": "Débroussailler légèrement, éclaircir le jardin, effort modéré",
+        "en": "Clearing light brush, thinning garden, moderate effort",
+        "estime": false
+       },
+       {
+        "code": "08030",
+        "met": 6.3,
+        "nom": "Défricher un terrain, transporter des broussailles, des sous-bois ou de la terre, effort vigoureux",
+        "en": "Clearing land, haul brush, undergrowth, or ground, vigorous effort",
+        "estime": false
+       }
+      ],
+      "sous": []
+     },
+     {
+      "nom": "Pelletage",
+      "activites": [
+       {
+        "code": "08040",
+        "met": 5.0,
+        "nom": "Creuser un bac à sable, pelleter du sable",
+        "en": "Digging sandbox, shoveling sand",
+        "estime": false
+       },
+       {
+        "code": "08080",
+        "met": 6.3,
+        "nom": "Étaler de la pierre concassée ou du gravier",
+        "en": "Laying crushed rock or gravel",
+        "estime": false
+       },
+       {
+        "code": "08192",
+        "met": 5.5,
+        "nom": "Pelleter de la terre ou de la boue",
+        "en": "Shoveling dirt or mud",
+        "estime": false
+       },
+       {
+        "code": "06110",
+        "met": 5.0,
+        "nom": "Creuser un garage",
+        "en": "Excavating garage",
+        "estime": true
+       },
+       {
+        "code": "06210",
+        "met": 5.0,
+        "nom": "Étaler de la terre à la pelle",
+        "en": "Spreading dirt with a shovel",
+        "estime": true
+       }
+      ],
+      "sous": []
+     },
+     {
+      "nom": "Bêcher",
+      "activites": [
+       {
+        "code": "08045",
+        "met": 3.5,
+        "nom": "Bêcher, retourner la terre, remplir le jardin, composter, effort léger à modéré",
+        "en": "Digging, spading, filling garden, composting, light-to-moderate effort",
+        "estime": false
+       },
+       {
+        "code": "08050",
+        "met": 5.0,
+        "nom": "Bêcher, retourner la terre, remplir le jardin, composter (Taylor Code 590)",
+        "en": "Digging, spading, filling garden, composting (Taylor Code 590)",
+        "estime": false
+       },
+       {
+        "code": "08052",
+        "met": 7.3,
+        "nom": "Bêcher, retourner la terre, remplir le jardin, composter, effort vigoureux",
+        "en": "Digging, spading, filling garden, composting, vigorous effort",
+        "estime": false
+       }
+      ],
+      "sous": []
+     },
+     {
+      "nom": "Tondre la pelouse",
+      "activites": [
+       {
+        "code": "08095",
+        "met": 5.5,
+        "nom": "Tondre la pelouse, en général, en marchant, effort modéré",
+        "en": "Mowing lawn, general, walking, moderate effort",
+        "estime": false
+       },
+       {
+        "code": "08100",
+        "met": 2.5,
+        "nom": "Tondre la pelouse, tondeuse autoportée (Taylor Code 550)",
+        "en": "Mowing lawn, riding mower (Taylor Code 550)",
+        "estime": false
+       },
+       {
+        "code": "08110",
+        "met": 6.0,
+        "nom": "Tondre la pelouse, tondeuse manuelle, effort vigoureux (Taylor Code 570)",
+        "en": "Mowing lawn, hand mower, vigorous effort (Taylor Code 570)",
+        "estime": false
+       },
+       {
+        "code": "08120",
+        "met": 5.0,
+        "nom": "Tondre la pelouse, en marchant, tondeuse à moteur, effort modéré ou vigoureux",
+        "en": "Mowing lawn, walk, power mower,  moderate or vigorous effort",
+        "estime": false
+       },
+       {
+        "code": "08125",
+        "met": 4.5,
+        "nom": "Tondre la pelouse, tondeuse à moteur, effort léger ou modéré (Taylor Code 590)",
+        "en": "Mowing lawn, power mower, light or moderate effort (Taylor Code 590)",
+        "estime": false
+       }
+      ],
+      "sous": []
+     },
+     {
+      "nom": "Planter",
+      "activites": [
+       {
+        "code": "08135",
+        "met": 2.6,
+        "nom": "Planter, rempoter, repiquer des semis ou des plantes, effort léger",
+        "en": "Planting, potting, transplanting seedlings or plants, light effort",
+        "estime": false
+       },
+       {
+        "code": "08140",
+        "met": 4.3,
+        "nom": "Planter des semis, des arbustes, penché, effort modéré",
+        "en": "Planting seedlings, shrubs, stooping, moderate effort",
+        "estime": false
+       },
+       {
+        "code": "08145",
+        "met": 4.3,
+        "nom": "Planter des cultures ou un potager, penché, effort modéré",
+        "en": "Planting crops or garden, stooping, moderate effort",
+        "estime": false
+       },
+       {
+        "code": "08150",
+        "met": 4.5,
+        "nom": "Planter des arbres",
+        "en": "Planting trees",
+        "estime": true
+       }
+      ],
+      "sous": []
+     },
+     {
+      "nom": "Ratisser",
+      "activites": [
+       {
+        "code": "08160",
+        "met": 4.0,
+        "nom": "Ratisser la pelouse ou les feuilles, effort modéré",
+        "en": "Raking lawn or leaves, moderate effort",
+        "estime": false
+       },
+       {
+        "code": "08165",
+        "met": 4.0,
+        "nom": "Ratisser la pelouse (Taylor Code 600)",
+        "en": "Raking lawn (Taylor Code 600)",
+        "estime": false
+       },
+       {
+        "code": "08190",
+        "met": 4.0,
+        "nom": "Ensacher l’herbe, les feuilles",
+        "en": "Sacking grass, leaves",
+        "estime": true
+       }
+      ],
+      "sous": []
+     },
+     {
+      "nom": "Tailler des arbustes ou des arbres",
+      "activites": [
+       {
+        "code": "08210",
+        "met": 3.8,
+        "nom": "Tailler des arbustes ou des arbres, outil manuel",
+        "en": "Trimming shrubs or trees, manual cutter",
+        "estime": false
+       },
+       {
+        "code": "08215",
+        "met": 3.3,
+        "nom": "Tailler des arbustes ou des arbres, outil électrique, utiliser un souffleur à feuilles, un coupe-bordure, effort modéré",
+        "en": "Trimming shrubs or trees, power cutter, using leaf blower, edger, moderate effort",
+        "estime": false
+       }
+      ],
+      "sous": []
+     },
+     {
+      "nom": "Désherber",
+      "activites": [
+       {
+        "code": "08239",
+        "met": 3.8,
+        "nom": "Désherber, cultiver le jardin, effort léger à modéré",
+        "en": "Weeding, cultivating garden, light-to-moderate effort",
+        "estime": false
+       },
+       {
+        "code": "08240",
+        "met": 4.5,
+        "nom": "Désherber, cultiver le jardin, effort modéré (Taylor Code 580)",
+        "en": "Weeding, cultivating garden, moderate effort (Taylor Code 580)",
+        "estime": false
+       },
+       {
+        "code": "08241",
+        "met": 5.0,
+        "nom": "Désherber, cultiver le jardin, à la binette, effort modéré à vigoureux",
+        "en": "Weeding, cultivating garden, using hoe moderate-to-vigorous effort",
+        "estime": false
+       }
+      ],
+      "sous": []
+     },
+     {
+      "nom": "Jardinage",
+      "activites": [
+       {
+        "code": "08066",
+        "met": 2.0,
+        "nom": "Jardinage, en général",
+        "en": "gardening, general",
+        "estime": false
+       },
+       {
+        "code": "08245",
+        "met": 3.8,
+        "nom": "Jardinage, en général, effort modéré",
+        "en": "Gardening, general, moderate effort",
+        "estime": false
+       },
+       {
+        "code": "08251",
+        "met": 3.0,
+        "nom": "Marche, rassemblement des outils de jardinage",
+        "en": "Walking, gathering gardening tools",
+        "estime": true
+       },
+       {
+        "code": "08260",
+        "met": 2.3,
+        "nom": "Travaux de jardin, en général, effort léger",
+        "en": "Yardwork, general, light effort",
+        "estime": false
+       },
+       {
+        "code": "08261",
+        "met": 4.0,
+        "nom": "Travaux de jardin, en général, effort modéré",
+        "en": "Yardwork, general, moderate effort",
+        "estime": false
+       },
+       {
+        "code": "08262",
+        "met": 6.0,
+        "nom": "Travaux de jardin, en général, effort vigoureux",
+        "en": "Yardwork, general, vigorous effort",
+        "estime": false
+       }
+      ],
+      "sous": []
+     },
+     {
+      "nom": "Cueillette",
+      "activites": [
+       {
+        "code": "08246",
+        "met": 3.5,
+        "nom": "Cueillette de fruits ou de café sur les arbres, effort modéré",
+        "en": "Picking fruit or coffee from trees, moderate effort",
+        "estime": false
+       },
+       {
+        "code": "08248",
+        "met": 4.5,
+        "nom": "Récolte de produits, cueillette de fruits sur les arbres, glanage de fruits, cueillette de fruits/légumes, montée à l’échelle pour cueillir des fruits, effort vigoureux",
+        "en": "Harvesting Produce, Picking fruit off trees, gleaning fruits, picking fruits/vegetables, climbing ladder to pick fruit, vigorous effort",
+        "estime": false
+       },
+       {
+        "code": "08250",
+        "met": 3.0,
+        "nom": "Marche/station debout implicite – ramassage dans le jardin, léger, cueillette de fleurs ou de légumes",
+        "en": "Implied walking/standing – picking up yard, light, picking flowers or vegetables",
+        "estime": false
+       }
+      ],
+      "sous": []
+     },
+     {
+      "nom": "Brouette",
+      "activites": [
+       {
+        "code": "08255",
+        "met": 4.8,
+        "nom": "Brouette, pousser un chariot de jardin ou une brouette, en général",
+        "en": "Wheel barrow, pushing garden cart or wheelbarrow, general",
+        "estime": false
+       },
+       {
+        "code": "08256",
+        "met": 6.0,
+        "nom": "Brouette, pousser un grand chariot de jardin ou une brouette lourde jusqu’à 150kg",
+        "en": "Wheel barrow, pushing large garden cart or heavy wheelbarrow up to 150kg",
+        "estime": false
+       }
+      ],
+      "sous": []
+     }
+    ]
+   },
+   {
+    "nom": "Bricolage",
+    "activites": [
+     {
+      "code": "06010",
+      "met": 3.0,
+      "nom": "Réparation d’avion",
+      "en": "Airplane repair",
+      "estime": true
+     },
+     {
+      "code": "06100",
+      "met": 5.0,
+      "nom": "Nettoyer les gouttières",
+      "en": "Cleaning gutters",
+      "estime": true
+     },
+     {
+      "code": "06120",
+      "met": 5.0,
+      "nom": "Poser des contre-fenêtres",
+      "en": "Hanging storm windows",
+      "estime": true
+     },
+     {
+      "code": "06122",
+      "met": 5.0,
+      "nom": "Poser des plaques de plâtre à l’intérieur de la maison",
+      "en": "Hanging sheet rock inside house",
+      "estime": true
+     },
+     {
+      "code": "06144",
+      "met": 3.0,
+      "nom": "Réparer des appareils électroménagers",
+      "en": "Repairing appliances",
+      "estime": true
+     },
+     {
+      "code": "06167",
+      "met": 3.0,
+      "nom": "Plomberie, en général",
+      "en": "Plumbing, general",
+      "estime": true
+     },
+     {
+      "code": "06180",
+      "met": 6.0,
+      "nom": "Couverture de toiture",
+      "en": "Roofing",
+      "estime": true
+     },
+     {
+      "code": "06205",
+      "met": 2.0,
+      "nom": "Affûter des outils",
+      "en": "Sharpening tools",
+      "estime": false
+     },
+     {
+      "code": "06240",
+      "met": 3.3,
+      "nom": "Câblage électrique, raccordement-épissure",
+      "en": "Wiring, tapping-splicing",
+      "estime": false
+     }
+    ],
+    "sous": [
+     {
+      "nom": "Menuiserie",
+      "activites": [
+       {
+        "code": "06040",
+        "met": 3.0,
+        "nom": "Menuiserie, en général, en atelier (Taylor Code 620)",
+        "en": "Carpentry, general, workshop (Taylor Code 620)",
+        "estime": false
+       },
+       {
+        "code": "06050",
+        "met": 6.0,
+        "nom": "Menuiserie, à l’extérieur de la maison (Taylor Code 640)",
+        "en": "Carpentry, outside house, (Taylor Code 640)",
+        "estime": false
+       },
+       {
+        "code": "06052",
+        "met": 3.8,
+        "nom": "Menuiserie, à l’extérieur de la maison, construire une clôture",
+        "en": "Carpentry, outside house, building a fence",
+        "estime": false
+       },
+       {
+        "code": "06060",
+        "met": 3.3,
+        "nom": "Menuiserie, finitions, vernir ou rénover des placards ou des meubles",
+        "en": "Carpentry, finishing, varnishing, or refinishing cabinets or furniture",
+        "estime": false
+       },
+       {
+        "code": "06070",
+        "met": 6.0,
+        "nom": "Menuiserie, scier du bois dur, raboter et percer du bois, effort modéré à vigoureux",
+        "en": "Carpentry, sawing hardwood, planing and drilling wood, moderate-to-vigorous effort",
+        "estime": false
+       },
+       {
+        "code": "06072",
+        "met": 4.0,
+        "nom": "Menuiserie, travaux de rénovation de la maison, effort modéré",
+        "en": "Carpentry, home remodeling tasks, moderate effort",
+        "estime": false
+       },
+       {
+        "code": "06074",
+        "met": 2.3,
+        "nom": "Menuiserie, travaux de rénovation de la maison, effort léger",
+        "en": "Carpentry, home remodeling tasks, light effort",
+        "estime": false
+       },
+       {
+        "code": "06124",
+        "met": 3.0,
+        "nom": "Planter des clous au marteau",
+        "en": "Hammering nails",
+        "estime": false
+       }
+      ],
+      "sous": []
+     },
+     {
+      "nom": "Calfeutrage",
+      "activites": [
+       {
+        "code": "06080",
+        "met": 5.0,
+        "nom": "Calfeutrage, jointoyer un chalet en rondins",
+        "en": "Caulking, chinking log cabin",
+        "estime": true
+       },
+       {
+        "code": "06090",
+        "met": 4.5,
+        "nom": "Calfeutrage, hors chalet en rondins",
+        "en": "Caulking, except log cabin",
+        "estime": true
+       }
+      ],
+      "sous": []
+     },
+     {
+      "nom": "Bricolage",
+      "activites": [
+       {
+        "code": "06126",
+        "met": 2.5,
+        "nom": "Bricolage, en général, effort léger",
+        "en": "Home repair, general, light effort",
+        "estime": true
+       },
+       {
+        "code": "06127",
+        "met": 4.5,
+        "nom": "Bricolage, en général, effort modéré",
+        "en": "Home repair, general, moderate effort",
+        "estime": true
+       },
+       {
+        "code": "06128",
+        "met": 6.0,
+        "nom": "Bricolage, en général, effort vigoureux",
+        "en": "Home repair, general, vigorous effort",
+        "estime": true
+       }
+      ],
+      "sous": []
+     },
+     {
+      "nom": "Peinture",
+      "activites": [
+       {
+        "code": "06150",
+        "met": 5.0,
+        "nom": "Peinture, extérieur de la maison (Taylor Code 650)",
+        "en": "Painting, outside home (Taylor Code 650)",
+        "estime": false
+       },
+       {
+        "code": "06160",
+        "met": 3.3,
+        "nom": "Peinture à l’intérieur de la maison, tapisserie, grattage de peinture",
+        "en": "Painting inside house, wallpapering, scraping paint",
+        "estime": false
+       },
+       {
+        "code": "06165",
+        "met": 4.5,
+        "nom": "Peinture (Taylor Code 630)",
+        "en": "Painting (Taylor Code 630)",
+        "estime": false
+       },
+       {
+        "code": "06230",
+        "met": 4.5,
+        "nom": "Laver une clôture, peindre une clôture, effort modéré",
+        "en": "Washing fence, painting fence, moderate effort",
+        "estime": true
+       }
+      ],
+      "sous": []
+     },
+     {
+      "nom": "Travaux de sol",
+      "activites": [
+       {
+        "code": "06130",
+        "met": 4.5,
+        "nom": "Poser ou retirer de la moquette",
+        "en": "Laying or removing carpet",
+        "estime": true
+       },
+       {
+        "code": "06140",
+        "met": 3.8,
+        "nom": "Poser du carrelage ou du linoléum",
+        "en": "Laying tile or linoleum",
+        "estime": false
+       },
+       {
+        "code": "06190",
+        "met": 4.5,
+        "nom": "Poncer les sols avec une ponceuse électrique",
+        "en": "Sanding floors with a power sander",
+        "estime": true
+       }
+      ],
+      "sous": []
+     }
+    ]
+   },
+   {
+    "nom": "Entretien automobile",
+    "activites": [
+     {
+      "code": "06020",
+      "met": 4.0,
+      "nom": "Carrosserie automobile",
+      "en": "Automobile body work",
+      "estime": true
+     },
+     {
+      "code": "06030",
+      "met": 3.3,
+      "nom": "Réparation automobile, effort léger ou modéré",
+      "en": "Automobile repair, light or moderate effort",
+      "estime": false
+     },
+     {
+      "code": "06225",
+      "met": 2.0,
+      "nom": "Laver et lustrer une voiture",
+      "en": "Washing and waxing car",
+      "estime": false
+     }
+    ],
+    "sous": []
+   },
+   {
+    "nom": "Entretien de bateau",
+    "activites": [
+     {
+      "code": "06170",
+      "met": 3.0,
+      "nom": "Mettre et retirer une bâche – voilier",
+      "en": "Put on and removal of tarp – sailboat",
+      "estime": true
+     },
+     {
+      "code": "06200",
+      "met": 4.5,
+      "nom": "Gratter et peindre un voilier ou un bateau à moteur",
+      "en": "Scraping and painting sailboat or powerboat",
+      "estime": true
+     },
+     {
+      "code": "06220",
+      "met": 4.5,
+      "nom": "Laver et lustrer la coque d’un voilier ou d’un avion",
+      "en": "Washing and waxing hull of sailboat or airplane",
+      "estime": true
+     }
+    ],
+    "sous": []
+   },
+   {
+    "nom": "Pratique musicale",
+    "activites": [
+     {
+      "code": "10030",
+      "met": 2.3,
+      "nom": "Direction d’orchestre, debout",
+      "en": "Conducting orchestra, standing",
+      "estime": false
+     },
+     {
+      "code": "10074",
+      "met": 2.0,
+      "nom": "Pratique d’instruments de musique, en général",
+      "en": "Playing musical instruments, general",
+      "estime": false
+     }
+    ],
+    "sous": [
+     {
+      "nom": "Claviers",
+      "activites": [
+       {
+        "code": "10010",
+        "met": 1.8,
+        "nom": "Accordéon, assis",
+        "en": "Accordion, sitting",
+        "estime": false
+       },
+       {
+        "code": "10070",
+        "met": 2.3,
+        "nom": "Piano, assis",
+        "en": "Piano, sitting",
+        "estime": false
+       },
+       {
+        "code": "10077",
+        "met": 2.0,
+        "nom": "Orgue, assis",
+        "en": "Organ, sitting",
+        "estime": false
+       }
+      ],
+      "sous": []
+     },
+     {
+      "nom": "Cordes frottées",
+      "activites": [
+       {
+        "code": "10020",
+        "met": 2.3,
+        "nom": "Violoncelle, assis",
+        "en": "Cello, sitting",
+        "estime": false
+       },
+       {
+        "code": "10035",
+        "met": 2.5,
+        "nom": "Contrebasse, debout",
+        "en": "Double bass, standing",
+        "estime": false
+       },
+       {
+        "code": "10100",
+        "met": 2.5,
+        "nom": "Violon, assis",
+        "en": "Violin, sitting",
+        "estime": false
+       }
+      ],
+      "sous": []
+     },
+     {
+      "nom": "Batterie et percussions",
+      "activites": [
+       {
+        "code": "10040",
+        "met": 3.8,
+        "nom": "Batterie, assis",
+        "en": "Drums, sitting",
+        "estime": false
+       },
+       {
+        "code": "10045",
+        "met": 3.0,
+        "nom": "Percussions (par ex. bongo, conga, benbe), modéré, assis",
+        "en": "Drumming (e.g., bongo, conga, benbe), moderate, sitting",
+        "estime": true
+       },
+       {
+        "code": "10048",
+        "met": 8.3,
+        "nom": "Batterie, concert/spectacle en direct",
+        "en": "Drumming, concert/live show",
+        "estime": false
+       }
+      ],
+      "sous": []
+     },
+     {
+      "nom": "Bois",
+      "activites": [
+       {
+        "code": "10050",
+        "met": 2.0,
+        "nom": "Flûte, assis",
+        "en": "Flute, sitting",
+        "estime": false
+       },
+       {
+        "code": "10110",
+        "met": 1.8,
+        "nom": "Instruments à vent (bois), assis",
+        "en": "Woodwind instruments, sitting",
+        "estime": false
+       }
+      ],
+      "sous": []
+     },
+     {
+      "nom": "Cuivres",
+      "activites": [
+       {
+        "code": "10060",
+        "met": 1.8,
+        "nom": "Cor, debout",
+        "en": "Horn, standing",
+        "estime": false
+       },
+       {
+        "code": "10080",
+        "met": 3.5,
+        "nom": "Trombone, debout",
+        "en": "Trombone, standing",
+        "estime": false
+       },
+       {
+        "code": "10090",
+        "met": 2.5,
+        "nom": "Trompette, debout",
+        "en": "Trumpet, standing",
+        "estime": false
+       },
+       {
+        "code": "10115",
+        "met": 1.8,
+        "nom": "Cuivres, assis",
+        "en": "Brass instruments, sitting",
+        "estime": false
+       }
+      ],
+      "sous": []
+     },
+     {
+      "nom": "Guitare",
+      "activites": [
+       {
+        "code": "10120",
+        "met": 2.0,
+        "nom": "Guitare, classique, folk, assis",
+        "en": "Guitar, classical, folk, sitting",
+        "estime": true
+       },
+       {
+        "code": "10125",
+        "met": 3.0,
+        "nom": "Guitare, groupe de rock and roll, debout",
+        "en": "Guitar, rock and roll band, standing",
+        "estime": true
+       }
+      ],
+      "sous": []
+     },
+     {
+      "nom": "Fanfare",
+      "activites": [
+       {
+        "code": "10130",
+        "met": 4.0,
+        "nom": "Fanfare, twirling bâton, marche, allure modérée, en général",
+        "en": "Marching band, baton twirling, walking, moderate pace, general",
+        "estime": true
+       },
+       {
+        "code": "10131",
+        "met": 5.5,
+        "nom": "Fanfare, jeu d’un instrument, marche, allure rapide, en général",
+        "en": "Marching band, playing an instrument, walking, brisk pace, general",
+        "estime": false
+       },
+       {
+        "code": "10135",
+        "met": 3.5,
+        "nom": "Fanfare, tambour-major, marche",
+        "en": "Marching band, drum major, walking",
+        "estime": true
+       }
+      ],
+      "sous": []
+     }
+    ]
+   },
+   {
+    "nom": "Escalier",
+    "activites": [],
+    "sous": [
+     {
+      "nom": "Escalier",
+      "activites": [
+       {
+        "code": "17070",
+        "met": 3.5,
+        "nom": "Descente d’escalier",
+        "en": "Descending stairs",
+        "estime": false
+       },
+       {
+        "code": "17130",
+        "met": 8.0,
+        "nom": "Montée d’escalier, utiliser ou monter une échelle (Taylor Code 030)",
+        "en": "Stair climbing, using or climbing up ladder (Taylor Code 030)",
+        "estime": false
+       },
+       {
+        "code": "17131",
+        "met": 6.8,
+        "nom": "Montée d’escalier, en général",
+        "en": "Stair climbing, general",
+        "estime": false
+       },
+       {
+        "code": "17133",
+        "met": 4.5,
+        "nom": "Montée d’escalier, rythme lent",
+        "en": "Stair climbing, slow pace",
+        "estime": false
+       },
+       {
+        "code": "17134",
+        "met": 9.3,
+        "nom": "Montée d’escalier, rythme rapide, une marche à la fois",
+        "en": "Stair climbing, fast pace, one step at a time",
+        "estime": false
+       },
+       {
+        "code": "17136",
+        "met": 7.5,
+        "nom": "Montée d’escalier, deux marches à la fois",
+        "en": "Stair climbing, two steps at a time",
+        "estime": false
+       },
+       {
+        "code": "17138",
+        "met": 7.5,
+        "nom": "Montée d’escalier, monter et descendre l’escalier",
+        "en": "Stair climbing, ascending and descending stairs",
+        "estime": false
+       }
+      ],
+      "sous": []
+     },
+     {
+      "nom": "Porter une charge en montant l’escalier",
+      "activites": [
+       {
+        "code": "17025",
+        "met": 8.3,
+        "nom": "Porter une charge en montant l’escalier, en général",
+        "en": "Carrying load upstairs, general",
+        "estime": false
+       },
+       {
+        "code": "17026",
+        "met": 5.5,
+        "nom": "Porter une charge, 1 à 15 lb, en montant l’escalier",
+        "en": "Carrying load, 1 to 15 lb load, upstairs",
+        "estime": false
+       },
+       {
+        "code": "17027",
+        "met": 6.0,
+        "nom": "Porter une charge, 16 à 24 lb, en montant l’escalier",
+        "en": "Carrying load, 16 to 24 lb load, upstairs",
+        "estime": false
+       },
+       {
+        "code": "17028",
+        "met": 8.0,
+        "nom": "Porter une charge, 25 à 49 lb, en montant l’escalier",
+        "en": "Carrying load, 25 to 49 lb load, upstairs",
+        "estime": true
+       },
+       {
+        "code": "17029",
+        "met": 10.0,
+        "nom": "Porter une charge, 50 à 74 lb, en montant l’escalier",
+        "en": "Carrying load, 50 to 74 lb load, upstairs",
+        "estime": true
+       },
+       {
+        "code": "17030",
+        "met": 12.0,
+        "nom": "Porter une charge, >74 lb, en montant l’escalier",
+        "en": "Carrying load, >74 lb load, upstairs",
+        "estime": true
+       }
+      ],
+      "sous": []
+     }
+    ]
+   }
+  ]
+ }
+]

@@ -3023,6 +3023,137 @@
    Le corps de la carte est plus étroit que la page : les tuiles ont perdu
    quelques pixels (68 → 62 de plancher), la pastille reste à 48 et
    l'icône à 34 (« + grandes de 2 tailles »). ─────────────────────────── */
+/* LE CHAMP DE RECHERCHE (2026-09-25, son image : une loupe, le mot, une
+   croix qui efface ; bleu sur l'image, ici la charte des formulaires — la
+   matière de « Autre dose », le focus à peine plus sombre, la loupe et la
+   croix en gris). */
+.recherche {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 0 12px 0 14px;
+  border: 1px solid var(--option-filet);
+  border-radius: 14px;
+  background: var(--option-fond);
+  color: var(--encre-chapeau);
+}
+
+.recherche:focus-within {
+  background: var(--option-choisi-fond);
+  border-color: var(--bille-eteinte);
+}
+
+.recherche > .icone {
+  flex: none;
+  width: 18px;
+  height: 18px;
+}
+
+.recherche__champ {
+  flex: 1;
+  min-width: 0;
+  margin: 0;
+  padding: 14px 0;
+  border: 0;
+  background: none;
+  color: var(--encre);
+  font-family: var(--font-body);
+  font-size: 17px;
+  outline: none;
+  -webkit-appearance: none;
+  appearance: none;
+}
+
+.recherche__champ::-webkit-search-cancel-button {
+  display: none;
+}
+
+.recherche__champ::placeholder {
+  color: var(--encre-chapeau);
+}
+
+.recherche__effacer {
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: var(--option-choisi-fond);
+  color: var(--encre-chapeau);
+  cursor: pointer;
+}
+
+.recherche__effacer .icone {
+  width: 14px;
+  height: 14px;
+}
+
+.recherche__nombre {
+  color: var(--encre-chapeau);
+}
+
+/* LES RÉSULTATS : deux par rangée, sur carte — la pastille de la catégorie
+   (plus petite que sur les tuiles), le nom et la catégorie en gris, le
+   chevron. Des blocs tant que le choix n'existe pas. */
+.resultats {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.resultat {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+  padding: 8px 8px 8px 10px;
+  border-radius: 12px;
+  background: var(--module-fond);
+  box-shadow: var(--ajout-carte-ombre);
+}
+
+.resultat .categorie__pastille {
+  flex: none;
+  width: 40px;
+  height: 40px;
+}
+
+.resultat .categorie__icone {
+  width: 28px;
+  height: 28px;
+}
+
+.resultat__texte {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+
+.resultat__nom {
+  font-family: var(--font-body);
+  font-size: 14px;
+  line-height: 1.2;
+  color: var(--encre);
+}
+
+.resultat__categorie {
+  font-family: var(--font-body);
+  font-size: 12px;
+  color: var(--encre-chapeau);
+}
+
+.resultat > .icone {
+  flex: none;
+  width: 16px;
+  height: 16px;
+  color: var(--encre-chapeau);
+}
+
 .categories {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(62px, 1fr));

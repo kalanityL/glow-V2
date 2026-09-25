@@ -304,6 +304,13 @@ export interface Textes {
     /** Le bandeau du formulaire (2026-09-25, « nouvelle activité physique
         est un formulaire, comme nouvelle injection »). */
     titre: string;
+    /** Le champ de recherche (2026-09-25, son image) : ce qu'il propose,
+        la croix qui l'efface (dite à qui écoute), le titre des résultats,
+        et l'absence de résultat. */
+    rechercher: string;
+    effacerRecherche: string;
+    resultats: string;
+    aucunResultat: string;
     categories: string;
     categorie: Record<CategorieActivite, string>;
   };
@@ -656,6 +663,10 @@ const FR: Textes = {
   },
   activite: {
     titre: 'Nouvelle activité physique',
+    rechercher: 'Rechercher une activité',
+    effacerRecherche: 'Effacer la recherche',
+    resultats: 'Résultats de recherche',
+    aucunResultat: 'Aucune activité ne répond à ce mot.',
     categories: 'Catégories',
     /* Ses neuf catégories, ses mots (24 et 25 septembre 2026). */
     categorie: {

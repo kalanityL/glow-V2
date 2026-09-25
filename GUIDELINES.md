@@ -907,8 +907,28 @@ prise** (le même soir, « nouvelle activité physique est un formulaire,
 comme nouvelle injection ») : l'entête des pages, la barre du bas, et la
 carte — le bandeau avec l'icône du module, « Nouvelle activité physique »
 et la croix ; le corps qui défile, avec la date et l'heure côte à côte
-puis « Catégories » ; « Valider » au pied, éteint tant qu'il n'y a rien à
-consigner. « Catégories » et neuf tuiles, les catégories de SON tri du Compendium of
+puis LE CHAMP DE RECHERCHE (le même soir, son image : « voilà le design
+du champ recherche. La recherche propose un sport uniquement du niveau
+1 : pas du niveau 0, ni des niveau 2, 3 etc.. si on tape un mot qui
+apparait dans un sport de niveau 2 ou 3, on suggere en resultat de
+recherche le sport de niveau 1 correspondant ») — la loupe, le mot, la
+croix qui efface, à la charte des formulaires et non au bleu de l'image ;
+dessous, « Résultats de recherche (n) » et des cartes deux par rangée,
+l'icône de la catégorie, le nom du nœud, la catégorie en gris, un
+chevron ; un résultat est TOUJOURS UN NŒUD DE NIVEAU 1 de l'arbre (un
+groupe d'une catégorie, ou une activité seule), jamais une catégorie ni
+un sous-groupe, et un mot trouvé dans un sous-groupe ou une activité,
+en français ou dans l'intitulé anglais du Compendium, fait remonter le
+nœud de niveau 1 qui le porte (`domaine/recherche-activites.ts`, testé) ;
+sans résultat, une phrase en place —, puis « Catégories » ; « Valider »
+au pied, éteint tant qu'il n'y a rien à consigner. **L'arbre est
+embarqué** : `docs/pour-claude/compendium/arbre.json` est son tri du
+Compendium 2024 (766 activités, leur MET, le nom français et l'intitulé
+anglais, le code du Compendium), `scripts/engendrer-activites.mjs` en
+écrit `src/domaine/activites-catalogue.ts` — à relancer à chaque
+correction de l'arbre ; les noms des activités sont des données du
+catalogue, comme ceux des traitements, pas des textes du dictionnaire.
+« Catégories » et neuf tuiles, les catégories de SON tri du Compendium of
 Physical Activities 2024 (la simulation « Compendium des activités
 physiques » des 24 et 25 septembre : Ballon et balles, Raquettes, Roues,
 Pédestre, Cheval, Individuel, Activités aquatiques, Activités hivernales,
@@ -917,8 +937,7 @@ petit, la pastille et l'icône aux jetons du « + » — rien de vert —, le no
 dessous (pastille 48, icône 34 : « icones des catégories + grandes de 2
 tailles », le même soir). LES ICÔNES SONT SES PLANCHES (`Images-pour-claude/icones/sport/`),
 découpées en masques PNG (`src/assets/images/activites/`) que la feuille
-remplit de la couleur du thème. PAS ENCORE : la recherche (« laisse la
-blank »), la liste des activités d'une catégorie (les tuiles sont des
+remplit de la couleur du thème. PAS ENCORE : la liste des activités d'une catégorie (les tuiles sont des
 blocs, pas des boutons), les activités récentes (aucune n'est
 enregistrée), le formulaire — qui reprendra celui de la V1 et ses règles
 (SPEC § 4.7 : sport du catalogue avec son MET, intensité ressentie, durée

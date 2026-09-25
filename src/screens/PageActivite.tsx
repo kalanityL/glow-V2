@@ -4,7 +4,9 @@ import { EntetePage } from './EntetePage';
 import type { FondProps } from './Accueil';
 import { ChoixDate } from '../components/ChoixDate';
 import { ChoixHeure } from '../components/ChoixHeure';
-import { IconeActivite, IconeCalendrier, IconeCoche, IconeCroix, IconeHorloge } from '../components/Icones';
+import { IconeActivite, IconeCalendrier, IconeChevronDroit, IconeCoche, IconeCroix, IconeHorloge, IconeRecherche } from '../components/Icones';
+import { MessageEnPlace } from '../components/MessageEnPlace';
+import { chercherActivites } from '../domaine/recherche-activites';
 import { detecterLangue, useTextes } from '../i18n/useTextes';
 import { classeDuTheme } from '../themes/themes';
 import { dateLocale, formaterDateCourte } from '../domaine/dates';
@@ -25,14 +27,22 @@ import { IndiceDefilement } from '../components/IndiceDefilement';
  * bas, et la carte du formulaire : le bandeau avec l'icône du module,
  * « Nouvelle activité physique » et la croix ; le corps, qui défile entre
  * le bandeau et le pied — la date et l'heure côte à côte, éditées en place,
- * puis « Catégories » et ses neuf tuiles (la pastille bleue du tiroir du
- * « + » avec l'icône de la catégorie, ses planches en masques que le thème
- * peint, le nom dessous) ; « Valider » au pied. RIEN DE VERT.
+ * puis LE CHAMP DE RECHERCHE (le même soir, son image : « voilà le design
+ * du champ recherche ») et ses résultats — des nœuds de NIVEAU 1
+ * seulement, un mot trouvé plus bas faisant remonter le nœud qui le porte
+ * (`domaine/recherche-activites.ts`), chacun sur une carte avec l'icône
+ * de sa catégorie, son nom, sa catégorie en gris et un chevron, deux par
+ * rangée, le nombre à côté du titre —, puis « Catégories » et ses neuf
+ * tuiles (la pastille bleue du tiroir du « + » avec l'icône de la
+ * catégorie, ses planches en masques que le thème peint, le nom dessous) ;
+ * « Valider » au pied. RIEN DE VERT ; le champ suit la charte des
+ * formulaires (sobre, le focus à peine plus sombre), pas le bleu de
+ * l'image.
  *
- * PAS ENCORE : la recherche (« laisse la blank »), le choix d'une activité
- * dans une catégorie (les tuiles sont des blocs, pas des boutons), la
- * durée, l'intensité, la distance et la note de la V1 (SPEC § 4.7), et
- * l'enregistrement : « Valider » est éteint, jamais caché.
+ * PAS ENCORE : le choix d'une activité — les résultats et les tuiles sont
+ * des blocs, pas des boutons —, la durée, l'intensité, la distance et la
+ * note de la V1 (SPEC § 4.7), et l'enregistrement : « Valider » est
+ * éteint, jamais caché.
  */
 export function PageActivite({
   forme,
@@ -56,6 +66,9 @@ export function PageActivite({
   const [heure, setHeure] = useState(heureRonde(heureLocale(maintenant)));
   const [editeDate, setEditeDate] = useState(false);
   const [editeHeure, setEditeHeure] = useState(false);
+  const [requete, setRequete] = useState('');
+  const resultats = chercherActivites(requete);
+  const cherche = requete.trim() !== '';
   /* Rien à consigner encore : le formulaire ne s'envoie pas. */
   const valider = (evenement: FormEvent) => {
     evenement.preventDefault();
@@ -108,6 +121,50 @@ export function PageActivite({
                 </button>
               )}
             </div>
+
+            <label className="recherche">
+              <IconeRecherche />
+              <input
+                className="recherche__champ"
+                type="search"
+                value={requete}
+                onChange={(e) => setRequete(e.target.value)}
+                placeholder={textes.activite.rechercher}
+                aria-label={textes.activite.rechercher}
+                autoComplete="off"
+              />
+              {cherche ? (
+                <button type="button" className="recherche__effacer" aria-label={textes.activite.effacerRecherche} onClick={() => setRequete('')}>
+                  <IconeCroix />
+                </button>
+              ) : null}
+            </label>
+
+            {cherche ? (
+              <>
+                <p className="prise__etiquette">
+                  {textes.activite.resultats} <span className="recherche__nombre">({resultats.length})</span>
+                </p>
+                {resultats.length === 0 ? (
+                  <MessageEnPlace classe="prise__question">{textes.activite.aucunResultat}</MessageEnPlace>
+                ) : (
+                  <div className="resultats">
+                    {resultats.map((r) => (
+                      <div key={`${r.categorie}-${r.noeud.nom}`} className={`resultat categorie--${r.categorie}`}>
+                        <span className="categorie__pastille">
+                          <span className="categorie__icone" aria-hidden="true" />
+                        </span>
+                        <span className="resultat__texte">
+                          <span className="resultat__nom">{r.noeud.nom}</span>
+                          <span className="resultat__categorie">{textes.activite.categorie[r.categorie]}</span>
+                        </span>
+                        <IconeChevronDroit />
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </>
+            ) : null}
 
             <p className="prise__etiquette">{textes.activite.categories}</p>
             <div className="categories">
