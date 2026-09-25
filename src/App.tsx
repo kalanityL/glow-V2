@@ -9,6 +9,7 @@ import { Accueil } from './screens/Accueil';
 import { Compte } from './screens/Compte';
 import { PagePrise } from './screens/PagePrise';
 import { PageConfirmation, ENTREES_PESEE, ENTREES_PRISE, ENTREES_SOMMEIL, type Origine } from './screens/PageConfirmation';
+import { PageActivite } from './screens/PageActivite';
 import { PagePesee } from './screens/PagePesee';
 import { PageSommeil } from './screens/PageSommeil';
 import { IconeBalance, IconeCalendrier, IconeCoche, IconeComprime, IconeHorloge, IconeLieu, IconeSeringue, IconeSommeil } from './components/Icones';
@@ -58,7 +59,7 @@ export default function App({ verrou = false }: { /** Le verrou de connexion, ar
      ouverte par le portrait ou par le tiroir du menu. Le bouton « retour » de la barre y ramène à l'accueil —
      c'est pour cela que la page vit ici, à côté du parcours, et non dans
      l'accueil. (Le menu principal, lui, est un tiroir de l'accueil.) */
-  const [page, setPage] = useState<'accueil' | 'compte' | 'prise' | 'confirmation' | 'pesee' | 'confirmation-pesee' | 'sommeil' | 'confirmation-sommeil'>(
+  const [page, setPage] = useState<'accueil' | 'compte' | 'prise' | 'confirmation' | 'pesee' | 'confirmation-pesee' | 'sommeil' | 'confirmation-sommeil' | 'activite'>(
     'accueil',
   );
 
@@ -127,6 +128,8 @@ export default function App({ verrou = false }: { /** Le verrou de connexion, ar
       setModification(false);
       setPage('sommeil');
     }
+    /* La page d'une activité physique (2026-09-25) : ses catégories, pour l'instant. */
+    if (module === 'activite-physique') setPage('activite');
   };
 
   /* LES PESÉES (2026-09-21, « ajouter balance : idem que ajouter
@@ -306,6 +309,15 @@ export default function App({ verrou = false }: { /** Le verrou de connexion, ar
                 setModification(false);
                 setPage('confirmation-pesee');
               }}
+              onAccueil={() => setPage('accueil')}
+              onOuvrirCompte={() => setPage('compte')}
+              onAjouter={ajouter}
+              ajoutTraitement={ajoutTraitement}
+              fond={fond}
+            />
+          ) : page === 'activite' ? (
+            <PageActivite
+              forme={parcours.reponses.formeTraitement}
               onAccueil={() => setPage('accueil')}
               onOuvrirCompte={() => setPage('compte')}
               onAjouter={ajouter}

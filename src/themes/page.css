@@ -3002,6 +3002,96 @@
   opacity: 0.85;
 }
 
+/* ── LA PAGE D'UNE ACTIVITÉ PHYSIQUE (2026-09-25, son image « Ajouter une
+   activité ») : « Catégories », puis les tuiles — cinq par rangée sur
+   l'image (86 px de pastille pour 512 px d'écran) ; ici des colonnes égales
+   d'au moins 68 px — cinq dans la colonne de page de 380 px, quatre sur un
+   téléphone plus étroit. Chaque tuile : une carte comme celles du tiroir du « + » (même
+   fond, même ombre), la pastille et l'icône aux mêmes jetons — « pas de
+   couleur vert, remplace le vert par notre bleu de pastille bleu » —, le
+   nom dessous, centré parce que la tuile est un carré sous une pastille.
+   L'ICÔNE EST UN MASQUE : ses planches (`Images-pour-claude/icones/sport/`)
+   découpées en PNG à canal alpha (`src/assets/images/activites/`), que la
+   feuille remplit de la couleur de l'icône du « + » — le thème la peint,
+   comme un SVG à `currentColor`. Le masque est nommé par tuile dans une
+   propriété personnalisée : ce n'est pas une couleur, `page.css` peut le
+   dire. ──────────────────────────────────────────────────────────────── */
+.activite {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  flex: 0 1 auto;
+  min-height: 0;
+  overflow-y: auto;
+  padding-bottom: 8px;
+}
+
+.activite > * {
+  flex: none;
+}
+
+.activite__titre {
+  margin: 4px 0 0;
+  font-family: var(--font-body);
+  font-weight: 500;
+  font-size: 16px;
+  color: var(--encre);
+}
+
+.categories {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(68px, 1fr));
+  gap: 6px;
+}
+
+.categorie {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+  padding: 8px 2px 8px;
+  border-radius: 12px;
+  background: var(--module-fond);
+  box-shadow: var(--ajout-carte-ombre);
+}
+
+.categorie__pastille {
+  display: grid;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: var(--ajout-pastille-fond);
+}
+
+.categorie__icone {
+  width: 26px;
+  height: 26px;
+  background: var(--ajout-icone-encre);
+  -webkit-mask: var(--categorie-masque) center / contain no-repeat;
+  mask: var(--categorie-masque) center / contain no-repeat;
+}
+
+.categorie__nom {
+  min-width: 0;
+  text-align: center;
+  font-family: var(--font-body);
+  font-size: 11.5px;
+  line-height: 1.2;
+  color: var(--encre);
+}
+
+.categorie--ballon-et-balles { --categorie-masque: url('../assets/images/activites/ballon-et-balles.png'); }
+.categorie--raquettes { --categorie-masque: url('../assets/images/activites/raquettes.png'); }
+.categorie--roues { --categorie-masque: url('../assets/images/activites/roues.png'); }
+.categorie--pedestre { --categorie-masque: url('../assets/images/activites/pedestre.png'); }
+.categorie--cheval { --categorie-masque: url('../assets/images/activites/cheval.png'); }
+.categorie--individuel { --categorie-masque: url('../assets/images/activites/individuel.png'); }
+.categorie--aquatiques { --categorie-masque: url('../assets/images/activites/aquatiques.png'); }
+.categorie--hivernales { --categorie-masque: url('../assets/images/activites/hivernales.png'); }
+.categorie--autre { --categorie-masque: url('../assets/images/activites/autre.png'); }
+
 /* ── L'INDICE DE DÉFILEMENT (2026-09-21, d'après son image : « quand un
    scroll est disponible n'importe ou sur le site, le signaler avec un petit
    picto de ce genre là — sobre et discret ») : en dernier enfant de tout ce

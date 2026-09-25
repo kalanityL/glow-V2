@@ -896,6 +896,28 @@ l'accueil », qui fermait la liste éteint depuis le 2026-09-20, est retiré
 entièrement (entrée, texte, icône). Lecture prise : « pas en bleu » vise
 ce premier choix ; « Ajouter » garde sa couleur, elle n'en a pas parlé.
 
+**La page d'une activité physique** (2026-09-25, son image « Ajouter une
+activité » : « on va créer la page ajouter une activité physique. (pas de
+couleur vert, reprends juste l'idée, remplace le vert par notre bleu de
+pastille bleu). les icones sont dans ../imagespour claude / icones/sport.
+pour la recherche laisse la blank, on s'occupera apres de la fonctionnalité
+de recherche et son design ») : la case « Activité Physique » du tiroir du
+« + » y mène (`PageActivite`). L'entête des pages et la barre du bas ;
+« Catégories » et neuf tuiles, les catégories de SON tri du Compendium of
+Physical Activities 2024 (la simulation « Compendium des activités
+physiques » des 24 et 25 septembre : Ballon et balles, Raquettes, Roues,
+Pédestre, Cheval, Individuel, Activités aquatiques, Activités hivernales,
+Autre — `domaine/activites.ts`), chacune une carte du tiroir du « + » en
+petit, la pastille et l'icône aux jetons du « + » — rien de vert —, le nom
+dessous. LES ICÔNES SONT SES PLANCHES (`Images-pour-claude/icones/sport/`),
+découpées en masques PNG (`src/assets/images/activites/`) que la feuille
+remplit de la couleur du thème. PAS ENCORE : la recherche (« laisse la
+blank »), la liste des activités d'une catégorie (les tuiles sont des
+blocs, pas des boutons), les activités récentes (aucune n'est
+enregistrée), le formulaire — qui reprendra celui de la V1 et ses règles
+(SPEC § 4.7 : sport du catalogue avec son MET, intensité ressentie, durée
+en minutes, distance facultative en mètres, note).
+
 **Toute page de l'application porte la barre du bas** (`BarreDuBas`, avec
 ses deux tiroirs) et, hors de l'accueil, **l'entête des pages**
 (`EntetePage` : la marque en petit et les deux outils sur une ligne, le

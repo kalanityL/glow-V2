@@ -9,6 +9,7 @@ import type { RefusConnexion } from '../domaine/connexion';
 import type { JourRelatif } from '../domaine/dates';
 import type { Zone } from '../domaine/prises';
 import type { SleepKind } from '../donnees/v1';
+import type { CategorieActivite } from '../domaine/activites';
 import type { EntreeConfirmation, Origine } from '../screens/PageConfirmation';
 import type { Systeme, Unite } from '../domaine/unites';
 import type { Langue } from './langues';
@@ -295,6 +296,13 @@ export interface Textes {
     titreModification: string;
     /** Le message de la V1, avec la date écrite, et la question. */
     remplacer: (date: string) => string;
+  };
+  /** LA PAGE D'UNE ACTIVITÉ PHYSIQUE (2026-09-25, « on va créer la page
+   *  ajouter une activité physique ») : le titre de la liste des
+   *  catégories, et le nom de chacune — les neuf de son tri du Compendium. */
+  activite: {
+    categories: string;
+    categorie: Record<CategorieActivite, string>;
   };
   /** LA PAGE D'UN SOMMEIL (2026-09-21, « fais moi l'écran nouveau sommeil et
    *  confirmation ») : le formulaire de la V1 (`SleepForm.tsx`) et ses
@@ -642,6 +650,21 @@ const FR: Textes = {
     titre: 'Nouvelle pesée',
     titreModification: 'Modifier la pesée',
     remplacer: (date) => `Une saisie existe déjà le ${date}. La mettre à jour ?`,
+  },
+  activite: {
+    categories: 'Catégories',
+    /* Ses neuf catégories, ses mots (24 et 25 septembre 2026). */
+    categorie: {
+      'ballon-et-balles': 'Ballon et balles',
+      raquettes: 'Raquettes',
+      roues: 'Roues',
+      pedestre: 'Pédestre',
+      cheval: 'Cheval',
+      individuel: 'Individuel',
+      aquatiques: 'Activités aquatiques',
+      hivernales: 'Activités hivernales',
+      autre: 'Autre',
+    },
   },
   sommeil: {
     titre: 'Nouveau sommeil',
