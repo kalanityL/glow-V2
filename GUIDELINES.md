@@ -909,7 +909,8 @@ physiques » des 24 et 25 septembre : Ballon et balles, Raquettes, Roues,
 Pédestre, Cheval, Individuel, Activités aquatiques, Activités hivernales,
 Autre — `domaine/activites.ts`), chacune une carte du tiroir du « + » en
 petit, la pastille et l'icône aux jetons du « + » — rien de vert —, le nom
-dessous. LES ICÔNES SONT SES PLANCHES (`Images-pour-claude/icones/sport/`),
+dessous (pastille 48, icône 34 : « icones des catégories + grandes de 2
+tailles », le même soir). LES ICÔNES SONT SES PLANCHES (`Images-pour-claude/icones/sport/`),
 découpées en masques PNG (`src/assets/images/activites/`) que la feuille
 remplit de la couleur du thème. PAS ENCORE : la recherche (« laisse la
 blank »), la liste des activités d'une catégorie (les tuiles sont des
