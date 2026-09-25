@@ -955,16 +955,31 @@ l'intensité avec des pictos qui exprime l'intensité (3 niveaux) sans
 label OU BIEN , si le sport s'y prete, entrer une distance ») : le fil sur
 trois crans (« Catégories › Roues › Vélo », les deux premiers ramènent) ;
 « Durée » et cinq boutons de la matière des paliers — 15 min, 30 min
-(choisi d'avance), 45 min, 1 h, Autre qui ouvre la saisie en minutes ;
-« Intensité » et trois pictos sans mot, un, deux, trois éclairs (les
-mots de la V1, douce / modérée / intensive, dits à qui écoute), modérée
-d'avance ; « ou une distance » en km pour les sports où elle a un sens
+(choisi d'avance), 45 min, 1 h, Autre — et « Autre » touché S'EFFACE, la
+saisie des minutes prend sa place dans la grille (« si on clique sur
+"autre" : le champ autre disparait et le champ ou on rentre les minutes
+prend sa place ») ; « Intensité » et trois pictos sans mot, un, deux,
+trois éclairs (les mots de la V1, douce / modérée / intensive, dits à qui
+écoute), modérée d'avance ; POUR LES SPORTS OÙ UNE DISTANCE A UN SENS,
+DEUX ONGLETS à l'encre, Intensité et Distance (« systeme d'onglet : un
+onglet intensite un onglet distance ») — l'onglet ouvert dit ce qui
+compte —, et sous Distance LE CADRAN DE LA DISTANCE
+(`components/CadranDistance.tsx` : « un rond sur le meme principe que
+l'horloge où un tour complet est 1km, meme son que l'horloge, si on fait
+plus d'un tour complet les lables évoluent accordingly, il ne se passe
+rien si on est deja a zero et qu'on recule encore ») — le cercle et les
+crans du cadran de l'heure, vingt crans de 50 m par tour, un clic
+« Plastique » par cran, les quatre repères disent le kilomètre du tour en
+cours et ses quarts, la boule ne recule pas sous zéro, la valeur en
+pastille dessous — TOUJOURS DEUX DÉCIMALES, chiffres tabulaires, la
+dizaine une case même vide (« distance : fixer la largeur des unités
+dizaines etc.. pour que ça ne saute pas qd modifie ») —, au départ la
+distance d'avance du sport
 (`DISTANCE_PAR_DEFAUT_KM`, `domaine/activites.ts` — sa liste : « distance
 par defaut : a pied et raquette 5km ; à velo/roller : 10km ; natation :
 1km ; rameur : 4km ; patinage, ski : pas de possibilité de mettre la
 distance » ; le vélo elliptique avec le vélo, le canoë-kayak-aviron avec
-le rameur, deux rapprochements de moi), qui ÉTEINT l'intensité tant
-qu'elle est remplie — la règle de la V1. « Catégories » et neuf tuiles, les catégories de SON tri du Compendium of
+le rameur, deux rapprochements de moi). « Catégories » et neuf tuiles, les catégories de SON tri du Compendium of
 Physical Activities 2024 (la simulation « Compendium des activités
 physiques » des 24 et 25 septembre : Ballon et balles, Raquettes, Roues,
 Pédestre, Cheval, Individuel, Activités aquatiques, Activités hivernales,

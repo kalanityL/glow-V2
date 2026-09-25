@@ -3167,9 +3167,75 @@
   overflow-wrap: anywhere;
 }
 
+/* LA SAISIE DES MINUTES À LA PLACE DE « AUTRE » (2026-09-25 au soir) : la
+   taille d'un bouton de palier, dans sa case de la grille. */
+.prise__dose--bouton {
+  padding: 11px 10px;
+  border-radius: 12px;
+  font-size: 15px;
+  text-align: center;
+}
+
+/* INTENSITÉ OU DISTANCE, PAR ONGLET (2026-09-25 au soir) : les onglets du
+   carrousel de « Mon compte », à l'encre et non à l'accent — la charte des
+   formulaires, pas de texte en bleu. */
+.activite__onglets {
+  display: flex;
+  border-bottom: 1px solid var(--option-filet);
+}
+
+.activite__onglet {
+  flex: 1 1 0;
+  min-width: 0;
+  padding: 6px 4px 8px;
+  border: 0;
+  border-bottom: 2px solid transparent;
+  background: none;
+  font-family: var(--font-body);
+  font-weight: 500;
+  font-size: 15px;
+  color: var(--encre-chapeau);
+  cursor: pointer;
+}
+
+.activite__onglet--actif {
+  color: var(--encre);
+  border-bottom-color: var(--encre);
+}
+
+/* LE CADRAN DE LA DISTANCE et sa valeur en pastille, comme l'heure du sommeil. */
+.distance {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+}
+
+.distance__valeur {
+  gap: 0;
+  cursor: default;
+  font-variant-numeric: tabular-nums;
+}
+
+/* Les cases de la valeur : la dizaine, même vide, tient sa place. */
+.distance__chiffre--vide {
+  visibility: hidden;
+}
+
+.distance__unite {
+  margin-left: 6px;
+}
+
+/* Les repères du cadran de la distance, à deux décimales : la même largeur
+   d'un tour à l'autre — et plus petits que ceux de l'heure, « 10,75 » et
+   « 10,25 » se touchaient au milieu. */
+.distance .cadran__repere {
+  font-size: 6.5px;
+  font-variant-numeric: tabular-nums;
+}
+
 /* L'INTENSITÉ (2026-09-25) : trois boutons carrés de la matière des
-   paliers, un picto chacun, sans mot ; éteints quand une distance est
-   entrée (la règle de la V1). */
+   paliers, un picto chacun, sans mot. */
 .intensites {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
@@ -3187,10 +3253,6 @@
   height: 26px;
 }
 
-.intensite:disabled {
-  opacity: 0.45;
-  cursor: default;
-}
 
 .categorie__pastille {
   display: grid;

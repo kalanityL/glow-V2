@@ -324,6 +324,13 @@ export interface Textes {
     intensites: Record<Intensite, string>;
     ouDistance: string;
     distanceKm: string;
+    /** Les deux onglets quand le sport accepte une distance (2026-09-25,
+        « systeme d'onglet : un onglet intensite un onglet distance »), et
+        l'unité écrite sous le cadran. */
+    onglets: Record<'intensite' | 'distance', string>;
+    km: string;
+    /** Ce que la saisie des minutes propose, à la place de « Autre » : court, la case est étroite. */
+    minutes: string;
   };
   /** LA PAGE D'UN SOMMEIL (2026-09-21, « fais moi l'écran nouveau sommeil et
    *  confirmation ») : le formulaire de la V1 (`SleepForm.tsx`) et ses
@@ -700,6 +707,9 @@ const FR: Textes = {
     intensites: { douce: 'Douce', moderee: 'Modérée', intensive: 'Intensive' },
     ouDistance: 'ou une distance',
     distanceKm: 'Distance en km',
+    onglets: { intensite: 'Intensité', distance: 'Distance' },
+    km: 'km',
+    minutes: 'Minutes',
   },
   sommeil: {
     titre: 'Nouveau sommeil',

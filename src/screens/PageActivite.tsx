@@ -16,6 +16,7 @@ import {
   IconeRecherche,
 } from '../components/Icones';
 import { MessageEnPlace } from '../components/MessageEnPlace';
+import { CadranDistance } from '../components/CadranDistance';
 import { chercherActivites } from '../domaine/recherche-activites';
 import type { NoeudActivite } from '../domaine/activites-catalogue';
 import type { ReactElement, ReactNode } from 'react';
@@ -99,7 +100,8 @@ import { IndiceDefilement } from '../components/IndiceDefilement';
  * UN SPORT TOUCHÉ (résultat ou tuile d'une catégorie) : le fil sur trois
  * crans, la durée (15, 30, 45 min, 1 h, ou « Autre » et ses minutes),
  * l'intensité en trois pictos sans mot — ou, pour les sports où elle a un
- * sens, une distance en km, qui éteint l'intensité.
+ * sens, par onglet, une distance au cadran (un tour par kilomètre, la
+ * distance d'avance du sport).
  *
  * PAS ENCORE : la note de la V1, et l'enregistrement dans `sportHistory`
  * (SPEC § 4.7) : « Valider » est éteint, jamais caché.
@@ -147,14 +149,25 @@ export function PageActivite({
   const [duree, setDuree] = useState<(typeof DUREES_PROPOSEES)[number] | 'autre'>(30);
   const [dureeTapee, setDureeTapee] = useState('');
   const [intensite, setIntensite] = useState<Intensite>('moderee');
-  const [distance, setDistance] = useState('');
-  const distanceEntree = distance.trim() !== '';
+  /* INTENSITÉ OU DISTANCE, PAR ONGLET (2026-09-25 au soir, « dans le cas où
+     on peut mettre soit l'un soit l'autre, systeme d'onglet : un onglet
+     intensite un onglet distance ») : l'onglet ouvert dit ce qui compte ;
+     la distance part de celle du sport (« distance par defaut ») et se
+     règle au cadran, un tour par kilomètre. */
+  const [onglet, setOnglet] = useState<'intensite' | 'distance'>('intensite');
+  const [distanceKm, setDistanceKm] = useState(0);
   const choisirSport = (categorie: CategorieActivite, noeud: NoeudActivite) => {
     setSportChoisi({ categorie, noeud });
     setCategorieOuverte(categorie);
     setRequete('');
-    setDistance('');
+    setOnglet('intensite');
+    setDistanceKm(DISTANCE_PAR_DEFAUT_KM[noeud.nom] ?? 0);
   };
+  /* « 5,25 » : toujours deux décimales, la virgule de la langue — une largeur
+     qui ne bouge pas d'un cran à l'autre (2026-09-25 au soir, « distance :
+     fixer la largeur des unités dizaines etc.. pour que ça ne saute pas qd
+     modifie »). */
+  const ecrireKm = (km: number) => (Math.round(km * 100) / 100).toFixed(2).replace('.', textes.separateurDecimal);
   /* Rien à consigner encore : le formulaire ne s'envoie pas. */
   const valider = (evenement: FormEvent) => {
     evenement.preventDefault();
@@ -288,67 +301,82 @@ export function PageActivite({
                       {textes.activite.durees[String(minutes) as '15' | '30' | '45' | '60']}
                     </button>
                   ))}
-                  <button
-                    type="button"
-                    role="radio"
-                    aria-checked={duree === 'autre'}
-                    className={`prise__bouton${duree === 'autre' ? ' prise__bouton--choisi' : ''}`}
-                    onClick={() => setDuree('autre')}
-                  >
-                    {textes.activite.autreDuree}
-                  </button>
-                </div>
-                {duree === 'autre' ? (
-                  <input
-                    className="prise__dose"
-                    type="text"
-                    inputMode="numeric"
-                    placeholder={textes.activite.dureeMinutes}
-                    aria-label={textes.activite.dureeMinutes}
-                    value={dureeTapee}
-                    autoFocus
-                    onChange={(e) => setDureeTapee(e.target.value)}
-                  />
-                ) : null}
-
-                {/* L'INTENSITÉ : trois pictos, sans mot ; éteinte quand une distance est entrée. */}
-                <p className="prise__etiquette">{textes.activite.intensite}</p>
-                <div className="intensites" role="radiogroup" aria-label={textes.activite.intensite}>
-                  {INTENSITES.map((niveau) => {
-                    const Icone = ICONES_INTENSITE[niveau];
-                    const choisi = !distanceEntree && intensite === niveau;
-                    return (
-                      <button
-                        key={niveau}
-                        type="button"
-                        role="radio"
-                        aria-checked={choisi}
-                        aria-label={textes.activite.intensites[niveau]}
-                        className={`prise__bouton intensite${choisi ? ' prise__bouton--choisi' : ''}`}
-                        disabled={distanceEntree}
-                        onClick={() => setIntensite(niveau)}
-                      >
-                        <Icone />
-                      </button>
-                    );
-                  })}
-                </div>
-
-                {/* OU LA DISTANCE, pour les sports où elle a un sens. */}
-                {AVEC_DISTANCE.has(sportChoisi.noeud.nom) ? (
-                  <>
-                    <p className="prise__etiquette">{textes.activite.ouDistance}</p>
+                  {/* « Autre » s'efface et la saisie des minutes prend sa place
+                      (2026-09-25 au soir, « si on clique sur "autre" : le champ
+                      autre disparait et le champ ou on rentre les minutes prend
+                      sa place »). */}
+                  {duree === 'autre' ? (
                     <input
-                      className="prise__dose"
+                      className="prise__dose prise__dose--bouton"
                       type="text"
-                      inputMode="decimal"
-                      placeholder={`${DISTANCE_PAR_DEFAUT_KM[sportChoisi.noeud.nom]} ${textes.activite.distanceKm}`}
-                      aria-label={textes.activite.distanceKm}
-                      value={distance}
-                      onChange={(e) => setDistance(e.target.value)}
+                      inputMode="numeric"
+                      placeholder={textes.activite.minutes}
+                      aria-label={textes.activite.dureeMinutes}
+                      value={dureeTapee}
+                      autoFocus
+                      onChange={(e) => setDureeTapee(e.target.value)}
                     />
-                  </>
-                ) : null}
+                  ) : (
+                    <button type="button" role="radio" aria-checked={false} className="prise__bouton" onClick={() => setDuree('autre')}>
+                      {textes.activite.autreDuree}
+                    </button>
+                  )}
+                </div>
+
+                {/* L'INTENSITÉ — ou, par onglet, LA DISTANCE pour les sports où elle a un sens. */}
+                {AVEC_DISTANCE.has(sportChoisi.noeud.nom) ? (
+                  <div className="activite__onglets" role="tablist">
+                    {(['intensite', 'distance'] as const).map((o) => (
+                      <button
+                        key={o}
+                        type="button"
+                        role="tab"
+                        aria-selected={onglet === o}
+                        className={`activite__onglet${onglet === o ? ' activite__onglet--actif' : ''}`}
+                        onClick={() => setOnglet(o)}
+                      >
+                        {textes.activite.onglets[o]}
+                      </button>
+                    ))}
+                  </div>
+                ) : (
+                  <p className="prise__etiquette">{textes.activite.intensite}</p>
+                )}
+                {onglet === 'intensite' || !AVEC_DISTANCE.has(sportChoisi.noeud.nom) ? (
+                  <div className="intensites" role="radiogroup" aria-label={textes.activite.intensite}>
+                    {INTENSITES.map((niveau) => {
+                      const Icone = ICONES_INTENSITE[niveau];
+                      const choisi = intensite === niveau;
+                      return (
+                        <button
+                          key={niveau}
+                          type="button"
+                          role="radio"
+                          aria-checked={choisi}
+                          aria-label={textes.activite.intensites[niveau]}
+                          className={`prise__bouton intensite${choisi ? ' prise__bouton--choisi' : ''}`}
+                          onClick={() => setIntensite(niveau)}
+                        >
+                          <Icone />
+                        </button>
+                      );
+                    })}
+                  </div>
+                ) : (
+                  <div className="distance">
+                    <CadranDistance km={distanceKm} onKm={setDistanceKm} nom={textes.activite.distanceKm} ecrire={ecrireKm} />
+                    {/* La valeur en cases : la dizaine est une case même vide (un
+                        zéro invisible), les chiffres sont tabulaires — rien ne
+                        saute en passant 10 km. */}
+                    <span className="sommeil__heure distance__valeur">
+                      <span className={distanceKm < 10 ? 'distance__chiffre distance__chiffre--vide' : 'distance__chiffre'} aria-hidden={distanceKm < 10}>
+                        {distanceKm < 10 ? '0' : ecrireKm(distanceKm).slice(0, -4)}
+                      </span>
+                      <span className="distance__chiffre">{ecrireKm(distanceKm).slice(-4)}</span>
+                      <span className="distance__unite">{textes.activite.km}</span>
+                    </span>
+                  </div>
+                )}
               </>
             ) : categorieOuverte ? (
               <>
