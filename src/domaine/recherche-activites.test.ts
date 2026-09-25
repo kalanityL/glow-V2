@@ -34,9 +34,9 @@ describe('chercherActivites', () => {
     expect(r).toHaveLength(1);
     expect(r[0]).toMatchObject({ categorie: 'roues', noeud: { nom: 'Vélo' } });
   });
-  it('fait remonter le niveau 1 quand le mot est dans une activité, en français ou en anglais', () => {
+  it('fait remonter le niveau 1 quand le mot est dans une activité, en français seulement', () => {
     expect(chercherActivites('ping', catalogue).map((r) => r.noeud.nom)).toEqual(['Tennis']);
-    expect(chercherActivites('soccer', catalogue).map((r) => r.noeud.nom)).toEqual(['Football']);
+    expect(chercherActivites('soccer', catalogue)).toEqual([]);
   });
   it('cherche au début d’un mot : « ping » trouve ping-pong, pas camping', () => {
     const cat = { ...catalogue, hivernales: [{ nom: 'Camping', activites: [a('17000', 'Camping, en général', 'Camping, general')], sous: [] }] };

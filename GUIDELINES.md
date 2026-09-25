@@ -913,13 +913,17 @@ du champ recherche. La recherche propose un sport uniquement du niveau
 apparait dans un sport de niveau 2 ou 3, on suggere en resultat de
 recherche le sport de niveau 1 correspondant ») — la loupe, le mot, la
 croix qui efface, à la charte des formulaires et non au bleu de l'image ;
-dessous, « Résultats de recherche (n) » et des cartes deux par rangée,
-l'icône de la catégorie, le nom du nœud, la catégorie en gris, un
-chevron ; un résultat est TOUJOURS UN NŒUD DE NIVEAU 1 de l'arbre (un
-groupe d'une catégorie, ou une activité seule), jamais une catégorie ni
-un sous-groupe, et un mot trouvé dans un sous-groupe ou une activité,
-en français ou dans l'intitulé anglais du Compendium, fait remonter le
-nœud de niveau 1 qui le porte (`domaine/recherche-activites.ts`, testé) ;
+dessous, « Résultats de recherche (n) » et des tuiles COMME CELLES DES
+CATÉGORIES (« resultat de recherche : Meme mise en page que categorie »),
+l'icône de la catégorie et le nom du nœud — une activité seule réduite à
+ce qui précède sa première virgule ; un résultat est TOUJOURS UN NŒUD DE
+NIVEAU 1 de l'arbre (un groupe d'une catégorie, ou une activité seule),
+jamais une catégorie ni un sous-groupe, et un mot trouvé dans un
+sous-groupe ou une activité fait remonter le nœud de niveau 1 qui le
+porte (`domaine/recherche-activites.ts`, testé) ; le mot se cherche AU
+DÉBUT D'UN MOT et DANS LE FRANÇAIS SEULEMENT — l'anglais du Compendium
+répondait à côté (« pourquoi calilistenie apparait qd je tape lu ? » :
+« lunges ») ;
 sans résultat, une phrase en place —, puis « Catégories » ; « Valider »
 au pied, éteint tant qu'il n'y a rien à consigner. **L'arbre est
 embarqué** : `docs/pour-claude/compendium/arbre.json` est son tri du
@@ -934,8 +938,9 @@ physiques » des 24 et 25 septembre : Ballon et balles, Raquettes, Roues,
 Pédestre, Cheval, Individuel, Activités aquatiques, Activités hivernales,
 Autre — `domaine/activites.ts`), chacune une carte du tiroir du « + » en
 petit, la pastille et l'icône aux jetons du « + » — rien de vert —, le nom
-dessous (pastille 48, icône 34 : « icones des catégories + grandes de 2
-tailles », le même soir). LES ICÔNES SONT SES PLANCHES (`Images-pour-claude/icones/sport/`),
+dessous (48 px : « icones des catégories + grandes de 2 tailles », puis
+« pas de pastille sous l'icone. Icone prend toute la place de la
+pastille », le même soir — l'icône seule, sans rond derrière). LES ICÔNES SONT SES PLANCHES (`Images-pour-claude/icones/sport/`),
 découpées en masques PNG (`src/assets/images/activites/`) que la feuille
 remplit de la couleur du thème. PAS ENCORE : la liste des activités d'une catégorie (les tuiles sont des
 blocs, pas des boutons), les activités récentes (aucune n'est

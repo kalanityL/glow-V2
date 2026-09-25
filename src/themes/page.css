@@ -3095,65 +3095,6 @@
   color: var(--encre-chapeau);
 }
 
-/* LES RÉSULTATS : deux par rangée, sur carte — la pastille de la catégorie
-   (plus petite que sur les tuiles), le nom et la catégorie en gris, le
-   chevron. Des blocs tant que le choix n'existe pas. */
-.resultats {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 8px;
-}
-
-.resultat {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  min-width: 0;
-  padding: 8px 8px 8px 10px;
-  border-radius: 12px;
-  background: var(--module-fond);
-  box-shadow: var(--ajout-carte-ombre);
-}
-
-.resultat .categorie__pastille {
-  flex: none;
-  width: 40px;
-  height: 40px;
-}
-
-.resultat .categorie__icone {
-  width: 28px;
-  height: 28px;
-}
-
-.resultat__texte {
-  flex: 1;
-  min-width: 0;
-  display: flex;
-  flex-direction: column;
-  gap: 1px;
-}
-
-.resultat__nom {
-  font-family: var(--font-body);
-  font-size: 14px;
-  line-height: 1.2;
-  color: var(--encre);
-}
-
-.resultat__categorie {
-  font-family: var(--font-body);
-  font-size: 12px;
-  color: var(--encre-chapeau);
-}
-
-.resultat > .icone {
-  flex: none;
-  width: 16px;
-  height: 16px;
-  color: var(--encre-chapeau);
-}
-
 .categories {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(62px, 1fr));
@@ -3176,16 +3117,17 @@
   display: grid;
   place-items: center;
   /* Deux tailles de plus (2026-09-25, « icones des catégories + grandes de
-     2 tailles ») : la pastille 40 → 48, l'icône 26 → 34. */
+     2 tailles ») : 40 → 48 ; PUIS PLUS DE PASTILLE (le même soir,
+     « catégorie etc.. : pas de pastille sous l'icone. Icone prend toute la
+     place de la pastille ») : la place reste, ronde et vide, l'icône la
+     remplit. */
   width: 48px;
   height: 48px;
-  border-radius: 50%;
-  background: var(--ajout-pastille-fond);
 }
 
 .categorie__icone {
-  width: 34px;
-  height: 34px;
+  width: 100%;
+  height: 100%;
   background: var(--ajout-icone-encre);
   -webkit-mask: var(--categorie-masque) center / contain no-repeat;
   mask: var(--categorie-masque) center / contain no-repeat;

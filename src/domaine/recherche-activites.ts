@@ -10,10 +10,12 @@ import { CATALOGUE_ACTIVITES, type NoeudActivite } from './activites-catalogue';
  * niveau 1 — un groupe d'une catégorie, ou une activité seule —, jamais
  * une catégorie, jamais un sous-groupe. Un mot trouvé dans un sous-groupe
  * ou une activité fait remonter le nœud de niveau 1 qui le porte, une
- * fois. Le mot se cherche sans accents ni casse, dans le nom français et
- * dans l'intitulé anglais du Compendium, AU DÉBUT D'UN MOT : « ping »
- * trouve « ping-pong », pas « camping » ni « skipping » (vu au pilotage,
- * le soir même). Ce fichier ne connaît ni l'écran ni le navigateur.
+ * fois. Le mot se cherche sans accents ni casse, AU DÉBUT D'UN MOT
+ * (« ping » trouve « ping-pong », pas « camping » — vu au pilotage), et
+ * DANS LE FRANÇAIS SEULEMENT : l'intitulé anglais du Compendium reste au
+ * catalogue mais ne répond pas (2026-09-25 au soir, « pourquoi
+ * calilistenie apparait qd je tape lu ? » — « lunges » dans l'anglais de
+ * la callisthénie). Ce fichier ne connaît ni l'écran ni le navigateur.
  */
 
 export interface ResultatActivite {
@@ -41,7 +43,7 @@ function commenceUnMot(texte: string, mot: string): boolean {
 /** Le nœud, ou l'un de ses descendants, porte le mot. */
 function porteLeMot(noeud: NoeudActivite, mot: string): boolean {
   if (commenceUnMot(noeud.nom, mot)) return true;
-  if (noeud.activites.some((a) => commenceUnMot(a.nom, mot) || commenceUnMot(a.en, mot))) return true;
+  if (noeud.activites.some((a) => commenceUnMot(a.nom, mot))) return true;
   return noeud.sous.some((s) => porteLeMot(s, mot));
 }
 

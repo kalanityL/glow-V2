@@ -4,9 +4,19 @@ import { EntetePage } from './EntetePage';
 import type { FondProps } from './Accueil';
 import { ChoixDate } from '../components/ChoixDate';
 import { ChoixHeure } from '../components/ChoixHeure';
-import { IconeActivite, IconeCalendrier, IconeChevronDroit, IconeCoche, IconeCroix, IconeHorloge, IconeRecherche } from '../components/Icones';
+import { IconeActivite, IconeCalendrier, IconeCoche, IconeCroix, IconeHorloge, IconeRecherche } from '../components/Icones';
 import { MessageEnPlace } from '../components/MessageEnPlace';
 import { chercherActivites } from '../domaine/recherche-activites';
+import type { NoeudActivite } from '../domaine/activites-catalogue';
+
+/** Le nom d'une tuile de résultat : celui du nœud ; pour une activité seule
+    faite nœud, dont le nom est l'intitulé entier du Compendium (« Lutte,
+    en compétition (un combat = 5 minutes) »), ce qui précède la première
+    virgule — le mot qui compte, à la taille d'une tuile. */
+function nomCourt(noeud: NoeudActivite): string {
+  const seule = noeud.sous.length === 0 && noeud.activites.length === 1 && noeud.activites[0].nom === noeud.nom;
+  return seule ? noeud.nom.split(',')[0] : noeud.nom;
+}
 import { detecterLangue, useTextes } from '../i18n/useTextes';
 import { classeDuTheme } from '../themes/themes';
 import { dateLocale, formaterDateCourte } from '../domaine/dates';
@@ -30,9 +40,11 @@ import { IndiceDefilement } from '../components/IndiceDefilement';
  * puis LE CHAMP DE RECHERCHE (le même soir, son image : « voilà le design
  * du champ recherche ») et ses résultats — des nœuds de NIVEAU 1
  * seulement, un mot trouvé plus bas faisant remonter le nœud qui le porte
- * (`domaine/recherche-activites.ts`), chacun sur une carte avec l'icône
- * de sa catégorie, son nom, sa catégorie en gris et un chevron, deux par
- * rangée, le nombre à côté du titre —, puis « Catégories » et ses neuf
+ * (`domaine/recherche-activites.ts`), EN TUILES COMME LES CATÉGORIES
+ * (« resultat de recherche : Meme mise en page que categorie ») — la
+ * pastille de la catégorie et le nom, une activité seule réduite à ce qui
+ * précède sa première virgule —, le nombre à côté du titre ; puis
+ * « Catégories » et ses neuf
  * tuiles (la pastille bleue du tiroir du « + » avec l'icône de la
  * catégorie, ses planches en masques que le thème peint, le nom dessous) ;
  * « Valider » au pied. RIEN DE VERT ; le champ suit la charte des
@@ -148,17 +160,13 @@ export function PageActivite({
                 {resultats.length === 0 ? (
                   <MessageEnPlace classe="prise__question">{textes.activite.aucunResultat}</MessageEnPlace>
                 ) : (
-                  <div className="resultats">
+                  <div className="categories">
                     {resultats.map((r) => (
-                      <div key={`${r.categorie}-${r.noeud.nom}`} className={`resultat categorie--${r.categorie}`}>
+                      <div key={`${r.categorie}-${r.noeud.nom}`} className={`categorie categorie--${r.categorie}`}>
                         <span className="categorie__pastille">
                           <span className="categorie__icone" aria-hidden="true" />
                         </span>
-                        <span className="resultat__texte">
-                          <span className="resultat__nom">{r.noeud.nom}</span>
-                          <span className="resultat__categorie">{textes.activite.categorie[r.categorie]}</span>
-                        </span>
-                        <IconeChevronDroit />
+                        <span className="categorie__nom">{nomCourt(r.noeud)}</span>
                       </div>
                     ))}
                   </div>
