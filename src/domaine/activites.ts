@@ -1,3 +1,5 @@
+import type { SportLog } from '../donnees/v1';
+import { CATALOGUE_ACTIVITES, type NoeudActivite } from './activites-catalogue';
 /**
  * L'ACTIVITÉ PHYSIQUE — LES CATÉGORIES (2026-09-25, « on va créer la page
  * ajouter une activité physique »). Elles viennent de son tri du Compendium
@@ -92,4 +94,39 @@ export function kmDepuisSaisie(saisie: string): number | null {
   const n = Number(saisie.trim().replace(',', '.'));
   if (!Number.isFinite(n) || n < 0 || saisie.trim() === '') return null;
   return Math.round(n * 20) / 20;
+}
+
+/** Des minutes tapées (la durée « Autre ») : un entier, au moins une ;
+    `null` sinon. */
+export function minutesDepuisSaisie(saisie: string): number | null {
+  const s = saisie.trim();
+  if (!/^\d+$/.test(s)) return null;
+  const n = Number(s);
+  return n >= 1 ? n : null;
+}
+
+/** Le nœud de niveau 1 qui porte ce nom, et sa catégorie — pour rouvrir une
+    séance enregistrée (la V1 ne garde que le nom du sport). */
+export function noeudDuSport(nom: string): { categorie: CategorieActivite; noeud: NoeudActivite } | null {
+  for (const categorie of CATEGORIES_ACTIVITE) {
+    const noeud = CATALOGUE_ACTIVITES[categorie].find((n) => n.nom === nom);
+    if (noeud) return { categorie, noeud };
+  }
+  return null;
+}
+
+/** QUINZE SÉANCES PAR JOUR AU PLUS (la règle de la V1, `addLogWithinDailyCap`
+    : « Limite atteinte pour aujourd'hui : cette saisie remplace la
+    dernière. ») : la seizième consignée sur une journée pleine remplace la
+    dernière de cette journée — comme la troisième prise. */
+export const ACTIVITES_PAR_JOUR_MAX = 15;
+
+/** Le journal avec cette séance : mise à jour si son identifiant y est,
+    sinon ajoutée — la journée pleine perd sa dernière séance —, trié par
+    date puis heure. Ne modifie pas le journal reçu. */
+export function avecLActivite(activites: readonly SportLog[], activite: SportLog): SportLog[] {
+  const autres = activites.filter((a) => a.id !== activite.id);
+  const duJour = autres.filter((a) => a.date === activite.date);
+  const gardees = duJour.length >= ACTIVITES_PAR_JOUR_MAX ? autres.filter((a) => a !== duJour[duJour.length - 1]) : autres;
+  return [...gardees, activite].sort((a, b) => (a.date === b.date ? a.time.localeCompare(b.time) : a.date.localeCompare(b.date)));
 }

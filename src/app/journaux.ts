@@ -1,5 +1,6 @@
-import type { AppData, InjectionLog, SleepLog, WeightLog } from '../donnees/v1';
+import type { AppData, InjectionLog, SleepLog, SportLog, WeightLog } from '../donnees/v1';
 import { avecLeSommeil } from '../domaine/sommeils';
+import { avecLActivite } from '../domaine/activites';
 import { avecLaPrise } from '../domaine/prises';
 import { avecLaPesee, garderLeDepart, sansLaPesee } from '../domaine/pesees';
 import { effacerEnregistre, lireEnregistre } from '../plateforme/navigateur';
@@ -22,6 +23,11 @@ export function consignerPrise(prise: InjectionLog, remplace?: InjectionLog): Ap
 
 export function consignerSommeil(sommeil: SleepLog): AppData {
   return modifierBase((base) => ({ ...base, sleepLogs: avecLeSommeil(base.sleepLogs ?? [], sommeil) }));
+}
+
+/** Une séance d'activité physique, dans `sportLogs` (2026-09-25). */
+export function consignerActivite(activite: SportLog): AppData {
+  return modifierBase((base) => ({ ...base, sportLogs: avecLActivite(base.sportLogs ?? [], activite) }));
 }
 
 export function consignerPesee(pesee: WeightLog, remplace?: WeightLog): AppData {

@@ -160,6 +160,23 @@ export interface SleepLog {
   notes?: string;
 }
 
+/** Une séance d'activité physique (`SportLog`, `V1/src/types.ts`) : la
+    date, l'heure, le sport (son nom, comme la V1 ; ici le nom du nœud de
+    niveau 1 de l'arbre), l'intensité ressentie, la durée EN MINUTES, la
+    distance EN MÈTRES quand elle a un sens, une note. */
+export type IntensiteSport = 'douce' | 'moderee' | 'intensive';
+
+export interface SportLog {
+  id: string;
+  date: string;
+  time: string;
+  sport: string;
+  intensity: IntensiteSport;
+  duration: number;
+  distance?: number;
+  notes?: string;
+}
+
 /** Une journée marquée (`DailyLog`) : sa seule présence à une date. */
 export interface DailyLog {
   id: string;
@@ -176,7 +193,7 @@ export interface AppData {
   savedMeals?: unknown[];
   sideEffectHistory?: unknown[];
   stepLogs?: unknown[];
-  sportLogs?: unknown[];
+  sportLogs?: SportLog[];
   meTimeLogs?: unknown[];
   sleepLogs?: SleepLog[];
   [autre: string]: unknown;
@@ -189,6 +206,7 @@ export const STARTING_WEIGHT_LOG_ID = 'starting-weight-log';
 export const idPesee = (): string => `w-${Date.now()}`;
 export const idPrise = (): string => `inj-${Date.now()}`;
 export const idSommeil = (): string => `sleep-${Date.now()}`;
+export const idActivite = (): string => `sport-${Date.now()}`;
 
 /** Le profil d'usine de la V1 (SPEC § « Le profil », colonne « d'usine »). */
 export const PROFIL_USINE: UserProfile = {

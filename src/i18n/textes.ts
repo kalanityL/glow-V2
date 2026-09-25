@@ -302,8 +302,11 @@ export interface Textes {
    *  catégories, et le nom de chacune — les neuf de son tri du Compendium. */
   activite: {
     /** Le bandeau du formulaire (2026-09-25, « nouvelle activité physique
-        est un formulaire, comme nouvelle injection »). */
+        est un formulaire, comme nouvelle injection »), et en modification. */
     titre: string;
+    titreModification: string;
+    /** La durée « Autre » refusée. */
+    regleDuree: string;
     /** Le champ de recherche (2026-09-25, son image) : ce qu'il propose,
         la croix qui l'efface (dite à qui écoute), le titre des résultats,
         et l'absence de résultat. */
@@ -388,6 +391,9 @@ export interface Textes {
     titrePeseeMiseAJour: string;
     titreSommeil: string;
     titreSommeilMiseAJour: string;
+    /** La confirmation d'une activité physique (2026-09-25). */
+    titreActivite: string;
+    titreActiviteMiseAJour: string;
     sousTitre: string;
     zone: string;
     maintenant: string;
@@ -687,6 +693,8 @@ const FR: Textes = {
   },
   activite: {
     titre: 'Nouvelle activité physique',
+    titreModification: 'Modifier l’activité physique',
+    regleDuree: 'Une durée en minutes est attendue.',
     rechercher: 'Rechercher une activité',
     effacerRecherche: 'Effacer la recherche',
     resultats: 'Résultats de recherche',
@@ -770,6 +778,8 @@ const FR: Textes = {
     titrePeseeMiseAJour: 'Balance mise à jour !',
     titreSommeil: 'Sommeil enregistré !',
     titreSommeilMiseAJour: 'Sommeil mis à jour !',
+    titreActivite: 'Activité physique enregistrée !',
+    titreActiviteMiseAJour: 'Activité physique mise à jour !',
     sousTitre: 'Votre suivi est à jour.',
     zone: 'Zone d’injection',
     maintenant: 'Vous pouvez maintenant :',
@@ -788,6 +798,7 @@ const FR: Textes = {
       evolution: 'Évolution du traitement',
       evolutionPoids: 'Évolution du poids',
       evolutionSommeil: 'Évolution du sommeil',
+      evolutionActivite: 'Évolution de l’activité physique',
     },
   },
   calendrier: {

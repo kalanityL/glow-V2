@@ -144,6 +144,13 @@ la V2.
 
 ## À arbitrer (décisions à toi)
 
+- [ ] **Les marches et les étages de l'escalier** (2026-09-25, « escalier :
+      durée / nombre de marche / nombre d'étages ») : le formulaire les
+      demande, la ligne de la V1 (`SportLog`) n'a pas de place pour eux —
+      ils ne s'enregistrent pas. Deux sorties : un champ de plus dans la
+      ligne (la base de la V1 change de forme), ou les convertir en une
+      grandeur que la ligne porte déjà (une distance ? une durée ?).
+
 - [ ] **Les analyses croisées à retenir** (2026-09-17, sa question :
       « quelle/s autres/s correlations/analyses de données croisées te
       paraissent pertinentes ? ») — proposées dans la réponse du jour, à

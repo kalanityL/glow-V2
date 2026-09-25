@@ -59,7 +59,21 @@ import { detecterLangue, useTextes } from '../i18n/useTextes';
 import { classeDuTheme } from '../themes/themes';
 import { dateLocale, formaterDateCourte } from '../domaine/dates';
 import { heureLocale, heureRonde } from '../domaine/prises';
-import { AVEC_DISTANCE, CATEGORIES_ACTIVITE, DISTANCE_PAR_DEFAUT_KM, DUREES_PROPOSEES, ESCALIER, INTENSITES, kmDepuisSaisie, slugActivite, type CategorieActivite, type Intensite } from '../domaine/activites';
+import {
+  AVEC_DISTANCE,
+  CATEGORIES_ACTIVITE,
+  DISTANCE_PAR_DEFAUT_KM,
+  DUREES_PROPOSEES,
+  ESCALIER,
+  INTENSITES,
+  kmDepuisSaisie,
+  minutesDepuisSaisie,
+  noeudDuSport,
+  slugActivite,
+  type CategorieActivite,
+  type Intensite,
+} from '../domaine/activites';
+import { idActivite, type SportLog } from '../donnees/v1';
 import { ChampEnLigne } from '../components/ChampEnLigne';
 import { CATALOGUE_ACTIVITES } from '../domaine/activites-catalogue';
 import type { Forme } from '../domaine/traitements';
@@ -105,11 +119,17 @@ import { IndiceDefilement } from '../components/IndiceDefilement';
  * distance d'avance du sport) ou tapée au chiffre ; pour l'escalier, les
  * marches ou les étages, par onglet.
  *
- * PAS ENCORE : la note de la V1, et l'enregistrement dans `sportHistory`
- * (SPEC § 4.7) : « Valider » est éteint, jamais caché.
+ * VALIDER (2026-09-25 au soir, « page de confirmation meme concept que les
+ * autres pages de confirmation ») écrit la séance dans `sportLogs`, la
+ * table de la V1, et mène à la confirmation ; sa carte rouvre le
+ * formulaire en modification (« Annuler » / « Mettre à jour »). Éteint
+ * tant qu'aucun sport n'est choisi. PAS ENCORE : la note de la V1.
  */
 export function PageActivite({
   forme,
+  initiale,
+  onValider,
+  onAnnuler,
   onAccueil,
   onOuvrirCompte,
   onAjouter,
@@ -117,6 +137,11 @@ export function PageActivite({
   fond,
 }: {
   forme: Forme | null;
+  /** La séance à modifier : le formulaire part d'elle (la carte de la
+      confirmation, 2026-09-25). */
+  initiale?: SportLog;
+  onValider: (activite: SportLog) => void;
+  onAnnuler?: () => void;
   onAccueil: () => void;
   onOuvrirCompte: () => void;
   onAjouter: (module: ModuleId) => void;
@@ -126,8 +151,14 @@ export function PageActivite({
   const textes = useTextes();
   const langue = detecterLangue();
   const maintenant = new Date();
-  const [date, setDate] = useState(dateLocale(maintenant));
-  const [heure, setHeure] = useState(heureRonde(heureLocale(maintenant)));
+  const modification = initiale !== undefined;
+  /* LA SÉANCE À MODIFIER : son sport retrouvé dans l'arbre par son nom, sa
+     durée parmi les quatre ou « Autre », son intensité, sa distance (en
+     mètres dans la base) qui ouvre l'onglet Distance. */
+  const depart = initiale ? noeudDuSport(initiale.sport) : null;
+  const dureeConnue = initiale ? (DUREES_PROPOSEES as readonly number[]).includes(initiale.duration) : true;
+  const [date, setDate] = useState(initiale?.date ?? dateLocale(maintenant));
+  const [heure, setHeure] = useState(initiale?.time ?? heureRonde(heureLocale(maintenant)));
   const [editeDate, setEditeDate] = useState(false);
   const [editeHeure, setEditeHeure] = useState(false);
   const [requete, setRequete] = useState('');
@@ -147,17 +178,23 @@ export function PageActivite({
      entrer une distance ») : le fil « Catégories › Roues › Vélo », la
      durée, puis l'intensité — ou la distance, qui l'éteint (la règle de la
      V1 : la distance remplie, l'intensité n'est plus prise en compte). */
-  const [sportChoisi, setSportChoisi] = useState<{ categorie: CategorieActivite; noeud: NoeudActivite } | null>(null);
-  const [duree, setDuree] = useState<(typeof DUREES_PROPOSEES)[number] | 'autre'>(30);
-  const [dureeTapee, setDureeTapee] = useState('');
-  const [intensite, setIntensite] = useState<Intensite>('moderee');
+  const [sportChoisi, setSportChoisi] = useState<{ categorie: CategorieActivite; noeud: NoeudActivite } | null>(depart);
+  const [duree, setDuree] = useState<(typeof DUREES_PROPOSEES)[number] | 'autre'>(
+    initiale && dureeConnue ? (initiale.duration as (typeof DUREES_PROPOSEES)[number]) : initiale ? 'autre' : 30,
+  );
+  const [dureeTapee, setDureeTapee] = useState(initiale && !dureeConnue ? String(initiale.duration) : '');
+  const [intensite, setIntensite] = useState<Intensite>(initiale?.intensity ?? 'moderee');
+  /* La durée « Autre » refusée : la règle se dit. */
+  const [dureeRefusee, setDureeRefusee] = useState(false);
   /* INTENSITÉ OU DISTANCE, PAR ONGLET (2026-09-25 au soir, « dans le cas où
      on peut mettre soit l'un soit l'autre, systeme d'onglet : un onglet
      intensite un onglet distance ») : l'onglet ouvert dit ce qui compte ;
      la distance part de celle du sport (« distance par defaut ») et se
      règle au cadran, un tour par kilomètre. */
-  const [onglet, setOnglet] = useState<'intensite' | 'distance' | 'marches' | 'etages'>('intensite');
-  const [distanceKm, setDistanceKm] = useState(0);
+  const [onglet, setOnglet] = useState<'intensite' | 'distance' | 'marches' | 'etages'>(
+    initiale?.distance !== undefined ? 'distance' : depart?.noeud.nom === ESCALIER ? 'marches' : 'intensite',
+  );
+  const [distanceKm, setDistanceKm] = useState(initiale?.distance !== undefined ? initiale.distance / 1000 : depart ? (DISTANCE_PAR_DEFAUT_KM[depart.noeud.nom] ?? 0) : 0);
   /* L'ESCALIER (2026-09-25 au soir, « escalier : durée / nombre de marche /
      nombre d'étages ») : à la place de l'intensité et de la distance, deux
      onglets, Marches et Étages, chacun sa saisie. */
@@ -170,6 +207,33 @@ export function PageActivite({
     setOnglet(noeud.nom === ESCALIER ? 'marches' : 'intensite');
     setDistanceKm(DISTANCE_PAR_DEFAUT_KM[noeud.nom] ?? 0);
   };
+  /* VALIDER : la durée choisie ou tapée (refusée si ce n'est pas un nombre
+     de minutes), la distance en mètres quand l'onglet Distance est ouvert
+     et qu'elle n'est pas nulle, l'intensité toujours (la V1 la garde même
+     avec une distance). LA LIGNE DE LA V1 : son identifiant gardé en
+     modification, ses notes aussi. Les marches et les étages de l'escalier
+     n'ont pas de place dans la ligne de la V1 : ils ne s'écrivent pas
+     (TODO-CLAUDE, à arbitrer). */
+  const valider = (evenement: FormEvent) => {
+    evenement.preventDefault();
+    if (!sportChoisi) return;
+    const minutes = duree === 'autre' ? minutesDepuisSaisie(dureeTapee) : duree;
+    if (minutes === null) {
+      setDureeRefusee(true);
+      return;
+    }
+    const distance = onglet === 'distance' && distanceKm > 0 ? Math.round(distanceKm * 1000) : undefined;
+    onValider({
+      id: initiale?.id ?? idActivite(),
+      date,
+      time: heure,
+      sport: sportChoisi.noeud.nom,
+      intensity: intensite,
+      duration: minutes,
+      ...(distance !== undefined ? { distance } : {}),
+      ...(initiale?.notes !== undefined ? { notes: initiale.notes } : {}),
+    });
+  };
   const escalier = sportChoisi?.noeud.nom === ESCALIER;
   const avecDistance = sportChoisi !== null && AVEC_DISTANCE.has(sportChoisi.noeud.nom);
   const onglets: readonly ('intensite' | 'distance' | 'marches' | 'etages')[] = escalier ? ['marches', 'etages'] : avecDistance ? ['intensite', 'distance'] : [];
@@ -178,10 +242,6 @@ export function PageActivite({
      fixer la largeur des unités dizaines etc.. pour que ça ne saute pas qd
      modifie »). */
   const ecrireKm = (km: number) => (Math.round(km * 100) / 100).toFixed(2).replace('.', textes.separateurDecimal);
-  /* Rien à consigner encore : le formulaire ne s'envoie pas. */
-  const valider = (evenement: FormEvent) => {
-    evenement.preventDefault();
-  };
 
   return (
     <div className={`page page--photo page--fond-${fond.apercu ?? fond.courant} ${classeDuTheme('blanc')}`}>
@@ -191,7 +251,7 @@ export function PageActivite({
         <form className="carte prise" onSubmit={valider} noValidate>
           <div className="prise__entete">
             <IconeActivite />
-            <h2 className="prise__titre">{textes.activite.titre}</h2>
+            <h2 className="prise__titre">{modification ? textes.activite.titreModification : textes.activite.titre}</h2>
             <button type="button" className="tiroir__fermer prise__fermer" aria-label={textes.fermer} onClick={onAccueil}>
               <IconeCroix />
             </button>
@@ -324,7 +384,10 @@ export function PageActivite({
                       aria-label={textes.activite.dureeMinutes}
                       value={dureeTapee}
                       autoFocus
-                      onChange={(e) => setDureeTapee(e.target.value)}
+                      onChange={(e) => {
+                        setDureeTapee(e.target.value);
+                        if (minutesDepuisSaisie(e.target.value) !== null) setDureeRefusee(false);
+                      }}
                     />
                   ) : (
                     <button type="button" role="radio" aria-checked={false} className="prise__bouton" onClick={() => setDuree('autre')}>
@@ -332,6 +395,7 @@ export function PageActivite({
                     </button>
                   )}
                 </div>
+                {dureeRefusee ? <MessageEnPlace classe="prise__regle">{textes.activite.regleDuree}</MessageEnPlace> : null}
 
                 {/* L'INTENSITÉ — ou, par onglet, LA DISTANCE pour les sports où elle a
                     un sens ; pour l'escalier, les marches ou les étages. */}
@@ -463,9 +527,15 @@ export function PageActivite({
           </div>
 
           <div className="prise__pied">
-            <button type="submit" className="bouton prise__valider" disabled aria-disabled="true">
+            {modification ? (
+              <button type="button" className="bouton bouton--second prise__valider" onClick={onAnnuler}>
+                {textes.prise.annuler}
+              </button>
+            ) : null}
+            {/* Éteint, jamais caché, tant qu'aucun sport n'est choisi. */}
+            <button type="submit" className="bouton prise__valider" disabled={!sportChoisi} aria-disabled={!sportChoisi}>
               <IconeCoche />
-              <span>{textes.prise.valider}</span>
+              <span>{modification ? textes.prise.mettreAJourPrise : textes.prise.valider}</span>
             </button>
           </div>
         </form>

@@ -2911,6 +2911,23 @@
   color: var(--encre-chapeau);
 }
 
+/* L'icône du sport sur la carte de la confirmation (2026-09-25) : son
+   masque, à la taille des icônes de ligne, dans leur gris. */
+.confirmation__sport {
+  flex: none;
+  display: block;
+  width: 18px;
+  height: 18px;
+}
+
+/* Le masque est un `span` : en bloc, sans quoi sa taille ne prend pas. */
+.confirmation__sport .categorie__icone {
+  display: block;
+  width: 100%;
+  height: 100%;
+  background: var(--encre-chapeau);
+}
+
 .confirmation__valeur {
   display: inline-flex;
   align-items: center;

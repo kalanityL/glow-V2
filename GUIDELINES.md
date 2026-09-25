@@ -949,9 +949,27 @@ quatre tuiles par rangée pour les résultats et les sports d'une catégorie**
 (« catégories : 3 par lignes. Résultats de recherche et sports une fois
 qu'on a choisi la catégorie : 4 par ligne »). **L'escalier** (le même soir, « escalier : durée / nombre de marche /
 nombre d'étages ») : le nœud « Escalier » n'a ni intensité ni distance —
-après la durée, deux onglets, Marches et Étages, chacun sa saisie ; ce
-que la base en fera (la ligne de la V1 n'a ni marches ni étages) se
-tranche à l'enregistrement. **Un sport touché** (le même
+après la durée, deux onglets, Marches et Étages, chacun sa saisie ; la
+ligne de la V1 n'a ni marches ni étages : ILS NE S'ÉCRIVENT PAS ENCORE
+(TODO-CLAUDE, à arbitrer : une table à part, ou un champ de plus dans la
+ligne de la V1). **Valider écrit la séance et mène à la confirmation**
+(le même soir, « page de confirmation meme concept que les autres pages de
+confirmation ») : la table `sportLogs` de la V1 (`SportLog` : date,
+heure, le nom du nœud, l'intensité toujours, la durée en minutes, la
+distance en mètres quand l'onglet Distance est ouvert et qu'elle n'est
+pas nulle, les notes gardées ; `domaine/activites.ts`, `avecLActivite`,
+testé), sa règle de la V1 — QUINZE SÉANCES PAR JOUR AU PLUS, la seizième
+remplace la dernière de la journée (« Limite atteinte pour aujourd'hui :
+cette saisie remplace la dernière. ») —, la durée « Autre » refusée si ce
+n'est pas un nombre de minutes (« Une durée en minutes est attendue. ») ;
+« Valider » est éteint tant qu'aucun sport n'est choisi. Sa confirmation
+est le même écran : « Activité physique enregistrée ! » / « Activité
+physique mise à jour ! », la carte — l'icône du sport (son masque, dans
+le gris des lignes) et son nom court avec la durée, la distance ou
+l'intensité (son picto), la date en toutes lettres et l'heure — qui
+rouvre le formulaire en modification (« Annuler » / « Mettre à jour »,
+le sport, la durée, l'intensité ou la distance retrouvés), puis Ajouter,
+Journal, Évolution de l'activité physique. **Un sport touché** (le même
 soir, « une fois qu'on clique sur un sport : on peut choisir le temps avec
 des choix 15 min 30 min 45 min 1h ou autre qui si on clique ouvre un
 champs pou rmettre la quantité en minute. Ensuite on peut choisir

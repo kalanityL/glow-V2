@@ -8,18 +8,19 @@ import { Onboarding } from './screens/Onboarding';
 import { Accueil } from './screens/Accueil';
 import { Compte } from './screens/Compte';
 import { PagePrise } from './screens/PagePrise';
-import { PageConfirmation, ENTREES_PESEE, ENTREES_PRISE, ENTREES_SOMMEIL, type Origine } from './screens/PageConfirmation';
+import { PageConfirmation, ENTREES_ACTIVITE, ENTREES_PESEE, ENTREES_PRISE, ENTREES_SOMMEIL, type Origine } from './screens/PageConfirmation';
 import { PageActivite } from './screens/PageActivite';
 import { PagePesee } from './screens/PagePesee';
 import { PageSommeil } from './screens/PageSommeil';
-import { IconeBalance, IconeCalendrier, IconeCoche, IconeComprime, IconeHorloge, IconeLieu, IconeSeringue, IconeSommeil } from './components/Icones';
+import { IconeActivite, IconeBalance, IconeCalendrier, IconeCoche, IconeComprime, IconeHorloge, IconeIntensiteDouce, IconeIntensiteIntensive, IconeIntensiteModeree, IconeLieu, IconeSeringue, IconeSommeil } from './components/Icones';
+import { noeudDuSport, slugActivite } from './domaine/activites';
 import { TRAITEMENTS } from './domaine/traitements';
 import { UNITES_DU_SYSTEME, poidsDepuisKg } from './domaine/unites';
 import { dateLocale, formaterDateCourte, formaterDateLongue } from './domaine/dates';
 import { peseeDuJour, poidsLePlusRecent } from './domaine/pesees';
 import { detecterLangue } from './i18n/useTextes';
 import type { ModuleId } from './app/modules';
-import type { InjectionLog, SleepLog, WeightLog } from './donnees/v1';
+import type { InjectionLog, SleepLog, WeightLog, SportLog } from './donnees/v1';
 import { dureeEcrite, dureeMinutes } from './domaine/sommeils';
 import { traitementDepuisBrand } from './donnees/conversions';
 import type { FondId } from './app/fonds';
@@ -61,7 +62,7 @@ export default function App({ verrou = false }: { /** Le verrou de connexion, ar
      ouverte par le portrait ou par le tiroir du menu. Le bouton « retour » de la barre y ramène à l'accueil —
      c'est pour cela que la page vit ici, à côté du parcours, et non dans
      l'accueil. (Le menu principal, lui, est un tiroir de l'accueil.) */
-  const [page, setPage] = useState<'accueil' | 'compte' | 'prise' | 'confirmation' | 'pesee' | 'confirmation-pesee' | 'sommeil' | 'confirmation-sommeil' | 'activite'>(
+  const [page, setPage] = useState<'accueil' | 'compte' | 'prise' | 'confirmation' | 'pesee' | 'confirmation-pesee' | 'sommeil' | 'confirmation-sommeil' | 'activite' | 'confirmation-activite'>(
     'accueil',
   );
 
@@ -131,7 +132,10 @@ export default function App({ verrou = false }: { /** Le verrou de connexion, ar
       setPage('sommeil');
     }
     /* La page d'une activité physique (2026-09-25) : ses catégories, pour l'instant. */
-    if (module === 'activite-physique') setPage('activite');
+    if (module === 'activite-physique') {
+      setModification(false);
+      setPage('activite');
+    }
   };
 
   /* LES PESÉES (2026-09-21, « ajouter balance : idem que ajouter
@@ -142,6 +146,16 @@ export default function App({ verrou = false }: { /** Le verrou de connexion, ar
   /* LES SOMMEILS (2026-09-21, « fais moi l'écran nouveau sommeil et
      confirmation ») : la table `sleepLogs` de la V1. */
   const [dernierSommeil, setDernierSommeil] = useState<SleepLog | null>(null);
+  /* L'ACTIVITÉ PHYSIQUE (2026-09-25) : la table `sportLogs` de la V1 ; la
+     dernière séance consignée, pour la confirmation et sa modification. */
+  const [derniereActivite, setDerniereActivite] = useState<SportLog | null>(null);
+  const validerActivite = (activite: SportLog) => {
+    journaux.consignerActivite(activite);
+    setDerniereActivite(activite);
+    setMiseAJour(modification);
+    setModification(false);
+    setPage('confirmation-activite');
+  };
   /* `fini` faux : le second écran a consigné avec la note d'avance, la page
      continue vers la note (2026-09-21) ; vrai : la confirmation suit. */
   const validerSommeil = (sommeil: SleepLog, fini: boolean) => {
@@ -320,6 +334,12 @@ export default function App({ verrou = false }: { /** Le verrou de connexion, ar
           ) : page === 'activite' ? (
             <PageActivite
               forme={parcours.reponses.formeTraitement}
+              initiale={modification && derniereActivite ? derniereActivite : undefined}
+              onValider={validerActivite}
+              onAnnuler={() => {
+                setModification(false);
+                setPage('confirmation-activite');
+              }}
               onAccueil={() => setPage('accueil')}
               onOuvrirCompte={() => setPage('compte')}
               onAjouter={ajouter}
@@ -335,6 +355,58 @@ export default function App({ verrou = false }: { /** Le verrou de connexion, ar
               onAnnuler={() => {
                 setModification(false);
                 setPage('confirmation-sommeil');
+              }}
+              onAccueil={() => setPage('accueil')}
+              onOuvrirCompte={() => setPage('compte')}
+              onAjouter={ajouter}
+              ajoutTraitement={ajoutTraitement}
+              fond={fond}
+            />
+          ) : page === 'confirmation-activite' && derniereActivite ? (
+            <PageConfirmation
+              titrePage={textes.accueil.modules['activite-physique']}
+              titre={miseAJour ? textes.confirmation.titreActiviteMiseAJour : textes.confirmation.titreActivite}
+              lignes={[
+                {
+                  /* L'icône du sport : son masque, comme sur les tuiles. */
+                  icone: (() => {
+                    const n = noeudDuSport(derniereActivite.sport);
+                    return n ? (
+                      <span className={`confirmation__sport categorie--${n.categorie} categorie--sport-${slugActivite(n.noeud.nom)}`}>
+                        <span className="categorie__icone" aria-hidden="true" />
+                      </span>
+                    ) : (
+                      <IconeActivite />
+                    );
+                  })(),
+                  nom: derniereActivite.sport.split(',')[0],
+                  valeur: dureeEcrite(derniereActivite.duration),
+                },
+                derniereActivite.distance !== undefined
+                  ? {
+                      icone: <IconeLieu />,
+                      nom: textes.activite.onglets.distance,
+                      valeur: `${(derniereActivite.distance / 1000).toFixed(2).replace('.', textes.separateurDecimal)} ${textes.activite.km}`,
+                    }
+                  : {
+                      icone: { douce: <IconeIntensiteDouce />, moderee: <IconeIntensiteModeree />, intensive: <IconeIntensiteIntensive /> }[derniereActivite.intensity],
+                      nom: textes.activite.intensite,
+                      valeur: textes.activite.intensites[derniereActivite.intensity],
+                    },
+                {
+                  icone: <IconeCalendrier />,
+                  nom: formaterDateLongue(derniereActivite.date, textes.calendrier.mois, langue),
+                  valeur: derniereActivite.time,
+                  iconeValeur: <IconeHorloge />,
+                },
+              ]}
+              entrees={ENTREES_ACTIVITE}
+              origine={origine}
+              onRetour={() => setPage(origine)}
+              forme={parcours.reponses.formeTraitement}
+              onModifier={() => {
+                setModification(true);
+                setPage('activite');
               }}
               onAccueil={() => setPage('accueil')}
               onOuvrirCompte={() => setPage('compte')}

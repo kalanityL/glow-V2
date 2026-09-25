@@ -28,7 +28,7 @@ const GLING = morceauxDuSon(SON_DE_LA_CONFIRMATION);
 /** Les entrées possibles de l'écran ; chaque écran dit lesquelles, DANS
     SON ORDRE (2026-09-20, « nouvelle element : en 1er ») : ajouter
     d'abord, l'accueil en dernier. */
-export const ENTREES_CONFIRMATION = ['ajouter', 'journal', 'concentration', 'evolution', 'evolutionPoids', 'evolutionSommeil'] as const;
+export const ENTREES_CONFIRMATION = ['ajouter', 'journal', 'concentration', 'evolution', 'evolutionPoids', 'evolutionSommeil', 'evolutionActivite'] as const;
 export type EntreeConfirmation = (typeof ENTREES_CONFIRMATION)[number];
 
 /** D'OÙ L'ON VIENT (2026-09-23, « 1er choix, pas en bleu : "retourner à"+
@@ -45,6 +45,7 @@ export type Origine = (typeof ORIGINES)[number];
 export const ENTREES_PRISE: readonly EntreeConfirmation[] = ['ajouter', 'journal', 'concentration', 'evolution'];
 export const ENTREES_PESEE: readonly EntreeConfirmation[] = ['ajouter', 'journal', 'evolutionPoids'];
 export const ENTREES_SOMMEIL: readonly EntreeConfirmation[] = ['ajouter', 'journal', 'evolutionSommeil'];
+export const ENTREES_ACTIVITE: readonly EntreeConfirmation[] = ['ajouter', 'journal', 'evolutionActivite'];
 
 const ICONES: Record<EntreeConfirmation, () => ReactElement> = {
   ajouter: IconePlus,
@@ -53,6 +54,7 @@ const ICONES: Record<EntreeConfirmation, () => ReactElement> = {
   evolution: IconeAnalyse,
   evolutionPoids: IconeAnalyse,
   evolutionSommeil: IconeAnalyse,
+  evolutionActivite: IconeAnalyse,
 };
 
 /** L'icône de l'endroit d'où l'on vient (« icone correspondant selon,la d
