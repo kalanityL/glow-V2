@@ -947,7 +947,11 @@ des sports (niveau 1) contenus dans la catégorie ») : à la place de
 catégorie, avec l'icône de chaque sport. **Trois catégories par rangée ;
 quatre tuiles par rangée pour les résultats et les sports d'une catégorie**
 (« catégories : 3 par lignes. Résultats de recherche et sports une fois
-qu'on a choisi la catégorie : 4 par ligne »). **Un sport touché** (le même
+qu'on a choisi la catégorie : 4 par ligne »). **L'escalier** (le même soir, « escalier : durée / nombre de marche /
+nombre d'étages ») : le nœud « Escalier » n'a ni intensité ni distance —
+après la durée, deux onglets, Marches et Étages, chacun sa saisie ; ce
+que la base en fera (la ligne de la V1 n'a ni marches ni étages) se
+tranche à l'enregistrement. **Un sport touché** (le même
 soir, « une fois qu'on clique sur un sport : on peut choisir le temps avec
 des choix 15 min 30 min 45 min 1h ou autre qui si on clique ouvre un
 champs pou rmettre la quantité en minute. Ensuite on peut choisir
@@ -981,8 +985,12 @@ EN ROND (la boule va au point de la piste le plus proche du doigt, le
 plus court chemin le long de la piste fait les tours), la boule ne recule
 pas sous zéro, la valeur en pastille dessous — TOUJOURS DEUX DÉCIMALES, chiffres tabulaires, la
 dizaine une case même vide (« distance : fixer la largeur des unités
-dizaines etc.. pour que ça ne saute pas qd modifie ») —, au départ la
-distance d'avance du sport
+dizaines etc.. pour que ça ne saute pas qd modifie ») ET QUI S'ÉDITE SUR
+PLACE (« on peut aussi modifier directement la valeur numérique des
+kilometre plutot que de bouger le curseur sur le parcours » :
+`ChampEnLigne`, virgule ou point, arrondi au cran de 50 m, jamais
+négatif, la règle dite en gris si refusé) —, au départ la distance
+d'avance du sport
 (`DISTANCE_PAR_DEFAUT_KM`, `domaine/activites.ts` — sa liste : « distance
 par defaut : a pied et raquette 5km ; à velo/roller : 10km ; natation :
 1km ; rameur : 4km ; patinage, ski : pas de possibilité de mettre la

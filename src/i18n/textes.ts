@@ -327,10 +327,16 @@ export interface Textes {
     /** Les deux onglets quand le sport accepte une distance (2026-09-25,
         « systeme d'onglet : un onglet intensite un onglet distance »), et
         l'unité écrite sous le cadran. */
-    onglets: Record<'intensite' | 'distance', string>;
+    onglets: Record<'intensite' | 'distance' | 'marches' | 'etages', string>;
     km: string;
     /** Ce que la saisie des minutes propose, à la place de « Autre » : court, la case est étroite. */
     minutes: string;
+    /** La distance tapée au chiffre (2026-09-25 au soir) : ce qu'elle attend. */
+    regleDistance: string;
+    /** L'escalier (le même soir, « escalier : durée / nombre de marche /
+        nombre d'étages ») : les deux saisies. */
+    nombreDeMarches: string;
+    nombreDEtages: string;
   };
   /** LA PAGE D'UN SOMMEIL (2026-09-21, « fais moi l'écran nouveau sommeil et
    *  confirmation ») : le formulaire de la V1 (`SleepForm.tsx`) et ses
@@ -707,9 +713,12 @@ const FR: Textes = {
     intensites: { douce: 'Douce', moderee: 'Modérée', intensive: 'Intensive' },
     ouDistance: 'ou une distance',
     distanceKm: 'Distance en km',
-    onglets: { intensite: 'Intensité', distance: 'Distance' },
+    onglets: { intensite: 'Intensité', distance: 'Distance', marches: 'Marches', etages: 'Étages' },
     km: 'km',
     minutes: 'Minutes',
+    regleDistance: 'Une distance en kilomètres est attendue.',
+    nombreDeMarches: 'Nombre de marches',
+    nombreDEtages: 'Nombre d’étages',
   },
   sommeil: {
     titre: 'Nouveau sommeil',

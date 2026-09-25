@@ -79,3 +79,17 @@ export const DISTANCE_PAR_DEFAUT_KM: Readonly<Record<string, number>> = {
 
 /** Les sports où une distance a un sens : ceux qui ont une distance d'avance. */
 export const AVEC_DISTANCE: ReadonlySet<string> = new Set(Object.keys(DISTANCE_PAR_DEFAUT_KM));
+
+/** L'ESCALIER (2026-09-25 au soir, « escalier : durée / nombre de marche /
+    nombre d'étages ») : le nœud de niveau 1 qui se compte en marches ou en
+    étages, pas en intensité ni en distance. */
+export const ESCALIER = 'Escalier';
+
+/** Des kilomètres tapés au chiffre (2026-09-25 au soir, « on peut aussi
+    modifier directement la valeur numérique des kilometre ») : virgule ou
+    point, jamais négatif, arrondis au cran de 50 m ; `null` sinon. */
+export function kmDepuisSaisie(saisie: string): number | null {
+  const n = Number(saisie.trim().replace(',', '.'));
+  if (!Number.isFinite(n) || n < 0 || saisie.trim() === '') return null;
+  return Math.round(n * 20) / 20;
+}

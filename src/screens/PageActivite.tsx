@@ -59,7 +59,8 @@ import { detecterLangue, useTextes } from '../i18n/useTextes';
 import { classeDuTheme } from '../themes/themes';
 import { dateLocale, formaterDateCourte } from '../domaine/dates';
 import { heureLocale, heureRonde } from '../domaine/prises';
-import { AVEC_DISTANCE, CATEGORIES_ACTIVITE, DISTANCE_PAR_DEFAUT_KM, DUREES_PROPOSEES, INTENSITES, slugActivite, type CategorieActivite, type Intensite } from '../domaine/activites';
+import { AVEC_DISTANCE, CATEGORIES_ACTIVITE, DISTANCE_PAR_DEFAUT_KM, DUREES_PROPOSEES, ESCALIER, INTENSITES, kmDepuisSaisie, slugActivite, type CategorieActivite, type Intensite } from '../domaine/activites';
+import { ChampEnLigne } from '../components/ChampEnLigne';
 import { CATALOGUE_ACTIVITES } from '../domaine/activites-catalogue';
 import type { Forme } from '../domaine/traitements';
 import type { ModuleId } from '../app/modules';
@@ -100,8 +101,9 @@ import { IndiceDefilement } from '../components/IndiceDefilement';
  * UN SPORT TOUCHÉ (résultat ou tuile d'une catégorie) : le fil sur trois
  * crans, la durée (15, 30, 45 min, 1 h, ou « Autre » et ses minutes),
  * l'intensité en trois pictos sans mot — ou, pour les sports où elle a un
- * sens, par onglet, une distance au cadran (un tour par kilomètre, la
- * distance d'avance du sport).
+ * sens, par onglet, une distance sur la piste (un tour par kilomètre, la
+ * distance d'avance du sport) ou tapée au chiffre ; pour l'escalier, les
+ * marches ou les étages, par onglet.
  *
  * PAS ENCORE : la note de la V1, et l'enregistrement dans `sportHistory`
  * (SPEC § 4.7) : « Valider » est éteint, jamais caché.
@@ -154,15 +156,23 @@ export function PageActivite({
      intensite un onglet distance ») : l'onglet ouvert dit ce qui compte ;
      la distance part de celle du sport (« distance par defaut ») et se
      règle au cadran, un tour par kilomètre. */
-  const [onglet, setOnglet] = useState<'intensite' | 'distance'>('intensite');
+  const [onglet, setOnglet] = useState<'intensite' | 'distance' | 'marches' | 'etages'>('intensite');
   const [distanceKm, setDistanceKm] = useState(0);
+  /* L'ESCALIER (2026-09-25 au soir, « escalier : durée / nombre de marche /
+     nombre d'étages ») : à la place de l'intensité et de la distance, deux
+     onglets, Marches et Étages, chacun sa saisie. */
+  const [marches, setMarches] = useState('');
+  const [etages, setEtages] = useState('');
   const choisirSport = (categorie: CategorieActivite, noeud: NoeudActivite) => {
     setSportChoisi({ categorie, noeud });
     setCategorieOuverte(categorie);
     setRequete('');
-    setOnglet('intensite');
+    setOnglet(noeud.nom === ESCALIER ? 'marches' : 'intensite');
     setDistanceKm(DISTANCE_PAR_DEFAUT_KM[noeud.nom] ?? 0);
   };
+  const escalier = sportChoisi?.noeud.nom === ESCALIER;
+  const avecDistance = sportChoisi !== null && AVEC_DISTANCE.has(sportChoisi.noeud.nom);
+  const onglets: readonly ('intensite' | 'distance' | 'marches' | 'etages')[] = escalier ? ['marches', 'etages'] : avecDistance ? ['intensite', 'distance'] : [];
   /* « 5,25 » : toujours deux décimales, la virgule de la langue — une largeur
      qui ne bouge pas d'un cran à l'autre (2026-09-25 au soir, « distance :
      fixer la largeur des unités dizaines etc.. pour que ça ne saute pas qd
@@ -323,10 +333,11 @@ export function PageActivite({
                   )}
                 </div>
 
-                {/* L'INTENSITÉ — ou, par onglet, LA DISTANCE pour les sports où elle a un sens. */}
-                {AVEC_DISTANCE.has(sportChoisi.noeud.nom) ? (
+                {/* L'INTENSITÉ — ou, par onglet, LA DISTANCE pour les sports où elle a
+                    un sens ; pour l'escalier, les marches ou les étages. */}
+                {onglets.length > 0 ? (
                   <div className="activite__onglets" role="tablist">
-                    {(['intensite', 'distance'] as const).map((o) => (
+                    {onglets.map((o) => (
                       <button
                         key={o}
                         type="button"
@@ -342,7 +353,17 @@ export function PageActivite({
                 ) : (
                   <p className="prise__etiquette">{textes.activite.intensite}</p>
                 )}
-                {onglet === 'intensite' || !AVEC_DISTANCE.has(sportChoisi.noeud.nom) ? (
+                {onglet === 'marches' || onglet === 'etages' ? (
+                  <input
+                    className="prise__dose"
+                    type="text"
+                    inputMode="numeric"
+                    placeholder={onglet === 'marches' ? textes.activite.nombreDeMarches : textes.activite.nombreDEtages}
+                    aria-label={onglet === 'marches' ? textes.activite.nombreDeMarches : textes.activite.nombreDEtages}
+                    value={onglet === 'marches' ? marches : etages}
+                    onChange={(e) => (onglet === 'marches' ? setMarches : setEtages)(e.target.value)}
+                  />
+                ) : onglet === 'intensite' || !avecDistance ? (
                   <div className="intensites" role="radiogroup" aria-label={textes.activite.intensite}>
                     {INTENSITES.map((niveau) => {
                       const Icone = ICONES_INTENSITE[niveau];
@@ -367,14 +388,36 @@ export function PageActivite({
                     <CadranDistance km={distanceKm} onKm={setDistanceKm} nom={textes.activite.distanceKm} ecrire={(k) => `${ecrireKm(k)} ${textes.activite.km}`} />
                     {/* La valeur en cases : la dizaine est une case même vide (un
                         zéro invisible), les chiffres sont tabulaires — rien ne
-                        saute en passant 10 km. */}
-                    <span className="distance__valeur">
-                      <span className={distanceKm < 10 ? 'distance__chiffre distance__chiffre--vide' : 'distance__chiffre'} aria-hidden={distanceKm < 10}>
-                        {distanceKm < 10 ? '0' : ecrireKm(distanceKm).slice(0, -4)}
-                      </span>
-                      <span className="distance__chiffre">{ecrireKm(distanceKm).slice(-4)}</span>
-                      <span className="distance__unite">{textes.activite.km}</span>
-                    </span>
+                        saute en passant 10 km. ET ELLE S'ÉDITE SUR PLACE (2026-09-25
+                        au soir, « on peut aussi modifier directement la valeur
+                        numérique des kilometre plutot que de bouger le curseur »),
+                        comme le chiffre du poids : touchée, un champ ; virgule ou
+                        point ; refusée, la règle se dit. */}
+                    <div className="distance__valeur">
+                      <ChampEnLigne
+                        valeur={ecrireKm(distanceKm)}
+                        valeurAffichee={
+                          <>
+                            <span className={distanceKm < 10 ? 'distance__chiffre distance__chiffre--vide' : 'distance__chiffre'} aria-hidden={distanceKm < 10}>
+                              {distanceKm < 10 ? '0' : ecrireKm(distanceKm).slice(0, -4)}
+                            </span>
+                            <span className="distance__chiffre">{ecrireKm(distanceKm).slice(-4)}</span>
+                          </>
+                        }
+                        onValeur={(saisie) => {
+                          const km = kmDepuisSaisie(saisie);
+                          if (km !== null) setDistanceKm(km);
+                        }}
+                        normaliser={(saisie) => {
+                          const km = kmDepuisSaisie(saisie);
+                          return km === null ? null : ecrireKm(km);
+                        }}
+                        regle={textes.activite.regleDistance}
+                        nom={textes.activite.distanceKm}
+                        unite={textes.activite.km}
+                        inputMode="decimal"
+                      />
+                    </div>
                   </div>
                 )}
               </>
