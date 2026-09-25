@@ -1,9 +1,9 @@
-import { useState, type FormEvent } from 'react';
-import { BarreDuBas, type AjoutTraitement } from './BarreDuBas';
-import { EntetePage } from './EntetePage';
-import type { FondProps } from './Accueil';
-import { ChoixDate } from '../components/ChoixDate';
-import { ChoixHeure } from '../components/ChoixHeure';
+import { useState, type FormEvent } from "react";
+import { BarreDuBas, type AjoutTraitement } from "./BarreDuBas";
+import { EntetePage } from "./EntetePage";
+import type { FondProps } from "./Accueil";
+import { ChoixDate } from "../components/ChoixDate";
+import { ChoixHeure } from "../components/ChoixHeure";
 import {
   IconeActivite,
   IconeCalendrier,
@@ -14,12 +14,12 @@ import {
   IconeIntensiteIntensive,
   IconeIntensiteModeree,
   IconeRecherche,
-} from '../components/Icones';
-import { MessageEnPlace } from '../components/MessageEnPlace';
-import { CadranDistance } from '../components/CadranDistance';
-import { chercherActivites } from '../domaine/recherche-activites';
-import type { NoeudActivite } from '../domaine/activites-catalogue';
-import type { ReactElement, ReactNode } from 'react';
+} from "../components/Icones";
+import { MessageEnPlace } from "../components/MessageEnPlace";
+import { CadranDistance } from "../components/CadranDistance";
+import { chercherActivites } from "../domaine/recherche-activites";
+import type { NoeudActivite } from "../domaine/activites-catalogue";
+import type { ReactElement, ReactNode } from "react";
 
 const ICONES_INTENSITE: Record<Intensite, () => ReactElement> = {
   douce: IconeIntensiteDouce,
@@ -32,13 +32,24 @@ const ICONES_INTENSITE: Record<Intensite, () => ReactElement> = {
     en compétition (un combat = 5 minutes) »), ce qui précède la première
     virgule — le mot qui compte, à la taille d'une tuile. */
 function nomCourt(noeud: NoeudActivite): string {
-  const seule = noeud.sous.length === 0 && noeud.activites.length === 1 && noeud.activites[0].nom === noeud.nom;
-  return seule ? noeud.nom.split(',')[0] : noeud.nom;
+  const seule =
+    noeud.sous.length === 0 &&
+    noeud.activites.length === 1 &&
+    noeud.activites[0].nom === noeud.nom;
+  return seule ? noeud.nom.split(",")[0] : noeud.nom;
 }
 
 /** Une tuile : l'icône (le masque de sa classe) et le nom ; un bouton quand
     elle mène quelque part, un bloc sinon. */
-function Tuile({ classes, nom, onClick }: { classes: string; nom: ReactNode; onClick?: () => void }) {
+function Tuile({
+  classes,
+  nom,
+  onClick,
+}: {
+  classes: string;
+  nom: ReactNode;
+  onClick?: () => void;
+}) {
   const contenu = (
     <>
       <span className="categorie__pastille">
@@ -48,17 +59,21 @@ function Tuile({ classes, nom, onClick }: { classes: string; nom: ReactNode; onC
     </>
   );
   return onClick ? (
-    <button type="button" className={`categorie categorie--bouton ${classes}`} onClick={onClick}>
+    <button
+      type="button"
+      className={`categorie categorie--bouton ${classes}`}
+      onClick={onClick}
+    >
       {contenu}
     </button>
   ) : (
     <div className={`categorie ${classes}`}>{contenu}</div>
   );
 }
-import { detecterLangue, useTextes } from '../i18n/useTextes';
-import { classeDuTheme } from '../themes/themes';
-import { dateLocale, formaterDateCourte } from '../domaine/dates';
-import { heureLocale, heureRonde } from '../domaine/prises';
+import { detecterLangue, useTextes } from "../i18n/useTextes";
+import { classeDuTheme } from "../themes/themes";
+import { dateLocale, formaterDateCourte } from "../domaine/dates";
+import { heureLocale, heureRonde } from "../domaine/prises";
 import {
   AVEC_DISTANCE,
   CATEGORIES_ACTIVITE,
@@ -72,13 +87,13 @@ import {
   slugActivite,
   type CategorieActivite,
   type Intensite,
-} from '../domaine/activites';
-import { idActivite, type SportLog } from '../donnees/v1';
-import { ChampEnLigne } from '../components/ChampEnLigne';
-import { CATALOGUE_ACTIVITES } from '../domaine/activites-catalogue';
-import type { Forme } from '../domaine/traitements';
-import type { ModuleId } from '../app/modules';
-import { IndiceDefilement } from '../components/IndiceDefilement';
+} from "../domaine/activites";
+import { idActivite, type SportLog } from "../donnees/v1";
+import { ChampEnLigne } from "../components/ChampEnLigne";
+import { CATALOGUE_ACTIVITES } from "../domaine/activites-catalogue";
+import type { Forme } from "../domaine/traitements";
+import type { ModuleId } from "../app/modules";
+import { IndiceDefilement } from "../components/IndiceDefilement";
 
 /**
  * LA PAGE D'UNE ACTIVITÉ PHYSIQUE (2026-09-25, son image « Ajouter une
@@ -156,20 +171,25 @@ export function PageActivite({
      durée parmi les quatre ou « Autre », son intensité, sa distance (en
      mètres dans la base) qui ouvre l'onglet Distance. */
   const depart = initiale ? noeudDuSport(initiale.sport) : null;
-  const dureeConnue = initiale ? (DUREES_PROPOSEES as readonly number[]).includes(initiale.duration) : true;
+  const dureeConnue = initiale
+    ? (DUREES_PROPOSEES as readonly number[]).includes(initiale.duration)
+    : true;
   const [date, setDate] = useState(initiale?.date ?? dateLocale(maintenant));
-  const [heure, setHeure] = useState(initiale?.time ?? heureRonde(heureLocale(maintenant)));
+  const [heure, setHeure] = useState(
+    initiale?.time ?? heureRonde(heureLocale(maintenant)),
+  );
   const [editeDate, setEditeDate] = useState(false);
   const [editeHeure, setEditeHeure] = useState(false);
-  const [requete, setRequete] = useState('');
+  const [requete, setRequete] = useState("");
   const resultats = chercherActivites(requete);
-  const cherche = requete.trim() !== '';
+  const cherche = requete.trim() !== "";
   /* LA CATÉGORIE OUVERTE (2026-09-25, « si on clique sur une catégorie, on
      voit le nom de la catégorie en fil d'arianne et on affiche les icones
      des sports (niveau 1) contenus dans la catégorie ») : à sa place, le
      fil « Catégories › Roues » — « Catégories » ramène — et les tuiles de
      ses nœuds de niveau 1. */
-  const [categorieOuverte, setCategorieOuverte] = useState<CategorieActivite | null>(null);
+  const [categorieOuverte, setCategorieOuverte] =
+    useState<CategorieActivite | null>(null);
   /* LE SPORT CHOISI (2026-09-25, « une fois qu'on clique sur un sport : on
      peut choisir le temps avec des choix 15 min 30 min 45 min 1h ou autre
      qui si on clique ouvre un champs pou rmettre la quantité en minute.
@@ -178,12 +198,25 @@ export function PageActivite({
      entrer une distance ») : le fil « Catégories › Roues › Vélo », la
      durée, puis l'intensité — ou la distance, qui l'éteint (la règle de la
      V1 : la distance remplie, l'intensité n'est plus prise en compte). */
-  const [sportChoisi, setSportChoisi] = useState<{ categorie: CategorieActivite; noeud: NoeudActivite } | null>(depart);
-  const [duree, setDuree] = useState<(typeof DUREES_PROPOSEES)[number] | 'autre'>(
-    initiale && dureeConnue ? (initiale.duration as (typeof DUREES_PROPOSEES)[number]) : initiale ? 'autre' : 30,
+  const [sportChoisi, setSportChoisi] = useState<{
+    categorie: CategorieActivite;
+    noeud: NoeudActivite;
+  } | null>(depart);
+  const [duree, setDuree] = useState<
+    (typeof DUREES_PROPOSEES)[number] | "autre"
+  >(
+    initiale && dureeConnue
+      ? (initiale.duration as (typeof DUREES_PROPOSEES)[number])
+      : initiale
+        ? "autre"
+        : 30,
   );
-  const [dureeTapee, setDureeTapee] = useState(initiale && !dureeConnue ? String(initiale.duration) : '');
-  const [intensite, setIntensite] = useState<Intensite>(initiale?.intensity ?? 'moderee');
+  const [dureeTapee, setDureeTapee] = useState(
+    initiale && !dureeConnue ? String(initiale.duration) : "",
+  );
+  const [intensite, setIntensite] = useState<Intensite>(
+    initiale?.intensity ?? "moderee",
+  );
   /* La durée « Autre » refusée : la règle se dit. */
   const [dureeRefusee, setDureeRefusee] = useState(false);
   /* INTENSITÉ OU DISTANCE, PAR ONGLET (2026-09-25 au soir, « dans le cas où
@@ -191,20 +224,32 @@ export function PageActivite({
      intensite un onglet distance ») : l'onglet ouvert dit ce qui compte ;
      la distance part de celle du sport (« distance par defaut ») et se
      règle au cadran, un tour par kilomètre. */
-  const [onglet, setOnglet] = useState<'intensite' | 'distance' | 'marches' | 'etages'>(
-    initiale?.distance !== undefined ? 'distance' : depart?.noeud.nom === ESCALIER ? 'marches' : 'intensite',
+  const [onglet, setOnglet] = useState<
+    "intensite" | "distance" | "marches" | "etages"
+  >(
+    initiale?.distance !== undefined
+      ? "distance"
+      : depart?.noeud.nom === ESCALIER
+        ? "marches"
+        : "intensite",
   );
-  const [distanceKm, setDistanceKm] = useState(initiale?.distance !== undefined ? initiale.distance / 1000 : depart ? (DISTANCE_PAR_DEFAUT_KM[depart.noeud.nom] ?? 0) : 0);
+  const [distanceKm, setDistanceKm] = useState(
+    initiale?.distance !== undefined
+      ? initiale.distance / 1000
+      : depart
+        ? (DISTANCE_PAR_DEFAUT_KM[depart.noeud.nom] ?? 0)
+        : 0,
+  );
   /* L'ESCALIER (2026-09-25 au soir, « escalier : durée / nombre de marche /
      nombre d'étages ») : à la place de l'intensité et de la distance, deux
      onglets, Marches et Étages, chacun sa saisie. */
-  const [marches, setMarches] = useState('');
-  const [etages, setEtages] = useState('');
+  const [marches, setMarches] = useState("");
+  const [etages, setEtages] = useState("");
   const choisirSport = (categorie: CategorieActivite, noeud: NoeudActivite) => {
     setSportChoisi({ categorie, noeud });
     setCategorieOuverte(categorie);
-    setRequete('');
-    setOnglet(noeud.nom === ESCALIER ? 'marches' : 'intensite');
+    setRequete("");
+    setOnglet(noeud.nom === ESCALIER ? "marches" : "intensite");
     setDistanceKm(DISTANCE_PAR_DEFAUT_KM[noeud.nom] ?? 0);
   };
   /* VALIDER : la durée choisie ou tapée (refusée si ce n'est pas un nombre
@@ -217,12 +262,15 @@ export function PageActivite({
   const valider = (evenement: FormEvent) => {
     evenement.preventDefault();
     if (!sportChoisi) return;
-    const minutes = duree === 'autre' ? minutesDepuisSaisie(dureeTapee) : duree;
+    const minutes = duree === "autre" ? minutesDepuisSaisie(dureeTapee) : duree;
     if (minutes === null) {
       setDureeRefusee(true);
       return;
     }
-    const distance = onglet === 'distance' && distanceKm > 0 ? Math.round(distanceKm * 1000) : undefined;
+    const distance =
+      onglet === "distance" && distanceKm > 0
+        ? Math.round(distanceKm * 1000)
+        : undefined;
     onValider({
       id: initiale?.id ?? idActivite(),
       date,
@@ -235,24 +283,47 @@ export function PageActivite({
     });
   };
   const escalier = sportChoisi?.noeud.nom === ESCALIER;
-  const avecDistance = sportChoisi !== null && AVEC_DISTANCE.has(sportChoisi.noeud.nom);
-  const onglets: readonly ('intensite' | 'distance' | 'marches' | 'etages')[] = escalier ? ['marches', 'etages'] : avecDistance ? ['intensite', 'distance'] : [];
+  const avecDistance =
+    sportChoisi !== null && AVEC_DISTANCE.has(sportChoisi.noeud.nom);
+  const onglets: readonly ("intensite" | "distance" | "marches" | "etages")[] =
+    escalier
+      ? ["marches", "etages"]
+      : avecDistance
+        ? ["intensite", "distance"]
+        : [];
   /* « 5,25 » : toujours deux décimales, la virgule de la langue — une largeur
      qui ne bouge pas d'un cran à l'autre (2026-09-25 au soir, « distance :
      fixer la largeur des unités dizaines etc.. pour que ça ne saute pas qd
      modifie »). */
-  const ecrireKm = (km: number) => (Math.round(km * 100) / 100).toFixed(2).replace('.', textes.separateurDecimal);
+  const ecrireKm = (km: number) =>
+    (Math.round(km * 100) / 100)
+      .toFixed(2)
+      .replace(".", textes.separateurDecimal);
 
   return (
-    <div className={`page page--photo page--fond-${fond.apercu ?? fond.courant} ${classeDuTheme('blanc')}`}>
+    <div
+      className={`page page--photo page--fond-${fond.apercu ?? fond.courant} ${classeDuTheme("blanc")}`}
+    >
       <div className="page__colonne">
-        <EntetePage titre={textes.accueil.modules['activite-physique']} onAccueil={onAccueil} />
+        <EntetePage
+          titre={textes.accueil.modules["activite-physique"]}
+          onAccueil={onAccueil}
+        />
 
         <form className="carte prise" onSubmit={valider} noValidate>
           <div className="prise__entete">
             <IconeActivite />
-            <h2 className="prise__titre">{modification ? textes.activite.titreModification : textes.activite.titre}</h2>
-            <button type="button" className="tiroir__fermer prise__fermer" aria-label={textes.fermer} onClick={onAccueil}>
+            <h2 className="prise__titre">
+              {modification
+                ? textes.activite.titreModification
+                : textes.activite.titre}
+            </h2>
+            <button
+              type="button"
+              className="tiroir__fermer prise__fermer"
+              aria-label={textes.fermer}
+              onClick={onAccueil}
+            >
               <IconeCroix />
             </button>
           </div>
@@ -269,7 +340,11 @@ export function PageActivite({
                   onFerme={() => setEditeDate(false)}
                 />
               ) : (
-                <button type="button" className="prise__quand" onClick={() => setEditeDate(true)}>
+                <button
+                  type="button"
+                  className="prise__quand"
+                  onClick={() => setEditeDate(true)}
+                >
                   <IconeCalendrier />
                   <span>{formaterDateCourte(date, langue)}</span>
                 </button>
@@ -284,38 +359,58 @@ export function PageActivite({
                   onFerme={() => setEditeHeure(false)}
                 />
               ) : (
-                <button type="button" className="prise__quand" onClick={() => setEditeHeure(true)}>
+                <button
+                  type="button"
+                  className="prise__quand"
+                  onClick={() => setEditeHeure(true)}
+                >
                   <IconeHorloge />
                   <span>{heure}</span>
                 </button>
               )}
             </div>
 
-            <label className="recherche">
-              <IconeRecherche />
-              <input
-                className="recherche__champ"
-                type="search"
-                value={requete}
-                onChange={(e) => setRequete(e.target.value)}
-                placeholder={textes.activite.rechercher}
-                aria-label={textes.activite.rechercher}
-                autoComplete="off"
-              />
-              {cherche ? (
-                <button type="button" className="recherche__effacer" aria-label={textes.activite.effacerRecherche} onClick={() => setRequete('')}>
-                  <IconeCroix />
-                </button>
-              ) : null}
-            </label>
+            {/* LE CHAMP DE RECHERCHE S'EFFACE UNE FOIS LE SPORT CHOISI (2026-09-26,
+                « une fois qu'on a choisi l'activité, le champ de recherche
+                d'activité disparait ») : le fil ramène aux catégories, où il
+                revient. */}
+            {sportChoisi ? null : (
+              <label className="recherche">
+                <IconeRecherche />
+                <input
+                  className="recherche__champ"
+                  type="search"
+                  value={requete}
+                  onChange={(e) => setRequete(e.target.value)}
+                  placeholder={textes.activite.rechercher}
+                  aria-label={textes.activite.rechercher}
+                  autoComplete="off"
+                />
+                {cherche ? (
+                  <button
+                    type="button"
+                    className="recherche__effacer"
+                    aria-label={textes.activite.effacerRecherche}
+                    onClick={() => setRequete("")}
+                  >
+                    <IconeCroix />
+                  </button>
+                ) : null}
+              </label>
+            )}
 
             {cherche ? (
               <>
                 <p className="prise__etiquette">
-                  {textes.activite.resultats} <span className="recherche__nombre">({resultats.length})</span>
+                  {textes.activite.resultats}{" "}
+                  <span className="recherche__nombre">
+                    ({resultats.length})
+                  </span>
                 </p>
                 {resultats.length === 0 ? (
-                  <MessageEnPlace classe="prise__question">{textes.activite.aucunResultat}</MessageEnPlace>
+                  <MessageEnPlace classe="prise__question">
+                    {textes.activite.aucunResultat}
+                  </MessageEnPlace>
                 ) : (
                   <div className="categories categories--4">
                     {resultats.map((r) => (
@@ -333,7 +428,10 @@ export function PageActivite({
 
             {sportChoisi ? (
               <>
-                <nav className="activite__fil" aria-label={textes.activite.categories}>
+                <nav
+                  className="activite__fil"
+                  aria-label={textes.activite.categories}
+                >
                   <button
                     type="button"
                     className="activite__fil-retour"
@@ -347,35 +445,49 @@ export function PageActivite({
                   <span className="activite__fil-sep" aria-hidden="true">
                     ›
                   </span>
-                  <button type="button" className="activite__fil-retour" onClick={() => setSportChoisi(null)}>
+                  <button
+                    type="button"
+                    className="activite__fil-retour"
+                    onClick={() => setSportChoisi(null)}
+                  >
                     {textes.activite.categorie[sportChoisi.categorie]}
                   </button>
                   <span className="activite__fil-sep" aria-hidden="true">
                     ›
                   </span>
-                  <span className="activite__fil-courant">{nomCourt(sportChoisi.noeud)}</span>
+                  <span className="activite__fil-courant">
+                    {nomCourt(sportChoisi.noeud)}
+                  </span>
                 </nav>
 
                 {/* LA DURÉE : quatre choix et « Autre », qui ouvre la saisie en minutes. */}
                 <p className="prise__etiquette">{textes.activite.duree}</p>
-                <div className="prise__boutons" role="radiogroup" aria-label={textes.activite.duree}>
+                <div
+                  className="prise__boutons"
+                  role="radiogroup"
+                  aria-label={textes.activite.duree}
+                >
                   {DUREES_PROPOSEES.map((minutes) => (
                     <button
                       key={minutes}
                       type="button"
                       role="radio"
                       aria-checked={duree === minutes}
-                      className={`prise__bouton${duree === minutes ? ' prise__bouton--choisi' : ''}`}
+                      className={`prise__bouton${duree === minutes ? " prise__bouton--choisi" : ""}`}
                       onClick={() => setDuree(minutes)}
                     >
-                      {textes.activite.durees[String(minutes) as '15' | '30' | '45' | '60']}
+                      {
+                        textes.activite.durees[
+                          String(minutes) as "15" | "30" | "45" | "60"
+                        ]
+                      }
                     </button>
                   ))}
                   {/* « Autre » s'efface et la saisie des minutes prend sa place
                       (2026-09-25 au soir, « si on clique sur "autre" : le champ
                       autre disparait et le champ ou on rentre les minutes prend
                       sa place »). */}
-                  {duree === 'autre' ? (
+                  {duree === "autre" ? (
                     <input
                       className="prise__dose prise__dose--bouton"
                       type="text"
@@ -386,16 +498,27 @@ export function PageActivite({
                       autoFocus
                       onChange={(e) => {
                         setDureeTapee(e.target.value);
-                        if (minutesDepuisSaisie(e.target.value) !== null) setDureeRefusee(false);
+                        if (minutesDepuisSaisie(e.target.value) !== null)
+                          setDureeRefusee(false);
                       }}
                     />
                   ) : (
-                    <button type="button" role="radio" aria-checked={false} className="prise__bouton" onClick={() => setDuree('autre')}>
+                    <button
+                      type="button"
+                      role="radio"
+                      aria-checked={false}
+                      className="prise__bouton"
+                      onClick={() => setDuree("autre")}
+                    >
                       {textes.activite.autreDuree}
                     </button>
                   )}
                 </div>
-                {dureeRefusee ? <MessageEnPlace classe="prise__regle">{textes.activite.regleDuree}</MessageEnPlace> : null}
+                {dureeRefusee ? (
+                  <MessageEnPlace classe="prise__regle">
+                    {textes.activite.regleDuree}
+                  </MessageEnPlace>
+                ) : null}
 
                 {/* L'INTENSITÉ — ou, par onglet, LA DISTANCE pour les sports où elle a
                     un sens ; pour l'escalier, les marches ou les étages. */}
@@ -407,7 +530,7 @@ export function PageActivite({
                         type="button"
                         role="tab"
                         aria-selected={onglet === o}
-                        className={`activite__onglet${onglet === o ? ' activite__onglet--actif' : ''}`}
+                        className={`activite__onglet${onglet === o ? " activite__onglet--actif" : ""}`}
                         onClick={() => setOnglet(o)}
                       >
                         {textes.activite.onglets[o]}
@@ -415,20 +538,38 @@ export function PageActivite({
                     ))}
                   </div>
                 ) : (
-                  <p className="prise__etiquette">{textes.activite.intensite}</p>
+                  <p className="prise__etiquette">
+                    {textes.activite.intensite}
+                  </p>
                 )}
-                {onglet === 'marches' || onglet === 'etages' ? (
+                {onglet === "marches" || onglet === "etages" ? (
                   <input
                     className="prise__dose"
                     type="text"
                     inputMode="numeric"
-                    placeholder={onglet === 'marches' ? textes.activite.nombreDeMarches : textes.activite.nombreDEtages}
-                    aria-label={onglet === 'marches' ? textes.activite.nombreDeMarches : textes.activite.nombreDEtages}
-                    value={onglet === 'marches' ? marches : etages}
-                    onChange={(e) => (onglet === 'marches' ? setMarches : setEtages)(e.target.value)}
+                    placeholder={
+                      onglet === "marches"
+                        ? textes.activite.nombreDeMarches
+                        : textes.activite.nombreDEtages
+                    }
+                    aria-label={
+                      onglet === "marches"
+                        ? textes.activite.nombreDeMarches
+                        : textes.activite.nombreDEtages
+                    }
+                    value={onglet === "marches" ? marches : etages}
+                    onChange={(e) =>
+                      (onglet === "marches" ? setMarches : setEtages)(
+                        e.target.value,
+                      )
+                    }
                   />
-                ) : onglet === 'intensite' || !avecDistance ? (
-                  <div className="intensites" role="radiogroup" aria-label={textes.activite.intensite}>
+                ) : onglet === "intensite" || !avecDistance ? (
+                  <div
+                    className="intensites"
+                    role="radiogroup"
+                    aria-label={textes.activite.intensite}
+                  >
                     {INTENSITES.map((niveau) => {
                       const Icone = ICONES_INTENSITE[niveau];
                       const choisi = intensite === niveau;
@@ -439,7 +580,7 @@ export function PageActivite({
                           role="radio"
                           aria-checked={choisi}
                           aria-label={textes.activite.intensites[niveau]}
-                          className={`prise__bouton intensite${choisi ? ' prise__bouton--choisi' : ''}`}
+                          className={`prise__bouton intensite${choisi ? " prise__bouton--choisi" : ""}`}
                           onClick={() => setIntensite(niveau)}
                         >
                           <Icone />
@@ -449,7 +590,12 @@ export function PageActivite({
                   </div>
                 ) : (
                   <div className="distance">
-                    <CadranDistance km={distanceKm} onKm={setDistanceKm} nom={textes.activite.distanceKm} ecrire={(k) => `${ecrireKm(k)} ${textes.activite.km}`} />
+                    <CadranDistance
+                      km={distanceKm}
+                      onKm={setDistanceKm}
+                      nom={textes.activite.distanceKm}
+                      ecrire={(k) => `${ecrireKm(k)} ${textes.activite.km}`}
+                    />
                     {/* La valeur en cases : la dizaine est une case même vide (un
                         zéro invisible), les chiffres sont tabulaires — rien ne
                         saute en passant 10 km. ET ELLE S'ÉDITE SUR PLACE (2026-09-25
@@ -462,10 +608,21 @@ export function PageActivite({
                         valeur={ecrireKm(distanceKm)}
                         valeurAffichee={
                           <>
-                            <span className={distanceKm < 10 ? 'distance__chiffre distance__chiffre--vide' : 'distance__chiffre'} aria-hidden={distanceKm < 10}>
-                              {distanceKm < 10 ? '0' : ecrireKm(distanceKm).slice(0, -4)}
+                            <span
+                              className={
+                                distanceKm < 10
+                                  ? "distance__chiffre distance__chiffre--vide"
+                                  : "distance__chiffre"
+                              }
+                              aria-hidden={distanceKm < 10}
+                            >
+                              {distanceKm < 10
+                                ? "0"
+                                : ecrireKm(distanceKm).slice(0, -4)}
                             </span>
-                            <span className="distance__chiffre">{ecrireKm(distanceKm).slice(-4)}</span>
+                            <span className="distance__chiffre">
+                              {ecrireKm(distanceKm).slice(-4)}
+                            </span>
                           </>
                         }
                         onValeur={(saisie) => {
@@ -487,14 +644,23 @@ export function PageActivite({
               </>
             ) : categorieOuverte ? (
               <>
-                <nav className="activite__fil" aria-label={textes.activite.categories}>
-                  <button type="button" className="activite__fil-retour" onClick={() => setCategorieOuverte(null)}>
+                <nav
+                  className="activite__fil"
+                  aria-label={textes.activite.categories}
+                >
+                  <button
+                    type="button"
+                    className="activite__fil-retour"
+                    onClick={() => setCategorieOuverte(null)}
+                  >
                     {textes.activite.categories}
                   </button>
                   <span className="activite__fil-sep" aria-hidden="true">
                     ›
                   </span>
-                  <span className="activite__fil-courant">{textes.activite.categorie[categorieOuverte]}</span>
+                  <span className="activite__fil-courant">
+                    {textes.activite.categorie[categorieOuverte]}
+                  </span>
                 </nav>
                 <div className="categories categories--4">
                   {CATALOGUE_ACTIVITES[categorieOuverte].map((noeud) => (
@@ -528,14 +694,27 @@ export function PageActivite({
 
           <div className="prise__pied">
             {modification ? (
-              <button type="button" className="bouton bouton--second prise__valider" onClick={onAnnuler}>
+              <button
+                type="button"
+                className="bouton bouton--second prise__valider"
+                onClick={onAnnuler}
+              >
                 {textes.prise.annuler}
               </button>
             ) : null}
             {/* Éteint, jamais caché, tant qu'aucun sport n'est choisi. */}
-            <button type="submit" className="bouton prise__valider" disabled={!sportChoisi} aria-disabled={!sportChoisi}>
+            <button
+              type="submit"
+              className="bouton prise__valider"
+              disabled={!sportChoisi}
+              aria-disabled={!sportChoisi}
+            >
               <IconeCoche />
-              <span>{modification ? textes.prise.mettreAJourPrise : textes.prise.valider}</span>
+              <span>
+                {modification
+                  ? textes.prise.mettreAJourPrise
+                  : textes.prise.valider}
+              </span>
             </button>
           </div>
         </form>

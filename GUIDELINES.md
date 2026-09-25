@@ -947,7 +947,9 @@ des sports (niveau 1) contenus dans la catégorie ») : à la place de
 catégorie, avec l'icône de chaque sport. **Trois catégories par rangée ;
 quatre tuiles par rangée pour les résultats et les sports d'une catégorie**
 (« catégories : 3 par lignes. Résultats de recherche et sports une fois
-qu'on a choisi la catégorie : 4 par ligne »). **L'escalier** (le même soir, « escalier : durée / nombre de marche /
+qu'on a choisi la catégorie : 4 par ligne »). **Le champ de recherche s'efface une fois le sport choisi** (2026-09-26,
+« une fois qu'on a choisi l'activité, le champ de recherche d'activité
+disparait ») ; il revient avec les catégories. **L'escalier** (le même soir, « escalier : durée / nombre de marche /
 nombre d'étages ») : le nœud « Escalier » n'a ni intensité ni distance —
 après la durée, deux onglets, Marches et Étages, chacun sa saisie ; la
 ligne de la V1 n'a ni marches ni étages : ILS NE S'ÉCRIVENT PAS ENCORE
