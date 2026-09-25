@@ -3211,13 +3211,32 @@
   gap: 4px;
 }
 
+/* La valeur en pastille, la matière de l'heure du sommeil mais aux jetons
+   du thème, et SES PROPRES CASES : la pastille de l'heure donnait 5ch à
+   chaque span, la dizaine et l'unité s'écartaient (2026-09-25 au soir,
+   « n'importe quoi la distance totale. pkoi le 1 et le km de chaque coté
+   sont si loin ? »). */
 .distance__valeur {
-  gap: 0;
-  cursor: default;
+  display: inline-flex;
+  align-items: baseline;
+  margin-top: 6px;
+  padding: 8px 16px;
+  border-radius: 14px;
+  background: var(--option-choisi-fond);
+  color: var(--encre);
+  font-family: var(--font-body);
+  font-weight: 500;
+  font-size: 15px;
   font-variant-numeric: tabular-nums;
 }
 
-/* Les cases de la valeur : la dizaine, même vide, tient sa place. */
+/* Les cases de la valeur : la dizaine tient sa place même vide, le reste
+   (« 0,85 ») fait toujours quatre signes. */
+.distance__chiffre {
+  display: inline-block;
+  text-align: right;
+}
+
 .distance__chiffre--vide {
   visibility: hidden;
 }

@@ -368,7 +368,7 @@ export function PageActivite({
                     {/* La valeur en cases : la dizaine est une case même vide (un
                         zéro invisible), les chiffres sont tabulaires — rien ne
                         saute en passant 10 km. */}
-                    <span className="sommeil__heure distance__valeur">
+                    <span className="distance__valeur">
                       <span className={distanceKm < 10 ? 'distance__chiffre distance__chiffre--vide' : 'distance__chiffre'} aria-hidden={distanceKm < 10}>
                         {distanceKm < 10 ? '0' : ecrireKm(distanceKm).slice(0, -4)}
                       </span>
