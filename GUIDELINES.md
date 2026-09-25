@@ -953,8 +953,9 @@ catalogue, comme ceux des traitements, pas des textes du dictionnaire.
 on voit le nom de la catégorie en fil d'arianne et on affiche les icones
 des sports (niveau 1) contenus dans la catégorie ») : à la place de
 « Catégories » et des neuf tuiles, le fil « Catégories › Roues » —
-« Catégories » ramène — et les tuiles des nœuds de niveau 1 de la
-catégorie, avec l'icône de chaque sport. **Trois catégories par rangée ;
+« Catégories » ramène, et LES CRANS QUI RAMÈNENT SONT SOULIGNÉS (2026-09-26,
+« fil d'ariane : souligne les éléemtns clicables du fil ») — et les tuiles
+des nœuds de niveau 1 de la catégorie, avec l'icône de chaque sport. **Trois catégories par rangée ;
 quatre tuiles par rangée pour les résultats et les sports d'une catégorie**
 (« catégories : 3 par lignes. Résultats de recherche et sports une fois
 qu'on a choisi la catégorie : 4 par ligne »). **Le champ de recherche s'efface une fois le sport choisi** (2026-09-26,

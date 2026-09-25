@@ -3183,6 +3183,12 @@
   background: none;
   color: var(--encre-chapeau);
   font: inherit;
+  /* Ce qui se touche se souligne (2026-09-26, « fil d'ariane : souligne
+     les éléemtns clicables du fil ») — le trait des liens des
+     formulaires, à l'encre du cran. */
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  text-decoration-thickness: 1px;
   cursor: pointer;
 }
 
