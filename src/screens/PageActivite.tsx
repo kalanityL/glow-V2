@@ -58,7 +58,7 @@ import { detecterLangue, useTextes } from '../i18n/useTextes';
 import { classeDuTheme } from '../themes/themes';
 import { dateLocale, formaterDateCourte } from '../domaine/dates';
 import { heureLocale, heureRonde } from '../domaine/prises';
-import { AVEC_DISTANCE, CATEGORIES_ACTIVITE, DUREES_PROPOSEES, INTENSITES, slugActivite, type CategorieActivite, type Intensite } from '../domaine/activites';
+import { AVEC_DISTANCE, CATEGORIES_ACTIVITE, DISTANCE_PAR_DEFAUT_KM, DUREES_PROPOSEES, INTENSITES, slugActivite, type CategorieActivite, type Intensite } from '../domaine/activites';
 import { CATALOGUE_ACTIVITES } from '../domaine/activites-catalogue';
 import type { Forme } from '../domaine/traitements';
 import type { ModuleId } from '../app/modules';
@@ -342,7 +342,7 @@ export function PageActivite({
                       className="prise__dose"
                       type="text"
                       inputMode="decimal"
-                      placeholder={textes.activite.distanceKm}
+                      placeholder={`${DISTANCE_PAR_DEFAUT_KM[sportChoisi.noeud.nom]} ${textes.activite.distanceKm}`}
                       aria-label={textes.activite.distanceKm}
                       value={distance}
                       onChange={(e) => setDistance(e.target.value)}

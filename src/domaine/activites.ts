@@ -52,27 +52,30 @@ export type Intensite = (typeof INTENSITES)[number];
 export const DUREES_PROPOSEES = [15, 30, 45, 60] as const;
 
 /**
- * LES SPORTS OÙ UNE DISTANCE A UN SENS (SPEC § 4.7 : « une distance
- * facultative en mètres pour les sports où elle a un sens » ; la V1 en
- * tenait la liste par ses courbes allure → MET, `sportCalories.ts` :
- * marche, randonnée, course à pied, vélo, natation, rameur et aviron, ski
- * de fond, patinage et roller). Ici, par nom de nœud de niveau 1 de
- * l'arbre. Une distance entrée remplace l'intensité (2026-09-25,
- * « entrer une distance » OU l'intensité ; la V1 : la distance remplie,
- * l'intensité passe en grisé).
+ * LES SPORTS OÙ UNE DISTANCE A UN SENS, ET LEUR DISTANCE PROPOSÉE D'AVANCE
+ * (SPEC § 4.7 : « une distance facultative en mètres pour les sports où
+ * elle a un sens » ; la V1 en tenait la liste par ses courbes allure → MET,
+ * `sportCalories.ts`). Sa liste du 2026-09-25 au soir (« distance par
+ * defaut : a pied et raquette 5km ; à velo/roller : 10km ; natation :
+ * 1km ; rameur : 4km ; patinage, ski : pas de possibilité de mettre la
+ * distance ») : par nom de nœud de niveau 1 de l'arbre, en kilomètres.
+ * Le vélo elliptique va avec le vélo, le canoë, le kayak et l'aviron avec
+ * le rameur — deux rapprochements de moi. Une distance entrée remplace
+ * l'intensité (la V1 : la distance remplie, l'intensité passe en grisé).
  */
-export const AVEC_DISTANCE: ReadonlySet<string> = new Set([
-  'Marche',
-  'Randonnée',
-  'Marche athlétique',
-  'Course à pied',
-  'Vélo',
-  'Roller',
-  'Natation',
-  'Canoë, kayak et aviron',
-  'Rameur',
-  'Vélo elliptique',
-  'Ski',
-  'Patinage',
-  'Raquettes à neige',
-]);
+export const DISTANCE_PAR_DEFAUT_KM: Readonly<Record<string, number>> = {
+  Marche: 5,
+  Randonnée: 5,
+  'Marche athlétique': 5,
+  'Course à pied': 5,
+  'Raquettes à neige': 5,
+  Vélo: 10,
+  Roller: 10,
+  'Vélo elliptique': 10,
+  Natation: 1,
+  Rameur: 4,
+  'Canoë, kayak et aviron': 4,
+};
+
+/** Les sports où une distance a un sens : ceux qui ont une distance d'avance. */
+export const AVEC_DISTANCE: ReadonlySet<string> = new Set(Object.keys(DISTANCE_PAR_DEFAUT_KM));

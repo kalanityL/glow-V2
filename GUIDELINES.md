@@ -959,8 +959,11 @@ trois crans (« Catégories › Roues › Vélo », les deux premiers ramènent)
 « Intensité » et trois pictos sans mot, un, deux, trois éclairs (les
 mots de la V1, douce / modérée / intensive, dits à qui écoute), modérée
 d'avance ; « ou une distance » en km pour les sports où elle a un sens
-(`AVEC_DISTANCE`, `domaine/activites.ts`, la liste des courbes allure →
-MET de la V1 reportée aux nœuds de l'arbre), qui ÉTEINT l'intensité tant
+(`DISTANCE_PAR_DEFAUT_KM`, `domaine/activites.ts` — sa liste : « distance
+par defaut : a pied et raquette 5km ; à velo/roller : 10km ; natation :
+1km ; rameur : 4km ; patinage, ski : pas de possibilité de mettre la
+distance » ; le vélo elliptique avec le vélo, le canoë-kayak-aviron avec
+le rameur, deux rapprochements de moi), qui ÉTEINT l'intensité tant
 qu'elle est remplie — la règle de la V1. « Catégories » et neuf tuiles, les catégories de SON tri du Compendium of
 Physical Activities 2024 (la simulation « Compendium des activités
 physiques » des 24 et 25 septembre : Ballon et balles, Raquettes, Roues,
