@@ -102,6 +102,21 @@
      blanc (2026-09-20). */
   --pastille-fond: #eff6ff;
 
+  /* LES CARTES DU TIROIR DU « + », AUX COULEURS DE SON IMAGE (2026-09-25,
+     `~/Desktop/GLOW/Images-pour-claude/menu-plus.png`, relevées au pixel) :
+     la pastille en bleu pâle (#e7f0fc, la moyenne du disque hors icône),
+     l'icône en bleu franc (#2653cc, la moyenne des pixels les plus sombres
+     du disque), le titre en bleu nuit (#11136a, de même), le chevron en
+     bleu grisé (#4d65ab, de même), et l'ombre d'une carte : une teinte
+     bleue diffuse sur une douzaine de pixels, qui fonce le fond du tiroir
+     de #fbfcfd à #f1f7fd au ras de la carte — un bleu à 10 %. La carte
+     elle-même est blanche (#fdfdfe) : `--module-fond`. */
+  --ajout-pastille-fond: #e7f0fc;
+  --ajout-icone-encre: #2653cc;
+  --ajout-titre-encre: #11136a;
+  --ajout-chevron-encre: #4d65ab;
+  --ajout-carte-ombre: 0 2px 12px rgba(59, 130, 246, 0.1);
+
   /* LA GRADUATION DU POIDS, d'après son image (2026-09-20) : les crans des
      unités clairs, ceux des dizaines un peu plus marqués — un cran plus
      foncés qu'au premier jet (« les crans clairs deviennent un peu plus

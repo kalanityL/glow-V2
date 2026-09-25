@@ -1750,69 +1750,104 @@
   column-gap: 12px;
 }
 
-/* LES CASES DU « + » (2026-09-20) : DEUX par rangée (trois d'abord, comme
-   la V1 ; « 2 icones par ligne » le même jour), sous le titre du tiroir —
-   l'icône sur sa pastille, le nom dessous, sur UNE SEULE LIGNE. */
+/* LES CASES DU « + » SONT DES CARTES, D'APRÈS SON IMAGE (2026-09-25,
+   « nouveau design pour me menu + dans ../images pour claude /
+   menu-plus.png / ne mets pas les sous titres des catégories, garde nos
+   icones la croix de fermeture et nos textes ») — `Images-pour-claude/
+   menu-plus.png`, RELEVÉE AU PIXEL (l'écran de l'image fait 467 px de
+   large) : deux colonnes de cartes blanches, gouttière de 14 px entre les
+   colonnes comme entre les rangées (13–14 mesurés), coins de 14 px (la
+   courbe du coin bas gauche s'étale sur dix colonnes), une ombre bleutée
+   diffuse tout autour ; dans chaque carte, la pastille ronde de 64 px à
+   20 px du bord gauche et 12 px du haut, le chevron « › » en haut à droite
+   à 18 px du bord et centré sur la hauteur de la pastille, le titre en gras
+   dessous. Ce qui reste du 2026-09-20 : deux par rangée (« 2 icones par
+   ligne »), l'ordre de la V1. Ce qui cède : le nom sur une seule ligne —
+   l'image l'écrit sur deux (« Effets / secondaires »), la rangée prend la
+   hauteur de la plus haute. Pas de sous-titre : elle n'en veut pas. Les
+   colonnes sont égales (GUIDELINES) ; la marge latérale reste celle de la
+   page (20 px sur l'image, 16 ici au plus large). */
 .tiroir__cases {
   display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  /* 24 px entre les rangées (14 auparavant ; 2026-09-20, « plus de vspace
-     entre les icones menu bouton + »). */
-  gap: 24px 8px;
-  margin-top: 10px;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+  /* Le titre du tiroir garde ses 10 px de marge dessous : de sa ligne de
+     base au haut des cartes, l'image compte 17 px. */
+  margin-top: 0;
 }
 
+/* Une carte : la pastille en haut à gauche, le chevron en haut à droite sur
+   la même rangée, le titre sur toute la largeur dessous. C'est un bouton
+   (elle mène à sa page) : sa matière est celle des cartes du thème —
+   `--module-fond`, l'ombre du thème, pas de filet (l'image n'en montre
+   aucun). */
 .tiroir__case {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 6px;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  grid-template-rows: auto auto;
+  align-items: start;
+  row-gap: 8px;
   min-width: 0;
-  /* Une case est un bouton (2026-09-20, elle mène à sa page) : rien de la
-     matière d'un bouton. */
-  padding: 0;
+  padding: 12px 18px 14px 20px;
   border: 0;
-  background: none;
+  border-radius: 14px;
+  background: var(--module-fond);
+  box-shadow: var(--ajout-carte-ombre);
   color: inherit;
   font: inherit;
+  text-align: left;
   cursor: pointer;
 }
 
-/* Les icônes du « + » sont plus grandes que celles du menu (2026-09-20,
-   « icones du menu ajouter : + grandes ») : pastille de 48 px, icône de 26. */
+/* La pastille de 64 px (48 auparavant), bleu pâle, l'icône en bleu — les
+   deux relevés sur l'image, en jetons du thème. */
 .tiroir__case .tiroir__icone {
-  width: 48px;
-  height: 48px;
+  width: 64px;
+  height: 64px;
+  background: var(--ajout-pastille-fond);
+  color: var(--ajout-icone-encre);
 }
 
-/* LE TRAIT NE GROSSIT PAS AVEC L'ICÔNE (2026-09-20, « augmentation de la
-   taille des icones ne veut pas dire augmentation de la taille du trait.
-   meme taille de trait pour icone du menu et icone du menu + ») : le trait
-   est en unités du dessin (2 sur 24), il suit l'échelle — à 26 px il
-   ferait 2,17 px là où celui du menu, à 18 px, fait 1,5. Il est donc
-   divisé par 26/18 : 1,38 (et 1,25 pour la fenêtre resserrée, 1,8 × 18/26),
-   pour faire 1,5 px à l'écran comme dans le menu. */
+/* L'ICÔNE : LA NÔTRE (« garde nos icones »), de 32 px — la moitié de la
+   pastille, comme sur l'image (33 px mesurés dans 64). LE TRAIT NE GROSSIT
+   PAS AVEC L'ICÔNE (2026-09-20, « augmentation de la taille des icones ne
+   veut pas dire augmentation de la taille du trait. meme taille de trait
+   pour icone du menu et icone du menu + ») : 2 sur 24 ferait 2,67 px à
+   32 px ; divisé par 32/18, 1,125 pour faire 1,5 px à l'écran comme dans le
+   menu (et 1,0125 pour la fenêtre resserrée, 1,8 × 18/32). Les icônes de
+   l'image, plus épaisses, ne sont pas reprises. */
 .tiroir__case .tiroir__icone .icone {
-  width: 26px;
-  height: 26px;
-  stroke-width: 1.38;
+  width: 32px;
+  height: 32px;
+  stroke-width: 1.125;
 }
 
 .tiroir__case .tiroir__icone .icone--resserree {
-  stroke-width: 1.25;
+  stroke-width: 1.0125;
 }
 
+/* Le chevron « › », en haut à droite, centré sur la hauteur de la pastille,
+   en bleu grisé : 8 × 14 px sur l'image, la fenêtre de 24 px de Lucide
+   au trait de 2 le donne tel quel. Il ne dit rien que la carte ne dise
+   déjà : caché aux lecteurs d'écran. */
+.tiroir__case-chevron {
+  align-self: center;
+  width: 24px;
+  height: 24px;
+  color: var(--ajout-chevron-encre);
+}
+
+/* Le titre : 16 px en gras (hauteur de capitale de 11–12 px sur l'image),
+   en bleu nuit, sur deux lignes s'il le faut ; sur toute la largeur de la
+   carte, sous la pastille et le chevron. */
 .tiroir__case-nom {
-  max-width: 100%;
+  grid-column: 1 / -1;
+  min-width: 0;
   font-family: var(--font-body);
-  font-weight: 500;
-  font-size: 13px;
-  line-height: 1.2;
-  text-align: center;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  color: var(--encre);
+  font-weight: 700;
+  font-size: 16px;
+  line-height: 1.25;
+  color: var(--ajout-titre-encre);
 }
 
 /* Une entrée : l'icône à l'encre sur une pastille bleu clair (2026-09-20,

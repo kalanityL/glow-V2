@@ -599,7 +599,23 @@ croix. **Un bloc resté ouvert passe sous la vitre d'un tiroir** (2026-09-20,
 « s'il y a un bloc reste de page vitré ouvert qd on ouvre un tiroir ou un
 menu, ce bloc passe sous la vitre ») : les rangs sont dans `page.css` —
 vitre du bloc, bloc, vitre du tiroir, tiroir, barre du bas. **Ouvrir un
-tiroir ferme l'autre en même temps** : l'un descend pendant que l'autre monte.
+tiroir ferme l'autre en même temps** : l'un descend pendant que l'autre monte. **Ses cases sont des cartes depuis le 2026-09-25, d'après son image
+`Images-pour-claude/menu-plus.png`** (« nouveau design pour me menu + dans
+../images pour claude / menu-plus.png / ne mets pas les sous titres des
+catégories, garde nos icones la croix de fermeture et nos textes ») : deux
+colonnes de cartes blanches aux coins arrondis (14 px), sur une ombre bleutée
+diffuse, gouttière de 14 px ; dans chacune, la pastille ronde de 64 px en
+bleu pâle portant l'icône en bleu, un chevron en bleu grisé en haut à
+droite, le nom en gras de 16 px en bleu nuit dessous, sur deux lignes s'il
+le faut (la règle « sur une seule ligne » du 20/09 cède : l'image l'écrit
+sur deux). Les mesures et les couleurs sont relevées au pixel — les
+couleurs en jetons `--ajout-*` des quatre thèmes, les ciels sur leurs
+propres couleurs. NON REPRIS de l'image, à sa demande : les sous-titres
+(aucun), ses icônes (les nôtres, `IconeDuModule`, au trait de 1,5 px du
+20/09), son titre « Ajouter une entrée » (le nôtre, sur la ligne de la
+croix, la croix telle quelle) ; et, de nous-mêmes, le fond du tiroir reste
+la photo voilée du 20/09 (l'image a un fond blanc uni) et la marge latérale
+celle de la page.
 
 **La page d'une prise** (2026-09-20, « ajouter->injection : envoie vers une
 page ultra simple avec uniquement le fomulaire d'ajout d'injection de la v1

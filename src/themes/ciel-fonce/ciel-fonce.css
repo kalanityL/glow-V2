@@ -168,6 +168,14 @@
   --marque-degrade-fin: var(--encre);
   --devise-encre: var(--encre);
   --pastille-fond: var(--option-fond);
+  /* Les cartes du tiroir du « + » (2026-09-25, d'après son image, voir
+     Blanc) : sur les ciels, les couleurs du thème — la surface choisie, l'accent,
+     l'encre, le gris du chapeau —, et pas d'ombre sur le ciel. */
+  --ajout-pastille-fond: var(--option-choisi-fond);
+  --ajout-icone-encre: var(--accent);
+  --ajout-titre-encre: var(--encre);
+  --ajout-chevron-encre: var(--encre-chapeau);
+  --ajout-carte-ombre: none;
   /* La graduation du poids : sur les neutres du thème. */
   --graduation-unite: var(--option-filet);
   --graduation-dizaine: var(--bille-eteinte);

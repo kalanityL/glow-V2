@@ -3,6 +3,7 @@ import { useTextes } from '../i18n/useTextes';
 import { MODULES_AJOUT, type ModuleId } from '../app/modules';
 import type { Forme } from '../domaine/traitements';
 import { IconeDuModule } from './iconesModules';
+import { IconeChevronDroit } from '../components/Icones';
 
 /**
  * LE TIROIR DU « + » (2026-09-20, « bouton + du menu du bas : ouvre un tiroir
@@ -13,8 +14,17 @@ import { IconeDuModule } from './iconesModules';
  * et son nom, dans
  * l'ordre de la V1 ; toucher une case mène à la page du module avec son
  * formulaire d'ajout ouvert (« menu + : envoie sur les pages avec formulaire
- * d'ajout ouvert », 2026-08-25). LE STYLE DE LA V2 : le cadre commun des
- * tiroirs, l'icône sur sa pastille bleu clair, le nom à l'encre.
+ * d'ajout ouvert », 2026-08-25). Le cadre commun des tiroirs.
+ *
+ * LES CASES SONT DES CARTES DEPUIS LE 2026-09-25 (« nouveau design pour me
+ * menu + dans ../images pour claude / menu-plus.png / ne mets pas les sous
+ * titres des catégories, garde nos icones la croix de fermeture et nos
+ * textes ») : d'après son image, chaque case est une carte blanche — la
+ * pastille ronde bleu pâle avec l'icône en bleu, un chevron en haut à
+ * droite, le nom en gras dessous, sur deux lignes s'il le faut. Rien de
+ * l'image au-delà de la mise en page et des couleurs (relevées au pixel,
+ * dans `page.css` et les jetons `--ajout-*` des thèmes) : pas de
+ * sous-titre, NOS icônes (`IconeDuModule`), NOTRE titre et NOTRE croix.
  *
  * Le nom du traitement suit la forme répondue (« Injections », « Comprimé »),
  * comme dans la V1 selon la marque. Un module éteint restera visible en
@@ -60,6 +70,11 @@ export function TiroirAjout({
           <button key={module} type="button" className="tiroir__case" onClick={() => onAjouter(module)}>
             <span className="tiroir__icone">
               <IconeDuModule module={module} forme={forme} />
+            </span>
+            {/* Le chevron de l'image, en haut à droite : décoratif, la carte
+                entière est le geste. */}
+            <span className="tiroir__case-chevron" aria-hidden="true">
+              <IconeChevronDroit />
             </span>
             <span className="tiroir__case-nom">
               {module === 'traitement' && forme
