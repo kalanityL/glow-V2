@@ -3,6 +3,7 @@
    et relancer. Une règle par icône de sport : le masque d'une tuile de
    résultat de recherche, à la place de celui de sa catégorie. */
 .categorie--sport-aerobic { --categorie-masque: url('../assets/images/activites/sports/aerobic.png'); }
+.categorie--sport-alpinisme { --categorie-masque: url('../assets/images/activites/sports/alpinisme.png'); }
 .categorie--sport-aquagym { --categorie-masque: url('../assets/images/activites/sports/aquagym.png'); }
 .categorie--sport-arts-martiaux { --categorie-masque: url('../assets/images/activites/sports/arts-martiaux.png'); }
 .categorie--sport-athletisme { --categorie-masque: url('../assets/images/activites/sports/athletisme.png'); }
@@ -10,9 +11,11 @@
 .categorie--sport-basket-ball { --categorie-masque: url('../assets/images/activites/sports/basket-ball.png'); }
 .categorie--sport-bowling { --categorie-masque: url('../assets/images/activites/sports/bowling.png'); }
 .categorie--sport-boxe { --categorie-masque: url('../assets/images/activites/sports/boxe.png'); }
+.categorie--sport-bricolage { --categorie-masque: url('../assets/images/activites/sports/bricolage.png'); }
 .categorie--sport-callisthenie { --categorie-masque: url('../assets/images/activites/sports/callisthenie.png'); }
 .categorie--sport-canoe-kayak-et-aviron { --categorie-masque: url('../assets/images/activites/sports/canoe-kayak-et-aviron.png'); }
 .categorie--sport-cardio { --categorie-masque: url('../assets/images/activites/sports/cardio.png'); }
+.categorie--sport-chasse-et-peche { --categorie-masque: url('../assets/images/activites/sports/chasse-et-peche.png'); }
 .categorie--sport-corde-a-sauter { --categorie-masque: url('../assets/images/activites/sports/corde-a-sauter.png'); }
 .categorie--sport-course-a-pied { --categorie-masque: url('../assets/images/activites/sports/course-a-pied.png'); }
 .categorie--sport-course-aquatique { --categorie-masque: url('../assets/images/activites/sports/course-aquatique.png'); }
@@ -21,8 +24,11 @@
 .categorie--sport-crosse-lacrosse { --categorie-masque: url('../assets/images/activites/sports/crosse-lacrosse.png'); }
 .categorie--sport-curling { --categorie-masque: url('../assets/images/activites/sports/curling.png'); }
 .categorie--sport-danse { --categorie-masque: url('../assets/images/activites/sports/danse.png'); }
+.categorie--sport-entretien-automobile { --categorie-masque: url('../assets/images/activites/sports/entretien-automobile.png'); }
+.categorie--sport-entretien-de-bateau { --categorie-masque: url('../assets/images/activites/sports/entretien-de-bateau.png'); }
 .categorie--sport-equitation { --categorie-masque: url('../assets/images/activites/sports/equitation.png'); }
 .categorie--sport-escalade { --categorie-masque: url('../assets/images/activites/sports/escalade.png'); }
+.categorie--sport-escalier { --categorie-masque: url('../assets/images/activites/sports/escalier.png'); }
 .categorie--sport-escrime { --categorie-masque: url('../assets/images/activites/sports/escrime.png'); }
 .categorie--sport-flechettes-murales-ou-sur-gazon { --categorie-masque: url('../assets/images/activites/sports/flechettes-murales-ou-sur-gazon.png'); }
 .categorie--sport-football-americain { --categorie-masque: url('../assets/images/activites/sports/football-americain.png'); }
@@ -33,17 +39,22 @@
 .categorie--sport-hacky-sack { --categorie-masque: url('../assets/images/activites/sports/hacky-sack.png'); }
 .categorie--sport-handball { --categorie-masque: url('../assets/images/activites/sports/handball.png'); }
 .categorie--sport-hockey { --categorie-masque: url('../assets/images/activites/sports/hockey.png'); }
+.categorie--sport-jardinage { --categorie-masque: url('../assets/images/activites/sports/jardinage.png'); }
 .categorie--sport-jonglage { --categorie-masque: url('../assets/images/activites/sports/jonglage.png'); }
 .categorie--sport-kickball { --categorie-masque: url('../assets/images/activites/sports/kickball.png'); }
+.categorie--sport-luge-toboggan-bobsleigh-luge-de-competition-taylor-code-370 { --categorie-masque: url('../assets/images/activites/sports/luge-toboggan-bobsleigh-luge-de-competition-taylor-code-370.png'); }
 .categorie--sport-lutte-en-competition-un-combat-5-minutes { --categorie-masque: url('../assets/images/activites/sports/lutte-en-competition-un-combat-5-minutes.png'); }
 .categorie--sport-marche-aquatique { --categorie-masque: url('../assets/images/activites/sports/marche-aquatique.png'); }
 .categorie--sport-marche-athletique { --categorie-masque: url('../assets/images/activites/sports/marche-athletique.png'); }
 .categorie--sport-marche { --categorie-masque: url('../assets/images/activites/sports/marche.png'); }
+.categorie--sport-menage-et-entretien-de-la-maison { --categorie-masque: url('../assets/images/activites/sports/menage-et-entretien-de-la-maison.png'); }
+.categorie--sport-motoneige { --categorie-masque: url('../assets/images/activites/sports/motoneige.png'); }
 .categorie--sport-muscu { --categorie-masque: url('../assets/images/activites/sports/muscu.png'); }
 .categorie--sport-natation { --categorie-masque: url('../assets/images/activites/sports/natation.png'); }
 .categorie--sport-netball { --categorie-masque: url('../assets/images/activites/sports/netball.png'); }
 .categorie--sport-paddleball { --categorie-masque: url('../assets/images/activites/sports/paddleball.png'); }
 .categorie--sport-parachutisme-base-jump-saut-a-l-elastique { --categorie-masque: url('../assets/images/activites/sports/parachutisme-base-jump-saut-a-l-elastique.png'); }
+.categorie--sport-patinage { --categorie-masque: url('../assets/images/activites/sports/patinage.png'); }
 .categorie--sport-pedalo { --categorie-masque: url('../assets/images/activites/sports/pedalo.png'); }
 .categorie--sport-pelote-basque-jai-alai { --categorie-masque: url('../assets/images/activites/sports/pelote-basque-jai-alai.png'); }
 .categorie--sport-petanque-boulingrin-bocce-en-exterieur { --categorie-masque: url('../assets/images/activites/sports/petanque-boulingrin-bocce-en-exterieur.png'); }
@@ -52,14 +63,18 @@
 .categorie--sport-plongee { --categorie-masque: url('../assets/images/activites/sports/plongee.png'); }
 .categorie--sport-plongeon-tremplin-ou-plateforme { --categorie-masque: url('../assets/images/activites/sports/plongeon-tremplin-ou-plateforme.png'); }
 .categorie--sport-polo-a-cheval { --categorie-masque: url('../assets/images/activites/sports/polo-a-cheval.png'); }
+.categorie--sport-pratique-musicale { --categorie-masque: url('../assets/images/activites/sports/pratique-musicale.png'); }
 .categorie--sport-racquetball { --categorie-masque: url('../assets/images/activites/sports/racquetball.png'); }
 .categorie--sport-rameur { --categorie-masque: url('../assets/images/activites/sports/rameur.png'); }
 .categorie--sport-randonnee { --categorie-masque: url('../assets/images/activites/sports/randonnee.png'); }
+.categorie--sport-raquettes-a-neige { --categorie-masque: url('../assets/images/activites/sports/raquettes-a-neige.png'); }
 .categorie--sport-rodeo { --categorie-masque: url('../assets/images/activites/sports/rodeo.png'); }
 .categorie--sport-roller { --categorie-masque: url('../assets/images/activites/sports/roller.png'); }
 .categorie--sport-rugby { --categorie-masque: url('../assets/images/activites/sports/rugby.png'); }
+.categorie--sport-saut-a-ski-montee-en-portant-les-skis { --categorie-masque: url('../assets/images/activites/sports/saut-a-ski-montee-en-portant-les-skis.png'); }
 .categorie--sport-skateboard { --categorie-masque: url('../assets/images/activites/sports/skateboard.png'); }
 .categorie--sport-ski-nautique-ou-wakeboard-taylor-code-220 { --categorie-masque: url('../assets/images/activites/sports/ski-nautique-ou-wakeboard-taylor-code-220.png'); }
+.categorie--sport-ski { --categorie-masque: url('../assets/images/activites/sports/ski.png'); }
 .categorie--sport-softball-et-baseball { --categorie-masque: url('../assets/images/activites/sports/softball-et-baseball.png'); }
 .categorie--sport-squash { --categorie-masque: url('../assets/images/activites/sports/squash.png'); }
 .categorie--sport-stand-up-paddle { --categorie-masque: url('../assets/images/activites/sports/stand-up-paddle.png'); }
