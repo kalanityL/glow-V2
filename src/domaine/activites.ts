@@ -40,3 +40,39 @@ export function slugActivite(nom: string): string {
     .replace(/[^a-z0-9]+/g, '-')
     .replace(/^-|-$/g, '');
 }
+
+/** LES TROIS INTENSITÉS RESSENTIES de la V1 (`SportLog.intensity`, SPEC
+    § 4.7) : douce, modérée, intensive — les valeurs de la base. */
+export const INTENSITES = ['douce', 'moderee', 'intensive'] as const;
+export type Intensite = (typeof INTENSITES)[number];
+
+/** LES DURÉES PROPOSÉES (2026-09-25, « on peut choisir le temps avec des
+    choix 15 min 30 min 45 min 1h ou autre ») — en minutes, l'unité de la
+    base. */
+export const DUREES_PROPOSEES = [15, 30, 45, 60] as const;
+
+/**
+ * LES SPORTS OÙ UNE DISTANCE A UN SENS (SPEC § 4.7 : « une distance
+ * facultative en mètres pour les sports où elle a un sens » ; la V1 en
+ * tenait la liste par ses courbes allure → MET, `sportCalories.ts` :
+ * marche, randonnée, course à pied, vélo, natation, rameur et aviron, ski
+ * de fond, patinage et roller). Ici, par nom de nœud de niveau 1 de
+ * l'arbre. Une distance entrée remplace l'intensité (2026-09-25,
+ * « entrer une distance » OU l'intensité ; la V1 : la distance remplie,
+ * l'intensité passe en grisé).
+ */
+export const AVEC_DISTANCE: ReadonlySet<string> = new Set([
+  'Marche',
+  'Randonnée',
+  'Marche athlétique',
+  'Course à pied',
+  'Vélo',
+  'Roller',
+  'Natation',
+  'Canoë, kayak et aviron',
+  'Rameur',
+  'Vélo elliptique',
+  'Ski',
+  'Patinage',
+  'Raquettes à neige',
+]);

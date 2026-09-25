@@ -568,3 +568,45 @@ export function IconeTempsPourSoi() {
     </svg>
   );
 }
+
+/* LES TROIS INTENSITÉS (2026-09-25, « choisir l'intensité avec des pictos
+   qui exprime l'intensité (3 niveaux) sans label ») : un, deux, trois
+   éclairs — le `zap` de Lucide, seul en grand, puis réduits côte à côte. */
+const ECLAIR = 'M4 14a1 1 0 0 1-.78-1.63l9.9-10.2a.5.5 0 0 1 .86.46l-1.92 6.02A1 1 0 0 0 13 10h7a1 1 0 0 1 .78 1.63l-9.9 10.2a.5.5 0 0 1-.86-.46l1.92-6.02A1 1 0 0 0 11 14z';
+
+export function IconeIntensiteDouce() {
+  return (
+    <Icone>
+      <path d={ECLAIR} />
+    </Icone>
+  );
+}
+
+export function IconeIntensiteModeree() {
+  return (
+    <Icone>
+      <g transform="translate(0 4) scale(0.68)">
+        <path d={ECLAIR} />
+      </g>
+      <g transform="translate(8 4) scale(0.68)">
+        <path d={ECLAIR} />
+      </g>
+    </Icone>
+  );
+}
+
+export function IconeIntensiteIntensive() {
+  return (
+    <Icone>
+      <g transform="translate(-1 5) scale(0.6)">
+        <path d={ECLAIR} />
+      </g>
+      <g transform="translate(5.5 5) scale(0.6)">
+        <path d={ECLAIR} />
+      </g>
+      <g transform="translate(12 5) scale(0.6)">
+        <path d={ECLAIR} />
+      </g>
+    </Icone>
+  );
+}

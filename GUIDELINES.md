@@ -947,7 +947,21 @@ des sports (niveau 1) contenus dans la catégorie ») : à la place de
 catégorie, avec l'icône de chaque sport. **Trois catégories par rangée ;
 quatre tuiles par rangée pour les résultats et les sports d'une catégorie**
 (« catégories : 3 par lignes. Résultats de recherche et sports une fois
-qu'on a choisi la catégorie : 4 par ligne »). « Catégories » et neuf tuiles, les catégories de SON tri du Compendium of
+qu'on a choisi la catégorie : 4 par ligne »). **Un sport touché** (le même
+soir, « une fois qu'on clique sur un sport : on peut choisir le temps avec
+des choix 15 min 30 min 45 min 1h ou autre qui si on clique ouvre un
+champs pou rmettre la quantité en minute. Ensuite on peut choisir
+l'intensité avec des pictos qui exprime l'intensité (3 niveaux) sans
+label OU BIEN , si le sport s'y prete, entrer une distance ») : le fil sur
+trois crans (« Catégories › Roues › Vélo », les deux premiers ramènent) ;
+« Durée » et cinq boutons de la matière des paliers — 15 min, 30 min
+(choisi d'avance), 45 min, 1 h, Autre qui ouvre la saisie en minutes ;
+« Intensité » et trois pictos sans mot, un, deux, trois éclairs (les
+mots de la V1, douce / modérée / intensive, dits à qui écoute), modérée
+d'avance ; « ou une distance » en km pour les sports où elle a un sens
+(`AVEC_DISTANCE`, `domaine/activites.ts`, la liste des courbes allure →
+MET de la V1 reportée aux nœuds de l'arbre), qui ÉTEINT l'intensité tant
+qu'elle est remplie — la règle de la V1. « Catégories » et neuf tuiles, les catégories de SON tri du Compendium of
 Physical Activities 2024 (la simulation « Compendium des activités
 physiques » des 24 et 25 septembre : Ballon et balles, Raquettes, Roues,
 Pédestre, Cheval, Individuel, Activités aquatiques, Activités hivernales,

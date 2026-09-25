@@ -4,11 +4,27 @@ import { EntetePage } from './EntetePage';
 import type { FondProps } from './Accueil';
 import { ChoixDate } from '../components/ChoixDate';
 import { ChoixHeure } from '../components/ChoixHeure';
-import { IconeActivite, IconeCalendrier, IconeCoche, IconeCroix, IconeHorloge, IconeRecherche } from '../components/Icones';
+import {
+  IconeActivite,
+  IconeCalendrier,
+  IconeCoche,
+  IconeCroix,
+  IconeHorloge,
+  IconeIntensiteDouce,
+  IconeIntensiteIntensive,
+  IconeIntensiteModeree,
+  IconeRecherche,
+} from '../components/Icones';
 import { MessageEnPlace } from '../components/MessageEnPlace';
 import { chercherActivites } from '../domaine/recherche-activites';
 import type { NoeudActivite } from '../domaine/activites-catalogue';
-import type { ReactNode } from 'react';
+import type { ReactElement, ReactNode } from 'react';
+
+const ICONES_INTENSITE: Record<Intensite, () => ReactElement> = {
+  douce: IconeIntensiteDouce,
+  moderee: IconeIntensiteModeree,
+  intensive: IconeIntensiteIntensive,
+};
 
 /** Le nom d'une tuile de résultat : celui du nœud ; pour une activité seule
     faite nœud, dont le nom est l'intitulé entier du Compendium (« Lutte,
@@ -42,7 +58,7 @@ import { detecterLangue, useTextes } from '../i18n/useTextes';
 import { classeDuTheme } from '../themes/themes';
 import { dateLocale, formaterDateCourte } from '../domaine/dates';
 import { heureLocale, heureRonde } from '../domaine/prises';
-import { CATEGORIES_ACTIVITE, slugActivite, type CategorieActivite } from '../domaine/activites';
+import { AVEC_DISTANCE, CATEGORIES_ACTIVITE, DUREES_PROPOSEES, INTENSITES, slugActivite, type CategorieActivite, type Intensite } from '../domaine/activites';
 import { CATALOGUE_ACTIVITES } from '../domaine/activites-catalogue';
 import type { Forme } from '../domaine/traitements';
 import type { ModuleId } from '../app/modules';
@@ -80,10 +96,13 @@ import { IndiceDefilement } from '../components/IndiceDefilement';
  * formulaires (sobre, le focus à peine plus sombre), pas le bleu de
  * l'image.
  *
- * PAS ENCORE : le choix d'une activité — les résultats et les tuiles sont
- * des blocs, pas des boutons —, la durée, l'intensité, la distance et la
- * note de la V1 (SPEC § 4.7), et l'enregistrement : « Valider » est
- * éteint, jamais caché.
+ * UN SPORT TOUCHÉ (résultat ou tuile d'une catégorie) : le fil sur trois
+ * crans, la durée (15, 30, 45 min, 1 h, ou « Autre » et ses minutes),
+ * l'intensité en trois pictos sans mot — ou, pour les sports où elle a un
+ * sens, une distance en km, qui éteint l'intensité.
+ *
+ * PAS ENCORE : la note de la V1, et l'enregistrement dans `sportHistory`
+ * (SPEC § 4.7) : « Valider » est éteint, jamais caché.
  */
 export function PageActivite({
   forme,
@@ -116,6 +135,26 @@ export function PageActivite({
      fil « Catégories › Roues » — « Catégories » ramène — et les tuiles de
      ses nœuds de niveau 1. */
   const [categorieOuverte, setCategorieOuverte] = useState<CategorieActivite | null>(null);
+  /* LE SPORT CHOISI (2026-09-25, « une fois qu'on clique sur un sport : on
+     peut choisir le temps avec des choix 15 min 30 min 45 min 1h ou autre
+     qui si on clique ouvre un champs pou rmettre la quantité en minute.
+     Ensuite on peut choisir l'intensité avec des pictos qui exprime
+     l'intensité (3 niveaux) sans label OU BIEN, si le sport s'y prete,
+     entrer une distance ») : le fil « Catégories › Roues › Vélo », la
+     durée, puis l'intensité — ou la distance, qui l'éteint (la règle de la
+     V1 : la distance remplie, l'intensité n'est plus prise en compte). */
+  const [sportChoisi, setSportChoisi] = useState<{ categorie: CategorieActivite; noeud: NoeudActivite } | null>(null);
+  const [duree, setDuree] = useState<(typeof DUREES_PROPOSEES)[number] | 'autre'>(30);
+  const [dureeTapee, setDureeTapee] = useState('');
+  const [intensite, setIntensite] = useState<Intensite>('moderee');
+  const [distance, setDistance] = useState('');
+  const distanceEntree = distance.trim() !== '';
+  const choisirSport = (categorie: CategorieActivite, noeud: NoeudActivite) => {
+    setSportChoisi({ categorie, noeud });
+    setCategorieOuverte(categorie);
+    setRequete('');
+    setDistance('');
+  };
   /* Rien à consigner encore : le formulaire ne s'envoie pas. */
   const valider = (evenement: FormEvent) => {
     evenement.preventDefault();
@@ -201,6 +240,7 @@ export function PageActivite({
                         key={`${r.categorie}-${r.noeud.nom}`}
                         classes={`categorie--${r.categorie} categorie--sport-${slugActivite(r.noeud.nom)}`}
                         nom={nomCourt(r.noeud)}
+                        onClick={() => choisirSport(r.categorie, r.noeud)}
                       />
                     ))}
                   </div>
@@ -208,7 +248,109 @@ export function PageActivite({
               </>
             ) : null}
 
-            {categorieOuverte ? (
+            {sportChoisi ? (
+              <>
+                <nav className="activite__fil" aria-label={textes.activite.categories}>
+                  <button
+                    type="button"
+                    className="activite__fil-retour"
+                    onClick={() => {
+                      setSportChoisi(null);
+                      setCategorieOuverte(null);
+                    }}
+                  >
+                    {textes.activite.categories}
+                  </button>
+                  <span className="activite__fil-sep" aria-hidden="true">
+                    ›
+                  </span>
+                  <button type="button" className="activite__fil-retour" onClick={() => setSportChoisi(null)}>
+                    {textes.activite.categorie[sportChoisi.categorie]}
+                  </button>
+                  <span className="activite__fil-sep" aria-hidden="true">
+                    ›
+                  </span>
+                  <span className="activite__fil-courant">{nomCourt(sportChoisi.noeud)}</span>
+                </nav>
+
+                {/* LA DURÉE : quatre choix et « Autre », qui ouvre la saisie en minutes. */}
+                <p className="prise__etiquette">{textes.activite.duree}</p>
+                <div className="prise__boutons" role="radiogroup" aria-label={textes.activite.duree}>
+                  {DUREES_PROPOSEES.map((minutes) => (
+                    <button
+                      key={minutes}
+                      type="button"
+                      role="radio"
+                      aria-checked={duree === minutes}
+                      className={`prise__bouton${duree === minutes ? ' prise__bouton--choisi' : ''}`}
+                      onClick={() => setDuree(minutes)}
+                    >
+                      {textes.activite.durees[String(minutes) as '15' | '30' | '45' | '60']}
+                    </button>
+                  ))}
+                  <button
+                    type="button"
+                    role="radio"
+                    aria-checked={duree === 'autre'}
+                    className={`prise__bouton${duree === 'autre' ? ' prise__bouton--choisi' : ''}`}
+                    onClick={() => setDuree('autre')}
+                  >
+                    {textes.activite.autreDuree}
+                  </button>
+                </div>
+                {duree === 'autre' ? (
+                  <input
+                    className="prise__dose"
+                    type="text"
+                    inputMode="numeric"
+                    placeholder={textes.activite.dureeMinutes}
+                    aria-label={textes.activite.dureeMinutes}
+                    value={dureeTapee}
+                    autoFocus
+                    onChange={(e) => setDureeTapee(e.target.value)}
+                  />
+                ) : null}
+
+                {/* L'INTENSITÉ : trois pictos, sans mot ; éteinte quand une distance est entrée. */}
+                <p className="prise__etiquette">{textes.activite.intensite}</p>
+                <div className="intensites" role="radiogroup" aria-label={textes.activite.intensite}>
+                  {INTENSITES.map((niveau) => {
+                    const Icone = ICONES_INTENSITE[niveau];
+                    const choisi = !distanceEntree && intensite === niveau;
+                    return (
+                      <button
+                        key={niveau}
+                        type="button"
+                        role="radio"
+                        aria-checked={choisi}
+                        aria-label={textes.activite.intensites[niveau]}
+                        className={`prise__bouton intensite${choisi ? ' prise__bouton--choisi' : ''}`}
+                        disabled={distanceEntree}
+                        onClick={() => setIntensite(niveau)}
+                      >
+                        <Icone />
+                      </button>
+                    );
+                  })}
+                </div>
+
+                {/* OU LA DISTANCE, pour les sports où elle a un sens. */}
+                {AVEC_DISTANCE.has(sportChoisi.noeud.nom) ? (
+                  <>
+                    <p className="prise__etiquette">{textes.activite.ouDistance}</p>
+                    <input
+                      className="prise__dose"
+                      type="text"
+                      inputMode="decimal"
+                      placeholder={textes.activite.distanceKm}
+                      aria-label={textes.activite.distanceKm}
+                      value={distance}
+                      onChange={(e) => setDistance(e.target.value)}
+                    />
+                  </>
+                ) : null}
+              </>
+            ) : categorieOuverte ? (
               <>
                 <nav className="activite__fil" aria-label={textes.activite.categories}>
                   <button type="button" className="activite__fil-retour" onClick={() => setCategorieOuverte(null)}>
@@ -225,6 +367,7 @@ export function PageActivite({
                       key={noeud.nom}
                       classes={`categorie--${categorieOuverte} categorie--sport-${slugActivite(noeud.nom)}`}
                       nom={nomCourt(noeud)}
+                      onClick={() => choisirSport(categorieOuverte, noeud)}
                     />
                   ))}
                 </div>

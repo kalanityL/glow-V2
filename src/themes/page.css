@@ -3167,6 +3167,31 @@
   overflow-wrap: anywhere;
 }
 
+/* L'INTENSITÉ (2026-09-25) : trois boutons carrés de la matière des
+   paliers, un picto chacun, sans mot ; éteints quand une distance est
+   entrée (la règle de la V1). */
+.intensites {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.intensite {
+  display: grid;
+  place-items: center;
+  min-height: 48px;
+}
+
+.intensite .icone {
+  width: 26px;
+  height: 26px;
+}
+
+.intensite:disabled {
+  opacity: 0.45;
+  cursor: default;
+}
+
 .categorie__pastille {
   display: grid;
   place-items: center;

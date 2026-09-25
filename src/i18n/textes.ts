@@ -9,7 +9,7 @@ import type { RefusConnexion } from '../domaine/connexion';
 import type { JourRelatif } from '../domaine/dates';
 import type { Zone } from '../domaine/prises';
 import type { SleepKind } from '../donnees/v1';
-import type { CategorieActivite } from '../domaine/activites';
+import type { CategorieActivite, Intensite } from '../domaine/activites';
 import type { EntreeConfirmation, Origine } from '../screens/PageConfirmation';
 import type { Systeme, Unite } from '../domaine/unites';
 import type { Langue } from './langues';
@@ -313,6 +313,17 @@ export interface Textes {
     aucunResultat: string;
     categories: string;
     categorie: Record<CategorieActivite, string>;
+    /** Un sport choisi (2026-09-25) : la durée et ses choix, « Autre » et
+        la saisie en minutes, l'intensité (ses trois niveaux dits à qui
+        écoute, sans mot à l'écran), ou la distance. */
+    duree: string;
+    durees: Record<'15' | '30' | '45' | '60', string>;
+    autreDuree: string;
+    dureeMinutes: string;
+    intensite: string;
+    intensites: Record<Intensite, string>;
+    ouDistance: string;
+    distanceKm: string;
   };
   /** LA PAGE D'UN SOMMEIL (2026-09-21, « fais moi l'écran nouveau sommeil et
    *  confirmation ») : le formulaire de la V1 (`SleepForm.tsx`) et ses
@@ -680,6 +691,15 @@ const FR: Textes = {
       hivernales: 'Activités hivernales',
       autre: 'Autre',
     },
+    duree: 'Durée',
+    durees: { '15': '15 min', '30': '30 min', '45': '45 min', '60': '1 h' },
+    autreDuree: 'Autre',
+    dureeMinutes: 'Durée en minutes',
+    intensite: 'Intensité',
+    /* Les mots de la V1 pour l'intensité ressentie. */
+    intensites: { douce: 'Douce', moderee: 'Modérée', intensive: 'Intensive' },
+    ouDistance: 'ou une distance',
+    distanceKm: 'Distance en km',
   },
   sommeil: {
     titre: 'Nouveau sommeil',
