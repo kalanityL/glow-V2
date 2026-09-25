@@ -334,6 +334,7 @@ export default function App({ verrou = false }: { /** Le verrou de connexion, ar
           ) : page === 'activite' ? (
             <PageActivite
               forme={parcours.reponses.formeTraitement}
+              sportsRecents={journaux.sportsRecents}
               initiale={modification && derniereActivite ? derniereActivite : undefined}
               onValider={validerActivite}
               onAnnuler={() => {

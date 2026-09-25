@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { ACTIVITES_PAR_JOUR_MAX, avecLActivite, kmDepuisSaisie, minutesDepuisSaisie, noeudDuSport, slugActivite } from './activites';
+import { ACTIVITES_PAR_JOUR_MAX, avecLActivite, kmDepuisSaisie, minutesDepuisSaisie, noeudDuSport, slugActivite, sportsRecents } from './activites';
 import type { SportLog } from '../donnees/v1';
 
 const s = (id: string, date: string, time: string): SportLog => ({ id, date, time, sport: 'Vélo', intensity: 'moderee', duration: 30 });
@@ -52,5 +52,14 @@ describe('avecLActivite', () => {
     expect(j).toHaveLength(ACTIVITES_PAR_JOUR_MAX);
     expect(j.some((x) => x.id === 's14')).toBe(false);
     expect(j[0].id).toBe('nouvelle');
+  });
+});
+
+describe('sportsRecents', () => {
+  it('rend les nœuds des noms, dans l’ordre reçu, sans les inconnus, quatre au plus', () => {
+    expect(sportsRecents(['Vélo', 'Inconnu', 'Natation', 'Yoga', 'Marche', 'Boxe']).map((r) => r.noeud.nom)).toEqual(['Vélo', 'Natation', 'Yoga', 'Marche']);
+  });
+  it('se tait sans séance', () => {
+    expect(sportsRecents([])).toEqual([]);
   });
 });

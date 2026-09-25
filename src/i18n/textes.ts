@@ -315,6 +315,8 @@ export interface Textes {
     resultats: string;
     aucunResultat: string;
     categories: string;
+    /** Les sports des dernières séances, sous les catégories (2026-09-26). */
+    recents: string;
     categorie: Record<CategorieActivite, string>;
     /** Un sport choisi (2026-09-25) : la durée et ses choix, « Autre » et
         la saisie en minutes, l'intensité (ses trois niveaux dits à qui
@@ -700,6 +702,7 @@ const FR: Textes = {
     resultats: 'Résultats de recherche',
     aucunResultat: 'Aucune activité ne répond à ce mot.',
     categories: 'Catégories',
+    recents: 'Récents',
     /* Ses neuf catégories, ses mots (24 et 25 septembre 2026). */
     categorie: {
       'ballon-et-balles': 'Ballon et balles',

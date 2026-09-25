@@ -129,3 +129,21 @@ export function avecLActivite(activites: readonly SportLog[], activite: SportLog
   const gardees = duJour.length >= ACTIVITES_PAR_JOUR_MAX ? autres.filter((a) => a !== duJour[duJour.length - 1]) : autres;
   return [...gardees, activite].sort((a, b) => (a.date === b.date ? a.time.localeCompare(b.time) : a.date.localeCompare(b.date)));
 }
+
+/** LES SPORTS RÉCENTS (2026-09-26, « sous catégorie, ajouter : récents »,
+    « met recent avant categories, 4 par ligne, 4 max », « dans l'ordre
+    dans lequel ça a été saisie (date de création ou de mise à jour), pas
+    date de l'activité ») : les noms consignés, du dernier au premier
+    (`app/recents-activite.ts`), retrouvés dans l'arbre — un sport qui n'y
+    est plus se tait —, quatre au plus. */
+export const RECENTS_MAX = 4;
+
+export function sportsRecents(noms: readonly string[]): { categorie: CategorieActivite; noeud: NoeudActivite }[] {
+  const recents: { categorie: CategorieActivite; noeud: NoeudActivite }[] = [];
+  for (const nom of noms) {
+    const n = noeudDuSport(nom);
+    if (n) recents.push(n);
+    if (recents.length >= RECENTS_MAX) break;
+  }
+  return recents;
+}

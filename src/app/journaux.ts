@@ -1,6 +1,7 @@
 import type { AppData, InjectionLog, SleepLog, SportLog, WeightLog } from '../donnees/v1';
 import { avecLeSommeil } from '../domaine/sommeils';
 import { avecLActivite } from '../domaine/activites';
+import { noterSportRecent } from './recents-activite';
 import { avecLaPrise } from '../domaine/prises';
 import { avecLaPesee, garderLeDepart, sansLaPesee } from '../domaine/pesees';
 import { effacerEnregistre, lireEnregistre } from '../plateforme/navigateur';
@@ -25,8 +26,10 @@ export function consignerSommeil(sommeil: SleepLog): AppData {
   return modifierBase((base) => ({ ...base, sleepLogs: avecLeSommeil(base.sleepLogs ?? [], sommeil) }));
 }
 
-/** Une séance d'activité physique, dans `sportLogs` (2026-09-25). */
+/** Une séance d'activité physique, dans `sportLogs` (2026-09-25) — et son
+    sport noté en tête des récents, création ou mise à jour (2026-09-26). */
 export function consignerActivite(activite: SportLog): AppData {
+  noterSportRecent(activite.sport);
   return modifierBase((base) => ({ ...base, sportLogs: avecLActivite(base.sportLogs ?? [], activite) }));
 }
 

@@ -1026,7 +1026,19 @@ d'avance du sport
 par defaut : a pied et raquette 5km ; à velo/roller : 10km ; natation :
 1km ; rameur : 4km ; patinage, ski : pas de possibilité de mettre la
 distance » ; le vélo elliptique avec le vélo, le canoë-kayak-aviron avec
-le rameur, deux rapprochements de moi). **« Marche athlétique » est retirée de l'arbre** (2026-09-26, « supprime
+le rameur, deux rapprochements de moi). **« Récents », avant les catégories** (2026-09-26, « sous catégorie,
+ajouter : récents », « récents : les sports récents, pas les categories
+récentes », puis « met recent avant categories, 4 par ligne, 4 max ») :
+LES SPORTS des dernières séances DANS L'ORDRE DE LA SAISIE (« dans
+l'ordre dans lequel ça a été saisie (date de création ou de mise à jour),
+pas date de l'activité. Une activité future sera présente dans recents ») :
+la ligne de la V1 ne dit pas quand elle a été écrite, la suite des sports
+consignés vit donc sous sa propre clé, `glp1_v2_sports_recents`
+(`app/recents-activite.ts`, versionnée, neuf gardés), le dernier consigné
+en tête, chacun une fois ; la page en montre quatre, en tuiles sur quatre
+colonnes qui choisissent le sport ; rien sans séance (`sportsRecents`,
+testé).
+**« Marche athlétique » est retirée de l'arbre** (2026-09-26, « supprime
 "marche athlétique" de la liste des sports ») : ses quatre activités
 aussi, `arbre.json` corrigé et le catalogue régénéré. « Catégories » et neuf tuiles, les catégories de SON tri du Compendium of
 Physical Activities 2024 (la simulation « Compendium des activités
