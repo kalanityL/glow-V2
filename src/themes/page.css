@@ -3101,6 +3101,17 @@
   gap: 6px;
 }
 
+/* Le nombre par rangée est dit (2026-09-25, « catégories : 3 par lignes.
+   Résultats de recherche et sports une fois qu'on a choisi la catégorie :
+   4 par ligne ») : colonnes égales, quel que soit l'écran. */
+.categories--3 {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.categories--4 {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
 .categorie {
   display: flex;
   flex-direction: column;
@@ -3111,6 +3122,49 @@
   border-radius: 12px;
   background: var(--module-fond);
   box-shadow: var(--ajout-carte-ombre);
+}
+
+/* Une tuile qui mène quelque part est un bouton : rien de la matière d'un
+   bouton, la tuile telle quelle. */
+.categorie--bouton {
+  margin: 0;
+  border: 0;
+  color: inherit;
+  font: inherit;
+  text-align: center;
+  cursor: pointer;
+}
+
+/* LE FIL D'ARIANE d'une catégorie ouverte (2026-09-25) : « Catégories »,
+   qui ramène, le chevron en filet, le nom de la catégorie à l'encre — à la
+   place de l'intitulé « Catégories », dans sa graisse. */
+.activite__fil {
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+  min-width: 0;
+  font-family: var(--font-body);
+  font-size: 15px;
+  color: var(--encre);
+}
+
+.activite__fil-retour {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--encre-chapeau);
+  font: inherit;
+  cursor: pointer;
+}
+
+.activite__fil-sep {
+  color: var(--option-filet);
+}
+
+.activite__fil-courant {
+  min-width: 0;
+  overflow-wrap: anywhere;
 }
 
 .categorie__pastille {

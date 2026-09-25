@@ -22,3 +22,21 @@ export const CATEGORIES_ACTIVITE = [
 ] as const;
 
 export type CategorieActivite = (typeof CATEGORIES_ACTIVITE)[number];
+
+/**
+ * LE SLUG D'UN NŒUD (2026-09-25, « resultat de recherche : les icones
+ * doivent etre celle du sport ») : le nom d'un nœud de niveau 1, en
+ * minuscules sans accents, tout ce qui n'est pas lettre ou chiffre devenu
+ * un tiret — c'est le nom de son icône, un masque de
+ * `src/assets/images/activites/sports/`, posé par
+ * `themes/activites-icones.css` (engendré). Un nœud sans icône garde celle
+ * de sa catégorie.
+ */
+export function slugActivite(nom: string): string {
+  return nom
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-|-$/g, '');
+}

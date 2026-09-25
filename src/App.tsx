@@ -36,6 +36,8 @@ import './themes/degrade-doux/degrade-doux.css';
 /* La palette de chaque fond — engendrée par `scripts/palette-fonds.py`
    depuis les images —, après les thèmes : elle rebranche leurs jetons. */
 import './themes/fonds-palette.css';
+/* Les icônes des sports des résultats de recherche (2026-09-25), engendrées. */
+import './themes/activites-icones.css';
 
 /**
  * V2 — repartie de zéro.

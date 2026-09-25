@@ -915,7 +915,14 @@ recherche le sport de niveau 1 correspondant ») — la loupe, le mot, la
 croix qui efface, à la charte des formulaires et non au bleu de l'image ;
 dessous, « Résultats de recherche (n) » et des tuiles COMME CELLES DES
 CATÉGORIES (« resultat de recherche : Meme mise en page que categorie »),
-l'icône de la catégorie et le nom du nœud — une activité seule réduite à
+L'ICÔNE DU SPORT (« resultat de recherche : les icones doivent etre celle
+du sport (cf ../images pour claude tu as toutes les icones sur les
+fichiers dans icones) » : ses planches par catégorie, découpées en masques
+`src/assets/images/activites/sports/<slug>.png` — le slug du nom du nœud,
+`domaine/activites.ts` —, et `scripts/engendrer-icones-activites.mjs` en
+écrit `src/themes/activites-icones.css`, une règle par icône, à relancer à
+chaque masque déposé ; un nœud sans planche, ceux des activités hivernales
+et de « Autre », garde l'icône de sa catégorie) et le nom du nœud — une activité seule réduite à
 ce qui précède sa première virgule ; un résultat est TOUJOURS UN NŒUD DE
 NIVEAU 1 de l'arbre (un groupe d'une catégorie, ou une activité seule),
 jamais une catégorie ni un sous-groupe, et un mot trouvé dans un
@@ -932,7 +939,15 @@ anglais, le code du Compendium), `scripts/engendrer-activites.mjs` en
 écrit `src/domaine/activites-catalogue.ts` — à relancer à chaque
 correction de l'arbre ; les noms des activités sont des données du
 catalogue, comme ceux des traitements, pas des textes du dictionnaire.
-« Catégories » et neuf tuiles, les catégories de SON tri du Compendium of
+**Une catégorie touchée** (le même soir, « si on clique sur une catégorie,
+on voit le nom de la catégorie en fil d'arianne et on affiche les icones
+des sports (niveau 1) contenus dans la catégorie ») : à la place de
+« Catégories » et des neuf tuiles, le fil « Catégories › Roues » —
+« Catégories » ramène — et les tuiles des nœuds de niveau 1 de la
+catégorie, avec l'icône de chaque sport. **Trois catégories par rangée ;
+quatre tuiles par rangée pour les résultats et les sports d'une catégorie**
+(« catégories : 3 par lignes. Résultats de recherche et sports une fois
+qu'on a choisi la catégorie : 4 par ligne »). « Catégories » et neuf tuiles, les catégories de SON tri du Compendium of
 Physical Activities 2024 (la simulation « Compendium des activités
 physiques » des 24 et 25 septembre : Ballon et balles, Raquettes, Roues,
 Pédestre, Cheval, Individuel, Activités aquatiques, Activités hivernales,
