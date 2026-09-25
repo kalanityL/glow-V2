@@ -902,8 +902,13 @@ couleur vert, reprends juste l'idée, remplace le vert par notre bleu de
 pastille bleu). les icones sont dans ../imagespour claude / icones/sport.
 pour la recherche laisse la blank, on s'occupera apres de la fonctionnalité
 de recherche et son design ») : la case « Activité Physique » du tiroir du
-« + » y mène (`PageActivite`). L'entête des pages et la barre du bas ;
-« Catégories » et neuf tuiles, les catégories de SON tri du Compendium of
+« + » y mène (`PageActivite`). **C'est un formulaire, comme celui d'une
+prise** (le même soir, « nouvelle activité physique est un formulaire,
+comme nouvelle injection ») : l'entête des pages, la barre du bas, et la
+carte — le bandeau avec l'icône du module, « Nouvelle activité physique »
+et la croix ; le corps qui défile, avec la date et l'heure côte à côte
+puis « Catégories » ; « Valider » au pied, éteint tant qu'il n'y a rien à
+consigner. « Catégories » et neuf tuiles, les catégories de SON tri du Compendium of
 Physical Activities 2024 (la simulation « Compendium des activités
 physiques » des 24 et 25 septembre : Ballon et balles, Raquettes, Roues,
 Pédestre, Cheval, Individuel, Activités aquatiques, Activités hivernales,

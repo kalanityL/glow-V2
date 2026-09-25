@@ -301,6 +301,9 @@ export interface Textes {
    *  ajouter une activité physique ») : le titre de la liste des
    *  catégories, et le nom de chacune — les neuf de son tri du Compendium. */
   activite: {
+    /** Le bandeau du formulaire (2026-09-25, « nouvelle activité physique
+        est un formulaire, comme nouvelle injection »). */
+    titre: string;
     categories: string;
     categorie: Record<CategorieActivite, string>;
   };
@@ -652,6 +655,7 @@ const FR: Textes = {
     remplacer: (date) => `Une saisie existe déjà le ${date}. La mettre à jour ?`,
   },
   activite: {
+    titre: 'Nouvelle activité physique',
     categories: 'Catégories',
     /* Ses neuf catégories, ses mots (24 et 25 septembre 2026). */
     categorie: {

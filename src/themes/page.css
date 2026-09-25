@@ -3003,44 +3003,29 @@
 }
 
 /* ── LA PAGE D'UNE ACTIVITÉ PHYSIQUE (2026-09-25, son image « Ajouter une
-   activité ») : « Catégories », puis les tuiles — cinq par rangée sur
-   l'image (86 px de pastille pour 512 px d'écran) ; ici des colonnes égales
-   d'au moins 68 px — cinq dans la colonne de page de 380 px, quatre sur un
-   téléphone plus étroit. Chaque tuile : une carte comme celles du tiroir du « + » (même
-   fond, même ombre), la pastille et l'icône aux mêmes jetons — « pas de
-   couleur vert, remplace le vert par notre bleu de pastille bleu » —, le
-   nom dessous, centré parce que la tuile est un carré sous une pastille.
-   L'ICÔNE EST UN MASQUE : ses planches (`Images-pour-claude/icones/sport/`)
-   découpées en PNG à canal alpha (`src/assets/images/activites/`), que la
-   feuille remplit de la couleur de l'icône du « + » — le thème la peint,
-   comme un SVG à `currentColor`. Le masque est nommé par tuile dans une
-   propriété personnalisée : ce n'est pas une couleur, `page.css` peut le
-   dire. ──────────────────────────────────────────────────────────────── */
-.activite {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-  flex: 0 1 auto;
-  min-height: 0;
-  overflow-y: auto;
-  padding-bottom: 8px;
-}
-
-.activite > * {
-  flex: none;
-}
-
-.activite__titre {
-  margin: 4px 0 0;
-  font-family: var(--font-body);
-  font-weight: 500;
-  font-size: 16px;
-  color: var(--encre);
-}
-
+   activité ») — UN FORMULAIRE COMME CELUI D'UNE PRISE (le même soir,
+   « nouvelle activité physique est un formulaire, comme nouvelle
+   injection ») : la carte `.prise`, son bandeau, son corps qui défile et
+   son pied ; dans le corps, après la date et l'heure, l'intitulé
+   « Catégories » (`.prise__etiquette`, celui de « Zone d'injection ») et
+   les tuiles — cinq par rangée sur l'image (86 px de pastille pour 512 px
+   d'écran) ; ici des colonnes égales d'au moins 62 px, cinq dans le corps
+   de la carte, quatre sur un téléphone plus étroit. Chaque tuile : une
+   carte comme celles du tiroir du « + » (même fond, même ombre), la
+   pastille et l'icône aux mêmes jetons — « pas de couleur vert, remplace
+   le vert par notre bleu de pastille bleu » —, le nom dessous, centré
+   parce que la tuile est un carré sous une pastille. L'ICÔNE EST UN
+   MASQUE : ses planches (`Images-pour-claude/icones/sport/`) découpées en
+   PNG à canal alpha (`src/assets/images/activites/`), que la feuille
+   remplit de la couleur de l'icône du « + » — le thème la peint, comme un
+   SVG à `currentColor`. Le masque est nommé par tuile dans une propriété
+   personnalisée : ce n'est pas une couleur, `page.css` peut le dire.
+   Le corps de la carte est plus étroit que la page : les tuiles ont perdu
+   quelques pixels (68 → 62 de plancher), la pastille reste à 48 et
+   l'icône à 34 (« + grandes de 2 tailles »). ─────────────────────────── */
 .categories {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(68px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(62px, 1fr));
   gap: 6px;
 }
 
