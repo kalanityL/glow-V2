@@ -571,7 +571,11 @@ export function IconeTempsPourSoi() {
 
 /* LES TROIS INTENSITÉS (2026-09-25, « choisir l'intensité avec des pictos
    qui exprime l'intensité (3 niveaux) sans label ») : un, deux, trois
-   éclairs — le `zap` de Lucide, seul en grand, puis réduits côte à côte. */
+   éclairs — le `zap` de Lucide, LES MÊMES ÉCLAIRS, À LA MÊME TAILLE
+   (2026-09-25 au soir, « intensité 2 et 3 : les éclairs font la meme
+   taille que pour intensité 1 ») : la fenêtre s'élargit d'un éclair à
+   l'autre (24, 44, 64), la feuille fixe la hauteur et laisse la largeur
+   suivre. */
 const ECLAIR = 'M4 14a1 1 0 0 1-.78-1.63l9.9-10.2a.5.5 0 0 1 .86.46l-1.92 6.02A1 1 0 0 0 13 10h7a1 1 0 0 1 .78 1.63l-9.9 10.2a.5.5 0 0 1-.86-.46l1.92-6.02A1 1 0 0 0 11 14z';
 
 export function IconeIntensiteDouce() {
@@ -584,29 +588,25 @@ export function IconeIntensiteDouce() {
 
 export function IconeIntensiteModeree() {
   return (
-    <Icone>
-      <g transform="translate(0 4) scale(0.68)">
+    <svg className="icone icone--deux-eclairs" viewBox="0 0 44 24" aria-hidden="true" focusable="false">
+      <path d={ECLAIR} />
+      <g transform="translate(20 0)">
         <path d={ECLAIR} />
       </g>
-      <g transform="translate(8 4) scale(0.68)">
-        <path d={ECLAIR} />
-      </g>
-    </Icone>
+    </svg>
   );
 }
 
 export function IconeIntensiteIntensive() {
   return (
-    <Icone>
-      <g transform="translate(-1 5) scale(0.6)">
+    <svg className="icone icone--trois-eclairs" viewBox="0 0 64 24" aria-hidden="true" focusable="false">
+      <path d={ECLAIR} />
+      <g transform="translate(20 0)">
         <path d={ECLAIR} />
       </g>
-      <g transform="translate(5.5 5) scale(0.6)">
+      <g transform="translate(40 0)">
         <path d={ECLAIR} />
       </g>
-      <g transform="translate(12 5) scale(0.6)">
-        <path d={ECLAIR} />
-      </g>
-    </Icone>
+    </svg>
   );
 }

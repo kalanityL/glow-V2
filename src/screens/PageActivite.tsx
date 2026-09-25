@@ -364,7 +364,7 @@ export function PageActivite({
                   </div>
                 ) : (
                   <div className="distance">
-                    <CadranDistance km={distanceKm} onKm={setDistanceKm} nom={textes.activite.distanceKm} ecrire={ecrireKm} />
+                    <CadranDistance km={distanceKm} onKm={setDistanceKm} nom={textes.activite.distanceKm} ecrire={(k) => `${ecrireKm(k)} ${textes.activite.km}`} />
                     {/* La valeur en cases : la dizaine est une case même vide (un
                         zéro invisible), les chiffres sont tabulaires — rien ne
                         saute en passant 10 km. */}

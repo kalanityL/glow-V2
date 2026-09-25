@@ -959,19 +959,27 @@ trois crans (« Catégories › Roues › Vélo », les deux premiers ramènent)
 saisie des minutes prend sa place dans la grille (« si on clique sur
 "autre" : le champ autre disparait et le champ ou on rentre les minutes
 prend sa place ») ; « Intensité » et trois pictos sans mot, un, deux,
-trois éclairs (les mots de la V1, douce / modérée / intensive, dits à qui
-écoute), modérée d'avance ; POUR LES SPORTS OÙ UNE DISTANCE A UN SENS,
+trois éclairs DE LA MÊME TAILLE (« intensité 2 et 3 : les éclairs font
+la meme taille que pour intensité 1 ») (les mots de la V1, douce /
+modérée / intensive, dits à qui écoute), modérée d'avance ; POUR LES SPORTS OÙ UNE DISTANCE A UN SENS,
 DEUX ONGLETS à l'encre, Intensité et Distance (« systeme d'onglet : un
 onglet intensite un onglet distance ») — l'onglet ouvert dit ce qui
-compte —, et sous Distance LE CADRAN DE LA DISTANCE
+compte —, et sous Distance LA PISTE DE LA DISTANCE
 (`components/CadranDistance.tsx` : « un rond sur le meme principe que
 l'horloge où un tour complet est 1km, meme son que l'horloge, si on fait
 plus d'un tour complet les lables évoluent accordingly, il ne se passe
-rien si on est deja a zero et qu'on recule encore ») — le cercle et les
-crans du cadran de l'heure, vingt crans de 50 m par tour, un clic
-« Plastique » par cran, les quatre repères disent le kilomètre du tour en
-cours et ses quarts, la boule ne recule pas sous zéro, la valeur en
-pastille dessous — TOUJOURS DEUX DÉCIMALES, chiffres tabulaires, la
+rien si on est deja a zero et qu'on recule encore », puis son image, le
+même soir : « à la place de l'horloge (garde le meme design mais mets
+cette forme à la place). on peut faire circuler le point en suivant le
+rectangle ou en faisant des cercles ça doit marcher aussi ») — UNE PISTE,
+deux droites et deux demi-cercles, avec les crans et la boule du cadran
+de l'heure et le tracé en dégradé du départ à la boule, vingt crans de
+50 m par tour, un clic « Plastique » par cran, les quatre repères disent
+la distance au quart, à la moitié, aux trois quarts et au bout du tour en
+cours (« 1,25 km … 2,00 km »), LE DOIGT PEUT SUIVRE LA PISTE OU TOURNER
+EN ROND (la boule va au point de la piste le plus proche du doigt, le
+plus court chemin le long de la piste fait les tours), la boule ne recule
+pas sous zéro, la valeur en pastille dessous — TOUJOURS DEUX DÉCIMALES, chiffres tabulaires, la
 dizaine une case même vide (« distance : fixer la largeur des unités
 dizaines etc.. pour que ça ne saute pas qd modifie ») —, au départ la
 distance d'avance du sport

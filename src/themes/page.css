@@ -3245,11 +3245,24 @@
   margin-left: 6px;
 }
 
-/* Les repères du cadran de la distance, à deux décimales : la même largeur
-   d'un tour à l'autre — et plus petits que ceux de l'heure, « 10,75 » et
-   « 10,25 » se touchaient au milieu. */
+/* LA PISTE (2026-09-25 au soir, son image « à la place de l'horloge ») :
+   plus large que haute, sur toute la largeur du corps au plus ; le tracé
+   fermé en filet, comme le cercle de l'heure. Les repères à deux
+   décimales et l'unité, tabulaires, petits — la même largeur d'un tour à
+   l'autre. */
+/* Nommée depuis `.distance` : la règle `.cadran` (150 px, carrée) vient
+   plus loin dans la feuille et gagnerait sinon. */
+.distance .cadran--piste {
+  max-width: 300px;
+  aspect-ratio: 280 / 110;
+}
+
+.distance .cadran--piste .cadran__cercle {
+  fill: none;
+}
+
 .distance .cadran__repere {
-  font-size: 6.5px;
+  font-size: 8px;
   font-variant-numeric: tabular-nums;
 }
 
@@ -3270,6 +3283,17 @@
 .intensite .icone {
   width: 26px;
   height: 26px;
+}
+
+/* Deux et trois éclairs, à la taille du premier : la hauteur est la même,
+   la largeur suit la fenêtre (2026-09-25 au soir, « intensité 2 et 3 :
+   les éclairs font la meme taille que pour intensité 1 »). */
+.intensite .icone--deux-eclairs {
+  width: 48px;
+}
+
+.intensite .icone--trois-eclairs {
+  width: 70px;
 }
 
 

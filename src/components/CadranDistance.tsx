@@ -7,27 +7,78 @@ import { SON_DU_CADRAN, morceauxDuSon } from '../app/sons';
 const CLICS = morceauxDuSon(SON_DU_CADRAN);
 
 /**
- * LE CADRAN D'UNE DISTANCE (2026-09-25, « Pour la distance, un rond sur le
+ * LA PISTE D'UNE DISTANCE (2026-09-25, « Pour la distance, un rond sur le
  * meme principe que l'horloge où un tour complet est 1km, meme son que
  * l'horloge, si on fait plus d'un tour complet les lables évoluent
  * accordingly, il ne se passe rien si on est deja a zero et qu'on recule
- * encore ») : le cercle et les crans du cadran de l'heure, une boule qu'on
- * glisse ; UN TOUR VAUT UN KILOMÈTRE, vingt crans de 50 m, un clic par
- * cran ; les quatre repères disent le kilomètre du tour en cours (« 0 ·
- * 0,25 · 0,5 · 0,75 », puis « 1 · 1,25 · 1,5 · 1,75 » au second tour…) ;
- * sous zéro, la boule ne recule pas. La valeur est en kilomètres, sur des
- * crans de 0,05 ; l'appelant l'écrit et la convertit en mètres pour la
- * base.
+ * encore » — puis, son image : « à la place de l'horloge (garde le meme
+ * design mais mets cette forme à la place). on peut faire circuler le
+ * point en suivant le rectangle ou en faisant des cercles ça doit marcher
+ * aussi ») : une PISTE — deux droites et deux demi-cercles —, les crans et
+ * la boule du cadran de l'heure, le tracé en dégradé du départ à la boule ;
+ * UN TOUR VAUT UN KILOMÈTRE, vingt crans de 50 m, un clic par cran ; les
+ * quatre repères disent la distance au quart, à la moitié, aux trois
+ * quarts et au bout du tour en cours (« 0,25 km · 0,5 km · 0,75 km ·
+ * 1 km », puis « 1,25 km … 2 km » au second tour) ; sous zéro, la boule
+ * ne recule pas. LE DOIGT PEUT SUIVRE LA PISTE OU TOURNER EN ROND : la
+ * boule va au point de la piste le plus proche du doigt, et le plus court
+ * chemin le long de la piste depuis le point d'avant fait les tours dans
+ * les deux sens. La valeur est en kilomètres, sur des crans de 0,05 ;
+ * l'appelant l'écrit et la convertit en mètres pour la base.
  */
-const RAYON = 40;
-const CENTRE = 50;
+const LARGEUR = 280;
+const HAUTEUR = 110;
+const RAYON = 32;
+const DROITE = 100;
+const GAUCHE = { x: 90, y: 55 };
+const DROIT = { x: 190, y: 55 };
+const HAUT = GAUCHE.y - RAYON;
+const BAS = GAUCHE.y + RAYON;
+const DEMI_TOUR = Math.PI * RAYON;
+/** Le tour entier de la piste, en unités de la fenêtre. */
+const PERIMETRE = 2 * DROITE + 2 * DEMI_TOUR;
 const CRANS_PAR_TOUR = 20;
 const PAS_KM = 1 / CRANS_PAR_TOUR;
+const DEPART = { x: (GAUCHE.x + DROIT.x) / 2, y: HAUT };
 
-/** L'angle depuis le haut, dans le sens des aiguilles, de la part de tour. */
-function angleDe(km: number): number {
-  const part = km - Math.floor(km + 1e-9);
-  return part * 360;
+/** Le point de la piste à la distance `s` du départ (le haut, au milieu),
+    dans le sens des aiguilles, et la normale qui rentre dans la piste. */
+function surLaPiste(s: number): { x: number; y: number; nx: number; ny: number } {
+  let d = ((s % PERIMETRE) + PERIMETRE) % PERIMETRE;
+  if (d < DROITE / 2) return { x: DEPART.x + d, y: HAUT, nx: 0, ny: 1 };
+  d -= DROITE / 2;
+  if (d < DEMI_TOUR) {
+    const a = -Math.PI / 2 + d / RAYON;
+    return { x: DROIT.x + RAYON * Math.cos(a), y: DROIT.y + RAYON * Math.sin(a), nx: -Math.cos(a), ny: -Math.sin(a) };
+  }
+  d -= DEMI_TOUR;
+  if (d < DROITE) return { x: DROIT.x - d, y: BAS, nx: 0, ny: -1 };
+  d -= DROITE;
+  if (d < DEMI_TOUR) {
+    const a = Math.PI / 2 + d / RAYON;
+    return { x: GAUCHE.x + RAYON * Math.cos(a), y: GAUCHE.y + RAYON * Math.sin(a), nx: -Math.cos(a), ny: -Math.sin(a) };
+  }
+  d -= DEMI_TOUR;
+  return { x: GAUCHE.x + d, y: HAUT, nx: 0, ny: 1 };
+}
+
+/** La piste échantillonnée, pour trouver le point le plus proche du doigt. */
+const ECHANTILLONS = Array.from({ length: 240 }, (_, i) => {
+  const s = (i / 240) * PERIMETRE;
+  const p = surLaPiste(s);
+  return { s, x: p.x, y: p.y };
+});
+
+/** Un morceau du tracé entre deux distances, en petits segments droits. */
+function trace(s0: number, s1: number): string {
+  const n = Math.max(1, Math.ceil((s1 - s0) / 3));
+  const p0 = surLaPiste(s0);
+  let d = `M ${p0.x.toFixed(2)} ${p0.y.toFixed(2)}`;
+  for (let i = 1; i <= n; i++) {
+    const p = surLaPiste(s0 + ((s1 - s0) * i) / n);
+    d += ` L ${p.x.toFixed(2)} ${p.y.toFixed(2)}`;
+  }
+  return d;
 }
 
 export function CadranDistance({
@@ -39,41 +90,47 @@ export function CadranDistance({
   km: number;
   onKm: (km: number) => void;
   nom: string;
-  /** Le nombre écrit pour qui écoute (« 5,25 km »), dans la langue. */
+  /** Le nombre écrit, dans la langue (« 5,25 ») ; le composant y ajoute l'unité. */
   ecrire: (km: number) => string;
-}) {
-  const cadran = useRef<SVGSVGElement>(null);
-  /* Pendant un glissement : l'angle d'avant et les kilomètres NON ARRONDIS
-     depuis le départ, pour compter les tours dans les deux sens. */
-  const glisse = useRef<{ angle: number; km: number } | null>(null);
+  }) {
+  const piste = useRef<SVGSVGElement>(null);
+  /* Pendant un glissement : la distance sur la piste d'avant et les
+     kilomètres NON ARRONDIS depuis le départ, pour compter les tours. */
+  const glisse = useRef<{ s: number; km: number } | null>(null);
   const crans = Math.round(km / PAS_KM);
-  const angle = angleDe(crans * PAS_KM);
-  const rad = ((angle - 90) * Math.PI) / 180;
-  const boule = { x: CENTRE + RAYON * Math.cos(rad), y: CENTRE + RAYON * Math.sin(rad) };
+  const part = crans * PAS_KM - Math.floor(crans * PAS_KM + 1e-9);
+  const sBoule = part * PERIMETRE;
+  const boule = surLaPiste(sBoule);
   const tour = Math.floor(crans / CRANS_PAR_TOUR);
-  /* Les repères du tour en cours : le kilomètre du tour, puis ses quarts. */
-  const reperes = [0, 0.25, 0.5, 0.75].map((q) => ecrire(tour + q));
+  /* Les repères : la distance au quart, à la moitié, aux trois quarts, au
+     bout du tour en cours. */
+  const reperes = [0.25, 0.5, 0.75, 1].map((q) => ecrire(tour + q));
 
-  const PAS = 4;
-  const segments = Math.ceil(angle / PAS);
-  const point = (deg: number) => {
-    const r = ((deg - 90) * Math.PI) / 180;
-    return { x: CENTRE + RAYON * Math.cos(r), y: CENTRE + RAYON * Math.sin(r) };
-  };
-  const arc = Array.from({ length: segments }, (_, i) => {
-    const p0 = point(i * PAS);
-    const p1 = point(Math.min(angle, (i + 1) * PAS));
-    return { d: `M ${p0.x} ${p0.y} A ${RAYON} ${RAYON} 0 0 1 ${p1.x} ${p1.y}`, part: segments === 1 ? 1 : i / (segments - 1) };
-  });
+  const PAS = 5;
+  const segments = Math.ceil(sBoule / PAS);
+  const arc = Array.from({ length: segments }, (_, i) => ({
+    d: trace(i * PAS, Math.min(sBoule, (i + 1) * PAS)),
+    part: segments === 1 ? 1 : i / (segments - 1),
+  }));
 
-  const angleSous = (e: PointerEvent): number => {
-    const r = cadran.current!.getBoundingClientRect();
-    const x = e.clientX - (r.left + r.width / 2);
-    const y = e.clientY - (r.top + r.height / 2);
-    return ((Math.atan2(y, x) * 180) / Math.PI + 90 + 360) % 360;
+  /* La distance sur la piste du point le plus proche du doigt. */
+  const sSous = (e: PointerEvent): number => {
+    const r = piste.current!.getBoundingClientRect();
+    const x = ((e.clientX - r.left) * LARGEUR) / r.width;
+    const y = ((e.clientY - r.top) * HAUTEUR) / r.height;
+    let meilleur = ECHANTILLONS[0];
+    let dist = Infinity;
+    for (const p of ECHANTILLONS) {
+      const d = (p.x - x) ** 2 + (p.y - y) ** 2;
+      if (d < dist) {
+        dist = d;
+        meilleur = p;
+      }
+    }
+    return meilleur.s;
   };
   /* Poser des kilomètres bruts : jamais sous zéro, arrondis au cran ; un cran
-     franchi clique. */
+     franchi clique (trois au plus d'un coup). */
   const poser = (brut: number) => {
     const nouveaux = Math.max(0, Math.round(brut / PAS_KM));
     if (nouveaux !== crans) {
@@ -84,9 +141,9 @@ export function CadranDistance({
 
   return (
     <svg
-      ref={cadran}
-      className="cadran"
-      viewBox="0 0 100 100"
+      ref={piste}
+      className="cadran cadran--piste"
+      viewBox={`0 0 ${LARGEUR} ${HAUTEUR}`}
       role="slider"
       aria-label={nom}
       aria-valuetext={ecrire(km)}
@@ -94,23 +151,23 @@ export function CadranDistance({
       aria-valuenow={km}
       onPointerDown={(e) => {
         e.currentTarget.setPointerCapture(e.pointerId);
-        const a = angleSous(e);
+        const s = sSous(e);
         /* La boule saute sous le doigt, dans le tour où l'on est. */
-        const brut = tour + a / 360;
-        glisse.current = { angle: a, km: brut };
+        const brut = tour + s / PERIMETRE;
+        glisse.current = { s, km: brut };
         poser(brut);
       }}
       onPointerMove={(e) => {
         if (!glisse.current) return;
-        const a = angleSous(e);
-        /* Le plus court chemin depuis l'angle d'avant : passer le haut du
-           cadran fait un tour de plus ou de moins. */
-        let delta = a - glisse.current.angle;
-        if (delta > 180) delta -= 360;
-        if (delta < -180) delta += 360;
-        /* Sous zéro, rien ne bouge : les kilomètres bruts s'arrêtent à zéro. */
-        const brut = Math.max(0, glisse.current.km + delta / 360);
-        glisse.current = { angle: a, km: brut };
+        const s = sSous(e);
+        /* Le plus court chemin le long de la piste depuis le point d'avant :
+           passer le départ fait un tour de plus ou de moins. */
+        let delta = s - glisse.current.s;
+        if (delta > PERIMETRE / 2) delta -= PERIMETRE;
+        if (delta < -PERIMETRE / 2) delta += PERIMETRE;
+        /* Sous zéro, rien ne bouge. */
+        const brut = Math.max(0, glisse.current.km + delta / PERIMETRE);
+        glisse.current = { s, km: brut };
         poser(brut);
       }}
       onPointerUp={() => {
@@ -120,31 +177,32 @@ export function CadranDistance({
         glisse.current = null;
       }}
     >
-      <circle className="cadran__cercle" cx={CENTRE} cy={CENTRE} r={RAYON} />
+      <path className="cadran__cercle" d={`${trace(0, PERIMETRE)} Z`} />
+      {/* Les crans, vingt par tour, les quatre des quarts plus longs. */}
       {Array.from({ length: CRANS_PAR_TOUR }, (_, i) => {
-        const a = ((i * (360 / CRANS_PAR_TOUR) - 90) * Math.PI) / 180;
+        const p = surLaPiste((i / CRANS_PAR_TOUR) * PERIMETRE);
         const longueur = i % 5 === 0 ? 5 : 2.5;
         return (
           <line
             key={i}
             className={`cadran__cran${i % 5 === 0 ? ' cadran__cran--heure' : ''}`}
-            x1={CENTRE + (RAYON - 1) * Math.cos(a)}
-            y1={CENTRE + (RAYON - 1) * Math.sin(a)}
-            x2={CENTRE + (RAYON - 1 - longueur) * Math.cos(a)}
-            y2={CENTRE + (RAYON - 1 - longueur) * Math.sin(a)}
+            x1={p.x + p.nx}
+            y1={p.y + p.ny}
+            x2={p.x + p.nx * (1 + longueur)}
+            y2={p.y + p.ny * (1 + longueur)}
           />
         );
       })}
-      <text className="cadran__repere" x={CENTRE} y={CENTRE - RAYON + 15} textAnchor="middle">
+      <text className="cadran__repere" x={DROIT.x + RAYON + 5} y={DROIT.y + 3.5} textAnchor="start">
         {reperes[0]}
       </text>
-      <text className="cadran__repere" x={CENTRE + RAYON - 9} y={CENTRE + 3.5} textAnchor="end">
+      <text className="cadran__repere" x={DEPART.x} y={BAS + 13} textAnchor="middle">
         {reperes[1]}
       </text>
-      <text className="cadran__repere" x={CENTRE} y={CENTRE + RAYON - 9} textAnchor="middle">
+      <text className="cadran__repere" x={GAUCHE.x - RAYON - 5} y={GAUCHE.y + 3.5} textAnchor="end">
         {reperes[2]}
       </text>
-      <text className="cadran__repere" x={CENTRE - RAYON + 9} y={CENTRE + 3.5} textAnchor="start">
+      <text className="cadran__repere" x={DEPART.x} y={HAUT - 8} textAnchor="middle">
         {reperes[3]}
       </text>
       {arc.map((s, i) => (
