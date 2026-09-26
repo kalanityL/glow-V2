@@ -434,6 +434,13 @@ export interface Textes {
     /** Le bouton qui ouvre le tiroir du filtre, son titre, son intitulé de
         groupe et le lien qui recoche tout. */
     filtrer: string;
+    /** L'INDICATEUR DU BOUTON (2026-09-26, « ajouter un indicateur sur le
+        bouton pour filtrer qui indique si un filtre es tmis ou non ») : la
+        pastille porte le nombre de catégories retenues ; la phrase dit la
+        même chose à qui écoute la page, et l'autre dit qu'il n'y a pas de
+        filtre. */
+    filtreMis: (retenues: number, total: number) => string;
+    filtreAucun: string;
     reinitialiser: string;
     categories: string;
     /** LES DEUX MODES (« switch mode-grille-ligne.png ») : les boutons n'ont
@@ -855,6 +862,8 @@ const FR: Textes = {
   journal: {
     vues: { semaine: 'Semaine', mois: 'Mois' },
     filtrer: 'Filtrer',
+    filtreMis: (retenues, total) => `Filtrer — ${retenues} catégories sur ${total}`,
+    filtreAucun: 'Filtrer — toutes les catégories',
     reinitialiser: 'Réinitialiser',
     categories: 'Catégories',
     modes: { liste: 'Voir en liste', grille: 'Voir en grille' },

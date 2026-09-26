@@ -4132,6 +4132,23 @@
   height: 16px;
 }
 
+/* LA PASTILLE DU FILTRE MIS (2026-09-26) : le nombre de catégories retenues,
+   plein à l'accent, au bout du bouton — chiffres tabulaires, la pastille ne
+   change pas de largeur d'un compte à l'autre. */
+.journal__filtre-compte {
+  display: grid;
+  place-items: center;
+  min-width: 17px;
+  height: 17px;
+  padding: 0 4px;
+  border-radius: 999px;
+  background: var(--accent);
+  color: var(--bouton-encre);
+  font-variant-numeric: tabular-nums;
+  font-size: 11px;
+  font-weight: 600;
+}
+
 .journal__filtrer--actif {
   border-color: color-mix(in srgb, var(--accent) 18%, var(--option-choisi-fond));
   background: var(--option-choisi-fond);

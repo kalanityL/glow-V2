@@ -123,6 +123,9 @@ export function PageJournal({
   const jours = useMemo(() => joursDuJournal(entrees, jour, retenus), [entrees, jour, retenus]);
   const pointes = useMemo(() => joursAvecEntree(entrees, retenus), [entrees, retenus]);
   const compte = compteDuJour(entrees, jour, retenus);
+  /* Un filtre est mis dès qu'une catégorie est écartée — toutes cochées,
+     c'est le journal entier, donc pas de filtre. */
+  const filtreMis = retenus.length < MODULES.length;
 
   /* LE TIROIR DU FILTRE, en trois états comme ceux de la barre du bas : le
      panneau reste monté le temps de redescendre, puis se démonte. */
@@ -219,15 +222,28 @@ export function PageJournal({
               le titre de chaque journée. */}
           <div className="journal__barre">
             <span className="journal__compte">{textes.journal.entrees(compte)}</span>
+            {/* L'INDICATEUR (2026-09-26, « ajouter un indicateur sur le
+                bouton pour filtrer qui indique si un filtre es tmis ou
+                non ») : un filtre mis, le bouton prend la matière des
+                réponses choisies ET porte une pastille à l'accent avec le
+                nombre de catégories retenues — le compte dit du même coup
+                combien il en reste, ce que le seul point ne dirait pas.
+                Aucun filtre, pas de pastille : l'absence est la réponse. */}
             <button
               ref={boutonFiltre}
               type="button"
-              className={`journal__filtrer${retenus.length < MODULES.length ? ' journal__filtrer--actif' : ''}`}
+              className={`journal__filtrer${filtreMis ? ' journal__filtrer--actif' : ''}`}
               aria-expanded={filtre === 'ouvert'}
+              aria-label={filtreMis ? textes.journal.filtreMis(retenus.length, MODULES.length) : textes.journal.filtreAucun}
               onClick={() => setFiltre((etat) => (etat === 'ouvert' ? 'fermeture' : 'ouvert'))}
             >
               <IconeFiltrer />
               <span>{textes.journal.filtrer}</span>
+              {filtreMis ? (
+                <span className="journal__filtre-compte" aria-hidden="true">
+                  {retenus.length}
+                </span>
+              ) : null}
             </button>
             <div className="journal__modes" role="radiogroup" aria-label={textes.journal.modes.liste}>
               {(['liste', 'grille'] as const).map((lequel) => (
