@@ -3,7 +3,7 @@ import { BarreDuBas, type AjoutTraitement } from './BarreDuBas';
 import { EntetePage } from './EntetePage';
 import type { FondProps } from './Accueil';
 import { TiroirFiltre } from './TiroirFiltre';
-import { IconeDuModule } from './iconesModules';
+import { IconeDuModule, ImageDuModule } from './iconesModules';
 import { IconeAujourdhui, IconeChevronBas, IconeChevronDroit, IconeCoche, IconeCroix, IconeFiltrer, IconeGrille, IconeListe, IconePlus } from '../components/Icones';
 import { IndiceDefilement } from '../components/IndiceDefilement';
 import { detecterLangue, useTextes } from '../i18n/useTextes';
@@ -823,7 +823,13 @@ const JourneeDuJournal = memo(function JourneeDuJournal({
                   <img className="journal__tuile-image" src={image} alt="" />
                 ) : (
                   <span className="journal__tuile-icone" aria-hidden="true">
-                    <IconeDuModule module={entree.module} forme={forme} />
+                    {/* LES PICTOS DE LA HOME (2026-09-26) : ses dessins en
+                        relief ; pour une séance, celui de SON sport. */}
+                    {entree.module === 'activite-physique' ? (
+                      <IconeDeLEntree entree={entree} forme={forme} />
+                    ) : (
+                      <ImageDuModule module={entree.module} forme={forme} />
+                    )}
                   </span>
                 )}
               </span>

@@ -2381,7 +2381,8 @@
   align-items: center;
   gap: 10px;
   padding: 12px 16px;
-  /* Le bandeau, à la couleur par défaut de la V1 (2026-09-21). */
+  /* Le bandeau, à sa couleur (2026-09-26, « Bleu de fond du bandeau
+     titre : #E3F2FD ») — jeton du thème, comme toute couleur. */
   background: var(--formulaire-bandeau-fond);
 }
 
@@ -4082,9 +4083,10 @@
    Les crans pleins à l'accent ont vécu la journée. */
 .journal__vues {
   display: flex;
-  /* Les deux vues se tiennent (2026-09-26, « rapproche semaine et mois ») :
-     elles vont ensemble, l'écart commun les séparerait. */
-  gap: 8px;
+  /* Les deux vues se tiennent (2026-09-26, « rapproche semaine et mois »,
+     puis « espace entre semaine et mois -> 5px ») : elles vont ensemble,
+     l'écart commun les séparerait. */
+  gap: 5px;
 }
 
 .journal__vue {
@@ -4418,8 +4420,9 @@
    se dit à qui écoute la page. */
 .journal__modes {
   display: flex;
-  /* De même pour les deux modes (« rapproche mode grille et mode ligne »). */
-  gap: 8px;
+  /* De même pour les deux modes (« rapproche mode grille et mode ligne »,
+     puis « espace entre grille et ligne -> 5px »). */
+  gap: 5px;
 }
 
 .journal__mode {
@@ -4935,29 +4938,33 @@
   object-fit: cover;
 }
 
-/* Sans image, l'icône SEULE, à la taille de la case — sans pastille. */
+/* SANS IMAGE, LE PICTO EN RELIEF DE LA HOME (2026-09-26, « mode grille :
+   oublie l'épaisseur de trait, utilise les pictos de la home à la place / pour
+   activité phyisque, utilise le picto du sport correspondant ») : ce sont des
+   dessins, pas des traits — il n'y a plus d'épaisseur à régler. Pour une
+   séance, c'est le dessin de SON sport. */
 .journal__tuile-icone {
   display: grid;
   place-items: center;
-  width: 76%;
-  height: 76%;
-  color: var(--ajout-icone-encre);
+  width: 78%;
+  height: 78%;
 }
 
-.journal__tuile-icone .icone {
-  width: 100%;
-  height: 100%;
-  /* Le trait ne grossit pas avec l'icône (2026-09-26, « trait des pictos en
-     mode grille : 1px ») : à 85 px dans une fenêtre de 24, il faut 0,28 pour
-     qu'il fasse UN pixel à l'écran. */
-  stroke-width: 0.28;
-}
-
-/* L'icône d'un sport est son dessin : il remplit la case comme les autres. */
+.journal__tuile-icone .module__image,
 .journal__tuile-icone .journal__sport {
   display: block;
   width: 100%;
   height: 100%;
+  object-fit: contain;
+}
+
+/* Un module sans dessin en relief (la marche, sous forme orale le comprimé)
+   garde son icône au trait, à la taille de la case. */
+.journal__tuile-icone .icone {
+  width: 100%;
+  height: 100%;
+  color: var(--ajout-icone-encre);
+  stroke-width: 0.6;
 }
 
 /* ── LE TIROIR DU FILTRE ────────────────────────────────────────────────── */
@@ -5094,4 +5101,22 @@
    n'emportent rien. */
 .filtre__pied .bouton {
   font-weight: 500;
+}
+
+/* LES ICÔNES D'UN FORMULAIRE À SON BLEU (2026-09-26, « Bleu des icones loupe
+   horloge calendrier picto altere : #6AAFEA ») : le picto du module dans le
+   bandeau, la loupe de la recherche, le calendrier et l'horloge de la date et
+   de l'heure. EN FIN DE FEUILLE, parce que les règles de la date et du
+   bandeau posent leur propre encre plus haut et gagneraient par l'ordre. La
+   croix de fermeture, elle, garde la sienne : la charte des formulaires la
+   veut « pas en bleu ». */
+.prise__entete > .icone,
+.recherche > .icone,
+.prise__quand .icone,
+.prise__quand > .choix .icone {
+  color: var(--formulaire-icone-encre);
+}
+
+.prise__fermer .icone {
+  color: var(--encre);
 }

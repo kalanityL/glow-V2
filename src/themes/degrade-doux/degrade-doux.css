@@ -41,7 +41,14 @@
   /* LE BANDEAU DE TITRE D'UN FORMULAIRE (2026-09-21, « prendre couleur par
      defaut de la v1 de fond de couleur de bandeau titre ») : le
      `--glow-band-bg` de la V1, #f0f9ff. */
-  --formulaire-bandeau-fond: #f0f9ff;
+  /* LE BANDEAU D'UN FORMULAIRE (2026-09-26, ses deux valeurs : « Bleu de
+     fond du bandeau titre : #E3F2FD ») — le #f0f9ff repris de la V1 le
+     2026-09-21 a vécu cinq jours. */
+  --formulaire-bandeau-fond: #E3F2FD;
+  /* LES ICÔNES D'UN FORMULAIRE — la loupe, l'horloge, le calendrier, le
+     picto du module dans le bandeau (« Bleu des icones loupe horloge
+     calendrier picto altere : #6AAFEA »). */
+  --formulaire-icone-encre: #6AAFEA;
 
   /* LE PANNEAU FLOTTANT des roues du sélecteur : une carte blanche, opaque,
      cernée de Gris 300, décollée par une ombre d'ardoise. */

@@ -691,8 +691,12 @@ plus discret) ; le nom
 du traitement et l'intitulé de la zone à l'encre ; **le bandeau de titre
 et le bouton Valider sont figés, le corps du formulaire défile entre eux**
 (« bandeau titre et bouton valider figés, c'est le reste qui scrolle »),
-et le bandeau prend la couleur par défaut de la V1
-(`--formulaire-bandeau-fond`, le `--glow-band-bg` #f0f9ff de la V1) ;
+et **le bandeau d'un formulaire est à #E3F2FD, ses icônes
+— la loupe, l'horloge, le calendrier, le picto du module — à #6AAFEA**
+(2026-09-26, ses deux valeurs données à la main ; le #f0f9ff repris de la V1
+a vécu cinq jours), en jetons `--formulaire-bandeau-fond` et
+`--formulaire-icone-encre` des quatre thèmes — LA CROIX DE FERMETURE GARDE
+SON ENCRE, la charte la veut « pas en bleu » ;
 la dose parmi les paliers de la spécialité — désormais dans
 `domaine/traitements.ts`, des faits de boîte, pas un conseil — ou « Autre
 dose » tapée ; « + Notes » ; « Valider » au milieu. Une dose absente ou
