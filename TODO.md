@@ -65,3 +65,6 @@ Règles de tenue (voir GUIDELINES.md, « Manière de travailler ») :
 
 - [ ] générer animation pour intercaller avec les pages d'onboarding et pour
       chaque badge, passage imc etc... avec Higgsfield AI modele Seedance 2.5
+
+- [ ] modele photo to anime cf
+      https://ai-engine.net/blog/photo-to-anime-api-vs-animegan-open-source
