@@ -1,7 +1,7 @@
 import { Avatar } from '../components/Avatar';
 import { BarreDuBas, type AjoutTraitement } from './BarreDuBas';
 import type { ModuleId } from '../app/modules';
-import { IconeDuModule } from './iconesModules';
+import { ImageDuModule } from './iconesModules';
 import { Cocarde } from '../components/Cocarde';
 import {
   IconeRecherche,
@@ -181,7 +181,10 @@ export function Accueil({
         <div className="page__defilant" onClick={surLeFond(fond.onOuvrirBloc)} />
       </div>
 
-      {/* Chaque module : sa pastille avec l'icône, SANS NOM VISIBLE
+      {/* Chaque module : sa pastille avec SON DESSIN EN RELIEF (2026-09-26,
+          « uniquement pour la home, utilise les icones dans ../images pour
+          claude/template/icones pour le bas de la home ») — ses images, ici
+          et nulle part ailleurs. SANS NOM VISIBLE
           (2026-09-17, « ne pas mettre les noms sous les cercles » — le
           2026-09-16 le nom était dans le cercle, le matin du 17 sous lui).
           Le nom reste dit à qui écoute la page, en `aria-label`. Le
@@ -200,7 +203,7 @@ export function Accueil({
                     : textes.accueil.modules[module]
                 }
               >
-                <IconeDuModule module={module} forme={reponses.formeTraitement} />
+                <ImageDuModule module={module} forme={reponses.formeTraitement} />
               </span>
             ))}
           </div>

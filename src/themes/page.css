@@ -880,6 +880,18 @@
   stroke-width: 1.2;
 }
 
+/* SES DESSINS EN RELIEF, AU BAS DE LA HOME ET LÀ SEULEMENT (2026-09-26,
+   « uniquement pour la home, utilise les icones dans ../images pour
+   claude/template/icones pour le bas de la home ») : des images détourées,
+   donc plus larges que l'icône au trait qu'elles remplacent — elles portent
+   leur propre air. Aucune couleur ici : ce sont ses couleurs, dans le
+   fichier. */
+.module__image {
+  width: 74%;
+  height: 74%;
+  object-fit: contain;
+}
+
 /* La fenêtre resserrée des dessins maison grossit le trait de 20/18 : 1,2
    devient 1,08 pour rester celui des voisins. */
 .module .icone--resserree {

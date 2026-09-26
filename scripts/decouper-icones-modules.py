@@ -46,7 +46,7 @@ CAPTURES = {
 # Un pixel est « du fond » s'il est à moins de cette distance du blanc des
 # coins. Assez large pour emporter le disque pâle qui entoure chaque dessin,
 # assez serré pour s'arrêter au premier bleu.
-TOLERANCE = 26
+TOLERANCE = 40
 # Le côté du carré rendu : deux fois la plus grande taille d'affichage (44 px
 # dans un cercle de 56), pour que l'écran de téléphone ait sa densité.
 COTE = 128

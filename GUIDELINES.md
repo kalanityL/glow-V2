@@ -567,6 +567,26 @@ filet de son image et la mise en page ne bougent pas. L'ombre portée vers
 le haut du menu de la V1 (`0 -6px 18px -10px rgb(0 0 0 / 0.35)`) n'est pas
 reprise.
 
+**LE BAS DE LA HOME PORTE SES DESSINS EN RELIEF, ET LÀ SEULEMENT**
+(2026-09-26, « uniquement pour la home, utilise les icones dans ../images
+pour claude/template/icones pour le bas de la home ») : ses huit captures
+— des icônes bleues en volume, une par module — sont DÉTOURÉES et
+embarquées en PNG (`src/assets/images/modules/`, engendrées par
+`scripts/decouper-icones-modules.py`, à relancer si elle en dépose
+d'autres), et `ImageDuModule` les pose dans les cercles de l'accueil.
+**Leurs couleurs sont celles de ses images, pas celles du thème :
+exception consignée**, comme la coche de validation d'une confirmation —
+ces dessins ont leurs dégradés et leur volume, qu'un aplat de thème
+détruirait ; ce ne sont donc PAS des masques, contrairement aux icônes de
+sport. Le détourage se fait par PROPAGATION DEPUIS LES BORDS et jamais par
+un seuil sur le blanc, qui mangerait les blancs intérieurs des dessins (le
+corps de la balance, l'abat-jour, le piston de la seringue). **Partout
+ailleurs — le journal, le tiroir du « + », le filtre, la confirmation —
+c'est `IconeDuModule`, au trait, qui sert** : « uniquement pour la home ».
+**Sous forme orale, le traitement garde son dessin au trait** : elle n'a
+donné que la seringue, et la montrer à qui prend un comprimé serait faux ;
+le jour où elle donne l'image du comprimé, elle s'ajoute au script.
+
 **Le menu principal** (2026-09-19, « remplace le lien profil du menu par une
 icone menu qui ouvre un menu […] garder le design actuel », puis « ouvre le
 menu en tiroir comme ça avec une croix pour fermer ») : l'entrée « Menu » de
