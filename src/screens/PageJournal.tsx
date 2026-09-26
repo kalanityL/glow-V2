@@ -9,6 +9,7 @@ import { IndiceDefilement } from '../components/IndiceDefilement';
 import { detecterLangue, useTextes } from '../i18n/useTextes';
 import { classeDuTheme } from '../themes/themes';
 import { MODULES, MODULES_AJOUT_JOURNAL, type ModuleId } from '../app/modules';
+import { noeudDuSport, slugActivite } from '../domaine/activites';
 import {
   anneeMoisDe,
   dateDecalee,
@@ -571,6 +572,26 @@ export function PageJournal({
   );
 }
 
+/**
+ * L'ICÔNE D'UNE ENTRÉE : celle de SON SPORT pour une séance (2026-09-26, son
+ * image), celle de son module pour tout le reste. Le masque du sport est le
+ * même que celui des tuiles de l'activité physique et de la confirmation ;
+ * un sport qui n'est pas au catalogue retombe sur l'icône du module.
+ */
+function IconeDeLEntree({ entree, forme }: { entree: EntreeJournal; forme: Forme | null }) {
+  if (entree.module === 'activite-physique') {
+    const noeud = noeudDuSport(entree.activite.sport);
+    if (noeud) {
+      return (
+        <span className={`journal__sport categorie--${noeud.categorie} categorie--sport-${slugActivite(noeud.noeud.nom)}`}>
+          <span className="categorie__icone" aria-hidden="true" />
+        </span>
+      );
+    }
+  }
+  return <IconeDuModule module={entree.module} forme={forme} />;
+}
+
 /** La vignette d'une entrée, quand la ligne porte une photo — aucune n'en
     porte aujourd'hui (voir `imageDeLEntree`), mais la place est tenue :
     c'est la même règle qu'en mode grille. */
@@ -698,14 +719,23 @@ const JourneeDuJournal = memo(function JourneeDuJournal({
           {journee.entrees.map((entree) => (
             <li key={entree.id} className="journal__entree">
               <span className="journal__heure">{entree.heure}</span>
+              {/* L'ICÔNE D'UNE SÉANCE EST CELLE DE SON SPORT (2026-09-26,
+                  son image : un vélo, un volant de badminton), celle du
+                  module pour tout le reste — NOS icônes dans les deux cas
+                  (« garde nos icones ») : le masque des tuiles de l'activité
+                  physique, et `IconeDuModule` ailleurs. */}
               <span className="journal__icone">
-                <IconeDuModule module={entree.module} forme={forme} />
+                <IconeDeLEntree entree={entree} forme={forme} />
               </span>
               <span className="journal__dit">
                 <span className="journal__nom">{nomDuModule(entree, forme, textes)}</span>
                 <span className="journal__detail">{detailDeLEntree(entree, unite, textes)}</span>
               </span>
               <Vignette entree={entree} />
+              {/* Le chevron de son image. Il ne mène encore nulle part. */}
+              <span className="journal__chevron" aria-hidden="true">
+                <IconeChevronDroit />
+              </span>
             </li>
           ))}
         </ul>
