@@ -11,70 +11,63 @@ que de te faire lire le fichier. Le TODO de la V1 est importé tel quel dans
 
 ---
 
-## NOTE DE REPRISE — CLEAR DU 2026-09-22 (le verrou, les sons, le sommeil peaufiné)
+## NOTE DE REPRISE — CLEAR DU 2026-09-26 (l'activité physique, le gling, la vitre)
 
 **Rien ne tourne, rien n'est à moitié fait.** Aucun agent en cours. TOUT
-EST POUSSÉ (neuvième push, 23 commits `4605149..HEAD`, entrée écrite dans
-`SUIVI-PUSHS.md`) ET DÉPLOYÉ sur `glow-private-v2.web.app` sur son ordre
-du 22/09 (« prepare un clear push et deploy » ; empreinte attendue
-`index-BNkmTDcm.js` — si le déploiement a été refusé au classificateur,
-c'est elle qui le lance : `! firebase deploy --only hosting:v2`). V1
-inchangée (`index-CkQLwi94.js`). Pousser et déployer SEULEMENT sur son
+EST POUSSÉ (dixième push, 25 commits `5bf0af6..f1cc2fc` + le commit du
+suivi, entrée écrite dans `SUIVI-PUSHS.md`), NON DÉPLOYÉ (pas demandé ;
+en ligne, c'est encore le neuvième push, `index-BNkmTDcm.js`). La V1 est
+poussée aussi (deux commits : deux effets secondaires, billard et bowling
+au temps pour soi), non déployée. Pousser et déployer SEULEMENT sur son
 ordre, ÉCRIRE L'ENTRÉE DE `SUIVI-PUSHS.md` AVANT le push.
 
-**LA MACHINE MANQUE DE MÉMOIRE** (Chrome 6 à 8 Go sur 17) : Claude Code
-tue les serveurs en arrière-plan toutes les quelques minutes, et Chrome
-sans fenêtre ne se lance plus par moments. Relancer `npm run dev -- --port
-3002 --strictPort` quand la page est blanche ; elle peut le lancer
-elle-même avec `!` devant. Chrome se pilote par
-`scripts/piloter-chrome.mjs` (ports 9340+) ; toujours `pkill -f
-"remote-debugging-port=<port>"` après, JAMAIS un `pkill` de tous les Chrome
-sans fenêtre (un agent a tué une capture de la session parente).
+**LA MACHINE MANQUE DE MÉMOIRE** : relancer `npm run dev -- --port 3002
+--strictPort` quand la page est blanche (vérifier d'abord `curl
+localhost:3002`, le port est souvent déjà pris par un serveur qui
+tourne). Chrome se pilote par `scripts/piloter-chrome.mjs` (ports 9340+,
+`attente: 5000` quand la machine est chargée) ; toujours `pkill -f
+"remote-debugging-port=<port>"` après, JAMAIS un `pkill` de tous les
+Chrome. Une tuile sous le pli se fait défiler avant le clic
+(`scrollIntoView`). Le python avec numpy et Pillow pour les images :
+`$(cat scratchpad/py-np.txt)` de la session — à recréer (`python3 -m venv`,
+`pip install numpy pillow`).
 
-**FAIT le 21/09 au soir et le 22/09 (tout dans GUIDELINES) :**
-- LE VERROU DE CONNEXION (GUIDELINES § 4) : Firebase Authentication de la
-  V1, `plateforme/compte.ts`, `screens/Verrou.tsx`, `screens/Connexion.tsx`,
-  armé en production seulement (`main.tsx`) ; en local, `npm run build`
-  puis `npx vite preview --port 4173` pour le voir. La connexion Google
-  marche depuis qu'elle a ajouté le domaine dans la console.
-- L'AVATAR MODULAIRE essayé par un agent et RETIRÉ (« trop moche ») : les
-  SVG de `../avatars` sont plats ; le style voulu est celui de
-  `UX:UI chatGPT/avatar/*.jpeg`. Deux pistes proposées (pièces en images
-  sur un canevas commun, ou vectoriel dessiné) ; puis « on va faire autre
-  chose ». La branche `worktree-agent-ae33afaaf63172488` et son worktree
-  existent encore, fusion défaite.
-- LA SIMULATION DES RÉGLAGES DE L'AVATAR ACTUEL (artifact
-  https://claude.ai/code/artifact/6ffee016-3b34-42d5-a153-98eb90b46f40,
-  fichier `scratchpad/avatar-reglages.html` de cette session) : curseurs
-  par élément, sourcils en courbure « plat ↔ circonflexe », valeurs à
-  dicter en bas. Elle n'a rien dicté encore.
-- LES SONS (artifact de la simulation :
-  https://claude.ai/code/artifact/b8484e6b-40a6-4284-97ec-7c994d1781db) :
-  catalogue embarqué, `scripts/rendre-sons.mjs`, `app/sons.ts` (Bulle,
-  Plastique, Cristal).
-- LE SOMMEIL : textes, nature sans défaut, étoiles nettes sans halo (ne
-  pas reproposer de halo), cadran assorti et dégradé, minuit change le
-  jour, jours en mots, note sous le doigt corrigée.
-- « Balance mise à jour ! » ; la forme du traitement relue du catalogue.
+**FAIT du 22 au 26 (tout dans GUIDELINES § 4) :**
+- Le gling de la confirmation (« Petite cloche », `SON_DE_LA_CONFIRMATION`),
+  le premier choix de la confirmation qui ramène d'où l'on vient, le
+  tiroir du « + » en cartes, le menu du bas en vitre.
+- L'ACTIVITÉ PHYSIQUE : `screens/PageActivite.tsx`, `domaine/activites.ts`
+  (catégories, slug, intensités, durées, distances d'avance, escalier,
+  règle des quinze séances, récents), `domaine/activites-catalogue.ts`
+  ENGENDRÉ par `scripts/engendrer-activites.mjs` depuis
+  `docs/pour-claude/compendium/arbre.json` (corriger le JSON, relancer),
+  `domaine/recherche-activites.ts`, `components/CadranDistance.tsx` (la
+  piste), `app/recents-activite.ts` (clé `glp1_v2_sports_recents`), les
+  masques `src/assets/images/activites/` et `sports/` avec
+  `themes/activites-icones.css` ENGENDRÉE par
+  `scripts/engendrer-icones-activites.mjs` (déposer un masque, relancer).
+  La ligne enregistrée est `SportLog` de la V1 (`sportLogs`).
+- Trois artifacts de simulation : le gling
+  (https://claude.ai/code/artifact/89ef81a0-0e85-4897-a862-f9aca9f0abe7),
+  le Compendium
+  (https://claude.ai/code/artifact/beeb8688-73a9-48a2-8506-998e00af6b85),
+  les bruitages de la piste
+  (https://claude.ai/code/artifact/0c8df719-55f1-4322-b7c1-03208ec8f56e) —
+  elle n'a pas encore choisi un bruitage par sport ; le jour venu, les
+  embarquer en fichiers comme le catalogue des clics
+  (`scripts/rendre-sons.mjs`), joués à la cadence du sport tant que la
+  boule bouge, en quatre variantes à tour de rôle.
 
 **Ce qui n'existe pas encore (les écrans l'annoncent, éteint) :** Journal,
-Analyse, Concentration sanguine, Évolution du traitement / du poids ; les
-cases du « + » autres que Traitement, Balance et Sommeil ; les mensurations
-de la pesée. TOUT S'ÉCRIT DANS LA BASE DE LA V1 (`src/donnees/v1.ts`, clé
-`glp1_app_companion_data`, `app/base.ts`) : chaque formulaire prend le type
-de sa table dans `V1/src/types.ts` et ses règles dans la SPEC.
+Analyse, Concentration sanguine, Évolution ; les cases du « + » autres
+que Traitement, Balance, Sommeil, Activité physique ; les mensurations ;
+la note et les calories d'une séance.
 
-**Non vérifié sur Android (à ses yeux) :** les gestes (glisser la boule du
-cadran, les étoiles, le clic hors bloc), les clics sonores de la règle,
-le rendu de `/long` sur un vrai navigateur.
+**À arbitrer, en tête de la section :** les marches et les étages de
+l'escalier (pas de place dans la ligne de la V1).
 
-**Son TODO porte** : limiter le 1er mois gratuit à 15 repas / 15 sommeils /
-5 activités ; l'écran des effets sonores (« parametre effets sonores choix
-sons pour les différents effets », 21/09 au soir) — le catalogue des vingt
-sons est déjà embarqué (`app/sons-catalogue.ts`), leurs noms iront dans le
-dictionnaire ce jour-là ; « Monte avec le poids » a dix morceaux, un par
-dixième de kilo, que `jouerClics` joue à tour de rôle : ce jour-là, la
-règle devra choisir le morceau du dixième lu.
+**Non vérifié sur Android (à ses yeux) :** la vitre du menu, la piste et
+ses gestes, les masques d'icônes (`mask-image`), les sons.
 
 **Ce qui reste des documents (note du 15/09), toujours vrai :**
 

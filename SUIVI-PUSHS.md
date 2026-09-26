@@ -10,6 +10,55 @@ du push seul, jusqu'au jour où un déploiement existera.
 
 ---
 
+## 2026-09-26 — dixième push · 25 commits (`5bf0af6..f1cc2fc`) + celui-ci · non déployé
+
+**Poussé sur sa demande** (« prepare un clear et push tout »). Entrée écrite
+avant le push. Pas de déploiement : il n'a pas été demandé.
+
+**Vérifié avant envoi :** `tsc` silencieux, `npm test` 103/103 (16
+fichiers), `npm run build` vert.
+
+**Ce que le lot contient** — du 22 au 26 septembre :
+- LE GLING DE LA CONFIRMATION : « Petite cloche », quatre notes d'une
+  frappe CC0, rendue en fichier (`rendre-petite-cloche.sh`), jouée à
+  l'apparition de toute page de confirmation ; choisi dans trois
+  simulations (dix sons, dix de plus, puis « quatre notes » à vitesse
+  réglable).
+- LA CONFIRMATION : le premier choix ramène d'où l'on vient (accueil ou
+  « Mon compte »), avec son icône, sur carte ; « Retour à l'accueil » parti.
+- LE TIROIR DU « + » : des cartes en deux colonnes d'après son image
+  `menu-plus.png` (un agent, mesures au pixel), puis tout en plus petit,
+  le nom sans gras.
+- L'ACTIVITÉ PHYSIQUE, née de son tri du Compendium of Physical
+  Activities 2024 (la simulation « Compendium des activités physiques »,
+  766 puis 762 activités en neuf catégories, l'arbre embarqué dans
+  `docs/pour-claude/compendium/arbre.json` et engendré en
+  `activites-catalogue.ts`) : la page-formulaire « Nouvelle activité
+  physique » — date et heure, la recherche (français, début de mot,
+  résultats de niveau 1 seulement), « Récents » (les quatre derniers
+  sports consignés, dans l'ordre de la saisie, sous leur propre clé),
+  les neuf catégories en tuiles avec les icônes de ses planches (91
+  masques de sport, trait aminci), une catégorie ouverte avec son fil
+  d'Ariane souligné, un sport choisi : la durée (15/30/45 min, 1 h,
+  « Autre » qui s'efface pour ses minutes), l'intensité en trois éclairs
+  ou, par onglet, la distance sur UNE PISTE (un tour par kilomètre, le
+  son de l'horloge, la valeur éditable au chiffre, sa liste des sports à
+  distance et leurs distances d'avance), l'escalier en marches ou
+  étages ; l'ENREGISTREMENT dans `sportLogs` de la V1 (quinze par jour,
+  la règle de la V1) et la confirmation, avec la modification.
+- LE MENU DU BAS EN VITRE, les valeurs de la V1 (55 %, flou 16, saturation
+  1,4), par un agent.
+
+**Répondu sans commit :** les simulations en artifacts — les sons du
+gling (trois états), le Compendium (une vingtaine de republications au fil
+de son tri), les bruitages de la piste (33 sons CC0, joués à la cadence du
+sport tant que le curseur bouge).
+
+**Non traité :** les marches et les étages ne s'enregistrent pas (à
+arbitrer) ; la note, les calories, le journal et l'évolution de
+l'activité ; les bruitages par sport ne sont pas branchés (elle n'a pas
+choisi) ; non vu sur Android : la vitre du menu, la piste, les masques.
+
 ## 2026-09-22 — neuvième push · 23 commits (`4605149..HEAD`) · déployé
 
 **Poussé et déployé sur sa demande** (« prepare un clear push et deploy »),
