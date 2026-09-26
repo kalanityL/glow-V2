@@ -1131,12 +1131,17 @@ DE LUI (« Aucune entrée au 28 novembre 2025.-> à côté du calendrier ») ;
 sous le bloc calendrier plus phrase », « ajouter avec ":" », puis « Ajoutez
 une entrée :->Ajouter : » — « Ajoutez une entrée : » a vécu une demi-heure).
 SANS LE « + » de son image, et sans ses mots à elle : les nôtres. **Les
-sept cases portent des libellés PROPRES À CET ÉCRAN** (« changement des
-titres ici, pas les titres des catégories mais des labels au étiquettes ,
-uniquement pour ici ») : « une Injection », « un Poids », « un Effets
-Secondaires », « un Repas », « une Activité Physique », « un temps de
-Sommeil », « Un Temps pour Soi » — sa dictée, articles et capitales
-compris ; ailleurs, ce sont les noms de modules. **Son « + » déplie cet
+sept cases sont DES ICÔNES SEULES, QUATRE PAR LIGNE AU PLUS** (2026-09-26,
+« pas de label, 4 icones par ligne max ») : la pastille et son icône, comme
+les cercles de l'accueil. **Leurs libellés, PROPRES À CET ÉCRAN**
+(« changement des titres ici, pas les titres des catégories mais des labels
+au étiquettes , uniquement pour ici ») — « une Injection », « un Poids »,
+« un Effets Secondaires », « un Repas », « une Activité Physique », « un
+temps de Sommeil », « Un Temps pour Soi », sa dictée avec ses articles et
+ses capitales — **NE SE VOIENT PLUS : ils restent dits à qui écoute la
+page**, comme les noms des cercles de l'accueil ; ailleurs, ce sont les
+noms de modules. Les cartes en deux colonnes avec leur nom et leur chevron
+ont vécu deux heures. **Son « + » déplie cet
 écran SOUS ELLE, dans le journal** (« Un petit bouton + sur un jour
 sans donnée pour voir, sous le jour en uestion, l'écran "journée sans
 donnée" insérée à l'intérieur du journal ») — le « + » devient une croix

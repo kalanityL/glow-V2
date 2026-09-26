@@ -575,22 +575,21 @@ const JourneeDuJournal = memo(function JourneeDuJournal({
               plus phrase », « ajouter avec ":" »). */}
           <h3 className="journal__vide-titre">{textes.journal.ajoutezUneEntree}</h3>
           <div className="journal__vide-cases">
+            {/* PAS DE LABEL, QUATRE PAR LIGNE (2026-09-26, « pas de label,
+                4 icones par ligne max ») : l'icône seule dans sa pastille.
+                SES LIBELLÉS — « une Injection », « un Poids »… — restent
+                dits à qui écoute la page, comme les cercles de l'accueil,
+                dont les noms ne se voient pas non plus. */}
             {MODULES_AJOUT_JOURNAL.map((module) => (
-              <button key={module} type="button" className="journal__vide-case" onClick={() => onAjouter(module, journee.date)}>
+              <button
+                key={module}
+                type="button"
+                className="journal__vide-case"
+                aria-label={module === 'traitement' ? textes.journal.ajoutTraitement[forme ?? 'injection'] : textes.journal.ajouts[module]}
+                onClick={() => onAjouter(module, journee.date)}
+              >
                 <span className="journal__icone">
                   <IconeDuModule module={module} forme={forme} />
-                </span>
-                {/* SES LIBELLÉS, PROPRES À CET ÉCRAN (2026-09-26, « changement
-                    des titres ici, pas les titres des catégories mais des
-                    labels au étiquettes , uniquement pour ici ») : « une
-                    Injection », « un Poids »… et non les noms de modules. */}
-                <span className="journal__vide-nom">
-                  {module === 'traitement'
-                    ? textes.journal.ajoutTraitement[forme ?? 'injection']
-                    : textes.journal.ajouts[module]}
-                </span>
-                <span className="journal__vide-chevron" aria-hidden="true">
-                  <IconeChevronDroit />
                 </span>
               </button>
             ))}

@@ -4287,58 +4287,35 @@
   overflow-wrap: anywhere;
 }
 
-/* Deux colonnes, colonnes égales (GUIDELINES) — la mise en page de son
-   image. */
+/* QUATRE PAR LIGNE AU PLUS, SANS LABEL (2026-09-26, « pas de label, 4 icones
+   par ligne max ») : l'icône seule dans sa pastille, comme les cercles de
+   l'accueil. Colonnes égales (GUIDELINES) : une colonne plus large aurait
+   l'air d'être la bonne réponse. Les libellés et le chevron des cartes en
+   deux colonnes ont vécu deux heures. */
 .journal__vide-cases {
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 8px;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 10px;
   width: 100%;
+  justify-items: center;
 }
 
 .journal__vide-case {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  min-width: 0;
-  padding: 8px 8px 8px 8px;
-  border: 1px solid color-mix(in srgb, var(--option-filet) 40%, var(--option-fond));
-  border-radius: 14px;
-  background: var(--module-fond);
+  display: grid;
+  place-items: center;
+  padding: 0;
+  border: 0;
+  background: none;
   color: inherit;
   font: inherit;
-  text-align: left;
   cursor: pointer;
 }
 
-/* La pastille est celle d'une entrée de la liste, en plus petit : la page
-   n'a qu'une seule façon de dessiner un module. */
+/* La pastille est celle d'une entrée de la liste : la page n'a qu'une seule
+   façon de dessiner un module. */
 .journal__vide-case .journal__icone {
-  width: 36px;
-  height: 36px;
-}
-
-.journal__vide-case .journal__icone .icone {
-  width: 19px;
-  height: 19px;
-}
-
-.journal__vide-nom {
-  flex: 1 1 auto;
-  min-width: 0;
-  font-family: var(--font-body);
-  font-size: 14px;
-  color: var(--encre);
-  overflow-wrap: anywhere;
-}
-
-/* Le chevron de son image, en bleu grisé — celui des cartes du tiroir du
-   « + ». Il ne dit rien que la case ne dise déjà. */
-.journal__vide-chevron {
-  flex: none;
-  width: 18px;
-  height: 18px;
-  color: var(--ajout-chevron-encre);
+  width: 44px;
+  height: 44px;
 }
 
 .journal__journee {
