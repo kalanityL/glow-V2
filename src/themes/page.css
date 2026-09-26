@@ -4718,6 +4718,16 @@
   object-fit: contain;
 }
 
+/* LE DESSIN D'UN SPORT EST PORTÉ PAR UN SPAN INTÉRIEUR, qu'il faut sortir du
+   flux en ligne : `display: inline`, il mesurait 0 × 0 et la case restait
+   vide (2026-09-26, sa capture : « où sont mes icones sport en mode
+   grille ??? »). */
+.journal__tuile-icone .journal__sport .categorie__icone {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
 /* Un module sans dessin en relief (la marche, sous forme orale le comprimé)
    garde son icône au trait, à la taille de la case. */
 .journal__tuile-icone .icone {

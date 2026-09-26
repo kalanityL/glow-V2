@@ -1371,8 +1371,11 @@ TypeScript `app/sons-catalogue.ts` est ENGENDRÉ par le script, à relancer
 `SON_DU_CADRAN`) ; les noms des sons ne sont pas dans le dictionnaire tant
 que l'écran des effets sonores (son TODO : « parametre effets sonores
 choix sons pour les différents effets ») n'existe pas. **Le cadran d'une
-heure clique aussi**, « Plastique », à chaque minute ronde franchie en
-glissant la boule, par la même file ; **et les étoiles de la qualité du
+heure et la piste d'une distance cliquent aussi, DU MÊME SON QUE LA BALANCE**
+(2026-09-26, « utilise le bruitage de balance aussi pour les heures de
+sommeils et la distances d'activité physique » — « Plastique », choisi le
+2026-09-21, a vécu cinq jours et reste au catalogue), à chaque cran franchi
+en glissant la boule, par la même file ; **et les étoiles de la qualité du
 sommeil**, « Cristal », un clic par étoile franchie (« ajouter son cristal
 à variation de qualité sommeil », le même soir) — `SON_DE_LA_NOTE`. **La graduation** (2026-09-20, « met les chiffres
 de la regle graduée au dessus des crans, tous les 5 kilos […] positionne
