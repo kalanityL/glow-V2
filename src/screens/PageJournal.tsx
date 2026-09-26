@@ -18,8 +18,8 @@ import {
   formaterJourEtDate,
   grilleDuMois,
   jourDeLaSemaine,
+  joursDe,
   jourRelatif,
-  semaineDe,
 } from '../domaine/dates';
 import type { Langue } from '../i18n/langues';
 /* L'ILLUSTRATION D'UNE JOURNÉE SANS RIEN (2026-09-26, « date sans entrée,
@@ -235,6 +235,30 @@ export function PageJournal({
   /* Les volets présents : pas de voisin du côté où la borne est atteinte. */
   const volets = [...(peutReculer ? [-1] : []), 0, ...(peutAvancer ? [1] : [])];
   const rangCourant = volets.indexOf(0);
+
+  /* EN VUE SEMAINE, LA PISTE EST CONTINUE ET SE GLISSE JOUR PAR JOUR
+     (2026-09-26, « slide en mode semaine : slide fluide des jour en jour
+     sans sacade, pas de passage de semaine en semaine ») : une suite de
+     jours aimantée sur chacun, sept visibles à la fois, le jour regardé au
+     milieu — le mécanisme de la règle crantée du poids, au jour près. La
+     vue Mois, elle, garde ses trois volets (« slide de mois en mois :
+     laisser comme tel »).
+
+     LA PISTE EST ANCRÉE et ne se refait pas à chaque cran : elle tient
+     quarante-cinq jours de part et d'autre de son ancre, et l'ancre ne se
+     repose que lorsque le jour regardé s'en éloigne de plus de vingt-cinq —
+     sans quoi le DOM changerait sous le doigt à chaque jour franchi. */
+  const JOURS_VISIBLES = 7;
+  const DEMI_PISTE = 45;
+  const [ancre, setAncre] = useState(jour);
+  useEffect(() => {
+    const ecart = Math.abs(new Date(jour).getTime() - new Date(ancre).getTime()) / 86_400_000;
+    if (ecart > 25) setAncre(jour);
+  }, [jour, ancre]);
+  const piste = useMemo(
+    () => joursDe(dansLesBornes(dateDecalee(ancre, -DEMI_PISTE), aujourdhui), dansLesBornes(dateDecalee(ancre, DEMI_PISTE), aujourdhui)),
+    [ancre, aujourdhui],
+  );
   /* Le replacement du rail est programmé : il ne doit pas se lire comme un
      geste (sans quoi la date repartirait toute seule). */
   const placement = useRef(false);
@@ -242,25 +266,42 @@ export function PageJournal({
     const zone = rail.current;
     if (!zone) return;
     placement.current = true;
-    defilerHorizontalA(zone, rangCourant * zone.clientWidth, false);
+    if (vue === 'semaine') {
+      /* Le jour regardé au milieu des sept. LE PAS D'UN CRAN SE MESURE sur
+         la piste elle-même (`scrollWidth / nombre de jours`) plutôt que de
+         se déduire des largeurs écrites : marges et arrondis ne peuvent
+         plus le fausser. */
+      const rang = piste.indexOf(jour);
+      const pasDuJour = zone.scrollWidth / piste.length;
+      if (rang >= 0) defilerHorizontalA(zone, (rang - (JOURS_VISIBLES - 1) / 2) * pasDuJour, false);
+    } else {
+      defilerHorizontalA(zone, rangCourant * zone.clientWidth, false);
+    }
     /* La marque se lève au prochain tour de boucle : le défilement programmé
        a alors fini de se produire. */
     const relacher = setTimeout(() => {
       placement.current = false;
     }, 120);
     return () => clearTimeout(relacher);
-  }, [jour, vue, rangCourant]);
+  }, [jour, vue, rangCourant, piste]);
   useEffect(
     () =>
       surFinDeDefilement(rail.current, () => {
         const zone = rail.current;
         if (!zone || placement.current || zone.clientWidth === 0) return;
+        if (vue === 'semaine') {
+          const pasDuJour = zone.scrollWidth / piste.length;
+          const rang = Math.round(zone.scrollLeft / pasDuJour + (JOURS_VISIBLES - 1) / 2);
+          const date = piste[rang];
+          if (date && date !== jour) allerAuJour(date);
+          return;
+        }
         const rang = Math.round(zone.scrollLeft / zone.clientWidth);
         const pas = volets[rang];
         if (pas !== undefined && pas !== 0) deplacer(pas);
       }),
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [jour, vue, rangCourant],
+    [jour, vue, rangCourant, piste],
   );
 
   return (
@@ -310,39 +351,38 @@ export function PageJournal({
               </div>
             </div>
 
-            {/* LE RAIL QUI GLISSE : trois volets, le précédent, le courant et
-                le suivant — ceux que les bornes permettent. C'est le
-                défilement du navigateur, aimanté, comme la piste de la règle
-                du poids ; rien n'est intercepté à la main. */}
-            <div className="journal__rail" ref={rail}>
-              {volets.map((pas) => {
-                const dateVolet = vue === 'semaine' ? dateDecalee(jour, 7 * pas) : dateDecaleeDeMois(jour, pas);
-                const { annee: a, mois: m } = anneeMoisDe(dateVolet);
-                return (
-                  <div className="journal__volet" key={pas} aria-hidden={pas !== 0}>
-                    {vue === 'semaine' ? (
-                      /* LA SEMAINE EN SEPT CARTES (« sous-header-vue
-                         semaine.png ») : le jour abrégé au-dessus, le
-                         quantième dessous. */
-                      <div className="journal__semaine">
-                        {semaineDe(dateVolet).map((date) => (
-                          <button
-                            key={date}
-                            type="button"
-                            tabIndex={pas === 0 ? undefined : -1}
-                            aria-current={date === jour ? 'date' : undefined}
-                            className={`journal__jour-carte${date === jour ? ' journal__jour-carte--choisi' : ''}`}
-                            onClick={() => choisirJour(date)}
-                          >
-                            <span className="journal__jour-nom">{textes.calendrier.joursAbreges[jourDeLaSemaine(date)]}</span>
-                            <span className="journal__jour-quantieme">{Number(date.slice(8))}</span>
-                            {pointes.has(date) ? <span className="journal__point" aria-hidden="true" /> : null}
-                          </button>
-                        ))}
-                      </div>
-                    ) : (
-                      /* LE MOIS : six semaines, lundi en premier, les jours
-                         des mois voisins en pâle (`grilleDuMois`). */
+            {/* LE RAIL QUI GLISSE — c'est le défilement du navigateur, aimanté,
+                comme la piste de la règle du poids ; rien n'est intercepté.
+                EN SEMAINE, une piste continue de jours, sept visibles, le
+                jour regardé au milieu (2026-09-26, « slide fluide des jour
+                en jour sans sacade, pas de passage de semaine en semaine ») ;
+                EN MOIS, trois volets — le précédent, le courant, le suivant
+                (« slide de mois en mois : laisser comme tel »). */}
+            {vue === 'semaine' ? (
+              <div className="journal__rail journal__rail--jours" ref={rail}>
+                {piste.map((date) => (
+                  <button
+                    key={date}
+                    type="button"
+                    aria-current={date === jour ? 'date' : undefined}
+                    className={`journal__jour-carte${date === jour ? ' journal__jour-carte--choisi' : ''}`}
+                    onClick={() => choisirJour(date)}
+                  >
+                    <span className="journal__jour-nom">{textes.calendrier.joursAbreges[jourDeLaSemaine(date)]}</span>
+                    <span className="journal__jour-quantieme">{Number(date.slice(8))}</span>
+                    {pointes.has(date) ? <span className="journal__point" aria-hidden="true" /> : null}
+                  </button>
+                ))}
+              </div>
+            ) : (
+              <div className="journal__rail" ref={rail}>
+                {volets.map((pas) => {
+                  const dateVolet = dateDecaleeDeMois(jour, pas);
+                  const { annee: a, mois: m } = anneeMoisDe(dateVolet);
+                  return (
+                    <div className="journal__volet" key={pas} aria-hidden={pas !== 0}>
+                      {/* LE MOIS : six semaines, lundi en premier, les jours
+                          des mois voisins en pâle (`grilleDuMois`). */}
                       <div className="journal__grille-mois">
                         {textes.calendrier.jours.map((lettre, i) => (
                           <span key={i} className="journal__entete-jour" aria-hidden="true">
@@ -363,11 +403,11 @@ export function PageJournal({
                           </button>
                         ))}
                       </div>
-                    )}
-                  </div>
-                );
-              })}
-            </div>
+                    </div>
+                  );
+                })}
+              </div>
+            )}
           </div>
 
           {/* LE BANDEAU DE MODE (« switch mode-grille-ligne.png ») : ce que

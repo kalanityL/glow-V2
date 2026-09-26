@@ -3994,6 +3994,27 @@
   user-select: none;
 }
 
+/* EN VUE SEMAINE, LA PISTE EST CONTINUE ET S'AIMANTE SUR CHAQUE JOUR
+   (2026-09-26, « slide en mode semaine : slide fluide des jour en jour sans
+   sacade, pas de passage de semaine en semaine ») : sept cartes visibles, le
+   jour regardé au milieu. La gouttière est rendue par le rembourrage des
+   cartes, non par un `gap` : un `gap` fausserait le pas du cran. */
+.journal__rail--jours {
+  gap: 0;
+}
+
+.journal__rail--jours .journal__jour-carte {
+  /* LA CARTE ET SES DEUX MARGES FONT EXACTEMENT LE SEPTIÈME : sans ce
+     retrait, chaque cran valait un septième PLUS six pixels, et le décalage
+     s'accumulait sur toute la piste (huit jours d'erreur au bout de
+     quarante-cinq). */
+  flex: 0 0 calc(100% / 7 - 6px);
+  min-width: 0;
+  margin: 0 3px;
+  scroll-snap-align: center;
+  user-select: none;
+}
+
 /* SEMAINE / MOIS : deux crans dans une gouttière, celui qui est choisi plein
    à l'accent — le motif des onglets de son image. */
 .journal__vues {
@@ -4025,12 +4046,6 @@
    mesurés pour 714 de large, gouttière 10, marge 30 — soit 47 × 44 et une
    gouttière de 6 sur un écran de 390. Colonnes égales (GUIDELINES) : une
    colonne plus large aurait l'air d'être la bonne réponse. */
-.journal__semaine {
-  display: grid;
-  grid-template-columns: repeat(7, minmax(0, 1fr));
-  gap: 6px;
-}
-
 .journal__jour-carte {
   position: relative;
   display: flex;

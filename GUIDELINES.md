@@ -1175,11 +1175,20 @@ la place. Touchée, elle ramène à aujourd'hui.
 **C'EST LE DÉFILEMENT DU NAVIGATEUR, AIMANTÉ — le mécanisme de la piste
 de la règle crantée du poids** (le même jour, « je n'arrive toujours pas a
 slider lees dates (tu peux regarder ajouter un poids, on utilise le slider
-a cet endroit pour voir comment fonctionne le sliding ») : trois volets
-pleine largeur côte à côte — le précédent, le courant, le suivant, ceux
-que les bornes permettent —, `scroll-snap` sur le rail ; le défilement
-fini sur un voisin déplace la date, et le rendu ramène le courant au
-milieu. Rien n'est intercepté à la main : le geste est celui du système, à
+a cet endroit pour voir comment fonctionne le sliding »). **EN VUE
+SEMAINE, LA PISTE EST CONTINUE ET S'AIMANTE SUR CHAQUE JOUR** (le même
+jour, « slide en mode semaine : slide fluide des jour en jour sans sacade,
+pas de passage de semaine en semaine ») : sept jours visibles, le jour
+regardé AU MILIEU, un cran par jour ; la piste tient quarante-cinq jours de
+part et d'autre d'une ancre, et l'ancre ne se repose que lorsque le jour
+regardé s'en éloigne de plus de vingt-cinq — sans quoi le DOM changerait
+sous le doigt à chaque jour franchi. **LE PAS D'UN CRAN SE MESURE sur la
+piste** (`scrollWidth / nombre de jours`) et ne se déduit pas des largeurs
+écrites : six pixels de marge oubliés décalaient de huit jours au bout de
+la piste. **EN VUE MOIS, trois volets** pleine largeur — le précédent, le
+courant, le suivant, ceux que les bornes permettent (« slide de mois en
+mois : laisser comme tel ») ; le défilement fini sur un voisin déplace la
+date, et le rendu ramène le courant au milieu. Rien n'est intercepté à la main : le geste est celui du système, à
 tous les doigts et à tous les trackpads. DEUX TENTATIVES D'INTERCEPTION
 ONT VÉCU LA JOURNÉE (un appui qu'on traîne, puis un `wheel` compté à la
 main) : ni l'une ni l'autre ne répondait à tous les gestes — la leçon est
