@@ -38,30 +38,29 @@ describe('bornesDuJournal', () => {
 
 describe('fenetreDuJournal', () => {
   it('ouvre sur six mois de chaque côté du jour regardé', () => {
-    const f = fenetreDuJournal('2026-09-26', '2026-09-26', 0, 0);
+    const f = fenetreDuJournal('2026-09-26', '2026-09-26');
     expect(f).toMatchObject({ debut: '2026-03-26', fin: '2027-03-26', plusAvant: true, plusApres: true });
   });
 
-  it('chaque « Voir plus » ajoute six mois de son côté, et lui seul', () => {
-    expect(fenetreDuJournal('2026-09-26', '2026-09-26', 1, 0)).toMatchObject({ debut: '2025-09-26', fin: '2027-03-26' });
-    expect(fenetreDuJournal('2026-09-26', '2026-09-26', 0, 1)).toMatchObject({ debut: '2026-03-26', fin: '2027-09-26' });
+  it('c’est le jour regardé qui déplace la fenêtre, pas un compteur de pas', () => {
+    /* « Voir plus » dans le passé revient à regarder le début de la fenêtre :
+       six mois de plus apparaissent dessous. */
+    expect(fenetreDuJournal('2026-03-26', '2026-09-26')).toMatchObject({ debut: '2025-09-26', fin: '2026-09-26' });
+    /* Et dans le futur, à regarder sa fin. */
+    expect(fenetreDuJournal('2027-03-26', '2026-09-26')).toMatchObject({ debut: '2026-09-26', fin: '2027-09-26' });
   });
 
   it('les bornes absolues rognent, et le « Voir plus » disparaît de ce côté', () => {
-    /* Un an en avant est atteint dès le premier pas : la borne est à
-       2027-09-26 et la fenêtre voudrait aller jusqu’à 2027-09-26 pile. */
-    expect(fenetreDuJournal('2026-09-26', '2026-09-26', 0, 1)).toMatchObject({ fin: '2027-09-26', plusApres: false });
-    /* Dix ans en arrière : dix-neuf pas ne suffisent pas, vingt oui. */
-    expect(fenetreDuJournal('2026-09-26', '2026-09-26', 100, 0)).toMatchObject({ debut: '2016-09-26', plusAvant: false });
+    expect(fenetreDuJournal('2027-03-26', '2026-09-26')).toMatchObject({ fin: '2027-09-26', plusApres: false });
+    expect(fenetreDuJournal('2016-12-26', '2026-09-26')).toMatchObject({ debut: '2016-09-26', plusAvant: false });
   });
 
   it('un jour du passé garde ses six mois en avant sans dépasser la borne', () => {
-    const f = fenetreDuJournal('2020-01-15', '2026-09-26', 0, 0);
-    expect(f).toMatchObject({ debut: '2019-07-15', fin: '2020-07-15', plusAvant: true, plusApres: true });
+    expect(fenetreDuJournal('2020-01-15', '2026-09-26')).toMatchObject({ debut: '2019-07-15', fin: '2020-07-15', plusAvant: true, plusApres: true });
   });
 
   it('ramène le quantième au dernier jour du mois d’arrivée', () => {
-    expect(fenetreDuJournal('2026-08-31', '2026-09-26', 0, 0).debut).toBe('2026-02-28');
+    expect(fenetreDuJournal('2026-08-31', '2026-09-26').debut).toBe('2026-02-28');
   });
 });
 

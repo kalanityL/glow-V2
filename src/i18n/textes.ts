@@ -904,8 +904,9 @@ const FR: Textes = {
     /* Sa tournure, telle qu'elle l'a dictée (« aucune entrée au
        xxxdatexx »), avec le point final que le projet met à ses phrases. */
     aucuneEntreeLe: (date) => `Aucune entrée au ${date}.`,
-    /* « ajouter avec ":" » (2026-09-26). */
-    ajoutezUneEntree: 'Ajoutez une entrée :',
+    /* « ajouter avec ":" » (2026-09-26), puis « Ajoutez une entrée :->Ajouter : »
+       le même jour — « Ajoutez une entrée : » a vécu une demi-heure. */
+    ajoutezUneEntree: 'Ajouter :',
     /* Ses mots, tels qu'elle les a dictés — l'article et les capitales
        compris (« un Effets Secondaires » est sa graphie). */
     ajouts: {

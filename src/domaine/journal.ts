@@ -90,23 +90,24 @@ export interface FenetreDuJournal {
 }
 
 /**
- * LA FENÊTRE DE LECTURE autour du jour regardé (2026-09-26, « Chaque clique
- * sur un jour on a accessible au scroll jusqu'à + ou - 6 mois par rapport au
- * jour courant. qd on arrive à + ou - 6 mois on a dans un sens comme dans
- * l'autre un "voir plus" qui charge les 6 mois (maximum) précédents ou
- * suivant ») : `pasAvant` et `pasApres` comptent les « Voir plus » touchés
- * de chaque côté — à l'ouverture d'un jour, zéro de part et d'autre, donc
- * six mois de chaque côté. Les bornes absolues rognent toujours.
+ * LA FENÊTRE DE LECTURE : TOUJOURS SIX MOIS DE PART ET D'AUTRE DU JOUR
+ * REGARDÉ (2026-09-26, « Chaque clique sur un jour on a accessible au scroll
+ * jusqu'à + ou - 6 mois par rapport au jour courant »), rognés par les bornes
+ * absolues.
+ *
+ * ELLE NE COMPTE PAS LES « VOIR PLUS » : c'est LE JOUR REGARDÉ QUI SE
+ * DÉPLACE (2026-09-26, « quand on clique sur "voir plus" dans le passé : le
+ * jour courant est décalé au nouveau jour le plus ancien ; dans le futur :
+ * le jour courant est décalé au 1er jour des nouveaux jour qui viennent
+ * d'etre charges ») — toucher « Voir plus » revient à choisir le jour du
+ * bout qu'on vient d'atteindre, et la fenêtre se rouvre autour de lui. On
+ * avance ainsi de six mois en six mois, sans fin, jusqu'aux bornes ; les
+ * deux compteurs de pas qui ont vécu une heure n'ont plus lieu d'être.
  */
-export function fenetreDuJournal(
-  jour: string,
-  aujourdhui: string,
-  pasAvant: number,
-  pasApres: number,
-): FenetreDuJournal {
+export function fenetreDuJournal(jour: string, aujourdhui: string): FenetreDuJournal {
   const { min, max } = bornesDuJournal(aujourdhui);
-  const vouluDebut = dateDecaleeDeMois(jour, -MOIS_PAR_PAS * (1 + pasAvant));
-  const vouluFin = dateDecaleeDeMois(jour, MOIS_PAR_PAS * (1 + pasApres));
+  const vouluDebut = dateDecaleeDeMois(jour, -MOIS_PAR_PAS);
+  const vouluFin = dateDecaleeDeMois(jour, MOIS_PAR_PAS);
   const debut = vouluDebut < min ? min : vouluDebut;
   const fin = vouluFin > max ? max : vouluFin;
   return { debut, fin, plusAvant: debut > min, plusApres: fin < max };

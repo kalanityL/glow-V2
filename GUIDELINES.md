@@ -1103,13 +1103,18 @@ l'autre peu importe ou on se trouve. jusqu'à 10 ans en arriere en 1 an
 dans le futur par rapport à la date du jour courant ») : `domaine/journal.ts`
 tient les deux bornes absolues, comptées depuis AUJOURD'HUI et non depuis
 le jour regardé (`bornesDuJournal` : dix ans en arrière, un an en avant).
-**Chaque jour choisi ouvre six mois de part et d'autre**, et **un « Voir
-plus » à chaque bout charge six mois de plus de SON côté**
-(`fenetreDuJournal`, `pasAvant`/`pasApres` — « qd on arrive à + ou - 6 mois
-on a dans un sens comme dans l'autre un "voir plus" qui charge les 6 mois
-(maximum) précédents ou suivant ») ; **aux bornes, plus de bouton et plus
-rien à faire défiler**. Après un « Voir plus », la lecture reprend sur la
-journée qui était à la limite (`amenerEnHaut`) : rien ne saute.
+**La fenêtre fait toujours six mois de part et d'autre du jour
+regardé** (`fenetreDuJournal`), et **UN « VOIR PLUS » DÉPLACE LE JOUR
+REGARDÉ au bout qu'on vient d'atteindre** (2026-09-26, « quand on clique
+sur "voir plus" dans le passé : le jour courant est décalé au nouveau jour
+le plus ancien ; dans le futur : le jour courant est décalé au 1er jour des
+nouveaux jour qui viennent d'etre charges ») : la fenêtre se rouvre autour
+de lui et six mois de plus apparaissent de ce côté. On avance ainsi de six
+mois en six mois, sans fin — les deux compteurs de pas ont vécu une heure,
+ils n'ont plus lieu d'être. **Aux bornes, plus de bouton et plus rien à
+faire défiler**. La lecture reprend sur ce jour-là (`amenerEnHaut`) : rien
+ne saute ; et un jour vide atteint ainsi NE SE DÉPLIE PAS de lui-même — on
+ne l'a pas choisi, on est arrivé dessus.
 **TOUTES LES JOURNÉES SONT LÀ, LES VIDES COMPRISES** (« jour sans donnée :
 apparait dans le journal comme un jour avec données, simplement il n'y a
 rien en dessous on passe directement au jour suivant ») : une journée vide
@@ -1122,8 +1127,9 @@ presents) ») : son calendrier sur des nuages, détouré et embarqué
 (`journee-vide.png`, le même script que les icônes de la home, à tolérance
 serrée), À GAUCHE, et la phrase « Aucune entrée au JJ mois AAAA. » À CÔTÉ
 DE LUI (« Aucune entrée au 28 novembre 2025.-> à côté du calendrier ») ;
-**« Ajoutez une entrée : » CENTRÉ SOUS LE BLOC** (« ajouter une entrée
-passe en centré sous le bloc calendrier plus phrase », « ajouter avec ":" »).
+**« Ajouter : » CENTRÉ SOUS LE BLOC** (« ajouter une entrée passe en centré
+sous le bloc calendrier plus phrase », « ajouter avec ":" », puis « Ajoutez
+une entrée :->Ajouter : » — « Ajoutez une entrée : » a vécu une demi-heure).
 SANS LE « + » de son image, et sans ses mots à elle : les nôtres. **Les
 sept cases portent des libellés PROPRES À CET ÉCRAN** (« changement des
 titres ici, pas les titres des catégories mais des labels au étiquettes ,

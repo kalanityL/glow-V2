@@ -131,10 +131,6 @@ export function PageJournal({
   const [mode, setMode] = useState<'liste' | 'grille'>('liste');
   /* Toutes les catégories retenues au départ : le journal s'ouvre entier. */
   const [retenus, setRetenus] = useState<readonly ModuleId[]>(MODULES);
-  /* LES « VOIR PLUS » TOUCHÉS de chaque côté (2026-09-26) : la fenêtre part
-     de six mois de part et d'autre et grandit de six mois par pas, jusqu'aux
-     bornes. Choisir un autre jour remet les deux à zéro. */
-  const [pas, setPas] = useState({ avant: 0, apres: 0 });
   /* LES JOURNÉES VIDES DÉPLIÉES (2026-09-26, « Un petit bouton + sur un jour
      sans donnée pour voir, sous le jour en uestion, l'écran "journée sans
      donnée" insérée à l'intérieur du journal ») : chacune se déplie pour
@@ -150,7 +146,7 @@ export function PageJournal({
   }, []);
 
   const entrees = useMemo(() => entreesDuJournal({ prises, pesees, sommeils, activites }), [prises, pesees, sommeils, activites]);
-  const fenetre = useMemo(() => fenetreDuJournal(jour, aujourdhui, pas.avant, pas.apres), [jour, aujourdhui, pas]);
+  const fenetre = useMemo(() => fenetreDuJournal(jour, aujourdhui), [jour, aujourdhui]);
   const jours = useMemo(() => joursDuJournal(entrees, fenetre, retenus), [entrees, fenetre, retenus]);
   const pointes = useMemo(() => joursAvecEntree(entrees, retenus), [entrees, retenus]);
   const compte = compteDuJour(entrees, jour, retenus);
@@ -166,24 +162,30 @@ export function PageJournal({
     amenerEnHaut(corpsRef.current?.querySelector(`[data-journee="${aAmener.date}"]`) ?? null);
   }, [aAmener]);
 
-  /* CHOISIR UN JOUR : la fenêtre se rouvre autour de lui, il est amené sous
-     les yeux, ET S'IL NE PORTE RIEN IL S'OUVRE DÉPLIÉ (2026-09-26, « Si on
-     clique sur un jour sasns donnée, on arrive sur ce jour par defaut
-     deplié »). */
-  const choisirJour = (date: string) => {
+  /* ALLER À UN JOUR : la fenêtre se rouvre autour de lui et il est amené
+     sous les yeux. */
+  const allerAuJour = (date: string) => {
     setJour(date);
-    setPas({ avant: 0, apres: 0 });
-    if (!pointes.has(date)) setDeplies((ouvertes) => new Set(ouvertes).add(date));
     setAAmener((precedent) => ({ date, n: precedent.n + 1 }));
   };
 
-  /* UN « VOIR PLUS » : six mois de plus de ce côté, et la lecture reprend
-     sur la journée qui était à la limite. */
-  const etendre = (cote: 'avant' | 'apres') => {
-    const limite = cote === 'avant' ? fenetre.debut : fenetre.fin;
-    setPas((p) => ({ ...p, [cote]: p[cote] + 1 }));
-    setAAmener((precedent) => ({ date: limite, n: precedent.n + 1 }));
+  /* CHOISIR UN JOUR AU CALENDRIER : comme ci-dessus, ET S'IL NE PORTE RIEN
+     IL S'OUVRE DÉPLIÉ (2026-09-26, « Si on clique sur un jour sasns donnée,
+     on arrive sur ce jour par defaut deplié »). */
+  const choisirJour = (date: string) => {
+    if (!pointes.has(date)) setDeplies((ouvertes) => new Set(ouvertes).add(date));
+    allerAuJour(date);
   };
+
+  /* UN « VOIR PLUS » : LE JOUR COURANT SE DÉPLACE AU BOUT QU'ON VIENT
+     D'ATTEINDRE (2026-09-26, « quand on clique sur "voir plus" dans le
+     passé : le jour courant est décalé au nouveau jour le plus ancien ;
+     dans le futur : le jour courant est décalé au 1er jour des nouveaux
+     jour qui viennent d'etre charges ») — la fenêtre se rouvre autour de
+     lui, six mois de plus apparaissent de ce côté, et la lecture reprend
+     sur ce jour-là : rien ne saute. Un jour vide atteint ainsi ne se déplie
+     pas de lui-même : on ne l'a pas choisi, on est arrivé dessus. */
+  const etendre = (cote: 'avant' | 'apres') => allerAuJour(cote === 'avant' ? fenetre.debut : fenetre.fin);
 
   /* LE TIROIR DU FILTRE, en trois états comme ceux de la barre du bas : le
      panneau reste monté le temps de redescendre, puis se démonte. */
