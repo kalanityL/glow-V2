@@ -1,29 +1,42 @@
 #!/usr/bin/env python3
 """
-DÉCOUPER SES PLANCHES D'ICÔNES DE SPORT (2026-09-26, « découpe et met a jour
-toutes les icones sports et catégroies de sport dans ../images pour claude/../
-sportv2 (supprime les nuages) ») : dix planches où chaque sport est dessiné en
-relief, bleu, posé sur un petit nuage, son nom écrit dessous. Chacune donne un
-PNG détouré, nommé du slug de son sport.
+DÉCOUPER SES PLANCHES D'ICÔNES D'ACTIVITÉ PHYSIQUE (2026-09-26, « remplacer
+les images sports et categories de sport par ../... sportv3 - découpe et
+remplace ») : dix planches où chaque sport et chaque catégorie est dessiné en
+relief, bleu sur blanc, son nom écrit dessous. Chacune donne un PNG nommé du
+slug du nœud de niveau 1 de l'arbre (`domaine/activites.ts`, `slugActivite`).
 
-CE NE SONT PAS DES MASQUES, contrairement aux icônes de sport d'avant : ces
-dessins ont leurs dégradés et leur volume, qu'un aplat de thème détruirait.
-Leurs couleurs sont celles de ses images — exception consignée, comme les
-icônes de la home.
+ON DÉCOUPE, ON NE REDESSINE PAS (2026-09-26, « catastrophe rien a voir avec
+les images ; ne redessine pa, decoupe et utilise. remets la v1 et recommence
+a zero la v3 sans redessiner ») : les icônes gardent LEURS couleurs, leurs
+dégradés et leur relief. Un premier essai les avait rendues en MASQUES —
+l'alpha seul, le RGB à zéro, la feuille les remplissant d'un aplat du thème —
+et les dessins étaient devenus des silhouettes bleues unies. C'est
+l'architecture d'avant ; elle ne vaut plus pour ces images-là.
 
-LES NUAGES : ils sont d'un bleu pâle qui CHEVAUCHE les blancs du dessin
-(relevé au pixel : nuage de 1 à 61 d'écart au blanc, blanc du dessin de 11 à
-88) — aucun seuil de couleur ne les sépare. On passe donc par la GÉOMÉTRIE :
-les traits soutenus du dessin, fermés puis remplis, font son enveloppe ; tout
-ce qui est dehors s'en va, nuages compris. Il reste autour du dessin quelques
-plages de BLANC QUASI PUR que la fermeture ne sait pas rogner ; elles sont
-invisibles sur les fonds blancs de l'application, où ces icônes se posent sans
-pastille.
+Ce sont donc des IMAGES EN COULEUR, et `themes/page.css` les pose telles
+quelles (`background-image`, pas `mask`). Exception consignée dans GUIDELINES,
+comme les icônes de la home : leurs couleurs sont celles de ses images.
 
-Les noms viennent de `PLANCHES` : ils sont LUS sur les planches, dans l'ordre
-de lecture (de gauche à droite, de haut en bas). Le découpage, lui, est
-automatique — par projection des blancs, une cellule par sport, l'icône prise
-au-dessus de son nom.
+SES PLANCHES DE SEPTEMBRE AVAIENT DES NUAGES, CELLES-CI N'EN ONT PLUS : le
+fond est à 0-2 d'écart du blanc. Le détourage se fait donc à l'écart au blanc,
+sans ruser par la géométrie — l'alpha suit ce que le pixel a d'encre, le RGB
+est gardé tel quel.
+
+LE DÉCOUPAGE distingue trois choses, mesurées au pixel :
+  — LE TEXTE EST BLEU NUIT, LES DESSINS SONT BLEU VIF (un nom : (28, 61, 126) ;
+    un dessin : (76, 150, 245)). Un pixel dont le bleu est sous 190 ET le vert
+    sous 118 est du texte ; dilaté, il emporte son anticrénelage.
+  — UN TITRE DE PLANCHE est une bande de texte LOIN sous la rangée d'avant,
+    quand une bande de noms la suit de quelques dizaines de pixels.
+  — UN LIBELLÉ DE MARGE (« Raquettes », « Roues »…) CHEVAUCHE verticalement sa
+    rangée de dessins, au lieu d'être dessous.
+Les cellules viennent ensuite des NOMS : chaque nom donne son abscisse, et
+chaque morceau de dessin de la rangée va au nom le plus proche — deux dessins
+qui se touchent se partagent ainsi sans se couper.
+
+Le compte trouvé doit ÉGALER le compte des noms lus sur la planche, sinon rien
+n'est écrit.
 
     python3 scripts/decouper-icones-sports.py
 (il faut Pillow et numpy.)
@@ -35,58 +48,66 @@ import unicodedata
 import numpy as np
 from PIL import Image, ImageFilter
 
-SOURCE = Path.home() / "Desktop/GLOW/Images-pour-claude/icones/sportv2"
+SOURCE = Path.home() / "Desktop/GLOW/Images-pour-claude/icones/sportv3"
 SORTIE = Path(__file__).resolve().parent.parent / "src/assets/images/activites"
 
-# Le seuil qui distingue un trait du dessin d'un nuage, et le rayon de la
-# fermeture qui relie les traits et englobe les plages blanches du dessin.
-TRAIT = 55
-FERMETURE = 41
-# Le côté du carré rendu, et l'air autour.
-COTE = 160
-MARGE = 0.04
+ENCRE = 25
+ALPHA_BAS, ALPHA_HAUT = 28, 58
+TEXTE_BLEU, TEXTE_VERT = 190, 118
+PAS = 4
+COTE = 192
+MARGE = 0.05
 
-# Ses dix planches, et ce qu'elles portent DANS L'ORDRE DE LECTURE.
-# `None` : une image à ignorer (un nom que l'arbre ne porte plus).
+# Quand le découpage automatique se trompe, on lui dit le nombre de dessins
+# PAR RANGÉE. La planche des activités aquatiques en a besoin : deux de ses
+# dessins se touchent, et l'automatique n'en voyait que seize sur dix-sept.
+RANGEES = {
+    "ChatGPT Image 26 sept. 2026, 15_12_48.png": [6, 5, 6],
+}
+
 PLANCHES = {
-    "ChatGPT Image 26 sept. 2026, 12_35_35.png": [
-        "Basket-ball", "Football", "Football américain", "Rugby", "Handball",
-        "Hockey", "Volley-ball", "Baseball", "Softball", "Golf",
-        "Croquet", "Pétanque et boulingrin", "Cricket", "Kickball", "Crosse", "Netball",
-        "Pelote basque", "Hacky sack", "Jonglage", "Curling",
-    ],
-    "ChatGPT Image 26 sept. 2026, 12_36_22.png": [
-        "Badminton", "Tennis", "Squash", "Racquetball", "Paddleball", "Tennis de table",
+    "ChatGPT Image 26 sept. 2026, 15_10_30.png": [
+        "Badminton", "Tennis", "Squash", "Racquetball", "Paddleball",
+        "Tennis de table, ping-pong (Taylor Code 410)",
         "Vélo", "Roller", "Skateboard",
         "Marche", "Randonnée", None, "Course à pied", "Athlétisme",
-        "Équitation", "Rodéo", "Polo",
+        "Équitation", "Rodéo", "Polo, à cheval",
     ],
-    "ChatGPT Image 26 sept. 2026, 12_37_32.png": [
+    "ChatGPT Image 26 sept. 2026, 15_11_53.png": [
         "Yoga", "Pilates", "Callisthénie", "Cardio", "Aérobic", "Vélo elliptique",
         "Rameur", "Muscu", "Danse", "Zumba", "Corde à sauter", "Trampoline",
         "Boxe", "Arts martiaux", "Escrime", "Escalade", "Frisbee",
-        "Gymnastique", "Lutte", "Parachutisme", "Tir à l'arc", "Fléchettes",
+        "Gymnastique, en général",
+        "Lutte, en compétition (un combat = 5 minutes)",
+        "Parachutisme, base jump, saut à l’élastique",
+        "Tir à l’arc (hors chasse)",
+        "Fléchettes, murales ou sur gazon",
     ],
-    "ChatGPT Image 26 sept. 2026, 12_37_54.png": [
-        "Natation", "Plongée", "Aquagym", "Course aquatique", "Marche aquatique", "Vélo aquatique",
-        "Canoë, kayak et aviron", "Voile", "Surf", "Stand up paddle", "Planche à voile",
-        "Plongeon", "Water-polo", "Volley-ball aquatique", "Pédalo", "Ski nautique", "Tubing",
+    "ChatGPT Image 26 sept. 2026, 15_12_48.png": [
+        "Natation", "Plongée", "Aquagym", "Course aquatique", "Marche aquatique",
+        "Vélo aquatique",
+        "Canoë, kayak et aviron", "Voile", "Surf", "Stand up paddle",
+        "Planche à voile",
+        "Plongeon, tremplin ou plateforme", "Water-polo", "Volley-ball aquatique",
+        "Pédalo", "Ski nautique ou wakeboard (Taylor Code 220)",
+        "Tubing, descente d’une rivière en flottant sur une bouée, en général",
     ],
-    "ChatGPT Image 26 sept. 2026, 12_39_15.png": [
-        "Patinage", "Ski", "Raquettes à neige", "Motoneige", "Alpinisme", "Saut à ski", "Luge et bobsleigh",
-        "Chasse et pêche", "Ménage et entretien de la maison", "Jardinage", "Bricolage",
-        "Entretien automobile", "Entretien de bateau", "Pratique musicale", "Escalier",
+    "ChatGPT Image 26 sept. 2026, 15_18_09.png": [
+        "Patinage", "Ski", "Raquettes à neige", "Motoneige", "Alpinisme",
+        "Saut à ski, montée en portant les skis",
+        "Luge, toboggan, bobsleigh, luge de compétition (Taylor Code 370)",
+        "Chasse et pêche", "Ménage et entretien de la maison", "Jardinage",
+        "Bricolage", "Entretien automobile", "Entretien de bateau",
+        "Pratique musicale", "Escalier",
     ],
-    # Les catégories, sur leur propre planche.
-    "ChatGPT Image 26 sept. 2026, 12_38_35.png": [
+    "ChatGPT Image 26 sept. 2026, 15_13_45.png": [
         "cat:pedestre", "cat:cheval", "cat:roues",
-        "cat:activites-aquatiques", "cat:activites-hivernales", "cat:autre",
+        "cat:aquatiques", "cat:hivernales", "cat:autre",
     ],
-    # Quatre images seules : un sport, trois catégories.
-    "ChatGPT Image 26 sept. 2026, 12_35_56.png": ["Bowling"],
-    "ChatGPT Image 26 sept. 2026, 12_35_59.png": ["cat:raquettes"],
-    "ChatGPT Image 26 sept. 2026, 12_36_03.png": ["cat:ballon-et-balles"],
-    "ChatGPT Image 26 sept. 2026, 12_36_05.png": ["cat:individuel"],
+    "ChatGPT Image 26 sept. 2026, 14_37_08.png": ["Bowling"],
+    "ChatGPT Image 26 sept. 2026, 15_05_11.png": ["cat:raquettes"],
+    "ChatGPT Image 26 sept. 2026, 15_06_14.png": ["cat:ballon-et-balles"],
+    "ChatGPT Image 26 sept. 2026, 15_08_35.png": ["cat:individuel"],
 }
 
 
@@ -94,41 +115,18 @@ def slug(nom: str) -> str:
     """Le slug d'un nom d'activité — le même que `domaine/activites.ts`."""
     sans = unicodedata.normalize("NFD", nom)
     sans = "".join(c for c in sans if unicodedata.category(c) != "Mn")
-    sortie = []
-    for c in sans.lower():
-        sortie.append(c if c.isalnum() else "-")
-    return "-".join(m for m in "".join(sortie).split("-") if m)
+    sortie = "".join(c if c.isalnum() else "-" for c in sans.lower())
+    return "-".join(m for m in sortie.split("-") if m)
 
 
-def remplir(masque):
-    """Ce qui n'est pas atteint depuis les bords : l'intérieur du dessin."""
-    h, l = masque.shape
-    dehors = np.zeros((h, l), dtype=bool)
-    file = deque()
-    for x in range(l):
-        for y in (0, h - 1):
-            if not masque[y, x] and not dehors[y, x]:
-                dehors[y, x] = True
-                file.append((y, x))
-    for y in range(h):
-        for x in (0, l - 1):
-            if not masque[y, x] and not dehors[y, x]:
-                dehors[y, x] = True
-                file.append((y, x))
-    while file:
-        y, x = file.popleft()
-        for dy, dx in ((1, 0), (-1, 0), (0, 1), (0, -1)):
-            v, u = y + dy, x + dx
-            if 0 <= v < h and 0 <= u < l and not masque[v, u] and not dehors[v, u]:
-                dehors[v, u] = True
-                file.append((v, u))
-    return ~dehors
+def dilater(masque, rayon):
+    image = Image.fromarray((masque * 255).astype(np.uint8), "L")
+    return np.array(image.filter(ImageFilter.MaxFilter(rayon))) > 128
 
 
-def blocs(profil, creux=6):
-    """Les suites de lignes (ou de colonnes) non vides, en (début, fin)."""
-    suites, debut = [], None
-    vide = 0
+def bandes(profil, creux):
+    """Les suites d'indices pleins, en (début, fin), qu'un creux sépare."""
+    suites, debut, vide = [], None, 0
     for i, plein in enumerate(profil):
         if plein:
             if debut is None:
@@ -144,37 +142,149 @@ def blocs(profil, creux=6):
     return suites
 
 
-def cellules(ecart):
-    """Les cellules d'une planche : une par sport, dans l'ordre de lecture.
-
-    Une rangée est une bande de lignes non vides ; dans une rangée, chaque
-    colonne non vide est une cellule (l'icône ET son nom). L'icône est le
-    premier bloc de la cellule, le nom celui d'en dessous."""
-    encre = ecart > 25
-    rangees = blocs(encre.any(axis=1), creux=18)
-    trouvees = []
-    for haut, bas in rangees:
-        bande = encre[haut : bas + 1]
-        for gauche, droite in blocs(bande.any(axis=0), creux=18):
-            colonne = bande[:, gauche : droite + 1]
-            morceaux = blocs(colonne.any(axis=1), creux=6)
-            if not morceaux:
+def morceaux(carte):
+    """Les composantes connexes d'une carte booléenne, en boîtes."""
+    h, l = carte.shape
+    vu = np.zeros((h, l), dtype=bool)
+    boites = []
+    for y0 in range(h):
+        for x0 in range(l):
+            if not carte[y0, x0] or vu[y0, x0]:
                 continue
-            # L'icône : le premier morceau. Les suivants sont son nom.
-            hd, hf = morceaux[0]
-            trouvees.append((gauche, droite, haut + hd, haut + hf))
+            file = deque([(y0, x0)])
+            vu[y0, x0] = True
+            hmin = hmax = y0
+            lmin = lmax = x0
+            while file:
+                y, x = file.popleft()
+                hmin, hmax = min(hmin, y), max(hmax, y)
+                lmin, lmax = min(lmin, x), max(lmax, x)
+                for dy in (-1, 0, 1):
+                    for dx in (-1, 0, 1):
+                        v, u = y + dy, x + dx
+                        if 0 <= v < h and 0 <= u < l and carte[v, u] and not vu[v, u]:
+                            vu[v, u] = True
+                            file.append((v, u))
+            boites.append((lmin, lmax, hmin, hmax))
+    return boites
+
+
+def cartes(a):
+    """La carte des dessins et celle du texte, séparées par la couleur."""
+    ecart = np.abs(a.astype(int) - 255).max(axis=2)
+    encre = ecart > ENCRE
+    # Le texte est bleu nuit, les dessins bleu vif : dilaté, le texte emporte
+    # son anticrénelage et ne compte plus comme dessin.
+    texte = dilater(encre & (a[:, :, 2] < TEXTE_BLEU) & (a[:, :, 1] < TEXTE_VERT), 9)
+    return encre & ~texte, texte
+
+
+def rangees_de_dessins(a):
+    """Les bandes de lignes où il y a des dessins, et la carte des dessins."""
+    dessins, _ = cartes(a)
+    return dessins, bandes(dessins.any(axis=1), creux=12)
+
+
+def colonnes_de_rangee(dessins, haut, bas, combien):
+    """Les boîtes des `combien` dessins d'une rangée.
+
+    UN DESSIN EST FAIT DE PIÈCES DÉTACHÉES (une raquette, un volant et une
+    balle font trois morceaux) : on ne les compte pas une à une, on coupe la
+    rangée aux CREUX VERTICAUX. Le creux juste se cherche — trop petit, un
+    dessin se coupe en deux ; trop grand, deux voisins se collent. On essaie
+    de l'étroit au large et on garde celui qui donne le compte attendu."""
+    profil = dessins[haut : bas + 1].any(axis=0)
+    meilleur = None
+    for creux in range(4, 141, 2):
+        parts = [(g, d) for g, d in bandes(profil, creux=creux) if d - g > 16]
+        if len(parts) == combien:
+            meilleur = parts
+            break
+    if meilleur is None:
+        return None
+    boites = []
+    for g, d in meilleur:
+        colonne = dessins[haut : bas + 1, g : d + 1]
+        lignes = np.where(colonne.any(axis=1))[0]
+        boites.append((g, d, haut + int(lignes.min()), haut + int(lignes.max())))
+    return boites
+
+
+def par_les_noms(dessins, texte, haut, bas, combien):
+    """Couper une rangée AUX NOMS écrits dessous, quand les dessins se
+    touchent (le water-polo et le volley-ball de la planche aquatique le
+    font, et le plongeoir du plongeon se détache de son plongeur).
+
+    On ne rattache pas chaque morceau à un nom — un dessin peut n'en avoir
+    aucun de son côté : ON COUPE LA RANGÉE AUX MILIEUX entre deux noms
+    voisins. Chaque tranche est un dessin."""
+    suite = [b for b in bandes(texte.any(axis=1), creux=12) if b[0] > bas and b[0] - bas < 90]
+    if not suite:
+        return None
+    hn, bn = suite[0]
+    colonnes = bandes(texte[hn : bn + 1].any(axis=0), creux=24)
+    if len(colonnes) != combien:
+        return None
+    centres = [(g + d) / 2 for g, d in colonnes]
+    frontieres = [0] + [int((centres[i] + centres[i + 1]) / 2) for i in range(combien - 1)] + [dessins.shape[1]]
+    boites = []
+    for i in range(combien):
+        tranche = dessins[haut : bas + 1, frontieres[i] : frontieres[i + 1]]
+        if not tranche.any():
+            return None
+        lignes = np.where(tranche.any(axis=1))[0]
+        cols = np.where(tranche.any(axis=0))[0]
+        boites.append((frontieres[i] + int(cols.min()), frontieres[i] + int(cols.max()),
+                       haut + int(lignes.min()), haut + int(lignes.max())))
+    return boites
+
+
+def cellules(a, noms, par_rangee=None):
+    """Les boîtes des dessins d'une planche, dans l'ordre de lecture.
+
+    Le nombre de dessins attendu par rangée n'est pas dit : on essaie de
+    répartir `len(noms)` sur les rangées trouvées, la dernière prenant le
+    reste. Une planche à une seule icône prend tout d'un bloc."""
+    dessins, texte = cartes(a)
+    rangees = bandes(dessins.any(axis=1), creux=12)
+    if not rangees:
+        return []
+    if len(noms) == 1:
+        lignes = np.where(dessins.any(axis=1))[0]
+        colonnes = np.where(dessins.any(axis=0))[0]
+        return [(int(colonnes.min()), int(colonnes.max()), int(lignes.min()), int(lignes.max()))]
+    # Combien de dessins par rangée : dit par `RANGEES` quand l'automatique
+    # se trompe, cherché sinon — rangée par rangée, le découpage qui laisse
+    # assez de place aux rangées suivantes.
+    trouvees = []
+    reste = len(noms)
+    for i, (haut, bas) in enumerate(rangees):
+        if par_rangee:
+            if i >= len(par_rangee):
+                return []
+            boites = colonnes_de_rangee(dessins, haut, bas, par_rangee[i])
+            if not boites:
+                boites = par_les_noms(dessins, texte, haut, bas, par_rangee[i])
+        else:
+            rangees_restantes = len(rangees) - i - 1
+            boites = None
+            for combien in range(min(reste - rangees_restantes, 12), 0, -1):
+                boites = colonnes_de_rangee(dessins, haut, bas, combien)
+                if boites:
+                    break
+        if not boites:
+            return []
+        trouvees.extend(boites)
+        reste -= len(boites)
     return trouvees
 
 
 def detourer(vignette):
-    a = np.array(vignette).astype(int)
-    ecart = np.abs(a - 255).max(axis=2)
-    fort = Image.fromarray(((ecart > TRAIT) * 255).astype(np.uint8), "L")
-    env = remplir(np.array(fort.filter(ImageFilter.MaxFilter(FERMETURE))) > 128)
-    env = np.array(Image.fromarray((env * 255).astype(np.uint8), "L").filter(ImageFilter.MinFilter(FERMETURE))) > 128
-    env = remplir(env)
-    alpha = np.array(Image.fromarray((env * 255).astype(np.uint8), "L").filter(ImageFilter.GaussianBlur(0.8)))
-    return Image.fromarray(np.dstack([np.array(vignette), alpha]), "RGBA")
+    """Le dessin SANS son fond, SES COULEURS GARDÉES — on ne redessine pas."""
+    rgb = np.array(vignette.convert("RGB"))
+    ecart = np.abs(rgb.astype(int) - 255).max(axis=2)
+    alpha = np.clip((ecart - ALPHA_BAS) * 255 / (ALPHA_HAUT - ALPHA_BAS), 0, 255).astype(np.uint8)
+    return Image.fromarray(np.dstack([rgb, alpha]), "RGBA")
 
 
 def au_carre(dessin):
@@ -191,35 +301,31 @@ def au_carre(dessin):
 
 def main() -> None:
     (SORTIE / "sports").mkdir(parents=True, exist_ok=True)
-    total, manques = 0, []
+    total, refusees = 0, []
     for fichier, noms in PLANCHES.items():
         chemin = SOURCE / fichier
         if not chemin.exists():
-            print(f"  MANQUE la planche {fichier}")
+            print(f"  MANQUE la planche {fichier[-14:]}")
             continue
         planche = Image.open(chemin).convert("RGB")
-        ecart = np.abs(np.array(planche).astype(int) - 255).max(axis=2)
-        trouvees = cellules(ecart)
+        trouvees = cellules(np.array(planche), noms, RANGEES.get(fichier))
         if len(trouvees) != len(noms):
-            print(f"  ⚠ {fichier[-14:]} : {len(trouvees)} cellules pour {len(noms)} noms — planche ignorée")
-            manques.append(fichier)
+            print(f"  ⚠ {fichier[-14:]} : {len(trouvees)} dessins pour {len(noms)} noms — rien écrit")
+            refusees.append(fichier[-14:])
             continue
         for (g, d, h, b), nom in zip(trouvees, noms):
             if nom is None:
                 continue
-            marge = 10
-            vignette = planche.crop((max(0, g - marge), max(0, h - marge), min(planche.width, d + marge), min(planche.height, b + marge)))
+            m = 8
+            vignette = planche.crop((max(0, g - m), max(0, h - m), min(planche.width, d + m), min(planche.height, b + m)))
             image = au_carre(detourer(vignette))
-            if nom.startswith("cat:"):
-                cible = SORTIE / f"{nom[4:]}.png"
-            else:
-                cible = SORTIE / "sports" / f"{slug(nom)}.png"
+            cible = SORTIE / f"{nom[4:]}.png" if nom.startswith("cat:") else SORTIE / "sports" / f"{slug(nom)}.png"
             image.save(cible, optimize=True)
             total += 1
-        print(f"  {fichier[-14:]} : {len(trouvees)} découpées")
+        print(f"  {fichier[-14:]} : {len(trouvees)} découpés")
     print(f"\n  {total} icônes écrites dans {SORTIE}")
-    if manques:
-        print("  planches à revoir :", ", ".join(m[-14:] for m in manques))
+    if refusees:
+        print("  planches à revoir :", ", ".join(refusees))
 
 
 if __name__ == "__main__":

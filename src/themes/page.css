@@ -2948,7 +2948,6 @@
   display: block;
   width: 100%;
   height: 100%;
-  background: var(--encre-chapeau);
 }
 
 .confirmation__valeur {
@@ -3356,12 +3355,16 @@
   height: 48px;
 }
 
+/* SES DESSINS EN COULEUR, POSÉS TELS QUELS (2026-09-26, « catastrophe rien a
+   voir avec les images ; ne redessine pa, decoupe et utilise ») : une image
+   de fond, plus un masque rempli d'un aplat du thème — ses icônes ont leurs
+   dégradés et leur relief, et un masque les rendait en silhouettes bleues
+   unies. Leurs couleurs sont donc celles de ses images, pas celles du thème :
+   exception consignée, comme les icônes de la home. */
 .categorie__icone {
   width: 100%;
   height: 100%;
-  background: var(--ajout-icone-encre);
-  -webkit-mask: var(--categorie-masque) center / contain no-repeat;
-  mask: var(--categorie-masque) center / contain no-repeat;
+  background: var(--categorie-masque) center / contain no-repeat;
 }
 
 .categorie__nom {
@@ -4731,7 +4734,6 @@
   display: block;
   width: 100%;
   height: 100%;
-  background: currentColor;
 }
 
 .journal__vignette {

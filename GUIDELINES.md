@@ -1295,6 +1295,28 @@ cinq mots des jours relatifs sont montés à la racine du dictionnaire
 (`joursRelatifs`) : ils servaient au sommeil, ils servent au journal, un
 seul jeu.
 
+**LES ICÔNES D'ACTIVITÉ SONT SES DESSINS EN COULEUR DEPUIS LE 2026-09-26**
+(« remplacer les images sports et categories de sport par ../... sportv3 -
+découpe et remplace », puis « catastrophe rien a voir avec les images ; ne
+redessine pa, decoupe et utilise. remets la v1 et recommence a zero la v3
+sans redessiner ») : ses dix planches `Images-pour-claude/icones/sportv3/`,
+découpées par `scripts/decouper-icones-sports.py` en 80 PNG — neuf
+catégories et soixante et onze sports. **ON DÉCOUPE, ON NE REDESSINE PAS** :
+les icônes gardent LEURS couleurs, leurs dégradés et leur relief, et
+`page.css` les pose en `background-image`, plus en `mask`. Un premier essai
+les avait rendues en MASQUES, comme celles d'avant — la feuille les
+remplissait d'un aplat du thème et les dessins devenaient des silhouettes
+bleues unies ; c'est l'architecture d'avant, elle ne vaut plus pour ces
+images-là. **Leurs couleurs sont donc celles de ses images, pas celles du
+thème : exception consignée**, comme les icônes de la home. **LES SPORTS DE
+"BALLON ET BALLES" N'ONT PAS D'ICÔNE** — cette catégorie n'a pas de planche
+dans `sportv3` — et leurs anciens masques ont été retirés : ils prennent
+l'icône de leur catégorie, comme tout nœud sans dessin. Le découpage
+distingue le texte (bleu nuit) des dessins (bleu vif), écarte les titres de
+planche et les libellés de marge, et coupe chaque rangée aux creux entre
+dessins — ou, quand deux dessins se touchent, AUX MILIEUX ENTRE LES NOMS
+écrits dessous.
+
 **Toute page de l'application porte la barre du bas** (`BarreDuBas`, avec
 ses deux tiroirs) et, hors de l'accueil, **l'entête des pages**
 (`EntetePage` : la marque en petit et les deux outils sur une ligne, le
