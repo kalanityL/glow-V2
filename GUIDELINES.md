@@ -1206,15 +1206,18 @@ de reprendre un mécanisme qui marche déjà dans le projet plutôt que d'en
 aussi). **LES BORNES S'Y APPLIQUENT COMME AU « VOIR PLUS »** (« Idem voir
 plus selon les memes regles qd on arrive à une borne », `dansLesBornes`) :
 à dix ans en arrière ou un an en avant, la date est rabattue, la flèche
-s'éteint et le glissement ne fait plus rien ; **les jours qui portent quelque chose sont pointés**,
-filtre compris, le futur compris. **TROIS ÉTATS POUR UNE DATE, ET TROIS
+s'éteint et le glissement ne fait plus rien ; **C'EST LE VIDE QUI SE MARQUE, d'un tiret fin et pâle sous le quantième
+(2026-09-26, « pas de point bleu qd il y a une donnée. On oublie le point
+bleu. On met un tiret tres fin gris tres clair qd il n'y a pas de
+donnée. ») — le point bleu des jours pleins a vécu la journée. **TROIS ÉTATS POUR UNE DATE, ET TROIS
 SEULEMENT** (2026-09-26, « mois et semaine : date du jour : fond bleu
 contour gris tres clair ; date selectionnée: contour bleu sky; date ni
 l'un ni l'autre : fond blanc contour gris tres clair comme actuellement ») :
-le JOUR MÊME plein à l'accent, son contour restant le gris des autres ; la
-DATE CHOISIE sur fond blanc, cernée d'un bleu BEAUCOUP PLUS CLAIR que celui
-du jour même (le même jour, « bleu ciel de selection -> passe le bcp plus
-clair que le bleu de date du jour » : un tiers de l'accent sur le fond) ; toute autre sur fond blanc,
+le JOUR MÊME sur FOND BLEU CLAIR, son contour restant le gris des autres ;
+la DATE CHOISIE sur fond blanc, cernée d'UN PIXEL DE BLEU FONCÉ (les deux
+bleus ont été échangés le même jour : « on inverse et on met bleu clair
+couleur de fond du jour courant et bleu foncé contour jour selectionné »,
+puis « passe le contour seletionné en épaisseur 1px ») ; toute autre sur fond blanc,
 cernée du gris très clair. Le jour choisi plein à l'accent a vécu la
 journée — alors que la liste ne montre rien de
 plus récent que le jour choisi. Le titre d'une journée : LA DATE EN TOUTES LETTRES À GAUCHE, TOUJOURS

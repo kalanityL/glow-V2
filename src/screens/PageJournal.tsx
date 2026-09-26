@@ -135,9 +135,15 @@ export function PageJournal({
      promènent le regard, SEUL UN CLIC change la date. `placer` est un
      compteur : il ne bouge que lorsqu'il faut ramener le rail sous le
      regard — un glissement, lui, a déjà placé le rail tout seul. */
-  const [vise, setVise] = useState({ date: jourInitial ?? aujourdhui, placer: 0 });
-  /* Porter le regard quelque part, et y ramener le rail. */
-  const regarder = (date: string) => setVise((v) => ({ date, placer: v.placer + 1 }));
+  const [vise, setVise] = useState<{ date: string; placer: number; ou: 'milieu' | 'debut' }>({
+    date: jourInitial ?? aujourdhui,
+    placer: 0,
+    ou: 'milieu',
+  });
+  /* Porter le regard quelque part, et y ramener le rail — au milieu de la
+     bande d'ordinaire, À SON DÉBUT quand on saute au premier d'un mois. */
+  const regarder = (date: string, ou: 'milieu' | 'debut' = 'milieu') =>
+    setVise((v) => ({ date, placer: v.placer + 1, ou }));
   const [vue, setVue] = useState<'semaine' | 'mois'>('semaine');
   /* LA LIGNE DES RÉGLAGES, REPLIÉE PAR DÉFAUT (2026-09-26, « a la place de
      26 semaine mois -> le texte "options" souligné ; quand on clique sur
@@ -199,7 +205,7 @@ export function PageJournal({
   const choisirJour = (date: string, ramener = false) => {
     if (!pointes.has(date)) setDeplies((ouvertes) => new Set(ouvertes).add(date));
     setJour(date);
-    setVise((v) => ({ date, placer: ramener ? v.placer + 1 : v.placer }));
+    setVise((v) => ({ date, placer: ramener ? v.placer + 1 : v.placer, ou: 'milieu' }));
     setAAmener((precedent) => ({ date, n: precedent.n + 1 }));
   };
 
@@ -234,14 +240,32 @@ export function PageJournal({
      en arrière ou un an en avant, la flèche s'éteint et le volet de ce côté
      n'existe pas. */
   const bornes = bornesDuJournal(aujourdhui);
-  /* LES FLÈCHES PROMÈNENT LE REGARD, elles ne choisissent pas : une semaine
-     ou un mois de plus, sans toucher à la date sélectionnée. */
+  /* LES FLÈCHES PROMÈNENT LE REGARD, elles ne choisissent pas : elles ne
+     touchent jamais à la date sélectionnée.
+     CELLES DU NOM DU MOIS VONT D'UN MOIS À L'AUTRE, dans les deux vues
+     (2026-09-26, « les chevrons autour du nom du mois font defiler d'un mois
+     vers le suivant ») ET SE POSENT AU PREMIER DU MOIS EN VUE SEMAINE
+     (« positionne au 1er du mois en debut de ligne si on est en affichage
+     semaine ») : la bande s'ouvre alors sur le 1er, qui est son premier
+     cran. */
+  const moisVoisin = (pas: number) => {
+    const cible = dateDecaleeDeMois(vise.date, pas);
+    const premier = `${cible.slice(0, 8)}01`;
+    return dansLesBornes(vue === 'semaine' ? premier : cible, aujourdhui);
+  };
+  const reculer = () => {
+    const voulu = moisVoisin(-1);
+    if (voulu !== vise.date) regarder(voulu, 'debut');
+  };
+  const avancer = () => {
+    const voulu = moisVoisin(1);
+    if (voulu !== vise.date) regarder(voulu, 'debut');
+  };
+  /* Les deux chevrons de la bande, eux, vont d'une semaine. */
   const deplacer = (pas: number) => {
     const voulu = dansLesBornes(vue === 'semaine' ? dateDecalee(vise.date, 7 * pas) : dateDecaleeDeMois(vise.date, pas), aujourdhui);
     if (voulu !== vise.date) regarder(voulu);
   };
-  const reculer = () => deplacer(-1);
-  const avancer = () => deplacer(1);
   /* Au bout, la flèche s'éteint : le regard ne bougerait plus. */
   const peutReculer = vise.date > bornes.min;
   const peutAvancer = vise.date < bornes.max;
@@ -300,7 +324,8 @@ export function PageJournal({
          plus le fausser. */
       const rang = piste.indexOf(vise.date);
       const pasDuJour = zone.scrollWidth / piste.length;
-      if (rang >= 0) defilerHorizontalA(zone, (rang - (JOURS_VISIBLES - 1) / 2) * pasDuJour, false);
+      const decalage = vise.ou === 'debut' ? 0 : (JOURS_VISIBLES - 1) / 2;
+      if (rang >= 0) defilerHorizontalA(zone, (rang - decalage) * pasDuJour, false);
     } else {
       defilerHorizontalA(zone, rangCourant * zone.clientWidth, false);
     }
@@ -445,6 +470,13 @@ export function PageJournal({
             ) : null}
 
             {vue === 'semaine' ? (
+              /* LES DEUX CHEVRONS DE LA BANDE (2026-09-26, « sans rien
+                 changer au positionnement des jours, ajoute à l'intérieur
+                 des mini espaces blancs sur le côté, des mini chevrons avant
+                 arriere encerclés qui font défilés d'une semaine à chaque
+                 clic ») : posés PAR-DESSUS la piste, aux deux bouts — le
+                 placement des cartes ne bouge pas d'un pixel. */
+              <div className="journal__bande">
               <div className="journal__rail journal__rail--jours" ref={rail}>
                 {piste.map((date) => (
                   <button
@@ -456,9 +488,30 @@ export function PageJournal({
                   >
                     <span className="journal__jour-nom">{textes.calendrier.joursAbreges[jourDeLaSemaine(date)]}</span>
                     <span className="journal__jour-quantieme">{Number(date.slice(8))}</span>
-                    {pointes.has(date) ? <span className="journal__point" aria-hidden="true" /> : null}
+                    {/* C'est le VIDE qui se marque (2026-09-26) : un tiret fin et pâle
+                        sous le quantième quand la journée ne porte rien. */}
+                    {pointes.has(date) ? null : <span className="journal__point" aria-hidden="true" />}
                   </button>
                 ))}
+              </div>
+              <button
+                type="button"
+                className="journal__glisser journal__glisser--avant"
+                aria-label={textes.calendrier.moisPrecedent}
+                disabled={!peutReculer}
+                onClick={() => deplacer(-1)}
+              >
+                <IconeChevronDroit />
+              </button>
+              <button
+                type="button"
+                className="journal__glisser journal__glisser--apres"
+                aria-label={textes.calendrier.moisSuivant}
+                disabled={!peutAvancer}
+                onClick={() => deplacer(1)}
+              >
+                <IconeChevronDroit />
+              </button>
               </div>
             ) : (
               <div className="journal__rail" ref={rail}>
@@ -485,7 +538,7 @@ export function PageJournal({
                             onClick={() => choisirJour(case_.date)}
                           >
                             <span className="journal__case-quantieme">{case_.jour}</span>
-                            {pointes.has(case_.date) ? <span className="journal__point" aria-hidden="true" /> : null}
+                            {pointes.has(case_.date) ? null : <span className="journal__point" aria-hidden="true" />}
                           </button>
                         ))}
                       </div>

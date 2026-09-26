@@ -3919,6 +3919,13 @@
   min-width: 0;
 }
 
+/* Le chevron du mois suivant ne colle pas à « Options » (2026-09-26, « pkoi
+   le chevron pour passer au mois suivant est collé à option ? ») : le nom du
+   mois pousse tout à gauche, il faut rendre son air au bout. */
+.journal__fleche--suivant {
+  margin-right: 10px;
+}
+
 .journal__mois-nom {
   margin-right: auto;
   font-family: var(--font-display);
@@ -3997,6 +4004,56 @@
   user-select: none;
 }
 
+/* LES DEUX CHEVRONS DE LA BANDE (2026-09-26, « des mini chevrons avant
+   arriere encerclés qui font défilés d'une semaine à chaque clic ») : posés
+   PAR-DESSUS la piste, aux deux bouts, dans les petits blancs de ses côtés —
+   « sans rien changer au positionnement des jours », donc en absolu, hors du
+   flux. Ronds, cernés d'un filet, petits. */
+.journal__bande {
+  position: relative;
+}
+
+.journal__glisser {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  display: grid;
+  place-items: center;
+  width: 20px;
+  height: 20px;
+  padding: 0;
+  border: 1px solid color-mix(in srgb, var(--option-filet) 60%, var(--option-fond));
+  border-radius: 999px;
+  background: var(--option-fond);
+  color: var(--encre-chapeau);
+  cursor: pointer;
+}
+
+.journal__glisser .icone {
+  width: 12px;
+  height: 12px;
+}
+
+.journal__glisser--avant {
+  /* Plus à l'intérieur (2026-09-26, « décalle les chevrons encore un peu.
+     plus à l'intérieur de la marge ») : posés sur le blanc du bord, pas au
+     ras des cartes. */
+  left: -13px;
+}
+
+.journal__glisser--avant .icone {
+  transform: rotate(180deg);
+}
+
+.journal__glisser--apres {
+  right: -13px;
+}
+
+.journal__glisser:disabled {
+  opacity: 0.3;
+  cursor: default;
+}
+
 /* EN VUE SEMAINE, LA PISTE EST CONTINUE ET S'AIMANTE SUR CHAQUE JOUR
    (2026-09-26, « slide en mode semaine : slide fluide des jour en jour sans
    sacade, pas de passage de semaine en semaine ») : sept cartes visibles, le
@@ -4018,20 +4075,21 @@
   user-select: none;
 }
 
-/* SEMAINE / MOIS : deux crans dans une gouttière, celui qui est choisi plein
-   à l'accent — le motif des onglets de son image. */
+/* LA LIGNE DES OPTIONS EST NUE (2026-09-26, « ligne d'option : pas de
+   contour, pas de fond. ce qui est selectionné (semaine ou moi, mode grille
+   ou mode ligne) est souligné 1px en bleu, c'est tout ») : ni gouttière, ni
+   pastille, ni cadre — seul un filet bleu d'un pixel sous ce qui est choisi.
+   Les crans pleins à l'accent ont vécu la journée. */
 .journal__vues {
   display: flex;
-  gap: 2px;
-  padding: 3px;
-  border-radius: 999px;
-  background: color-mix(in srgb, var(--option-filet) 22%, var(--option-fond));
+  gap: 10px;
 }
 
 .journal__vue {
-  padding: 5px 10px;
+  padding: 3px 1px;
   border: 0;
-  border-radius: 999px;
+  border-bottom: 1px solid transparent;
+  border-radius: 0;
   background: none;
   color: var(--encre-chapeau);
   font-family: var(--font-body);
@@ -4041,8 +4099,8 @@
 }
 
 .journal__vue--choisie {
-  background: var(--accent);
-  color: var(--bouton-encre);
+  border-bottom-color: var(--accent);
+  color: var(--encre);
 }
 
 /* LA SEMAINE EN SEPT CARTES (« sous-header-vue semaine.png ») : 86 × 80 px
@@ -4078,48 +4136,40 @@
 
 /* TROIS ÉTATS, ET TROIS SEULEMENT (2026-09-26, « mois et semaine : date du
    jour : fond bleu contour gris tres clair ; date selectionnée: contour bleu
-   sky; date ni l'un ni l'autre : fond blanc contour gris tres clair comme
-   actuellement ») :
-   — LE JOUR MÊME : plein à l'accent, son contour reste le gris très clair
-     des autres ;
-   — LE JOUR CHOISI : fond blanc, CONTOUR BLEU CIEL, plus épais pour qu'il se
-     voie sans peser ;
+   sky; date ni l'un ni l'autre : fond blanc contour gris tres clair »), LES
+   DEUX BLEUS ÉCHANGÉS LE MÊME JOUR (« on inverse et on met bleu clair
+   couleur de fond du jour courant et bleu foncé contour jour selectionné ») :
+   — LE JOUR MÊME : fond BLEU CLAIR, son encre ordinaire, son contour le gris
+     très clair des autres ;
+   — LE JOUR CHOISI : fond blanc, CONTOUR BLEU FONCÉ — l'accent plein ;
    — les autres : fond blanc, contour gris très clair, comme avant.
-   Le jour choisi qui était plein à l'accent a vécu la journée. */
+   Le jour même plein à l'accent et le contour bleu ciel ont vécu la
+   journée. */
 .journal__jour-carte--aujourdhui {
-  background: var(--accent);
+  background: var(--option-choisi-fond);
 }
 
-.journal__jour-carte--aujourdhui .journal__jour-nom,
-.journal__jour-carte--aujourdhui .journal__jour-quantieme {
-  color: var(--bouton-encre);
-}
-
-/* LE CONTOUR DE LA DATE CHOISIE EST BEAUCOUP PLUS CLAIR QUE LE BLEU DU JOUR
-   MÊME (2026-09-26, « bleu ciel de selection -> passe le bcp plus clair que
-   le bleu de date du jour ») MAIS ASSEZ SOUTENU POUR SE VOIR (le même jour,
-   ses deux captures : « le bleu ciel de contour doit mieux se voir autour du
-   bleu de jour courant : ne change pas les épaisseurs, change la couleur du
-   bleu ciel pour qu'on le voit mieux ») : 55 % de l'accent sur le fond, là où
-   le jour même est l'accent plein — 35 % se perdait. */
+/* LE CONTOUR DE LA DATE CHOISIE EST LE BLEU FONCÉ (2026-09-26, « on inverse
+   et on met bleu clair couleur de fond du jour courant et bleu foncé contour
+   jour selectionné ») : l'accent plein, doublé d'un filet intérieur plutôt
+   qu'épaissi — un contour qui passe de 1 à 2 px déplacerait le contenu d'un
+   pixel et la rangée sauterait. */
 .journal__jour-carte--choisi {
-  border-color: color-mix(in srgb, var(--accent) 55%, var(--option-fond));
-  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--accent) 55%, var(--option-fond));
+  /* UN SEUL PIXEL (2026-09-26, « passe le contour seletionné en épaisseur
+     1px ») : le filet intérieur qui le doublait s'en va. */
+  border-color: var(--accent);
 }
 
-/* LE POINT D'UN JOUR QUI PORTE QUELQUE CHOSE (son image du calendrier) :
-   sous le quantième, à l'accent — blanc sur le jour choisi, qui est déjà
-   bleu. */
+/* PAS DE MARQUE QUAND IL Y A QUELQUE CHOSE, UN TIRET QUAND IL N'Y A RIEN
+   (2026-09-26, « pas de point bleu qd il y a une donnée. On oublie le point
+   bleu. On met un tiret tres fin gris tres clair qd il n'y a pas de
+   donnée. ») : c'est le VIDE qui se marque désormais, d'un trait fin et
+   pâle sous le quantième. Le point bleu a vécu la journée. */
 .journal__point {
-  width: 4px;
-  height: 4px;
-  border-radius: 999px;
-  background: var(--accent);
-}
-
-.journal__jour-carte--aujourdhui .journal__point,
-.journal__case--aujourdhui .journal__point {
-  background: var(--bouton-encre);
+  width: 9px;
+  height: 1px;
+  border-radius: 0;
+  background: color-mix(in srgb, var(--option-filet) 70%, var(--option-fond));
 }
 
 /* LE MOIS : six semaines de sept jours, lundi en premier (`grilleDuMois`),
@@ -4172,16 +4222,11 @@
 
 /* Les mêmes trois états dans la grille du mois. */
 .journal__case--aujourdhui {
-  background: var(--accent);
-}
-
-.journal__case--aujourdhui .journal__case-quantieme {
-  color: var(--bouton-encre);
+  background: var(--option-choisi-fond);
 }
 
 .journal__case--choisie {
-  border-color: color-mix(in srgb, var(--accent) 55%, var(--option-fond));
-  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--accent) 55%, var(--option-fond));
+  border-color: var(--accent);
 }
 
 /* « OPTIONS », AU BOUT DE LA LIGNE DU MOIS (2026-09-26, « a la place de 26
@@ -4213,6 +4258,36 @@
   color: var(--encre-chapeau);
 }
 
+/* LA MARQUE DU FOCUS EST CELLE DU PROJET, PAS L'ANNEAU DU NAVIGATEUR
+   (2026-09-26, « l'encadré en bleu autour de masquer les options c'est
+   quoi ? […] je le remplace par la marque du projet -> oui ») : la charte
+   des formulaires veut « un très léger changement de couleur », « plus
+   d'anneau ». Le focus reste MARQUÉ — sans lui, on ne se repère plus au
+   clavier —, il ne crie plus. */
+.journal__options:focus-visible,
+.journal__filtrer:focus-visible,
+.journal__vue:focus-visible,
+.journal__mode:focus-visible,
+.journal__fleche:focus-visible,
+.journal__glisser:focus-visible,
+.journal__aujourdhui:focus-visible,
+.journal__deplier:focus-visible,
+.journal__plus:focus-visible,
+.journal__jour-carte:focus-visible,
+.journal__case:focus-visible {
+  outline: none;
+  background: var(--option-choisi-fond);
+}
+
+/* Sur un réglage nu, le focus assombrit l'encre d'un rien : un fond y
+   reviendrait à poser la pastille qu'elle a retirée. */
+.journal__vue:focus-visible,
+.journal__mode:focus-visible,
+.journal__filtrer:focus-visible {
+  background: none;
+  color: var(--encre);
+}
+
 /* LA LIGNE DES RÉGLAGES (2026-09-26, « quand on clique sur option, apparait
    une ligne avec 26 semaine mois et aussi ce qu'il y a sur la ligne filtrer,
    le tout sur la meme ligne ») : tout sur une ligne, sous le calendrier ;
@@ -4221,33 +4296,50 @@
 .journal__reglages {
   display: flex;
   align-items: center;
-  justify-content: flex-end;
   gap: 6px;
+  /* ELLE SE GLISSE SI L'ÉCRAN EST ÉTROIT (2026-09-26, « la ligne des
+     options, si l'écran n'est pas asse large, doit etre ausi slidable ,
+     comme la ligne semaine ») : le défilement du navigateur, comme la piste
+     des jours ; rien ne déborde, rien ne se coupe. */
+  overflow-x: auto;
+  scrollbar-width: none;
+  touch-action: pan-x;
+  overscroll-behavior-x: contain;
   /* EN DEUXIÈME LIGNE, dans le calendrier (2026-09-26, « la ligne d'option
      vient se mettre en 2eme ligne ») : pas de filet, elle appartient au
      bloc du mois et non à ce qui suit. */
   margin: -2px 0 2px;
 }
 
-/* Sur une ligne étroite, « Filtrer » perd son mot avant que quoi que ce soit
-   ne déborde : son icône et son étiquette suffisent. */
-@media (max-width: 359px) {
-  .journal__filtrer span {
-    display: none;
-  }
+.journal__reglages::-webkit-scrollbar {
+  display: none;
 }
 
-/* « Filtrer » : à l'encre et à la matière des boutons de choix, jamais en
-   bleu ; il se marque quand une catégorie est écartée — sans quoi on
-   filtrerait sans le savoir. */
+/* Rien ne se resserre dans une ligne qui glisse : chaque réglage garde sa
+   taille, et le mot de « Filtrer » reste. LE PREMIER EST POUSSÉ À DROITE PAR
+   SA MARGE, et non par un `justify-content: flex-end` (2026-09-26, « le
+   slider ne fonctionne pas dans la ligne des options. Corrige ») : avec
+   `flex-end`, ce qui déborde sort par la GAUCHE et le défilement ne peut
+   pas y revenir — c'est ce qui rendait la ligne immobile. */
+.journal__reglages > * {
+  flex: none;
+}
+
+.journal__reglages > :first-child {
+  margin-left: auto;
+}
+
+/* « Filtrer » : nu lui aussi, à l'encre discrète ; il se marque quand une
+   catégorie est écartée — sans quoi on filtrerait sans le savoir. */
 .journal__filtrer {
   display: flex;
   align-items: center;
-  gap: 6px;
-  padding: 6px 12px;
-  border: 1px solid color-mix(in srgb, var(--option-filet) 55%, var(--option-fond));
-  border-radius: 999px;
-  background: color-mix(in srgb, var(--option-filet) 22%, var(--option-fond));
+  gap: 5px;
+  padding: 3px 1px;
+  border: 0;
+  border-bottom: 1px solid transparent;
+  border-radius: 0;
+  background: none;
   color: var(--encre-chapeau);
   font-family: var(--font-body);
   font-weight: 500;
@@ -4282,29 +4374,26 @@
 }
 
 .journal__filtrer--actif {
-  border-color: color-mix(in srgb, var(--accent) 18%, var(--option-choisi-fond));
-  background: var(--option-choisi-fond);
+  border-bottom-color: var(--accent);
   color: var(--encre);
 }
 
-/* Les deux modes : deux pastilles dans une gouttière, comme la bascule des
-   vues ; sans mot à l'écran (son image), leur nom se dit à qui écoute. */
+/* Les deux modes, nus eux aussi : sans mot à l'écran (son image), leur nom
+   se dit à qui écoute la page. */
 .journal__modes {
   display: flex;
-  gap: 2px;
-  padding: 3px;
-  border-radius: 999px;
-  background: color-mix(in srgb, var(--option-filet) 22%, var(--option-fond));
+  gap: 10px;
 }
 
 .journal__mode {
   display: grid;
   place-items: center;
-  width: 30px;
-  height: 26px;
+  width: 22px;
+  height: 24px;
   padding: 0;
   border: 0;
-  border-radius: 999px;
+  border-bottom: 1px solid transparent;
+  border-radius: 0;
   background: none;
   color: var(--encre-chapeau);
   cursor: pointer;
@@ -4316,8 +4405,8 @@
 }
 
 .journal__mode--choisi {
-  background: var(--accent);
-  color: var(--bouton-encre);
+  border-bottom-color: var(--accent);
+  color: var(--encre);
 }
 
 /* Le corps : ce qui défile. */
@@ -4327,10 +4416,10 @@
   overflow-y: auto;
   display: flex;
   flex-direction: column;
-  /* DE L'AIR ENTRE LES JOURNÉES (2026-09-26, « plus d'espace vide entre les
-     jours dans le journal ») : le déroulé aligne des dizaines de titres, il
-     leur faut de quoi respirer. */
-  gap: 22px;
+  /* L'air entre les journées est porté par chacune (`padding-top`), pas par
+     un écart du corps : il doit être VISIBLE quand on arrive sur une
+     journée, donc lui appartenir. */
+  gap: 0;
   padding: 14px;
   border-top: 1px solid color-mix(in srgb, var(--option-filet) 45%, var(--option-fond));
 }
@@ -4459,16 +4548,22 @@
   gap: 8px;
 }
 
-/* CINQUANTE PIXELS D'AIR AU-DESSUS D'UNE JOURNÉE QU'ON AMÈNE SOUS LES YEUX
-   (2026-09-26, « ajoute 50px vide de vpace avant une date sur le journal /
-   espace visible au dessus de la date qd on selectionne une date y compris
-   qd on arrive sur la page journal a la date du jour, espace visible avant
-   la date du jour dans les items de journal ») : `scroll-margin-top` est la
-   marge que le défilement respecte en amenant l'élément en haut de sa zone —
-   la journée ne colle plus au bandeau, on voit ce qui la précède. Elle ne
-   prend aucune place quand on ne défile pas jusqu'à elle. */
+/* CINQUANTE PIXELS DE VIDE AU-DESSUS DE CHAQUE JOURNÉE (2026-09-26, « ajoute
+   50px vide de vpace avant une date sur le journal / espace visible au
+   dessus de la date », puis « remonte, je ne devrais pas voir le bas de la
+   ligne du dessus qd j'arrive sur la page ») : un VRAI vide, dans la page.
+   Un `scroll-margin-top` n'y suffisait pas — il laissait la journée à 50 px
+   du haut, donc laissait VOIR la dernière entrée de la journée d'avant. Ici
+   le vide appartient à la journée : elle arrive en haut avec lui, et il n'y
+   a rien à voir dessus. */
 .journal__journee {
-  scroll-margin-top: 50px;
+  padding-top: 50px;
+  /* ET ELLE SE PLACE 30 PX PLUS HAUT quand on l'amène sous les yeux
+     (2026-09-26, « l'espace avant une date est bon, ne le modifie pas. Par
+     contre remonte le positionnement de 30px pour la date selectionnée ») :
+     une marge de défilement NÉGATIVE fait défiler d'autant en plus. Le vide
+     de 50 px, lui, ne bouge pas — il est dans la page. */
+  scroll-margin-top: -30px;
 }
 
 /* La journée choisie ne se marque que par son filet : pas de graisse en
@@ -4482,7 +4577,11 @@
 
    LA JOURNÉE CHOISIE AU CALENDRIER, elle, est marquée d'un filet à l'accent :
    dans une liste d'un an, il faut pouvoir la retrouver d'un coup d'œil. */
-.journal__journee--choisie {
+/* LE TIRET DE LA JOURNÉE CHOISIE EST SUR LE SEUL NOM DU JOUR (2026-09-26,
+   « jour selectionné : tiret vertical sur le nom du jour, pas tout le long
+   des activité du jour ») : il marque le titre, il ne longe plus la colonne
+   des entrées. */
+.journal__journee--choisie .journal__titre-jour {
   border-left: 2px solid var(--accent);
   margin-left: -8px;
   padding-left: 6px;

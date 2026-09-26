@@ -62,6 +62,11 @@ MARGE = 0.05
 # PAR RANGÉE. La planche des activités aquatiques en a besoin : deux de ses
 # dessins se touchent, et l'automatique n'en voyait que seize sur dix-sept.
 RANGEES = {
+    # Raquettes (6), Roues (3), Pédestre (5), Cheval (3). Sans ce compte,
+    # deux paires de raquettes se touchaient, la première rangée était
+    # coupée en quatre et TOUT GLISSAIT de deux crans (2026-09-26, sa
+    # capture : « erreur au decoupage » — le vélo portait une raquette).
+    "ChatGPT Image 26 sept. 2026, 15_10_30.png": [6, 3, 5, 3],
     "ChatGPT Image 26 sept. 2026, 15_12_48.png": [6, 5, 6],
 }
 
