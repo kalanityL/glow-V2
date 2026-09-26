@@ -62,3 +62,6 @@ Règles de tenue (voir GUIDELINES.md, « Manière de travailler ») :
       sommeils / 5 activité
 
 - [ ] parametre effets sonores choix sons pour les différents effets
+
+- [ ] générer animation pour intercaller avec les pages d'onboarding et pour
+      chaque badge, passage imc etc... avec Higgsfield AI modele Seedance 2.5
