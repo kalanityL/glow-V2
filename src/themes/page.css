@@ -3963,13 +3963,34 @@
   cursor: default;
 }
 
-/* LE GLISSEMENT (2026-09-26, « on peut slider dans les dates en mode semaine
-   et aussi en mode mois ») : le doigt traverse le calendrier sans que le
-   navigateur y voie une sélection de texte ou un geste de sa propre page ;
-   le défilement vertical de la page reste possible. */
-.journal__semaine,
-.journal__grille-mois {
-  touch-action: pan-y;
+/* LE RAIL QUI GLISSE (2026-09-26, « on peut slider dans les dates en mode
+   semaine et aussi en mode mois », puis « je n'arrive toujours pas a slider
+   lees dates (tu peux regarder ajouter un poids, on utilise le slider a cet
+   endroit pour voir comment fonctionne le sliding ») : LE DÉFILEMENT DU
+   NAVIGATEUR, aimanté — le mécanisme de la piste de la règle crantée du
+   poids (`.graduation__defilement`). Trois volets pleine largeur côte à
+   côte ; le geste est celui du système, à tous les doigts et à tous les
+   trackpads. Deux tentatives d'interception à la main ont vécu la journée. */
+.journal__rail {
+  display: flex;
+  overflow-x: auto;
+  overflow-y: hidden;
+  scrollbar-width: none;
+  scroll-snap-type: x mandatory;
+  /* Le défilement vertical de la page reste au navigateur. */
+  touch-action: pan-x;
+  overscroll-behavior-x: contain;
+}
+
+.journal__rail::-webkit-scrollbar {
+  display: none;
+}
+
+.journal__volet {
+  flex: 0 0 100%;
+  min-width: 0;
+  scroll-snap-align: start;
+  scroll-snap-stop: always;
   user-select: none;
 }
 

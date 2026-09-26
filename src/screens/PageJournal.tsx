@@ -27,7 +27,7 @@ import type { Langue } from '../i18n/langues';
    cette façon (sans ajouter le + et avec nos textes deja presents) ») : son
    calendrier sur des nuages, détouré et embarqué comme les autres images. */
 import illustrationJourneeVide from '../assets/images/modules/journee-vide.png';
-import { amenerEnHaut } from '../plateforme/navigateur';
+import { amenerEnHaut, defilerHorizontalA, surFinDeDefilement } from '../plateforme/navigateur';
 import {
   bornesDuJournal,
   dansLesBornes,
@@ -201,17 +201,17 @@ export function PageJournal({
   const { annee, mois } = anneeMoisDe(jour);
 
   /* SE DÉPLACER DANS LE CALENDRIER — d'une semaine en vue Semaine, d'un mois
-     en vue Mois : par les deux flèches, ou EN GLISSANT LE DOIGT (2026-09-26,
+     en vue Mois : par les deux flèches, ou EN LE FAISANT GLISSER (2026-09-26,
      « on peut slider dans les dates en mode semaine et aussi en mode mois »).
      LES BORNES S'APPLIQUENT COMME AU « VOIR PLUS » (le même jour, « Idem
      voir plus selon les memes regles qd on arrive à une borne ») : à dix ans
-     en arrière ou un an en avant, la date est rabattue et la flèche s'éteint. */
+     en arrière ou un an en avant, la flèche s'éteint et le volet de ce côté
+     n'existe pas. */
   const bornes = bornesDuJournal(aujourdhui);
   const cible = (pas: number) => (vue === 'semaine' ? dateDecalee(jour, 7 * pas) : dateDecaleeDeMois(jour, pas));
   const deplacer = (pas: number) => {
-    const voulu = cible(pas);
-    const borne = dansLesBornes(voulu, aujourdhui);
-    if (borne !== jour) choisirJour(borne);
+    const voulu = dansLesBornes(cible(pas), aujourdhui);
+    if (voulu !== jour) allerAuJour(voulu);
   };
   const reculer = () => deplacer(-1);
   const avancer = () => deplacer(1);
@@ -219,67 +219,49 @@ export function PageJournal({
   const peutReculer = jour > bornes.min;
   const peutAvancer = jour < bornes.max;
 
-  /* LE GLISSEMENT : un geste horizontal sur la semaine ou sur la grille du
-     mois déplace d'un cran, dans le sens du doigt — vers la gauche pour
-     avancer, comme on tourne une page. Le seuil écarte les frôlements et
-     les gestes verticaux (la zone défile aussi).
+  /* LE GLISSEMENT SE FAIT PAR LE DÉFILEMENT DU NAVIGATEUR, comme la règle
+     crantée du poids (2026-09-26, « je n'arrive toujours pas a slider lees
+     dates (tu peux regarder ajouter un poids, on utilise le slider a cet
+     endroit pour voir comment fonctionne le sliding ») : trois volets côte à
+     côte — le précédent, le courant, le suivant —, une zone qui défile
+     horizontalement et s'aimante sur l'un d'eux. Le navigateur fait tout le
+     geste : au doigt, au trackpad, à la barre. Mes deux tentatives d'hier —
+     un appui qu'on traîne, puis un `wheel` compté à la main — ne
+     répondaient qu'à une partie des gestes ; elles sont retirées.
 
-     DEUX GESTES, PAS UN (2026-09-26, « le glissement dans les semaines ou
-     mois ne fonctionne pas sur localhost ») : au DOIGT, sur le téléphone,
-     c'est un appui qu'on traîne (les événements de pointeur) ; AU TRACKPAD,
-     sur l'ordinateur où elle regarde, « slider » c'est deux doigts qui
-     poussent — le navigateur n'en fait pas un appui, mais un défilement
-     horizontal (`wheel`, `deltaX`). Le premier seul ne marchait pas chez
-     elle. */
-  const glisse = useRef<{ x: number; y: number } | null>(null);
-  /* Un glissement vient d'avoir lieu : le clic qui suit le relâchement ne
-     doit pas, EN PLUS, choisir le jour sous le doigt. */
-  const aGlisse = useRef(false);
-  /* Le défilement horizontal arrive en rafale : on cumule, et on se bloque
-     un court instant après chaque cran — sans quoi un seul geste passerait
-     dix mois. `dernier` date le dernier événement reçu (deux rafales
-     séparées ne s'additionnent pas) ; il se met à jour À CHAQUE ÉVÉNEMENT,
-     sans quoi le cumul repart de zéro à chaque fois et n'atteint jamais le
-     seuil — c'est ce qui rendait le geste sans effet. */
-  const roue = useRef({ cumul: 0, dernier: 0, bloqueJusqua: 0 });
-  const gestes = {
-    onPointerDown: (e: React.PointerEvent) => {
-      aGlisse.current = false;
-      glisse.current = { x: e.clientX, y: e.clientY };
-    },
-    onPointerUp: (e: React.PointerEvent) => {
-      const depart = glisse.current;
-      glisse.current = null;
-      if (!depart) return;
-      const dx = e.clientX - depart.x;
-      if (Math.abs(dx) < 40 || Math.abs(dx) < Math.abs(e.clientY - depart.y)) return;
-      aGlisse.current = true;
-      deplacer(dx < 0 ? 1 : -1);
-    },
-    onPointerCancel: () => {
-      glisse.current = null;
-    },
-    /* Le clic qui suit un glissement est avalé : on a tourné la page, on n'a
-       pas choisi le jour qui se trouvait sous le doigt. */
-    onClickCapture: (e: React.MouseEvent) => {
-      if (!aGlisse.current) return;
-      aGlisse.current = false;
-      e.preventDefault();
-      e.stopPropagation();
-    },
-    onWheel: (e: React.WheelEvent) => {
-      if (Math.abs(e.deltaX) <= Math.abs(e.deltaY)) return;
-      const maintenant = Date.now();
-      if (maintenant < roue.current.bloqueJusqua) return;
-      if (maintenant - roue.current.dernier > 300) roue.current.cumul = 0;
-      roue.current.cumul += e.deltaX;
-      roue.current.dernier = maintenant;
-      if (Math.abs(roue.current.cumul) < 60) return;
-      const sens = roue.current.cumul > 0 ? 1 : -1;
-      roue.current = { cumul: 0, dernier: maintenant, bloqueJusqua: maintenant + 350 };
-      deplacer(sens);
-    },
-  };
+     Le défilement fini sur un volet voisin, la date se déplace ; le nouveau
+     rendu ramène le volet courant au milieu. */
+  const rail = useRef<HTMLDivElement>(null);
+  /* Les volets présents : pas de voisin du côté où la borne est atteinte. */
+  const volets = [...(peutReculer ? [-1] : []), 0, ...(peutAvancer ? [1] : [])];
+  const rangCourant = volets.indexOf(0);
+  /* Le replacement du rail est programmé : il ne doit pas se lire comme un
+     geste (sans quoi la date repartirait toute seule). */
+  const placement = useRef(false);
+  useEffect(() => {
+    const zone = rail.current;
+    if (!zone) return;
+    placement.current = true;
+    defilerHorizontalA(zone, rangCourant * zone.clientWidth, false);
+    /* La marque se lève au prochain tour de boucle : le défilement programmé
+       a alors fini de se produire. */
+    const relacher = setTimeout(() => {
+      placement.current = false;
+    }, 120);
+    return () => clearTimeout(relacher);
+  }, [jour, vue, rangCourant]);
+  useEffect(
+    () =>
+      surFinDeDefilement(rail.current, () => {
+        const zone = rail.current;
+        if (!zone || placement.current || zone.clientWidth === 0) return;
+        const rang = Math.round(zone.scrollLeft / zone.clientWidth);
+        const pas = volets[rang];
+        if (pas !== undefined && pas !== 0) deplacer(pas);
+      }),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [jour, vue, rangCourant],
+  );
 
   return (
     <div className={`page page--photo page--fond-${fond.apercu ?? fond.courant} ${classeDuTheme('blanc')}`}>
@@ -328,47 +310,64 @@ export function PageJournal({
               </div>
             </div>
 
-            {vue === 'semaine' ? (
-              /* LA SEMAINE EN SEPT CARTES (« sous-header-vue semaine.png ») :
-                 le jour abrégé au-dessus, le quantième dessous. */
-              <div className="journal__semaine" {...gestes}>
-                {semaineDe(jour).map((date) => (
-                  <button
-                    key={date}
-                    type="button"
-                    aria-current={date === jour ? 'date' : undefined}
-                    className={`journal__jour-carte${date === jour ? ' journal__jour-carte--choisi' : ''}`}
-                    onClick={() => choisirJour(date)}
-                  >
-                    <span className="journal__jour-nom">{textes.calendrier.joursAbreges[jourDeLaSemaine(date)]}</span>
-                    <span className="journal__jour-quantieme">{Number(date.slice(8))}</span>
-                    {pointes.has(date) ? <span className="journal__point" aria-hidden="true" /> : null}
-                  </button>
-                ))}
-              </div>
-            ) : (
-              /* LE MOIS : six semaines, lundi en premier, les jours des mois
-                 voisins en pâle — la grille du projet (`grilleDuMois`). */
-              <div className="journal__grille-mois" {...gestes}>
-                {textes.calendrier.jours.map((lettre, i) => (
-                  <span key={i} className="journal__entete-jour" aria-hidden="true">
-                    {lettre}
-                  </span>
-                ))}
-                {grilleDuMois(annee, mois).map((case_) => (
-                  <button
-                    key={case_.date}
-                    type="button"
-                    aria-current={case_.date === jour ? 'date' : undefined}
-                    className={`journal__case${case_.date === jour ? ' journal__case--choisie' : ''}${case_.dansLeMois ? '' : ' journal__case--voisine'}`}
-                    onClick={() => choisirJour(case_.date)}
-                  >
-                    <span className="journal__case-quantieme">{case_.jour}</span>
-                    {pointes.has(case_.date) ? <span className="journal__point" aria-hidden="true" /> : null}
-                  </button>
-                ))}
-              </div>
-            )}
+            {/* LE RAIL QUI GLISSE : trois volets, le précédent, le courant et
+                le suivant — ceux que les bornes permettent. C'est le
+                défilement du navigateur, aimanté, comme la piste de la règle
+                du poids ; rien n'est intercepté à la main. */}
+            <div className="journal__rail" ref={rail}>
+              {volets.map((pas) => {
+                const dateVolet = vue === 'semaine' ? dateDecalee(jour, 7 * pas) : dateDecaleeDeMois(jour, pas);
+                const { annee: a, mois: m } = anneeMoisDe(dateVolet);
+                return (
+                  <div className="journal__volet" key={pas} aria-hidden={pas !== 0}>
+                    {vue === 'semaine' ? (
+                      /* LA SEMAINE EN SEPT CARTES (« sous-header-vue
+                         semaine.png ») : le jour abrégé au-dessus, le
+                         quantième dessous. */
+                      <div className="journal__semaine">
+                        {semaineDe(dateVolet).map((date) => (
+                          <button
+                            key={date}
+                            type="button"
+                            tabIndex={pas === 0 ? undefined : -1}
+                            aria-current={date === jour ? 'date' : undefined}
+                            className={`journal__jour-carte${date === jour ? ' journal__jour-carte--choisi' : ''}`}
+                            onClick={() => choisirJour(date)}
+                          >
+                            <span className="journal__jour-nom">{textes.calendrier.joursAbreges[jourDeLaSemaine(date)]}</span>
+                            <span className="journal__jour-quantieme">{Number(date.slice(8))}</span>
+                            {pointes.has(date) ? <span className="journal__point" aria-hidden="true" /> : null}
+                          </button>
+                        ))}
+                      </div>
+                    ) : (
+                      /* LE MOIS : six semaines, lundi en premier, les jours
+                         des mois voisins en pâle (`grilleDuMois`). */
+                      <div className="journal__grille-mois">
+                        {textes.calendrier.jours.map((lettre, i) => (
+                          <span key={i} className="journal__entete-jour" aria-hidden="true">
+                            {lettre}
+                          </span>
+                        ))}
+                        {grilleDuMois(a, m).map((case_) => (
+                          <button
+                            key={case_.date}
+                            type="button"
+                            tabIndex={pas === 0 ? undefined : -1}
+                            aria-current={case_.date === jour ? 'date' : undefined}
+                            className={`journal__case${case_.date === jour ? ' journal__case--choisie' : ''}${case_.dansLeMois ? '' : ' journal__case--voisine'}`}
+                            onClick={() => choisirJour(case_.date)}
+                          >
+                            <span className="journal__case-quantieme">{case_.jour}</span>
+                            {pointes.has(case_.date) ? <span className="journal__point" aria-hidden="true" /> : null}
+                          </button>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                );
+              })}
+            </div>
           </div>
 
           {/* LE BANDEAU DE MODE (« switch mode-grille-ligne.png ») : ce que

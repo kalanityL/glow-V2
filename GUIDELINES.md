@@ -1172,12 +1172,19 @@ l'icone aujourd'hui agrandit le chiffre ») : le cadre de son image rognait
 la place. Touchée, elle ramène à aujourd'hui.
 **ON S'Y DÉPLACE AU DOIGT COMME AUX FLÈCHES** (2026-09-26,
 « on peut slider dans les dates en mode semaine et aussi en mode mois ») :
-un geste horizontal sur la semaine ou sur la grille avance ou recule d'un
-cran — **AU DOIGT (appui traîné) ET AU TRACKPAD (défilement horizontal)**
-(le même jour, « le glissement dans les semaines ou mois ne fonctionne pas
-sur localhost ») : sur l'ordinateur, « slider » n'est pas un appui mais un
-`wheel` ; les deux gestes mènent au même verbe, et le clic qui suit un
-glissement est avalé pour ne pas choisir, en plus, le jour sous le doigt — d'une semaine, d'un mois —, dans le sens du doigt, avec un seuil de
+**C'EST LE DÉFILEMENT DU NAVIGATEUR, AIMANTÉ — le mécanisme de la piste
+de la règle crantée du poids** (le même jour, « je n'arrive toujours pas a
+slider lees dates (tu peux regarder ajouter un poids, on utilise le slider
+a cet endroit pour voir comment fonctionne le sliding ») : trois volets
+pleine largeur côte à côte — le précédent, le courant, le suivant, ceux
+que les bornes permettent —, `scroll-snap` sur le rail ; le défilement
+fini sur un voisin déplace la date, et le rendu ramène le courant au
+milieu. Rien n'est intercepté à la main : le geste est celui du système, à
+tous les doigts et à tous les trackpads. DEUX TENTATIVES D'INTERCEPTION
+ONT VÉCU LA JOURNÉE (un appui qu'on traîne, puis un `wheel` compté à la
+main) : ni l'une ni l'autre ne répondait à tous les gestes — la leçon est
+de reprendre un mécanisme qui marche déjà dans le projet plutôt que d'en
+écrire un — d'une semaine, d'un mois —, dans le sens du doigt, avec un seuil de
 40 px qui écarte les frôlements et les gestes verticaux (la zone défile
 aussi). **LES BORNES S'Y APPLIQUENT COMME AU « VOIR PLUS »** (« Idem voir
 plus selon les memes regles qd on arrive à une borne », `dansLesBornes`) :
