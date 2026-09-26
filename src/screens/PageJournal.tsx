@@ -4,7 +4,7 @@ import { EntetePage } from './EntetePage';
 import type { FondProps } from './Accueil';
 import { TiroirFiltre } from './TiroirFiltre';
 import { IconeDuModule } from './iconesModules';
-import { IconeAujourdhui, IconeChevronDroit, IconeCoche, IconeCroix, IconeFiltrer, IconeGrille, IconeListe, IconePlus } from '../components/Icones';
+import { IconeAujourdhui, IconeChevronDroit, IconeCoche, IconeFiltrer, IconeGrille, IconeListe, IconePlus } from '../components/Icones';
 import { IndiceDefilement } from '../components/IndiceDefilement';
 import { detecterLangue, useTextes } from '../i18n/useTextes';
 import { classeDuTheme } from '../themes/themes';
@@ -360,17 +360,16 @@ export function PageJournal({
               {/* « OPTIONS », SOULIGNÉ, À LA PLACE DES RÉGLAGES (2026-09-26,
                   « a la place de 26 semaine mois -> le texte "options"
                   souligné ») : replié, le calendrier n'a que son mois et ses
-                  deux flèches. OUVERT, UNE CROIX PREND SA PLACE (le même
-                  jour, « une croix de fermeture qui remplace le texte option
-                  qd on a cliqué »). */}
+                  deux flèches. OUVERT, IL DIT « Masquer les options »
+                  (2026-09-26, « option : remplacer croix de fermeture par
+                  "masquer les options" ») — la croix a vécu une demi-heure. */}
               <button
                 type="button"
                 className={`journal__options${options ? ' journal__options--ouvertes' : ''}`}
                 aria-expanded={options}
-                aria-label={options ? textes.fermer : undefined}
                 onClick={() => setOptions((o) => !o)}
               >
-                {options ? <IconeCroix /> : textes.journal.options}
+                {options ? textes.journal.masquerOptions : textes.journal.options}
               </button>
             </div>
 

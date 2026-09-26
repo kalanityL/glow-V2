@@ -4092,9 +4092,13 @@
   color: var(--bouton-encre);
 }
 
+/* LE CONTOUR DE LA DATE CHOISIE EST BEAUCOUP PLUS CLAIR QUE LE BLEU DU JOUR
+   MÊME (2026-09-26, « bleu ciel de selection -> passe le bcp plus clair que
+   le bleu de date du jour ») : un tiers de l'accent sur le fond, là où le
+   jour même est l'accent plein. */
 .journal__jour-carte--choisi {
-  border-color: var(--accent);
-  box-shadow: inset 0 0 0 1px var(--accent);
+  border-color: color-mix(in srgb, var(--accent) 35%, var(--option-fond));
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--accent) 35%, var(--option-fond));
 }
 
 /* LE POINT D'UN JOUR QUI PORTE QUELQUE CHOSE (son image du calendrier) :
@@ -4170,8 +4174,8 @@
 }
 
 .journal__case--choisie {
-  border-color: var(--accent);
-  box-shadow: inset 0 0 0 1px var(--accent);
+  border-color: color-mix(in srgb, var(--accent) 35%, var(--option-fond));
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--accent) 35%, var(--option-fond));
 }
 
 /* « OPTIONS », AU BOUT DE LA LIGNE DU MOIS (2026-09-26, « a la place de 26
@@ -4191,20 +4195,16 @@
   cursor: pointer;
 }
 
-.journal__options--ouvertes {
-  /* Ouvert, une croix prend la place du mot (2026-09-26) : ni soulignement
-     ni accent, c'est la croix des tiroirs, à l'encre discrète. */
-  display: grid;
-  place-items: center;
-  width: 22px;
-  height: 22px;
-  color: var(--encre-chapeau);
-  text-decoration: none;
+.journal__options {
+  /* Le mot ne se coupe pas : c'est le nom du mois qui cède s'il le faut. */
+  white-space: nowrap;
 }
 
-.journal__options--ouvertes .icone {
-  width: 15px;
-  height: 15px;
+/* Ouvert, il dit « Masquer les options » (2026-09-26) — même lien souligné,
+   en gris : il referme, il n'ouvre plus rien. La croix a vécu une
+   demi-heure. */
+.journal__options--ouvertes {
+  color: var(--encre-chapeau);
 }
 
 /* LA LIGNE DES RÉGLAGES (2026-09-26, « quand on clique sur option, apparait

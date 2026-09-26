@@ -1212,7 +1212,9 @@ SEULEMENT** (2026-09-26, « mois et semaine : date du jour : fond bleu
 contour gris tres clair ; date selectionnée: contour bleu sky; date ni
 l'un ni l'autre : fond blanc contour gris tres clair comme actuellement ») :
 le JOUR MÊME plein à l'accent, son contour restant le gris des autres ; la
-DATE CHOISIE sur fond blanc, cernée de bleu ; toute autre sur fond blanc,
+DATE CHOISIE sur fond blanc, cernée d'un bleu BEAUCOUP PLUS CLAIR que celui
+du jour même (le même jour, « bleu ciel de selection -> passe le bcp plus
+clair que le bleu de date du jour » : un tiers de l'accent sur le fond) ; toute autre sur fond blanc,
 cernée du gris très clair. Le jour choisi plein à l'accent a vécu la
 journée — alors que la liste ne montre rien de
 plus récent que le jour choisi. Le titre d'une journée : LA DATE EN TOUTES LETTRES À GAUCHE, TOUJOURS
