@@ -128,6 +128,15 @@ export function PageJournal({
      Mois —, si bien que le calendrier et la liste ne peuvent pas se
      contredire. */
   const [jour, setJour] = useState(jourInitial ?? aujourdhui);
+  /* CE QUE LE CALENDRIER MONTRE, distinct du jour choisi (2026-09-26,
+     « slide sur semaine ou mois : si on ne clique nulle part, la date
+     selectionnée ne change pas ») : glisser et pousser les flèches
+     promènent le regard, SEUL UN CLIC change la date. `placer` est un
+     compteur : il ne bouge que lorsqu'il faut ramener le rail sous le
+     regard — un glissement, lui, a déjà placé le rail tout seul. */
+  const [vise, setVise] = useState({ date: jourInitial ?? aujourdhui, placer: 0 });
+  /* Porter le regard quelque part, et y ramener le rail. */
+  const regarder = (date: string) => setVise((v) => ({ date, placer: v.placer + 1 }));
   const [vue, setVue] = useState<'semaine' | 'mois'>('semaine');
   const [mode, setMode] = useState<'liste' | 'grille'>('liste');
   /* Toutes les catégories retenues au départ : le journal s'ouvre entier. */
@@ -166,6 +175,7 @@ export function PageJournal({
      sous les yeux. */
   const allerAuJour = (date: string) => {
     setJour(date);
+    regarder(date);
     setAAmener((precedent) => ({ date, n: precedent.n + 1 }));
   };
 
@@ -198,7 +208,7 @@ export function PageJournal({
      c'est le journal entier, donc pas de filtre. */
   const filtreMis = retenus.length < MODULES.length;
 
-  const { annee, mois } = anneeMoisDe(jour);
+  const { annee, mois } = anneeMoisDe(vise.date);
 
   /* SE DÉPLACER DANS LE CALENDRIER — d'une semaine en vue Semaine, d'un mois
      en vue Mois : par les deux flèches, ou EN LE FAISANT GLISSER (2026-09-26,
@@ -208,16 +218,17 @@ export function PageJournal({
      en arrière ou un an en avant, la flèche s'éteint et le volet de ce côté
      n'existe pas. */
   const bornes = bornesDuJournal(aujourdhui);
-  const cible = (pas: number) => (vue === 'semaine' ? dateDecalee(jour, 7 * pas) : dateDecaleeDeMois(jour, pas));
+  /* LES FLÈCHES PROMÈNENT LE REGARD, elles ne choisissent pas : une semaine
+     ou un mois de plus, sans toucher à la date sélectionnée. */
   const deplacer = (pas: number) => {
-    const voulu = dansLesBornes(cible(pas), aujourdhui);
-    if (voulu !== jour) allerAuJour(voulu);
+    const voulu = dansLesBornes(vue === 'semaine' ? dateDecalee(vise.date, 7 * pas) : dateDecaleeDeMois(vise.date, pas), aujourdhui);
+    if (voulu !== vise.date) regarder(voulu);
   };
   const reculer = () => deplacer(-1);
   const avancer = () => deplacer(1);
-  /* Au bout, la flèche s'éteint : la date ne bougerait plus. */
-  const peutReculer = jour > bornes.min;
-  const peutAvancer = jour < bornes.max;
+  /* Au bout, la flèche s'éteint : le regard ne bougerait plus. */
+  const peutReculer = vise.date > bornes.min;
+  const peutAvancer = vise.date < bornes.max;
 
   /* LE GLISSEMENT SE FAIT PAR LE DÉFILEMENT DU NAVIGATEUR, comme la règle
      crantée du poids (2026-09-26, « je n'arrive toujours pas a slider lees
@@ -250,11 +261,11 @@ export function PageJournal({
      sans quoi le DOM changerait sous le doigt à chaque jour franchi. */
   const JOURS_VISIBLES = 7;
   const DEMI_PISTE = 45;
-  const [ancre, setAncre] = useState(jour);
+  const [ancre, setAncre] = useState(vise.date);
   useEffect(() => {
-    const ecart = Math.abs(new Date(jour).getTime() - new Date(ancre).getTime()) / 86_400_000;
-    if (ecart > 25) setAncre(jour);
-  }, [jour, ancre]);
+    const ecart = Math.abs(new Date(vise.date).getTime() - new Date(ancre).getTime()) / 86_400_000;
+    if (ecart > 25) setAncre(vise.date);
+  }, [vise.date, ancre]);
   const piste = useMemo(
     () => joursDe(dansLesBornes(dateDecalee(ancre, -DEMI_PISTE), aujourdhui), dansLesBornes(dateDecalee(ancre, DEMI_PISTE), aujourdhui)),
     [ancre, aujourdhui],
@@ -267,11 +278,11 @@ export function PageJournal({
     if (!zone) return;
     placement.current = true;
     if (vue === 'semaine') {
-      /* Le jour regardé au milieu des sept. LE PAS D'UN CRAN SE MESURE sur
+      /* Le jour REGARDÉ au milieu des sept. LE PAS D'UN CRAN SE MESURE sur
          la piste elle-même (`scrollWidth / nombre de jours`) plutôt que de
          se déduire des largeurs écrites : marges et arrondis ne peuvent
          plus le fausser. */
-      const rang = piste.indexOf(jour);
+      const rang = piste.indexOf(vise.date);
       const pasDuJour = zone.scrollWidth / piste.length;
       if (rang >= 0) defilerHorizontalA(zone, (rang - (JOURS_VISIBLES - 1) / 2) * pasDuJour, false);
     } else {
@@ -283,25 +294,35 @@ export function PageJournal({
       placement.current = false;
     }, 120);
     return () => clearTimeout(relacher);
-  }, [jour, vue, rangCourant, piste]);
+    /* Le rail ne se replace QUE sur demande (`vise.placer`), jamais au fil
+       d'un glissement : sinon le doigt se battrait contre le replacement. */
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [vise.placer, vue, rangCourant, piste]);
   useEffect(
     () =>
       surFinDeDefilement(rail.current, () => {
         const zone = rail.current;
         if (!zone || placement.current || zone.clientWidth === 0) return;
+        /* LE GLISSEMENT NE CHANGE QUE LE REGARD, jamais la date choisie
+           (2026-09-26, « si on ne clique nulle part, la date selectionnée ne
+           change pas ») : on note où l'on est arrivé, sans replacer le rail
+           — il est déjà au bon endroit, c'est le doigt qui l'y a mis. */
         if (vue === 'semaine') {
           const pasDuJour = zone.scrollWidth / piste.length;
           const rang = Math.round(zone.scrollLeft / pasDuJour + (JOURS_VISIBLES - 1) / 2);
           const date = piste[rang];
-          if (date && date !== jour) allerAuJour(date);
+          if (date && date !== vise.date) setVise((v) => ({ ...v, date }));
           return;
         }
         const rang = Math.round(zone.scrollLeft / zone.clientWidth);
         const pas = volets[rang];
-        if (pas !== undefined && pas !== 0) deplacer(pas);
+        if (pas !== undefined && pas !== 0) {
+          const voulu = dansLesBornes(dateDecaleeDeMois(vise.date, pas), aujourdhui);
+          if (voulu !== vise.date) regarder(voulu);
+        }
       }),
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [jour, vue, rangCourant, piste],
+    [vise.date, vue, rangCourant, piste],
   );
 
   return (
@@ -377,7 +398,7 @@ export function PageJournal({
             ) : (
               <div className="journal__rail" ref={rail}>
                 {volets.map((pas) => {
-                  const dateVolet = dateDecaleeDeMois(jour, pas);
+                  const dateVolet = dateDecaleeDeMois(vise.date, pas);
                   const { annee: a, mois: m } = anneeMoisDe(dateVolet);
                   return (
                     <div className="journal__volet" key={pas} aria-hidden={pas !== 0}>

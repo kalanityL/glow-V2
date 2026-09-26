@@ -1093,11 +1093,14 @@ quatre thèmes ; ce qui est repris de ses images est LA MISE EN PAGE. **Nos
 icônes, pas les siennes** (« utilise evidemment nos icones pas celles des
 templates ») : `IconeDuModule`, la même qu'à l'accueil et au tiroir du
 « + » ; et nos mots (« Balance » là où son template écrit « Poids »,
-« Menus », « Marche »). **Le jour choisi commande tout** : le calendrier le
-marque, LA FENÊTRE DE LECTURE S'OUVRE AUTOUR DE LUI et il est amené sous
-les yeux ; les flèches le déplacent — d'une semaine en vue Semaine, d'un
-mois en vue Mois — si bien que le calendrier et la liste ne peuvent pas se
-contredire. **LE PASSÉ EST EN HAUT, LE FUTUR EN BAS** (2026-09-26, « orientation du
+« Menus », « Marche »). **Le jour choisi commande la liste** : la fenêtre de lecture s'ouvre autour
+de lui et il est amené sous les yeux. **MAIS LE CALENDRIER SE PROMÈNE SANS
+LE CHANGER** (2026-09-26, « slide sur semaine ou mois : si on ne clique
+nulle part, la date selectionnée ne change pas ») : glisser et pousser les
+flèches déplacent le REGARD — une semaine, un mois —, et SEUL UN CLIC
+choisit une date. Deux états distincts, donc : le jour choisi et ce que le
+calendrier montre ; le rail ne se replace que sur demande, jamais au fil
+d'un glissement, sinon le doigt se battrait contre le replacement. **LE PASSÉ EST EN HAUT, LE FUTUR EN BAS** (2026-09-26, « orientation du
 journal : le passé en haut le futur en bas » — l'ordre inverse, hérité du
 template, a vécu la journée) : les journées vont du plus ancien au plus
 récent, le « Voir plus » du passé est en haut et celui du futur en bas.
