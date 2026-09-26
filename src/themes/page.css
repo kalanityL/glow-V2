@@ -4174,27 +4174,48 @@
   box-shadow: inset 0 0 0 1px var(--accent);
 }
 
-/* LE BANDEAU DE MODE (« switch mode-grille-ligne.png ») : le compte de ce
-   que le jour choisi porte, « Filtrer », et les deux façons de lire. Il vaut
-   pour toute la page. */
-.journal__barre {
+/* « OPTIONS », AU BOUT DE LA LIGNE DU MOIS (2026-09-26, « a la place de 26
+   semaine mois -> le texte "options" souligné ») : un lien à l'encre et
+   souligné — la charte des formulaires, pas de texte en bleu. Ouvert, il se
+   marque à l'accent. */
+.journal__options {
+  padding: 0 2px;
+  border: 0;
+  background: none;
+  color: var(--encre);
+  font-family: var(--font-body);
+  font-size: 13px;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  text-decoration-thickness: 1px;
+  cursor: pointer;
+}
+
+.journal__options--ouvertes {
+  color: var(--accent);
+}
+
+/* LA LIGNE DES RÉGLAGES (2026-09-26, « quand on clique sur option, apparait
+   une ligne avec 26 semaine mois et aussi ce qu'il y a sur la ligne filtrer,
+   le tout sur la meme ligne ») : tout sur une ligne, sous le calendrier ;
+   repliée, il n'y a RIEN entre le calendrier et le journal. L'ancienne ligne
+   du filtre, qui n'existait que pour ça, a disparu. */
+.journal__reglages {
   flex: none;
   display: flex;
   align-items: center;
-  /* TOUT À DROITE (2026-09-26, « laisse l'alignement à droite pour la ligne
-     filtre ») : le compte qui poussait le reste au bout est parti, la rangée
-     garde sa place. */
   justify-content: flex-end;
-  gap: 8px;
-  padding: 10px 14px;
+  gap: 6px;
+  padding: 8px 14px;
   border-top: 1px solid color-mix(in srgb, var(--option-filet) 45%, var(--option-fond));
 }
 
-.journal__compte {
-  margin-right: auto;
-  font-family: var(--font-body);
-  font-size: 13px;
-  color: var(--encre-chapeau);
+/* Sur une ligne étroite, « Filtrer » perd son mot avant que quoi que ce soit
+   ne déborde : son icône et son étiquette suffisent. */
+@media (max-width: 359px) {
+  .journal__filtrer span {
+    display: none;
+  }
 }
 
 /* « Filtrer » : à l'encre et à la matière des boutons de choix, jamais en
@@ -4442,8 +4463,8 @@
   color: var(--encre-chapeau);
 }
 
-/* L'ICÔNE D'AUJOURD'HUI (2026-09-26, son image `aujourdhui.png`) : le
-   bandeau, les anneaux, le corps et le cadre du quantième. SES COULEURS
+/* L'ICÔNE D'AUJOURD'HUI (2026-09-26, son image `aujourdhui.png`), dans la
+   ligne des réglages : le bandeau, les anneaux, le corps et le quantième. SES COULEURS
    RELEVÉES AU PIXEL — bandeau #86b8f8, bleu soutenu #6398f6, corps #f5f9fe
    — sont rendues en jetons du thème : c'est un dessin de l'application, pas
    une image embarquée, et il doit suivre les quatre thèmes. */
@@ -4452,7 +4473,7 @@
   place-items: center;
   width: 26px;
   height: 26px;
-  margin-right: 1px;
+  margin-right: auto;
   padding: 0;
   border: 0;
   border-radius: 999px;

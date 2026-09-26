@@ -431,6 +431,10 @@ export interface Textes {
   journal: {
     /** Les deux vues du calendrier (« header-vue clendrier.png »). */
     vues: Record<'semaine' | 'mois', string>;
+    /** LE LIEN QUI OUVRE LA LIGNE DES RÉGLAGES (2026-09-26, « a la place de
+        26 semaine mois -> le texte "options" souligné ») : replié, le
+        calendrier n'a que son mois et ses flèches. */
+    options: string;
     /** Le bouton qui ouvre le tiroir du filtre, son titre, son intitulé de
         groupe et le lien qui recoche tout. */
     filtrer: string;
@@ -888,6 +892,7 @@ const FR: Textes = {
   },
   journal: {
     vues: { semaine: 'Semaine', mois: 'Mois' },
+    options: 'Options',
     filtrer: 'Filtrer',
     filtreMis: (retenues, total) => `Filtrer — ${retenues} catégories sur ${total}`,
     filtreAucun: 'Filtrer — toutes les catégories',
