@@ -121,6 +121,26 @@ export function grilleDuMois(annee: number, mois: number): CaseDuMois[] {
   });
 }
 
+/**
+ * LA SEMAINE D'UNE DATE, LUNDI EN PREMIER (2026-09-26, la vue « Semaine » du
+ * journal, son template « sous-header-vue semaine.png ») : les sept jours,
+ * du lundi au dimanche, celui de la date comprise. Même premier jour que la
+ * grille du mois — le calendrier du projet ouvre toujours sur un lundi.
+ */
+export function semaineDe(date: string): string[] {
+  const [a, m, j] = date.split('-').map(Number);
+  const d = new Date(a, m - 1, j);
+  const lundi = new Date(a, m - 1, j - ((d.getDay() + 6) % 7));
+  return Array.from({ length: 7 }, (_, i) => dateLocale(new Date(lundi.getFullYear(), lundi.getMonth(), lundi.getDate() + i)));
+}
+
+/** Le jour de la semaine d'une date, 0 pour lundi — l'index des noms de
+    jours du dictionnaire, qui commencent au lundi comme les calendriers. */
+export function jourDeLaSemaine(date: string): number {
+  const [a, m, j] = date.split('-').map(Number);
+  return (new Date(a, m - 1, j).getDay() + 6) % 7;
+}
+
 /** Une date `AAAA-MM-JJ` écrite en toutes lettres avec les noms de mois
     donnés : « 13 septembre 2026 » ; en anglais, « September 13, 2026 ». */
 export function formaterDateLongue(date: string, mois: readonly string[], langue: Langue): string {

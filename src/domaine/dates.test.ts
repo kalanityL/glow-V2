@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { ageA, anneeDe, anneeMoisDe, dateDecalee, dateDepuisAnnee, dateLocale, formaterDateCourte, grilleDuMois, jourRelatif, lireDateCourte, moisDecale } from './dates';
+import { ageA, anneeDe, anneeMoisDe, dateDecalee, dateDepuisAnnee, dateLocale, formaterDateCourte, grilleDuMois, jourDeLaSemaine, jourRelatif, lireDateCourte, moisDecale, semaineDe } from './dates';
 
 describe('jourRelatif', () => {
   it('nomme de l’avant-veille au surlendemain, et se tait au-delà', () => {
@@ -89,5 +89,39 @@ describe('moisDecale / anneeMoisDe', () => {
     expect(moisDecale(2026, 12, 1)).toEqual({ annee: 2027, mois: 1 });
     expect(moisDecale(2026, 1, -1)).toEqual({ annee: 2025, mois: 12 });
     expect(anneeMoisDe('2026-09-20')).toEqual({ annee: 2026, mois: 9 });
+  });
+});
+
+describe('semaineDe / jourDeLaSemaine', () => {
+  it('rend les sept jours de la semaine, lundi en premier', () => {
+    /* Le 26 septembre 2026 est un samedi : sa semaine ouvre le lundi 21. */
+    expect(semaineDe('2026-09-26')).toEqual([
+      '2026-09-21',
+      '2026-09-22',
+      '2026-09-23',
+      '2026-09-24',
+      '2026-09-25',
+      '2026-09-26',
+      '2026-09-27',
+    ]);
+  });
+  it('garde la semaine d’un lundi et d’un dimanche du même côté', () => {
+    expect(semaineDe('2026-09-21')[0]).toBe('2026-09-21');
+    expect(semaineDe('2026-09-27')[0]).toBe('2026-09-21');
+  });
+  it('passe le mois et l’année', () => {
+    expect(semaineDe('2027-01-01')).toEqual([
+      '2026-12-28',
+      '2026-12-29',
+      '2026-12-30',
+      '2026-12-31',
+      '2027-01-01',
+      '2027-01-02',
+      '2027-01-03',
+    ]);
+  });
+  it('compte les jours à partir du lundi', () => {
+    expect(jourDeLaSemaine('2026-09-21')).toBe(0);
+    expect(jourDeLaSemaine('2026-09-27')).toBe(6);
   });
 });
