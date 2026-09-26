@@ -4192,7 +4192,19 @@
 }
 
 .journal__options--ouvertes {
-  color: var(--accent);
+  /* Ouvert, une croix prend la place du mot (2026-09-26) : ni soulignement
+     ni accent, c'est la croix des tiroirs, à l'encre discrète. */
+  display: grid;
+  place-items: center;
+  width: 22px;
+  height: 22px;
+  color: var(--encre-chapeau);
+  text-decoration: none;
+}
+
+.journal__options--ouvertes .icone {
+  width: 15px;
+  height: 15px;
 }
 
 /* LA LIGNE DES RÉGLAGES (2026-09-26, « quand on clique sur option, apparait
@@ -4201,13 +4213,14 @@
    repliée, il n'y a RIEN entre le calendrier et le journal. L'ancienne ligne
    du filtre, qui n'existait que pour ça, a disparu. */
 .journal__reglages {
-  flex: none;
   display: flex;
   align-items: center;
   justify-content: flex-end;
   gap: 6px;
-  padding: 8px 14px;
-  border-top: 1px solid color-mix(in srgb, var(--option-filet) 45%, var(--option-fond));
+  /* EN DEUXIÈME LIGNE, dans le calendrier (2026-09-26, « la ligne d'option
+     vient se mettre en 2eme ligne ») : pas de filet, elle appartient au
+     bloc du mois et non à ce qui suit. */
+  margin: -2px 0 2px;
 }
 
 /* Sur une ligne étroite, « Filtrer » perd son mot avant que quoi que ce soit
@@ -4308,7 +4321,10 @@
   overflow-y: auto;
   display: flex;
   flex-direction: column;
-  gap: 14px;
+  /* DE L'AIR ENTRE LES JOURNÉES (2026-09-26, « plus d'espace vide entre les
+     jours dans le journal ») : le déroulé aligne des dizaines de titres, il
+     leur faut de quoi respirer. */
+  gap: 22px;
   padding: 14px;
   border-top: 1px solid color-mix(in srgb, var(--option-filet) 45%, var(--option-fond));
 }
@@ -4436,6 +4452,9 @@
   flex-direction: column;
   gap: 8px;
 }
+
+/* La journée choisie ne se marque que par son filet : pas de graisse en
+   plus, les dates ne sont pas en gras (2026-09-26). */
 
 /* AUCUNE DIFFÉRENCE DE STYLE ENTRE UNE JOURNÉE AVEC ET SANS ENTRÉE
    (2026-09-26, « pas de différence de style pour les dates avec ou sasn
@@ -4565,6 +4584,9 @@
 
 /* LE TITRE D'UNE JOURNÉE (« journal mode liste.png ») : le mot du jour à
    gauche, gros ; la date en toutes lettres à droite, en gris. */
+/* LA DATE N'EST PAS EN GRAS (2026-09-26, « dates non en gras ») : 400,
+   comme le nom d'une case du tiroir du « + » — c'est un libellé, pas un
+   bandeau. Le 600 a vécu la journée. */
 .journal__titre-jour {
   display: flex;
   align-items: baseline;
@@ -4572,7 +4594,7 @@
   gap: 10px;
   margin: 0;
   font-family: var(--font-display);
-  font-weight: 600;
+  font-weight: 400;
   font-size: 17px;
   color: var(--encre);
 }
@@ -4597,15 +4619,15 @@
    vignette quand la ligne porte une photo. C'est un BLOC, pas un bouton —
    aucune page de détail n'existe encore, et le chevron de son template
    promettrait une page qui n'est pas là. */
+/* SANS CONTOUR (2026-09-26, « pas de contour autour des item du journal en
+   mode ligne ») : l'entrée est posée sur la carte, l'heure et la pastille
+   suffisent à la détacher. Le filet et le fond ont vécu la journée. */
 .journal__entree {
   display: flex;
   align-items: center;
   gap: 10px;
   min-width: 0;
-  padding: 8px 10px;
-  border: 1px solid color-mix(in srgb, var(--option-filet) 40%, var(--option-fond));
-  border-radius: 14px;
-  background: var(--module-fond);
+  padding: 4px 0;
 }
 
 .journal__heure {

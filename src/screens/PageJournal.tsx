@@ -4,7 +4,7 @@ import { EntetePage } from './EntetePage';
 import type { FondProps } from './Accueil';
 import { TiroirFiltre } from './TiroirFiltre';
 import { IconeDuModule } from './iconesModules';
-import { IconeAujourdhui, IconeChevronDroit, IconeCoche, IconeFiltrer, IconeGrille, IconeListe, IconePlus } from '../components/Icones';
+import { IconeAujourdhui, IconeChevronDroit, IconeCoche, IconeCroix, IconeFiltrer, IconeGrille, IconeListe, IconePlus } from '../components/Icones';
 import { IndiceDefilement } from '../components/IndiceDefilement';
 import { detecterLangue, useTextes } from '../i18n/useTextes';
 import { classeDuTheme } from '../themes/themes';
@@ -186,12 +186,20 @@ export function PageJournal({
     setAAmener((precedent) => ({ date, n: precedent.n + 1 }));
   };
 
-  /* CHOISIR UN JOUR AU CALENDRIER : comme ci-dessus, ET S'IL NE PORTE RIEN
+  /* CHOISIR UN JOUR AU CALENDRIER : la liste s'y rend, ET S'IL NE PORTE RIEN
      IL S'OUVRE DÉPLIÉ (2026-09-26, « Si on clique sur un jour sasns donnée,
-     on arrive sur ce jour par defaut deplié »). */
-  const choisirJour = (date: string) => {
+     on arrive sur ce jour par defaut deplié »).
+     LE CALENDRIER, LUI, NE BOUGE PAS (le même jour, « si on selecte un date
+     visible sur la ligne semaine actuellement affichée, la ligne de bouge
+     pas ») : on ne peut cliquer que ce qu'on voit, donc la bande est déjà au
+     bon endroit — la recentrer ferait sauter sous le doigt ce qu'on vient
+     de viser. `ramener` n'est vrai que pour un geste qui vient d'ailleurs,
+     l'icône d'aujourd'hui. */
+  const choisirJour = (date: string, ramener = false) => {
     if (!pointes.has(date)) setDeplies((ouvertes) => new Set(ouvertes).add(date));
-    allerAuJour(date);
+    setJour(date);
+    setVise((v) => ({ date, placer: ramener ? v.placer + 1 : v.placer }));
+    setAAmener((precedent) => ({ date, n: precedent.n + 1 }));
   };
 
   /* UN « VOIR PLUS » : LE JOUR COURANT SE DÉPLACE AU BOUT QU'ON VIENT
@@ -352,16 +360,89 @@ export function PageJournal({
               {/* « OPTIONS », SOULIGNÉ, À LA PLACE DES RÉGLAGES (2026-09-26,
                   « a la place de 26 semaine mois -> le texte "options"
                   souligné ») : replié, le calendrier n'a que son mois et ses
-                  deux flèches. */}
+                  deux flèches. OUVERT, UNE CROIX PREND SA PLACE (le même
+                  jour, « une croix de fermeture qui remplace le texte option
+                  qd on a cliqué »). */}
               <button
                 type="button"
                 className={`journal__options${options ? ' journal__options--ouvertes' : ''}`}
                 aria-expanded={options}
+                aria-label={options ? textes.fermer : undefined}
                 onClick={() => setOptions((o) => !o)}
               >
-                {textes.journal.options}
+                {options ? <IconeCroix /> : textes.journal.options}
               </button>
             </div>
+
+            {/* LA LIGNE DES RÉGLAGES, EN DEUXIÈME LIGNE (2026-09-26, « la
+                ligne d'option vient se mettre en 2eme ligne ») : juste sous
+                le mois, AVANT le calendrier — aujourd'hui, les deux vues,
+                « Filtrer » et les deux modes, TOUS SUR LA MÊME LIGNE. Repliée,
+                il n'y a rien de plus entre le mois et le calendrier, ni entre
+                le calendrier et le journal. */}
+            {options ? (
+              <div className="journal__reglages">
+                {/* AUJOURD'HUI (2026-09-26, son image `aujourdhui.png`) : le
+                    quantième du jour courant, SUR DEUX CHIFFRES. Touchée, elle
+                    ramène à aujourd'hui. */}
+                <button
+                  type="button"
+                  className="journal__aujourdhui"
+                  aria-label={textes.joursRelatifs.aujourdhui}
+                  onClick={() => choisirJour(aujourdhui, true)}
+                >
+                  <IconeAujourdhui quantieme={aujourdhui.slice(8)} />
+                </button>
+                <div className="journal__vues" role="radiogroup" aria-label={textes.calendrier.mois[mois - 1]}>
+                  {(['semaine', 'mois'] as const).map((laquelle) => (
+                    <button
+                      key={laquelle}
+                      type="button"
+                      role="radio"
+                      aria-checked={vue === laquelle}
+                      className={`journal__vue${vue === laquelle ? ' journal__vue--choisie' : ''}`}
+                      onClick={() => setVue(laquelle)}
+                    >
+                      {textes.journal.vues[laquelle]}
+                    </button>
+                  ))}
+                </div>
+                {/* L'INDICATEUR : un filtre mis, le bouton prend la matière des
+                    réponses choisies ET porte une pastille à la coche
+                    (2026-09-26). Aucun filtre, pas de pastille. */}
+                <button
+                  ref={boutonFiltre}
+                  type="button"
+                  className={`journal__filtrer${filtreMis ? ' journal__filtrer--actif' : ''}`}
+                  aria-expanded={filtre === 'ouvert'}
+                  aria-label={filtreMis ? textes.journal.filtreMis(retenus.length, MODULES.length) : textes.journal.filtreAucun}
+                  onClick={() => setFiltre((etat) => (etat === 'ouvert' ? 'fermeture' : 'ouvert'))}
+                >
+                  <IconeFiltrer />
+                  <span>{textes.journal.filtrer}</span>
+                  {filtreMis ? (
+                    <span className="journal__filtre-compte" aria-hidden="true">
+                      <IconeCoche />
+                    </span>
+                  ) : null}
+                </button>
+                <div className="journal__modes" role="radiogroup" aria-label={textes.journal.modes.liste}>
+                  {(['liste', 'grille'] as const).map((lequel) => (
+                    <button
+                      key={lequel}
+                      type="button"
+                      role="radio"
+                      aria-checked={mode === lequel}
+                      aria-label={textes.journal.modes[lequel]}
+                      className={`journal__mode${mode === lequel ? ' journal__mode--choisi' : ''}`}
+                      onClick={() => setMode(lequel)}
+                    >
+                      {lequel === 'liste' ? <IconeListe /> : <IconeGrille />}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            ) : null}
 
             {vue === 'semaine' ? (
               <div className="journal__rail journal__rail--jours" ref={rail}>
@@ -414,79 +495,6 @@ export function PageJournal({
               </div>
             )}
           </div>
-
-          {/* LA LIGNE DES RÉGLAGES (2026-09-26, « quand on clique sur option,
-              apparait une ligne avec 26 semaine mois et aussi ce qu'il y a
-              sur la ligne filtrer, le tout sur la meme ligne ») : aujourd'hui,
-              les deux vues, « Filtrer » et les deux modes — TOUT SUR UNE SEULE
-              LIGNE, et rien entre le calendrier et le journal quand elle est
-              repliée (« on ne repete pas la ligne filtrer elle disparait et
-              n'est pas visible entre le calendrier semaine/mois et le
-              journal »). L'ancienne ligne du filtre n'existait que pour ça :
-              elle a disparu. */}
-          {options ? (
-            <div className="journal__reglages">
-              {/* AUJOURD'HUI (2026-09-26, son image `aujourdhui.png`) : le
-                  quantième du jour courant, SUR DEUX CHIFFRES. Touchée, elle
-                  ramène à aujourd'hui. */}
-              <button
-                type="button"
-                className="journal__aujourdhui"
-                aria-label={textes.joursRelatifs.aujourdhui}
-                onClick={() => choisirJour(aujourdhui)}
-              >
-                <IconeAujourdhui quantieme={aujourdhui.slice(8)} />
-              </button>
-              <div className="journal__vues" role="radiogroup" aria-label={textes.calendrier.mois[mois - 1]}>
-                {(['semaine', 'mois'] as const).map((laquelle) => (
-                  <button
-                    key={laquelle}
-                    type="button"
-                    role="radio"
-                    aria-checked={vue === laquelle}
-                    className={`journal__vue${vue === laquelle ? ' journal__vue--choisie' : ''}`}
-                    onClick={() => setVue(laquelle)}
-                  >
-                    {textes.journal.vues[laquelle]}
-                  </button>
-                ))}
-              </div>
-              {/* L'INDICATEUR : un filtre mis, le bouton prend la matière des
-                  réponses choisies ET porte une pastille à la coche
-                  (2026-09-26). Aucun filtre, pas de pastille. */}
-              <button
-                ref={boutonFiltre}
-                type="button"
-                className={`journal__filtrer${filtreMis ? ' journal__filtrer--actif' : ''}`}
-                aria-expanded={filtre === 'ouvert'}
-                aria-label={filtreMis ? textes.journal.filtreMis(retenus.length, MODULES.length) : textes.journal.filtreAucun}
-                onClick={() => setFiltre((etat) => (etat === 'ouvert' ? 'fermeture' : 'ouvert'))}
-              >
-                <IconeFiltrer />
-                <span>{textes.journal.filtrer}</span>
-                {filtreMis ? (
-                  <span className="journal__filtre-compte" aria-hidden="true">
-                    <IconeCoche />
-                  </span>
-                ) : null}
-              </button>
-              <div className="journal__modes" role="radiogroup" aria-label={textes.journal.modes.liste}>
-                {(['liste', 'grille'] as const).map((lequel) => (
-                  <button
-                    key={lequel}
-                    type="button"
-                    role="radio"
-                    aria-checked={mode === lequel}
-                    aria-label={textes.journal.modes[lequel]}
-                    className={`journal__mode${mode === lequel ? ' journal__mode--choisi' : ''}`}
-                    onClick={() => setMode(lequel)}
-                  >
-                    {lequel === 'liste' ? <IconeListe /> : <IconeGrille />}
-                  </button>
-                ))}
-              </div>
-            </div>
-          ) : null}
 
           {/* LE CORPS DÉFILE, le calendrier et le bandeau restent — la règle
               des formulaires (2026-09-21, « bandeau titre et bouton valider

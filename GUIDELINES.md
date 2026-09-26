@@ -1098,7 +1098,12 @@ de lui et il est amené sous les yeux. **MAIS LE CALENDRIER SE PROMÈNE SANS
 LE CHANGER** (2026-09-26, « slide sur semaine ou mois : si on ne clique
 nulle part, la date selectionnée ne change pas ») : glisser et pousser les
 flèches déplacent le REGARD — une semaine, un mois —, et SEUL UN CLIC
-choisit une date. Deux états distincts, donc : le jour choisi et ce que le
+choisit une date. **Cliquer une date déjà visible ne déplace pas le
+calendrier** (le même jour, « si on selecte un date visible sur la ligne
+semaine actuellement affichée, la ligne de bouge pas ») : on ne peut
+cliquer que ce qu'on voit, donc la bande est au bon endroit — la recentrer
+ferait sauter sous le doigt ce qu'on vient de viser ; seule l'icône
+d'aujourd'hui ramène la bande. Deux états distincts, donc : le jour choisi et ce que le
 calendrier montre ; le rail ne se replace que sur demande, jamais au fil
 d'un glissement, sinon le doigt se battrait contre le replacement. **LE PASSÉ EST EN HAUT, LE FUTUR EN BAS** (2026-09-26, « orientation du
 journal : le passé en haut le futur en bas » — l'ordre inverse, hérité du
