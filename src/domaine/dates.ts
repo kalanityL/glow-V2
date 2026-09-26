@@ -79,11 +79,12 @@ export function dateDecaleeDeMois(date: string, delta: number): string {
   return `${String(cible.annee).padStart(4, '0')}-${String(cible.mois).padStart(2, '0')}-${String(Math.min(jour, dernier)).padStart(2, '0')}`;
 }
 
-/** Les dates d'un intervalle, de la plus RÉCENTE à la plus ancienne — l'ordre
-    de lecture du journal. Les deux bornes comprises. */
+/** Les dates d'un intervalle, DE LA PLUS ANCIENNE À LA PLUS RÉCENTE — le
+    sens du temps, et celui du journal depuis le 2026-09-26 (« orientation du
+    journal : le passé en haut le futur en bas »). Les deux bornes comprises. */
 export function joursDe(debut: string, fin: string): string[] {
   const dates: string[] = [];
-  for (let d = fin; d >= debut; d = dateDecalee(d, -1)) dates.push(d);
+  for (let d = debut; d <= fin; d = dateDecalee(d, 1)) dates.push(d);
   return dates;
 }
 

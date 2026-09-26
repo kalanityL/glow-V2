@@ -68,9 +68,9 @@ describe('joursDuJournal', () => {
   const entrees = entreesDuJournal(tables);
   const fenetre = { debut: '2026-09-24', fin: '2026-09-27', plusAvant: false, plusApres: false };
 
-  it('rend TOUS les jours de la fenêtre, du plus récent au plus ancien, les vides compris', () => {
+  it('rend TOUS les jours de la fenêtre, du plus ancien au plus récent, les vides compris', () => {
     const jours = joursDuJournal(entrees, fenetre, TOUS);
-    expect(jours.map((j) => j.date)).toEqual(['2026-09-27', '2026-09-26', '2026-09-25', '2026-09-24']);
+    expect(jours.map((j) => j.date)).toEqual(['2026-09-24', '2026-09-25', '2026-09-26', '2026-09-27']);
   });
 
   it('une journée sans rien est là, sans entrée', () => {
@@ -81,7 +81,7 @@ describe('joursDuJournal', () => {
   });
 
   it('range les entrées d’une journée du matin au soir', () => {
-    const [, aujourdhui] = joursDuJournal(entrees, fenetre, TOUS);
+    const [, , aujourdhui] = joursDuJournal(entrees, fenetre, TOUS);
     expect(aujourdhui.entrees.map((e) => e.id)).toEqual(['sleep-1', 'w-1', 'inj-1', 'sport-1']);
   });
 
@@ -92,7 +92,8 @@ describe('joursDuJournal', () => {
 
   it('le filtre retient les catégories cochées ; aucune cochée, les jours restent vides', () => {
     const jours = joursDuJournal(entrees, fenetre, ['balance']);
-    expect(jours.flatMap((j) => j.entrees).map((e) => e.id)).toEqual(['w-1', 'w-2']);
+    /* Le passé en haut : la pesée du 24 précède celle du 26. */
+    expect(jours.flatMap((j) => j.entrees).map((e) => e.id)).toEqual(['w-2', 'w-1']);
     expect(joursDuJournal(entrees, fenetre, []).every((j) => j.entrees.length === 0)).toBe(true);
   });
 });

@@ -115,7 +115,8 @@ export function fenetreDuJournal(jour: string, aujourdhui: string): FenetreDuJou
 
 /**
  * LES JOURNÉES DU JOURNAL, telles que la page les déroule : TOUS LES JOURS
- * de la fenêtre, du plus récent au plus ancien — les vides compris
+ * de la fenêtre, DU PLUS ANCIEN AU PLUS RÉCENT (2026-09-26, « orientation
+ * du journal : le passé en haut le futur en bas ») — les vides compris
  * (2026-09-26, « jour sans donnée : apparait dans le journal comme un jour
  * avec données, simplement il n'y a rien en dessous on passe directement au
  * jour suivant »). Dans une journée, les entrées vont du matin au soir.

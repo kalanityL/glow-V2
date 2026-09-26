@@ -4288,34 +4288,50 @@
 }
 
 /* QUATRE PAR LIGNE AU PLUS, SANS LABEL (2026-09-26, « pas de label, 4 icones
-   par ligne max ») : l'icône seule dans sa pastille, comme les cercles de
-   l'accueil. Colonnes égales (GUIDELINES) : une colonne plus large aurait
-   l'air d'être la bonne réponse. Les libellés et le chevron des cartes en
-   deux colonnes ont vécu deux heures. */
+   par ligne max »), MAIS AVEC LEUR CONTOUR ET LEUR ENCOCHE (le même jour,
+   « garde les contours et les encoches ») : la carte et son chevron, comme
+   celles du tiroir du « + » — sans leur nom. Colonnes égales (GUIDELINES) :
+   une colonne plus large aurait l'air d'être la bonne réponse. */
 .journal__vide-cases {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: 10px;
+  gap: 8px;
   width: 100%;
-  justify-items: center;
 }
 
 .journal__vide-case {
   display: grid;
-  place-items: center;
-  padding: 0;
-  border: 0;
-  background: none;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  min-width: 0;
+  padding: 7px 4px 7px 6px;
+  border: 1px solid color-mix(in srgb, var(--option-filet) 40%, var(--option-fond));
+  border-radius: 14px;
+  background: var(--module-fond);
   color: inherit;
   font: inherit;
   cursor: pointer;
 }
 
-/* La pastille est celle d'une entrée de la liste : la page n'a qu'une seule
-   façon de dessiner un module. */
+/* La pastille est celle d'une entrée de la liste, en plus petit : la page
+   n'a qu'une seule façon de dessiner un module. */
 .journal__vide-case .journal__icone {
-  width: 44px;
-  height: 44px;
+  width: 36px;
+  height: 36px;
+}
+
+.journal__vide-case .journal__icone .icone {
+  width: 19px;
+  height: 19px;
+}
+
+/* L'encoche : le chevron des cartes du tiroir du « + », en bleu grisé. Il ne
+   dit rien que la case ne dise déjà. */
+.journal__vide-chevron {
+  flex: none;
+  width: 14px;
+  height: 14px;
+  color: var(--ajout-chevron-encre);
 }
 
 .journal__journee {

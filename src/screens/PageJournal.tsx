@@ -333,12 +333,15 @@ export function PageJournal({
 
               IL DÉROULE TOUTE LA FENÊTRE, dans les deux sens (2026-09-26,
               « on doit pouvoir scroller sans fin dans un sens comme dans
-              l'autre peu importe ou on se trouve ») : les jours du plus
-              récent au plus ancien, les VIDES COMPRIS, et un « Voir plus »
-              à chaque bout tant que les bornes ne sont pas atteintes. */}
+              l'autre peu importe ou on se trouve ») : LE PASSÉ EN HAUT, LE
+              FUTUR EN BAS (le même jour, « orientation du journal : le passé
+              en haut le futur en bas » — l'ordre inverse a vécu la
+              journée), les VIDES COMPRIS, et un « Voir plus » à chaque bout
+              tant que les bornes ne sont pas atteintes. */}
           <div className="journal__corps" ref={corpsRef}>
-            {fenetre.plusApres ? (
-              <button type="button" className="journal__plus" onClick={() => etendre('apres')}>
+            {/* Le passé est en haut : c'est lui que ce bouton charge. */}
+            {fenetre.plusAvant ? (
+              <button type="button" className="journal__plus" onClick={() => etendre('avant')}>
                 {textes.journal.voirPlus}
               </button>
             ) : null}
@@ -360,8 +363,9 @@ export function PageJournal({
               />
             ))}
 
-            {fenetre.plusAvant ? (
-              <button type="button" className="journal__plus" onClick={() => etendre('avant')}>
+            {/* Le futur est en bas. */}
+            {fenetre.plusApres ? (
+              <button type="button" className="journal__plus" onClick={() => etendre('apres')}>
                 {textes.journal.voirPlus}
               </button>
             ) : null}
@@ -576,10 +580,13 @@ const JourneeDuJournal = memo(function JourneeDuJournal({
           <h3 className="journal__vide-titre">{textes.journal.ajoutezUneEntree}</h3>
           <div className="journal__vide-cases">
             {/* PAS DE LABEL, QUATRE PAR LIGNE (2026-09-26, « pas de label,
-                4 icones par ligne max ») : l'icône seule dans sa pastille.
-                SES LIBELLÉS — « une Injection », « un Poids »… — restent
-                dits à qui écoute la page, comme les cercles de l'accueil,
-                dont les noms ne se voient pas non plus. */}
+                4 icones par ligne max »), MAIS LE CONTOUR ET L'ENCOCHE
+                RESTENT (le même jour, « garde les contours et les
+                encoches ») : la carte et son chevron, comme celles du
+                tiroir du « + » — sans leur nom. SES LIBELLÉS — « une
+                Injection », « un Poids »… — restent dits à qui écoute la
+                page, comme les cercles de l'accueil, dont les noms ne se
+                voient pas non plus. */}
             {MODULES_AJOUT_JOURNAL.map((module) => (
               <button
                 key={module}
@@ -590,6 +597,9 @@ const JourneeDuJournal = memo(function JourneeDuJournal({
               >
                 <span className="journal__icone">
                   <IconeDuModule module={module} forme={forme} />
+                </span>
+                <span className="journal__vide-chevron" aria-hidden="true">
+                  <IconeChevronDroit />
                 </span>
               </button>
             ))}

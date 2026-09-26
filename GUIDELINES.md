@@ -1097,7 +1097,11 @@ templates ») : `IconeDuModule`, la même qu'à l'accueil et au tiroir du
 marque, LA FENÊTRE DE LECTURE S'OUVRE AUTOUR DE LUI et il est amené sous
 les yeux ; les flèches le déplacent — d'une semaine en vue Semaine, d'un
 mois en vue Mois — si bien que le calendrier et la liste ne peuvent pas se
-contredire. **LE JOURNAL SE DÉROULE SANS FIN DANS LES DEUX SENS**
+contredire. **LE PASSÉ EST EN HAUT, LE FUTUR EN BAS** (2026-09-26, « orientation du
+journal : le passé en haut le futur en bas » — l'ordre inverse, hérité du
+template, a vécu la journée) : les journées vont du plus ancien au plus
+récent, le « Voir plus » du passé est en haut et celui du futur en bas.
+**LE JOURNAL SE DÉROULE SANS FIN DANS LES DEUX SENS**
 (2026-09-26, « on doit pouvoir scroller sans fin dans un sens comme dans
 l'autre peu importe ou on se trouve. jusqu'à 10 ans en arriere en 1 an
 dans le futur par rapport à la date du jour courant ») : `domaine/journal.ts`
@@ -1131,9 +1135,10 @@ DE LUI (« Aucune entrée au 28 novembre 2025.-> à côté du calendrier ») ;
 sous le bloc calendrier plus phrase », « ajouter avec ":" », puis « Ajoutez
 une entrée :->Ajouter : » — « Ajoutez une entrée : » a vécu une demi-heure).
 SANS LE « + » de son image, et sans ses mots à elle : les nôtres. **Les
-sept cases sont DES ICÔNES SEULES, QUATRE PAR LIGNE AU PLUS** (2026-09-26,
-« pas de label, 4 icones par ligne max ») : la pastille et son icône, comme
-les cercles de l'accueil. **Leurs libellés, PROPRES À CET ÉCRAN**
+sept cases sont QUATRE PAR LIGNE AU PLUS ET SANS LABEL** (2026-09-26, « pas
+de label, 4 icones par ligne max »), **mais gardent leur contour et leur
+encoche** (le même jour, « garde les contours et les encoches ») : la carte
+et son chevron, comme celles du tiroir du « + » — sans leur nom. **Leurs libellés, PROPRES À CET ÉCRAN**
 (« changement des titres ici, pas les titres des catégories mais des labels
 au étiquettes , uniquement pour ici ») — « une Injection », « un Poids »,
 « un Effets Secondaires », « un Repas », « une Activité Physique », « un
