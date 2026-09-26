@@ -148,3 +148,22 @@ export function formaterDateLongue(date: string, mois: readonly string[], langue
   const nom = mois[m - 1] ?? '';
   return langue === 'en' ? `${nom} ${jour}, ${annee}` : `${jour} ${nom} ${annee}`;
 }
+
+/**
+ * LE TITRE D'UNE JOURNÉE DU JOURNAL (2026-09-26, son template « journal mode
+ * liste.png » : « Mardi 16 septembre ») : le jour de la semaine, le quantième
+ * et le mois — SANS L'ANNÉE, qui est dite par le calendrier juste au-dessus.
+ * La capitale initiale est celle du dictionnaire (« Lundi »), pas une
+ * fabrication.
+ */
+export function formaterJourEtDate(
+  date: string,
+  jours: readonly string[],
+  mois: readonly string[],
+  langue: Langue,
+): string {
+  const [, m, jour] = date.split('-').map(Number);
+  const nomJour = jours[jourDeLaSemaine(date)] ?? '';
+  const nomMois = mois[m - 1] ?? '';
+  return langue === 'en' ? `${nomJour}, ${nomMois} ${jour}` : `${nomJour} ${jour} ${nomMois}`;
+}

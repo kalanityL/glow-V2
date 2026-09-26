@@ -21,9 +21,9 @@ import type { FondProps } from './Accueil';
  * l'application (2026-09-20, « mon compte est une page à part entiere : le
  * menu du bas apparait ») : sortis de l'accueil, où ils sont nés.
  *
- * Les entrées : « Accueil » ramène à l'accueil ; « + » et « Menu » ouvrent
- * leur tiroir ; « Journal » et « Analyse » attendent leurs pages. L'entrée de
- * la page courante est allumée.
+ * Les entrées : « Accueil » ramène à l'accueil, « Journal » mène au journal
+ * (2026-09-26) ; « + » et « Menu » ouvrent leur tiroir ; « Analyse » attend sa
+ * page. L'entrée de la page courante est allumée.
  *
  * DEUX TIROIRS, chacun en trois états : fermé, ouvert, et EN FERMETURE — le
  * tiroir reste monté le temps de redescendre, puis se démonte quand son
@@ -44,6 +44,7 @@ export interface AjoutTraitement {
 export function BarreDuBas({
   active,
   onAccueil,
+  onJournal,
   onOuvrirCompte,
   forme,
   fond,
@@ -54,6 +55,9 @@ export function BarreDuBas({
   /** L'entrée de la page courante, allumée. */
   active: EntreeMenu | null;
   onAccueil: () => void;
+  /** LA PAGE JOURNAL (2026-09-26) : fournie, l'entrée « Journal » y mène ;
+      absente — sur le journal lui-même —, l'entrée est un bloc allumé. */
+  onJournal?: () => void;
   onOuvrirCompte: () => void;
   /** La forme du traitement répondue, pour la case du tiroir d'ajout. */
   forme: Forme | null;
@@ -173,6 +177,19 @@ export function BarreDuBas({
                 className="menu__entree menu__entree--ajouter menu__entree--bouton"
                 aria-expanded={tiroirs.ajout === 'ouvert'}
                 onClick={() => basculer('ajout')}
+              >
+                {contenu}
+              </button>
+            );
+          }
+          if (entree === 'journal' && onJournal) {
+            return (
+              <button
+                key={entree}
+                type="button"
+                className={`menu__entree menu__entree--journal menu__entree--bouton${active === 'journal' ? ' menu__entree--active' : ''}`}
+                aria-current={active === 'journal' ? 'page' : undefined}
+                onClick={onJournal}
               >
                 {contenu}
               </button>

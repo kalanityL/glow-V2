@@ -75,6 +75,7 @@ export function PagePrise({
   traitement,
   onAccueil,
   onOuvrirCompte,
+  onJournal,
   onValider,
   onAjouter,
   ajoutTraitement,
@@ -88,6 +89,8 @@ export function PagePrise({
   traitement: string;
   onAccueil: () => void;
   onOuvrirCompte: () => void;
+  /** La page Journal, par la barre du bas (2026-09-26). */
+  onJournal: () => void;
   onValider: (prise: Prise) => void;
   onAjouter: (module: ModuleId) => void;
   ajoutTraitement?: AjoutTraitement | null;
@@ -370,6 +373,7 @@ export function PagePrise({
         active={null}
         onAccueil={onAccueil}
         onOuvrirCompte={onOuvrirCompte}
+        onJournal={onJournal}
         forme={forme}
         fond={fond}
         onAjouter={onAjouter}

@@ -102,6 +102,8 @@ export function PageConfirmation({
   onModifier,
   onAccueil,
   onOuvrirCompte,
+  onJournal,
+  onVoirDansLeJournal,
   onAjouter,
   ajoutTraitement,
   fond,
@@ -121,6 +123,14 @@ export function PageConfirmation({
   onModifier: () => void;
   onAccueil: () => void;
   onOuvrirCompte: () => void;
+  /** La page Journal, par la barre du bas (2026-09-26). */
+  onJournal: () => void;
+  /** « VOIR DANS LE JOURNAL » (2026-09-26, « brancher les pages de
+      confirmation voir dans le journal envoie vers le jouranl à la date
+      saisie pour l'item ») : le journal OUVERT À LA DATE DE CE QUI VIENT
+      d'être consigné — pas à aujourd'hui, qui n'est pas forcément la même
+      journée (on consigne une pesée d'hier, une séance de demain). */
+  onVoirDansLeJournal: () => void;
   onAjouter: (module: ModuleId) => void;
   ajoutTraitement?: AjoutTraitement | null;
   fond: FondProps;
@@ -142,10 +152,13 @@ export function PageConfirmation({
     jouerClics(GLING);
   }, []);
 
-  /* Parmi les entrées, seule « Ajouter » agit (2026-09-20, « retour à
-     l'accueil comme les autres désactivés ») ; le retour d'où l'on vient
-     est le premier choix, avant elles. */
-  const agit = (entree: EntreeConfirmation) => (entree === 'ajouter' ? () => setDemandeAjout((n) => n + 1) : null);
+  /* Parmi les entrées, « Ajouter » ouvre le tiroir du « + » (2026-09-20) et
+     « Voir dans le journal » mène au journal à la date de l'item
+     (2026-09-26) ; les autres restent éteintes tant que leurs pages
+     n'existent pas. Le retour d'où l'on vient est le premier choix, avant
+     elles. */
+  const agit = (entree: EntreeConfirmation) =>
+    entree === 'ajouter' ? () => setDemandeAjout((n) => n + 1) : entree === 'journal' ? onVoirDansLeJournal : null;
   const IconeOrigine = ICONES_ORIGINE[origine];
 
   return (
@@ -211,6 +224,7 @@ export function PageConfirmation({
         active={null}
         onAccueil={onAccueil}
         onOuvrirCompte={onOuvrirCompte}
+        onJournal={onJournal}
         forme={forme}
         fond={fond}
         onAjouter={onAjouter}

@@ -3860,3 +3860,610 @@
   text-underline-offset: 3px;
   cursor: pointer;
 }
+
+/* ── LE JOURNAL ─────────────────────────────────────────────────────────── */
+
+/* LA PAGE JOURNAL (2026-09-26, « On va faire la page journal »), d'après ses
+   quatre templates `Images-pour-claude/templates/journal/`, RELEVÉS AU PIXEL
+   avant d'écrire (GUIDELINES : une image de référence se mesure). Les mesures
+   citées sont celles de ses images, ramenées à un écran de 390 px (ses
+   captures font 714 px de large pour la liste, soit un facteur de 1,83).
+
+   AUCUNE COULEUR N'EST ÉCRITE ICI : les couleurs relevées sur ses images sont,
+   à trois unités près, les jetons que les thèmes portent déjà — la pastille
+   d'une entrée #eaf3fc contre `--ajout-pastille-fond` #e7f0fc, les cartes
+   blanches contre `--module-fond`, le bleu du jour choisi #3375f3 contre
+   `--accent`. C'est donc aux jetons que la page est bâtie, et elle suit les
+   quatre thèmes. */
+
+/* La carte de la page : le calendrier et le bandeau de mode figés, le corps
+   qui défile entre eux — le partage de la carte d'un formulaire. */
+.journal {
+  display: flex;
+  flex-direction: column;
+  padding: 0;
+  overflow: hidden;
+  flex: 0 1 auto;
+  min-height: 0;
+}
+
+.journal__calendrier {
+  flex: none;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 14px 14px 12px;
+}
+
+/* La ligne du mois : les deux flèches autour du nom, la bascule des deux
+   vues au bout (« header-vue clendrier.png »). */
+.journal__mois {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.journal__mois-nom {
+  margin-right: auto;
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 16px;
+  color: var(--encre);
+  /* Le mois porte sa capitale comme dans le calendrier d'un choix de date
+     (`.calendrier__mois`) : les noms du dictionnaire sont en minuscules,
+     parce qu'ils servent surtout au milieu d'une phrase (« 26 septembre
+     2026 »). C'est du style, pas un second jeu de mots. */
+  text-transform: capitalize;
+}
+
+.journal__fleche {
+  display: grid;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  padding: 0;
+  border: 0;
+  border-radius: 999px;
+  background: none;
+  color: var(--encre-chapeau);
+  cursor: pointer;
+}
+
+/* Une seule icône pour les deux sens : le chevron droit, retourné. Un dessin
+   de moins à tenir. */
+.journal__fleche .icone {
+  width: 18px;
+  height: 18px;
+}
+
+.journal__fleche:not(.journal__fleche--suivant) .icone {
+  transform: rotate(180deg);
+}
+
+/* SEMAINE / MOIS : deux crans dans une gouttière, celui qui est choisi plein
+   à l'accent — le motif des onglets de son image. */
+.journal__vues {
+  display: flex;
+  gap: 2px;
+  padding: 3px;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--option-filet) 22%, var(--option-fond));
+}
+
+.journal__vue {
+  padding: 5px 12px;
+  border: 0;
+  border-radius: 999px;
+  background: none;
+  color: var(--encre-chapeau);
+  font-family: var(--font-body);
+  font-weight: 500;
+  font-size: 13px;
+  cursor: pointer;
+}
+
+.journal__vue--choisie {
+  background: var(--accent);
+  color: var(--bouton-encre);
+}
+
+/* LA SEMAINE EN SEPT CARTES (« sous-header-vue semaine.png ») : 86 × 80 px
+   mesurés pour 714 de large, gouttière 10, marge 30 — soit 47 × 44 et une
+   gouttière de 6 sur un écran de 390. Colonnes égales (GUIDELINES) : une
+   colonne plus large aurait l'air d'être la bonne réponse. */
+.journal__semaine {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  gap: 6px;
+}
+
+.journal__jour-carte {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  min-width: 0;
+  padding: 7px 0 9px;
+  border: 1px solid color-mix(in srgb, var(--option-filet) 45%, var(--option-fond));
+  border-radius: 12px;
+  background: var(--module-fond);
+  cursor: pointer;
+}
+
+.journal__jour-nom {
+  font-family: var(--font-body);
+  font-size: 11px;
+  color: var(--encre-chapeau);
+}
+
+.journal__jour-quantieme {
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 15px;
+  color: var(--encre);
+}
+
+/* Le jour choisi, plein à l'accent — le bleu de ses deux images du
+   calendrier ; c'est une page de lecture, pas un formulaire (la charte des
+   formulaires veut le jour choisi plein à l'encre, elle vise les
+   formulaires). */
+.journal__jour-carte--choisi {
+  border-color: var(--accent);
+  background: var(--accent);
+}
+
+.journal__jour-carte--choisi .journal__jour-nom,
+.journal__jour-carte--choisi .journal__jour-quantieme {
+  color: var(--bouton-encre);
+}
+
+/* LE POINT D'UN JOUR QUI PORTE QUELQUE CHOSE (son image du calendrier) :
+   sous le quantième, à l'accent — blanc sur le jour choisi, qui est déjà
+   bleu. */
+.journal__point {
+  width: 4px;
+  height: 4px;
+  border-radius: 999px;
+  background: var(--accent);
+}
+
+.journal__jour-carte--choisi .journal__point,
+.journal__case--choisie .journal__point {
+  background: var(--bouton-encre);
+}
+
+/* LE MOIS : six semaines de sept jours, lundi en premier (`grilleDuMois`),
+   la hauteur ne bouge pas d'un mois à l'autre. */
+.journal__grille-mois {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  gap: 4px;
+}
+
+.journal__entete-jour {
+  padding-bottom: 2px;
+  font-family: var(--font-body);
+  font-size: 11px;
+  text-align: center;
+  color: var(--encre-chapeau);
+}
+
+.journal__case {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  min-width: 0;
+  padding: 6px 0;
+  border: 1px solid color-mix(in srgb, var(--option-filet) 45%, var(--option-fond));
+  border-radius: 10px;
+  background: var(--module-fond);
+  cursor: pointer;
+}
+
+.journal__case-quantieme {
+  font-family: var(--font-display);
+  font-weight: 500;
+  font-size: 13px;
+  color: var(--encre);
+}
+
+/* Les jours des mois voisins, en pâle : ils sont là pour que la grille garde
+   sa hauteur, pas pour être lus. */
+.journal__case--voisine {
+  border-color: transparent;
+  background: none;
+}
+
+.journal__case--voisine .journal__case-quantieme {
+  color: color-mix(in srgb, var(--encre-chapeau) 45%, transparent);
+}
+
+.journal__case--choisie {
+  border-color: var(--accent);
+  background: var(--accent);
+}
+
+.journal__case--choisie .journal__case-quantieme {
+  color: var(--bouton-encre);
+}
+
+/* LE BANDEAU DE MODE (« switch mode-grille-ligne.png ») : le compte de ce
+   que le jour choisi porte, « Filtrer », et les deux façons de lire. Il vaut
+   pour toute la page. */
+.journal__barre {
+  flex: none;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 14px;
+  border-top: 1px solid color-mix(in srgb, var(--option-filet) 45%, var(--option-fond));
+}
+
+.journal__compte {
+  margin-right: auto;
+  font-family: var(--font-body);
+  font-size: 13px;
+  color: var(--encre-chapeau);
+}
+
+/* « Filtrer » : à l'encre et à la matière des boutons de choix, jamais en
+   bleu ; il se marque quand une catégorie est écartée — sans quoi on
+   filtrerait sans le savoir. */
+.journal__filtrer {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  border: 1px solid color-mix(in srgb, var(--option-filet) 55%, var(--option-fond));
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--option-filet) 22%, var(--option-fond));
+  color: var(--encre-chapeau);
+  font-family: var(--font-body);
+  font-weight: 500;
+  font-size: 13px;
+  cursor: pointer;
+}
+
+.journal__filtrer .icone {
+  width: 16px;
+  height: 16px;
+}
+
+.journal__filtrer--actif {
+  border-color: color-mix(in srgb, var(--accent) 18%, var(--option-choisi-fond));
+  background: var(--option-choisi-fond);
+  color: var(--encre);
+}
+
+/* Les deux modes : deux pastilles dans une gouttière, comme la bascule des
+   vues ; sans mot à l'écran (son image), leur nom se dit à qui écoute. */
+.journal__modes {
+  display: flex;
+  gap: 2px;
+  padding: 3px;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--option-filet) 22%, var(--option-fond));
+}
+
+.journal__mode {
+  display: grid;
+  place-items: center;
+  width: 30px;
+  height: 26px;
+  padding: 0;
+  border: 0;
+  border-radius: 999px;
+  background: none;
+  color: var(--encre-chapeau);
+  cursor: pointer;
+}
+
+.journal__mode .icone {
+  width: 17px;
+  height: 17px;
+}
+
+.journal__mode--choisi {
+  background: var(--accent);
+  color: var(--bouton-encre);
+}
+
+/* Le corps : ce qui défile. */
+.journal__corps {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  padding: 14px;
+  border-top: 1px solid color-mix(in srgb, var(--option-filet) 45%, var(--option-fond));
+}
+
+.journal__rien {
+  margin: 4px 0;
+  font-family: var(--font-body);
+  font-size: 14px;
+  font-style: italic;
+  text-align: center;
+  color: var(--encre-chapeau);
+}
+
+.journal__journee {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+/* LE TITRE D'UNE JOURNÉE (« journal mode liste.png ») : le mot du jour à
+   gauche, gros ; la date en toutes lettres à droite, en gris. */
+.journal__titre-jour {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 10px;
+  margin: 0;
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 17px;
+  color: var(--encre);
+}
+
+.journal__titre-date {
+  font-family: var(--font-body);
+  font-weight: 400;
+  font-size: 13px;
+  color: var(--encre-chapeau);
+}
+
+.journal__liste {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+/* UNE ENTRÉE : l'heure, la pastille de l'icône, ce qui est dit, et la
+   vignette quand la ligne porte une photo. C'est un BLOC, pas un bouton —
+   aucune page de détail n'existe encore, et le chevron de son template
+   promettrait une page qui n'est pas là. */
+.journal__entree {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+  padding: 8px 10px;
+  border: 1px solid color-mix(in srgb, var(--option-filet) 40%, var(--option-fond));
+  border-radius: 14px;
+  background: var(--module-fond);
+}
+
+.journal__heure {
+  flex: none;
+  /* Chiffres tabulaires et largeur constante : la colonne ne saute pas d'une
+     ligne à l'autre. */
+  width: 42px;
+  font-variant-numeric: tabular-nums;
+  font-family: var(--font-body);
+  font-size: 13px;
+  color: var(--encre-chapeau);
+}
+
+/* La pastille : 78 px mesurés sur son image de 714 de large, soit 44 sur un
+   écran de 390 — celle du tiroir du « + » en un peu plus petit. */
+.journal__icone {
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  border-radius: 999px;
+  background: var(--ajout-pastille-fond);
+  color: var(--ajout-icone-encre);
+}
+
+/* Le trait ne grossit pas avec l'icône (2026-09-20) : 22 px dans une
+   fenêtre de 24 à 1,5 d'épaisseur, comme le menu et le tiroir. */
+.journal__icone .icone {
+  width: 22px;
+  height: 22px;
+  stroke-width: 1.5;
+}
+
+.journal__dit {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+  margin-right: auto;
+}
+
+.journal__nom {
+  font-family: var(--font-body);
+  font-size: 15px;
+  color: var(--encre);
+  overflow-wrap: anywhere;
+}
+
+.journal__detail {
+  font-family: var(--font-body);
+  font-size: 13px;
+  color: var(--encre-chapeau);
+  overflow-wrap: anywhere;
+}
+
+.journal__vignette {
+  flex: none;
+  width: 44px;
+  height: 44px;
+  border-radius: 10px;
+  object-fit: cover;
+}
+
+/* LE MODE GRILLE (2026-09-26, « pour le mode grille tu mets juste l'image de
+   l'entrée si elle exite sinon l'icone ») : la tuile ne porte QUE l'image,
+   ou l'icône. Trois par rangée, colonnes égales. */
+.journal__tuiles {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.journal__tuile {
+  display: grid;
+  place-items: center;
+  aspect-ratio: 1;
+  min-width: 0;
+  border: 1px solid color-mix(in srgb, var(--option-filet) 40%, var(--option-fond));
+  border-radius: 14px;
+  background: var(--module-fond);
+  overflow: hidden;
+}
+
+.journal__tuile-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* Sans image, l'icône du module dans sa pastille, au milieu de la tuile. */
+.journal__tuile-icone {
+  display: grid;
+  place-items: center;
+  width: 48px;
+  height: 48px;
+  border-radius: 999px;
+  background: var(--ajout-pastille-fond);
+  color: var(--ajout-icone-encre);
+}
+
+.journal__tuile-icone .icone {
+  width: 24px;
+  height: 24px;
+  stroke-width: 1.5;
+}
+
+/* ── LE TIROIR DU FILTRE ────────────────────────────────────────────────── */
+
+/* Son template « écran-filtre.png » : « Catégories » et les huit modules en
+   tuiles cochables, quatre par rangée. Nos icônes et nos mots. */
+.filtre__intitule {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+
+.filtre__groupe {
+  margin: 0;
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 15px;
+  color: var(--encre);
+}
+
+/* « Réinitialiser » : un lien à l'encre et souligné — la charte des
+   formulaires, pas de texte en bleu. Éteint, il se tait en gris. */
+.filtre__reinitialiser {
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--encre);
+  font-family: var(--font-body);
+  font-size: 13px;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  text-decoration-thickness: 1px;
+  cursor: pointer;
+}
+
+.filtre__reinitialiser:disabled {
+  color: color-mix(in srgb, var(--encre-chapeau) 55%, transparent);
+  text-decoration: none;
+  cursor: default;
+}
+
+.filtre__cases {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 8px;
+  /* De l'air sous la dernière rangée : le tiroir s'arrête à la barre du bas,
+     et un nom sur deux lignes venait la toucher. */
+  padding-bottom: 8px;
+}
+
+.filtre__case {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+  padding: 4px 0;
+  border: 0;
+  background: none;
+  cursor: pointer;
+}
+
+.filtre__pastille {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: 52px;
+  height: 52px;
+  border-radius: 999px;
+  /* Écartée : la pastille et son icône s'effacent, sans disparaître (son
+     image montre les catégories non retenues en pâle). */
+  background: color-mix(in srgb, var(--ajout-pastille-fond) 45%, var(--option-fond));
+  color: color-mix(in srgb, var(--ajout-icone-encre) 40%, transparent);
+}
+
+.filtre__case--retenue .filtre__pastille {
+  background: var(--ajout-pastille-fond);
+  color: var(--ajout-icone-encre);
+}
+
+.filtre__pastille .icone {
+  width: 26px;
+  height: 26px;
+  stroke-width: 1.5;
+}
+
+/* La coche d'une catégorie retenue, en haut à droite de la pastille, pleine
+   à l'accent — comme son image. */
+.filtre__coche {
+  position: absolute;
+  top: -2px;
+  right: -2px;
+  display: grid;
+  place-items: center;
+  width: 20px;
+  height: 20px;
+  border-radius: 999px;
+  background: var(--accent);
+  color: var(--bouton-encre);
+}
+
+.filtre__coche .icone {
+  width: 13px;
+  height: 13px;
+  stroke-width: 2.5;
+}
+
+.filtre__nom {
+  font-family: var(--font-body);
+  font-size: 12px;
+  line-height: 1.25;
+  text-align: center;
+  color: color-mix(in srgb, var(--encre-chapeau) 70%, transparent);
+  overflow-wrap: anywhere;
+}
+
+.filtre__case--retenue .filtre__nom {
+  color: var(--encre);
+}

@@ -49,6 +49,7 @@ export function PagePesee({
   onAnnuler,
   onAccueil,
   onOuvrirCompte,
+  onJournal,
   onAjouter,
   ajoutTraitement,
   fond,
@@ -65,6 +66,8 @@ export function PagePesee({
   onAnnuler?: () => void;
   onAccueil: () => void;
   onOuvrirCompte: () => void;
+  /** La page Journal, par la barre du bas (2026-09-26). */
+  onJournal: () => void;
   onAjouter: (module: ModuleId) => void;
   ajoutTraitement?: AjoutTraitement | null;
   fond: FondProps;
@@ -203,6 +206,7 @@ export function PagePesee({
         active={null}
         onAccueil={onAccueil}
         onOuvrirCompte={onOuvrirCompte}
+        onJournal={onJournal}
         forme={forme}
         fond={fond}
         onAjouter={onAjouter}

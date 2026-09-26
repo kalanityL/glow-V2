@@ -86,6 +86,7 @@ export function surLeFond(onOuvrir: () => void) {
 export function Accueil({
   reponses,
   onOuvrirCompte,
+  onJournal,
   fond,
   onAjouter,
   ajoutTraitement,
@@ -96,6 +97,8 @@ export function Accueil({
   /** Le portrait ouvre la page « Mon compte » (2026-09-19), et l'entrée
       « Mon compte » du tiroir aussi. */
   onOuvrirCompte: () => void;
+  /** La page Journal, par la barre du bas (2026-09-26). */
+  onJournal: () => void;
   /** Une case du tiroir du « + » : voir `App`. */
   onAjouter: (module: ModuleId) => void;
   ajoutTraitement?: AjoutTraitement | null;
@@ -208,6 +211,7 @@ export function Accueil({
         active="accueil"
         onAccueil={() => undefined}
         onOuvrirCompte={onOuvrirCompte}
+        onJournal={onJournal}
         forme={reponses.formeTraitement}
         fond={fond}
         onAjouter={onAjouter}

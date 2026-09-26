@@ -360,6 +360,52 @@ export function IconeChevronDroit() {
   );
 }
 
+/**
+ * Lucide `sliders-horizontal` — « Filtrer », au journal (2026-09-26) : les
+ * trois curseurs de son template `écran-filtre.png`, dans notre trait.
+ */
+export function IconeFiltrer() {
+  return (
+    <Icone>
+      <path d="M10 5H3" />
+      <path d="M21 5h-7" />
+      <path d="M6 12H3" />
+      <path d="M21 12H10" />
+      <path d="M14 19H3" />
+      <path d="M21 19h-3" />
+      <path d="M12 3v4" />
+      <path d="M8 10v4" />
+      <path d="M16 17v4" />
+    </Icone>
+  );
+}
+
+/** Lucide `list` — le mode liste du journal (2026-09-26). */
+export function IconeListe() {
+  return (
+    <Icone>
+      <path d="M8 6h13" />
+      <path d="M8 12h13" />
+      <path d="M8 18h13" />
+      <path d="M3 6h.01" />
+      <path d="M3 12h.01" />
+      <path d="M3 18h.01" />
+    </Icone>
+  );
+}
+
+/** Lucide `layout-grid` — le mode grille du journal (2026-09-26). */
+export function IconeGrille() {
+  return (
+    <Icone>
+      <rect width="7" height="7" x="3" y="3" rx="1" />
+      <rect width="7" height="7" x="14" y="3" rx="1" />
+      <rect width="7" height="7" x="14" y="14" rx="1" />
+      <rect width="7" height="7" x="3" y="14" rx="1" />
+    </Icone>
+  );
+}
+
 /** Lucide `map-pin` — la zone d'une prise. */
 export function IconeLieu() {
   return (

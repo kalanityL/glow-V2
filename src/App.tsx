@@ -12,6 +12,7 @@ import { PageConfirmation, ENTREES_ACTIVITE, ENTREES_PESEE, ENTREES_PRISE, ENTRE
 import { PageActivite } from './screens/PageActivite';
 import { PagePesee } from './screens/PagePesee';
 import { PageSommeil } from './screens/PageSommeil';
+import { PageJournal } from './screens/PageJournal';
 import { IconeActivite, IconeBalance, IconeCalendrier, IconeCoche, IconeComprime, IconeHorloge, IconeIntensiteDouce, IconeIntensiteIntensive, IconeIntensiteModeree, IconeLieu, IconeSeringue, IconeSommeil } from './components/Icones';
 import { noeudDuSport, slugActivite } from './domaine/activites';
 import { TRAITEMENTS } from './domaine/traitements';
@@ -62,7 +63,7 @@ export default function App({ verrou = false }: { /** Le verrou de connexion, ar
      ouverte par le portrait ou par le tiroir du menu. Le bouton « retour » de la barre y ramène à l'accueil —
      c'est pour cela que la page vit ici, à côté du parcours, et non dans
      l'accueil. (Le menu principal, lui, est un tiroir de l'accueil.) */
-  const [page, setPage] = useState<'accueil' | 'compte' | 'prise' | 'confirmation' | 'pesee' | 'confirmation-pesee' | 'sommeil' | 'confirmation-sommeil' | 'activite' | 'confirmation-activite'>(
+  const [page, setPage] = useState<'accueil' | 'compte' | 'journal' | 'prise' | 'confirmation' | 'pesee' | 'confirmation-pesee' | 'sommeil' | 'confirmation-sommeil' | 'activite' | 'confirmation-activite'>(
     'accueil',
   );
 
@@ -195,6 +196,17 @@ export default function App({ verrou = false }: { /** Le verrou de connexion, ar
   };
   const derniere = dernierePrise;
 
+  /* LE JOUR SUR LEQUEL LE JOURNAL S'OUVRE (2026-09-26, « brancher les pages
+     de confirmation voir dans le journal envoie vers le jouranl à la date
+     saisie pour l'item ») : posé par « Voir dans le journal » d'une
+     confirmation, à la date de ce qui vient d'être consigné ; remis à zéro
+     quand le journal s'ouvre par la barre du bas, qui mène à aujourd'hui. */
+  const [jourDuJournal, setJourDuJournal] = useState<string | null>(null);
+  const allerAuJournal = (date?: string) => {
+    setJourDuJournal(date ?? null);
+    setPage('journal');
+  };
+
   /* LE FOND DE PAGE (2026-09-20) : l'enregistré vient des réponses ; l'APERÇU,
      provisoire, vit ici — le bloc « Thème » le pose sous les yeux, « Choisir »
      l'enregistre, fermer l'efface. Toute page le reçoit. */
@@ -267,8 +279,25 @@ export default function App({ verrou = false }: { /** Le verrou de connexion, ar
           {(session) => !parcours.entre ? (
             <Onboarding parcours={parcours} />
           ) : page === 'compte' ? (
-            <Compte parcours={parcours} onAccueil={() => setPage('accueil')} fond={fond} onAjouter={ajouter}
+            <Compte parcours={parcours} onAccueil={() => setPage('accueil')} onJournal={() => allerAuJournal()} fond={fond} onAjouter={ajouter}
               ajoutTraitement={ajoutTraitement} onDeconnexion={session.onDeconnexion} />
+          ) : page === 'journal' ? (
+            /* LA PAGE JOURNAL (2026-09-26) : l'entrée « Journal » de la barre
+               du bas y mène, depuis n'importe quelle page. */
+            <PageJournal
+              jourInitial={jourDuJournal ?? undefined}
+              prises={journaux.prises}
+              pesees={pesees}
+              sommeils={journaux.sommeils}
+              activites={journaux.activites}
+              unite={unites.poids}
+              forme={parcours.reponses.formeTraitement}
+              onAccueil={() => setPage('accueil')}
+              onOuvrirCompte={() => setPage('compte')}
+              onAjouter={ajouter}
+              ajoutTraitement={ajoutTraitement}
+              fond={fond}
+            />
           ) : page === 'confirmation' && derniere && parcours.reponses.formeTraitement ? (
             <PageConfirmation
               titrePage={textes.accueil.traitement[parcours.reponses.formeTraitement]}
@@ -300,6 +329,7 @@ export default function App({ verrou = false }: { /** Le verrou de connexion, ar
                     ]),
               ]}
               entrees={ENTREES_PRISE}
+              onVoirDansLeJournal={() => allerAuJournal(derniere.date)}
               origine={origine}
               onRetour={() => setPage(origine)}
               forme={parcours.reponses.formeTraitement}
@@ -309,6 +339,7 @@ export default function App({ verrou = false }: { /** Le verrou de connexion, ar
               }}
               onAccueil={() => setPage('accueil')}
               onOuvrirCompte={() => setPage('compte')}
+              onJournal={() => allerAuJournal()}
               onAjouter={ajouter}
               ajoutTraitement={ajoutTraitement}
               fond={fond}
@@ -327,6 +358,7 @@ export default function App({ verrou = false }: { /** Le verrou de connexion, ar
               }}
               onAccueil={() => setPage('accueil')}
               onOuvrirCompte={() => setPage('compte')}
+              onJournal={() => allerAuJournal()}
               onAjouter={ajouter}
               ajoutTraitement={ajoutTraitement}
               fond={fond}
@@ -343,6 +375,7 @@ export default function App({ verrou = false }: { /** Le verrou de connexion, ar
               }}
               onAccueil={() => setPage('accueil')}
               onOuvrirCompte={() => setPage('compte')}
+              onJournal={() => allerAuJournal()}
               onAjouter={ajouter}
               ajoutTraitement={ajoutTraitement}
               fond={fond}
@@ -359,6 +392,7 @@ export default function App({ verrou = false }: { /** Le verrou de connexion, ar
               }}
               onAccueil={() => setPage('accueil')}
               onOuvrirCompte={() => setPage('compte')}
+              onJournal={() => allerAuJournal()}
               onAjouter={ajouter}
               ajoutTraitement={ajoutTraitement}
               fond={fond}
@@ -402,6 +436,7 @@ export default function App({ verrou = false }: { /** Le verrou de connexion, ar
                 },
               ]}
               entrees={ENTREES_ACTIVITE}
+              onVoirDansLeJournal={() => allerAuJournal(derniereActivite.date)}
               origine={origine}
               onRetour={() => setPage(origine)}
               forme={parcours.reponses.formeTraitement}
@@ -411,6 +446,7 @@ export default function App({ verrou = false }: { /** Le verrou de connexion, ar
               }}
               onAccueil={() => setPage('accueil')}
               onOuvrirCompte={() => setPage('compte')}
+              onJournal={() => allerAuJournal()}
               onAjouter={ajouter}
               ajoutTraitement={ajoutTraitement}
               fond={fond}
@@ -440,6 +476,7 @@ export default function App({ verrou = false }: { /** Le verrou de connexion, ar
                 { icone: <IconeCoche />, nom: textes.sommeil.qualites[dernierSommeil.quality] ?? '', valeur: `${dernierSommeil.quality} / 5` },
               ]}
               entrees={ENTREES_SOMMEIL}
+              onVoirDansLeJournal={() => allerAuJournal(dernierSommeil.date)}
               origine={origine}
               onRetour={() => setPage(origine)}
               forme={parcours.reponses.formeTraitement}
@@ -449,6 +486,7 @@ export default function App({ verrou = false }: { /** Le verrou de connexion, ar
               }}
               onAccueil={() => setPage('accueil')}
               onOuvrirCompte={() => setPage('compte')}
+              onJournal={() => allerAuJournal()}
               onAjouter={ajouter}
               ajoutTraitement={ajoutTraitement}
               fond={fond}
@@ -470,6 +508,7 @@ export default function App({ verrou = false }: { /** Le verrou de connexion, ar
                 },
               ]}
               entrees={ENTREES_PESEE}
+              onVoirDansLeJournal={() => allerAuJournal(dernierePesee.date)}
               origine={origine}
               onRetour={() => setPage(origine)}
               forme={parcours.reponses.formeTraitement}
@@ -479,6 +518,7 @@ export default function App({ verrou = false }: { /** Le verrou de connexion, ar
               }}
               onAccueil={() => setPage('accueil')}
               onOuvrirCompte={() => setPage('compte')}
+              onJournal={() => allerAuJournal()}
               onAjouter={ajouter}
               ajoutTraitement={ajoutTraitement}
               fond={fond}
@@ -490,6 +530,7 @@ export default function App({ verrou = false }: { /** Le verrou de connexion, ar
               traitement={parcours.reponses.traitement}
               onAccueil={() => setPage('accueil')}
               onOuvrirCompte={() => setPage('compte')}
+              onJournal={() => allerAuJournal()}
               onValider={validerPrise}
               onAjouter={ajouter}
               ajoutTraitement={ajoutTraitement}
@@ -504,6 +545,7 @@ export default function App({ verrou = false }: { /** Le verrou de connexion, ar
             <Accueil
               reponses={parcours.reponses}
               onOuvrirCompte={() => setPage('compte')}
+              onJournal={() => allerAuJournal()}
               fond={fond}
               onAjouter={ajouter}
               ajoutTraitement={ajoutTraitement}

@@ -134,6 +134,7 @@ export function PageActivite({
   onAnnuler,
   onAccueil,
   onOuvrirCompte,
+  onJournal,
   onAjouter,
   ajoutTraitement,
   fond,
@@ -148,6 +149,8 @@ export function PageActivite({
   onAnnuler?: () => void;
   onAccueil: () => void;
   onOuvrirCompte: () => void;
+  /** La page Journal, par la barre du bas (2026-09-26). */
+  onJournal: () => void;
   onAjouter: (module: ModuleId) => void;
   ajoutTraitement?: AjoutTraitement | null;
   fond: FondProps;
@@ -593,6 +596,7 @@ export function PageActivite({
         active={null}
         onAccueil={onAccueil}
         onOuvrirCompte={onOuvrirCompte}
+        onJournal={onJournal}
         forme={forme}
         fond={fond}
         onAjouter={onAjouter}

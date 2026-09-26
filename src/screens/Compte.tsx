@@ -93,6 +93,7 @@ type Volet = VoletCompte;
 export function Compte({
   parcours,
   onAccueil,
+  onJournal,
   fond,
   onAjouter,
   ajoutTraitement,
@@ -107,6 +108,8 @@ export function Compte({
   fond: FondProps;
   /** « Accueil » de la barre du bas ramène à l'accueil. */
   onAccueil: () => void;
+  /** La page Journal, par la barre du bas (2026-09-26). */
+  onJournal: () => void;
   /** Une case du tiroir du « + » : voir `App`. */
   onAjouter: (module: ModuleId) => void;
   ajoutTraitement?: AjoutTraitement | null;
@@ -406,6 +409,7 @@ export function Compte({
         active={null}
         onAccueil={onAccueil}
         onOuvrirCompte={() => aller('compte')}
+        onJournal={onJournal}
         forme={reponses.formeTraitement}
         fond={fond}
         onAjouter={onAjouter}

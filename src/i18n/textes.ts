@@ -352,10 +352,6 @@ export interface Textes {
     natures: Record<SleepKind, string>;
     endormissement: string;
     reveil: string;
-    /** Le jour en mots quand il en a un (2026-09-21, « mettre hier,
-        aujourd'hui ou date », puis le soir : « hier / avant hier /
-        aujourd'hui / demain / apres demain / sinon la date »). */
-    jours: Record<JourRelatif, string>;
     /** La durée écrite en phrase : « Durée : 8 h 05 » (2026-09-21 au soir,
         « 8 h 05 de sommeil-> Durée : xx ») — et le mot seul, avant, pour
         l'écran, où la durée garde sa largeur fixe. */
@@ -406,12 +402,52 @@ export interface Textes {
     entrees: Record<EntreeConfirmation, string>;
   };
   /** LE CALENDRIER d'un choix de date (2026-09-20) : les mois, les jours en
-   *  court, lundi en premier, et les deux flèches dites à qui écoute. */
+   *  court, lundi en premier, et les deux flèches dites à qui écoute.
+   *  `joursAbreges` est la forme à trois lettres de la vue « Semaine » du
+   *  journal (2026-09-26, son template) ; `jours` reste la lettre seule du
+   *  calendrier, où sept colonnes étroites ne tiennent rien de plus. */
   calendrier: {
     mois: readonly string[];
     jours: readonly string[];
+    joursAbreges: readonly string[];
+    joursEntiers: readonly string[];
     moisPrecedent: string;
     moisSuivant: string;
+  };
+  /**
+   * LES JOURS QUI ONT UN MOT (2026-09-21 au soir, « pour les dates : hier /
+   * avant hier / aujourd'hui / demain / apres demain / sinon la date ») : nés
+   * dans le formulaire du sommeil, ils servent partout où une date se lit —
+   * le journal les emploie pour ses titres de journée. Un seul jeu de mots,
+   * pour qu'il n'y ait pas deux vérités.
+   */
+  joursRelatifs: Record<JourRelatif, string>;
+  /**
+   * LA PAGE JOURNAL (2026-09-26, « On va faire la page journal », ses
+   * templates `Images-pour-claude/templates/journal/`) : le calendrier et ses
+   * deux vues, le filtre par catégorie, les deux modes d'affichage, et ce
+   * qu'une entrée dit d'elle-même.
+   */
+  journal: {
+    /** Les deux vues du calendrier (« header-vue clendrier.png »). */
+    vues: Record<'semaine' | 'mois', string>;
+    /** Le bouton qui ouvre le tiroir du filtre, son titre, son intitulé de
+        groupe et le lien qui recoche tout. */
+    filtrer: string;
+    reinitialiser: string;
+    categories: string;
+    /** LES DEUX MODES (« switch mode-grille-ligne.png ») : les boutons n'ont
+        pas de mot à l'écran, leur nom se dit à qui écoute la page. */
+    modes: Record<'liste' | 'grille', string>;
+    /** Le compte du bandeau de mode : « 6 entrées », « 1 entrée » — et
+        « Aucune entrée », jamais « 0 entrée » (VOCABULAIRE § 3). */
+    entrees: (nombre: number) => string;
+    /** Rien à montrer : le jour choisi est vide, ou le filtre ne laisse rien
+        passer. Deux phrases, parce que ce n'est pas la même chose. */
+    aucuneEntree: string;
+    aucuneCategorie: string;
+    /** Le détail d'un sommeil : sa qualité, telle que la V1 la note. */
+    qualite: (note: number) => string;
   };
   /**
    * L'ÉCRAN DE CONNEXION (2026-09-21, « brancher sur la v2 en ligne la
@@ -737,13 +773,6 @@ const FR: Textes = {
     natures: { nuit: 'Nuit', sieste: 'Sieste' },
     endormissement: 'Endormissement',
     reveil: 'Réveil',
-    jours: {
-      avantHier: 'Avant-hier',
-      hier: 'Hier',
-      aujourdhui: 'Aujourd’hui',
-      demain: 'Demain',
-      apresDemain: 'Après-demain',
-    },
     /* « Durée : 8 h 05 » (2026-09-21 au soir, « 8 h 05 de sommeil-> Durée :
        xx ») — « 13 h de sommeil » a vécu la journée. */
     duree: (duree) => `Durée : ${duree}`,
@@ -807,8 +836,34 @@ const FR: Textes = {
   calendrier: {
     mois: ['janvier', 'février', 'mars', 'avril', 'mai', 'juin', 'juillet', 'août', 'septembre', 'octobre', 'novembre', 'décembre'],
     jours: ['L', 'M', 'M', 'J', 'V', 'S', 'D'],
+    /* La vue « Semaine » du journal (2026-09-26, son template) : sept cartes
+       larges, où le jour tient en entier abrégé. */
+    joursAbreges: ['Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam', 'Dim'],
+    /* Le titre d'une journée du journal : « Mardi 16 septembre ». La
+       capitale initiale est ici, pas fabriquée par l'écran. */
+    joursEntiers: ['Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi', 'Dimanche'],
     moisPrecedent: 'Mois précédent',
     moisSuivant: 'Mois suivant',
+  },
+  joursRelatifs: {
+    avantHier: 'Avant-hier',
+    hier: 'Hier',
+    aujourdhui: 'Aujourd’hui',
+    demain: 'Demain',
+    apresDemain: 'Après-demain',
+  },
+  journal: {
+    vues: { semaine: 'Semaine', mois: 'Mois' },
+    filtrer: 'Filtrer',
+    reinitialiser: 'Réinitialiser',
+    categories: 'Catégories',
+    modes: { liste: 'Voir en liste', grille: 'Voir en grille' },
+    /* « Aucune entrée », jamais « 0 entrée » (VOCABULAIRE § 3 : une famille
+       à zéro se tait). */
+    entrees: (nombre) => (nombre === 0 ? 'Aucune entrée' : nombre === 1 ? '1 entrée' : `${nombre} entrées`),
+    aucuneEntree: 'Rien d’enregistré ce jour-là.',
+    aucuneCategorie: 'Aucune catégorie retenue.',
+    qualite: (note) => `Qualité ${note}`,
   },
   connexion: {
     chapeau: 'Accès privé — connectez-vous pour continuer',

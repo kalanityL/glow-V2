@@ -26,8 +26,20 @@ export async function ouvrirChrome(url, { port = 9333, largeur = 520, hauteur = 
     ['--headless=new', `--remote-debugging-port=${port}`, `--window-size=${largeur},${hauteur}`, `--user-data-dir=${profil}`, 'about:blank'],
     { stdio: 'ignore' },
   );
-  await sommeil(1500);
-  const cibles = await (await fetch(`http://127.0.0.1:${port}/json`)).json();
+  /* ATTENDRE QUE LE PORT RÉPONDE, et non un délai fixe (2026-09-26) : sur une
+     machine chargée, Chrome met plus de 1,5 s à ouvrir son port et le
+     scénario tombait sur un `ECONNREFUSED`. Vingt essais d'une demi-seconde. */
+  let cibles;
+  for (let essai = 0; essai < 20; essai += 1) {
+    await sommeil(500);
+    try {
+      cibles = await (await fetch(`http://127.0.0.1:${port}/json`)).json();
+      break;
+    } catch {
+      /* Pas encore ouvert : on repasse. */
+    }
+  }
+  if (!cibles) throw new Error(`Chrome n'a pas ouvert son port ${port}`);
   const ws = new WebSocket(cibles.find((t) => t.type === 'page').webSocketDebuggerUrl);
   await new Promise((r) => (ws.onopen = r));
   let id = 0;

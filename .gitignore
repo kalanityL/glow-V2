@@ -3,3 +3,6 @@ dist/
 .DS_Store
 *.local
 .firebase/
+
+# Le dossier de travail de Claude Code (worktrees d’agents) : hors du projet.
+.claude/

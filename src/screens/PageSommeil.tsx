@@ -58,6 +58,7 @@ export function PageSommeil({
   onAnnuler,
   onAccueil,
   onOuvrirCompte,
+  onJournal,
   onAjouter,
   ajoutTraitement,
   fond,
@@ -71,6 +72,8 @@ export function PageSommeil({
   onAnnuler?: () => void;
   onAccueil: () => void;
   onOuvrirCompte: () => void;
+  /** La page Journal, par la barre du bas (2026-09-26). */
+  onJournal: () => void;
   onAjouter: (module: ModuleId) => void;
   ajoutTraitement?: AjoutTraitement | null;
   fond: FondProps;
@@ -197,7 +200,7 @@ export function PageSommeil({
        soir, « hier / avant hier / aujourd'hui / demain / apres demain /
        sinon la date »). */
     const mot = jourRelatif(date, aujourdhui);
-    return mot ? textes.sommeil.jours[mot] : formaterDateCourte(date, langue);
+    return mot ? textes.joursRelatifs[mot] : formaterDateCourte(date, langue);
   };
 
   const colonne = (
@@ -385,6 +388,7 @@ export function PageSommeil({
         active={null}
         onAccueil={onAccueil}
         onOuvrirCompte={onOuvrirCompte}
+        onJournal={onJournal}
         forme={forme}
         fond={fond}
         onAjouter={onAjouter}
