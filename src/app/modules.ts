@@ -40,6 +40,24 @@ export const RANGS_MODULES: readonly (readonly ModuleId[])[] = [
  * temps pour soi) — la marche n'y est pas, elle n'a pas de formulaire
  * d'ajout dans la V1.
  */
+/**
+ * LES MODULES DE L'ÉCRAN VIDE DU JOURNAL (2026-09-26, sa liste : « Ajouter :
+ * une injection / un poids / un effet secondaire / un repas / une activité
+ * physiue / un sommeil / un temps pour soi ») : les mêmes sept que le tiroir
+ * du « + », DANS SON ORDRE À ELLE, qui n'est pas celui de la V1 — le repas
+ * passe devant l'activité physique. Une liste à part plutôt qu'un tri :
+ * l'ordre du tiroir est celui de la V1 et ne doit pas bouger.
+ */
+export const MODULES_AJOUT_JOURNAL: readonly ModuleId[] = [
+  'traitement',
+  'balance',
+  'effets-secondaires',
+  'menus',
+  'activite-physique',
+  'sommeil',
+  'temps-pour-soi',
+];
+
 export const MODULES_AJOUT: readonly ModuleId[] = [
   'traitement',
   'balance',

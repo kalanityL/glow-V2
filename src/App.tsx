@@ -114,7 +114,14 @@ export default function App({ verrou = false }: { /** Le verrou de connexion, ar
      depuis une confirmation ou un formulaire, l'origine ne bouge pas. La
      confirmation y ramène par son premier choix. */
   const [origine, setOrigine] = useState<Origine>('accueil');
-  const ajouter = (module: ModuleId) => {
+  /* LA DATE PROPOSÉE AU FORMULAIRE (2026-09-26, l'écran d'un jour vide du
+     journal) : ajouter depuis un jour regardé ouvre le formulaire à CE
+     jour-là, pas à aujourd'hui — sans quoi on lirait le 17 et on
+     enregistrerait le 26. Le « + » de la barre n'en passe pas : ses
+     formulaires s'ouvrent à aujourd'hui, comme avant. */
+  const [dateProposee, setDateProposee] = useState<string | null>(null);
+  const ajouter = (module: ModuleId, date?: string) => {
+    setDateProposee(date ?? null);
     if (page === 'accueil' || page === 'compte') setOrigine(page);
     if (module === 'traitement') {
       if (parcours.reponses.formeTraitement && parcours.reponses.traitement) {
@@ -346,6 +353,7 @@ export default function App({ verrou = false }: { /** Le verrou de connexion, ar
             />
           ) : page === 'pesee' ? (
             <PagePesee
+              dateProposee={dateProposee ?? undefined}
               poidsPropose={poidsPropose}
               unite={unites.poids}
               pesees={pesees}
@@ -365,6 +373,7 @@ export default function App({ verrou = false }: { /** Le verrou de connexion, ar
             />
           ) : page === 'activite' ? (
             <PageActivite
+              dateProposee={dateProposee ?? undefined}
               forme={parcours.reponses.formeTraitement}
               sportsRecents={journaux.sportsRecents}
               initiale={modification && derniereActivite ? derniereActivite : undefined}
@@ -382,6 +391,7 @@ export default function App({ verrou = false }: { /** Le verrou de connexion, ar
             />
           ) : page === 'sommeil' ? (
             <PageSommeil
+              dateProposee={dateProposee ?? undefined}
               sommeils={journaux.sommeils}
               forme={parcours.reponses.formeTraitement}
               initiale={modification && dernierSommeil ? dernierSommeil : undefined}
@@ -525,6 +535,7 @@ export default function App({ verrou = false }: { /** Le verrou de connexion, ar
             />
           ) : page === 'prise' && parcours.reponses.formeTraitement && parcours.reponses.traitement ? (
             <PagePrise
+              dateProposee={dateProposee ?? undefined}
               parcours={parcours}
               forme={parcours.reponses.formeTraitement}
               traitement={parcours.reponses.traitement}

@@ -135,6 +135,7 @@ export function PageActivite({
   onAccueil,
   onOuvrirCompte,
   onJournal,
+  dateProposee,
   onAjouter,
   ajoutTraitement,
   fond,
@@ -151,7 +152,10 @@ export function PageActivite({
   onOuvrirCompte: () => void;
   /** La page Journal, par la barre du bas (2026-09-26). */
   onJournal: () => void;
-  onAjouter: (module: ModuleId) => void;
+  /** LE JOUR PROPOSÉ D'AVANCE (2026-09-26) : la date regardée au journal
+      quand on ajoute depuis l'écran d'un jour vide ; sans elle, aujourd'hui. */
+  dateProposee?: string;
+  onAjouter: (module: ModuleId, date?: string) => void;
   ajoutTraitement?: AjoutTraitement | null;
   fond: FondProps;
 }) {
@@ -164,7 +168,7 @@ export function PageActivite({
      mètres dans la base) qui ouvre l'onglet Distance. */
   const depart = initiale ? noeudDuSport(initiale.sport) : null;
   const dureeConnue = initiale ? (DUREES_PROPOSEES as readonly number[]).includes(initiale.duration) : true;
-  const [date, setDate] = useState(initiale?.date ?? dateLocale(maintenant));
+  const [date, setDate] = useState(initiale?.date ?? dateProposee ?? dateLocale(maintenant));
   const [heure, setHeure] = useState(initiale?.time ?? heureRonde(heureLocale(maintenant)));
   const [editeDate, setEditeDate] = useState(false);
   const [editeHeure, setEditeHeure] = useState(false);

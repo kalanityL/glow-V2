@@ -8,11 +8,12 @@ import { IconeChevronDroit, IconeFiltrer, IconeGrille, IconeListe } from '../com
 import { IndiceDefilement } from '../components/IndiceDefilement';
 import { detecterLangue, useTextes } from '../i18n/useTextes';
 import { classeDuTheme } from '../themes/themes';
-import { MODULES, type ModuleId } from '../app/modules';
+import { MODULES, MODULES_AJOUT_JOURNAL, type ModuleId } from '../app/modules';
 import {
   anneeMoisDe,
   dateDecalee,
   dateLocale,
+  formaterDateLongue,
   formaterJourEtDate,
   grilleDuMois,
   jourDeLaSemaine,
@@ -101,7 +102,9 @@ export function PageJournal({
   forme: Forme | null;
   onAccueil: () => void;
   onOuvrirCompte: () => void;
-  onAjouter: (module: ModuleId) => void;
+  /** Une case touchée : le module, et LE JOUR REGARDÉ — le formulaire
+      s'ouvre à cette date (2026-09-26, l'écran d'un jour vide). */
+  onAjouter: (module: ModuleId, date?: string) => void;
   ajoutTraitement?: AjoutTraitement | null;
   fond: FondProps;
 }) {
@@ -269,7 +272,33 @@ export function PageJournal({
             {retenus.length === 0 ? (
               <p className="journal__rien">{textes.journal.aucuneCategorie}</p>
             ) : jours.length === 0 ? (
-              <p className="journal__rien">{textes.journal.aucuneEntree}</p>
+              /* L'ÉCRAN D'UN JOUR VIDE (2026-09-26, son image et sa dictée) :
+                 la phrase avec la date regardée, « Ajoutez une entrée », et
+                 SES SEPT CASES sur deux colonnes — l'icône dans sa pastille,
+                 le nom, le chevron. NOS ICÔNES ET UNE COULEUR UNIE (« couleur
+                 unie des icones et utiliser nos icones ») : `IconeDuModule`
+                 aux jetons `--ajout-*`, pas les six teintes de son image. */
+              <div className="journal__vide">
+                <p className="journal__vide-phrase">
+                  {textes.journal.aucuneEntreeLe(formaterDateLongue(jour, textes.calendrier.mois, langue))}
+                </p>
+                <h2 className="journal__vide-titre">{textes.journal.ajoutezUneEntree}</h2>
+                <div className="journal__vide-cases">
+                  {MODULES_AJOUT_JOURNAL.map((module) => (
+                    <button key={module} type="button" className="journal__vide-case" onClick={() => onAjouter(module, jour)}>
+                      <span className="journal__icone">
+                        <IconeDuModule module={module} forme={forme} />
+                      </span>
+                      <span className="journal__vide-nom">
+                        {module === 'traitement' && forme ? textes.accueil.traitement[forme] : textes.accueil.modules[module]}
+                      </span>
+                      <span className="journal__vide-chevron" aria-hidden="true">
+                        <IconeChevronDroit />
+                      </span>
+                    </button>
+                  ))}
+                </div>
+              </div>
             ) : (
               jours.map((journee) => {
                 const mot = jourRelatif(journee.date, aujourdhui);

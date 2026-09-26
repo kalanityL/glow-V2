@@ -111,7 +111,7 @@ export function Compte({
   /** La page Journal, par la barre du bas (2026-09-26). */
   onJournal: () => void;
   /** Une case du tiroir du « + » : voir `App`. */
-  onAjouter: (module: ModuleId) => void;
+  onAjouter: (module: ModuleId, date?: string) => void;
   ajoutTraitement?: AjoutTraitement | null;
 }) {
   const textes = useTextes();

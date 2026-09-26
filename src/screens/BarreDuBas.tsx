@@ -65,7 +65,7 @@ export function BarreDuBas({
       deux gestes — voir `App`, qui tient l'aperçu pour toute page. */
   fond: FondProps;
   /** Une case du tiroir du « + » touchée : le tiroir se ferme, la page change. */
-  onAjouter: (module: ModuleId) => void;
+  onAjouter: (module: ModuleId, date?: string) => void;
   /** LE BLOC « MON TRAITEMENT » OUVERT PAR LE « + » (2026-09-21, « ajouter
       traitement si traitement aucun : ouvre le formulaire de traitement ») :
       rendu ici, dans la page, comme le bloc « Thème ». */

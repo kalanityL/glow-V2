@@ -77,6 +77,7 @@ export function PagePrise({
   onOuvrirCompte,
   onJournal,
   onValider,
+  dateProposee,
   onAjouter,
   ajoutTraitement,
   fond,
@@ -92,7 +93,10 @@ export function PagePrise({
   /** La page Journal, par la barre du bas (2026-09-26). */
   onJournal: () => void;
   onValider: (prise: Prise) => void;
-  onAjouter: (module: ModuleId) => void;
+  /** LE JOUR PROPOSÉ D'AVANCE (2026-09-26) : la date regardée au journal
+      quand on ajoute depuis l'écran d'un jour vide ; sans elle, aujourd'hui. */
+  dateProposee?: string;
+  onAjouter: (module: ModuleId, date?: string) => void;
   ajoutTraitement?: AjoutTraitement | null;
   fond: FondProps;
   /** La prise à modifier : le formulaire part d'elle. Absente, c'est une
@@ -112,7 +116,7 @@ export function PagePrise({
   const doseInitialeEstUnPalier = initiale ? paliers.includes(initiale.dose) : true;
 
   const maintenant = new Date();
-  const [date, setDate] = useState(initiale?.date ?? dateLocale(maintenant));
+  const [date, setDate] = useState(initiale?.date ?? dateProposee ?? dateLocale(maintenant));
   const [heure, setHeure] = useState(initiale?.time ?? heureRonde(heureLocale(maintenant)));
   const [editeDate, setEditeDate] = useState(false);
   const [editeHeure, setEditeHeure] = useState(false);

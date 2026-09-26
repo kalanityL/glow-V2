@@ -131,7 +131,7 @@ export function PageConfirmation({
       d'être consigné — pas à aujourd'hui, qui n'est pas forcément la même
       journée (on consigne une pesée d'hier, une séance de demain). */
   onVoirDansLeJournal: () => void;
-  onAjouter: (module: ModuleId) => void;
+  onAjouter: (module: ModuleId, date?: string) => void;
   ajoutTraitement?: AjoutTraitement | null;
   fond: FondProps;
 }) {

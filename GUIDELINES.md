@@ -1112,7 +1112,28 @@ en bas ») : deux boutons pleine largeur sous le filet de son image —
 « Annuler », qui REND LE FILTRE TEL QU'IL ÉTAIT À L'OUVERTURE du tiroir
 (ce que « Réinitialiser » ne fait pas, lui qui recoche tout) puis ferme, et
 « Fermer » à l'accent, qui garde le filtre qu'on vient de poser. Lecture
-prise du « / » : deux boutons, comme ses autres paires dictées au slash. **PAS DE RECHERCHE**
+prise du « / » : deux boutons, comme ses autres paires dictées au slash. **UN
+JOUR SANS RIEN A SON PROPRE ÉCRAN** (2026-09-26, son image et sa dictée :
+« design s'il n'y a pas d'entrée sur le jour sur lequel on clique : texte :
+aucune entrée au xxxdatexx. Ajouter : une injection / un poids / un effet
+secondaire / un repas / une activité physiue / un sommeil / un temps pour
+soi ») : la phrase dans sa tournure (« Aucune entrée au 21 septembre
+2026. »), « Ajoutez une entrée », et SES SEPT MODULES sur deux colonnes —
+l'icône dans sa pastille, le nom, le chevron. **Son ordre à elle**
+(`MODULES_AJOUT_JOURNAL`), qui n'est pas celui du tiroir du « + » : le repas
+passe devant l'activité physique ; l'ordre du tiroir est celui de la V1 et
+ne bouge pas. **Nos icônes et une couleur unie** (« couleur unie des icones
+et utiliser nos icones ») : `IconeDuModule` aux jetons `--ajout-*`, pas les
+six teintes de son image ; la mise en page de l'image est reprise, pas ses
+couleurs. **L'illustration du carton de son image n'est pas reprise** : elle
+était collée dans la conversation, pas sur le disque. **Toucher une case
+ouvre le formulaire À LA DATE REGARDÉE**, pas à aujourd'hui (`dateProposee`,
+descendue d'`App` aux quatre formulaires ; pour un sommeil c'est la date du
+réveil, le coucher partant de sa veille) : on lirait le 17 et on
+enregistrerait le 26. Le « + » de la barre n'en passe pas — ses formulaires
+s'ouvrent à aujourd'hui, comme avant. Les trois modules sans formulaire
+(effets secondaires, repas, temps pour soi) ont leur case et ne mènent
+encore nulle part, comme dans le tiroir du « + ». **PAS DE RECHERCHE**
 (2026-09-26, « pour l'instant ne fait pas la fonctionnalité recherche du
 journal ») : la loupe de son template n'est pas reprise. **« Voir dans le
 journal » des confirmations ouvre le journal À LA DATE DE L'ITEM**

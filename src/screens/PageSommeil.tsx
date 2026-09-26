@@ -59,6 +59,7 @@ export function PageSommeil({
   onAccueil,
   onOuvrirCompte,
   onJournal,
+  dateProposee,
   onAjouter,
   ajoutTraitement,
   fond,
@@ -74,7 +75,10 @@ export function PageSommeil({
   onOuvrirCompte: () => void;
   /** La page Journal, par la barre du bas (2026-09-26). */
   onJournal: () => void;
-  onAjouter: (module: ModuleId) => void;
+  /** LE JOUR PROPOSÉ D'AVANCE (2026-09-26) : la date regardée au journal
+      quand on ajoute depuis l'écran d'un jour vide ; sans elle, aujourd'hui. */
+  dateProposee?: string;
+  onAjouter: (module: ModuleId, date?: string) => void;
   ajoutTraitement?: AjoutTraitement | null;
   fond: FondProps;
 }) {
@@ -89,9 +93,12 @@ export function PageSommeil({
      pas touché un ; la nuit reste la valeur de départ de la suite. En
      modification, la nature du sommeil est marquée. */
   const [natureChoisie, setNatureChoisie] = useState(initiale !== undefined);
-  const [dateCoucher, setDateCoucher] = useState(initiale?.bedDate ?? veille(aujourdhui));
+  /* La date proposée est celle du réveil — la date de la ligne (V1) ; le
+     coucher part de sa veille, comme il part de la veille d'aujourd'hui. */
+  const jourPropose = dateProposee ?? aujourdhui;
+  const [dateCoucher, setDateCoucher] = useState(initiale?.bedDate ?? veille(jourPropose));
   const [heureCoucher, setHeureCoucher] = useState(initiale?.bedTime ?? HEURES_PAR_DEFAUT.nuit.coucher);
-  const [dateReveil, setDateReveil] = useState(initiale?.date ?? aujourdhui);
+  const [dateReveil, setDateReveil] = useState(initiale?.date ?? jourPropose);
   const [heureReveil, setHeureReveil] = useState(initiale?.time ?? HEURES_PAR_DEFAUT.nuit.reveil);
   /* LA NOTE PROPOSÉE D'AVANCE : celle du dernier sommeil de même nature
      (2026-09-21) ; changer de nature au premier écran la repose. */

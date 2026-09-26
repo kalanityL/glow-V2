@@ -4209,6 +4209,93 @@
   color: var(--encre-chapeau);
 }
 
+/* ── L'ÉCRAN D'UN JOUR VIDE ─────────────────────────────────────────────── */
+
+/* 2026-09-26, son image et sa dictée (« design s'il n'y a pas d'entrée sur le
+   jour sur lequel on clique : texte : aucune entrée au xxxdatexx. Ajouter :
+   une injection / un poids / ... ») : la phrase, l'invitation, et ses sept
+   cases sur deux colonnes — l'icône dans sa pastille, le nom, le chevron.
+   NOS ICÔNES ET UNE COULEUR UNIE (« couleur unie des icones et utiliser nos
+   icones ») : les jetons `--ajout-*`, pas les six teintes de son image. */
+.journal__vide {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  padding-top: 6px;
+}
+
+.journal__vide-phrase {
+  margin: 0;
+  font-family: var(--font-body);
+  font-size: 14px;
+  text-align: center;
+  color: var(--encre-chapeau);
+}
+
+.journal__vide-titre {
+  margin: 0 0 12px;
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 18px;
+  text-align: center;
+  color: var(--encre);
+}
+
+/* Deux colonnes, colonnes égales (GUIDELINES) — la mise en page de son
+   image. */
+.journal__vide-cases {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+  width: 100%;
+}
+
+.journal__vide-case {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+  padding: 8px 8px 8px 8px;
+  border: 1px solid color-mix(in srgb, var(--option-filet) 40%, var(--option-fond));
+  border-radius: 14px;
+  background: var(--module-fond);
+  color: inherit;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+/* La pastille est celle d'une entrée de la liste, en plus petit : la page
+   n'a qu'une seule façon de dessiner un module. */
+.journal__vide-case .journal__icone {
+  width: 36px;
+  height: 36px;
+}
+
+.journal__vide-case .journal__icone .icone {
+  width: 19px;
+  height: 19px;
+}
+
+.journal__vide-nom {
+  flex: 1 1 auto;
+  min-width: 0;
+  font-family: var(--font-body);
+  font-size: 14px;
+  color: var(--encre);
+  overflow-wrap: anywhere;
+}
+
+/* Le chevron de son image, en bleu grisé — celui des cartes du tiroir du
+   « + ». Il ne dit rien que la case ne dise déjà. */
+.journal__vide-chevron {
+  flex: none;
+  width: 18px;
+  height: 18px;
+  color: var(--ajout-chevron-encre);
+}
+
 .journal__journee {
   display: flex;
   flex-direction: column;

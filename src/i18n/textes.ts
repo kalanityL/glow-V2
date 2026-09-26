@@ -453,10 +453,13 @@ export interface Textes {
     /** Le compte du bandeau de mode : « 6 entrées », « 1 entrée » — et
         « Aucune entrée », jamais « 0 entrée » (VOCABULAIRE § 3). */
     entrees: (nombre: number) => string;
-    /** Rien à montrer : le jour choisi est vide, ou le filtre ne laisse rien
-        passer. Deux phrases, parce que ce n'est pas la même chose. */
-    aucuneEntree: string;
+    /** Rien à montrer : le filtre ne laisse rien passer. */
     aucuneCategorie: string;
+    /** L'ÉCRAN D'UN JOUR VIDE (2026-09-26, son image et sa dictée : « texte :
+        aucune entrée au xxxdatexx. Ajouter : ... ») : la phrase avec la date
+        du jour regardé, puis l'invitation au-dessus des sept cases. */
+    aucuneEntreeLe: (date: string) => string;
+    ajoutezUneEntree: string;
     /** Le détail d'un sommeil : sa qualité, telle que la V1 la note. */
     qualite: (note: number) => string;
   };
@@ -875,8 +878,11 @@ const FR: Textes = {
     /* « Aucune entrée », jamais « 0 entrée » (VOCABULAIRE § 3 : une famille
        à zéro se tait). */
     entrees: (nombre) => (nombre === 0 ? 'Aucune entrée' : nombre === 1 ? '1 entrée' : `${nombre} entrées`),
-    aucuneEntree: 'Rien d’enregistré ce jour-là.',
     aucuneCategorie: 'Aucune catégorie retenue.',
+    /* Sa tournure, telle qu'elle l'a dictée (« aucune entrée au
+       xxxdatexx »), avec le point final que le projet met à ses phrases. */
+    aucuneEntreeLe: (date) => `Aucune entrée au ${date}.`,
+    ajoutezUneEntree: 'Ajoutez une entrée',
     qualite: (note) => `Qualité ${note}`,
   },
   connexion: {
