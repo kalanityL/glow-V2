@@ -4144,21 +4144,25 @@
   height: 16px;
 }
 
-/* LA PASTILLE DU FILTRE MIS (2026-09-26) : le nombre de catégories retenues,
-   plein à l'accent, au bout du bouton — chiffres tabulaires, la pastille ne
-   change pas de largeur d'un compte à l'autre. */
+/* LA PASTILLE DU FILTRE MIS (2026-09-26) : UNE COCHE pleine à l'accent, au
+   bout du bouton (« au lieu de mettre un numéro pour indiqué ue filtre est
+   activé, mets plutot un check à la place du numéro ») — le nombre de
+   catégories retenues a vécu une heure ; il reste dit à qui écoute la page,
+   par l'étiquette du bouton. */
 .journal__filtre-compte {
   display: grid;
   place-items: center;
-  min-width: 17px;
+  width: 17px;
   height: 17px;
-  padding: 0 4px;
   border-radius: 999px;
   background: var(--accent);
   color: var(--bouton-encre);
-  font-variant-numeric: tabular-nums;
-  font-size: 11px;
-  font-weight: 600;
+}
+
+.journal__filtre-compte .icone {
+  width: 11px;
+  height: 11px;
+  stroke-width: 3;
 }
 
 .journal__filtrer--actif {
@@ -4232,7 +4236,7 @@
 .journal__vide {
   display: flex;
   flex-direction: column;
-  align-items: center;
+  align-items: stretch;
   gap: 4px;
   /* Déplié DANS le journal, sous le titre de sa journée (2026-09-26) : un
      peu d'air au-dessus et en dessous, pour qu'on voie où il commence et
@@ -4240,21 +4244,47 @@
   padding: 10px 0 14px;
 }
 
-.journal__vide-phrase {
-  margin: 0;
-  font-family: var(--font-body);
-  font-size: 14px;
-  text-align: center;
-  color: var(--encre-chapeau);
+/* SON BANDEAU (2026-09-26, son image) : l'illustration à gauche, les deux
+   textes à droite, sur le fond légèrement bleuté de son exemple. SANS LE
+   « + » qu'elle y avait ajouté, et avec NOS textes. */
+.journal__vide-bandeau {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 14px;
+  padding: 8px 14px 8px 4px;
+  border-radius: 14px;
+  background: color-mix(in srgb, var(--ajout-pastille-fond) 45%, var(--option-fond));
 }
 
+/* Le dessin garde ses proportions ; aucune couleur ici, ce sont les siennes,
+   dans le fichier. */
+.journal__vide-image {
+  flex: none;
+  width: 96px;
+  height: auto;
+}
+
+/* « Ajoutez une entrée : » CENTRÉ SOUS LE BLOC (2026-09-26, « ajouter une
+   entrée passe en centré sous le bloc calendrier plus phrase »). */
 .journal__vide-titre {
-  margin: 0 0 12px;
+  margin: 0 0 10px;
   font-family: var(--font-display);
   font-weight: 600;
   font-size: 16px;
   text-align: center;
   color: var(--encre);
+}
+
+/* La phrase À CÔTÉ DU CALENDRIER (« Aucune entrée au 28 novembre 2025.-> à
+   côté du calendrier ») : elle prend la place qui reste dans le bandeau. */
+.journal__vide-phrase {
+  margin: 0;
+  min-width: 0;
+  font-family: var(--font-body);
+  font-size: 14px;
+  color: var(--encre-chapeau);
+  overflow-wrap: anywhere;
 }
 
 /* Deux colonnes, colonnes égales (GUIDELINES) — la mise en page de son
@@ -4317,28 +4347,14 @@
   gap: 8px;
 }
 
-/* UNE JOURNÉE SANS RIEN : son titre seul, et on passe au jour suivant
-   (2026-09-26, « jour sans donnée : apparait dans le journal comme un jour
-   avec données, simplement il n'y a rien en dessous »). Elle se resserre
-   pour que dérouler des mois vides reste lisible, et son titre s'efface
-   d'un ton : il n'y a rien à y lire. */
-.journal__journee--vide {
-  gap: 0;
-}
+/* AUCUNE DIFFÉRENCE DE STYLE ENTRE UNE JOURNÉE AVEC ET SANS ENTRÉE
+   (2026-09-26, « pas de différence de style pour les dates avec ou sasn
+   entrée ») : même titre, même graisse, même couleur, même écart — seule
+   change la présence de ce qu'il y a dessous. Le titre resserré et pâli
+   d'une journée vide a vécu une heure.
 
-.journal__journee--vide .journal__titre-mot {
-  font-size: 15px;
-  font-weight: 500;
-  color: var(--encre-chapeau);
-}
-
-/* LA JOURNÉE CHOISIE AU CALENDRIER, marquée d'un filet à l'accent : dans une
-   liste d'un an, il faut pouvoir la retrouver d'un coup d'œil. */
-.journal__journee--choisie .journal__titre-mot {
-  color: var(--encre);
-  font-weight: 600;
-}
-
+   LA JOURNÉE CHOISIE AU CALENDRIER, elle, est marquée d'un filet à l'accent :
+   dans une liste d'un an, il faut pouvoir la retrouver d'un coup d'œil. */
 .journal__journee--choisie {
   border-left: 2px solid var(--accent);
   margin-left: -8px;

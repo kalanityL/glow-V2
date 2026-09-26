@@ -48,7 +48,7 @@ export const RANGS_MODULES: readonly (readonly ModuleId[])[] = [
  * passe devant l'activité physique. Une liste à part plutôt qu'un tri :
  * l'ordre du tiroir est celui de la V1 et ne doit pas bouger.
  */
-export const MODULES_AJOUT_JOURNAL: readonly ModuleId[] = [
+export const MODULES_AJOUT_JOURNAL = [
   'traitement',
   'balance',
   'effets-secondaires',
@@ -56,7 +56,11 @@ export const MODULES_AJOUT_JOURNAL: readonly ModuleId[] = [
   'activite-physique',
   'sommeil',
   'temps-pour-soi',
-];
+] as const;
+
+/** Les sept modules de cet écran — le type des libellés qui leur sont
+    propres (`textes.journal.ajouts`). */
+export type ModuleAjoutJournal = (typeof MODULES_AJOUT_JOURNAL)[number];
 
 export const MODULES_AJOUT: readonly ModuleId[] = [
   'traitement',

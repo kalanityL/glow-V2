@@ -53,8 +53,17 @@ COTE = 128
 # L'air laissé autour du dessin dans le carré, en part du côté.
 MARGE = 0.06
 
+# L'ILLUSTRATION D'UNE JOURNÉE SANS RIEN (2026-09-26, « date sans entrée,
+# ajouter l'icone ../images pour claude/ template/icone/calendrier nuage de
+# cette façon (sans ajouter le + et avec nos textes deja presents) ») : son
+# calendrier sur des nuages. Même détourage, mais une TOLÉRANCE SERRÉE — ses
+# nuages sont à 9 du blanc, le fond à 2 — et PAS de mise au carré : le dessin
+# est large, on garde ses proportions.
+ILLUSTRATION = ("calendrier-nuages.png", "journee-vide", 6, 480)
 
-def detourer(chemin: Path) -> Image.Image:
+
+def detourer(chemin: Path, tolerance: int) -> Image.Image:
+    """Le dessin seul, le fond rendu transparent, recadré sur son contenu."""
     im = Image.open(chemin).convert("RGB")
     a = np.array(im).astype(int)
     h, l, _ = a.shape
@@ -62,7 +71,7 @@ def detourer(chemin: Path) -> Image.Image:
     # Le blanc de référence : la médiane des quatre coins.
     coins = np.concatenate([a[0, :4], a[-1, :4], a[:4, 0], a[:4, -1]])
     blanc = np.median(coins, axis=0)
-    clair = np.abs(a - blanc).max(axis=2) <= TOLERANCE
+    clair = np.abs(a - blanc).max(axis=2) <= tolerance
 
     # Propagation depuis les quatre bords : seul le clair CONNECTÉ au bord
     # est du fond. Les blancs intérieurs du dessin sont épargnés.
@@ -88,11 +97,12 @@ def detourer(chemin: Path) -> Image.Image:
 
     alpha = np.where(fond, 0, 255).astype(np.uint8)
     decoupe = Image.fromarray(np.dstack([np.array(im), alpha]), "RGBA")
-
-    # Recadrer sur le dessin, puis le centrer dans un carré avec un peu d'air.
     boite = decoupe.getbbox()
-    if boite:
-        decoupe = decoupe.crop(boite)
+    return decoupe.crop(boite) if boite else decoupe
+
+
+def mettreAuCarre(decoupe: Image.Image) -> Image.Image:
+    """Le dessin centré dans un carré, avec un peu d'air autour."""
     utile = int(COTE * (1 - 2 * MARGE))
     echelle = min(utile / decoupe.width, utile / decoupe.height)
     decoupe = decoupe.resize(
@@ -111,11 +121,26 @@ def main() -> None:
         if not chemin.exists():
             print(f"  MANQUE {fichier}")
             continue
-        image = detourer(chemin)
+        image = mettreAuCarre(detourer(chemin, TOLERANCE))
         cible = SORTIE / f"{module}.png"
         image.save(cible, optimize=True)
         opaques = int((np.array(image)[:, :, 3] > 0).sum())
         print(f"  {module:22s} {cible.stat().st_size / 1024:6.1f} ko  {opaques} pixels peints")
+
+
+    # L'illustration, à part : ses proportions sont gardées, et sa largeur
+    # est celle qu'il faut pour un écran de téléphone en double densité.
+    fichier, nom, tolerance, largeur = ILLUSTRATION
+    chemin = SOURCE / fichier
+    if chemin.exists():
+        dessin = detourer(chemin, tolerance)
+        hauteur = max(1, round(dessin.height * largeur / dessin.width))
+        dessin = dessin.resize((largeur, hauteur), Image.LANCZOS)
+        cible = SORTIE / f"{nom}.png"
+        dessin.save(cible, optimize=True)
+        print(f"  {nom:22s} {cible.stat().st_size / 1024:6.1f} ko  {dessin.width}x{dessin.height}")
+    else:
+        print(f"  MANQUE {fichier}")
 
 
 if __name__ == "__main__":

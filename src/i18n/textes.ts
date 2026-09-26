@@ -16,7 +16,7 @@ import type { Langue } from './langues';
 import type { Objectif } from '../screens/onboarding/reponses';
 import type { ThemeId } from '../themes/themes';
 import type { EntreeMenu } from '../app/menu';
-import type { ModuleId } from '../app/modules';
+import type { ModuleAjoutJournal, ModuleId } from '../app/modules';
 import type { EntreeMenuPrincipal, SectionMenu } from '../app/menuPrincipal';
 import type { VoletCompte } from '../screens/Compte';
 import type { FondId } from '../app/fonds';
@@ -469,6 +469,16 @@ export interface Textes {
         du jour regardé, puis l'invitation au-dessus des sept cases. */
     aucuneEntreeLe: (date: string) => string;
     ajoutezUneEntree: string;
+    /** LES LIBELLÉS DES SEPT CASES, PROPRES À CET ÉCRAN (2026-09-26,
+        « changement des titres ici, pas les titres des catégories mais des
+        labels au étiquettes , uniquement pour ici : une Injection / un
+        Poids / un Effets Secondaires / un Repas / une Activité Physique /
+        un temps de Sommeil / Un Temps pour Soi ») : ses mots, tels qu'elle
+        les a dictés. Ailleurs — l'accueil, le tiroir du « + », le filtre —
+        ce sont les noms de modules qui servent. Le traitement suit la forme
+        répondue, comme partout. */
+    ajouts: Record<Exclude<ModuleAjoutJournal, 'traitement'>, string>;
+    ajoutTraitement: Record<Forme, string>;
     /** Le détail d'un sommeil : sa qualité, telle que la V1 la note. */
     qualite: (note: number) => string;
   };
@@ -894,7 +904,21 @@ const FR: Textes = {
     /* Sa tournure, telle qu'elle l'a dictée (« aucune entrée au
        xxxdatexx »), avec le point final que le projet met à ses phrases. */
     aucuneEntreeLe: (date) => `Aucune entrée au ${date}.`,
-    ajoutezUneEntree: 'Ajoutez une entrée',
+    /* « ajouter avec ":" » (2026-09-26). */
+    ajoutezUneEntree: 'Ajoutez une entrée :',
+    /* Ses mots, tels qu'elle les a dictés — l'article et les capitales
+       compris (« un Effets Secondaires » est sa graphie). */
+    ajouts: {
+      balance: 'un Poids',
+      'effets-secondaires': 'un Effets Secondaires',
+      menus: 'un Repas',
+      'activite-physique': 'une Activité Physique',
+      sommeil: 'un temps de Sommeil',
+      'temps-pour-soi': 'Un Temps pour Soi',
+    },
+    /* Elle a dicté « une Injection » ; le comprimé suit par symétrie — sa
+       forme à elle, à dire d'un mot si ce n'est pas celle-là. */
+    ajoutTraitement: { injection: 'une Injection', comprime: 'un Comprimé' },
     qualite: (note) => `Qualité ${note}`,
   },
   connexion: {

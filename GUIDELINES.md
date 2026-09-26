@@ -1113,8 +1113,25 @@ journée qui était à la limite (`amenerEnHaut`) : rien ne saute.
 **TOUTES LES JOURNÉES SONT LÀ, LES VIDES COMPRISES** (« jour sans donnée :
 apparait dans le journal comme un jour avec données, simplement il n'y a
 rien en dessous on passe directement au jour suivant ») : une journée vide
-n'a que son titre, resserré et d'un ton plus pâle. **Son « + » déplie son
-écran d'ajout SOUS ELLE, dans le journal** (« Un petit bouton + sur un jour
+n'a que son titre, **et AUCUNE différence de style avec une journée pleine**
+(2026-09-26, « pas de différence de style pour les dates avec ou sasn
+entrée » — le titre resserré et pâli a vécu une heure). **SON ÉCRAN D'AJOUT PORTE SON ILLUSTRATION** (2026-09-26, « date sans
+entrée, ajouter l'icone ../images pour claude/ template/icone/calendrier
+nuage de cette façon (sans ajouter le + et avec nos textes deja
+presents) ») : son calendrier sur des nuages, détouré et embarqué
+(`journee-vide.png`, le même script que les icônes de la home, à tolérance
+serrée), À GAUCHE, et la phrase « Aucune entrée au JJ mois AAAA. » À CÔTÉ
+DE LUI (« Aucune entrée au 28 novembre 2025.-> à côté du calendrier ») ;
+**« Ajoutez une entrée : » CENTRÉ SOUS LE BLOC** (« ajouter une entrée
+passe en centré sous le bloc calendrier plus phrase », « ajouter avec ":" »).
+SANS LE « + » de son image, et sans ses mots à elle : les nôtres. **Les
+sept cases portent des libellés PROPRES À CET ÉCRAN** (« changement des
+titres ici, pas les titres des catégories mais des labels au étiquettes ,
+uniquement pour ici ») : « une Injection », « un Poids », « un Effets
+Secondaires », « un Repas », « une Activité Physique », « un temps de
+Sommeil », « Un Temps pour Soi » — sa dictée, articles et capitales
+compris ; ailleurs, ce sont les noms de modules. **Son « + » déplie cet
+écran SOUS ELLE, dans le journal** (« Un petit bouton + sur un jour
 sans donnée pour voir, sous le jour en uestion, l'écran "journée sans
 donnée" insérée à l'intérieur du journal ») — le « + » devient une croix
 d'un quart de tour ; **et choisir un jour sans donnée au calendrier

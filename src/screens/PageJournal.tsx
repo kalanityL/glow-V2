@@ -4,7 +4,7 @@ import { EntetePage } from './EntetePage';
 import type { FondProps } from './Accueil';
 import { TiroirFiltre } from './TiroirFiltre';
 import { IconeDuModule } from './iconesModules';
-import { IconeChevronDroit, IconeFiltrer, IconeGrille, IconeListe, IconePlus } from '../components/Icones';
+import { IconeChevronDroit, IconeCoche, IconeFiltrer, IconeGrille, IconeListe, IconePlus } from '../components/Icones';
 import { IndiceDefilement } from '../components/IndiceDefilement';
 import { detecterLangue, useTextes } from '../i18n/useTextes';
 import { classeDuTheme } from '../themes/themes';
@@ -22,6 +22,11 @@ import {
   semaineDe,
 } from '../domaine/dates';
 import type { Langue } from '../i18n/langues';
+/* L'ILLUSTRATION D'UNE JOURNÉE SANS RIEN (2026-09-26, « date sans entrée,
+   ajouter l'icone ../images pour claude/ template/icone/calendrier nuage de
+   cette façon (sans ajouter le + et avec nos textes deja presents) ») : son
+   calendrier sur des nuages, détouré et embarqué comme les autres images. */
+import illustrationJourneeVide from '../assets/images/modules/journee-vide.png';
 import { amenerEnHaut } from '../plateforme/navigateur';
 import {
   compteDuJour,
@@ -281,10 +286,12 @@ export function PageJournal({
             {/* L'INDICATEUR (2026-09-26, « ajouter un indicateur sur le
                 bouton pour filtrer qui indique si un filtre es tmis ou
                 non ») : un filtre mis, le bouton prend la matière des
-                réponses choisies ET porte une pastille à l'accent avec le
-                nombre de catégories retenues — le compte dit du même coup
-                combien il en reste, ce que le seul point ne dirait pas.
-                Aucun filtre, pas de pastille : l'absence est la réponse. */}
+                réponses choisies ET porte UNE PASTILLE À LA COCHE
+                (2026-09-26, « au lieu de mettre un numéro pour indiqué ue
+                filtre est activé, mets plutot un check à la place du
+                numéro » — le nombre de catégories retenues a vécu une
+                heure ; il reste dit à qui écoute la page). Aucun filtre,
+                pas de pastille : l'absence est la réponse. */}
             <button
               ref={boutonFiltre}
               type="button"
@@ -297,7 +304,7 @@ export function PageJournal({
               <span>{textes.journal.filtrer}</span>
               {filtreMis ? (
                 <span className="journal__filtre-compte" aria-hidden="true">
-                  {retenus.length}
+                  <IconeCoche />
                 </span>
               ) : null}
             </button>
@@ -550,9 +557,20 @@ const JourneeDuJournal = memo(function JourneeDuJournal({
           Chaque case ouvre son formulaire À CETTE DATE. */}
       {vide && deplie ? (
         <div className="journal__vide">
-          <p className="journal__vide-phrase">
-            {textes.journal.aucuneEntreeLe(formaterDateLongue(journee.date, textes.calendrier.mois, langue))}
-          </p>
+          {/* SON ILLUSTRATION À GAUCHE, LA PHRASE À DROITE (2026-09-26,
+              « Aucune entrée au 28 novembre 2025.-> à côté du calendrier ») —
+              SANS le « + » qu'elle avait ajouté sur son image et avec nos
+              mots à nous. Ses couleurs sont celles du dessin, comme les
+              icônes de la home : exception consignée. */}
+          <div className="journal__vide-bandeau">
+            <img className="journal__vide-image" src={illustrationJourneeVide} alt="" />
+            <span className="journal__vide-phrase">
+              {textes.journal.aucuneEntreeLe(formaterDateLongue(journee.date, textes.calendrier.mois, langue))}
+            </span>
+          </div>
+          {/* « Ajoutez une entrée : » CENTRÉ SOUS LE BLOC (2026-09-26,
+              « ajouter une entrée passe en centré sous le bloc calendrier
+              plus phrase », « ajouter avec ":" »). */}
           <h3 className="journal__vide-titre">{textes.journal.ajoutezUneEntree}</h3>
           <div className="journal__vide-cases">
             {MODULES_AJOUT_JOURNAL.map((module) => (
@@ -560,8 +578,14 @@ const JourneeDuJournal = memo(function JourneeDuJournal({
                 <span className="journal__icone">
                   <IconeDuModule module={module} forme={forme} />
                 </span>
+                {/* SES LIBELLÉS, PROPRES À CET ÉCRAN (2026-09-26, « changement
+                    des titres ici, pas les titres des catégories mais des
+                    labels au étiquettes , uniquement pour ici ») : « une
+                    Injection », « un Poids »… et non les noms de modules. */}
                 <span className="journal__vide-nom">
-                  {module === 'traitement' && forme ? textes.accueil.traitement[forme] : textes.accueil.modules[module]}
+                  {module === 'traitement'
+                    ? textes.journal.ajoutTraitement[forme ?? 'injection']
+                    : textes.journal.ajouts[module]}
                 </span>
                 <span className="journal__vide-chevron" aria-hidden="true">
                   <IconeChevronDroit />
