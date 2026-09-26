@@ -11,7 +11,40 @@ que de te faire lire le fichier. Le TODO de la V1 est importé tel quel dans
 
 ---
 
-## NOTE DE REPRISE — 2026-09-26 au soir (le journal)
+## NOTE DE REPRISE — CLEAR DU 2026-09-26 AU SOIR (le journal, les icônes v3)
+
+**Rien ne tourne, rien n'est à moitié fait.** Aucun agent en cours (celui
+des icônes a été arrêté, son travail défait et refait à la main). TOUT EST
+POUSSÉ (douzième push, 29 commits `a6ff7f5..8b8485e` + le suivi), NON
+DÉPLOYÉ — en ligne, c'est encore le onzième push du matin. La V1 a un
+commit non poussé : « Shopping » au temps pour soi.
+
+**LA PAGE JOURNAL est faite** (GUIDELINES § 4, très détaillé) :
+`screens/PageJournal.tsx` (une seule vue, la semaine, en piste continue),
+`screens/TiroirFiltre.tsx`, `domaine/journal.ts` (testé : bornes, fenêtre,
+journées), la section `journal` du dictionnaire, le CSS en fin de
+`page.css`. Le chevron d'une entrée NE MÈNE NULLE PART : le brancher
+demande d'abord que les formulaires sachent modifier une ligne QUELCONQUE,
+pas seulement la dernière.
+
+**LES ICÔNES D'ACTIVITÉ sont ses dessins de `sportv3`, EN COULEUR** :
+`scripts/decouper-icones-sports.py` les découpe (99, catalogue complet), et
+`page.css` les pose en `background-image` — PLUS EN MASQUE. Ne jamais les
+repasser en masque : un masque efface leurs dégradés et les rend en
+silhouettes unies. Relancer le script puis
+`node scripts/engendrer-icones-activites.mjs` à chaque planche déposée.
+
+**LEÇONS DE LA JOURNÉE, chères :**
+- Un retrait de CSS par BORNES emporte ce qu'on ne voit pas : retirer règle
+  par règle, et comparer les classes employées à celles qui sont définies.
+- `justify-content: flex-end` (et `center` sans `safe`) rend inatteignable
+  ce qui déborde d'une zone qui défile.
+- Un span en `display: inline` mesure 0 × 0 : rien ne le dit, ni `tsc` ni
+  le diff.
+- Quand un geste existe déjà ailleurs dans le projet, le REPRENDRE (la
+  piste de la règle du poids) plutôt que d'en écrire un.
+
+## NOTE DE REPRISE — 2026-09-26 (l'après-midi, le journal)
 
 **Rien ne tourne, rien n'est à moitié fait.** TOUT EST POUSSÉ (onzième
 push) ET DÉPLOYÉ sur `https://glow-private-v2.web.app`. La page Journal

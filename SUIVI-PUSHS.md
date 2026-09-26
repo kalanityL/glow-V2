@@ -10,6 +10,68 @@ du push seul, jusqu'au jour où un déploiement existera.
 
 ---
 
+## 2026-09-26 (soir) — douzième push · 29 commits (`a6ff7f5..8b8485e`) + celui-ci · non déployé
+
+**Poussé sur sa demande** (« prepare un clear et push tout »). Entrée écrite
+avant le push. Pas de déploiement : il n'a pas été demandé — le site en
+ligne reste au onzième push de ce matin.
+
+**Vérifié avant envoi :** `tsc` silencieux, `npm test` 125/125 (18
+fichiers), `npm run build` vert.
+
+**Ce que le lot contient** — une journée entière sur LA PAGE JOURNAL, puis
+les icônes d'activité :
+
+- LA PAGE JOURNAL, d'après ses cinq templates : tout ce qui est enregistré
+  remis ensemble et rangé par journée (`domaine/journal.ts`, testé). Elle a
+  été reprise une vingtaine de fois dans la journée ; son état final :
+  - LE PASSÉ EN HAUT, le futur en bas, sans fin — dix ans en arrière, un an
+    en avant, par fenêtres de six mois qu'un « Voir plus » étend de chaque
+    côté ;
+  - UNE SEULE VUE, LA SEMAINE, en piste continue qui glisse JOUR PAR JOUR
+    (le défilement du navigateur, comme la règle du poids) ; la grille du
+    mois, sa bascule et la ligne d'options repliable ont vécu la journée ;
+  - trois pictos au bout de la ligne du mois : le calendrier du jour, le
+    filtre sans son mot, les deux modes ;
+  - glisser et pousser les flèches promènent le REGARD, seul un clic choisit
+    une date ; cliquer une date déjà visible ne déplace rien ;
+  - trois états pour une date : le jour même sur fond bleu clair, la date
+    choisie cernée d'un pixel de bleu foncé, les autres blanches ; un tiret
+    pâle marque les jours SANS rien ;
+  - toutes les journées sont là, les vides comprises, avec 50 px de vide
+    au-dessus de chacune ; une journée vide déplie son écran d'ajout sous
+    elle (l'illustration du calendrier sur nuages, ses sept modules en
+    quatre par ligne) ;
+  - une entrée : l'heure, l'icône de son module — celle de SON SPORT pour
+    une séance —, le nom en gras, le détail, un chevron ; en mode grille,
+    les pictos en relief de la home ;
+  - le filtre en tiroir, les huit catégories cochables, « Annuler » et
+    « Fermer » en pied.
+- LES ICÔNES D'ACTIVITÉ : ses dix planches de `sportv3` découpées en 99
+  dessins EN COULEUR — quatre-vingt-dix sports et neuf catégories, le
+  catalogue est complet. Un premier essai les avait rendues en masques (des
+  silhouettes bleues unies) : refait.
+- LE FORMULAIRE à ses quatre bleus, donnés à la main : bandeau #E3F2FD,
+  icônes #6AAFEA, picto du bandeau #318EF9, bouton « Valider » #5B9DF9.
+- LES RÉCENTS se reconstruisent à chaque ouverture du formulaire : la clé
+  pour l'ordre de saisie, le journal pour ce qu'elle ignore.
+- LE CLIC DE LA BALANCE sert aussi au cadran des heures et à la piste des
+  distances.
+- Deux lignes dictées dans son `TODO.md` (les animations d'onboarding et de
+  badges, le modèle photo vers anime).
+
+**Trois défauts de ma main, trouvés au rendu et réparés dans la journée :**
+un `justify-content: flex-end` qui rendait le débordement d'une ligne qui
+défile inatteignable ; un retrait de règles CSS trop large qui a emporté 349
+lignes et cassé la page ; une icône de sport laissée en `display: inline`,
+donc invisible en mode grille. Tous vus en mesurant au rendu, aucun par le
+diff ni par `tsc`.
+
+**Non traité :** aucune page de détail d'une entrée, donc le chevron ne mène
+nulle part ; la recherche du journal (à sa demande) ; les repas, effets
+secondaires, marche et temps pour soi n'ont toujours pas de table ; non vu
+sur Android.
+
 ## 2026-09-26 — onzième push · 3 commits (`0e96354..HEAD`) · déployé
 
 **Poussé et déployé sur sa demande** (« push et deploie tout et redonne moi
