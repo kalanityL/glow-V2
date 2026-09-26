@@ -11,6 +11,31 @@ que de te faire lire le fichier. Le TODO de la V1 est importé tel quel dans
 
 ---
 
+## NOTE DE REPRISE — 2026-09-26 au soir (le journal)
+
+**Rien ne tourne, rien n'est à moitié fait.** TOUT EST POUSSÉ (onzième
+push) ET DÉPLOYÉ sur `https://glow-private-v2.web.app`. La page Journal
+est faite (GUIDELINES § 4) : `screens/PageJournal.tsx`,
+`screens/TiroirFiltre.tsx`, `domaine/journal.ts` (testé), la section
+`journal` du dictionnaire, le CSS en fin de `page.css`. L'entrée
+« Journal » de la barre mène quelque part, et « Voir dans le journal »
+des quatre confirmations ouvre le journal à la date de l'item.
+
+**Deux lectures prises à lui faire confirmer** (dites dans la réponse du
+jour) : l'entête de son template n'est pas repris (la V2 garde son entête
+de page, « Filtrer » descend sur le bandeau de mode) ; le bandeau de mode
+est global et non dans le titre de chaque journée.
+
+**Ce qui attend un mot d'elle sur le journal :** une page de détail d'une
+entrée — aujourd'hui les entrées sont des blocs sans chevron ; la
+brancher demande d'abord que les formulaires sachent modifier une ligne
+QUELCONQUE, et non plus seulement la dernière. Et la recherche, qu'elle a
+mise de côté.
+
+**`scripts/piloter-chrome.mjs` attend maintenant que le port réponde**
+(vingt essais d'une demi-seconde) : le délai fixe de 1,5 s ne suffisait
+plus sur cette machine.
+
 ## NOTE DE REPRISE — CLEAR DU 2026-09-26 (l'activité physique, le gling, la vitre)
 
 **Rien ne tourne, rien n'est à moitié fait.** Aucun agent en cours. TOUT

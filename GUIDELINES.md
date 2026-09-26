@@ -1056,6 +1056,63 @@ enregistrée), le formulaire — qui reprendra celui de la V1 et ses règles
 (SPEC § 4.7 : sport du catalogue avec son MET, intensité ressentie, durée
 en minutes, distance facultative en mètres, note).
 
+**La page Journal** (2026-09-26, « On va faire la page journal. tu as tous
+les templates dans ../images pour claude/templates / journal ») : l'entrée
+« Journal » de la barre du bas y mène, depuis n'importe quelle page
+(`PageJournal`). TOUT CE QUI EST ENREGISTRÉ, REMIS ENSEMBLE ET RANGÉ PAR
+JOURNÉE — les quatre tables que la V2 écrit (`domaine/journal.ts`, testé :
+`entreesDuJournal`, `joursDuJournal`, `joursAvecEntree`, `compteDuJour`,
+`imageDeLEntree`) ; le domaine NE PRODUIT AUCUN TEXTE, l'écran écrit les
+mots. Ses cinq templates sont relevés AU PIXEL (714 px de large pour la
+liste, facteur 1,83 sur un écran de 390) : sept cartes de jour de 86 × 80,
+gouttière 10, marge 30 (soit 47 × 44, 6 et 16) ; la pastille d'une entrée,
+78 (soit 44). **Les couleurs relevées sont, à trois unités près, les jetons
+que les thèmes portent déjà** — #eaf3fc contre `--ajout-pastille-fond`,
+#3375f3 contre `--accent` — : la page est donc bâtie AUX JETONS et suit les
+quatre thèmes ; ce qui est repris de ses images est LA MISE EN PAGE. **Nos
+icônes, pas les siennes** (« utilise evidemment nos icones pas celles des
+templates ») : `IconeDuModule`, la même qu'à l'accueil et au tiroir du
+« + » ; et nos mots (« Balance » là où son template écrit « Poids »,
+« Menus », « Marche »). **Le jour choisi commande tout** : le calendrier le
+marque, la liste part de lui et remonte le temps, et les flèches le
+déplacent — d'une semaine en vue Semaine, d'un mois en vue Mois — si bien
+que le calendrier et la liste ne peuvent pas se contredire. Deux vues : la
+semaine en sept cartes, le mois en six semaines lundi en premier
+(`grilleDuMois`) ; **les jours qui portent quelque chose sont pointés**,
+filtre compris, le futur compris — alors que la liste ne montre rien de
+plus récent que le jour choisi. Le titre d'une journée : le mot du jour à
+gauche quand il en a un (`jourRelatif`, d'avant-hier à après-demain), la
+date en toutes lettres à droite (`formaterJourEtDate`, sans l'année) ;
+sans mot, la date prend la gauche et la droite se tait. **Le bandeau de
+mode est GLOBAL** — le compte du jour choisi, « Filtrer », liste ou grille
+— et non dans le titre de chaque journée : ses deux images se contredisent
+sur ce point, et changer de mode sur une seule journée n'aurait pas de
+sens (lecture prise). **L'entête de son template n'est pas repris** (« Journal » en gros,
+la loupe, « Filtrer ») : la V2 a son entête de page consigné, et
+« Filtrer » descend sur le bandeau de mode (lecture prise). **Les entrées
+sont des BLOCS, pas des boutons, et sans le chevron de son template** :
+aucune page de détail n'existe, et un chevron promettrait une page qui
+n'est pas là. **Le mode grille, littéralement** (« pour le mode grille tu
+mets juste l'image de l'entrée si elle exite sinon l'icone ») : la tuile
+ne porte QUE l'image ou l'icône — ni heure ni nom, le nom se dit à qui
+écoute —, trois par rangée ; AUCUNE LIGNE N'A D'IMAGE aujourd'hui (la base
+de la V1 n'a de champ de photo sur aucune des quatre tables), c'est donc
+l'icône partout. **Le filtre est un tiroir** (`TiroirFiltre`, d'après
+`écran-filtre.png`), les huit modules en tuiles cochables quatre par
+rangée, toutes cochées au départ, agissant tout de suite ; « Filtrer » se
+marque quand une catégorie est écartée ; « Réinitialiser » est un lien à
+l'encre souligné, éteint quand tout est coché. **PAS DE RECHERCHE**
+(2026-09-26, « pour l'instant ne fait pas la fonctionnalité recherche du
+journal ») : la loupe de son template n'est pas reprise. **« Voir dans le
+journal » des confirmations ouvre le journal À LA DATE DE L'ITEM**
+(2026-09-26, « brancher les pages de confirmation voir dans le journal
+envoie vers le jouranl à la date saisie pour l"item ») et non à
+aujourd'hui — on consigne une pesée d'hier, une séance de demain ; pour un
+sommeil, la date du RÉVEIL, celle sous laquelle la ligne se range. Les
+cinq mots des jours relatifs sont montés à la racine du dictionnaire
+(`joursRelatifs`) : ils servaient au sommeil, ils servent au journal, un
+seul jeu.
+
 **Toute page de l'application porte la barre du bas** (`BarreDuBas`, avec
 ses deux tiroirs) et, hors de l'accueil, **l'entête des pages**
 (`EntetePage` : la marque en petit et les deux outils sur une ligne, le

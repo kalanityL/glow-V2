@@ -10,6 +10,51 @@ du push seul, jusqu'au jour où un déploiement existera.
 
 ---
 
+## 2026-09-26 — onzième push · 3 commits (`0e96354..HEAD`) · déployé
+
+**Poussé et déployé sur sa demande** (« push et deploie tout et redonne moi
+l'url pour voir le site deployé en ligne »), dixième déploiement sur
+`https://glow-private-v2.web.app`. Entrée écrite avant le push. Le dixième
+push, ce matin, n'avait pas été déployé : ce déploiement emporte donc aussi
+l'activité physique, le gling et la vitre du menu.
+
+**Vérifié avant envoi :** `tsc` silencieux, `npm test` 117/117 (17
+fichiers), `npm run build` vert.
+
+**Ce que le lot contient :**
+- LA PAGE JOURNAL, d'après ses cinq templates
+  (`Images-pour-claude/templates/journal/`, relevés au pixel) : tout ce qui
+  est enregistré remis ensemble et rangé par journée — le calendrier en
+  deux vues (Semaine en sept cartes, Mois en six semaines, les jours qui
+  portent quelque chose pointés, le jour choisi plein à l'accent), le
+  bandeau de mode (le compte, « Filtrer », liste ou grille), les journées
+  et leurs entrées (l'heure, l'icône du module, le nom, le détail), le
+  mode grille (juste l'image de l'entrée, sinon l'icône — aucune ligne n'a
+  d'image aujourd'hui), et le tiroir du filtre (les huit modules en tuiles
+  cochables, « Réinitialiser »). Le domaine est testé
+  (`domaine/journal.ts`, dix cas).
+- L'entrée « Journal » de la barre du bas mène enfin quelque part, depuis
+  n'importe quelle page.
+- « VOIR DANS LE JOURNAL » des quatre pages de confirmation est allumée :
+  elle ouvre le journal À LA DATE DE L'ITEM consigné, pas à aujourd'hui.
+- Les cinq mots des jours relatifs (« Hier », « Aujourd'hui »…) sont montés
+  à la racine du dictionnaire : ils servaient au sommeil, ils servent au
+  journal ; un seul jeu, pas deux vérités.
+- `scripts/piloter-chrome.mjs` attend que le port de Chrome réponde au lieu
+  d'un délai fixe — la machine chargée faisait échouer les scénarios.
+
+**Décisions de lecture prises, à dire si elles ne sont pas les siennes :**
+l'entête de son template (« Journal » en gros, la loupe, « Filtrer ») n'est
+pas repris — la V2 a son entête de page consigné, et « Filtrer » est
+descendu sur le bandeau de mode ; le bandeau de mode est global et non dans
+le titre de chaque journée (ses deux images se contredisent sur ce point).
+
+**Non traité :** la recherche du journal (à sa demande) ; aucune page de
+détail d'une entrée, donc les entrées sont des blocs et ne portent pas le
+chevron de son template ; les quatre modules sans table (repas, effets
+secondaires, marche, temps pour soi) ont leur case au filtre et aucune
+entrée ; non vu sur Android.
+
 ## 2026-09-26 — dixième push · 25 commits (`5bf0af6..f1cc2fc`) + celui-ci · non déployé
 
 **Poussé sur sa demande** (« prepare un clear et push tout »). Entrée écrite
