@@ -376,6 +376,7 @@ export default function App({ verrou = false }: { /** Le verrou de connexion, ar
               dateProposee={dateProposee ?? undefined}
               forme={parcours.reponses.formeTraitement}
               sportsRecents={journaux.sportsRecents}
+              activites={journaux.activites}
               initiale={modification && derniereActivite ? derniereActivite : undefined}
               onValider={validerActivite}
               onAnnuler={() => {

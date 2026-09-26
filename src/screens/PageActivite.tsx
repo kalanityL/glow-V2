@@ -1,4 +1,5 @@
-import { useState, type FormEvent } from 'react';
+import { useMemo, useState, type FormEvent } from 'react';
+import { recentsAvecLeJournal } from '../app/recents-activite';
 import { BarreDuBas, type AjoutTraitement } from './BarreDuBas';
 import { EntetePage } from './EntetePage';
 import type { FondProps } from './Accueil';
@@ -129,6 +130,7 @@ import { IndiceDefilement } from '../components/IndiceDefilement';
 export function PageActivite({
   forme,
   sportsRecents: nomsRecents,
+  activites,
   initiale,
   onValider,
   onAnnuler,
@@ -143,6 +145,10 @@ export function PageActivite({
   forme: Forme | null;
   /** Les sports récents, du dernier consigné au premier (2026-09-26). */
   sportsRecents: readonly string[];
+  /** LE JOURNAL DES SÉANCES (2026-09-26, « recent : reconstruit la liste à
+      chaque ouverture du formulaire ») : il complète les récents avec les
+      sports que la clé ne connaît pas. */
+  activites: readonly SportLog[];
   /** La séance à modifier : le formulaire part d'elle (la carte de la
       confirmation, 2026-09-25). */
   initiale?: SportLog;
@@ -255,7 +261,10 @@ export function PageActivite({
      categories, 4 par ligne, 4 max ») : les sports des dernières séances,
      AVANT les catégories, quatre par rangée, en tuiles qui choisissent le
      sport ; rien sans séance. */
-  const recents = sportsRecents(nomsRecents);
+  /* RECONSTRUITE À L'OUVERTURE (2026-09-26) : la clé pour l'ordre de saisie,
+     le journal pour ce qu'elle ignore. La page est montée à chaque ouverture
+     du formulaire, le calcul s'y refait donc à chaque fois. */
+  const recents = useMemo(() => sportsRecents(recentsAvecLeJournal(nomsRecents, activites)), [nomsRecents, activites]);
   const escalier = sportChoisi?.noeud.nom === ESCALIER;
   const avecDistance = sportChoisi !== null && AVEC_DISTANCE.has(sportChoisi.noeud.nom);
   const onglets: readonly ('intensite' | 'distance' | 'marches' | 'etages')[] = escalier

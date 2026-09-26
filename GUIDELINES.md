@@ -1059,7 +1059,13 @@ pas date de l'activité. Une activité future sera présente dans recents ») :
 la ligne de la V1 ne dit pas quand elle a été écrite, la suite des sports
 consignés vit donc sous sa propre clé, `glp1_v2_sports_recents`
 (`app/recents-activite.ts`, versionnée, neuf gardés), le dernier consigné
-en tête, chacun une fois ; la page en montre quatre, en tuiles sur quatre
+en tête, chacun une fois. **LA LISTE SE RECONSTRUIT À CHAQUE OUVERTURE DU
+FORMULAIRE** (2026-09-26, « recent : reconstruit la liste à chaque ouverture
+du formulaire ») : la clé d'abord, pour l'ordre de saisie qu'elle seule
+sait, PUIS LES SPORTS DU JOURNAL qu'elle ne connaît pas, du plus récent au
+plus ancien (`recentsAvecLeJournal`) — sans quoi un sport consigné hors du
+formulaire, ou avant que la clé n'existe, ne paraissait jamais, et il
+fallait le ressaisir pour l'y voir. la page en montre quatre, en tuiles sur quatre
 colonnes qui choisissent le sport ; rien sans séance (`sportsRecents`,
 testé).
 **« Marche athlétique » est retirée de l'arbre** (2026-09-26, « supprime
