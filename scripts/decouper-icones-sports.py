@@ -41,7 +41,6 @@ n'est écrit.
     python3 scripts/decouper-icones-sports.py
 (il faut Pillow et numpy.)
 """
-from collections import deque
 from pathlib import Path
 import unicodedata
 
@@ -49,6 +48,11 @@ import numpy as np
 from PIL import Image, ImageFilter
 
 SOURCE = Path.home() / "Desktop/GLOW/Images-pour-claude/icones/sportv3"
+# `sportv2` n'est plus lue : sa planche de « Ballon et balles » a servi une
+# demi-heure, le temps qu'elle dépose `balles.png` dans `sportv3` (2026-09-26,
+# « catégorie balles : refait tout, les icones sont KO à part bowling », puis
+# « ajouté à l'instant : balles.png / dans sportv3 »). La sienne n'a pas de
+# nuages, comme le reste de `sportv3`.
 SORTIE = Path(__file__).resolve().parent.parent / "src/assets/images/activites"
 
 ENCRE = 25
@@ -62,6 +66,8 @@ MARGE = 0.05
 # PAR RANGÉE. La planche des activités aquatiques en a besoin : deux de ses
 # dessins se touchent, et l'automatique n'en voyait que seize sur dix-sept.
 RANGEES = {
+    # « Ballon et balles » : 5, 5, 6, 4.
+    "balles.png": [5, 5, 6, 4],
     # Raquettes (6), Roues (3), Pédestre (5), Cheval (3). Sans ce compte,
     # deux paires de raquettes se touchaient, la première rangée était
     # coupée en quatre et TOUT GLISSAIT de deux crans (2026-09-26, sa
@@ -71,6 +77,18 @@ RANGEES = {
 }
 
 PLANCHES = {
+    # Sa planche de « Ballon et balles ». Les noms sont ceux des nœuds de
+    # l'arbre, pas ceux écrits sous les dessins (« Baseball » et « Softball »
+    # y sont deux dessins pour UN seul nœud, « Softball et baseball » : le
+    # second est ignoré ; « Bowling » a sa propre image).
+    "balles.png": [
+        "Basket-ball", "Football", "Football américain", "Rugby", "Handball",
+        "Hockey", "Volley-ball", "Softball et baseball", None, "Golf",
+        "Croquet", "Pétanque, boulingrin, bocce, en extérieur",
+        "Cricket, batteur, lanceur, chasseur", "Kickball", "Crosse (lacrosse)",
+        "Netball",
+        "Pelote basque (jai alai)", "Hacky sack", "Jonglage", "Curling",
+    ],
     "ChatGPT Image 26 sept. 2026, 15_10_30.png": [
         "Badminton", "Tennis", "Squash", "Racquetball", "Paddleball",
         "Tennis de table, ping-pong (Taylor Code 410)",

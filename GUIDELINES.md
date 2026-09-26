@@ -1323,10 +1323,12 @@ les avait rendues en MASQUES, comme celles d'avant — la feuille les
 remplissait d'un aplat du thème et les dessins devenaient des silhouettes
 bleues unies ; c'est l'architecture d'avant, elle ne vaut plus pour ces
 images-là. **Leurs couleurs sont donc celles de ses images, pas celles du
-thème : exception consignée**, comme les icônes de la home. **LES SPORTS DE
-"BALLON ET BALLES" N'ONT PAS D'ICÔNE** — cette catégorie n'a pas de planche
-dans `sportv3` — et leurs anciens masques ont été retirés : ils prennent
-l'icône de leur catégorie, comme tout nœud sans dessin. Le découpage
+thème : exception consignée**, comme les icônes de la home. **LES QUATRE-VINGT-DIX SPORTS DU CATALOGUE ONT LEUR ICÔNE** depuis qu'elle a
+déposé `balles.png` dans `sportv3` (2026-09-26, « catégorie balles : refait
+tout, les icones sont KO à part bowling », puis « ajouté à l'instant :
+balles.png / dans sportv3 ») : la catégorie « Ballon et balles » en était la
+seule dépourvue. Un nœud qui n'aurait pas de dessin prendrait l'icône de sa
+catégorie. Le découpage
 distingue le texte (bleu nuit) des dessins (bleu vif), écarte les titres de
 planche et les libellés de marge, et coupe chaque rangée aux creux entre
 dessins — ou, quand deux dessins se touchent, AUX MILIEUX ENTRE LES NOMS
