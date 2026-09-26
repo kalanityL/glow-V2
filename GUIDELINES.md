@@ -1111,9 +1111,19 @@ une rangée en pied** (2026-09-26, « filtrer : gros bouton annuler / fermer
 en bas ») : deux boutons pleine largeur sous le filet de son image —
 « Annuler », qui REND LE FILTRE TEL QU'IL ÉTAIT À L'OUVERTURE du tiroir
 (ce que « Réinitialiser » ne fait pas, lui qui recoche tout) puis ferme, et
-« Fermer » à l'accent, qui garde le filtre qu'on vient de poser. Lecture
+« Fermer » à l'accent, qui garde le filtre qu'on vient de poser ; **pas de
+filet avant eux, de l'air puis un filet après, et leur texte sans gras**
+(le même jour, « pas de ligne séparatrice avant annuler/fermer ; plus de
+vspacce sous annuler /fermer, ligne separatrice apres annuler/fermer »,
+puis « bouton annuler/fermer texte pas en gras »). **« Réinitialiser »
+disparaît quand tout est coché** (« réinitialiser disparait s'il est
+desativé ») : un lien éteint n'apprend rien. Lecture
 prise du « / » : deux boutons, comme ses autres paires dictées au slash. **UN
-JOUR SANS RIEN A SON PROPRE ÉCRAN** (2026-09-26, son image et sa dictée :
+JOUR SANS RIEN A SON PROPRE ÉCRAN, ET LUI SEUL** — dès que LE JOUR CHOISI
+ne porte rien, même si les jours d'avant en portent (2026-09-26, « je
+clique sur un bouton sans point je n'ai pas l'écran qu'il faut ») : le
+déroulé vers le passé ne vaut que pour un jour qui a quelque chose à
+montrer. (2026-09-26, son image et sa dictée :
 « design s'il n'y a pas d'entrée sur le jour sur lequel on clique : texte :
 aucune entrée au xxxdatexx. Ajouter : une injection / un poids / un effet
 secondaire / un repas / une activité physiue / un sommeil / un temps pour

@@ -4487,12 +4487,6 @@
   cursor: pointer;
 }
 
-.filtre__reinitialiser:disabled {
-  color: color-mix(in srgb, var(--encre-chapeau) 55%, transparent);
-  text-decoration: none;
-  cursor: default;
-}
-
 .filtre__cases {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
@@ -4574,12 +4568,22 @@
 
 /* LA RANGÉE DU PIED (2026-09-26, « filtrer : gros bouton annuler / fermer en
    bas ») : deux boutons pleine largeur, à parts égales — colonnes égales, un
-   bouton plus large aurait l'air d'être la bonne réponse. Sous le filet que
-   montre son image, séparé des cases. */
+   bouton plus large aurait l'air d'être la bonne réponse.
+   PAS DE FILET AVANT, DE L'AIR PUIS UN FILET APRÈS (le même jour, « pas de
+   ligne séparatrice avant annuler/fermer ; plus de vspacce sous annuler
+   /fermer, ligne separatrice apres annuler/fermer ») : le trait ferme le
+   tiroir au lieu de couper les cases des boutons. */
 .filtre__pied {
   display: flex;
   gap: 10px;
   margin-top: 14px;
-  padding-top: 14px;
-  border-top: 1px solid color-mix(in srgb, var(--option-filet) 45%, var(--option-fond));
+  padding-bottom: 22px;
+  border-bottom: 1px solid color-mix(in srgb, var(--option-filet) 45%, var(--option-fond));
+}
+
+/* SANS GRAS (le même jour, « bouton annuler/fermer texte pas en gras ») —
+   les boutons du projet sont en 700 ; ces deux-là ferment un tiroir, ils
+   n'emportent rien. */
+.filtre__pied .bouton {
+  font-weight: 500;
 }

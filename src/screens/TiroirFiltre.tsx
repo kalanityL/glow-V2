@@ -68,10 +68,14 @@ export function TiroirFiltre({
       <div className="filtre__intitule">
         <h3 className="filtre__groupe">{textes.journal.categories}</h3>
         {/* Un lien à l'encre et souligné, la charte des formulaires — pas un
-            texte en bleu. Éteint quand tout est déjà coché : il ne ferait rien. */}
-        <button type="button" className="filtre__reinitialiser" disabled={tousRetenus} onClick={onReinitialiser}>
-          {textes.journal.reinitialiser}
-        </button>
+            texte en bleu. IL DISPARAÎT QUAND TOUT EST DÉJÀ COCHÉ (2026-09-26,
+            « réinitialiser disparait s'il est desativé ») : il ne ferait rien,
+            et un lien éteint n'apprend rien à personne. */}
+        {tousRetenus ? null : (
+          <button type="button" className="filtre__reinitialiser" onClick={onReinitialiser}>
+            {textes.journal.reinitialiser}
+          </button>
+        )}
       </div>
       <div className="filtre__cases">
         {MODULES.map((module) => {

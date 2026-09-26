@@ -115,7 +115,12 @@ export function PageJournal({
   /* LE JOUR CHOISI commande tout : le calendrier le marque, la liste part de
      lui et remonte le temps. Les flèches le déplacent — d'une semaine en vue
      Semaine, d'un mois en vue Mois —, si bien que le calendrier et la liste
-     ne peuvent pas se contredire. */
+     ne peuvent pas se contredire.
+     ET S'IL NE PORTE RIEN, C'EST SON ÉCRAN VIDE QUI S'AFFICHE, seul
+     (2026-09-26, « design s'il n'y a pas d'entrée sur le jour sur lequel on
+     clique », puis « je clique sur un bouton sans point je n'ai pas l'écran
+     qu'il faut ») : le déroulé vers le passé ne vaut que pour un jour qui a
+     quelque chose à montrer. */
   const [jour, setJour] = useState(jourInitial ?? aujourdhui);
   const [vue, setVue] = useState<'semaine' | 'mois'>('semaine');
   const [mode, setMode] = useState<'liste' | 'grille'>('liste');
@@ -271,7 +276,7 @@ export function PageJournal({
           <div className="journal__corps">
             {retenus.length === 0 ? (
               <p className="journal__rien">{textes.journal.aucuneCategorie}</p>
-            ) : jours.length === 0 ? (
+            ) : compte === 0 ? (
               /* L'ÉCRAN D'UN JOUR VIDE (2026-09-26, son image et sa dictée) :
                  la phrase avec la date regardée, « Ajoutez une entrée », et
                  SES SEPT CASES sur deux colonnes — l'icône dans sa pastille,
