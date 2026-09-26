@@ -4073,18 +4073,28 @@
   color: var(--encre);
 }
 
-/* Le jour choisi, plein à l'accent — le bleu de ses deux images du
-   calendrier ; c'est une page de lecture, pas un formulaire (la charte des
-   formulaires veut le jour choisi plein à l'encre, elle vise les
-   formulaires). */
-.journal__jour-carte--choisi {
-  border-color: var(--accent);
+/* TROIS ÉTATS, ET TROIS SEULEMENT (2026-09-26, « mois et semaine : date du
+   jour : fond bleu contour gris tres clair ; date selectionnée: contour bleu
+   sky; date ni l'un ni l'autre : fond blanc contour gris tres clair comme
+   actuellement ») :
+   — LE JOUR MÊME : plein à l'accent, son contour reste le gris très clair
+     des autres ;
+   — LE JOUR CHOISI : fond blanc, CONTOUR BLEU CIEL, plus épais pour qu'il se
+     voie sans peser ;
+   — les autres : fond blanc, contour gris très clair, comme avant.
+   Le jour choisi qui était plein à l'accent a vécu la journée. */
+.journal__jour-carte--aujourdhui {
   background: var(--accent);
 }
 
-.journal__jour-carte--choisi .journal__jour-nom,
-.journal__jour-carte--choisi .journal__jour-quantieme {
+.journal__jour-carte--aujourdhui .journal__jour-nom,
+.journal__jour-carte--aujourdhui .journal__jour-quantieme {
   color: var(--bouton-encre);
+}
+
+.journal__jour-carte--choisi {
+  border-color: var(--accent);
+  box-shadow: inset 0 0 0 1px var(--accent);
 }
 
 /* LE POINT D'UN JOUR QUI PORTE QUELQUE CHOSE (son image du calendrier) :
@@ -4097,8 +4107,8 @@
   background: var(--accent);
 }
 
-.journal__jour-carte--choisi .journal__point,
-.journal__case--choisie .journal__point {
+.journal__jour-carte--aujourdhui .journal__point,
+.journal__case--aujourdhui .journal__point {
   background: var(--bouton-encre);
 }
 
@@ -4150,13 +4160,18 @@
   color: color-mix(in srgb, var(--encre-chapeau) 45%, transparent);
 }
 
-.journal__case--choisie {
-  border-color: var(--accent);
+/* Les mêmes trois états dans la grille du mois. */
+.journal__case--aujourdhui {
   background: var(--accent);
 }
 
-.journal__case--choisie .journal__case-quantieme {
+.journal__case--aujourdhui .journal__case-quantieme {
   color: var(--bouton-encre);
+}
+
+.journal__case--choisie {
+  border-color: var(--accent);
+  box-shadow: inset 0 0 0 1px var(--accent);
 }
 
 /* LE BANDEAU DE MODE (« switch mode-grille-ligne.png ») : le compte de ce

@@ -1202,7 +1202,14 @@ aussi). **LES BORNES S'Y APPLIQUENT COMME AU « VOIR PLUS »** (« Idem voir
 plus selon les memes regles qd on arrive à une borne », `dansLesBornes`) :
 à dix ans en arrière ou un an en avant, la date est rabattue, la flèche
 s'éteint et le glissement ne fait plus rien ; **les jours qui portent quelque chose sont pointés**,
-filtre compris, le futur compris — alors que la liste ne montre rien de
+filtre compris, le futur compris. **TROIS ÉTATS POUR UNE DATE, ET TROIS
+SEULEMENT** (2026-09-26, « mois et semaine : date du jour : fond bleu
+contour gris tres clair ; date selectionnée: contour bleu sky; date ni
+l'un ni l'autre : fond blanc contour gris tres clair comme actuellement ») :
+le JOUR MÊME plein à l'accent, son contour restant le gris des autres ; la
+DATE CHOISIE sur fond blanc, cernée de bleu ; toute autre sur fond blanc,
+cernée du gris très clair. Le jour choisi plein à l'accent a vécu la
+journée — alors que la liste ne montre rien de
 plus récent que le jour choisi. Le titre d'une journée : LA DATE EN TOUTES LETTRES À GAUCHE, TOUJOURS
 (`formaterJourEtDate`, sans l'année), le mot du jour à droite quand il en a
 un (`jourRelatif`, d'avant-hier à après-demain) — 2026-09-26, « les jours

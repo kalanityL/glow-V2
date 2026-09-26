@@ -386,7 +386,7 @@ export function PageJournal({
                     key={date}
                     type="button"
                     aria-current={date === jour ? 'date' : undefined}
-                    className={`journal__jour-carte${date === jour ? ' journal__jour-carte--choisi' : ''}`}
+                    className={`journal__jour-carte${date === jour ? ' journal__jour-carte--choisi' : ''}${date === aujourdhui ? ' journal__jour-carte--aujourdhui' : ''}`}
                     onClick={() => choisirJour(date)}
                   >
                     <span className="journal__jour-nom">{textes.calendrier.joursAbreges[jourDeLaSemaine(date)]}</span>
@@ -416,7 +416,7 @@ export function PageJournal({
                             type="button"
                             tabIndex={pas === 0 ? undefined : -1}
                             aria-current={case_.date === jour ? 'date' : undefined}
-                            className={`journal__case${case_.date === jour ? ' journal__case--choisie' : ''}${case_.dansLeMois ? '' : ' journal__case--voisine'}`}
+                            className={`journal__case${case_.date === jour ? ' journal__case--choisie' : ''}${case_.date === aujourdhui ? ' journal__case--aujourdhui' : ''}${case_.dansLeMois ? '' : ' journal__case--voisine'}`}
                             onClick={() => choisirJour(case_.date)}
                           >
                             <span className="journal__case-quantieme">{case_.jour}</span>
