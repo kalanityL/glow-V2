@@ -3997,14 +3997,6 @@
   display: none;
 }
 
-.journal__volet {
-  flex: 0 0 100%;
-  min-width: 0;
-  scroll-snap-align: start;
-  scroll-snap-stop: always;
-  user-select: none;
-}
-
 /* LES DEUX CHEVRONS DE LA BANDE (2026-09-26, « des mini chevrons avant
    arriere encerclés qui font défilés d'une semaine à chaque clic ») : posés
    PAR-DESSUS la piste, aux deux bouts, dans les petits blancs de ses côtés —
@@ -4076,41 +4068,52 @@
   user-select: none;
 }
 
-/* LA LIGNE DES OPTIONS EST NUE (2026-09-26, « ligne d'option : pas de
-   contour, pas de fond. ce qui est selectionné (semaine ou moi, mode grille
-   ou mode ligne) est souligné 1px en bleu, c'est tout ») : ni gouttière, ni
-   pastille, ni cadre — seul un filet bleu d'un pixel sous ce qui est choisi.
-   Les crans pleins à l'accent ont vécu la journée. */
-.journal__vues {
+/* LA LIGNE DES TROIS PICTOS, AU BOUT DE LA LIGNE DU MOIS (2026-09-26, « à la
+   place de "options" , mets : picto calendrier, picto filtre sans label,
+   picto ligne et grille ») : le calendrier du jour, le filtre SANS SON MOT,
+   les deux modes. Plus de ligne repliable, plus de bascule semaine/mois. */
+.journal__reglages {
   display: flex;
-  /* Les deux vues se tiennent (2026-09-26, « rapproche semaine et mois »,
-     puis « espace entre semaine et mois -> 5px ») : elles vont ensemble,
-     l'écart commun les séparerait. */
-  gap: 5px;
+  align-items: center;
+  gap: 12px;
+  overflow-x: auto;
+  scrollbar-width: none;
+  touch-action: pan-x;
+  overscroll-behavior-x: contain;
 }
 
-.journal__vue {
-  padding: 3px 1px;
+.journal__reglages::-webkit-scrollbar {
+  display: none;
+}
+
+/* « Filtrer » : nu, à l'encre discrète, SANS SON MOT ; il se marque quand
+   une catégorie est écartée — sans quoi on filtrerait sans le savoir. */
+.journal__filtrer {
+  display: grid;
+  place-items: center;
+  width: 22px;
+  height: 24px;
+  padding: 0;
   border: 0;
   border-bottom: 1px solid transparent;
   border-radius: 0;
   background: none;
   color: var(--encre-chapeau);
-  font-family: var(--font-body);
-  font-weight: 500;
-  font-size: 13px;
   cursor: pointer;
 }
 
-.journal__vue--choisie {
+.journal__filtrer .icone {
+  width: 17px;
+  height: 17px;
+}
+
+.journal__filtrer--actif {
   border-bottom-color: var(--accent);
   color: var(--encre);
 }
 
-/* LA SEMAINE EN SEPT CARTES (« sous-header-vue semaine.png ») : 86 × 80 px
-   mesurés pour 714 de large, gouttière 10, marge 30 — soit 47 × 44 et une
-   gouttière de 6 sur un écran de 390. Colonnes égales (GUIDELINES) : une
-   colonne plus large aurait l'air d'être la bonne réponse. */
+/* UNE CARTE DE JOUR : le jour abrégé au-dessus, le quantième dessous, et
+   sous lui la marque du vide. Sept visibles à la fois dans la piste. */
 .journal__jour-carte {
   position: relative;
   display: flex;
@@ -4125,6 +4128,7 @@
   cursor: pointer;
 }
 
+/* LE NOM DU JOUR ET SON QUANTIÈME, dans la bande. */
 .journal__jour-nom {
   font-family: var(--font-body);
   font-size: 11px;
@@ -4138,37 +4142,21 @@
   color: var(--encre);
 }
 
-/* TROIS ÉTATS, ET TROIS SEULEMENT (2026-09-26, « mois et semaine : date du
-   jour : fond bleu contour gris tres clair ; date selectionnée: contour bleu
-   sky; date ni l'un ni l'autre : fond blanc contour gris tres clair »), LES
-   DEUX BLEUS ÉCHANGÉS LE MÊME JOUR (« on inverse et on met bleu clair
-   couleur de fond du jour courant et bleu foncé contour jour selectionné ») :
-   — LE JOUR MÊME : fond BLEU CLAIR, son encre ordinaire, son contour le gris
-     très clair des autres ;
-   — LE JOUR CHOISI : fond blanc, CONTOUR BLEU FONCÉ — l'accent plein ;
-   — les autres : fond blanc, contour gris très clair, comme avant.
-   Le jour même plein à l'accent et le contour bleu ciel ont vécu la
-   journée. */
+/* TROIS ÉTATS, ET TROIS SEULEMENT (2026-09-26) : LE JOUR MÊME sur fond bleu
+   clair, son contour restant le gris des autres ; LE JOUR CHOISI sur fond
+   blanc, cerné d'UN pixel de bleu foncé ; les autres, fond blanc et contour
+   gris très clair. */
 .journal__jour-carte--aujourdhui {
   background: var(--option-choisi-fond);
 }
 
-/* LE CONTOUR DE LA DATE CHOISIE EST LE BLEU FONCÉ (2026-09-26, « on inverse
-   et on met bleu clair couleur de fond du jour courant et bleu foncé contour
-   jour selectionné ») : l'accent plein, doublé d'un filet intérieur plutôt
-   qu'épaissi — un contour qui passe de 1 à 2 px déplacerait le contenu d'un
-   pixel et la rangée sauterait. */
 .journal__jour-carte--choisi {
-  /* UN SEUL PIXEL (2026-09-26, « passe le contour seletionné en épaisseur
-     1px ») : le filet intérieur qui le doublait s'en va. */
   border-color: var(--accent);
 }
 
 /* PAS DE MARQUE QUAND IL Y A QUELQUE CHOSE, UN TIRET QUAND IL N'Y A RIEN
-   (2026-09-26, « pas de point bleu qd il y a une donnée. On oublie le point
-   bleu. On met un tiret tres fin gris tres clair qd il n'y a pas de
-   donnée. ») : c'est le VIDE qui se marque désormais, d'un trait fin et
-   pâle sous le quantième. Le point bleu a vécu la journée. */
+   (2026-09-26, « On oublie le point bleu. On met un tiret tres fin gris tres
+   clair qd il n'y a pas de donnée. ») : c'est le VIDE qui se marque. */
 .journal__point {
   width: 9px;
   height: 1px;
@@ -4176,244 +4164,16 @@
   background: color-mix(in srgb, var(--option-filet) 70%, var(--option-fond));
 }
 
-/* LE MOIS : six semaines de sept jours, lundi en premier (`grilleDuMois`),
-   la hauteur ne bouge pas d'un mois à l'autre. */
-.journal__grille-mois {
-  display: grid;
-  grid-template-columns: repeat(7, minmax(0, 1fr));
-  gap: 4px;
+/* AUCUNE DIFFÉRENCE DE STYLE ENTRE UNE JOURNÉE AVEC ET SANS ENTRÉE
+   (2026-09-26, « pas de différence de style pour les dates avec ou sasn
+   entrée ») : le titre est le même, seul change ce qu'il y a dessous. */
+.journal__journee--vide {
+  /* Rien : la règle existe pour dire qu'il n'y a rien à changer. */
 }
 
-.journal__entete-jour {
-  padding-bottom: 2px;
-  font-family: var(--font-body);
-  font-size: 11px;
-  text-align: center;
-  color: var(--encre-chapeau);
-}
-
-.journal__case {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 2px;
+.journal__titre-mot {
   min-width: 0;
-  padding: 6px 0;
-  border: 1px solid color-mix(in srgb, var(--option-filet) 45%, var(--option-fond));
-  border-radius: 10px;
-  background: var(--module-fond);
-  cursor: pointer;
-}
-
-.journal__case-quantieme {
-  font-family: var(--font-display);
-  font-weight: 500;
-  font-size: 13px;
-  color: var(--encre);
-}
-
-/* Les jours des mois voisins, en pâle : ils sont là pour que la grille garde
-   sa hauteur, pas pour être lus. */
-.journal__case--voisine {
-  border-color: transparent;
-  background: none;
-}
-
-.journal__case--voisine .journal__case-quantieme {
-  color: color-mix(in srgb, var(--encre-chapeau) 45%, transparent);
-}
-
-/* Les mêmes trois états dans la grille du mois. */
-.journal__case--aujourdhui {
-  background: var(--option-choisi-fond);
-}
-
-.journal__case--choisie {
-  border-color: var(--accent);
-}
-
-/* « OPTIONS », AU BOUT DE LA LIGNE DU MOIS (2026-09-26, « a la place de 26
-   semaine mois -> le texte "options" souligné ») : un lien à l'encre et
-   souligné — la charte des formulaires, pas de texte en bleu. Ouvert, il se
-   marque à l'accent. */
-.journal__options {
-  padding: 0 2px;
-  border: 0;
-  background: none;
-  color: var(--encre);
-  font-family: var(--font-body);
-  font-size: 13px;
-  text-decoration: underline;
-  text-underline-offset: 3px;
-  text-decoration-thickness: 1px;
-  cursor: pointer;
-}
-
-.journal__options {
-  /* Le mot ne se coupe pas : c'est le nom du mois qui cède s'il le faut. */
-  white-space: nowrap;
-}
-
-/* Ouvert, il dit « Masquer les options » (2026-09-26) — même lien souligné,
-   en gris : il referme, il n'ouvre plus rien. La croix a vécu une
-   demi-heure. */
-.journal__options--ouvertes {
-  color: var(--encre-chapeau);
-}
-
-/* LA MARQUE DU FOCUS EST CELLE DU PROJET, PAS L'ANNEAU DU NAVIGATEUR
-   (2026-09-26, « l'encadré en bleu autour de masquer les options c'est
-   quoi ? […] je le remplace par la marque du projet -> oui ») : la charte
-   des formulaires veut « un très léger changement de couleur », « plus
-   d'anneau ». Le focus reste MARQUÉ — sans lui, on ne se repère plus au
-   clavier —, il ne crie plus. */
-.journal__options:focus-visible,
-.journal__filtrer:focus-visible,
-.journal__vue:focus-visible,
-.journal__mode:focus-visible,
-.journal__fleche:focus-visible,
-.journal__glisser:focus-visible,
-.journal__aujourdhui:focus-visible,
-.journal__deplier:focus-visible,
-.journal__plus:focus-visible,
-.journal__jour-carte:focus-visible,
-.journal__case:focus-visible {
-  outline: none;
-  background: var(--option-choisi-fond);
-}
-
-/* Sur un réglage nu, le focus assombrit l'encre d'un rien : un fond y
-   reviendrait à poser la pastille qu'elle a retirée. */
-.journal__vue:focus-visible,
-.journal__mode:focus-visible,
-.journal__filtrer:focus-visible {
-  background: none;
-  color: var(--encre);
-}
-
-/* LA LIGNE DES RÉGLAGES (2026-09-26, « quand on clique sur option, apparait
-   une ligne avec 26 semaine mois et aussi ce qu'il y a sur la ligne filtrer,
-   le tout sur la meme ligne ») : tout sur une ligne, sous le calendrier ;
-   repliée, il n'y a RIEN entre le calendrier et le journal. L'ancienne ligne
-   du filtre, qui n'existait que pour ça, a disparu. */
-.journal__reglages {
-  display: flex;
-  align-items: center;
-  /* UN SEUL ÉCART, PARTOUT (2026-09-26, « équilibre les espaces vides entre
-     les différents composants pas seulement autour du picto aujourdhui ») :
-     le même entre l'icône du jour, les deux vues, « Filtrer » et les deux
-     modes — les groupes avaient leur propre écart, plus large que celui qui
-     les séparait, et la ligne paraissait bancale. Les deux vues et les deux
-     modes se resserrent à l'intérieur de leur groupe (2026-09-26).
-     LA LIGNE EST CENTRÉE (« centre l'ensemble de la ligne ») : `safe center`
-     et non `center`, sans quoi ce qui déborde sortirait par la gauche et le
-     défilement ne pourrait pas y revenir — l'erreur du `flex-end`. */
-  justify-content: safe center;
-  gap: 16px;
-  /* ELLE SE GLISSE SI L'ÉCRAN EST ÉTROIT (2026-09-26, « la ligne des
-     options, si l'écran n'est pas asse large, doit etre ausi slidable ,
-     comme la ligne semaine ») : le défilement du navigateur, comme la piste
-     des jours ; rien ne déborde, rien ne se coupe. */
-  overflow-x: auto;
-  scrollbar-width: none;
-  touch-action: pan-x;
-  overscroll-behavior-x: contain;
-  /* EN DEUXIÈME LIGNE, dans le calendrier (2026-09-26, « la ligne d'option
-     vient se mettre en 2eme ligne ») : pas de filet, elle appartient au
-     bloc du mois et non à ce qui suit. */
-  margin: -2px 0 2px;
-}
-
-.journal__reglages::-webkit-scrollbar {
-  display: none;
-}
-
-/* LA CROIX QUI REPLIE LA LIGNE (2026-09-26, « ajoute en fin de ligne
-   d'option une croix de fermeture de la ligne ») : au bout, discrète, à
-   l'encre des réglages — elle ferme, elle ne règle rien. */
-.journal__fermer-options {
-  display: grid;
-  place-items: center;
-  width: 22px;
-  height: 22px;
-  padding: 0;
-  border: 0;
-  border-radius: 999px;
-  background: none;
-  color: var(--encre-chapeau);
-  cursor: pointer;
-}
-
-.journal__fermer-options .icone {
-  width: 14px;
-  height: 14px;
-}
-
-.journal__fermer-options:focus-visible {
-  outline: none;
-  color: var(--encre);
-}
-
-/* Rien ne se resserre dans une ligne qui glisse : chaque réglage garde sa
-   taille, et le mot de « Filtrer » reste. LE PREMIER EST POUSSÉ À DROITE PAR
-   SA MARGE, et non par un `justify-content: flex-end` (2026-09-26, « le
-   slider ne fonctionne pas dans la ligne des options. Corrige ») : avec
-   `flex-end`, ce qui déborde sort par la GAUCHE et le défilement ne peut
-   pas y revenir — c'est ce qui rendait la ligne immobile. */
-.journal__reglages > * {
-  flex: none;
-}
-
-
-
-/* « Filtrer » : nu lui aussi, à l'encre discrète ; il se marque quand une
-   catégorie est écartée — sans quoi on filtrerait sans le savoir. */
-.journal__filtrer {
-  display: flex;
-  align-items: center;
-  gap: 5px;
-  padding: 3px 1px;
-  border: 0;
-  border-bottom: 1px solid transparent;
-  border-radius: 0;
-  background: none;
-  color: var(--encre-chapeau);
-  font-family: var(--font-body);
-  font-weight: 500;
-  font-size: 13px;
-  cursor: pointer;
-}
-
-.journal__filtrer .icone {
-  width: 16px;
-  height: 16px;
-}
-
-/* LA PASTILLE DU FILTRE MIS (2026-09-26) : UNE COCHE pleine à l'accent, au
-   bout du bouton (« au lieu de mettre un numéro pour indiqué ue filtre est
-   activé, mets plutot un check à la place du numéro ») — le nombre de
-   catégories retenues a vécu une heure ; il reste dit à qui écoute la page,
-   par l'étiquette du bouton. */
-.journal__filtre-compte {
-  display: grid;
-  place-items: center;
-  width: 17px;
-  height: 17px;
-  border-radius: 999px;
-  background: var(--accent);
-  color: var(--bouton-encre);
-}
-
-.journal__filtre-compte .icone {
-  width: 11px;
-  height: 11px;
-  stroke-width: 3;
-}
-
-.journal__filtrer--actif {
-  border-bottom-color: var(--accent);
-  color: var(--encre);
+  overflow-wrap: anywhere;
 }
 
 /* Les deux modes, nus eux aussi : sans mot à l'écran (son image), leur nom

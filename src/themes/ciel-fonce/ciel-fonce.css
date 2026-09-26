@@ -129,6 +129,12 @@
      picto du module dans le bandeau (« Bleu des icones loupe horloge
      calendrier picto altere : #6AAFEA »). */
   --formulaire-icone-encre: #6AAFEA;
+  /* LE PICTO DU BANDEAU a son bleu à lui, plus soutenu que les autres
+     icônes (2026-09-26, « picto du bandeau titre -> #318EF9 »). */
+  --formulaire-bandeau-icone: #318EF9;
+  /* LE BOUTON QUI VALIDE UN FORMULAIRE (« Le bleu du bouton "Valider" ->
+     #5B9DF9 ») — l'accent du thème le peignait jusqu'ici. */
+  --formulaire-valider-fond: #5B9DF9;
 
   /* LE PANNEAU FLOTTANT des roues du sélecteur. Son fond est OPAQUE et pris
      dans le ciel du thème : il passe par-dessus le texte de la page, et une

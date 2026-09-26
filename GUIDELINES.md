@@ -1174,9 +1174,13 @@ jour par defaut deplié »). La journée choisie porte un filet à l'accent :
 dans une liste d'un an, il faut la retrouver d'un coup d'œil. **Chaque
 journée est un composant MÉMOÏSÉ** (`JourneeDuJournal`) : la fenêtre
 déroule jusqu'à plusieurs milliers de journées, et déplier la moindre les
-re-rendrait toutes. Deux vues : la
-semaine en sept cartes, le mois en six semaines lundi en premier
-(`grilleDuMois`). **UNE ICÔNE « AUJOURD'HUI » À GAUCHE DE SEMAINE / MOIS** (2026-09-26,
+re-rendrait toutes. **UNE SEULE VUE, LA SEMAINE** (2026-09-26, « options : supprimer l'option
+semaine/mois, vue uniquement par semaine ») : sept cartes dans une piste
+continue. La grille du mois, sa bascule, la ligne des réglages repliable et
+son lien « Options » ont vécu la journée — **TROIS PICTOS les remplacent,
+au bout de la ligne du mois** (« à la place de "options" , mets : picto
+calendrier, picto filtre sans label, picto ligne et grille ») : le
+calendrier du jour, le filtre SANS SON MOT, et les deux modes. **UNE ICÔNE « AUJOURD'HUI » À GAUCHE DE SEMAINE / MOIS** (2026-09-26,
 « ajoute petite icone qui represente aujourd'hui à gauche de semaine/mois /
 modele de l'icone ../images claude/icones / aujourd'hui / tu mets dedans le
 chiffre du jour courant », « si on est le 2 février, tu mettras 02 ») :

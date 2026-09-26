@@ -4,7 +4,7 @@ import { EntetePage } from './EntetePage';
 import type { FondProps } from './Accueil';
 import { TiroirFiltre } from './TiroirFiltre';
 import { IconeDuModule, ImageDuModule } from './iconesModules';
-import { IconeAujourdhui, IconeChevronBas, IconeChevronDroit, IconeCoche, IconeCroix, IconeFiltrer, IconeGrille, IconeListe, IconePlus } from '../components/Icones';
+import { IconeAujourdhui, IconeChevronBas, IconeChevronDroit, IconeFiltrer, IconeGrille, IconeListe, IconePlus } from '../components/Icones';
 import { IndiceDefilement } from '../components/IndiceDefilement';
 import { detecterLangue, useTextes } from '../i18n/useTextes';
 import { classeDuTheme } from '../themes/themes';
@@ -17,7 +17,6 @@ import {
   dateLocale,
   formaterDateLongue,
   formaterJourEtDate,
-  grilleDuMois,
   jourDeLaSemaine,
   joursDe,
   jourRelatif,
@@ -144,14 +143,12 @@ export function PageJournal({
      bande d'ordinaire, À SON DÉBUT quand on saute au premier d'un mois. */
   const regarder = (date: string, ou: 'milieu' | 'debut' = 'milieu') =>
     setVise((v) => ({ date, placer: v.placer + 1, ou }));
-  const [vue, setVue] = useState<'semaine' | 'mois'>('semaine');
-  /* LA LIGNE DES RÉGLAGES, REPLIÉE PAR DÉFAUT (2026-09-26, « a la place de
-     26 semaine mois -> le texte "options" souligné ; quand on clique sur
-     option, apparait une ligne avec 26 semaine mois et aussi ce qu'il y a
-     sur la ligne filtrer, le tout sur la meme ligne ») : tout ce qui règle
-     la lecture tient sur UNE ligne, sous le calendrier — l'ancienne ligne du
-     filtre a disparu, elle n'existait que pour ça. */
-  const [options, setOptions] = useState(false);
+  /* LA VUE EST TOUJOURS LA SEMAINE (2026-09-26, « options : supprimer
+     l'option semaine/mois, vue uniquement par semaine ») : la grille du mois
+     et sa bascule ont vécu la journée, et avec elles la ligne des réglages
+     repliable — SES QUATRE PICTOS SONT DÉSORMAIS SUR LA LIGNE DU MOIS
+     (« à la place de "options" , mets : picto calendrier, picto filtre sans
+     label, picto ligne et grille »). */
   const [mode, setMode] = useState<'liste' | 'grille'>('liste');
   /* Toutes les catégories retenues au départ : le journal s'ouvre entier. */
   const [retenus, setRetenus] = useState<readonly ModuleId[]>(MODULES);
@@ -250,8 +247,7 @@ export function PageJournal({
      cran. */
   const moisVoisin = (pas: number) => {
     const cible = dateDecaleeDeMois(vise.date, pas);
-    const premier = `${cible.slice(0, 8)}01`;
-    return dansLesBornes(vue === 'semaine' ? premier : cible, aujourdhui);
+    return dansLesBornes(`${cible.slice(0, 8)}01`, aujourdhui);
   };
   const reculer = () => {
     const voulu = moisVoisin(-1);
@@ -263,7 +259,7 @@ export function PageJournal({
   };
   /* Les deux chevrons de la bande, eux, vont d'une semaine. */
   const deplacer = (pas: number) => {
-    const voulu = dansLesBornes(vue === 'semaine' ? dateDecalee(vise.date, 7 * pas) : dateDecaleeDeMois(vise.date, pas), aujourdhui);
+    const voulu = dansLesBornes(dateDecalee(vise.date, 7 * pas), aujourdhui);
     if (voulu !== vise.date) regarder(voulu);
   };
   /* Au bout, la flèche s'éteint : le regard ne bougerait plus. */
@@ -283,9 +279,6 @@ export function PageJournal({
      Le défilement fini sur un volet voisin, la date se déplace ; le nouveau
      rendu ramène le volet courant au milieu. */
   const rail = useRef<HTMLDivElement>(null);
-  /* Les volets présents : pas de voisin du côté où la borne est atteinte. */
-  const volets = [...(peutReculer ? [-1] : []), 0, ...(peutAvancer ? [1] : [])];
-  const rangCourant = volets.indexOf(0);
 
   /* EN VUE SEMAINE, LA PISTE EST CONTINUE ET SE GLISSE JOUR PAR JOUR
      (2026-09-26, « slide en mode semaine : slide fluide des jour en jour
@@ -317,18 +310,14 @@ export function PageJournal({
     const zone = rail.current;
     if (!zone) return;
     placement.current = true;
-    if (vue === 'semaine') {
-      /* Le jour REGARDÉ au milieu des sept. LE PAS D'UN CRAN SE MESURE sur
-         la piste elle-même (`scrollWidth / nombre de jours`) plutôt que de
-         se déduire des largeurs écrites : marges et arrondis ne peuvent
-         plus le fausser. */
-      const rang = piste.indexOf(vise.date);
-      const pasDuJour = zone.scrollWidth / piste.length;
-      const decalage = vise.ou === 'debut' ? 0 : (JOURS_VISIBLES - 1) / 2;
-      if (rang >= 0) defilerHorizontalA(zone, (rang - decalage) * pasDuJour, false);
-    } else {
-      defilerHorizontalA(zone, rangCourant * zone.clientWidth, false);
-    }
+    /* Le jour REGARDÉ au milieu des sept. LE PAS D'UN CRAN SE MESURE sur la
+       piste elle-même (`scrollWidth / nombre de jours`) plutôt que de se
+       déduire des largeurs écrites : marges et arrondis ne peuvent plus le
+       fausser. */
+    const rang = piste.indexOf(vise.date);
+    const pasDuJour = zone.scrollWidth / piste.length;
+    const decalage = vise.ou === 'debut' ? 0 : (JOURS_VISIBLES - 1) / 2;
+    if (rang >= 0) defilerHorizontalA(zone, (rang - decalage) * pasDuJour, false);
     /* La marque se lève au prochain tour de boucle : le défilement programmé
        a alors fini de se produire. */
     const relacher = setTimeout(() => {
@@ -338,7 +327,7 @@ export function PageJournal({
     /* Le rail ne se replace QUE sur demande (`vise.placer`), jamais au fil
        d'un glissement : sinon le doigt se battrait contre le replacement. */
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [vise.placer, vue, rangCourant, piste]);
+  }, [vise.placer, piste]);
   useEffect(
     () =>
       surFinDeDefilement(rail.current, () => {
@@ -348,22 +337,13 @@ export function PageJournal({
            (2026-09-26, « si on ne clique nulle part, la date selectionnée ne
            change pas ») : on note où l'on est arrivé, sans replacer le rail
            — il est déjà au bon endroit, c'est le doigt qui l'y a mis. */
-        if (vue === 'semaine') {
-          const pasDuJour = zone.scrollWidth / piste.length;
-          const rang = Math.round(zone.scrollLeft / pasDuJour + (JOURS_VISIBLES - 1) / 2);
-          const date = piste[rang];
-          if (date && date !== vise.date) setVise((v) => ({ ...v, date }));
-          return;
-        }
-        const rang = Math.round(zone.scrollLeft / zone.clientWidth);
-        const pas = volets[rang];
-        if (pas !== undefined && pas !== 0) {
-          const voulu = dansLesBornes(dateDecaleeDeMois(vise.date, pas), aujourdhui);
-          if (voulu !== vise.date) regarder(voulu);
-        }
+        const pasDuJour = zone.scrollWidth / piste.length;
+        const rang = Math.round(zone.scrollLeft / pasDuJour + (JOURS_VISIBLES - 1) / 2);
+        const date = piste[rang];
+        if (date && date !== vise.date) setVise((v) => ({ ...v, date }));
       }),
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [vise.date, vue, rangCourant, piste],
+    [vise.date, piste],
   );
 
   return (
@@ -383,33 +363,12 @@ export function PageJournal({
               <button type="button" className="journal__fleche journal__fleche--suivant" aria-label={textes.calendrier.moisSuivant} disabled={!peutAvancer} aria-disabled={!peutAvancer} onClick={avancer}>
                 <IconeChevronDroit />
               </button>
-              {/* « OPTIONS », SOULIGNÉ, À LA PLACE DES RÉGLAGES (2026-09-26,
-                  « a la place de 26 semaine mois -> le texte "options"
-                  souligné ») : replié, le calendrier n'a que son mois et ses
-                  deux flèches. OUVERT, IL DIT « Masquer les options »
-                  (2026-09-26, « option : remplacer croix de fermeture par
-                  "masquer les options" ») — la croix a vécu une demi-heure. */}
-              <button
-                type="button"
-                className={`journal__options${options ? ' journal__options--ouvertes' : ''}`}
-                aria-expanded={options}
-                onClick={() => setOptions((o) => !o)}
-              >
-                {options ? textes.journal.masquerOptions : textes.journal.options}
-              </button>
-            </div>
-
-            {/* LA LIGNE DES RÉGLAGES, EN DEUXIÈME LIGNE (2026-09-26, « la
-                ligne d'option vient se mettre en 2eme ligne ») : juste sous
-                le mois, AVANT le calendrier — aujourd'hui, les deux vues,
-                « Filtrer » et les deux modes, TOUS SUR LA MÊME LIGNE. Repliée,
-                il n'y a rien de plus entre le mois et le calendrier, ni entre
-                le calendrier et le journal. */}
-            {options ? (
+              {/* LES QUATRE PICTOS, SUR LA LIGNE DU MOIS (2026-09-26, « à la
+                  place de "options" , mets : picto calendrier, picto filtre
+                  sans label, picto ligne et grille ») : le calendrier du
+                  jour, le filtre SANS SON MOT, et les deux modes. Le lien
+                  « Options » et sa ligne repliable ont vécu la journée. */}
               <div className="journal__reglages">
-                {/* AUJOURD'HUI (2026-09-26, son image `aujourdhui.png`) : le
-                    quantième du jour courant, SUR DEUX CHIFFRES. Touchée, elle
-                    ramène à aujourd'hui. */}
                 <button
                   type="button"
                   className="journal__aujourdhui"
@@ -418,23 +377,6 @@ export function PageJournal({
                 >
                   <IconeAujourdhui quantieme={aujourdhui.slice(8)} />
                 </button>
-                <div className="journal__vues" role="radiogroup" aria-label={textes.calendrier.mois[mois - 1]}>
-                  {(['semaine', 'mois'] as const).map((laquelle) => (
-                    <button
-                      key={laquelle}
-                      type="button"
-                      role="radio"
-                      aria-checked={vue === laquelle}
-                      className={`journal__vue${vue === laquelle ? ' journal__vue--choisie' : ''}`}
-                      onClick={() => setVue(laquelle)}
-                    >
-                      {textes.journal.vues[laquelle]}
-                    </button>
-                  ))}
-                </div>
-                {/* L'INDICATEUR : un filtre mis, le bouton prend la matière des
-                    réponses choisies ET porte une pastille à la coche
-                    (2026-09-26). Aucun filtre, pas de pastille. */}
                 <button
                   ref={boutonFiltre}
                   type="button"
@@ -444,12 +386,6 @@ export function PageJournal({
                   onClick={() => setFiltre((etat) => (etat === 'ouvert' ? 'fermeture' : 'ouvert'))}
                 >
                   <IconeFiltrer />
-                  <span>{textes.journal.filtrer}</span>
-                  {filtreMis ? (
-                    <span className="journal__filtre-compte" aria-hidden="true">
-                      <IconeCoche />
-                    </span>
-                  ) : null}
                 </button>
                 <div className="journal__modes" role="radiogroup" aria-label={textes.journal.modes.liste}>
                   {(['liste', 'grille'] as const).map((lequel) => (
@@ -466,29 +402,13 @@ export function PageJournal({
                     </button>
                   ))}
                 </div>
-                {/* LA CROIX QUI REPLIE LA LIGNE (2026-09-26, « ajoute en fin
-                    de ligne d'option une croix de fermeture de la ligne ») :
-                    au bout, la croix des tiroirs ; « Masquer les options »,
-                    en tête, fait la même chose. */}
-                <button
-                  type="button"
-                  className="journal__fermer-options"
-                  aria-label={textes.journal.masquerOptions}
-                  onClick={() => setOptions(false)}
-                >
-                  <IconeCroix />
-                </button>
               </div>
-            ) : null}
+            </div>
 
-            {vue === 'semaine' ? (
-              /* LES DEUX CHEVRONS DE LA BANDE (2026-09-26, « sans rien
-                 changer au positionnement des jours, ajoute à l'intérieur
-                 des mini espaces blancs sur le côté, des mini chevrons avant
-                 arriere encerclés qui font défilés d'une semaine à chaque
-                 clic ») : posés PAR-DESSUS la piste, aux deux bouts — le
-                 placement des cartes ne bouge pas d'un pixel. */
-              <div className="journal__bande">
+            {/* LE RAIL QUI GLISSE — le défilement du navigateur, aimanté,
+                comme la piste de la règle du poids : une piste continue de
+                jours, sept visibles, le jour regardé au milieu. */}
+            <div className="journal__bande">
               <div className="journal__rail journal__rail--jours" ref={rail}>
                 {piste.map((date) => (
                   <button
@@ -500,8 +420,8 @@ export function PageJournal({
                   >
                     <span className="journal__jour-nom">{textes.calendrier.joursAbreges[jourDeLaSemaine(date)]}</span>
                     <span className="journal__jour-quantieme">{Number(date.slice(8))}</span>
-                    {/* C'est le VIDE qui se marque (2026-09-26) : un tiret fin et pâle
-                        sous le quantième quand la journée ne porte rien. */}
+                    {/* C'est le VIDE qui se marque (2026-09-26) : un tiret fin
+                        et pâle sous le quantième. */}
                     {pointes.has(date) ? null : <span className="journal__point" aria-hidden="true" />}
                   </button>
                 ))}
@@ -524,41 +444,7 @@ export function PageJournal({
               >
                 <IconeChevronDroit />
               </button>
-              </div>
-            ) : (
-              <div className="journal__rail" ref={rail}>
-                {volets.map((pas) => {
-                  const dateVolet = dateDecaleeDeMois(vise.date, pas);
-                  const { annee: a, mois: m } = anneeMoisDe(dateVolet);
-                  return (
-                    <div className="journal__volet" key={pas} aria-hidden={pas !== 0}>
-                      {/* LE MOIS : six semaines, lundi en premier, les jours
-                          des mois voisins en pâle (`grilleDuMois`). */}
-                      <div className="journal__grille-mois">
-                        {textes.calendrier.jours.map((lettre, i) => (
-                          <span key={i} className="journal__entete-jour" aria-hidden="true">
-                            {lettre}
-                          </span>
-                        ))}
-                        {grilleDuMois(a, m).map((case_) => (
-                          <button
-                            key={case_.date}
-                            type="button"
-                            tabIndex={pas === 0 ? undefined : -1}
-                            aria-current={case_.date === jour ? 'date' : undefined}
-                            className={`journal__case${case_.date === jour ? ' journal__case--choisie' : ''}${case_.date === aujourdhui ? ' journal__case--aujourdhui' : ''}${case_.dansLeMois ? '' : ' journal__case--voisine'}`}
-                            onClick={() => choisirJour(case_.date)}
-                          >
-                            <span className="journal__case-quantieme">{case_.jour}</span>
-                            {pointes.has(case_.date) ? null : <span className="journal__point" aria-hidden="true" />}
-                          </button>
-                        ))}
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
-            )}
+            </div>
           </div>
 
           {/* LE CORPS DÉFILE, le calendrier et le bandeau restent — la règle
