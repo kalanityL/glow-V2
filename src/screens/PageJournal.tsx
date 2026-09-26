@@ -4,7 +4,7 @@ import { EntetePage } from './EntetePage';
 import type { FondProps } from './Accueil';
 import { TiroirFiltre } from './TiroirFiltre';
 import { IconeDuModule } from './iconesModules';
-import { IconeAujourdhui, IconeChevronDroit, IconeCoche, IconeFiltrer, IconeGrille, IconeListe, IconePlus } from '../components/Icones';
+import { IconeAujourdhui, IconeChevronBas, IconeChevronDroit, IconeCoche, IconeCroix, IconeFiltrer, IconeGrille, IconeListe, IconePlus } from '../components/Icones';
 import { IndiceDefilement } from '../components/IndiceDefilement';
 import { detecterLangue, useTextes } from '../i18n/useTextes';
 import { classeDuTheme } from '../themes/themes';
@@ -466,6 +466,18 @@ export function PageJournal({
                     </button>
                   ))}
                 </div>
+                {/* LA CROIX QUI REPLIE LA LIGNE (2026-09-26, « ajoute en fin
+                    de ligne d'option une croix de fermeture de la ligne ») :
+                    au bout, la croix des tiroirs ; « Masquer les options »,
+                    en tête, fait la même chose. */}
+                <button
+                  type="button"
+                  className="journal__fermer-options"
+                  aria-label={textes.journal.masquerOptions}
+                  onClick={() => setOptions(false)}
+                >
+                  <IconeCroix />
+                </button>
               </div>
             ) : null}
 
@@ -561,10 +573,14 @@ export function PageJournal({
               journée), les VIDES COMPRIS, et un « Voir plus » à chaque bout
               tant que les bornes ne sont pas atteintes. */}
           <div className="journal__corps" ref={corpsRef}>
-            {/* Le passé est en haut : c'est lui que ce bouton charge. */}
+            {/* Le passé est en haut : c'est lui que ce bouton charge. Son
+                chevron pointe VERS LE HAUT, du côté où il va chercher
+                (2026-09-26, « chevron vers le bas (ou le haut dans le cas où
+                c'est l'autre voir plus ) »). */}
             {fenetre.plusAvant ? (
-              <button type="button" className="journal__plus" onClick={() => etendre('avant')}>
-                {textes.journal.voirPlus}
+              <button type="button" className="journal__plus journal__plus--avant" onClick={() => etendre('avant')}>
+                <span>{textes.journal.voirPlus}</span>
+                <IconeChevronBas />
               </button>
             ) : null}
 
@@ -585,10 +601,11 @@ export function PageJournal({
               />
             ))}
 
-            {/* Le futur est en bas. */}
+            {/* Le futur est en bas : son chevron pointe vers le bas. */}
             {fenetre.plusApres ? (
               <button type="button" className="journal__plus" onClick={() => etendre('apres')}>
-                {textes.journal.voirPlus}
+                <span>{textes.journal.voirPlus}</span>
+                <IconeChevronBas />
               </button>
             ) : null}
             <IndiceDefilement />

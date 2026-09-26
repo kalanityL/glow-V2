@@ -4082,7 +4082,9 @@
    Les crans pleins à l'accent ont vécu la journée. */
 .journal__vues {
   display: flex;
-  gap: 10px;
+  /* Les deux vues se tiennent (2026-09-26, « rapproche semaine et mois ») :
+     elles vont ensemble, l'écart commun les séparerait. */
+  gap: 8px;
 }
 
 .journal__vue {
@@ -4296,7 +4298,17 @@
 .journal__reglages {
   display: flex;
   align-items: center;
-  gap: 6px;
+  /* UN SEUL ÉCART, PARTOUT (2026-09-26, « équilibre les espaces vides entre
+     les différents composants pas seulement autour du picto aujourdhui ») :
+     le même entre l'icône du jour, les deux vues, « Filtrer » et les deux
+     modes — les groupes avaient leur propre écart, plus large que celui qui
+     les séparait, et la ligne paraissait bancale. Les deux vues et les deux
+     modes se resserrent à l'intérieur de leur groupe (2026-09-26).
+     LA LIGNE EST CENTRÉE (« centre l'ensemble de la ligne ») : `safe center`
+     et non `center`, sans quoi ce qui déborde sortirait par la gauche et le
+     défilement ne pourrait pas y revenir — l'erreur du `flex-end`. */
+  justify-content: safe center;
+  gap: 16px;
   /* ELLE SE GLISSE SI L'ÉCRAN EST ÉTROIT (2026-09-26, « la ligne des
      options, si l'écran n'est pas asse large, doit etre ausi slidable ,
      comme la ligne semaine ») : le défilement du navigateur, comme la piste
@@ -4315,6 +4327,32 @@
   display: none;
 }
 
+/* LA CROIX QUI REPLIE LA LIGNE (2026-09-26, « ajoute en fin de ligne
+   d'option une croix de fermeture de la ligne ») : au bout, discrète, à
+   l'encre des réglages — elle ferme, elle ne règle rien. */
+.journal__fermer-options {
+  display: grid;
+  place-items: center;
+  width: 22px;
+  height: 22px;
+  padding: 0;
+  border: 0;
+  border-radius: 999px;
+  background: none;
+  color: var(--encre-chapeau);
+  cursor: pointer;
+}
+
+.journal__fermer-options .icone {
+  width: 14px;
+  height: 14px;
+}
+
+.journal__fermer-options:focus-visible {
+  outline: none;
+  color: var(--encre);
+}
+
 /* Rien ne se resserre dans une ligne qui glisse : chaque réglage garde sa
    taille, et le mot de « Filtrer » reste. LE PREMIER EST POUSSÉ À DROITE PAR
    SA MARGE, et non par un `justify-content: flex-end` (2026-09-26, « le
@@ -4325,9 +4363,7 @@
   flex: none;
 }
 
-.journal__reglages > :first-child {
-  margin-left: auto;
-}
+
 
 /* « Filtrer » : nu lui aussi, à l'encre discrète ; il se marque quand une
    catégorie est écartée — sans quoi on filtrerait sans le savoir. */
@@ -4382,7 +4418,8 @@
    se dit à qui écoute la page. */
 .journal__modes {
   display: flex;
-  gap: 10px;
+  /* De même pour les deux modes (« rapproche mode grille et mode ligne »). */
+  gap: 8px;
 }
 
 .journal__mode {
@@ -4609,7 +4646,6 @@
   place-items: center;
   width: 26px;
   height: 26px;
-  margin-right: auto;
   padding: 0;
   border: 0;
   border-radius: 999px;
@@ -4685,9 +4721,34 @@
 /* LE BOUT DE LA FENÊTRE (2026-09-26, « un "voir plus" qui charge les 6 mois
    (maximum) précédents ou suivant ») : un bouton pleine largeur, à la
    matière des boutons de choix — il charge, il n'enregistre rien. Aux
-   bornes, il n'existe pas. */
+   bornes, il n'existe pas.
+   IL A AUTANT D'AIR AU-DESSUS QU'UNE JOURNÉE (le même jour, « plus d'espace
+   vide avant le "voir plus" (autant qu'avant un jour) »), et SON CHEVRON
+   POINTE DU CÔTÉ OÙ IL VA CHERCHER — vers le bas pour le futur, vers le
+   haut pour le passé. */
+.journal__plus .icone {
+  width: 16px;
+  height: 16px;
+}
+
+/* Celui du passé est en haut : son air va DESSOUS, et son chevron pointe
+   vers le haut — du côté où il va chercher (2026-09-26). */
+.journal__plus--avant {
+  margin-top: 0;
+  margin-bottom: 50px;
+}
+
+.journal__plus--avant .icone {
+  transform: rotate(180deg);
+}
+
 .journal__plus {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
   width: 100%;
+  margin-top: 50px;
   padding: 10px 16px;
   border: 1px solid color-mix(in srgb, var(--option-filet) 55%, var(--option-fond));
   border-radius: 12px;
@@ -4852,14 +4913,19 @@
   gap: 8px;
 }
 
+/* LA CASE DU MODE GRILLE (2026-09-26, « mode grille : pas de pastille, les
+   icones prennent toute la place du carré, fond de case bleu plus clair que
+   la pastille actuelle ») : un carré au fond bleu très pâle — plus clair que
+   la pastille des entrées —, et l'icône qui l'occupe tout entier. La
+   pastille ronde dans la case a vécu la journée. */
 .journal__tuile {
   display: grid;
   place-items: center;
   aspect-ratio: 1;
   min-width: 0;
-  border: 1px solid color-mix(in srgb, var(--option-filet) 40%, var(--option-fond));
+  border: 0;
   border-radius: 14px;
-  background: var(--module-fond);
+  background: color-mix(in srgb, var(--ajout-pastille-fond) 45%, var(--option-fond));
   overflow: hidden;
 }
 
@@ -4869,21 +4935,29 @@
   object-fit: cover;
 }
 
-/* Sans image, l'icône du module dans sa pastille, au milieu de la tuile. */
+/* Sans image, l'icône SEULE, à la taille de la case — sans pastille. */
 .journal__tuile-icone {
   display: grid;
   place-items: center;
-  width: 48px;
-  height: 48px;
-  border-radius: 999px;
-  background: var(--ajout-pastille-fond);
+  width: 76%;
+  height: 76%;
   color: var(--ajout-icone-encre);
 }
 
 .journal__tuile-icone .icone {
-  width: 24px;
-  height: 24px;
-  stroke-width: 1.5;
+  width: 100%;
+  height: 100%;
+  /* Le trait ne grossit pas avec l'icône (2026-09-26, « trait des pictos en
+     mode grille : 1px ») : à 85 px dans une fenêtre de 24, il faut 0,28 pour
+     qu'il fasse UN pixel à l'écran. */
+  stroke-width: 0.28;
+}
+
+/* L'icône d'un sport est son dessin : il remplit la case comme les autres. */
+.journal__tuile-icone .journal__sport {
+  display: block;
+  width: 100%;
+  height: 100%;
 }
 
 /* ── LE TIROIR DU FILTRE ────────────────────────────────────────────────── */

@@ -1124,7 +1124,11 @@ nouveaux jour qui viennent d'etre charges ») : la fenêtre se rouvre autour
 de lui et six mois de plus apparaissent de ce côté. On avance ainsi de six
 mois en six mois, sans fin — les deux compteurs de pas ont vécu une heure,
 ils n'ont plus lieu d'être. **Aux bornes, plus de bouton et plus rien à
-faire défiler**. La lecture reprend sur ce jour-là (`amenerEnHaut`) : rien
+faire défiler**. Chaque « Voir plus » a AUTANT D'AIR qu'une journée — 50 px,
+dessous pour celui du passé — et SON CHEVRON POINTE DU CÔTÉ OÙ IL VA
+CHERCHER (2026-09-26, « plus d'espace vide avant le "voir plus" (autant
+qu'avant un jour). chevron vers le bas (ou le haut dans le cas où c'est
+l'autre voir plus) »). La lecture reprend sur ce jour-là (`amenerEnHaut`) : rien
 ne saute ; et un jour vide atteint ainsi NE SE DÉPLIE PAS de lui-même — on
 ne l'a pas choisi, on est arrivé dessus.
 **TOUTES LES JOURNÉES SONT LÀ, LES VIDES COMPRISES** (« jour sans donnée :
