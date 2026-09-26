@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { compteDuJour, entreesDuJournal, imageDeLEntree, joursAvecEntree, joursDuJournal, type TablesDuJournal } from './journal';
+import { bornesDuJournal, compteDuJour, entreesDuJournal, fenetreDuJournal, imageDeLEntree, joursAvecEntree, joursDuJournal, type TablesDuJournal } from './journal';
 import type { InjectionLog, SleepLog, SportLog, WeightLog } from '../donnees/v1';
 
 const prise = (id: string, date: string, time: string): InjectionLog => ({ id, date, time, dose: 0.25, site: 'abdomen_gauche' });
@@ -30,28 +30,71 @@ describe('entreesDuJournal', () => {
   });
 });
 
+describe('bornesDuJournal', () => {
+  it('va dix ans en arrière et un an en avant, depuis aujourd’hui', () => {
+    expect(bornesDuJournal('2026-09-26')).toEqual({ min: '2016-09-26', max: '2027-09-26' });
+  });
+});
+
+describe('fenetreDuJournal', () => {
+  it('ouvre sur six mois de chaque côté du jour regardé', () => {
+    const f = fenetreDuJournal('2026-09-26', '2026-09-26', 0, 0);
+    expect(f).toMatchObject({ debut: '2026-03-26', fin: '2027-03-26', plusAvant: true, plusApres: true });
+  });
+
+  it('chaque « Voir plus » ajoute six mois de son côté, et lui seul', () => {
+    expect(fenetreDuJournal('2026-09-26', '2026-09-26', 1, 0)).toMatchObject({ debut: '2025-09-26', fin: '2027-03-26' });
+    expect(fenetreDuJournal('2026-09-26', '2026-09-26', 0, 1)).toMatchObject({ debut: '2026-03-26', fin: '2027-09-26' });
+  });
+
+  it('les bornes absolues rognent, et le « Voir plus » disparaît de ce côté', () => {
+    /* Un an en avant est atteint dès le premier pas : la borne est à
+       2027-09-26 et la fenêtre voudrait aller jusqu’à 2027-09-26 pile. */
+    expect(fenetreDuJournal('2026-09-26', '2026-09-26', 0, 1)).toMatchObject({ fin: '2027-09-26', plusApres: false });
+    /* Dix ans en arrière : dix-neuf pas ne suffisent pas, vingt oui. */
+    expect(fenetreDuJournal('2026-09-26', '2026-09-26', 100, 0)).toMatchObject({ debut: '2016-09-26', plusAvant: false });
+  });
+
+  it('un jour du passé garde ses six mois en avant sans dépasser la borne', () => {
+    const f = fenetreDuJournal('2020-01-15', '2026-09-26', 0, 0);
+    expect(f).toMatchObject({ debut: '2019-07-15', fin: '2020-07-15', plusAvant: true, plusApres: true });
+  });
+
+  it('ramène le quantième au dernier jour du mois d’arrivée', () => {
+    expect(fenetreDuJournal('2026-08-31', '2026-09-26', 0, 0).debut).toBe('2026-02-28');
+  });
+});
+
 describe('joursDuJournal', () => {
   const entrees = entreesDuJournal(tables);
+  const fenetre = { debut: '2026-09-24', fin: '2026-09-27', plusAvant: false, plusApres: false };
 
-  it('part du jour choisi et remonte le temps, sans rien montrer de plus récent', () => {
-    const jours = joursDuJournal(entrees, '2026-09-26', TOUS);
-    expect(jours.map((j) => j.date)).toEqual(['2026-09-26', '2026-09-25', '2026-09-24']);
+  it('rend TOUS les jours de la fenêtre, du plus récent au plus ancien, les vides compris', () => {
+    const jours = joursDuJournal(entrees, fenetre, TOUS);
+    expect(jours.map((j) => j.date)).toEqual(['2026-09-27', '2026-09-26', '2026-09-25', '2026-09-24']);
+  });
+
+  it('une journée sans rien est là, sans entrée', () => {
+    const vide = { debut: '2026-09-20', fin: '2026-09-21', plusAvant: false, plusApres: false };
+    const jours = joursDuJournal(entrees, vide, TOUS);
+    expect(jours).toHaveLength(2);
+    expect(jours.every((j) => j.entrees.length === 0)).toBe(true);
   });
 
   it('range les entrées d’une journée du matin au soir', () => {
-    const [aujourdhui] = joursDuJournal(entrees, '2026-09-26', TOUS);
+    const [, aujourdhui] = joursDuJournal(entrees, fenetre, TOUS);
     expect(aujourdhui.entrees.map((e) => e.id)).toEqual(['sleep-1', 'w-1', 'inj-1', 'sport-1']);
   });
 
-  it('ne fait pas de titre pour une journée vide', () => {
-    const jours = joursDuJournal(entrees, '2026-09-25', TOUS);
-    expect(jours.map((j) => j.date)).toEqual(['2026-09-25', '2026-09-24']);
+  it('ne montre rien hors de la fenêtre', () => {
+    const etroite = { debut: '2026-09-26', fin: '2026-09-26', plusAvant: true, plusApres: true };
+    expect(joursDuJournal(entrees, etroite, TOUS).map((j) => j.date)).toEqual(['2026-09-26']);
   });
 
-  it('le filtre retient les catégories cochées ; aucune cochée, rien ne passe', () => {
-    const jours = joursDuJournal(entrees, '2026-09-26', ['balance']);
+  it('le filtre retient les catégories cochées ; aucune cochée, les jours restent vides', () => {
+    const jours = joursDuJournal(entrees, fenetre, ['balance']);
     expect(jours.flatMap((j) => j.entrees).map((e) => e.id)).toEqual(['w-1', 'w-2']);
-    expect(joursDuJournal(entrees, '2026-09-26', [])).toEqual([]);
+    expect(joursDuJournal(entrees, fenetre, []).every((j) => j.entrees.length === 0)).toBe(true);
   });
 });
 

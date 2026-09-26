@@ -1,10 +1,10 @@
-import { useCallback, useMemo, useRef, useState } from 'react';
+import { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { BarreDuBas, type AjoutTraitement } from './BarreDuBas';
 import { EntetePage } from './EntetePage';
 import type { FondProps } from './Accueil';
 import { TiroirFiltre } from './TiroirFiltre';
 import { IconeDuModule } from './iconesModules';
-import { IconeChevronDroit, IconeFiltrer, IconeGrille, IconeListe } from '../components/Icones';
+import { IconeChevronDroit, IconeFiltrer, IconeGrille, IconeListe, IconePlus } from '../components/Icones';
 import { IndiceDefilement } from '../components/IndiceDefilement';
 import { detecterLangue, useTextes } from '../i18n/useTextes';
 import { classeDuTheme } from '../themes/themes';
@@ -12,22 +12,26 @@ import { MODULES, MODULES_AJOUT_JOURNAL, type ModuleId } from '../app/modules';
 import {
   anneeMoisDe,
   dateDecalee,
+  dateDecaleeDeMois,
   dateLocale,
   formaterDateLongue,
   formaterJourEtDate,
   grilleDuMois,
   jourDeLaSemaine,
   jourRelatif,
-  moisDecale,
   semaineDe,
 } from '../domaine/dates';
+import type { Langue } from '../i18n/langues';
+import { amenerEnHaut } from '../plateforme/navigateur';
 import {
   compteDuJour,
   entreesDuJournal,
+  fenetreDuJournal,
   imageDeLEntree,
   joursAvecEntree,
   joursDuJournal,
   type EntreeJournal,
+  type JourDuJournal,
 } from '../domaine/journal';
 import { dureeEcrite, dureeMinutes } from '../domaine/sommeils';
 import { poidsDepuisKg, type UnitePoids } from '../domaine/unites';
@@ -112,28 +116,69 @@ export function PageJournal({
   const langue = detecterLangue();
   const aujourdhui = dateLocale(new Date());
 
-  /* LE JOUR CHOISI commande tout : le calendrier le marque, la liste part de
-     lui et remonte le temps. Les flèches le déplacent — d'une semaine en vue
-     Semaine, d'un mois en vue Mois —, si bien que le calendrier et la liste
-     ne peuvent pas se contredire.
-     ET S'IL NE PORTE RIEN, C'EST SON ÉCRAN VIDE QUI S'AFFICHE, seul
-     (2026-09-26, « design s'il n'y a pas d'entrée sur le jour sur lequel on
-     clique », puis « je clique sur un bouton sans point je n'ai pas l'écran
-     qu'il faut ») : le déroulé vers le passé ne vaut que pour un jour qui a
-     quelque chose à montrer. */
+  /* LE JOUR CHOISI commande tout : le calendrier le marque, la fenêtre de
+     lecture s'ouvre autour de lui, et la liste l'amène sous les yeux. Les
+     flèches le déplacent — d'une semaine en vue Semaine, d'un mois en vue
+     Mois —, si bien que le calendrier et la liste ne peuvent pas se
+     contredire. */
   const [jour, setJour] = useState(jourInitial ?? aujourdhui);
   const [vue, setVue] = useState<'semaine' | 'mois'>('semaine');
   const [mode, setMode] = useState<'liste' | 'grille'>('liste');
   /* Toutes les catégories retenues au départ : le journal s'ouvre entier. */
   const [retenus, setRetenus] = useState<readonly ModuleId[]>(MODULES);
+  /* LES « VOIR PLUS » TOUCHÉS de chaque côté (2026-09-26) : la fenêtre part
+     de six mois de part et d'autre et grandit de six mois par pas, jusqu'aux
+     bornes. Choisir un autre jour remet les deux à zéro. */
+  const [pas, setPas] = useState({ avant: 0, apres: 0 });
+  /* LES JOURNÉES VIDES DÉPLIÉES (2026-09-26, « Un petit bouton + sur un jour
+     sans donnée pour voir, sous le jour en uestion, l'écran "journée sans
+     donnée" insérée à l'intérieur du journal ») : chacune se déplie pour
+     elle-même et le reste. */
+  const [deplies, setDeplies] = useState<ReadonlySet<string>>(() => new Set<string>());
+  const basculerDeplie = useCallback((date: string) => {
+    setDeplies((ouvertes) => {
+      const suite = new Set(ouvertes);
+      if (suite.has(date)) suite.delete(date);
+      else suite.add(date);
+      return suite;
+    });
+  }, []);
 
   const entrees = useMemo(() => entreesDuJournal({ prises, pesees, sommeils, activites }), [prises, pesees, sommeils, activites]);
-  const jours = useMemo(() => joursDuJournal(entrees, jour, retenus), [entrees, jour, retenus]);
+  const fenetre = useMemo(() => fenetreDuJournal(jour, aujourdhui, pas.avant, pas.apres), [jour, aujourdhui, pas]);
+  const jours = useMemo(() => joursDuJournal(entrees, fenetre, retenus), [entrees, fenetre, retenus]);
   const pointes = useMemo(() => joursAvecEntree(entrees, retenus), [entrees, retenus]);
   const compte = compteDuJour(entrees, jour, retenus);
-  /* Un filtre est mis dès qu'une catégorie est écartée — toutes cochées,
-     c'est le journal entier, donc pas de filtre. */
-  const filtreMis = retenus.length < MODULES.length;
+
+  /* CE QU'IL FAUT AMENER SOUS LES YEUX après le prochain rendu : la journée
+     choisie au calendrier, ou — après un « Voir plus » — la journée qui
+     était à la limite, pour que la lecture reprenne où elle s'était
+     arrêtée. Un compteur l'accompagne : rechoisir le même jour doit y
+     ramener. */
+  const corpsRef = useRef<HTMLDivElement>(null);
+  const [aAmener, setAAmener] = useState<{ date: string; n: number }>({ date: jour, n: 0 });
+  useEffect(() => {
+    amenerEnHaut(corpsRef.current?.querySelector(`[data-journee="${aAmener.date}"]`) ?? null);
+  }, [aAmener]);
+
+  /* CHOISIR UN JOUR : la fenêtre se rouvre autour de lui, il est amené sous
+     les yeux, ET S'IL NE PORTE RIEN IL S'OUVRE DÉPLIÉ (2026-09-26, « Si on
+     clique sur un jour sasns donnée, on arrive sur ce jour par defaut
+     deplié »). */
+  const choisirJour = (date: string) => {
+    setJour(date);
+    setPas({ avant: 0, apres: 0 });
+    if (!pointes.has(date)) setDeplies((ouvertes) => new Set(ouvertes).add(date));
+    setAAmener((precedent) => ({ date, n: precedent.n + 1 }));
+  };
+
+  /* UN « VOIR PLUS » : six mois de plus de ce côté, et la lecture reprend
+     sur la journée qui était à la limite. */
+  const etendre = (cote: 'avant' | 'apres') => {
+    const limite = cote === 'avant' ? fenetre.debut : fenetre.fin;
+    setPas((p) => ({ ...p, [cote]: p[cote] + 1 }));
+    setAAmener((precedent) => ({ date: limite, n: precedent.n + 1 }));
+  };
 
   /* LE TIROIR DU FILTRE, en trois états comme ceux de la barre du bas : le
      panneau reste monté le temps de redescendre, puis se démonte. */
@@ -142,10 +187,13 @@ export function PageJournal({
   const leBoutonFiltre = useCallback(() => boutonFiltre.current, []);
   const fermerFiltre = useCallback(() => setFiltre((etat) => (etat === 'ouvert' ? 'fermeture' : etat)), []);
   const filtreFerme = useCallback(() => setFiltre('ferme'), []);
+  /* Un filtre est mis dès qu'une catégorie est écartée — toutes cochées,
+     c'est le journal entier, donc pas de filtre. */
+  const filtreMis = retenus.length < MODULES.length;
 
   const { annee, mois } = anneeMoisDe(jour);
-  const reculer = () => setJour(vue === 'semaine' ? dateDecalee(jour, -7) : moisDuJour(jour, -1));
-  const avancer = () => setJour(vue === 'semaine' ? dateDecalee(jour, 7) : moisDuJour(jour, 1));
+  const reculer = () => choisirJour(vue === 'semaine' ? dateDecalee(jour, -7) : dateDecaleeDeMois(jour, -1));
+  const avancer = () => choisirJour(vue === 'semaine' ? dateDecalee(jour, 7) : dateDecaleeDeMois(jour, 1));
 
   return (
     <div className={`page page--photo page--fond-${fond.apercu ?? fond.courant} ${classeDuTheme('blanc')}`}>
@@ -190,7 +238,7 @@ export function PageJournal({
                     type="button"
                     aria-current={date === jour ? 'date' : undefined}
                     className={`journal__jour-carte${date === jour ? ' journal__jour-carte--choisi' : ''}`}
-                    onClick={() => setJour(date)}
+                    onClick={() => choisirJour(date)}
                   >
                     <span className="journal__jour-nom">{textes.calendrier.joursAbreges[jourDeLaSemaine(date)]}</span>
                     <span className="journal__jour-quantieme">{Number(date.slice(8))}</span>
@@ -213,7 +261,7 @@ export function PageJournal({
                     type="button"
                     aria-current={case_.date === jour ? 'date' : undefined}
                     className={`journal__case${case_.date === jour ? ' journal__case--choisie' : ''}${case_.dansLeMois ? '' : ' journal__case--voisine'}`}
-                    onClick={() => setJour(case_.date)}
+                    onClick={() => choisirJour(case_.date)}
                   >
                     <span className="journal__case-quantieme">{case_.jour}</span>
                     {pointes.has(case_.date) ? <span className="journal__point" aria-hidden="true" /> : null}
@@ -272,96 +320,42 @@ export function PageJournal({
 
           {/* LE CORPS DÉFILE, le calendrier et le bandeau restent — la règle
               des formulaires (2026-09-21, « bandeau titre et bouton valider
-              figés, c'est le reste qui scrolle »). */}
-          <div className="journal__corps">
-            {retenus.length === 0 ? (
-              <p className="journal__rien">{textes.journal.aucuneCategorie}</p>
-            ) : compte === 0 ? (
-              /* L'ÉCRAN D'UN JOUR VIDE (2026-09-26, son image et sa dictée) :
-                 la phrase avec la date regardée, « Ajoutez une entrée », et
-                 SES SEPT CASES sur deux colonnes — l'icône dans sa pastille,
-                 le nom, le chevron. NOS ICÔNES ET UNE COULEUR UNIE (« couleur
-                 unie des icones et utiliser nos icones ») : `IconeDuModule`
-                 aux jetons `--ajout-*`, pas les six teintes de son image. */
-              <div className="journal__vide">
-                <p className="journal__vide-phrase">
-                  {textes.journal.aucuneEntreeLe(formaterDateLongue(jour, textes.calendrier.mois, langue))}
-                </p>
-                <h2 className="journal__vide-titre">{textes.journal.ajoutezUneEntree}</h2>
-                <div className="journal__vide-cases">
-                  {MODULES_AJOUT_JOURNAL.map((module) => (
-                    <button key={module} type="button" className="journal__vide-case" onClick={() => onAjouter(module, jour)}>
-                      <span className="journal__icone">
-                        <IconeDuModule module={module} forme={forme} />
-                      </span>
-                      <span className="journal__vide-nom">
-                        {module === 'traitement' && forme ? textes.accueil.traitement[forme] : textes.accueil.modules[module]}
-                      </span>
-                      <span className="journal__vide-chevron" aria-hidden="true">
-                        <IconeChevronDroit />
-                      </span>
-                    </button>
-                  ))}
-                </div>
-              </div>
-            ) : (
-              jours.map((journee) => {
-                const mot = jourRelatif(journee.date, aujourdhui);
-                const enToutesLettres = formaterJourEtDate(journee.date, textes.calendrier.joursEntiers, textes.calendrier.mois, langue);
-                return (
-                  <section key={journee.date} className="journal__journee">
-                    {/* Le titre : le mot du jour à gauche quand il en a un
-                        (« Aujourd'hui », « Hier »), la date en toutes lettres
-                        à droite — sinon la date prend la gauche, et la droite
-                        se tait. */}
-                    <h2 className="journal__titre-jour">
-                      <span className="journal__titre-mot">{mot ? textes.joursRelatifs[mot] : enToutesLettres}</span>
-                      {mot ? <span className="journal__titre-date">{enToutesLettres}</span> : null}
-                    </h2>
-                    {mode === 'liste' ? (
-                      <ul className="journal__liste">
-                        {journee.entrees.map((entree) => (
-                          <li key={entree.id} className="journal__entree">
-                            <span className="journal__heure">{entree.heure}</span>
-                            <span className="journal__icone">
-                              <IconeDuModule module={entree.module} forme={forme} />
-                            </span>
-                            <span className="journal__dit">
-                              <span className="journal__nom">{nomDuModule(entree, forme, textes)}</span>
-                              <span className="journal__detail">{detailDeLEntree(entree, unite, textes)}</span>
-                            </span>
-                            <Vignette entree={entree} />
-                          </li>
-                        ))}
-                      </ul>
-                    ) : (
-                      /* LE MODE GRILLE (2026-09-26, « pour le mode grille tu
-                         mets juste l'image de l'entrée si elle exite sinon
-                         l'icone ») : la tuile ne porte QUE ça — le nom du
-                         module se dit à qui écoute la page. Aucune ligne ne
-                         porte d'image aujourd'hui : c'est donc l'icône
-                         partout. */
-                      <div className="journal__tuiles">
-                        {journee.entrees.map((entree) => {
-                          const image = imageDeLEntree(entree);
-                          return (
-                            <span key={entree.id} className="journal__tuile" role="img" aria-label={nomDuModule(entree, forme, textes)}>
-                              {image ? (
-                                <img className="journal__tuile-image" src={image} alt="" />
-                              ) : (
-                                <span className="journal__tuile-icone" aria-hidden="true">
-                                  <IconeDuModule module={entree.module} forme={forme} />
-                                </span>
-                              )}
-                            </span>
-                          );
-                        })}
-                      </div>
-                    )}
-                  </section>
-                );
-              })
-            )}
+              figés, c'est le reste qui scrolle »).
+
+              IL DÉROULE TOUTE LA FENÊTRE, dans les deux sens (2026-09-26,
+              « on doit pouvoir scroller sans fin dans un sens comme dans
+              l'autre peu importe ou on se trouve ») : les jours du plus
+              récent au plus ancien, les VIDES COMPRIS, et un « Voir plus »
+              à chaque bout tant que les bornes ne sont pas atteintes. */}
+          <div className="journal__corps" ref={corpsRef}>
+            {fenetre.plusApres ? (
+              <button type="button" className="journal__plus" onClick={() => etendre('apres')}>
+                {textes.journal.voirPlus}
+              </button>
+            ) : null}
+
+            {jours.map((journee) => (
+              <JourneeDuJournal
+                key={journee.date}
+                journee={journee}
+                aujourdhui={aujourdhui}
+                choisi={journee.date === jour}
+                deplie={deplies.has(journee.date)}
+                onDeplier={basculerDeplie}
+                mode={mode}
+                forme={forme}
+                unite={unite}
+                langue={langue}
+                textes={textes}
+                onAjouter={onAjouter}
+              />
+            ))}
+
+            {fenetre.plusAvant ? (
+              <button type="button" className="journal__plus" onClick={() => etendre('avant')}>
+                {textes.journal.voirPlus}
+              </button>
+            ) : null}
             <IndiceDefilement />
           </div>
         </div>
@@ -404,17 +398,6 @@ function Vignette({ entree }: { entree: EntreeJournal }) {
   return image ? <img className="journal__vignette" src={image} alt="" /> : null;
 }
 
-/** Le mois du jour choisi, décalé — le quantième ramené au dernier jour du
-    mois d'arrivée (le 31 janvier reculé d'un mois donne le 28 février, pas
-    le 3 mars). */
-function moisDuJour(jour: string, delta: number): string {
-  const { annee, mois } = anneeMoisDe(jour);
-  const cible = moisDecale(annee, mois, delta);
-  const dernier = new Date(cible.annee, cible.mois, 0).getDate();
-  const quantieme = Math.min(Number(jour.slice(8)), dernier);
-  return `${cible.annee}-${String(cible.mois).padStart(2, '0')}-${String(quantieme).padStart(2, '0')}`;
-}
-
 /** Le nom d'une entrée : celui de son module, la forme répondue pour le
     traitement — les mots de l'accueil, pas un second jeu. */
 function nomDuModule(entree: EntreeJournal, forme: Forme | null, textes: ReturnType<typeof useTextes>): string {
@@ -451,3 +434,143 @@ function detailDeLEntree(entree: EntreeJournal, unite: UnitePoids, textes: Retur
       : textes.activite.intensites[entree.activite.intensity];
   return `${sport} · ${duree} · ${fin}`;
 }
+
+/**
+ * UNE JOURNÉE DU JOURNAL — son titre, et ce qu'elle porte.
+ *
+ * TOUTES LES JOURNÉES SONT LÀ, LES VIDES COMPRISES (2026-09-26, « jour sans
+ * donnée : apparait dans le journal comme un jour avec données, simplement il
+ * n'y a rien en dessous on passe directement au jour suivant ») : une journée
+ * vide n'a que son titre. SON « + » DÉPLIE SON ÉCRAN D'AJOUT SOUS ELLE (« Un
+ * petit bouton + sur un jour sans donnée pour voir, sous le jour en uestion,
+ * l'écran "journée sans donnée" insérée à l'intérieur du journal »), là où
+ * elle est, sans quitter le journal.
+ *
+ * MÉMOÏSÉE (GUIDELINES) : la fenêtre déroule jusqu'à plusieurs milliers de
+ * journées ; sans ce `memo`, déplier une seule journée les re-rendrait
+ * toutes.
+ */
+const JourneeDuJournal = memo(function JourneeDuJournal({
+  journee,
+  aujourdhui,
+  choisi,
+  deplie,
+  onDeplier,
+  mode,
+  forme,
+  unite,
+  langue,
+  textes,
+  onAjouter,
+}: {
+  journee: JourDuJournal;
+  aujourdhui: string;
+  /** La journée choisie au calendrier : c'est elle qu'on amène sous les yeux. */
+  choisi: boolean;
+  deplie: boolean;
+  onDeplier: (date: string) => void;
+  mode: 'liste' | 'grille';
+  forme: Forme | null;
+  unite: UnitePoids;
+  langue: Langue;
+  textes: ReturnType<typeof useTextes>;
+  onAjouter: (module: ModuleId, date?: string) => void;
+}) {
+  const mot = jourRelatif(journee.date, aujourdhui);
+  const enToutesLettres = formaterJourEtDate(journee.date, textes.calendrier.joursEntiers, textes.calendrier.mois, langue);
+  const vide = journee.entrees.length === 0;
+
+  return (
+    <section
+      className={`journal__journee${choisi ? ' journal__journee--choisie' : ''}${vide ? ' journal__journee--vide' : ''}`}
+      data-journee={journee.date}
+    >
+      {/* Le titre : le mot du jour à gauche quand il en a un (« Aujourd'hui »,
+          « Hier »), la date en toutes lettres à droite — sinon la date prend
+          la gauche, et la droite se tait. Une journée vide porte son « + ». */}
+      <h2 className="journal__titre-jour">
+        <span className="journal__titre-mot">{mot ? textes.joursRelatifs[mot] : enToutesLettres}</span>
+        {mot ? <span className="journal__titre-date">{enToutesLettres}</span> : null}
+        {vide ? (
+          <button
+            type="button"
+            className={`journal__deplier${deplie ? ' journal__deplier--deplie' : ''}`}
+            aria-expanded={deplie}
+            aria-label={deplie ? textes.journal.replierJour : textes.journal.deplierJour}
+            onClick={() => onDeplier(journee.date)}
+          >
+            <IconePlus />
+          </button>
+        ) : null}
+      </h2>
+
+      {vide ? null : mode === 'liste' ? (
+        <ul className="journal__liste">
+          {journee.entrees.map((entree) => (
+            <li key={entree.id} className="journal__entree">
+              <span className="journal__heure">{entree.heure}</span>
+              <span className="journal__icone">
+                <IconeDuModule module={entree.module} forme={forme} />
+              </span>
+              <span className="journal__dit">
+                <span className="journal__nom">{nomDuModule(entree, forme, textes)}</span>
+                <span className="journal__detail">{detailDeLEntree(entree, unite, textes)}</span>
+              </span>
+              <Vignette entree={entree} />
+            </li>
+          ))}
+        </ul>
+      ) : (
+        /* LE MODE GRILLE (2026-09-26, « pour le mode grille tu mets juste
+           l'image de l'entrée si elle exite sinon l'icone ») : la tuile ne
+           porte QUE ça — le nom du module se dit à qui écoute la page.
+           Aucune ligne ne porte d'image aujourd'hui : c'est donc l'icône. */
+        <div className="journal__tuiles">
+          {journee.entrees.map((entree) => {
+            const image = imageDeLEntree(entree);
+            return (
+              <span key={entree.id} className="journal__tuile" role="img" aria-label={nomDuModule(entree, forme, textes)}>
+                {image ? (
+                  <img className="journal__tuile-image" src={image} alt="" />
+                ) : (
+                  <span className="journal__tuile-icone" aria-hidden="true">
+                    <IconeDuModule module={entree.module} forme={forme} />
+                  </span>
+                )}
+              </span>
+            );
+          })}
+        </div>
+      )}
+
+      {/* L'ÉCRAN D'UNE JOURNÉE SANS RIEN, DÉPLIÉ DANS LE JOURNAL : la phrase,
+          « Ajoutez une entrée », et ses sept cases sur deux colonnes. NOS
+          ICÔNES ET UNE COULEUR UNIE (2026-09-26, « couleur unie des icones et
+          utiliser nos icones ») : `IconeDuModule` aux jetons `--ajout-*`.
+          Chaque case ouvre son formulaire À CETTE DATE. */}
+      {vide && deplie ? (
+        <div className="journal__vide">
+          <p className="journal__vide-phrase">
+            {textes.journal.aucuneEntreeLe(formaterDateLongue(journee.date, textes.calendrier.mois, langue))}
+          </p>
+          <h3 className="journal__vide-titre">{textes.journal.ajoutezUneEntree}</h3>
+          <div className="journal__vide-cases">
+            {MODULES_AJOUT_JOURNAL.map((module) => (
+              <button key={module} type="button" className="journal__vide-case" onClick={() => onAjouter(module, journee.date)}>
+                <span className="journal__icone">
+                  <IconeDuModule module={module} forme={forme} />
+                </span>
+                <span className="journal__vide-nom">
+                  {module === 'traitement' && forme ? textes.accueil.traitement[forme] : textes.accueil.modules[module]}
+                </span>
+                <span className="journal__vide-chevron" aria-hidden="true">
+                  <IconeChevronDroit />
+                </span>
+              </button>
+            ))}
+          </div>
+        </div>
+      ) : null}
+    </section>
+  );
+});

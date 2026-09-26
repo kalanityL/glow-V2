@@ -455,6 +455,15 @@ export interface Textes {
     entrees: (nombre: number) => string;
     /** Rien à montrer : le filtre ne laisse rien passer. */
     aucuneCategorie: string;
+    /** LE BOUT DE LA FENÊTRE (2026-09-26, « qd on arrive à + ou - 6 mois on a
+        dans un sens comme dans l'autre un "voir plus" qui charge les 6 mois
+        (maximum) précédents ou suivant ») : le bouton de chaque bout. Aux
+        bornes (dix ans en arrière, un an en avant), il n'y en a plus.  */
+    voirPlus: string;
+    /** Le « + » d'une journée sans rien, qui déplie son écran d'ajout, et la
+        croix qui le replie : dits à qui écoute, ils n'ont pas de mot. */
+    deplierJour: string;
+    replierJour: string;
     /** L'ÉCRAN D'UN JOUR VIDE (2026-09-26, son image et sa dictée : « texte :
         aucune entrée au xxxdatexx. Ajouter : ... ») : la phrase avec la date
         du jour regardé, puis l'invitation au-dessus des sept cases. */
@@ -879,6 +888,9 @@ const FR: Textes = {
        à zéro se tait). */
     entrees: (nombre) => (nombre === 0 ? 'Aucune entrée' : nombre === 1 ? '1 entrée' : `${nombre} entrées`),
     aucuneCategorie: 'Aucune catégorie retenue.',
+    voirPlus: 'Voir plus',
+    deplierJour: 'Ajouter une entrée ce jour-là',
+    replierJour: 'Replier',
     /* Sa tournure, telle qu'elle l'a dictée (« aucune entrée au
        xxxdatexx »), avec le point final que le projet met à ses phrases. */
     aucuneEntreeLe: (date) => `Aucune entrée au ${date}.`,

@@ -1,5 +1,6 @@
 import type { ModuleId } from '../app/modules';
 import type { InjectionLog, SleepLog, SportLog, WeightLog } from '../donnees/v1';
+import { dateDecaleeDeMois, joursDe } from './dates';
 
 /**
  * LE JOURNAL (2026-09-26, « On va faire la page journal ») : toutes les
@@ -57,38 +58,90 @@ export function entreesDuJournal(tables: TablesDuJournal): EntreeJournal[] {
 }
 
 /**
- * LES JOURNÉES DU JOURNAL, telles que la page les déroule (son template
- * « journal mode liste.png ») : on part du jour choisi et on remonte le
- * temps — les journées de la plus récente à la plus ancienne, et DANS une
- * journée les entrées dans l'ordre des heures, du matin au soir.
+ * JUSQU'OÙ LE JOURNAL VA (2026-09-26, « jusqu'à 10 ans en arriere en 1 an
+ * dans le futur par rapport à la date du jour courant ») : deux bornes
+ * absolues, comptées depuis AUJOURD'HUI et non depuis le jour regardé. Au
+ * delà, il n'y a plus rien à charger et plus rien à faire défiler.
+ */
+export const ANNEES_EN_ARRIERE = 10;
+export const MOIS_EN_AVANT = 12;
+
+export function bornesDuJournal(aujourdhui: string): { min: string; max: string } {
+  return {
+    min: dateDecaleeDeMois(aujourdhui, -12 * ANNEES_EN_ARRIERE),
+    max: dateDecaleeDeMois(aujourdhui, MOIS_EN_AVANT),
+  };
+}
+
+/** Ce qu'un « Voir plus » charge d'un coup, et ce que vaut la fenêtre à
+    l'ouverture d'un jour (2026-09-26, « accessible au scroll jusqu'à + ou -
+    6 mois », « charge les 6 mois (maximum) précédents ou suivant »). */
+export const MOIS_PAR_PAS = 6;
+
+export interface FenetreDuJournal {
+  /** Le plus ancien et le plus récent jour montrés, bornes comprises. */
+  debut: string;
+  fin: string;
+  /** Reste-t-il quelque chose à charger de ce côté ? Faux : pas de « Voir
+      plus », et le défilement s'arrête là (« Qd on arrive à ces bornes
+      (10 ans/1 an) on ne met pas de bouton "voir plus" »). */
+  plusAvant: boolean;
+  plusApres: boolean;
+}
+
+/**
+ * LA FENÊTRE DE LECTURE autour du jour regardé (2026-09-26, « Chaque clique
+ * sur un jour on a accessible au scroll jusqu'à + ou - 6 mois par rapport au
+ * jour courant. qd on arrive à + ou - 6 mois on a dans un sens comme dans
+ * l'autre un "voir plus" qui charge les 6 mois (maximum) précédents ou
+ * suivant ») : `pasAvant` et `pasApres` comptent les « Voir plus » touchés
+ * de chaque côté — à l'ouverture d'un jour, zéro de part et d'autre, donc
+ * six mois de chaque côté. Les bornes absolues rognent toujours.
+ */
+export function fenetreDuJournal(
+  jour: string,
+  aujourdhui: string,
+  pasAvant: number,
+  pasApres: number,
+): FenetreDuJournal {
+  const { min, max } = bornesDuJournal(aujourdhui);
+  const vouluDebut = dateDecaleeDeMois(jour, -MOIS_PAR_PAS * (1 + pasAvant));
+  const vouluFin = dateDecaleeDeMois(jour, MOIS_PAR_PAS * (1 + pasApres));
+  const debut = vouluDebut < min ? min : vouluDebut;
+  const fin = vouluFin > max ? max : vouluFin;
+  return { debut, fin, plusAvant: debut > min, plusApres: fin < max };
+}
+
+/**
+ * LES JOURNÉES DU JOURNAL, telles que la page les déroule : TOUS LES JOURS
+ * de la fenêtre, du plus récent au plus ancien — les vides compris
+ * (2026-09-26, « jour sans donnée : apparait dans le journal comme un jour
+ * avec données, simplement il n'y a rien en dessous on passe directement au
+ * jour suivant »). Dans une journée, les entrées vont du matin au soir.
  *
- * `depuis` est le jour choisi au calendrier : rien de plus récent n'est
- * montré (une entrée datée de demain attend son jour). `modules` retient
- * les catégories cochées au filtre ; vide, aucune entrée ne passe — c'est
- * le filtre qui décide de rendre toutes les cases cochées au départ.
- * Une journée sans entrée ne fait pas de titre.
+ * `modules` retient les catégories cochées au filtre ; vide, les journées
+ * restent mais aucune n'a d'entrée — c'est au filtre de cocher toutes les
+ * cases au départ.
  */
 export function joursDuJournal(
   entrees: readonly EntreeJournal[],
-  depuis: string,
+  fenetre: FenetreDuJournal,
   modules: readonly ModuleId[],
 ): JourDuJournal[] {
   const retenus = new Set(modules);
   const parJour = new Map<string, EntreeJournal[]>();
   for (const entree of entrees) {
-    if (entree.date > depuis || !retenus.has(entree.module)) continue;
+    if (entree.date < fenetre.debut || entree.date > fenetre.fin || !retenus.has(entree.module)) continue;
     const jour = parJour.get(entree.date);
     if (jour) jour.push(entree);
     else parJour.set(entree.date, [entree]);
   }
-  return [...parJour.keys()]
-    .sort((a, b) => (a < b ? 1 : -1))
-    .map((date) => ({
-      date,
-      /* À heure égale, l'ordre reste celui des tables : deux lignes du même
-         instant ne doivent pas s'échanger d'un rendu à l'autre. */
-      entrees: (parJour.get(date) ?? []).slice().sort((a, b) => (a.heure < b.heure ? -1 : a.heure > b.heure ? 1 : 0)),
-    }));
+  return joursDe(fenetre.debut, fenetre.fin).map((date) => ({
+    date,
+    /* À heure égale, l'ordre reste celui des tables : deux lignes du même
+       instant ne doivent pas s'échanger d'un rendu à l'autre. */
+    entrees: (parJour.get(date) ?? []).slice().sort((a, b) => (a.heure < b.heure ? -1 : a.heure > b.heure ? 1 : 0)),
+  }));
 }
 
 /**

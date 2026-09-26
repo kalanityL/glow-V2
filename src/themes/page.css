@@ -4234,7 +4234,10 @@
   flex-direction: column;
   align-items: center;
   gap: 4px;
-  padding-top: 6px;
+  /* Déplié DANS le journal, sous le titre de sa journée (2026-09-26) : un
+     peu d'air au-dessus et en dessous, pour qu'on voie où il commence et
+     où il finit. */
+  padding: 10px 0 14px;
 }
 
 .journal__vide-phrase {
@@ -4249,7 +4252,7 @@
   margin: 0 0 12px;
   font-family: var(--font-display);
   font-weight: 600;
-  font-size: 18px;
+  font-size: 16px;
   text-align: center;
   color: var(--encre);
 }
@@ -4312,6 +4315,85 @@
   display: flex;
   flex-direction: column;
   gap: 8px;
+}
+
+/* UNE JOURNÉE SANS RIEN : son titre seul, et on passe au jour suivant
+   (2026-09-26, « jour sans donnée : apparait dans le journal comme un jour
+   avec données, simplement il n'y a rien en dessous »). Elle se resserre
+   pour que dérouler des mois vides reste lisible, et son titre s'efface
+   d'un ton : il n'y a rien à y lire. */
+.journal__journee--vide {
+  gap: 0;
+}
+
+.journal__journee--vide .journal__titre-mot {
+  font-size: 15px;
+  font-weight: 500;
+  color: var(--encre-chapeau);
+}
+
+/* LA JOURNÉE CHOISIE AU CALENDRIER, marquée d'un filet à l'accent : dans une
+   liste d'un an, il faut pouvoir la retrouver d'un coup d'œil. */
+.journal__journee--choisie .journal__titre-mot {
+  color: var(--encre);
+  font-weight: 600;
+}
+
+.journal__journee--choisie {
+  border-left: 2px solid var(--accent);
+  margin-left: -8px;
+  padding-left: 6px;
+}
+
+/* LE « + » D'UNE JOURNÉE SANS RIEN (2026-09-26, « Un petit bouton + sur un
+   jour sans donnée pour voir, sous le jour en uestion, l'écran "journée sans
+   donnée" insérée à l'intérieur du journal ») : petit, discret, à la matière
+   des boutons de choix ; déplié, il devient une croix par un quart de tour. */
+.journal__deplier {
+  display: grid;
+  place-items: center;
+  width: 22px;
+  height: 22px;
+  padding: 0;
+  border: 1px solid color-mix(in srgb, var(--option-filet) 55%, var(--option-fond));
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--option-filet) 22%, var(--option-fond));
+  color: var(--encre-chapeau);
+  cursor: pointer;
+}
+
+.journal__deplier .icone {
+  width: 13px;
+  height: 13px;
+  /* La rotation est nommée, jamais `all` (GUIDELINES). */
+  transition: transform 150ms;
+}
+
+.journal__deplier--deplie {
+  border-color: color-mix(in srgb, var(--accent) 18%, var(--option-choisi-fond));
+  background: var(--option-choisi-fond);
+  color: var(--encre);
+}
+
+.journal__deplier--deplie .icone {
+  transform: rotate(45deg);
+}
+
+/* LE BOUT DE LA FENÊTRE (2026-09-26, « un "voir plus" qui charge les 6 mois
+   (maximum) précédents ou suivant ») : un bouton pleine largeur, à la
+   matière des boutons de choix — il charge, il n'enregistre rien. Aux
+   bornes, il n'existe pas. */
+.journal__plus {
+  width: 100%;
+  padding: 10px 16px;
+  border: 1px solid color-mix(in srgb, var(--option-filet) 55%, var(--option-fond));
+  border-radius: 12px;
+  background: color-mix(in srgb, var(--option-filet) 22%, var(--option-fond));
+  color: var(--encre-chapeau);
+  font-family: var(--font-body);
+  font-weight: 500;
+  font-size: 14px;
+  cursor: pointer;
 }
 
 /* LE TITRE D'UNE JOURNÉE (« journal mode liste.png ») : le mot du jour à

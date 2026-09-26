@@ -66,6 +66,27 @@ export function dateDecalee(date: string, jours: number): string {
   return dateLocale(new Date(a, m - 1, j + jours));
 }
 
+/**
+ * LA MÊME DATE, DÉCALÉE DE `delta` MOIS — le quantième ramené au dernier jour
+ * du mois d'arrivée : le 31 janvier reculé d'un mois donne le 28 février, et
+ * non le 3 mars comme le ferait `Date` laissée à elle-même. Sert au
+ * calendrier du journal et à sa fenêtre de lecture.
+ */
+export function dateDecaleeDeMois(date: string, delta: number): string {
+  const [annee, mois, jour] = date.split('-').map(Number);
+  const cible = moisDecale(annee, mois, delta);
+  const dernier = new Date(cible.annee, cible.mois, 0).getDate();
+  return `${String(cible.annee).padStart(4, '0')}-${String(cible.mois).padStart(2, '0')}-${String(Math.min(jour, dernier)).padStart(2, '0')}`;
+}
+
+/** Les dates d'un intervalle, de la plus RÉCENTE à la plus ancienne — l'ordre
+    de lecture du journal. Les deux bornes comprises. */
+export function joursDe(debut: string, fin: string): string[] {
+  const dates: string[] = [];
+  for (let d = fin; d >= debut; d = dateDecalee(d, -1)) dates.push(d);
+  return dates;
+}
+
 /** LES JOURS QUI ONT UN MOT (2026-09-21 au soir, « pour les dates : hier /
     avant hier / aujourd'hui / demain / apres demain / sinon la date ») :
     l'écart en jours entre `date` et `aujourdhui` quand il vaut un mot, de

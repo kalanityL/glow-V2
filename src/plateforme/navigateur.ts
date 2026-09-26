@@ -177,6 +177,16 @@ export function centrerDansSaListe(element: Element | null): void {
   element?.scrollIntoView({ block: 'center' });
 }
 
+/**
+ * AMÈNE L'ÉLÉMENT EN HAUT DE SA ZONE DE DÉFILEMENT, sans glissement
+ * (2026-09-26, le journal : une journée choisie au calendrier doit se
+ * retrouver sous les yeux dans une liste d'un an, et un « Voir plus » doit
+ * reprendre la lecture là où elle s'était arrêtée).
+ */
+export function amenerEnHaut(element: Element | null): void {
+  element?.scrollIntoView({ block: 'start' });
+}
+
 /** Ramène une zone de défilement à son haut. */
 export function remonterEnHaut(element: Element | null): void {
   if (element) element.scrollTop = 0;

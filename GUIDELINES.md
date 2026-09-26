@@ -1094,9 +1094,36 @@ icônes, pas les siennes** (« utilise evidemment nos icones pas celles des
 templates ») : `IconeDuModule`, la même qu'à l'accueil et au tiroir du
 « + » ; et nos mots (« Balance » là où son template écrit « Poids »,
 « Menus », « Marche »). **Le jour choisi commande tout** : le calendrier le
-marque, la liste part de lui et remonte le temps, et les flèches le
-déplacent — d'une semaine en vue Semaine, d'un mois en vue Mois — si bien
-que le calendrier et la liste ne peuvent pas se contredire. Deux vues : la
+marque, LA FENÊTRE DE LECTURE S'OUVRE AUTOUR DE LUI et il est amené sous
+les yeux ; les flèches le déplacent — d'une semaine en vue Semaine, d'un
+mois en vue Mois — si bien que le calendrier et la liste ne peuvent pas se
+contredire. **LE JOURNAL SE DÉROULE SANS FIN DANS LES DEUX SENS**
+(2026-09-26, « on doit pouvoir scroller sans fin dans un sens comme dans
+l'autre peu importe ou on se trouve. jusqu'à 10 ans en arriere en 1 an
+dans le futur par rapport à la date du jour courant ») : `domaine/journal.ts`
+tient les deux bornes absolues, comptées depuis AUJOURD'HUI et non depuis
+le jour regardé (`bornesDuJournal` : dix ans en arrière, un an en avant).
+**Chaque jour choisi ouvre six mois de part et d'autre**, et **un « Voir
+plus » à chaque bout charge six mois de plus de SON côté**
+(`fenetreDuJournal`, `pasAvant`/`pasApres` — « qd on arrive à + ou - 6 mois
+on a dans un sens comme dans l'autre un "voir plus" qui charge les 6 mois
+(maximum) précédents ou suivant ») ; **aux bornes, plus de bouton et plus
+rien à faire défiler**. Après un « Voir plus », la lecture reprend sur la
+journée qui était à la limite (`amenerEnHaut`) : rien ne saute.
+**TOUTES LES JOURNÉES SONT LÀ, LES VIDES COMPRISES** (« jour sans donnée :
+apparait dans le journal comme un jour avec données, simplement il n'y a
+rien en dessous on passe directement au jour suivant ») : une journée vide
+n'a que son titre, resserré et d'un ton plus pâle. **Son « + » déplie son
+écran d'ajout SOUS ELLE, dans le journal** (« Un petit bouton + sur un jour
+sans donnée pour voir, sous le jour en uestion, l'écran "journée sans
+donnée" insérée à l'intérieur du journal ») — le « + » devient une croix
+d'un quart de tour ; **et choisir un jour sans donnée au calendrier
+l'ouvre déplié** (« Si on clique sur un jour sasns donnée, on arrive sur ce
+jour par defaut deplié »). La journée choisie porte un filet à l'accent :
+dans une liste d'un an, il faut la retrouver d'un coup d'œil. **Chaque
+journée est un composant MÉMOÏSÉ** (`JourneeDuJournal`) : la fenêtre
+déroule jusqu'à plusieurs milliers de journées, et déplier la moindre les
+re-rendrait toutes. Deux vues : la
 semaine en sept cartes, le mois en six semaines lundi en premier
 (`grilleDuMois`) ; **les jours qui portent quelque chose sont pointés**,
 filtre compris, le futur compris — alors que la liste ne montre rien de
