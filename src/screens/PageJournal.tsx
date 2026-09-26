@@ -29,7 +29,9 @@ import type { Langue } from '../i18n/langues';
 import illustrationJourneeVide from '../assets/images/modules/journee-vide.png';
 import { amenerEnHaut } from '../plateforme/navigateur';
 import {
+  bornesDuJournal,
   compteDuJour,
+  dansLesBornes,
   entreesDuJournal,
   fenetreDuJournal,
   imageDeLEntree,
@@ -199,8 +201,47 @@ export function PageJournal({
   const filtreMis = retenus.length < MODULES.length;
 
   const { annee, mois } = anneeMoisDe(jour);
-  const reculer = () => choisirJour(vue === 'semaine' ? dateDecalee(jour, -7) : dateDecaleeDeMois(jour, -1));
-  const avancer = () => choisirJour(vue === 'semaine' ? dateDecalee(jour, 7) : dateDecaleeDeMois(jour, 1));
+
+  /* SE DÉPLACER DANS LE CALENDRIER — d'une semaine en vue Semaine, d'un mois
+     en vue Mois : par les deux flèches, ou EN GLISSANT LE DOIGT (2026-09-26,
+     « on peut slider dans les dates en mode semaine et aussi en mode mois »).
+     LES BORNES S'APPLIQUENT COMME AU « VOIR PLUS » (le même jour, « Idem
+     voir plus selon les memes regles qd on arrive à une borne ») : à dix ans
+     en arrière ou un an en avant, la date est rabattue et la flèche s'éteint. */
+  const bornes = bornesDuJournal(aujourdhui);
+  const cible = (pas: number) => (vue === 'semaine' ? dateDecalee(jour, 7 * pas) : dateDecaleeDeMois(jour, pas));
+  const deplacer = (pas: number) => {
+    const voulu = cible(pas);
+    const borne = dansLesBornes(voulu, aujourdhui);
+    if (borne !== jour) choisirJour(borne);
+  };
+  const reculer = () => deplacer(-1);
+  const avancer = () => deplacer(1);
+  /* Au bout, la flèche s'éteint : la date ne bougerait plus. */
+  const peutReculer = jour > bornes.min;
+  const peutAvancer = jour < bornes.max;
+
+  /* LE GLISSEMENT : un geste horizontal sur la semaine ou sur la grille du
+     mois déplace d'un cran, dans le sens du doigt — vers la gauche pour
+     avancer, comme on tourne une page. Le seuil écarte les frôlements et
+     les gestes verticaux (la zone défile aussi). */
+  const glisse = useRef<{ x: number; y: number } | null>(null);
+  const gestes = {
+    onPointerDown: (e: React.PointerEvent) => {
+      glisse.current = { x: e.clientX, y: e.clientY };
+    },
+    onPointerUp: (e: React.PointerEvent) => {
+      const depart = glisse.current;
+      glisse.current = null;
+      if (!depart) return;
+      const dx = e.clientX - depart.x;
+      if (Math.abs(dx) < 40 || Math.abs(dx) < Math.abs(e.clientY - depart.y)) return;
+      deplacer(dx < 0 ? 1 : -1);
+    },
+    onPointerCancel: () => {
+      glisse.current = null;
+    },
+  };
 
   return (
     <div className={`page page--photo page--fond-${fond.apercu ?? fond.courant} ${classeDuTheme('blanc')}`}>
@@ -212,11 +253,11 @@ export function PageJournal({
               mois entre deux flèches, et la bascule des deux vues. */}
           <div className="journal__calendrier">
             <div className="journal__mois">
-              <button type="button" className="journal__fleche" aria-label={textes.calendrier.moisPrecedent} onClick={reculer}>
+              <button type="button" className="journal__fleche" aria-label={textes.calendrier.moisPrecedent} disabled={!peutReculer} aria-disabled={!peutReculer} onClick={reculer}>
                 <IconeChevronDroit />
               </button>
               <span className="journal__mois-nom">{`${textes.calendrier.mois[mois - 1]} ${annee}`}</span>
-              <button type="button" className="journal__fleche journal__fleche--suivant" aria-label={textes.calendrier.moisSuivant} onClick={avancer}>
+              <button type="button" className="journal__fleche journal__fleche--suivant" aria-label={textes.calendrier.moisSuivant} disabled={!peutAvancer} aria-disabled={!peutAvancer} onClick={avancer}>
                 <IconeChevronDroit />
               </button>
               <div className="journal__vues" role="radiogroup" aria-label={textes.calendrier.mois[mois - 1]}>
@@ -238,7 +279,7 @@ export function PageJournal({
             {vue === 'semaine' ? (
               /* LA SEMAINE EN SEPT CARTES (« sous-header-vue semaine.png ») :
                  le jour abrégé au-dessus, le quantième dessous. */
-              <div className="journal__semaine">
+              <div className="journal__semaine" {...gestes}>
                 {semaineDe(jour).map((date) => (
                   <button
                     key={date}
@@ -256,7 +297,7 @@ export function PageJournal({
             ) : (
               /* LE MOIS : six semaines, lundi en premier, les jours des mois
                  voisins en pâle — la grille du projet (`grilleDuMois`). */
-              <div className="journal__grille-mois">
+              <div className="journal__grille-mois" {...gestes}>
                 {textes.calendrier.jours.map((lettre, i) => (
                   <span key={i} className="journal__entete-jour" aria-hidden="true">
                     {lettre}

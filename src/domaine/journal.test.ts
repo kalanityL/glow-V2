@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { bornesDuJournal, compteDuJour, entreesDuJournal, fenetreDuJournal, imageDeLEntree, joursAvecEntree, joursDuJournal, type TablesDuJournal } from './journal';
+import { bornesDuJournal, compteDuJour, dansLesBornes, entreesDuJournal, fenetreDuJournal, imageDeLEntree, joursAvecEntree, joursDuJournal, type TablesDuJournal } from './journal';
 import type { InjectionLog, SleepLog, SportLog, WeightLog } from '../donnees/v1';
 
 const prise = (id: string, date: string, time: string): InjectionLog => ({ id, date, time, dose: 0.25, site: 'abdomen_gauche' });
@@ -33,6 +33,14 @@ describe('entreesDuJournal', () => {
 describe('bornesDuJournal', () => {
   it('va dix ans en arrière et un an en avant, depuis aujourd’hui', () => {
     expect(bornesDuJournal('2026-09-26')).toEqual({ min: '2016-09-26', max: '2027-09-26' });
+  });
+});
+
+describe('dansLesBornes', () => {
+  it('laisse passer une date de l’intervalle et rabat les autres', () => {
+    expect(dansLesBornes('2020-05-04', '2026-09-26')).toBe('2020-05-04');
+    expect(dansLesBornes('2010-01-01', '2026-09-26')).toBe('2016-09-26');
+    expect(dansLesBornes('2030-01-01', '2026-09-26')).toBe('2027-09-26');
   });
 });
 

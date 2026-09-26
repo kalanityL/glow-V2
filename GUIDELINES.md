@@ -1158,7 +1158,15 @@ journée est un composant MÉMOÏSÉ** (`JourneeDuJournal`) : la fenêtre
 déroule jusqu'à plusieurs milliers de journées, et déplier la moindre les
 re-rendrait toutes. Deux vues : la
 semaine en sept cartes, le mois en six semaines lundi en premier
-(`grilleDuMois`) ; **les jours qui portent quelque chose sont pointés**,
+(`grilleDuMois`). **ON S'Y DÉPLACE AU DOIGT COMME AUX FLÈCHES** (2026-09-26,
+« on peut slider dans les dates en mode semaine et aussi en mode mois ») :
+un geste horizontal sur la semaine ou sur la grille avance ou recule d'un
+cran — d'une semaine, d'un mois —, dans le sens du doigt, avec un seuil de
+40 px qui écarte les frôlements et les gestes verticaux (la zone défile
+aussi). **LES BORNES S'Y APPLIQUENT COMME AU « VOIR PLUS »** (« Idem voir
+plus selon les memes regles qd on arrive à une borne », `dansLesBornes`) :
+à dix ans en arrière ou un an en avant, la date est rabattue, la flèche
+s'éteint et le glissement ne fait plus rien ; **les jours qui portent quelque chose sont pointés**,
 filtre compris, le futur compris — alors que la liste ne montre rien de
 plus récent que le jour choisi. Le titre d'une journée : le mot du jour à
 gauche quand il en a un (`jourRelatif`, d'avant-hier à après-demain), la

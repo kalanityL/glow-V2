@@ -3952,6 +3952,23 @@
   transform: rotate(180deg);
 }
 
+/* À la borne, la flèche s'éteint : la date ne bougerait plus (2026-09-26,
+   « Idem voir plus selon les memes regles qd on arrive à une borne »). */
+.journal__fleche:disabled {
+  opacity: 0.35;
+  cursor: default;
+}
+
+/* LE GLISSEMENT (2026-09-26, « on peut slider dans les dates en mode semaine
+   et aussi en mode mois ») : le doigt traverse le calendrier sans que le
+   navigateur y voie une sélection de texte ou un geste de sa propre page ;
+   le défilement vertical de la page reste possible. */
+.journal__semaine,
+.journal__grille-mois {
+  touch-action: pan-y;
+  user-select: none;
+}
+
 /* SEMAINE / MOIS : deux crans dans une gouttière, celui qui est choisi plein
    à l'accent — le motif des onglets de son image. */
 .journal__vues {

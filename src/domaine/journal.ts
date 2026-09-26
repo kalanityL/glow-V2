@@ -73,6 +73,17 @@ export function bornesDuJournal(aujourdhui: string): { min: string; max: string 
   };
 }
 
+/**
+ * UNE DATE RAMENÉE DANS LES BORNES du journal : au-delà, il n'y a rien à
+ * montrer. Sert au calendrier — ses flèches et son glissement s'arrêtent là,
+ * comme le « Voir plus » (2026-09-26, « Idem voir plus selon les memes
+ * regles qd on arrive à une borne »).
+ */
+export function dansLesBornes(date: string, aujourdhui: string): string {
+  const { min, max } = bornesDuJournal(aujourdhui);
+  return date < min ? min : date > max ? max : date;
+}
+
 /** Ce qu'un « Voir plus » charge d'un coup, et ce que vaut la fenêtre à
     l'ouverture d'un jour (2026-09-26, « accessible au scroll jusqu'à + ou -
     6 mois », « charge les 6 mois (maximum) précédents ou suivant »). */
