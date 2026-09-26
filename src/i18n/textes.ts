@@ -464,11 +464,12 @@ export interface Textes {
         croix qui le replie : dits à qui écoute, ils n'ont pas de mot. */
     deplierJour: string;
     replierJour: string;
-    /** L'ÉCRAN D'UN JOUR VIDE (2026-09-26, son image et sa dictée : « texte :
-        aucune entrée au xxxdatexx. Ajouter : ... ») : la phrase avec la date
-        du jour regardé, puis l'invitation au-dessus des sept cases. */
-    aucuneEntreeLe: (date: string) => string;
-    ajoutezUneEntree: string;
+    /** L'ÉCRAN D'UN JOUR VIDE (2026-09-26) : la phrase à côté du calendrier,
+        puis l'invitation au-dessus des sept cases — C'EST ELLE QUI PORTE LA
+        DATE depuis « Aucune entrée au 3 septembre 2026.->Aucune entrée pour
+        ce jour. / Ajouter :->Ajouter au 3 septembre 2026 : ». */
+    aucuneEntree: string;
+    ajoutezUneEntree: (date: string) => string;
     /** LES LIBELLÉS DES SEPT CASES, PROPRES À CET ÉCRAN (2026-09-26,
         « changement des titres ici, pas les titres des catégories mais des
         labels au étiquettes , uniquement pour ici : une Injection / un
@@ -901,12 +902,13 @@ const FR: Textes = {
     voirPlus: 'Voir plus',
     deplierJour: 'Ajouter une entrée ce jour-là',
     replierJour: 'Replier',
-    /* Sa tournure, telle qu'elle l'a dictée (« aucune entrée au
-       xxxdatexx »), avec le point final que le projet met à ses phrases. */
-    aucuneEntreeLe: (date) => `Aucune entrée au ${date}.`,
-    /* « ajouter avec ":" » (2026-09-26), puis « Ajoutez une entrée :->Ajouter : »
-       le même jour — « Ajoutez une entrée : » a vécu une demi-heure. */
-    ajoutezUneEntree: 'Ajouter :',
+    /* « Aucune entrée au 3 septembre 2026.->Aucune entrée pour ce jour. »
+       (2026-09-26) : la date est passée à la ligne du dessous. */
+    aucuneEntree: 'Aucune entrée pour ce jour.',
+    /* « ajouter avec ":" », puis « Ajoutez une entrée :->Ajouter : », puis
+       « Ajouter :->Ajouter au 3 septembre 2026 : » (2026-09-26) : c'est
+       cette ligne qui porte la date, désormais. */
+    ajoutezUneEntree: (date) => `Ajouter au ${date} :`,
     /* Ses mots, tels qu'elle les a dictés — l'article et les capitales
        compris (« un Effets Secondaires » est sa graphie). */
     ajouts: {

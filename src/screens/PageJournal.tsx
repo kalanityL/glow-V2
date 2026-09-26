@@ -4,7 +4,7 @@ import { EntetePage } from './EntetePage';
 import type { FondProps } from './Accueil';
 import { TiroirFiltre } from './TiroirFiltre';
 import { IconeDuModule } from './iconesModules';
-import { IconeChevronDroit, IconeCoche, IconeFiltrer, IconeGrille, IconeListe, IconePlus } from '../components/Icones';
+import { IconeAujourdhui, IconeChevronDroit, IconeCoche, IconeFiltrer, IconeGrille, IconeListe, IconePlus } from '../components/Icones';
 import { IndiceDefilement } from '../components/IndiceDefilement';
 import { detecterLangue, useTextes } from '../i18n/useTextes';
 import { classeDuTheme } from '../themes/themes';
@@ -30,7 +30,6 @@ import illustrationJourneeVide from '../assets/images/modules/journee-vide.png';
 import { amenerEnHaut } from '../plateforme/navigateur';
 import {
   bornesDuJournal,
-  compteDuJour,
   dansLesBornes,
   entreesDuJournal,
   fenetreDuJournal,
@@ -151,7 +150,6 @@ export function PageJournal({
   const fenetre = useMemo(() => fenetreDuJournal(jour, aujourdhui), [jour, aujourdhui]);
   const jours = useMemo(() => joursDuJournal(entrees, fenetre, retenus), [entrees, fenetre, retenus]);
   const pointes = useMemo(() => joursAvecEntree(entrees, retenus), [entrees, retenus]);
-  const compte = compteDuJour(entrees, jour, retenus);
 
   /* CE QU'IL FAUT AMENER SOUS LES YEUX après le prochain rendu : la journée
      choisie au calendrier, ou — après un « Voir plus » — la journée qui
@@ -224,10 +222,29 @@ export function PageJournal({
   /* LE GLISSEMENT : un geste horizontal sur la semaine ou sur la grille du
      mois déplace d'un cran, dans le sens du doigt — vers la gauche pour
      avancer, comme on tourne une page. Le seuil écarte les frôlements et
-     les gestes verticaux (la zone défile aussi). */
+     les gestes verticaux (la zone défile aussi).
+
+     DEUX GESTES, PAS UN (2026-09-26, « le glissement dans les semaines ou
+     mois ne fonctionne pas sur localhost ») : au DOIGT, sur le téléphone,
+     c'est un appui qu'on traîne (les événements de pointeur) ; AU TRACKPAD,
+     sur l'ordinateur où elle regarde, « slider » c'est deux doigts qui
+     poussent — le navigateur n'en fait pas un appui, mais un défilement
+     horizontal (`wheel`, `deltaX`). Le premier seul ne marchait pas chez
+     elle. */
   const glisse = useRef<{ x: number; y: number } | null>(null);
+  /* Un glissement vient d'avoir lieu : le clic qui suit le relâchement ne
+     doit pas, EN PLUS, choisir le jour sous le doigt. */
+  const aGlisse = useRef(false);
+  /* Le défilement horizontal arrive en rafale : on cumule, et on se bloque
+     un court instant après chaque cran — sans quoi un seul geste passerait
+     dix mois. `dernier` date le dernier événement reçu (deux rafales
+     séparées ne s'additionnent pas) ; il se met à jour À CHAQUE ÉVÉNEMENT,
+     sans quoi le cumul repart de zéro à chaque fois et n'atteint jamais le
+     seuil — c'est ce qui rendait le geste sans effet. */
+  const roue = useRef({ cumul: 0, dernier: 0, bloqueJusqua: 0 });
   const gestes = {
     onPointerDown: (e: React.PointerEvent) => {
+      aGlisse.current = false;
       glisse.current = { x: e.clientX, y: e.clientY };
     },
     onPointerUp: (e: React.PointerEvent) => {
@@ -236,10 +253,31 @@ export function PageJournal({
       if (!depart) return;
       const dx = e.clientX - depart.x;
       if (Math.abs(dx) < 40 || Math.abs(dx) < Math.abs(e.clientY - depart.y)) return;
+      aGlisse.current = true;
       deplacer(dx < 0 ? 1 : -1);
     },
     onPointerCancel: () => {
       glisse.current = null;
+    },
+    /* Le clic qui suit un glissement est avalé : on a tourné la page, on n'a
+       pas choisi le jour qui se trouvait sous le doigt. */
+    onClickCapture: (e: React.MouseEvent) => {
+      if (!aGlisse.current) return;
+      aGlisse.current = false;
+      e.preventDefault();
+      e.stopPropagation();
+    },
+    onWheel: (e: React.WheelEvent) => {
+      if (Math.abs(e.deltaX) <= Math.abs(e.deltaY)) return;
+      const maintenant = Date.now();
+      if (maintenant < roue.current.bloqueJusqua) return;
+      if (maintenant - roue.current.dernier > 300) roue.current.cumul = 0;
+      roue.current.cumul += e.deltaX;
+      roue.current.dernier = maintenant;
+      if (Math.abs(roue.current.cumul) < 60) return;
+      const sens = roue.current.cumul > 0 ? 1 : -1;
+      roue.current = { cumul: 0, dernier: maintenant, bloqueJusqua: maintenant + 350 };
+      deplacer(sens);
     },
   };
 
@@ -259,6 +297,20 @@ export function PageJournal({
               <span className="journal__mois-nom">{`${textes.calendrier.mois[mois - 1]} ${annee}`}</span>
               <button type="button" className="journal__fleche journal__fleche--suivant" aria-label={textes.calendrier.moisSuivant} disabled={!peutAvancer} aria-disabled={!peutAvancer} onClick={avancer}>
                 <IconeChevronDroit />
+              </button>
+              {/* AUJOURD'HUI, À GAUCHE DE SEMAINE / MOIS (2026-09-26, son
+                  image `aujourdhui.png`) : le quantième du jour courant,
+                  SUR DEUX CHIFFRES (« si on est le 2 février, tu mettras
+                  02 »). Touchée, elle ramène à aujourd'hui — elle ne le dit
+                  pas, mais une icône qui représente aujourd'hui et ne ferait
+                  rien serait un dessin de plus. */}
+              <button
+                type="button"
+                className="journal__aujourdhui"
+                aria-label={textes.joursRelatifs.aujourdhui}
+                onClick={() => choisirJour(aujourdhui)}
+              >
+                <IconeAujourdhui quantieme={aujourdhui.slice(8)} />
               </button>
               <div className="journal__vues" role="radiogroup" aria-label={textes.calendrier.mois[mois - 1]}>
                 {(['semaine', 'mois'] as const).map((laquelle) => (
@@ -323,9 +375,13 @@ export function PageJournal({
               le jour choisi porte, le filtre, et les deux façons de lire.
               Il vaut pour toute la page — changer de mode sur une seule
               journée n'aurait pas de sens —, d'où sa place ici et non dans
-              le titre de chaque journée. */}
+              le titre de chaque journée.
+
+              LE COMPTE N'Y EST PLUS (2026-09-26, « supprime le nombre
+              d'entrées qui est actuellement sur la ligne du filtre ») :
+              chaque journée porte le sien entre parenthèses, au bout de son
+              titre. */}
           <div className="journal__barre">
-            <span className="journal__compte">{textes.journal.entrees(compte)}</span>
             {/* L'INDICATEUR (2026-09-26, « ajouter un indicateur sur le
                 bouton pour filtrer qui indique si un filtre es tmis ou
                 non ») : un filtre mis, le bouton prend la matière des
@@ -539,12 +595,18 @@ const JourneeDuJournal = memo(function JourneeDuJournal({
       className={`journal__journee${choisi ? ' journal__journee--choisie' : ''}${vide ? ' journal__journee--vide' : ''}`}
       data-journee={journee.date}
     >
-      {/* Le titre : le mot du jour à gauche quand il en a un (« Aujourd'hui »,
-          « Hier »), la date en toutes lettres à droite — sinon la date prend
-          la gauche, et la droite se tait. Une journée vide porte son « + ». */}
+      {/* Le titre : LA DATE EN TOUTES LETTRES À GAUCHE, TOUJOURS, et le mot
+          du jour à droite quand il en a un (2026-09-26, « les jours qui ont
+          des noms (hier aujourd'hui etc..) inverse noms et jour ») — la
+          place de chacun ne dépend plus du jour qu'on regarde. Une journée
+          vide porte son « + », une journée pleine son compte. */}
       <h2 className="journal__titre-jour">
-        <span className="journal__titre-mot">{mot ? textes.joursRelatifs[mot] : enToutesLettres}</span>
-        {mot ? <span className="journal__titre-date">{enToutesLettres}</span> : null}
+        <span className="journal__titre-mot">{enToutesLettres}</span>
+        {mot ? <span className="journal__titre-date">{textes.joursRelatifs[mot]}</span> : null}
+        {/* UNE JOURNÉE VIDE PORTE SON « + » ; UNE JOURNÉE PLEINE, LE NOMBRE
+            DE SES ENTRÉES ENTRE PARENTHÈSES (2026-09-26, « les jours où il y
+            a des entrées : à la place du "+", on met entre parentheses le
+            nombre d'entrées ») — à la même place, au bout du titre. */}
         {vide ? (
           <button
             type="button"
@@ -555,7 +617,9 @@ const JourneeDuJournal = memo(function JourneeDuJournal({
           >
             <IconePlus />
           </button>
-        ) : null}
+        ) : (
+          <span className="journal__compte-jour">{`(${journee.entrees.length})`}</span>
+        )}
       </h2>
 
       {vide ? null : mode === 'liste' ? (
@@ -611,14 +675,14 @@ const JourneeDuJournal = memo(function JourneeDuJournal({
               icônes de la home : exception consignée. */}
           <div className="journal__vide-bandeau">
             <img className="journal__vide-image" src={illustrationJourneeVide} alt="" />
-            <span className="journal__vide-phrase">
-              {textes.journal.aucuneEntreeLe(formaterDateLongue(journee.date, textes.calendrier.mois, langue))}
-            </span>
+            <span className="journal__vide-phrase">{textes.journal.aucuneEntree}</span>
           </div>
           {/* « Ajoutez une entrée : » CENTRÉ SOUS LE BLOC (2026-09-26,
               « ajouter une entrée passe en centré sous le bloc calendrier
               plus phrase », « ajouter avec ":" »). */}
-          <h3 className="journal__vide-titre">{textes.journal.ajoutezUneEntree}</h3>
+          <h3 className="journal__vide-titre">
+            {textes.journal.ajoutezUneEntree(formaterDateLongue(journee.date, textes.calendrier.mois, langue))}
+          </h3>
           <div className="journal__vide-cases">
             {/* PAS DE LABEL, QUATRE PAR LIGNE (2026-09-26, « pas de label,
                 4 icones par ligne max »), MAIS LE CONTOUR ET L'ENCOCHE

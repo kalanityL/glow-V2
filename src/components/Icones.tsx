@@ -361,6 +361,45 @@ export function IconeChevronDroit() {
 }
 
 /**
+ * LE CALENDRIER D'AUJOURD'HUI, AVEC LE QUANTIÈME DEDANS (2026-09-26,
+ * « ajoute petite icone qui represente aujourd'hui à gauche de semaine/mois /
+ * modele de l'icone ../images claude/icones / aujourd'hui / tu mets dedans le
+ * chiffre du jour courant », puis « si on est le 2 février, tu mettras 02 ») :
+ * d'après son image `aujourdhui.png` — le bandeau bleu, les deux anneaux et
+ * le nombre, SANS le cadre arrondi de l'image (2026-09-26, « pas de contour
+ * autour du chiffre pour l'icone aujourd'hui agrandit le chiffre ») : à
+ * cette taille, le cadre rognait la place du quantième.
+ *
+ * DESSINÉE ET NON EMBARQUÉE, contrairement aux autres icônes en relief : le
+ * quantième change chaque jour, une image le graverait. Son relief n'est donc
+ * pas repris — la structure l'est, et ses couleurs, relevées au pixel
+ * (bandeau #86b8f8, bleu soutenu #6398f6, corps #f5f9fe), sont peintes par la
+ * feuille en jetons du thème.
+ *
+ * SUR DEUX CHIFFRES TOUJOURS (« si on est le 2 février, tu mettras 02 ») :
+ * c'est l'appelant qui l'écrit ainsi.
+ */
+export function IconeAujourdhui({ quantieme }: { quantieme: string }) {
+  return (
+    <svg className="icone-aujourdhui" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+      {/* Les deux anneaux, derrière le corps. */}
+      <rect className="icone-aujourdhui__anneau" x="7" y="1" width="2.6" height="5" rx="1.3" />
+      <rect className="icone-aujourdhui__anneau" x="14.4" y="1" width="2.6" height="5" rx="1.3" />
+      {/* Le corps, et son bandeau. */}
+      <path className="icone-aujourdhui__bandeau" d="M3 7a3 3 0 0 1 3-3h12a3 3 0 0 1 3 3v2.5H3Z" />
+      <path className="icone-aujourdhui__corps" d="M3 9.5h18V19a3 3 0 0 1-3 3H6a3 3 0 0 1-3-3Z" />
+      {/* Le quantième, SANS CADRE AUTOUR (2026-09-26, « pas de contour autour
+          du chiffre pour l'icone aujourd'hui agrandit le chiffre ») : le
+          cadre arrondi de son image a vécu une demi-heure, il rognait la
+          place du nombre. */}
+      <text className="icone-aujourdhui__nombre" x="12" y="16.4" textAnchor="middle" dominantBaseline="middle">
+        {quantieme}
+      </text>
+    </svg>
+  );
+}
+
+/**
  * Lucide `sliders-horizontal` — « Filtrer », au journal (2026-09-26) : les
  * trois curseurs de son template `écran-filtre.png`, dans notre trait.
  */

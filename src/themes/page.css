@@ -3912,14 +3912,18 @@
 .journal__mois {
   display: flex;
   align-items: center;
-  gap: 4px;
+  gap: 2px;
+  min-width: 0;
 }
 
 .journal__mois-nom {
   margin-right: auto;
   font-family: var(--font-display);
   font-weight: 600;
-  font-size: 16px;
+  font-size: 15px;
+  /* SUR UNE SEULE LIGNE (2026-09-26) : l'icône d'aujourd'hui a resserré la
+     rangée, et « Septembre 2026 » se coupait en deux. */
+  white-space: nowrap;
   color: var(--encre);
   /* Le mois porte sa capitale comme dans le calendrier d'un choix de date
      (`.calendrier__mois`) : les noms du dictionnaire sont en minuscules,
@@ -3931,8 +3935,8 @@
 .journal__fleche {
   display: grid;
   place-items: center;
-  width: 28px;
-  height: 28px;
+  width: 24px;
+  height: 24px;
   padding: 0;
   border: 0;
   border-radius: 999px;
@@ -3980,7 +3984,7 @@
 }
 
 .journal__vue {
-  padding: 5px 12px;
+  padding: 5px 10px;
   border: 0;
   border-radius: 999px;
   background: none;
@@ -4126,6 +4130,10 @@
   flex: none;
   display: flex;
   align-items: center;
+  /* TOUT À DROITE (2026-09-26, « laisse l'alignement à droite pour la ligne
+     filtre ») : le compte qui poussait le reste au bout est parti, la rangée
+     garde sa place. */
+  justify-content: flex-end;
   gap: 8px;
   padding: 10px 14px;
   border-top: 1px solid color-mix(in srgb, var(--option-filet) 45%, var(--option-fond));
@@ -4369,6 +4377,67 @@
   border-left: 2px solid var(--accent);
   margin-left: -8px;
   padding-left: 6px;
+}
+
+/* LE NOMBRE D'ENTRÉES D'UNE JOURNÉE PLEINE (2026-09-26, « les jours où il y
+   a des entrées : à la place du "+", on met entre parentheses le nombre
+   d'entrées ») : au bout du titre, là où une journée vide porte son « + ».
+   Chiffres tabulaires : la colonne ne saute pas d'une journée à l'autre. */
+.journal__compte-jour {
+  font-family: var(--font-body);
+  font-weight: 400;
+  font-size: 13px;
+  font-variant-numeric: tabular-nums;
+  color: var(--encre-chapeau);
+}
+
+/* L'ICÔNE D'AUJOURD'HUI (2026-09-26, son image `aujourdhui.png`) : le
+   bandeau, les anneaux, le corps et le cadre du quantième. SES COULEURS
+   RELEVÉES AU PIXEL — bandeau #86b8f8, bleu soutenu #6398f6, corps #f5f9fe
+   — sont rendues en jetons du thème : c'est un dessin de l'application, pas
+   une image embarquée, et il doit suivre les quatre thèmes. */
+.journal__aujourdhui {
+  display: grid;
+  place-items: center;
+  width: 26px;
+  height: 26px;
+  margin-right: 1px;
+  padding: 0;
+  border: 0;
+  border-radius: 999px;
+  background: none;
+  cursor: pointer;
+}
+
+.icone-aujourdhui {
+  width: 22px;
+  height: 22px;
+}
+
+.icone-aujourdhui__anneau {
+  fill: var(--ajout-pastille-fond);
+  stroke: var(--accent);
+  stroke-width: 1;
+}
+
+.icone-aujourdhui__bandeau {
+  fill: color-mix(in srgb, var(--accent) 55%, var(--option-fond));
+}
+
+.icone-aujourdhui__corps {
+  fill: var(--option-fond);
+  stroke: color-mix(in srgb, var(--accent) 55%, var(--option-fond));
+  stroke-width: 0.8;
+}
+
+.icone-aujourdhui__nombre {
+  fill: var(--accent);
+  font-family: var(--font-display);
+  font-weight: 700;
+  /* Sans cadre, le nombre prend toute la place du corps (2026-09-26,
+     « agrandit le chiffre »). */
+  font-size: 10.5px;
+  font-variant-numeric: tabular-nums;
 }
 
 /* LE « + » D'UNE JOURNÉE SANS RIEN (2026-09-26, « Un petit bouton + sur un

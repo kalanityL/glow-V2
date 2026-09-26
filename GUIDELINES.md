@@ -1129,9 +1129,11 @@ entrée, ajouter l'icone ../images pour claude/ template/icone/calendrier
 nuage de cette façon (sans ajouter le + et avec nos textes deja
 presents) ») : son calendrier sur des nuages, détouré et embarqué
 (`journee-vide.png`, le même script que les icônes de la home, à tolérance
-serrée), À GAUCHE, et la phrase « Aucune entrée au JJ mois AAAA. » À CÔTÉ
-DE LUI (« Aucune entrée au 28 novembre 2025.-> à côté du calendrier ») ;
-**« Ajouter : » CENTRÉ SOUS LE BLOC** (« ajouter une entrée passe en centré
+serrée), À GAUCHE, et la phrase « Aucune entrée pour ce jour. » À CÔTÉ
+DE LUI (« Aucune entrée au 28 novembre 2025.-> à côté du calendrier », puis
+« Aucune entrée au 3 septembre 2026.->Aucune entrée pour ce jour. ») ;
+**« Ajouter au JJ mois AAAA : » CENTRÉ SOUS LE BLOC** — c'est cette ligne
+qui porte la date (« Ajouter :->Ajouter au 3 septembre 2026 : ») (« ajouter une entrée passe en centré
 sous le bloc calendrier plus phrase », « ajouter avec ":" », puis « Ajoutez
 une entrée :->Ajouter : » — « Ajoutez une entrée : » a vécu une demi-heure).
 SANS LE « + » de son image, et sans ses mots à elle : les nôtres. **Les
@@ -1158,20 +1160,37 @@ journée est un composant MÉMOÏSÉ** (`JourneeDuJournal`) : la fenêtre
 déroule jusqu'à plusieurs milliers de journées, et déplier la moindre les
 re-rendrait toutes. Deux vues : la
 semaine en sept cartes, le mois en six semaines lundi en premier
-(`grilleDuMois`). **ON S'Y DÉPLACE AU DOIGT COMME AUX FLÈCHES** (2026-09-26,
+(`grilleDuMois`). **UNE ICÔNE « AUJOURD'HUI » À GAUCHE DE SEMAINE / MOIS** (2026-09-26,
+« ajoute petite icone qui represente aujourd'hui à gauche de semaine/mois /
+modele de l'icone ../images claude/icones / aujourd'hui / tu mets dedans le
+chiffre du jour courant », « si on est le 2 février, tu mettras 02 ») :
+d'après son image `aujourdhui.png`, mais DESSINÉE et non embarquée — le
+quantième change chaque jour, une image le graverait ; ses couleurs
+relevées au pixel sont rendues en jetons du thème. **Sans cadre autour du
+chiffre, et le chiffre en grand** (« pas de contour autour du chiffre pour
+l'icone aujourd'hui agrandit le chiffre ») : le cadre de son image rognait
+la place. Touchée, elle ramène à aujourd'hui.
+**ON S'Y DÉPLACE AU DOIGT COMME AUX FLÈCHES** (2026-09-26,
 « on peut slider dans les dates en mode semaine et aussi en mode mois ») :
 un geste horizontal sur la semaine ou sur la grille avance ou recule d'un
-cran — d'une semaine, d'un mois —, dans le sens du doigt, avec un seuil de
+cran — **AU DOIGT (appui traîné) ET AU TRACKPAD (défilement horizontal)**
+(le même jour, « le glissement dans les semaines ou mois ne fonctionne pas
+sur localhost ») : sur l'ordinateur, « slider » n'est pas un appui mais un
+`wheel` ; les deux gestes mènent au même verbe, et le clic qui suit un
+glissement est avalé pour ne pas choisir, en plus, le jour sous le doigt — d'une semaine, d'un mois —, dans le sens du doigt, avec un seuil de
 40 px qui écarte les frôlements et les gestes verticaux (la zone défile
 aussi). **LES BORNES S'Y APPLIQUENT COMME AU « VOIR PLUS »** (« Idem voir
 plus selon les memes regles qd on arrive à une borne », `dansLesBornes`) :
 à dix ans en arrière ou un an en avant, la date est rabattue, la flèche
 s'éteint et le glissement ne fait plus rien ; **les jours qui portent quelque chose sont pointés**,
 filtre compris, le futur compris — alors que la liste ne montre rien de
-plus récent que le jour choisi. Le titre d'une journée : le mot du jour à
-gauche quand il en a un (`jourRelatif`, d'avant-hier à après-demain), la
-date en toutes lettres à droite (`formaterJourEtDate`, sans l'année) ;
-sans mot, la date prend la gauche et la droite se tait. **Le bandeau de
+plus récent que le jour choisi. Le titre d'une journée : LA DATE EN TOUTES LETTRES À GAUCHE, TOUJOURS
+(`formaterJourEtDate`, sans l'année), le mot du jour à droite quand il en a
+un (`jourRelatif`, d'avant-hier à après-demain) — 2026-09-26, « les jours
+qui ont des noms (hier aujourd'hui etc..) inverse noms et jour » ; et AU
+BOUT, le nombre d'entrées entre parenthèses pour une journée pleine (« les
+jours où il y a des entrées : à la place du "+", on met entre parentheses
+le nombre d'entrées »), son « + » pour une journée vide. **Le bandeau de
 mode est GLOBAL** — le compte du jour choisi, « Filtrer », liste ou grille
 — et non dans le titre de chaque journée : ses deux images se contredisent
 sur ce point, et changer de mode sur une seule journée n'aurait pas de
