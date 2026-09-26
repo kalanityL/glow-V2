@@ -4484,3 +4484,15 @@
 .filtre__case--retenue .filtre__nom {
   color: var(--encre);
 }
+
+/* LA RANGÉE DU PIED (2026-09-26, « filtrer : gros bouton annuler / fermer en
+   bas ») : deux boutons pleine largeur, à parts égales — colonnes égales, un
+   bouton plus large aurait l'air d'être la bonne réponse. Sous le filet que
+   montre son image, séparé des cases. */
+.filtre__pied {
+  display: flex;
+  gap: 10px;
+  margin-top: 14px;
+  padding-top: 14px;
+  border-top: 1px solid color-mix(in srgb, var(--option-filet) 45%, var(--option-fond));
+}

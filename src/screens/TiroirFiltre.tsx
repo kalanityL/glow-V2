@@ -1,3 +1,4 @@
+import { useRef } from 'react';
 import { Tiroir } from '../components/Tiroir';
 import { useTextes } from '../i18n/useTextes';
 import { MODULES, type ModuleId } from '../app/modules';
@@ -21,6 +22,13 @@ import { IconeCoche } from '../components/Icones';
  *
  * Le filtre agit tout de suite : il n'y a rien à valider. « Réinitialiser »
  * recoche tout — c'est l'état de départ.
+ *
+ * LA RANGÉE DU PIED (2026-09-26, « filtrer : gros bouton annuler / fermer en
+ * bas ») : deux boutons pleine largeur, sous le filet que montre son image.
+ * Comme le filtre agit à chaque clic, « Annuler » a un vrai travail : il REND
+ * LE FILTRE TEL QU'IL ÉTAIT À L'OUVERTURE du tiroir — ce que « Réinitialiser »
+ * ne fait pas, lui qui recoche TOUT — puis ferme. « Fermer », à l'accent,
+ * garde le filtre qu'on vient de poser.
  */
 export function TiroirFiltre({
   onFermer,
@@ -31,6 +39,7 @@ export function TiroirFiltre({
   retenus,
   onBasculer,
   onReinitialiser,
+  onRetablir,
 }: {
   onFermer: () => void;
   onFermee: () => void;
@@ -42,9 +51,14 @@ export function TiroirFiltre({
   retenus: readonly ModuleId[];
   onBasculer: (module: ModuleId) => void;
   onReinitialiser: () => void;
+  /** « Annuler » : remet les catégories qu'on avait en ouvrant. */
+  onRetablir: (retenus: readonly ModuleId[]) => void;
 }) {
   const textes = useTextes();
   const tousRetenus = retenus.length === MODULES.length;
+  /* Le filtre tel qu'il était à l'ouverture, retenu une fois pour toutes :
+     c'est ce que « Annuler » rend. */
+  const aLOuverture = useRef(retenus);
 
   return (
     <Tiroir nom={textes.journal.filtrer} onFermer={onFermer} onFermee={onFermee} enFermeture={enFermeture} bouton={bouton}>
@@ -85,6 +99,21 @@ export function TiroirFiltre({
             </button>
           );
         })}
+      </div>
+      <div className="filtre__pied">
+        <button
+          type="button"
+          className="bouton bouton--second"
+          onClick={() => {
+            onRetablir(aLOuverture.current);
+            onFermer();
+          }}
+        >
+          {textes.journal.annuler}
+        </button>
+        <button type="button" className="bouton" onClick={onFermer}>
+          {textes.fermer}
+        </button>
       </div>
     </Tiroir>
   );

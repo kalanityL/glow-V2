@@ -441,6 +441,10 @@ export interface Textes {
         filtre. */
     filtreMis: (retenues: number, total: number) => string;
     filtreAucun: string;
+    /** LA RANGÉE DU PIED DU TIROIR (2026-09-26, « filtrer : gros bouton
+        annuler / fermer en bas ») : « Annuler » rend le filtre tel qu'il
+        était en ouvrant ; « Fermer » garde celui qu'on vient de poser. */
+    annuler: string;
     reinitialiser: string;
     categories: string;
     /** LES DEUX MODES (« switch mode-grille-ligne.png ») : les boutons n'ont
@@ -864,6 +868,7 @@ const FR: Textes = {
     filtrer: 'Filtrer',
     filtreMis: (retenues, total) => `Filtrer — ${retenues} catégories sur ${total}`,
     filtreAucun: 'Filtrer — toutes les catégories',
+    annuler: 'Annuler',
     reinitialiser: 'Réinitialiser',
     categories: 'Catégories',
     modes: { liste: 'Voir en liste', grille: 'Voir en grille' },

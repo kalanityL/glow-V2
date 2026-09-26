@@ -1101,7 +1101,18 @@ l'icône partout. **Le filtre est un tiroir** (`TiroirFiltre`, d'après
 `écran-filtre.png`), les huit modules en tuiles cochables quatre par
 rangée, toutes cochées au départ, agissant tout de suite ; « Filtrer » se
 marque quand une catégorie est écartée ; « Réinitialiser » est un lien à
-l'encre souligné, éteint quand tout est coché. **PAS DE RECHERCHE**
+l'encre souligné, éteint quand tout est coché. **Le bouton « Filtrer » dit
+si un filtre est mis** (2026-09-26, « ajouter un indicateur sur le bouton
+pour filtrer qui indique si un filtre es tmis ou non ») : une pastille à
+l'accent portant LE NOMBRE DE CATÉGORIES RETENUES — « je vois six
+catégories », ce qu'on a sous les yeux, et non le compte des écartées ;
+aucun filtre, pas de pastille, l'absence est la réponse. **Et le tiroir a
+une rangée en pied** (2026-09-26, « filtrer : gros bouton annuler / fermer
+en bas ») : deux boutons pleine largeur sous le filet de son image —
+« Annuler », qui REND LE FILTRE TEL QU'IL ÉTAIT À L'OUVERTURE du tiroir
+(ce que « Réinitialiser » ne fait pas, lui qui recoche tout) puis ferme, et
+« Fermer » à l'accent, qui garde le filtre qu'on vient de poser. Lecture
+prise du « / » : deux boutons, comme ses autres paires dictées au slash. **PAS DE RECHERCHE**
 (2026-09-26, « pour l'instant ne fait pas la fonctionnalité recherche du
 journal ») : la loupe de son template n'est pas reprise. **« Voir dans le
 journal » des confirmations ouvre le journal À LA DATE DE L'ITEM**

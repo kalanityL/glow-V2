@@ -345,6 +345,7 @@ export function PageJournal({
             setRetenus((liste) => (liste.includes(module) ? liste.filter((m) => m !== module) : MODULES.filter((m) => m === module || liste.includes(m))))
           }
           onReinitialiser={() => setRetenus(MODULES)}
+          onRetablir={setRetenus}
         />
       ) : null}
 
